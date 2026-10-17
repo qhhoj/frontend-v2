@@ -1312,7 +1312,10 @@
     "scrollHint": "Vuốt ngang để xem các bài →",
     "tied": "đồng hạng",
     "tiedAt": "Đồng hạng {rank}",
-    "moreTied": "+{count} nữa"
+    "moreTied": "+{count} nữa",
+    "virtual": "ảo",
+    "virtualLegend": "Hàng có chip “ảo” là lượt thi ảo; hàng không có chip là kết quả thật.",
+    "myRow": "Về hàng của tôi · #{rank}"
   },
   "formats": {
     "default": "Tính điểm",
@@ -2392,8 +2395,7 @@
     "table": {
       "caption": "Bảng xếp hạng phát lại",
       "ghost": "Ghost",
-      "unranked": "Không đủ dữ liệu",
-      "virtual": "(ảo)"
+      "unranked": "Không đủ dữ liệu"
     },
     "overlay": {
       "label": "So sánh lượt ảo với bảng thật",
@@ -2401,7 +2403,8 @@
       "summary": "Bạn xếp thứ {rank} · bảng thật xếp thứ {realRank}",
       "noRow": "Chưa thấy hàng của bạn trên bảng ảo.",
       "realBoard": "Bảng thật · {time}",
-      "yourBoard": "Lượt ảo của bạn · {time}"
+      "yourBoard": "Lượt ảo của bạn · {time}",
+      "youReal": "Bạn (thật)"
     }
   },
   "contestTags": {

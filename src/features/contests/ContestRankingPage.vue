@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { Search } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { LocateFixed, Search } from 'lucide-vue-next';
+import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import EmptyState from '@/components/EmptyState.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import Notice from '@/components/ui/Notice.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
@@ -33,7 +34,6 @@ const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
 const key = computed(() => String(route.params.key));
-const withVirtual = computed(() => route.query.virtual === '1');
 const {
   data: contest,
   isPending: contestPending,
@@ -49,9 +49,12 @@ const { data: current } = useCurrentParticipationQuery(needsCurrent);
 const virtualRun = computed(() =>
   contest.value?.phase === 'ended' ? virtualRunOf(current.value, key.value, now.value) : null,
 );
+/** A live virtual run opens the board with its virtual row (P-19); `?virtual=0` keeps the official board. */
+const withVirtual = computed(() => {
+  const asked = route.query.virtual;
+  return asked === '1' || (asked !== '0' && virtualRun.value !== null);
+});
 const isComparing = computed(() => route.query.compare === '1' && virtualRun.value !== null);
-const setComparing = (value: boolean) =>
-  void router.replace({ query: { ...route.query, compare: value ? '1' : undefined } });
 /** Also true once a contest that was still upcoming when loaded has started, so polling begins without a reload. */
 const running = computed(
   () =>
@@ -65,7 +68,12 @@ const {
   isRefetchError: rankingRefreshFailed,
   isPlaceholderData: rankingStale,
   refetch: refetchRanking,
-} = useRankingQuery(key, withVirtual, running);
+} = useRankingQuery(
+  key,
+  withVirtual,
+  // The virtual row moves while the run lasts, so its board is re-read like a running one.
+  computed(() => running.value || (withVirtual.value && virtualRun.value !== null)),
+);
 
 const search = ref('');
 const locale = useLocaleStore();
@@ -105,13 +113,46 @@ const summary = computed(() =>
       )
     : '',
 );
-const setVirtual = (value: boolean) =>
-  void router.replace({ query: { ...route.query, virtual: value ? '1' : undefined } });
+type ViewMode = 'official' | 'virtual' | 'compare';
 const viewModes = computed(() => [
-  { value: 'official', label: t('ranking.official') },
-  { value: 'virtual', label: t('ranking.withVirtual') },
+  { value: 'official' as const, label: t('ranking.official') },
+  { value: 'virtual' as const, label: t('ranking.withVirtual') },
+  ...(virtualRun.value ? [{ value: 'compare' as const, label: t('replay.overlay.toggle') }] : []),
 ]);
-const viewMode = computed(() => (withVirtual.value ? 'virtual' : 'official'));
+const viewMode = computed<ViewMode>(() => {
+  if (isComparing.value) return 'compare';
+  return withVirtual.value ? 'virtual' : 'official';
+});
+/** The official board is written out (`virtual=0`) only while a virtual run would otherwise open the virtual one. */
+const setViewMode = (mode: ViewMode) => {
+  const official = virtualRun.value ? '0' : undefined;
+  void router.replace({
+    query: {
+      ...route.query,
+      virtual: mode === 'official' ? official : '1',
+      compare: mode === 'compare' ? '1' : undefined,
+    },
+  });
+};
+/** The viewer's row on this board: the running virtual run's while it lasts, else the live one. */
+const myRow = computed(() => {
+  const viewerId = session.user?.id;
+  const own = (ranking.value?.rows ?? []).filter((row) => row.user.id === viewerId);
+  const run = virtualRun.value;
+  const virtualRow = run && own.find((row) => row.participationId === run.id);
+  return virtualRow || own.find((row) => row.virtual === 0) || own[0] || null;
+});
+const table = ref<{ focusRow(participationId: string): boolean } | null>(null);
+/** A search that hides the row is cleared first, so the jump always lands. */
+async function goToMyRow() {
+  const row = myRow.value;
+  if (!row) return;
+  if (!rows.value.includes(row)) {
+    search.value = '';
+    await nextTick();
+  }
+  table.value?.focusRow(row.participationId);
+}
 </script>
 
 <template>
@@ -160,22 +201,16 @@ const viewMode = computed(() => (withVirtual.value ? 'virtual' : 'official'));
               :options="viewModes"
               :model-value="viewMode"
               class="whitespace-nowrap"
-              @update:model-value="setVirtual($event === 'virtual')"
+              @update:model-value="setViewMode"
             />
-            <button
-              v-if="virtualRun"
-              type="button"
-              :aria-pressed="isComparing"
-              class="glass min-h-(--qh-control) rounded-pill px-4 text-sm"
-              :class="
-                isComparing
-                  ? 'bg-gradient-accent font-bold text-on-accent'
-                  : 'text-content hover:bg-surface-hover'
-              "
-              @click="setComparing(!isComparing)"
-            >
-              {{ $t('replay.overlay.toggle') }}
-            </button>
+            <AppButton v-if="myRow && !isComparing" data-testid="my-row" @click="goToMyRow">
+              <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
+              {{
+                myRow.rank === null || myRow.isDisqualified
+                  ? $t('replay.player.myRow')
+                  : $t('ranking.myRow', { rank: myRow.rank })
+              }}
+            </AppButton>
             <label
               class="glass flex h-(--qh-control) items-center gap-2 rounded-pill px-4 text-muted"
             >
@@ -251,6 +286,7 @@ const viewMode = computed(() => (withVirtual.value ? 'virtual' : 'official'));
           :class="{ 'opacity-60': rankingStale }"
         >
           <RankingTable
+            ref="table"
             :ranking="ranking"
             :rows="rows"
             :context="rankingContext"

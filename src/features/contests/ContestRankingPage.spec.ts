@@ -1,7 +1,8 @@
 import { flushPromises } from '@vue/test-utils';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   contestDetail,
+  participationSummary,
   ranking,
   rankingRow,
   RANKING_PROBLEM_IDS,
@@ -11,6 +12,9 @@ import { contestPageRoutes } from '@/test/contest-routes';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { signedInViewer } from '@/test/problem-routes';
+import { endedContest, r41Ranking, VIRTUAL_PARTICIPATION_ID } from '@/test/replay-fixtures';
+import { replayRoute } from '@/test/replay-routes';
 
 const routes = (overrides: Record<string, MockHandler> = {}): Record<string, MockHandler> => ({
   'GET /auth/me': signedOut,
@@ -238,5 +242,98 @@ describe('contest ranking', () => {
       '2',
       '3',
     ]);
+  });
+
+  describe("the viewer's row", () => {
+    const signedIn = () => routes({ ...signedInViewer() });
+    const myRowButton = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
+      wrapper.get('[data-testid="my-row"]');
+
+    it('names the live rank and focuses the row, clearing a search that hides it', async () => {
+      mockApi(signedIn());
+      const { wrapper } = await mountApp('/contests/r42/ranking');
+      expect(myRowButton(wrapper).text()).toBe('Về hàng của tôi · #4');
+      await wrapper.get('input[type="search"]').setValue('user_07');
+      await myRowButton(wrapper).trigger('click');
+      await flushPromises();
+      expect((wrapper.get('input[type="search"]').element as HTMLInputElement).value).toBe('');
+      expect(document.activeElement?.closest('tr')?.dataset.rowId).toBe('part-01');
+    });
+
+    it('is not offered to a signed-out viewer', async () => {
+      mockApi(routes());
+      const { wrapper } = await mountApp('/contests/r42/ranking');
+      expect(wrapper.find('[data-testid="my-row"]').exists()).toBe(false);
+    });
+  });
+
+  describe('during a virtual run of an ended contest', () => {
+    const currentRun = ok({
+      contest: {
+        key: 'r41',
+        name: 'QHH Round #41',
+        startTime: '2026-10-01T08:00:00Z',
+        endTime: '2026-10-01T11:00:00Z',
+      },
+      participation: participationSummary({
+        id: VIRTUAL_PARTICIPATION_ID,
+        virtual: 1,
+        realStart: '2026-10-09T10:00:00Z',
+        endTime: '2026-10-09T13:00:00Z',
+      }),
+    });
+    const virtualRoutes = (run: MockHandler = currentRun) => ({
+      ...signedInViewer(),
+      ...contestPageRoutes(endedContest()),
+      ...replayRoute('r41'),
+      'GET /contests/r41/ranking': ok(r41Ranking()),
+      'GET /contests/current': run,
+    });
+    const lastVirtualFlag = (calls: Array<{ path: string; query: URLSearchParams }>) =>
+      calls
+        .filter((call) => call.path === '/contests/r41/ranking')
+        .at(-1)!
+        .query.get('virtual');
+
+    beforeEach(() => {
+      vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] });
+      vi.setSystemTime(new Date('2026-10-09T10:25:00Z'));
+    });
+
+    it('opens on the board with virtual rows, marks the virtual row and aims the jump at it', async () => {
+      const calls = mockApi(virtualRoutes());
+      const { wrapper } = await mountApp('/contests/r41/ranking');
+      expect(lastVirtualFlag(calls)).toBe('true');
+      const pressed = wrapper.findAll('[role="group"] button[aria-pressed="true"]');
+      expect(pressed.map((button) => button.text())).toEqual(['Gồm thi ảo']);
+      const virtualRow = wrapper.get(`tr[data-row-id="${VIRTUAL_PARTICIPATION_ID}"]`);
+      expect(virtualRow.text()).toContain('ảo');
+      expect(wrapper.get('[data-testid="my-row"]').text()).toBe('Về hàng của tôi · #2');
+      // The virtual row (VIRTUAL_PARTICIPATION_ID, user_01) ranks 2 on the board but takes no podium place.
+      const podium = wrapper.get('section[aria-label="Top 3"]');
+      expect(podium.findAll('a').map((link) => link.text())).toEqual(['user_07']);
+    });
+
+    it('keeps the official board when asked for it, and offers the comparison as a third mode', async () => {
+      const calls = mockApi(virtualRoutes());
+      const { wrapper, router } = await mountApp('/contests/r41/ranking?virtual=0');
+      expect(lastVirtualFlag(calls)).toBe('false');
+      const modes = wrapper.findAll('[role="group"] button');
+      expect(modes.map((button) => button.text())).toEqual([
+        'Chính thức',
+        'Gồm thi ảo',
+        'So với bảng thật',
+      ]);
+      await modes[2]!.trigger('click');
+      await flushPromises();
+      expect(router.currentRoute.value.query).toMatchObject({ virtual: '1', compare: '1' });
+      expect(wrapper.find('[data-testid="virtual-overlay"]').exists()).toBe(true);
+    });
+
+    it('opens on the official board once no virtual run is live', async () => {
+      const calls = mockApi(virtualRoutes(ok(null)));
+      await mountApp('/contests/r41/ranking');
+      expect(lastVirtualFlag(calls)).toBe('false');
+    });
   });
 });

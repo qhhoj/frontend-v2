@@ -41,5 +41,5 @@ test('a virtual contestant compares the run with the real board at the same elap
     page.locator('[data-overlay-part="summary"] [data-testid="inline-bit"]'),
   ).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Lượt ảo của bạn · 00:25:00' })).toBeVisible();
-  await expect(page.locator('tr[data-kind="virtual"]')).toContainText('(ảo)');
+  await expect(page.locator('tr[data-kind="virtual"]')).toContainText('ảo');
 });
