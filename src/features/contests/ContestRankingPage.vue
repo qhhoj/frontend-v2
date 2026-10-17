@@ -20,6 +20,7 @@ import { useSessionStore } from '@/stores/session.store';
 import ContestTabs from './ContestTabs.vue';
 import { ownSubmissionsOnly } from './own-submissions';
 import RankingSkeleton from './RankingSkeleton.vue';
+import RankingFreezeNotice from './RankingFreezeNotice.vue';
 import RankingPodium from './RankingPodium.vue';
 import RankingTable from './RankingTable.vue';
 import { useContestQuery, useCurrentParticipationQuery, useRankingQuery } from './contests.queries';
@@ -227,15 +228,7 @@ async function goToMyRow() {
             </label>
           </div>
         </div>
-        <Notice v-if="ranking?.frozen" role="status" :title="$t('ranking.frozenTitle')">
-          {{
-            $t(
-              'ranking.frozenBody',
-              { minutes: contest.frozenLastMinutes },
-              contest.frozenLastMinutes,
-            )
-          }}
-        </Notice>
+        <RankingFreezeNotice :contest="contest" :is-board-frozen="ranking?.frozen ?? false" />
       </template>
     </QueryState>
     <QueryState
