@@ -1,31 +1,17 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { countdownView } from '@/lib/contest-time';
+import { useCountdownText } from '@/lib/use-countdown-text';
 import { useNow } from '@/lib/use-now';
 
 /** `short` abbreviates days and hours (`28 ng 14 g`) where a bar has no room for the words. */
 const props = defineProps<{ until: string; short?: boolean }>();
 const emit = defineEmits<{ elapsed: [] }>();
-const { t } = useI18n();
+const countdownText = useCountdownText();
 const now = useNow();
 const remaining = computed(() =>
   Math.max(0, Math.floor((Date.parse(props.until) - now.value) / 1000)),
 );
-/** `13 ngày 21 giờ` from 48 hours left, `HH:MM:SS` below (P-18); a whole number of days drops the hours. */
-const text = computed(() => {
-  const view = countdownView(remaining.value);
-  if (view.kind === 'clock') return view.text;
-  const { days, hours } = view;
-  if (hours === 0)
-    return props.short
-      ? t('contests.span.daysShort', { days })
-      : t('contests.span.days', { count: days }, days);
-  return t(props.short ? 'contests.span.daysHoursShort' : 'contests.span.daysHours', {
-    days,
-    hours,
-  });
-});
+const text = computed(() => countdownText(remaining.value, props.short));
 watch(remaining, (seconds) => seconds === 0 && emit('elapsed'));
 </script>
 

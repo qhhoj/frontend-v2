@@ -1,57 +1,80 @@
 <script setup lang="ts">
-import { LogOut } from 'lucide-vue-next';
-import { computed } from 'vue';
-import type { ContestDetail, CurrentParticipation } from '@/api/types/contests';
-import CountdownTimer from '@/components/CountdownTimer.vue';
+import { Trophy } from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue';
+import type { ContestDetail } from '@/api/types/contests';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { formatClock } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import type { ParticipationKind } from './bar/current-contest';
 
+/**
+ * The hero's line while the viewer takes part (P-17 A): who they are here and since when, then leaving as a text link.
+ * The note that used to stand under a red button is in the confirm dialog, worded per participation (live, virtual,
+ * spectating). A virtual run also points at its board ("Gồm thi ảo") (P-19).
+ */
 const props = defineProps<{
   contest: ContestDetail;
-  current: CurrentParticipation | null | undefined;
+  kind: ParticipationKind;
+  /** When the live participation started, shown as "từ HH:MM"; null hides it. */
+  since: string | null;
   isPending: boolean;
+  /** Where focus goes once leaving succeeds: the link that opened the dialog is gone by then. */
+  returnFocusTo?: () => HTMLElement | null;
 }>();
 const emit = defineEmits<{ leave: [] }>();
 const locale = useLocaleStore();
-/** `virtual` is -1 for a spectator, 0 for the real run and n for the nth virtual run. */
-const SPECTATE = -1;
-/** The current participation is this contest's (the page is only shown with `inContest`); until it loads, the detail's live row stands in. */
-const participation = computed(() => {
-  const current = props.current;
-  if (current && current.contest.key !== props.contest.key) {
-    return props.contest.viewer.liveParticipation;
-  }
-  return current?.participation ?? props.contest.viewer.liveParticipation;
-});
+const keys = computed(() => `contests.leave.${props.kind}`);
+const isConfirmOpen = ref(false);
+/** The dialog stays open, busy, while the request runs; it closes once the answer is in (an error shows below). */
+watch(
+  () => props.isPending,
+  (isNow, was) => {
+    if (was && !isNow) isConfirmOpen.value = false;
+  },
+);
+const LINK =
+  'inline-flex min-h-8 items-center font-semibold text-accent-text underline underline-offset-2 hover:no-underline pointer-coarse:min-h-11';
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
-    <p class="flex flex-wrap items-center gap-2 font-semibold">
+  <div class="flex flex-col gap-3">
+    <template v-if="kind === 'virtual'">
+      <p class="text-sm text-muted">{{ $t('contests.virtualRun.note') }}</p>
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <AppButton
+          :to="{ name: 'contest-ranking', params: { key: contest.key }, query: { virtual: '1' } }"
+        >
+          <template #icon><Trophy class="size-4" aria-hidden="true" /></template>
+          {{ $t('contests.tabs.ranking') }}
+        </AppButton>
+        <button type="button" :class="LINK" @click="isConfirmOpen = true">
+          {{ $t(`${keys}.link`) }}
+        </button>
+      </div>
+    </template>
+    <p v-else class="flex flex-wrap items-center gap-x-1.5 text-sm">
       <span aria-hidden="true" class="size-2 rounded-full bg-verdict-ac" />
-      <template v-if="participation?.virtual === SPECTATE">
-        {{ $t('contests.actions.spectating') }}
-      </template>
-      <template v-else-if="participation && participation.virtual > 0">
-        {{ $t('contests.actions.virtualRunning', { run: participation.virtual }) }}
-        <CountdownTimer :until="participation.endTime" class="font-mono" />
-      </template>
-      <template v-else>
-        {{ $t('contests.actions.inContest') }}
-        <span v-if="participation" class="font-normal text-muted">
-          {{
-            $t('contests.actions.since', {
-              time: formatClock(participation.realStart, locale.locale),
-            })
-          }}
-        </span>
-      </template>
+      <strong>{{
+        $t(kind === 'spectate' ? 'contests.actions.spectating' : 'contests.actions.inContest')
+      }}</strong>
+      <span v-if="since && kind === 'live'" class="text-muted">
+        {{ $t('contests.actions.since', { time: formatClock(since, locale.locale) }) }}
+      </span>
+      <span aria-hidden="true" class="text-muted">·</span>
+      <button type="button" :class="LINK" @click="isConfirmOpen = true">
+        {{ $t(`${keys}.link`) }}
+      </button>
     </p>
-    <AppButton tone="danger" :loading="isPending" @click="emit('leave')">
-      <template #icon><LogOut class="size-4" aria-hidden="true" /></template>
-      {{ $t('contests.actions.leave') }}
-    </AppButton>
-    <p class="text-sm text-muted">{{ $t('contests.actions.leaveNote') }}</p>
+    <ConfirmDialog
+      v-model:visible="isConfirmOpen"
+      :title="$t(`${keys}.title`)"
+      :body="$t(`${keys}.body`)"
+      :confirm-label="$t(`${keys}.link`)"
+      :tone="kind === 'virtual' ? 'danger' : 'neutral'"
+      :busy="isPending"
+      :return-focus-to="returnFocusTo"
+      @confirm="emit('leave')"
+    />
   </div>
 </template>

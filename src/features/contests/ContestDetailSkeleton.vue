@@ -51,8 +51,8 @@ const hasActionRow = computed(() => session.status === 'authenticated');
           <p class="text-meta"><SkeletonBlock text class="w-40" /></p>
         </div>
       </div>
-      <!-- ContestActions is static from md (below md it is a fixed bar and takes no row), then the short-link row. -->
-      <SkeletonBlock pill class="hidden h-11 w-full md:block" />
+      <!-- ContestActions, then the short-link row. -->
+      <SkeletonBlock pill class="h-11 w-full" />
       <SkeletonBlock v-if="hasActionRow" pill class="h-11 w-full" />
     </div>
   </Card>
