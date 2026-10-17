@@ -3,7 +3,8 @@ import { computed } from 'vue';
 import type { SubmissionDetail } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
 import UserLink from '@/components/UserLink.vue';
-import { formatDateTime, formatRelative } from '@/lib/format';
+import type { SubmissionInContest } from '@/features/contests/submission/submission-contest';
+import { formatClock, formatDateTime, formatRelative } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import DeletedProblemChip from './DeletedProblemChip.vue';
@@ -17,6 +18,8 @@ const props = defineProps<{
   submission: SubmissionDetail;
   /** The problem's name when it is readable; the row's own name is the fallback. */
   problemName: string | null;
+  /** In the viewer's contest (P-14 B): a "Kỳ thi" row, the contest letter, and the minute of the run. */
+  inContest?: SubmissionInContest | null;
 }>();
 const locale = useLocaleStore();
 const now = useNow(CLOCK_REFRESH_MS);
@@ -29,6 +32,18 @@ const plainFacts = computed(() => [
 <template>
   <Card as="aside" data-testid="submission-facts" class="rounded-card p-5 sm:px-6">
     <dl class="grid grid-cols-[auto_1fr] gap-x-5 gap-y-3 text-sm">
+      <template v-if="inContest">
+        <dt data-fact="contest" class="text-meta text-muted">
+          {{ $t('submission.facts.contest') }}
+        </dt>
+        <dd class="min-w-0 [overflow-wrap:anywhere]">
+          <RouterLink
+            :to="{ name: 'contest', params: { key: inContest.contest.key } }"
+            class="font-semibold text-accent-text underline underline-offset-2 hover:no-underline"
+            >{{ inContest.contest.name }}</RouterLink
+          >
+        </dd>
+      </template>
       <dt data-fact="problem" class="text-meta text-muted">
         {{ $t('submission.facts.problem') }}
       </dt>
@@ -40,6 +55,7 @@ const plainFacts = computed(() => [
           v-else-if="submission.problem"
           :to="{ name: 'problem', params: { code: submission.problem.code } }"
           class="font-semibold hover:underline"
+          ><template v-if="inContest">{{ inContest.problem.label }}. </template
           >{{ problemName ?? submission.problem.name }}</RouterLink
         ><template v-else>{{ NO_VALUE }}</template>
       </dd>
@@ -58,7 +74,12 @@ const plainFacts = computed(() => [
       </dt>
       <dd class="min-w-0">
         <time :datetime="submission.date" :title="formatDateTime(submission.date, locale.locale)">{{
-          formatRelative(submission.date, now, locale.locale)
+          inContest
+            ? $t('submission.contest.minute', {
+                time: formatClock(submission.date, locale.locale),
+                minute: inContest.minute,
+              })
+            : formatRelative(submission.date, now, locale.locale)
         }}</time>
       </dd>
       <template v-for="fact in plainFacts" :key="fact.key">

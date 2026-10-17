@@ -1376,7 +1376,8 @@
       "user": "Người nộp",
       "language": "Ngôn ngữ",
       "judge": "Máy chấm",
-      "submitted": "Nộp lúc"
+      "submitted": "Nộp lúc",
+      "contest": "Kỳ thi"
     },
     "pretest": "Bài nộp này chỉ chấm với bộ test mẫu (pretest).",
     "overview": {
@@ -1459,6 +1460,13 @@
       "signIn": "Đăng nhập để xem mã nguồn, nếu đề bài cho phép.",
       "solveFirst": "Giải bài này để xem mã nguồn.",
       "signInAction": "Đăng nhập"
+    },
+    "contest": {
+      "outOf": "/ {max} điểm kỳ thi",
+      "problemScore": "Điểm bài {score} / {max}",
+      "next": "Bài {label} · {name}",
+      "barNote": "Bảng xếp hạng và đồng hồ nằm trên thanh kỳ thi.",
+      "minute": "{time} · phút {minute}"
     }
   },
   "states": {

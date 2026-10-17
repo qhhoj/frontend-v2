@@ -1376,7 +1376,8 @@
       "user": "Author",
       "language": "Language",
       "judge": "Judge",
-      "submitted": "Submitted"
+      "submitted": "Submitted",
+      "contest": "Contest"
     },
     "pretest": "This submission was graded on the pretests only.",
     "overview": {
@@ -1459,6 +1460,13 @@
       "signIn": "Sign in to see the source, if the problem allows it.",
       "solveFirst": "Solve this problem to see the source.",
       "signInAction": "Sign in"
+    },
+    "contest": {
+      "outOf": "/ {max} contest points",
+      "problemScore": "Problem score {score} / {max}",
+      "next": "Problem {label} · {name}",
+      "barNote": "The ranking and the clock are on the contest bar.",
+      "minute": "{time} · minute {minute}"
     }
   },
   "states": {

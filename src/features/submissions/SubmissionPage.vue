@@ -7,6 +7,10 @@ import Card from '@/components/ui/Card.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
+import SubmissionNextStep from '@/features/contests/submission/SubmissionNextStep.vue';
+import { useContestScore } from '@/features/contests/submission/use-contest-score';
+import { useSubmissionContest } from '@/features/contests/submission/use-submission-contest';
+import { useNavSection } from '@/features/shell/nav-section';
 import { useProblemQuery } from '@/features/problems/problems.queries';
 import { IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import { submissionVerdictOf, verdictOf } from '@/lib/verdicts';
@@ -61,6 +65,14 @@ const problemQuery = useProblemQuery(
 const problemName = computed(
   () => problemQuery.data.value?.name ?? row.value?.problem?.name ?? null,
 );
+/** The viewer's own submission in their running contest (P-14 B): the page belongs to "Kỳ thi" and scores in its points. */
+const inContest = useSubmissionContest(row, isOwn);
+useNavSection(() => (inContest.value ? '/contests' : null));
+const contestScore = useContestScore(
+  row,
+  inContest,
+  () => problemQuery.data.value?.partial ?? null,
+);
 const canResubmit = computed(
   () => isOwn.value && problemCode.value !== null && !isDeletedProblem.value,
 );
@@ -88,12 +100,24 @@ const verdict = computed(() => {
       :aria-label="$t('common.breadcrumb')"
       class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1 text-sm"
     >
-      <RouterLink :to="{ name: 'submissions' }" class="text-muted hover:underline">{{
+      <template v-if="inContest">
+        <RouterLink :to="{ name: 'contests' }" class="text-muted hover:underline">{{
+          $t('contests.title')
+        }}</RouterLink>
+        <span aria-hidden="true" class="text-muted">/</span>
+        <RouterLink
+          :to="{ name: 'contest', params: { key: inContest.contest.key } }"
+          class="font-semibold text-accent-text underline underline-offset-2 hover:no-underline"
+          >{{ inContest.contest.name }}</RouterLink
+        >
+      </template>
+      <RouterLink v-else :to="{ name: 'submissions' }" class="text-muted hover:underline">{{
         $t('pages.submissions')
       }}</RouterLink>
       <span aria-hidden="true" class="text-muted">/</span>
       <h1 class="min-w-0 font-semibold [overflow-wrap:anywhere]">
-        {{ problemName ?? shortId }}
+        <template v-if="inContest">{{ inContest.problem.label }}. </template
+        >{{ problemName ?? shortId }}
       </h1>
       <span v-if="problemName" class="font-mono text-meta text-muted">{{ shortId }}</span>
     </nav>
@@ -131,7 +155,9 @@ const verdict = computed(() => {
             :is-problem-loading="problemQuery.isLoading.value"
             :is-live="isLive"
             :can-resubmit="canResubmit"
+            :contest-score="contestScore"
           />
+          <SubmissionNextStep v-if="inContest" :in-contest="inContest" />
           <p
             v-if="live.stale"
             data-testid="stale-reload"
@@ -177,7 +203,7 @@ const verdict = computed(() => {
             <CompareWithForm :current-id="row.id" />
           </SourceView>
         </div>
-        <SubmissionFacts :submission="row" :problem-name="problemName" />
+        <SubmissionFacts :submission="row" :problem-name="problemName" :in-contest="inContest" />
       </div>
     </QueryState>
   </div>
