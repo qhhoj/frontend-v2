@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { CARD_VARIANTS } from '@/components/ui/Card.variants';
 import type { ContestListItem } from '@/api/types/contests';
+import CompactListRow from '@/components/CompactListRow.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
+import { formatLabel } from '@/lib/contest-format';
+import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { spanMessage } from '@/lib/contest-time';
 import { formatNumber, formatShortDate } from '@/lib/format';
+import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
@@ -32,10 +36,46 @@ const whenText = (contest: ContestListItem) => {
   const lengthSeconds = (Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000;
   return `${formatShortDate(contest.startTime, locale.locale)} · ${spanText(spanMessage(lengthSeconds))}`;
 };
+/** P-04 B: a phone gets compact rows: name, then date · length · contestants · format, and the action at the end. */
+const isCompact = useMediaQuery(COMPACT_LIST_QUERY);
+const compactMeta = (contest: ContestListItem) =>
+  [
+    whenText(contest),
+    translate('contests.list.contestantCount', {
+      count: formatNumber(contest.userCount, locale.locale),
+    }),
+    formatLabel(contest.formatName),
+  ].join(' · ');
 </script>
 
 <template>
+  <div
+    v-if="isCompact"
+    data-testid="ended-contests"
+    :class="[CARD_VARIANTS.glass, 'overflow-hidden']"
+  >
+    <ul :aria-label="$t('contests.phase.ended')" class="m-0 list-none p-0">
+      <CompactListRow
+        v-for="contest in contests"
+        :key="contest.key"
+        :to="{ name: 'contest', params: { key: contest.key } }"
+        :title="contest.name"
+      >
+        <template #meta>{{ compactMeta(contest) }}</template>
+        <template #trail>
+          <ContestCallLink
+            compact
+            :contest-key="contest.key"
+            :contest-name="contest.name"
+            :label-key="callOf(contest).labelKey"
+            :is-primary="callOf(contest).isPrimary"
+          />
+        </template>
+      </CompactListRow>
+    </ul>
+  </div>
   <ScrollRegion
+    v-else
     data-testid="ended-contests"
     :label="$t('contests.list.endedRegion')"
     :class="[CARD_VARIANTS.glass, 'overflow-hidden']"

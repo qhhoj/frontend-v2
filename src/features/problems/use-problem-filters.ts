@@ -92,3 +92,14 @@ export function useProblemFilters() {
   const clearAll = () => update({ ...NO_FILTERS, sort: filters.value.sort });
   return { filters, page, update, clearAll };
 }
+
+/** How many of the filters behind the phone's "Bộ lọc" button (all but search and sort) narrow the list; the points range counts once. */
+export function panelFilterCount(filters: ProblemFilters): number {
+  return [
+    filters.groupId !== null,
+    filters.typeIds.length > 0,
+    filters.pointsMin !== null || filters.pointsMax !== null,
+    filters.hideSolved,
+    filters.hasEditorial,
+  ].filter(Boolean).length;
+}
