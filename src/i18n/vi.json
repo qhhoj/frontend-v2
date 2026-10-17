@@ -162,6 +162,12 @@
         "notPushed": "Chưa bật gửi trực tiếp: thí sinh chỉ thấy ở tab này.",
         "post": "Đăng thông báo",
         "posted": "Đã đăng thông báo."
+      },
+      "alert": {
+        "label": "Thông báo mới của kỳ thi",
+        "title": "Thông báo mới",
+        "view": "Xem",
+        "close": "Đóng"
       }
     },
     "rules": {

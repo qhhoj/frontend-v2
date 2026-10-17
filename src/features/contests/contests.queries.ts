@@ -49,7 +49,7 @@ export const useContestQuery = (
   });
 };
 
-/** The viewer's current participation (virtual run number and end); asked only while in a contest. */
+/** The viewer's current participation (virtual run number and end), or null; the app shell asks it for every signed-in viewer. */
 export const useCurrentParticipationQuery = (isEnabled: Ref<boolean>) => {
   const viewerId = useViewerId();
   return useQuery({
@@ -59,9 +59,14 @@ export const useCurrentParticipationQuery = (isEnabled: Ref<boolean>) => {
   });
 };
 
-export const useContestAnnouncementsQuery = (key: Ref<string>, page: Ref<number>) => {
+export const useContestAnnouncementsQuery = (
+  key: Ref<string>,
+  page: Ref<number>,
+  isEnabled: MaybeRefOrGetter<boolean> = true,
+) => {
   const viewerId = useViewerId();
   return useQuery({
+    enabled: () => toValue(isEnabled),
     queryKey: computed(() => ['contests', 'announcements', viewerId.value, key.value, page.value]),
     queryFn: () => fetchContestAnnouncements(key.value, page.value),
     placeholderData: computed(() => keepPreviousForSameViewer(VIEWER_KEY_INDEX, viewerId.value)),
