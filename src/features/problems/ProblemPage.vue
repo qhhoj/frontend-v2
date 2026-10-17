@@ -93,7 +93,7 @@ watch(
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
           <div :class="layout.grid">
-            <StatementSkeleton header :class="layout.left" />
+            <StatementSkeleton header :strip-class="layout.strip" :class="layout.left" />
             <ProblemRailSkeleton data-testid="problem-rail" :class="layout.rail" />
           </div>
         </template>

@@ -16,6 +16,7 @@ import NoStatement from './NoStatement.vue';
 import PdfStatement from './PdfStatement.vue';
 import ProblemFactsCard from './ProblemFactsCard.vue';
 import ProblemHeader from './ProblemHeader.vue';
+import ProblemLimitStrip from './ProblemLimitStrip.vue';
 import ProblemLinksCard from './ProblemLinksCard.vue';
 import ProblemMySubmissions from './ProblemMySubmissions.vue';
 import ProblemSubmitCard from './ProblemSubmitCard.vue';
@@ -74,6 +75,15 @@ function panelIdOf(tabId: string) {
       :class="['min-w-0 rounded-panel p-6 sm:p-8', layout.left]"
     >
       <ProblemHeader :problem="problem" :section="tab === 'editorial' ? 'editorial' : 'statement'">
+        <template #strip>
+          <ProblemLimitStrip
+            :problem="problem"
+            :is-signed-in="isSignedIn"
+            :has-editorial="hasEditorial"
+            :contest="contest"
+            :class="layout.strip"
+          />
+        </template>
         <Tabs
           v-if="tabs.length > 1"
           v-model="tab"
@@ -125,7 +135,12 @@ function panelIdOf(tabId: string) {
         :form="submitForm"
         :is-signed-in="isSignedIn"
       />
-      <ProblemFactsCard :problem="problem" :is-signed-in="isSignedIn" :contest="contest" />
+      <ProblemFactsCard
+        :problem="problem"
+        :is-signed-in="isSignedIn"
+        :contest="contest"
+        :narrow="layout.facts"
+      />
       <ProblemMySubmissions v-if="isSignedIn" :code="problem.code" :points="problem.points" />
       <ProblemLinksCard :problem="problem" :has-editorial="hasEditorial" />
     </aside>

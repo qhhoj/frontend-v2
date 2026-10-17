@@ -1101,7 +1101,11 @@
       }
     },
     "pdfRender": "Download statement as PDF",
-    "externalJudge": "Judged on {oj}"
+    "externalJudge": "Judged on {oj}",
+    "strip": {
+      "partial": "partial",
+      "solves": "AC {rate}% · {count} solvers"
+    }
   },
   "problems": {
     "title": "Problems",

@@ -274,6 +274,11 @@ describe('problem page inside a contest', () => {
     const facts = wrapper.get('[data-testid="problem-facts"]').text();
     expect(facts).toContain('Điểm kỳ thi250');
     expect(facts).not.toContain('Tỉ lệ AC');
+    const strip = wrapper.get('[data-testid="problem-limit-strip"]');
+    expect(strip.text()).toContain('250');
+    expect(strip.find('[data-testid="strip-own-result"]').exists()).toBe(true);
+    expect(strip.find('[data-testid="strip-status"]').exists()).toBe(false);
+    expect(strip.text()).not.toContain('người giải');
     expect(wrapper.get('[data-testid="submit-contest"]').text()).toContain(
       `Kỳ thi: ${solved.name}`,
     );
