@@ -47,7 +47,7 @@ describe('contest detail header', () => {
     const header = wrapper.get('[data-testid="contest-header"]');
     expect(header.text()).toContain('Kỳ thi chưa bắt đầu');
     expect(header.get('[role="timer"]').text()).toBe('00:42:15');
-    expect(header.text()).toContain('Bắt đầu lúc 08:00');
+    expect(header.get('[data-testid="timeline-labels"]').text()).toMatch(/^08:00/);
   });
 
   it('refetches once when the countdown elapses, and follows the new phase', async () => {
@@ -173,7 +173,7 @@ describe('contest problems with the viewer’s results (backend 4c)', () => {
     expect(table.text()).not.toContain('Chưa nộp');
   });
 
-  it('shows the submission cap with the attempts left, or ∞ when uncapped', async () => {
+  it('writes the submission cap under the name with the attempts left, and nothing when uncapped', async () => {
     const mixed = contestDetail({
       problems: [
         contestProblem(0, { maxSubmissions: 3, viewerResult: viewerResult({ attempts: 2 }) }),
@@ -183,11 +183,10 @@ describe('contest problems with the viewer’s results (backend 4c)', () => {
     mockApi({ ...signedInViewer(), ...contestPageRoutes(mixed) });
     const { wrapper } = await mountApp('/contests/r42');
     const rows = wrapper.findAll('[data-testid="contest-problems"] tbody tr');
-    // Cells: name, limits, points, max submissions, own result, open.
-    const CAP_CELL = 3;
-    expect(rows[0]!.findAll('td')[CAP_CELL]!.text()).toContain('3 (còn 1)');
-    expect(rows[1]!.findAll('td')[CAP_CELL]!.text()).toContain('∞');
-    expect(rows[1]!.findAll('td')[CAP_CELL]!.text()).toContain('Không giới hạn');
+    const nameCell = (row: number) => rows[row]!.findAll('td')[0]!.text();
+    expect(nameCell(0)).toContain('Tối đa 3 lượt (còn 1)');
+    expect(nameCell(1)).not.toContain('Tối đa');
+    expect(wrapper.get('[data-testid="contest-problems"]').text()).not.toContain('∞');
   });
 });
 
@@ -216,5 +215,55 @@ describe('contest page rules card', () => {
     mockApi({ ...signedInViewer(), ...contestPageRoutes(ruled({ viewer })) });
     const { wrapper } = await mountApp('/contests/r42');
     expect(wrapper.get('[data-testid="join-rules-card"]').text()).toContain('Đã đồng ý bản 1 lúc');
+  });
+});
+
+describe('contest page while it runs (P-23)', () => {
+  const ruled = (phase: 'running' | 'upcoming') =>
+    contestDetail({ phase, rules: RULES_MARKDOWN, rulesHtml: RULES_HTML, rulesRevision: 2 });
+  const asideHeadings = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
+    wrapper.findAll('aside h2').map((heading) => heading.text());
+  afterEach(() => vi.useRealTimers());
+
+  it('hides the comments and puts the announcements first', async () => {
+    vi.useFakeTimers({ now: RUNNING_NOW, toFake: ['Date'] });
+    mockApi({ ...anonymousViewer, ...contestPageRoutes(ruled('running')) });
+    const { wrapper } = await mountApp('/contests/r42');
+    expect(wrapper.find('#comments-heading').exists()).toBe(false);
+    expect(asideHeadings(wrapper)[0]).toBe('Thông báo');
+    expect(asideHeadings(wrapper).at(-1)).not.toBe('Thông báo');
+  });
+
+  it("hides the comments during the viewer's virtual run of an ended contest", async () => {
+    vi.useFakeTimers({ now: RUNNING_NOW, toFake: ['Date'] });
+    const ended = contestDetail({
+      phase: 'ended',
+      startTime: '2026-10-01T08:00:00Z',
+      endTime: '2026-10-01T11:00:00Z',
+    });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(ended),
+      'GET /contests/current': ok({
+        contest: ended,
+        participation: participationSummary({ virtual: 1, endTime: '2026-10-08T11:00:00Z' }),
+      }),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="virtual-countdown"]').exists()).toBe(true),
+    );
+    expect(wrapper.find('#comments-heading').exists()).toBe(false);
+  });
+
+  it('shows the comments before the start, with the rules first and the announcements last', async () => {
+    vi.useFakeTimers({ now: BEFORE_START, toFake: ['Date'] });
+    mockApi({ ...anonymousViewer, ...contestPageRoutes(ruled('upcoming')) });
+    const { wrapper } = await mountApp('/contests/r42');
+    await vi.waitFor(() => expect(wrapper.find('#comments-heading').exists()).toBe(true));
+    expect(wrapper.get('aside').element.firstElementChild!.getAttribute('data-testid')).toBe(
+      'join-rules-card',
+    );
+    expect(asideHeadings(wrapper).at(-1)).toBe('Thông báo');
   });
 });

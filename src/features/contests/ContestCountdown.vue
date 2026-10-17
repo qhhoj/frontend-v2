@@ -31,7 +31,6 @@ const sizeOf = (until: string) => (isLong(until) ? 'text-stat' : 'text-3xl md:te
 const instantLabel = (instant: string) =>
   `${formatClock(instant, locale.locale)} · ${formatShortDate(instant, locale.locale)}`;
 const LABELS = { start: 'contests.detail.notStarted', end: 'contests.detail.timeLeft' } as const;
-const CAPTIONS = { start: 'contests.detail.startsAt', end: 'contests.detail.endsAt' } as const;
 const freezeClock = computed(() => {
   const from = freezeStart(props.contest);
   return from === null ? null : formatClock(new Date(from).toISOString(), locale.locale);
@@ -75,9 +74,6 @@ const freezeClock = computed(() => {
       </p>
       <p :class="['leading-tight font-semibold whitespace-nowrap', sizeOf(target.at)]">
         <CountdownTimer :key="target.at" :until="target.at" />
-      </p>
-      <p class="text-meta text-muted">
-        {{ $t(CAPTIONS[target.kind], { time: instantLabel(target.at) }) }}
       </p>
     </div>
     <p v-else class="flex-1 text-muted">

@@ -21,8 +21,6 @@ const problemLink = (problem: ContestProblem) => ({
   name: 'problem',
   params: { code: problem.code },
 });
-/** The attempt cap line, shown only for problems that cap their submissions. */
-const capText = (cap: number) => t('contests.problems.cap', { count: cap }, cap);
 /** Why the statements are not listed yet, per phase. */
 const HIDDEN_KEYS: Record<ContestPhase, string> = {
   upcoming: 'contests.problems.afterStart',
@@ -37,19 +35,21 @@ const hasOwnResults = computed(() =>
 const context = computed(() => ownResultContext(props.contest, locale.locale));
 const solvedCounts = computed(() => solvedSummary(problems.value));
 const isCrowned = computed(() => props.contest.phase === 'ended' && solvedCounts.value.solved > 0);
-/** The cap line, with the attempts the viewer has left once they have a result. */
-const leftText = (count: number) => t('contests.problems.left', { count }, count);
-/** The per-problem submission cap with the viewer's attempts left, or ∞ when uncapped. */
-const maxSubmissionsText = (problem: ContestProblem) => {
-  if (!problem.maxSubmissions) return '∞';
-  const max = formatNumber(problem.maxSubmissions, locale.locale);
-  if (!problem.viewerResult) return max;
-  const left = attemptsLeftUnderCap(problem.maxSubmissions, problem.viewerResult.attempts);
-  return `${max} (${leftText(left)})`;
+/**
+ * The attempt cap under the problem's name, with what the viewer has left once they have a result; null when the
+ * problem has no cap (most do not, so no column of ∞ for it, P-23).
+ */
+const capLineOf = (problem: ContestProblem): string | null => {
+  const cap = problem.maxSubmissions;
+  if (!cap) return null;
+  const text = t('contests.problems.cap', { count: formatNumber(cap, locale.locale) }, cap);
+  if (!problem.viewerResult) return text;
+  const left = attemptsLeftUnderCap(cap, problem.viewerResult.attempts);
+  return `${text} (${t('contests.problems.left', { count: left }, left)})`;
 };
-/** Spoken form: the symbol alone reads as nothing useful. */
-const maxSubmissionsLabel = (problem: ContestProblem) =>
-  problem.maxSubmissions ? maxSubmissionsText(problem) : t('contests.problems.unlimited');
+const capLines = computed(
+  () => new Map(problems.value.map((problem) => [problem.problemId, capLineOf(problem)])),
+);
 </script>
 
 <template>
@@ -101,13 +101,6 @@ const maxSubmissionsLabel = (problem: ContestProblem) =>
             <th scope="col" class="px-3 py-3 text-right font-semibold">
               {{ $t('contests.problems.columns.points') }}
             </th>
-            <th
-              scope="col"
-              class="px-3 py-3 text-right font-semibold whitespace-nowrap"
-              :title="$t('contests.problems.columns.maxSubmissions')"
-            >
-              {{ $t('contests.problems.columns.submissions') }}
-            </th>
             <th v-if="hasOwnResults" scope="col" class="px-3 py-3 font-semibold whitespace-nowrap">
               {{ $t('contests.problems.columns.own') }}
             </th>
@@ -135,17 +128,14 @@ const maxSubmissionsLabel = (problem: ContestProblem) =>
               <span :title="problem.code" class="block truncate font-mono text-caption text-muted">
                 {{ problem.code }}
               </span>
+              <span v-if="capLines.get(problem.problemId)" class="block text-caption text-muted">
+                {{ capLines.get(problem.problemId) }}
+              </span>
             </td>
             <td class="px-3 py-3 font-mono text-meta whitespace-nowrap tabular-nums">
               {{ limitsText(problem) }}
             </td>
             <td class="px-3 py-3 text-right font-mono tabular-nums">{{ pointsOf(problem) }}</td>
-            <td class="px-3 py-3 text-right font-mono tabular-nums whitespace-nowrap">
-              <span aria-hidden="true" :title="maxSubmissionsLabel(problem)">{{
-                maxSubmissionsText(problem)
-              }}</span>
-              <span class="sr-only">{{ maxSubmissionsLabel(problem) }}</span>
-            </td>
             <td v-if="hasOwnResults" class="max-w-40 px-3 py-3 xl:max-w-none">
               <OwnResultChip :problem="problem" :context="context" />
             </td>
@@ -177,10 +167,11 @@ const maxSubmissionsLabel = (problem: ContestProblem) =>
             >
             <p class="text-caption text-muted">
               {{ problem.code
-              }}<template v-if="problem.maxSubmissions">
-                · {{ capText(problem.maxSubmissions) }}</template
+              }}<template v-if="capLines.get(problem.problemId)">
+                · {{ capLines.get(problem.problemId) }}</template
               >
-              · {{ limitsText(problem) }}
+              ·
+              {{ limitsText(problem) }}
               ·
               {{ $t('contests.problems.pointsShort', { points: pointsOf(problem) }) }}
             </p>

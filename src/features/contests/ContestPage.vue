@@ -38,6 +38,13 @@ const { current } = useCurrentContest();
 const run = computed(() =>
   current.value?.contest.key === key.value ? current.value.participation : null,
 );
+/**
+ * While the contest runs, or the viewer's virtual run of it does, the page keeps to the contest (P-23): no comments,
+ * where solutions could be discussed, and the announcements first.
+ */
+const isUnderway = computed(
+  () => contest.value?.phase === 'running' || (run.value?.virtual ?? 0) > 0,
+);
 /** A contest that does not exist (or is hidden) is a dead end, not a failure to retry: the crying Bit says so. */
 const isMissing = computed(() => error.value instanceof ApiError && error.value.status === 404);
 
@@ -79,15 +86,21 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
           <div class="flex min-w-0 flex-col gap-6">
             <ContestProblemsTable :contest="contest" />
             <ContestIntroCard :contest="contest" />
-            <CommentsSection type="contest" :page-key="contest.key" class="mt-2" />
+            <CommentsSection
+              v-if="!isUnderway"
+              type="contest"
+              :page-key="contest.key"
+              class="mt-2"
+            />
           </div>
           <aside :aria-label="$t('contests.detail.aside')" class="flex flex-col gap-6">
-            <ContestRulesCard :contest="contest" />
-            <ContestAnnouncementsRail :contest="contest" />
+            <ContestAnnouncementsRail v-if="isUnderway" :contest="contest" />
             <ContestJoinRulesCard
               :contest="contest"
               :acceptance="acceptanceOf(contest.viewer.liveParticipation)"
             />
+            <ContestRulesCard :contest="contest" />
+            <ContestAnnouncementsRail v-if="!isUnderway" :contest="contest" />
           </aside>
         </div>
       </template>

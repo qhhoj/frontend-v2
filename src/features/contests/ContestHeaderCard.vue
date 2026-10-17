@@ -4,10 +4,11 @@ import type { ContestDetail, ParticipationSummary } from '@/api/types/contests';
 import Card from '@/components/ui/Card.vue';
 import UserLink from '@/components/UserLink.vue';
 import { phaseAt, spanMessage } from '@/lib/contest-time';
-import { formatClock, formatNumber, formatShortDate, formatWeekdayDate } from '@/lib/format';
+import { formatNumber, formatWeekdayDate } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestChips from './ContestChips.vue';
+import { isOneDay } from './contest-clock';
 import { useContestTagsQuery } from './contest-extras.queries';
 import ContestCountdown from './ContestCountdown.vue';
 import ContestTimeBar from './ContestTimeBar.vue';
@@ -33,9 +34,9 @@ const lengthSpan = computed(() =>
 const elapsedSpan = computed(() =>
   phase.value === 'running' ? spanMessage((now.value - startMs.value) / 1000) : null,
 );
-const phoneLine = computed(
-  () =>
-    `${props.contest.key} · ${formatClock(props.contest.startTime, locale.locale)}–${formatClock(props.contest.endTime, locale.locale)} · ${formatShortDate(props.contest.startTime, locale.locale)}`,
+/** The day, when the bar's labels carry clocks only (a one-day contest); otherwise they already carry the dates. */
+const oneDay = computed(() =>
+  isOneDay(props.contest) ? formatWeekdayDate(props.contest.startTime, locale.locale) : null,
 );
 </script>
 
@@ -61,7 +62,6 @@ const phoneLine = computed(
           />
           {{ contest.name }}
         </h1>
-        <p class="font-mono text-caption text-muted md:hidden">{{ phoneLine }}</p>
         <p v-if="contest.summary" class="mt-1 hidden text-muted md:block">
           {{ contest.summary }}
         </p>
@@ -83,8 +83,8 @@ const phoneLine = computed(
         </p>
       </div>
       <ContestTimeBar :contest="contest" :now="now" />
-      <p class="hidden text-sm text-muted md:block">
-        {{ formatWeekdayDate(contest.startTime, locale.locale) }} ·
+      <p class="text-sm text-muted">
+        <template v-if="oneDay">{{ oneDay }} · </template>
         {{ $t(lengthSpan.key, lengthSpan.params, lengthSpan.count ?? 1) }}
         <template v-if="elapsedSpan">
           ·

@@ -16,7 +16,7 @@ const hasActionRow = computed(() => session.status === 'authenticated');
     data-skeleton-region="contest-header"
     class="grid gap-5 p-5 md:grid-cols-[minmax(0,1fr)_minmax(260px,320px)] md:p-6"
   >
-    <!-- Line boxes mirror ContestHeaderCard: the phone line and the authors line each show at one width only. -->
+    <!-- Line boxes mirror ContestHeaderCard: the authors line shows from md up only. -->
     <div class="flex flex-col gap-3">
       <div class="flex flex-wrap items-center gap-1.5">
         <SkeletonBlock pill class="h-7 w-48" />
@@ -27,17 +27,17 @@ const hasActionRow = computed(() => session.status === 'authenticated');
         <div class="font-display text-2xl leading-tight font-bold md:text-4xl">
           <SkeletonBlock text class="w-3/4" />
         </div>
-        <p class="font-mono text-caption md:hidden"><SkeletonBlock text class="w-48" /></p>
         <p class="mt-1 hidden items-center gap-1.5 text-sm md:flex">
           <SkeletonBlock class="size-6 shrink-0" />
           <SkeletonBlock text class="w-48" />
         </p>
       </div>
+      <!-- The bar, its two end labels, then the length line. -->
       <div class="flex flex-col gap-1.5">
-        <p class="hidden h-5 md:block"><SkeletonBlock text class="w-full" /></p>
         <SkeletonBlock class="h-2 w-full" />
+        <p class="text-caption"><SkeletonBlock text class="w-full" /></p>
       </div>
-      <p class="hidden text-sm md:block"><SkeletonBlock text class="w-80" /></p>
+      <p class="text-sm"><SkeletonBlock text class="w-80 max-w-full" /></p>
     </div>
     <div class="flex flex-col gap-4">
       <div data-skeleton-region="countdown" class="flex items-center gap-3">
@@ -48,7 +48,6 @@ const hasActionRow = computed(() => session.status === 'authenticated');
           <p class="font-mono text-3xl leading-tight md:text-5xl">
             <SkeletonBlock text class="w-48" />
           </p>
-          <p class="text-meta"><SkeletonBlock text class="w-40" /></p>
         </div>
       </div>
       <!-- ContestActions, then the short-link row. -->
