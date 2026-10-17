@@ -48,7 +48,7 @@ const ADMINISTRATOR = {
   pendingRequestId: null,
 };
 
-test('a signed-in visitor joins an open organization and the panel turns to member', async ({
+test('a signed-in visitor joins an open organization: a member chip and a toast, leaving is behind ⋯', async ({
   page,
   api,
 }) => {
@@ -72,7 +72,11 @@ test('a signed-in visitor joins an open organization and the panel turns to memb
   };
   await page.goto('/organizations/lhp');
   await page.getByRole('button', { name: 'Tham gia tổ chức' }).click();
-  await expect(page.getByText('Bạn là thành viên', { exact: true }).first()).toBeVisible();
+  await expect(page.getByTestId('membership-chip')).toHaveText('Thành viên');
+  await expect(page.getByTestId('admin-toasts')).toContainText('Đã tham gia');
+  await expect(page.getByRole('button', { name: 'Rời tổ chức' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Thao tác với tổ chức' }).click();
+  await expect(page.getByRole('menuitem', { name: 'Rời tổ chức' })).toBeVisible();
 });
 
 test('a signed-in visitor asks to join a private organization and sees the request pending', async ({
@@ -95,9 +99,10 @@ test('a signed-in visitor asks to join a private organization and sees the reque
   };
   api.routes[`GET /organizations/hcmus/requests/${REQUEST_ID}`] = ok(request);
   await page.goto('/organizations/hcmus');
+  await page.getByRole('button', { name: 'Gửi yêu cầu tham gia' }).click();
   await page.getByLabel('Lý do (bắt buộc, tối đa 4096 ký tự)').fill('Em muốn tham gia đội tuyển.');
-  await page.getByRole('button', { name: 'Gửi yêu cầu' }).click();
-  await expect(page.getByText('Đang chờ duyệt', { exact: true }).first()).toBeVisible();
+  await page.getByRole('dialog').getByRole('button', { name: 'Gửi yêu cầu' }).click();
+  await expect(page.getByTestId('membership-chip')).toHaveText('Đang chờ duyệt');
 });
 
 test('an administrator approves a pending request on "Quản lý" and the queue empties', async ({
