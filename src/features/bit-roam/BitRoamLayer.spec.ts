@@ -5,7 +5,7 @@ import { fakeAnimationFrames } from '@/test/animation-frames';
 import { staffViewer } from '@/test/admin-routes';
 import { participationSummary, profile, signedIn, signedOut } from '@/test/fixtures';
 import { stubMatchMedia } from '@/test/match-media';
-import { mockApi, ok } from '@/test/mock-api';
+import { mockApi, ok, page } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { seededRandom } from '@/test/seeded-random';
@@ -101,6 +101,8 @@ describe('BitRoamLayer', () => {
           },
           participation: participationSummary({ virtual: 0, endTime: '2999-01-01T00:00:00Z' }),
         }),
+        // The contest bar's unread count.
+        'GET /contests/r41/announcements': page([]),
       }),
     );
     const { wrapper } = await mountApp('/settings/appearance');

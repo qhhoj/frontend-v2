@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { problemTypeLabel } from './problem-type-label';
 import { computed, ref } from 'vue';
+import type { ContestDetail } from '@/api/types/contests';
 import type { ProblemDetail } from '@/api/types/problems';
 import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
 import StateBit from '@/components/StateBit.vue';
+import OwnResultChip from '@/features/contests/OwnResultChip.vue';
+import { ownResultContext } from '@/features/contests/own-result';
 import {
   formatMemoryLimit,
   formatNumber,
@@ -13,11 +16,25 @@ import {
 } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 
-/** Limits, solve counts, the viewer's status and the problem types (hideable). Keep `ProblemRailSkeleton.vue` in step. */
-const props = defineProps<{ problem: ProblemDetail; isSignedIn: boolean }>();
+/**
+ * Limits, solve counts, the viewer's status and the problem types (hideable). Keep `ProblemRailSkeleton.vue` in step.
+ * Inside the viewer's contest (`contest` lists the problem) the site-wide numbers make no sense: the card shows the
+ * contest's points and the viewer's own cell ("Của bạn") instead (P-15).
+ */
+const props = defineProps<{
+  problem: ProblemDetail;
+  isSignedIn: boolean;
+  contest?: ContestDetail | null;
+}>();
 const locale = useLocaleStore();
 const typesShown = ref(true);
-const facts = computed(() => [
+const contestProblem = computed(
+  () => props.contest?.problems?.find((problem) => problem.code === props.problem.code) ?? null,
+);
+const ownContext = computed(() =>
+  props.contest ? ownResultContext(props.contest, locale.locale) : null,
+);
+const limitFacts = computed(() => [
   {
     key: 'time',
     label: 'problem.limits.time',
@@ -30,6 +47,23 @@ const facts = computed(() => [
     value: formatMemoryLimit(props.problem.memoryLimit),
     tone: 'text-limit-memory',
   },
+]);
+const contestFacts = computed(() => {
+  const inContest = contestProblem.value;
+  if (!inContest || !props.contest) return null;
+  const points = formatNumber(inContest.points, locale.locale, props.contest.pointsPrecision);
+  return [
+    ...limitFacts.value,
+    {
+      key: 'contestPoints',
+      label: 'problem.rail.facts.contestPoints',
+      value: points,
+      tone: 'text-limit-points',
+    },
+  ];
+});
+const siteFacts = computed(() => [
+  ...limitFacts.value,
   {
     key: 'points',
     label: 'problem.limits.points',
@@ -49,6 +83,7 @@ const facts = computed(() => [
     tone: '',
   },
 ]);
+const facts = computed(() => contestFacts.value ?? siteFacts.value);
 /** File I/O shows the exact names (the contestant types them into `freopen`/`assign`); standard I/O reads in words. */
 const ioFacts = computed(() => {
   const { mode, inputFile, outputFile } = props.problem.io;
@@ -76,7 +111,13 @@ const status = computed(() => STATUS[props.problem.viewerStatus ?? 'untried']);
           {{ fact.value }}
         </dd>
       </div>
-      <div v-if="isSignedIn" data-testid="viewer-status">
+      <div v-if="contestProblem && ownContext" data-testid="viewer-own-result">
+        <dt class="text-meta text-muted">{{ $t('contests.problems.columns.own') }}</dt>
+        <dd class="mt-0.5 flex min-h-6 items-center text-title font-bold">
+          <OwnResultChip :problem="contestProblem" :context="ownContext" inline />
+        </dd>
+      </div>
+      <div v-else-if="isSignedIn" data-testid="viewer-status">
         <dt class="text-meta text-muted">{{ $t('problem.rail.facts.status') }}</dt>
         <dd class="mt-0.5 flex min-h-6 items-center gap-1.5 text-sm font-bold" :class="status.tone">
           {{ $t(status.key) }}

@@ -70,10 +70,13 @@
     },
     "span": {
       "days": "{count} ngày",
+      "daysHours": "{days} ngày {hours} giờ",
       "hoursMinutes": "{hours} giờ {minutes} phút",
       "hours": "{count} giờ",
       "minutes": "{count} phút",
-      "underMinute": "dưới 1 phút"
+      "underMinute": "dưới 1 phút",
+      "daysHoursShort": "{days} ng {hours} g",
+      "daysShort": "{days} ng"
     },
     "participants": "{count} thí sinh",
     "virtualExtra": "+{count} ảo",
@@ -1061,7 +1064,8 @@
         "status": "Trạng thái",
         "untried": "Chưa thử",
         "hideTypes": "Ẩn dạng bài",
-        "showTypes": "Hiện dạng bài"
+        "showTypes": "Hiện dạng bài",
+        "contestPoints": "Điểm kỳ thi"
       },
       "mine": {
         "title": "Bài nộp của tôi"
@@ -1307,7 +1311,7 @@
     "overLimit": "Vượt quá giới hạn {max} ký tự",
     "templateRestored": "Đã khôi phục mẫu",
     "limits": "{time} · {memory}",
-    "inContest": "Kỳ thi {key}",
+    "inContest": "Kỳ thi: {name}",
     "attemptsLeft": "Còn {count} lượt nộp | Còn {count} lượt nộp",
     "attemptsNone": "Đã hết lượt nộp cho bài này.",
     "resubmitUnavailable": "Không lấy được bài nộp để nộp lại.",
@@ -2397,6 +2401,13 @@
       "unknown": "Chưa có kết quả"
     },
     "title": "Bài trong kỳ thi"
+  },
+  "contestBar": {
+    "label": "Kỳ thi bạn đang tham gia",
+    "live": "Bạn đang thi",
+    "virtual": "Thi ảo #{run}",
+    "spectate": "Đang theo dõi",
+    "rankingShort": "Bảng"
   },
   "balloons": {
     "tab": "Bóng bay",

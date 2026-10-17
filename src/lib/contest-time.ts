@@ -1,4 +1,5 @@
 import type { ContestFormatName, ContestPhase } from '@/api/types/contests';
+import { formatDuration } from './format';
 
 /** Mirrors backend libs/contests/src/contest-time.ts; times are ISO strings, `now` is epoch ms. */
 export interface ContestTimes {
@@ -103,4 +104,20 @@ export function spanMessage(seconds: number): MessageRef {
     return { key: 'contests.span.minutes', params: { count: minutes }, count: minutes };
   }
   return { key: 'contests.span.underMinute', params: {} };
+}
+
+/** From this many seconds left a countdown reads in days and hours: a clock past 48 hours is not read at a glance. */
+export const LONG_COUNTDOWN_SECONDS = 48 * 3600;
+export type CountdownView =
+  { kind: 'clock'; text: string } | { kind: 'words'; days: number; hours: number };
+
+/** Time left, said one way on the hero, the contest bar, the ranking pill and the list: `13 ngày 21 giờ`, then `HH:MM:SS`. */
+export function countdownView(seconds: number): CountdownView {
+  const left = Math.max(0, Math.floor(seconds));
+  if (left < LONG_COUNTDOWN_SECONDS) return { kind: 'clock', text: formatDuration(left) };
+  return {
+    kind: 'words',
+    days: Math.floor(left / 86_400),
+    hours: Math.floor((left % 86_400) / 3600),
+  };
 }

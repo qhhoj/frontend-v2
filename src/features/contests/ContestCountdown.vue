@@ -4,7 +4,7 @@ import type { ContestDetail } from '@/api/types/contests';
 import BitLoop from '@/components/BitLoop.vue';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import InlineBit from '@/components/InlineBit.vue';
-import { countdownTarget, freezeStart } from '@/lib/contest-time';
+import { LONG_COUNTDOWN_SECONDS, countdownTarget, freezeStart } from '@/lib/contest-time';
 import { formatClock, formatShortDate } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -22,6 +22,12 @@ const target = computed(() => countdownTarget(props.contest, now.value));
 watch(
   () => target.value?.at,
   () => emit('elapsed'),
+);
+/** Days and hours (`28 ngày 14 giờ`, P-18) are longer than a clock: one line at the stat size instead of the hero's. */
+const isLong = computed(
+  () =>
+    target.value !== null &&
+    Date.parse(target.value.at) - now.value >= LONG_COUNTDOWN_SECONDS * 1000,
 );
 const instantLabel = (instant: string) =>
   `${formatClock(instant, locale.locale)} · ${formatShortDate(instant, locale.locale)}`;
@@ -47,7 +53,10 @@ const freezeClock = computed(() => {
       <p class="text-caption font-semibold tracking-wider text-muted uppercase">
         {{ $t(LABELS[target.kind]) }}
       </p>
-      <p class="font-mono text-3xl leading-tight font-semibold md:text-5xl">
+      <p
+        class="leading-tight font-semibold whitespace-nowrap"
+        :class="isLong ? 'text-stat' : 'text-3xl md:text-5xl'"
+      >
         <CountdownTimer :key="target.at" :until="target.at" />
       </p>
       <p class="text-meta text-muted">

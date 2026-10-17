@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   contestProgress,
   countdownTarget,
+  countdownView,
   freezeStart,
   isFrozenAt,
   localDayOffset,
@@ -88,5 +89,21 @@ describe('localDayOffset', () => {
     expect(localDayOffset('2026-10-08T01:00:00Z', '2026-10-08T16:59:00Z')).toBe(0);
     expect(localDayOffset('2026-10-08T01:00:00Z', '2026-10-08T17:00:00Z')).toBe(1);
     expect(localDayOffset('2026-10-08T01:00:00Z', '2026-10-11T03:00:00Z')).toBe(3);
+  });
+});
+
+describe('countdownView', () => {
+  it('reads a clock below 48 hours, never below zero', () => {
+    expect(countdownView(47 * 3600 + 59 * 60 + 59)).toEqual({ kind: 'clock', text: '47:59:59' });
+    expect(countdownView(-3)).toEqual({ kind: 'clock', text: '00:00:00' });
+  });
+
+  it('reads days and hours from 48 hours on', () => {
+    expect(countdownView(48 * 3600)).toEqual({ kind: 'words', days: 2, hours: 0 });
+    expect(countdownView(13 * 86_400 + 21 * 3600 + 59)).toEqual({
+      kind: 'words',
+      days: 13,
+      hours: 21,
+    });
   });
 });

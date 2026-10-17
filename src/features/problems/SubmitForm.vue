@@ -5,6 +5,7 @@ import CodeEditor from '@/components/CodeEditor.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { formatMemoryLimit, formatNumber, formatTimeLimit } from '@/lib/format';
 import { MAX_SOURCE_LENGTH, acceptedExtension } from '@/lib/source';
+import { useContestQuery } from '@/features/contests/contests.queries';
 import FileDropzone from './FileDropzone.vue';
 import LanguagePicker from './LanguagePicker.vue';
 import SourceUploadButton from './SourceUploadButton.vue';
@@ -24,6 +25,12 @@ const props = defineProps<{
 }>();
 /** The same refs as `form`, unwrapped for the template. */
 const state = reactive(props.form);
+/** The contest line names the contest, never its raw key; the problem page's rail has read it already. */
+const contestKey = computed(() => props.problem.contest?.contestKey ?? null);
+const { data: contest } = useContestQuery(
+  () => contestKey.value ?? '',
+  () => contestKey.value !== null,
+);
 const locale = useLocaleStore();
 const formatCount = (count: number) => formatNumber(count, locale.locale);
 const errorId = useId();
@@ -143,7 +150,9 @@ const hasSourceUpload = computed(() => !state.fileMode && !props.collapsed);
         <RouterLink
           :to="`/contests/${encodeURIComponent(problem.contest.contestKey)}`"
           class="font-semibold text-accent underline"
-          >{{ $t('submit.inContest', { key: problem.contest.contestKey }) }}</RouterLink
+          >{{
+            $t('submit.inContest', { name: contest?.name ?? problem.contest.contestKey })
+          }}</RouterLink
         >
         <template v-if="state.attemptsLeft !== null">
           ·

@@ -26,6 +26,8 @@ export const SHELL_DEFAULTS: Readonly<Record<string, MockResponse>> = {
   'GET /notifications/unread-count': { body: { data: { count: 0 } } },
   'GET /notifications': { body: { data: [], meta: { page: 1, pageSize: 20, total: 0 } } },
   'GET /tickets/summary': { body: { data: { assignedOpen: 0, awaitingStaff: 0 } } },
+  // The contest bar asks every signed-in page whether the viewer is in a contest.
+  'GET /contests/current': { body: { data: null } },
   // The admin nav's count badges (a staff member holding the screen's permission).
   'GET /comments/reports': { body: { data: [], meta: { page: 1, pageSize: 20, total: 0 } } },
   'GET /admin/organization-requests': {

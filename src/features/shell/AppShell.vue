@@ -3,6 +3,8 @@ import { defineAsyncComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAccountAppearanceSync } from '@/features/appearance/use-account-appearance';
 import BitRoamLayer from '@/features/bit-roam/BitRoamLayer.vue';
+import ContestBar from '@/features/contests/bar/ContestBar.vue';
+import { useCurrentContest } from '@/features/contests/bar/use-current-contest';
 import { useAccountBitRoamSync } from '@/features/bit-roam/use-bit-roam-choice';
 import AppFooter from './AppFooter.vue';
 import AppHeader from './AppHeader.vue';
@@ -23,6 +25,10 @@ useAccountThemeSync();
 useAccountAppearanceSync();
 useAccountBitRoamSync();
 const route = useRoute();
+/** While the viewer takes part in a contest, every public page carries its bar (P-15 B). */
+const { current: currentContest } = useCurrentContest(
+  () => route.meta.layout !== 'admin' && route.meta.layout !== 'auth',
+);
 </script>
 
 <template>
@@ -45,6 +51,7 @@ const route = useRoute();
     <template v-else>
       <template v-if="route.meta.layout !== 'auth'">
         <AppHeader class="print:hidden" />
+        <ContestBar v-if="currentContest" :current="currentContest" />
         <SiteNoticeBanner class="print:hidden" />
         <OfficialModeBanner class="print:hidden" />
         <HighPriorityBanner class="print:hidden" />

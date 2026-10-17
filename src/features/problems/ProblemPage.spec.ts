@@ -1,8 +1,15 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { useLocaleStore } from '@/stores/locale.store';
-import { contestDetail, contestProblem, problemDetail, problemEditorial } from '@/test/fixtures';
-import { fail, mockApi, ok, sequence } from '@/test/mock-api';
+import {
+  contestDetail,
+  contestProblem,
+  participationSummary,
+  problemDetail,
+  problemEditorial,
+  viewerResult,
+} from '@/test/fixtures';
+import { fail, mockApi, ok, page, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, problemPageRoutes, signedInViewer } from '@/test/problem-routes';
 
@@ -223,6 +230,53 @@ describe('problem page inside a contest', () => {
     );
     const current = wrapper.get('[data-testid="problem-switcher"] [aria-current="page"]');
     expect(current.attributes('href')).toBe('/problems/r42b');
+  });
+
+  it('carries the contest bar, lights "Kỳ thi" and trades site-wide facts for the contest ones', async () => {
+    const solved = contestDetail({
+      problems: [
+        contestProblem(0),
+        contestProblem(1, {
+          points: 250,
+          viewerResult: viewerResult({
+            isSolved: true,
+            attempts: 1,
+            cell: { points: 250, time: 3038 },
+          }),
+        }),
+      ],
+    });
+    mockApi({
+      ...signedInViewer(),
+      ...problemPageRoutes(inContest),
+      'GET /contests/r42': ok(solved),
+      'GET /contests/r42/announcements': page([]),
+      'GET /contests/current': ok({
+        contest: {
+          key: 'r42',
+          name: solved.name,
+          startTime: solved.startTime,
+          endTime: '2999-01-01T00:00:00Z',
+        },
+        participation: participationSummary({ endTime: '2999-01-01T00:00:00Z' }),
+      }),
+    });
+    const { wrapper } = await openProblem('/problems/r42b');
+    await vi.waitFor(() => expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(true));
+    const bar = wrapper.get('[data-testid="contest-bar"]');
+    expect(bar.text()).toContain(`Bạn đang thi · ${solved.name}`);
+    expect(bar.get('[aria-current="page"]').attributes('href')).toBe('/contests/r42');
+    const nav = wrapper.get('header nav[aria-label]');
+    expect(nav.get('[aria-current="page"]').text()).toBe('Kỳ thi');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="viewer-own-result"]').exists()).toBe(true),
+    );
+    const facts = wrapper.get('[data-testid="problem-facts"]').text();
+    expect(facts).toContain('Điểm kỳ thi250');
+    expect(facts).not.toContain('Tỉ lệ AC');
+    expect(wrapper.get('[data-testid="submit-contest"]').text()).toContain(
+      `Kỳ thi: ${solved.name}`,
+    );
   });
 
   it('has no rail outside a contest and asks for no contest', async () => {

@@ -70,10 +70,13 @@
     },
     "span": {
       "days": "{count} day | {count} days",
+      "daysHours": "{days} days {hours} h",
       "hoursMinutes": "{hours} h {minutes} min",
       "hours": "{count} hour | {count} hours",
       "minutes": "{count} minute | {count} minutes",
-      "underMinute": "under a minute"
+      "underMinute": "under a minute",
+      "daysHoursShort": "{days}d {hours}h",
+      "daysShort": "{days}d"
     },
     "participants": "{count} contestant | {count} contestants",
     "virtualExtra": "+{count} virtual",
@@ -1061,7 +1064,8 @@
         "status": "Status",
         "untried": "Not tried",
         "hideTypes": "Hide problem types",
-        "showTypes": "Show problem types"
+        "showTypes": "Show problem types",
+        "contestPoints": "Contest points"
       },
       "mine": {
         "title": "My submissions"
@@ -1307,7 +1311,7 @@
     "overLimit": "Over the {max} character limit",
     "templateRestored": "Template restored",
     "limits": "{time} · {memory}",
-    "inContest": "Contest {key}",
+    "inContest": "Contest: {name}",
     "attemptsLeft": "{count} attempt left | {count} attempts left",
     "attemptsNone": "No attempts left for this problem.",
     "resubmitUnavailable": "The submission to resubmit could not be loaded.",
@@ -2397,6 +2401,13 @@
       "unknown": "No result"
     },
     "title": "Contest problems"
+  },
+  "contestBar": {
+    "label": "Your current contest",
+    "live": "In contest",
+    "virtual": "Virtual #{run}",
+    "spectate": "Spectating",
+    "rankingShort": "Ranking"
   },
   "balloons": {
     "tab": "Balloons",
