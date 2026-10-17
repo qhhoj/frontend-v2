@@ -49,7 +49,7 @@ export const useContestQuery = (
   });
 };
 
-/** The viewer's current participation (virtual run number and end); asked only while in a contest. */
+/** The viewer's current participation (virtual run number and end), or null; the app shell asks it for every signed-in viewer. */
 export const useCurrentParticipationQuery = (isEnabled: Ref<boolean>) => {
   const viewerId = useViewerId();
   return useQuery({
