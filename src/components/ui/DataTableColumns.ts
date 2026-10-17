@@ -15,8 +15,10 @@ export interface DataTableColumn {
   key: string;
   label: string;
   priority?: ColumnPriority;
-  /** `end`: numbers, right-aligned in mono with tabular figures. */
+  /** `end`: numbers, right-aligned in mono with tabular figures, on one line. */
   align?: 'start' | 'end';
+  /** A code, key, slug or address: mono, on one line (its width is the value's). */
+  mono?: boolean;
   sort?: ColumnSort;
   /** The header text is for screen readers only (an actions or icon column). */
   hideLabel?: boolean;

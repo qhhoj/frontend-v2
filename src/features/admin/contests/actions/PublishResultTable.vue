@@ -13,7 +13,7 @@ const columns = computed<AdminColumn[]>(() => [
     key: 'problem',
     label: t('admin.contestPublish.columns.problem'),
     priority: 'primary',
-    cellClass: 'font-mono whitespace-nowrap',
+    mono: true,
   },
   { key: 'outcome', label: t('admin.contestPublish.columns.outcome'), grow: true },
   { key: 'editorial', label: t('admin.contestPublish.columns.editorial'), priority: 'meta' },

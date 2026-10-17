@@ -36,9 +36,9 @@ const columns = computed<AdminColumn[]>(() => [
   { key: 'load', label: t('admin.judges.table.load'), align: 'end' },
   { key: 'ping', label: t('admin.judges.table.ping'), align: 'end' },
   { key: 'busy', label: t('admin.judges.table.busy'), align: 'end' },
-  { key: 'build', label: t('admin.judges.table.build'), priority: 'meta' },
+  { key: 'build', label: t('admin.judges.table.build'), priority: 'meta', mono: true },
   { key: 'languages', label: t('admin.judges.table.languages'), priority: 'meta', align: 'end' },
-  { key: 'ip', label: t('admin.judges.table.ip'), priority: 'meta' },
+  { key: 'ip', label: t('admin.judges.table.ip'), priority: 'meta', mono: true },
 ]);
 
 const loadText = (judge: Judge) =>

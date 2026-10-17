@@ -12,7 +12,7 @@ const columns = computed<AdminColumn[]>(() => [
     key: 'language',
     label: t('admin.judges.runtimes.language'),
     priority: 'primary',
-    cellClass: 'font-mono',
+    mono: true,
   },
   { key: 'name', label: t('admin.judges.runtimes.compiler'), grow: true },
   { key: 'version', label: t('admin.judges.runtimes.version'), cellClass: 'font-mono' },
