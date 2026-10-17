@@ -20,6 +20,7 @@ import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
 import { contestEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import ContestTabs from './ContestTabs.vue';
 import { ownSubmissionsOnly } from './own-submissions';
+import { podiumRows } from './podium-rows';
 import RankingSkeleton from './RankingSkeleton.vue';
 import RankingPodium from './RankingPodium.vue';
 import RankingTable from './RankingTable.vue';
@@ -82,8 +83,6 @@ const rows = computed(() => {
   const all = ranking.value?.rows ?? [];
   return needle ? all.filter((row) => row.user.username.toLocaleLowerCase().includes(needle)) : all;
 });
-/** Ranks 1-3 including ties, capped so a mass tie does not fill the page. */
-const PODIUM_LIMIT = 6;
 const PODIUM_SKELETON_CELLS = 3;
 /** The format is known before the board is, so the skeleton can have the penalty column the table will have. */
 /** The board's own problem list once it is known (a cached board), else the contest's: the skeleton has the table's column count. */
@@ -96,11 +95,7 @@ const skeletonHasTimeColumn = computed(
     isPenaltyFormat(contest.value.formatName) &&
     showsCumtime(contest.value.formatName),
 );
-const podium = computed(() =>
-  (ranking.value?.rows ?? [])
-    .filter((row) => row.rank !== null && row.rank <= 3 && !row.isDisqualified)
-    .slice(0, PODIUM_LIMIT),
-);
+const podium = computed(() => podiumRows(ranking.value?.rows ?? []));
 const summary = computed(() =>
   contest.value
     ? rankingSummary(
