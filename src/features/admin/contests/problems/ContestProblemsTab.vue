@@ -80,6 +80,7 @@ const HEAD = 'px-2 py-2 text-xs font-semibold tracking-wide uppercase';
     <!-- The save bar submits this empty form: the add and copy tools are forms of their own. -->
     <form :id="formId" class="hidden" novalidate @submit.prevent="save" />
     <div class="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_15rem]">
+      <ContestSummaryRail :contest="contest" class="xl:order-last" />
       <div class="flex min-w-0 flex-col gap-3">
         <section class="flex flex-col gap-3" :aria-label="$t('admin.contests.problems.tools')">
           <div class="flex flex-wrap items-start gap-2">
@@ -104,7 +105,7 @@ const HEAD = 'px-2 py-2 text-xs font-semibold tracking-wide uppercase';
               {{ $t('admin.contests.problems.copyLabel') }}
             </button>
           </div>
-          <div v-if="isCopyOpen" :id="copyPanelId" :class="[CARD, 'px-4 py-3']">
+          <div v-show="isCopyOpen" :id="copyPanelId" :class="[CARD, 'px-4 py-3']">
             <ProblemCopyFrom :current-key="contest.key" :copy="copyRows" />
           </div>
         </section>
@@ -230,7 +231,11 @@ const HEAD = 'px-2 py-2 text-xs font-semibold tracking-wide uppercase';
           <li>
             {{ $t('admin.contests.problems.rejudgeLine') }}
             <RouterLink
-              :to="{ name: 'admin-contestActions', params: { key: contest.key } }"
+              :to="{
+                name: 'admin-contestActions',
+                params: { key: contest.key },
+                hash: '#contest-actions-problem',
+              }"
               class="font-semibold text-accent-text underline"
               data-testid="contest-rejudge-link"
               >{{ $t('admin.contests.problems.rejudgeLink') }}</RouterLink
@@ -238,7 +243,6 @@ const HEAD = 'px-2 py-2 text-xs font-semibold tracking-wide uppercase';
           </li>
         </ul>
       </div>
-      <ContestSummaryRail :contest="contest" class="max-xl:order-first" />
     </div>
 
     <AdminStatus

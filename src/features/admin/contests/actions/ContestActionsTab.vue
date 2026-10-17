@@ -193,6 +193,15 @@ const runReplayRebuild = () => runAction(rebuildReplay);
           </ContestActionCard>
         </div>
       </QueryState>
+    </section>
+    <section
+      id="contest-actions-problem"
+      class="flex scroll-mt-20 flex-col gap-3"
+      aria-labelledby="contest-actions-problem-title"
+    >
+      <h2 id="contest-actions-problem-title" :class="GROUP">
+        {{ $t('admin.contests.actions.groups.problem') }}
+      </h2>
       <ContestProblemOpsCard :contest="contest" />
     </section>
     <section class="flex flex-col gap-3" aria-labelledby="contest-actions-board">

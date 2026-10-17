@@ -38,6 +38,11 @@ const pageFailure = computed(() =>
 <template>
   <form class="flex flex-col gap-4" novalidate @submit.prevent="submit">
     <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_15rem] xl:items-start">
+      <ContestSummaryRail
+        :contest="contest"
+        :has-sections="view === 'advanced'"
+        class="xl:order-last"
+      />
       <fieldset :disabled="mutation.isPending.value" class="m-0 min-w-0 border-0 p-0">
         <ContestGeneralForm
           v-model="form"
@@ -60,11 +65,6 @@ const pageFailure = computed(() =>
           >
         </p>
       </fieldset>
-      <ContestSummaryRail
-        :contest="contest"
-        :has-sections="view === 'advanced'"
-        class="max-xl:order-first"
-      />
     </div>
     <AdminNotice
       v-if="willRescore"

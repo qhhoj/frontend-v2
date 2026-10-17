@@ -131,7 +131,7 @@ describe('ContestProblemsTab', () => {
     const position = wrapper.get('input[aria-label="Vị trí của hcmus41c"]');
     await position.setValue('1');
     await position.trigger('change');
-    expect(wrapper.find('#contest-copy-problems').exists()).toBe(false);
+    expect(wrapper.get('#contest-copy-problems').isVisible()).toBe(false);
     await wrapper.get('[data-testid="contest-copy-toggle"]').trigger('click');
     await wrapper.get('#contest-copy-problems').setValue('hcmus-w40');
     await wrapper

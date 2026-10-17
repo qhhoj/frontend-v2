@@ -161,7 +161,6 @@
       "removeAccessCode": "Remove code",
       "rankingAccessCode": "Ranking access code",
       "removeRankingAccessCode": "Remove ranking code",
-      "isVisible": "Contest visible",
       "isPrivate": "Private",
       "isPrivateHint": "Only the contestants listed.",
       "privateContestants": "Listed contestants",
@@ -180,7 +179,6 @@
       "optionsTitle": "Display and judging options",
       "runPretestsOnlyHint": "Only pretests run during the contest; full tests at final judging.",
       "hideProblemTagsHint": "Contestants do not see the problem tags.",
-      "isVisibleHint": "Off: only the contest staff see it.",
       "isOrganizationPrivateHint": "Only members of the chosen organizations may enter."
     },
     "hints": {
@@ -475,6 +473,7 @@
     "queuedToast": "Queued: {action}.",
     "groups": {
       "jobs": "Judging and scoring",
+      "problem": "One problem",
       "board": "Scoreboard and publishing",
       "copy": "Data and copies",
       "danger": "Danger zone"
@@ -488,7 +487,7 @@
     },
     "penalty": "{hours} h {minutes} min",
     "countLine": "{total} participations · 50 per page",
-    "countSplit": "{total} participations: {live} participants, {virtual} virtual · 50 per page",
+    "countSplit": "{total} participations, of which {live} participants and {virtual} virtual · 50 per page",
     "userLabel": "Search usernames",
     "columns": {
       "user": "User",

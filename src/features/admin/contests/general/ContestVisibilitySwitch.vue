@@ -37,8 +37,8 @@ const lockedBy = computed(() => {
 const mutation = useAdminMutation({
   mutate: (isVisible: boolean) => updateContest(props.contest.key, { isVisible }),
   invalidates: () => [PUBLIC_CONTESTS_KEY, CONTEST_INDEX_KEY],
-  successText: (saved: EditableContest) =>
-    translate(saved.settings?.isVisible ? `${KEY}.shown` : `${KEY}.hidden`, { key: saved.key }),
+  successText: (saved: EditableContest, isVisible: boolean) =>
+    translate(isVisible ? `${KEY}.shown` : `${KEY}.hidden`, { key: saved.key }),
   onDone: (saved: EditableContest) =>
     queryClient.setQueryData(editableContestKey(saved.key, viewer.value), saved),
 });

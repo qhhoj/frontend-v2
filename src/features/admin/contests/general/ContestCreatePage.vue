@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { translate } from '@/i18n';
 import { useRouter } from 'vue-router';
 import { createContest, createOrganizationContest } from '@/api/contest-editing.api';
@@ -13,7 +13,7 @@ import { CARD, buttonClass } from '../../ui/controls';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
-import { canSetVisible, checkContestForm, emptyContestForm, toContestBody } from '../contest-form';
+import { checkContestForm, emptyContestForm, toContestBody } from '../contest-form';
 import { usePermissions } from '@/stores/use-permissions';
 import ContestBasicForm from './ContestBasicForm.vue';
 
@@ -24,12 +24,11 @@ import ContestBasicForm from './ContestBasicForm.vue';
 const router = useRouter();
 const { can } = usePermissions();
 const form = ref(emptyContestForm());
-/** Mock-up 2C: an owning organization makes the contest its members-only one; the server sets those fields. */
+/**
+ * Mock-up 2C: an owning organization makes the contest its members-only one; the server sets those fields. Every new
+ * contest starts hidden, also for members: it is shown from the summary's switch once its problems are in.
+ */
 const owner = ref<CreationOwner | null>(null);
-/** Members of the owning organization should see the contest: it starts visible when the account may set that. */
-watch(owner, (picked) => {
-  form.value.isVisible = Boolean(picked) && canSetVisible(form.value, can, true);
-});
 const isOwnerReady = ref(false);
 const localErrors = computed(() => checkContestForm(form.value));
 /** Errors show once a save was tried, not while the first field is still being typed. */

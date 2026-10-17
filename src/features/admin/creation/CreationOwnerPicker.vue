@@ -51,12 +51,15 @@ const selectedSlug = computed({
     owner.value = options.value.find((option) => option.slug === slug) ?? null;
   },
 });
+/** The field layout offers a site-wide creator a select once there is an organization to pick. */
 const isSelect = computed(
-  () => options.value.length > MAX_CARDS || (props.layout === 'field' && scope.value.site),
+  () =>
+    options.value.length > MAX_CARDS ||
+    (props.layout === 'field' && scope.value.site && options.value.length > 0),
 );
 const ownerHint = computed(() => {
   if (owner.value) return 'admin.creation.owner.privateHint';
-  return props.layout === 'field'
+  return props.layout === 'field' && isSelect.value
     ? 'admin.creation.owner.chooseHint'
     : 'admin.creation.owner.siteHint';
 });
