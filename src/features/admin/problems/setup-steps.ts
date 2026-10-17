@@ -11,6 +11,13 @@ export interface SetupStep {
   routeName: string;
 }
 
+const isWritten = (text: string | undefined) => (text ?? '').trim() !== '';
+
+/** A statement in any slot counts: the base description or a translation's (a new problem is often written in Vietnamese only). */
+const hasStatement = (problem: EditableProblem) =>
+  isWritten(problem.editor?.description) ||
+  (problem.editor?.translations ?? []).some((translation) => isWritten(translation.description));
+
 /**
  * Mock-up 3C: the manual setup of a new problem, in order — information, statement, tests, checker and points, a trial
  * submission, publishing. `cases` is null while the test data is unknown (counted as not done).
@@ -22,11 +29,7 @@ export function setupSteps(
   const hasCases = (cases ?? []).some((testCase) => testCase.type === 'C');
   return [
     { id: 'info', isDone: true, routeName: 'admin-problemGeneral' },
-    {
-      id: 'statement',
-      isDone: (problem.editor?.description ?? '').trim() !== '',
-      routeName: 'admin-problemStatements',
-    },
+    { id: 'statement', isDone: hasStatement(problem), routeName: 'admin-problemStatements' },
     { id: 'tests', isDone: hasCases, routeName: 'admin-problemData' },
     {
       id: 'scoring',

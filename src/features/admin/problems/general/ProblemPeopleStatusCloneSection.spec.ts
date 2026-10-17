@@ -75,7 +75,7 @@ describe('problem people, status and clone', () => {
     expect(wrapper.get('#problem-isFullMarkup').attributes('disabled')).toBeDefined();
     await router.push('/admin/problems/hcmus41c/general');
     await flushPromises();
-    expect(wrapper.get('#problem-isPublic').attributes('disabled')).toBeUndefined();
+    expect(wrapper.find('[data-testid="problem-visibility-open"]').exists()).toBe(true);
   });
 
   it('clones under a new code from the header menu and opens the copy; a taken code shows under the box', async () => {

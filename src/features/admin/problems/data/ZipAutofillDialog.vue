@@ -20,17 +20,24 @@ const props = defineProps<{
   archiveFiles: string[];
   cases: KeyedCase[];
   problemPoints: number | null;
+  /** The dismiss button's text; "Huỷ" by default. */
+  dismissLabel?: string;
 }>();
 const emit = defineEmits<{ apply: [rows: KeyedCase[], mode: AutofillMode] }>();
 const titleId = useId();
 
 const mode = ref<AutofillMode>('replace');
 const total = ref(totalPointsOf(props.problemPoints));
-watch(visible, (isOpen) => {
-  if (!isOpen) return;
-  mode.value = props.cases.length > 0 ? 'append' : 'replace';
-  total.value = totalPointsOf(props.problemPoints);
-});
+// Immediate: the dialog can mount already open (opened by an upload as its button first appears).
+watch(
+  visible,
+  (isOpen) => {
+    if (!isOpen) return;
+    mode.value = props.cases.length > 0 ? 'append' : 'replace';
+    total.value = totalPointsOf(props.problemPoints);
+  },
+  { immediate: true },
+);
 
 const pairing = computed(() => pairArchiveFiles(props.archiveFiles));
 const pairs = computed(() =>
@@ -184,7 +191,7 @@ const CELL = 'border-b border-line px-2 py-1.5';
       </details>
       <div class="flex flex-wrap justify-end gap-2 border-t border-line pt-4">
         <button type="button" :class="BUTTON.ghost" @click="visible = false">
-          {{ $t('common.cancel') }}
+          {{ dismissLabel ?? $t('common.cancel') }}
         </button>
         <button
           type="submit"

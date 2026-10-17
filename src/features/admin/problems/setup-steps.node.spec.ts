@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { editableProblem, problemEditor, testCase } from '@/test/admin-fixtures/problems';
 import { isSetupOpen, nextStep, setupSteps } from './setup-steps';
 
-const fresh = editableProblem({ editor: { ...problemEditor(), description: '' } });
+const fresh = editableProblem({
+  editor: { ...problemEditor(), description: '', translations: [] },
+});
 const doneIds = (steps: ReturnType<typeof setupSteps>) =>
   steps.filter((step) => step.isDone).map((step) => step.id);
 
@@ -11,6 +13,25 @@ describe('setupSteps', () => {
     const steps = setupSteps(fresh, []);
     expect(doneIds(steps)).toEqual(['info']);
     expect(nextStep(steps)?.id).toBe('statement');
+  });
+
+  it('counts a statement written only as a translation', () => {
+    const vietnameseOnly = editableProblem({
+      editor: {
+        ...problemEditor(),
+        description: '',
+        translations: [{ language: 'vi', name: 'Tổng', description: 'Cho $a$, $b$.' }],
+      },
+    });
+    expect(nextStep(setupSteps(vietnameseOnly, []))?.id).toBe('tests');
+    const blankTranslation = editableProblem({
+      editor: {
+        ...problemEditor(),
+        description: ' ',
+        translations: [{ language: 'en', name: 'Sum', description: '  ' }],
+      },
+    });
+    expect(nextStep(setupSteps(blankTranslation, []))?.id).toBe('statement');
   });
 
   it('leads to the tests once the statement is written', () => {

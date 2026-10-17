@@ -16,8 +16,7 @@ const form = defineModel<ProblemForm>({ required: true });
 /** The revision comment; bound only by the edit form. */
 const changeMessage = defineModel<string>('changeMessage');
 /**
- * The general form as its Basic or Advanced `view`. `suggester`: who suggested an existing problem (read-only);
- * `privateCode`, `canPublishToMembers`: see `ProblemPublishField`.
+ * The general form as its Basic or Advanced `view`. `suggester`: who suggested an existing problem (read-only).
  */
 defineProps<{
   view: EditorView;
@@ -25,20 +24,12 @@ defineProps<{
   errors: FieldErrors;
   suggester?: UserSummaryView | null;
   isSuggestionPending?: boolean;
-  privateCode?: string;
   hasChangeMessage?: boolean;
-  canPublishToMembers?: boolean;
 }>();
 </script>
 
 <template>
-  <ProblemBasicForm
-    v-if="view === 'basic'"
-    v-model="form"
-    :errors="errors"
-    :private-code="privateCode"
-    :can-publish-to-members="canPublishToMembers"
-  />
+  <ProblemBasicForm v-if="view === 'basic'" v-model="form" :errors="errors" />
   <template v-else>
     <ProblemBasicsSection
       v-model="form"

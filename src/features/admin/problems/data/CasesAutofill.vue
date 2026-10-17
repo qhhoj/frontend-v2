@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, shallowRef, toRaw } from 'vue';
+import { computed, shallowRef, toRaw } from 'vue';
 import { FileArchive } from 'lucide-vue-next';
 import { translate } from '@/i18n';
 import AdminStatus from '../../ui/AdminStatus.vue';
@@ -19,8 +19,9 @@ const props = defineProps<{
   problemPoints: number | null;
 }>();
 const emit = defineEmits<{ invalid: [key: number, isInvalid: boolean] }>();
-
-const isShown = ref(false);
+/** The dialog; the data tab opens it itself right after a zip upload, where its dismiss reads "Bỏ qua, tự thêm test". */
+const isShown = defineModel<boolean>('open', { default: false });
+const isAfterUpload = defineModel<boolean>('afterUpload', { default: false });
 /**
  * Shown inline (a toast would sit over the save bar it points to) while the list is still the one the autofill made; any
  * later change, a save or a discard replaces the list and hides it.
@@ -53,7 +54,10 @@ function apply(rows: KeyedCase[], mode: AutofillMode) {
       type="button"
       data-testid="zip-autofill-open"
       :class="buttonClass(cases.length === 0 ? 'primary' : 'secondary')"
-      @click="isShown = true"
+      @click="
+        isAfterUpload = false;
+        isShown = true;
+      "
     >
       <FileArchive aria-hidden="true" class="size-4" :stroke-width="1.75" />
       {{ $t('admin.problems.data.cases.autofill') }}
@@ -63,6 +67,7 @@ function apply(rows: KeyedCase[], mode: AutofillMode) {
       :archive-files="archiveFiles"
       :cases="cases"
       :problem-points="problemPoints"
+      :dismiss-label="isAfterUpload ? $t('admin.problems.data.autofill.skip') : undefined"
       @apply="apply"
     />
   </div>

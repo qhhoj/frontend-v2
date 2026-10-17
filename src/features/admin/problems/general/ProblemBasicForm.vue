@@ -4,11 +4,10 @@ import type { FieldErrors } from '../../ui/admin-errors';
 import { INPUT } from '../../ui/controls';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { ProblemForm } from './problem-form';
-import ProblemPublishField from './ProblemPublishField.vue';
 
-/** The Basic view ("Cơ bản") of the general form: code, name, the three limits, and "Công khai". */
+/** The Basic view ("Cơ bản") of the general form: code, name and the three limits ("Công khai" is `ProblemVisibilityCard`). */
 const form = defineModel<ProblemForm>({ required: true });
-defineProps<{ errors: FieldErrors; privateCode?: string; canPublishToMembers?: boolean }>();
+defineProps<{ errors: FieldErrors }>();
 const KEY = 'admin.problems.general';
 const TEXT_FIELDS = [
   { key: 'code', mono: true },
@@ -69,16 +68,5 @@ const NUMBER_FIELDS = [
         />
       </AdminField>
     </div>
-  </AdminFormSection>
-  <AdminFormSection
-    :title="$t(`${KEY}.basic.sections.publish`)"
-    :description="$t(`${KEY}.basic.leads.publish`)"
-    :columns="1"
-  >
-    <ProblemPublishField
-      v-model="form"
-      :private-code="privateCode"
-      :can-publish-to-members="canPublishToMembers"
-    />
   </AdminFormSection>
 </template>

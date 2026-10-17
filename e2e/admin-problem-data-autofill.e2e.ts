@@ -39,9 +39,9 @@ test('fills the test list from an uploaded zip and saves it through the save bar
     mimeType: 'application/zip',
     buffer: Buffer.from('PK'),
   });
-  await page.getByRole('button', { name: 'Tạo test từ gói zip' }).click();
-
+  // The upload opens the dialog itself; its dismiss offers to add the tests by hand.
   const dialog = page.getByRole('dialog', { name: 'Tạo test từ gói zip' });
+  await expect(dialog.getByRole('button', { name: 'Bỏ qua, tự thêm test' })).toBeVisible();
   await expect(dialog.getByText('Tìm thấy 3 cặp input/output')).toBeVisible();
   await expect(dialog.getByTestId('autofill-pair')).toHaveText([
     /Test01\/BAI\.INP.*Test01\/BAI\.OUT.*33/,
