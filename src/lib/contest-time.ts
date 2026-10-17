@@ -111,13 +111,15 @@ export const LONG_COUNTDOWN_SECONDS = 48 * 3600;
 export type CountdownView =
   { kind: 'clock'; text: string } | { kind: 'words'; days: number; hours: number };
 
+/** Whole days and the hours past them. */
+export const daysHoursOf = (seconds: number): { days: number; hours: number } => ({
+  days: Math.floor(seconds / 86_400),
+  hours: Math.floor((seconds % 86_400) / 3600),
+});
+
 /** Time left, said one way on the hero, the contest bar, the ranking pill and the list: `13 ngày 21 giờ`, then `HH:MM:SS`. */
 export function countdownView(seconds: number): CountdownView {
   const left = Math.max(0, Math.floor(seconds));
   if (left < LONG_COUNTDOWN_SECONDS) return { kind: 'clock', text: formatDuration(left) };
-  return {
-    kind: 'words',
-    days: Math.floor(left / 86_400),
-    hours: Math.floor((left % 86_400) / 3600),
-  };
+  return { kind: 'words', ...daysHoursOf(left) };
 }

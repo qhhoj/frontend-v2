@@ -4,8 +4,12 @@ import type {
   RankingProblem,
   RankingRow,
 } from '@/api/types/contests';
+import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
+import { daysHoursOf } from './contest-time';
 import { formatElapsed, formatElapsedSeconds, formatNumber } from './format';
+import { daysHoursText } from './use-countdown-text';
+import type { Translate } from './use-countdown-text';
 
 export type CellKind = 'empty' | 'first-solve' | 'solved' | 'partial' | 'failed' | 'pending';
 export interface RankingCellView {
@@ -61,6 +65,29 @@ export const formatCumtime = (formatName: ContestFormatName, cumtime: number) =>
 const NO_CUMTIME_FORMATS = new Set<ContestFormatName>(['ioi16', 'final_submission']);
 export const showsCumtime = (formatName: ContestFormatName) => !NO_CUMTIME_FORMATS.has(formatName);
 
+/**
+ * From 100 hours a cell's clock (`2735:36:42`, or `2735:36` on penalty boards) no longer reads at a glance, nor fits
+ * the cell: it says `113 ng 23 g` instead (P-18). Below that, `H:MM:SS` fits up to 99:59:59.
+ */
+const LONG_CELL_SECONDS = 100 * 3600;
+/** A cell's solve time: shown short, and in full words for screen readers. */
+function cellElapsed(
+  seconds: number,
+  formatBelowLong: (seconds: number) => string,
+  locale: Locale,
+): { shown: string; spoken: string } {
+  if (seconds < LONG_CELL_SECONDS) {
+    const clock = formatBelowLong(seconds);
+    return { shown: clock, spoken: clock };
+  }
+  const inLocale: Translate = (key, named, plural) => translate(key, named, { locale, plural });
+  const span = daysHoursOf(seconds);
+  return {
+    shown: daysHoursText(inLocale, span, true),
+    spoken: daysHoursText(inLocale, span, false),
+  };
+}
+
 const EMPTY: RankingCellView = {
   kind: 'empty',
   text: '',
@@ -90,14 +117,19 @@ const READ_TRIES: Partial<Record<ContestFormatName, (cell: ProblemCell) => Tries
   vnoj: (cell) => ({ wrong: Number(cell.penalty ?? 0), pending: Number(cell.pending ?? 0) }),
 };
 
-function solvedPenaltyCell(cell: ProblemCell, wrong: number, isFirst: boolean): RankingCellView {
-  const time = formatElapsed(Number(cell.time ?? 0));
+function solvedPenaltyCell(
+  cell: ProblemCell,
+  wrong: number,
+  isFirst: boolean,
+  locale: Locale,
+): RankingCellView {
+  const time = cellElapsed(Number(cell.time ?? 0), formatElapsed, locale);
   return {
     kind: isFirst ? 'first-solve' : 'solved',
     text: `+${wrong || ''}`,
-    time,
+    time: time.shown,
     labelKey: isFirst ? 'ranking.cell.firstSolve' : 'ranking.cell.solved',
-    labelParams: { tries: wrong, time },
+    labelParams: { tries: wrong, time: time.spoken },
   };
 }
 
@@ -114,7 +146,7 @@ function penaltyCell(
     context.formatName === 'icpc'
       ? points > 0
       : isFullPoints(points, problem, context.pointsPrecision);
-  if (solved) return solvedPenaltyCell(cell, wrong, isFirst);
+  if (solved) return solvedPenaltyCell(cell, wrong, isFirst, context.locale);
   if (pending > 0)
     return {
       kind: 'pending',
@@ -134,7 +166,9 @@ function penaltyCell(
 }
 
 const cellTime = (cell: ProblemCell, context: RankingContext) =>
-  context.showsTime && typeof cell.time === 'number' ? formatElapsedSeconds(cell.time) : undefined;
+  context.showsTime && typeof cell.time === 'number'
+    ? cellElapsed(cell.time, formatElapsedSeconds, context.locale)
+    : undefined;
 
 /** Full or partial points, with the time under them when the format has one. */
 function scoredCell(
@@ -148,7 +182,13 @@ function scoredCell(
   if (time === undefined)
     return { kind, text, labelKey: 'ranking.cell.points', labelParams: { points: text } };
   const labelKey = kind === 'first-solve' ? 'ranking.cell.firstPointsAt' : 'ranking.cell.pointsAt';
-  return { kind, text, time, labelKey, labelParams: { points: text, time } };
+  return {
+    kind,
+    text,
+    time: time.shown,
+    labelKey,
+    labelParams: { points: text, time: time.spoken },
+  };
 }
 
 function partialCell(
