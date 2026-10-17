@@ -26,7 +26,8 @@ interface NoticeLook {
 /**
  * An inline notice beside its cause: an icon (or Bit, any `InlineBit` kind), an optional title, the body (default slot), an
  * optional long explanation behind a "Chi tiết" disclosure (`details` slot) and an `action` slot. It owns its surface.
- * The default look tints the whole box and puts the action on the right; `compact` (admin) keeps content-coloured text on a
+ * The default look tints the whole box and puts the action on the right, or under the text when the
+ * text would get less than 12rem beside it (a sign-in link on a phone); `compact` (admin) keeps content-coloured text on a
  * tinted box with a tinted icon and puts the action under the text. Role: a failure interrupts (`alert`), a success is
  * announced politely (`status`), standing advice has none; `role` overrides it (`null` = none).
  */
@@ -89,7 +90,7 @@ const resolvedRole = computed(() =>
 <template>
   <div
     :role="resolvedRole"
-    class="flex items-start gap-2.5 text-sm"
+    class="flex flex-wrap items-start gap-2.5 text-sm"
     :class="[look.box, look.tones[tone].box]"
   >
     <InlineBit v-if="bit" :kind="bit" />
@@ -101,7 +102,7 @@ const resolvedRole = computed(() =>
       :class="[look.icon, look.tones[tone].icon]"
       :stroke-width="look.strokeWidth"
     />
-    <div class="min-w-0 flex-1">
+    <div class="min-w-0 grow basis-48">
       <p v-if="title" class="m-0 font-semibold">{{ title }}</p>
       <p v-if="slots.default" class="m-0"><slot /></p>
       <template v-if="slots.details">
