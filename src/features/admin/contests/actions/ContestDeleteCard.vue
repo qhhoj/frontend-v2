@@ -10,7 +10,7 @@ import { deleteBlockedBy } from '../lifecycle/contest-delete';
 const props = defineProps<{ contest: EditableContest }>();
 const router = useRouter();
 const isOpen = ref(false);
-const blockedBy = computed(() => deleteBlockedBy(props.contest.settings?.isVisible ?? true));
+const blockedBy = computed(() => deleteBlockedBy(props.contest.settings?.isVisible));
 </script>
 
 <template>

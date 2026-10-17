@@ -131,6 +131,10 @@ const editTo = (contest: ContestListItem) => ({
 const target = ref<ContestListItem | null>(null);
 const isCloneOpen = ref(false);
 const isDeleteOpen = ref(false);
+/** A deleted contest leaves the bulk selection too, so a later bulk run does not name it. */
+function forget(key: string) {
+  selected.value = new Set([...selected.value].filter((picked) => picked !== key));
+}
 const menuOf = useContestRowMenu({
   clone: (contest) => {
     target.value = contest;
@@ -253,7 +257,11 @@ const resultRows = computed(() =>
     />
     <template v-if="target">
       <ContestCloneDialog v-model:visible="isCloneOpen" :source="target" />
-      <ContestDeleteDialog v-model:visible="isDeleteOpen" :contest-key="target.key" />
+      <ContestDeleteDialog
+        v-model:visible="isDeleteOpen"
+        :contest-key="target.key"
+        @deleted="forget(target.key)"
+      />
     </template>
   </div>
 </template>

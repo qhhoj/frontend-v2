@@ -50,7 +50,8 @@
     "author": "Tác giả: {name}"
   },
   "menu": {
-    "label": "Thao tác khác cho {code}"
+    "label": "Thao tác khác cho {code}",
+    "data": "Dữ liệu chấm"
   },
   "partial": "từng phần",
   "partialHint": "Chấm từng phần: mỗi test đúng được một phần điểm.",

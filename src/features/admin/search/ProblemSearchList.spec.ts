@@ -83,7 +83,7 @@ describe('ProblemSearchList', () => {
     expect(problemCalls(calls).at(-1)!.query.get('q')).toBe('cây');
     expect(problemCalls(calls).at(-1)!.query.has('search')).toBe(false);
   });
-  it('keeps one row contract: the title edits, "⋯" lists view, clone and delete, and points read as a number', async () => {
+  it('keeps one row contract: the title edits, "⋯" lists view, clone, test data and delete, and points read as a number', async () => {
     mockApi({
       ...staffViewer([...PERMS, 'judge.clone_problem', 'judge.delete_problem']),
       ...META,
@@ -103,6 +103,7 @@ describe('ProblemSearchList', () => {
     expect(items.map((item) => item.textContent.trim())).toEqual([
       'Xem trang công khai',
       'Nhân bản…',
+      'Dữ liệu chấm',
       'Xoá…',
     ]);
     (items[1]!.querySelector('a') as HTMLElement).click();

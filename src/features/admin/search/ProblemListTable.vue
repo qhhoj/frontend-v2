@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Building2, Globe, Lock } from 'lucide-vue-next';
+import { Building2, Database, Globe, Lock } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { NumberedPageMeta } from '@/api/client';
@@ -71,6 +71,13 @@ const menuItems = (code: string) =>
   standardRowMenu({
     view: { name: 'problem', params: { code } },
     clone: can('judge.clone_problem') ? () => askClone(code) : undefined,
+    extra: [
+      {
+        label: t('admin.problemList.menu.data'),
+        icon: Database,
+        to: { name: 'admin-problemData', params: { code } },
+      },
+    ],
     remove: can('judge.delete_problem') ? { run: () => emit('delete', code) } : undefined,
   });
 </script>

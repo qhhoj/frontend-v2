@@ -50,7 +50,8 @@
     "author": "Author: {name}"
   },
   "menu": {
-    "label": "More actions for {code}"
+    "label": "More actions for {code}",
+    "data": "Test data"
   },
   "partial": "partial",
   "partialHint": "Partial scoring: each passed test earns part of the points.",

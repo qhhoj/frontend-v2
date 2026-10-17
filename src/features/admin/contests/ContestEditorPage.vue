@@ -14,7 +14,7 @@ import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import AdminTabs from '../ui/AdminTabs.vue';
 import { routeTabs } from '../ui/admin-tabs';
 import { isNotFound } from '../ui/admin-errors';
-import { CARD, buttonClass } from '../ui/controls';
+import { CARD, OVERFLOW_ITEM, buttonClass } from '../ui/controls';
 import { useEditableContestQuery } from './contest-editing.queries';
 import { CONTEST_TABS, contestTabComponent, contestTabCount, contestTabOf } from './contest-tabs';
 import ContestPhaseChip from './list/ContestPhaseChip.vue';
@@ -51,7 +51,7 @@ const router = useRouter();
 const { can } = usePermissions();
 const isCloneOpen = ref(false);
 const isDeleteOpen = ref(false);
-const deleteBlock = computed(() => deleteBlockedBy(contest.value?.settings?.isVisible ?? true));
+const deleteBlock = computed(() => deleteBlockedBy(contest.value?.settings?.isVisible));
 function openClone(close: () => void) {
   close();
   isCloneOpen.value = true;
@@ -60,8 +60,6 @@ function openDelete(close: () => void) {
   close();
   isDeleteOpen.value = true;
 }
-const MENU_ITEM =
-  'flex min-h-(--qa-control) w-full items-center gap-2 rounded-cell px-3 text-left text-sm hover:bg-surface-hover disabled:cursor-not-allowed disabled:opacity-60';
 </script>
 
 <template>
@@ -113,7 +111,7 @@ const MENU_ITEM =
           <button
             v-if="can('judge.clone_contest')"
             type="button"
-            :class="MENU_ITEM"
+            :class="OVERFLOW_ITEM"
             @click="openClone(close)"
           >
             <Copy aria-hidden="true" class="size-4 text-muted" :stroke-width="1.75" />
@@ -121,7 +119,7 @@ const MENU_ITEM =
           </button>
           <button
             type="button"
-            :class="[MENU_ITEM, 'text-negative']"
+            :class="[OVERFLOW_ITEM, 'text-negative']"
             :disabled="Boolean(deleteBlock)"
             :title="deleteBlock"
             data-testid="contest-header-delete"

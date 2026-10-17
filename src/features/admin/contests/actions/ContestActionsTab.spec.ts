@@ -1,5 +1,5 @@
 import { needsPermissionText } from '../../ui/permission-text';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import type { mountApp } from '@/test/mount';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
@@ -27,6 +27,8 @@ const click = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], t
   await flushPromises();
 };
 const TAB_TEXT = 'Tính lại điểm và hạng của mọi lượt tham gia';
+
+afterEach(() => vi.restoreAllMocks());
 
 describe('ContestActionsTab', () => {
   it('rescores only after confirming, then shows the queued state the status endpoint reports', async () => {
@@ -214,6 +216,7 @@ describe('rating by format and freeze window', () => {
   });
 
   it('clones a week later by default, says when the copy ends, and opens the copy', async () => {
+    vi.spyOn(Date, 'now').mockReturnValue(Date.parse('2026-10-09T00:00:00.000Z'));
     const calls = mockApi({
       ...staffViewer(['judge.edit_own_contest', 'judge.clone_contest']),
       ...routes({

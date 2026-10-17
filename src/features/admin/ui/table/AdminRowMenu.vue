@@ -110,7 +110,7 @@ const model = computed<MenuItem[]>(() => {
           :class="item.danger ? 'text-negative' : 'text-muted'"
           :stroke-width="1.75"
         />
-        <span class="flex flex-col py-1.5">
+        <span class="flex flex-col" :class="item.hint && 'py-1.5'">
           <span>{{ item.label }}</span>
           <span v-if="item.hint" class="text-xs text-muted">{{ item.hint }}</span>
         </span>

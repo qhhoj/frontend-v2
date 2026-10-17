@@ -5,7 +5,13 @@ const source = { startTime: '2026-10-18T04:40:00.000Z', endTime: '2026-10-18T07:
 
 describe('contest clone window', () => {
   it('offers the same start one week later', () => {
-    expect(defaultCloneStart(source.startTime)).toBe('2026-10-25T04:40:00.000Z');
+    const now = Date.parse('2026-10-17T00:00:00.000Z');
+    expect(defaultCloneStart(source.startTime, now)).toBe('2026-10-25T04:40:00.000Z');
+  });
+
+  it('offers the first weekly slot still ahead for an older contest', () => {
+    const now = Date.parse('2026-11-03T12:00:00.000Z');
+    expect(defaultCloneStart(source.startTime, now)).toBe('2026-11-08T04:40:00.000Z');
   });
 
   it('keeps the length of the source for any new start', () => {
