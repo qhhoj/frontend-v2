@@ -368,14 +368,11 @@
       "data": "Data"
     },
     "defaults": {
-      "title": "Defaults and display",
-      "lead": "Used on the submit page and for times.",
       "languageHint": "Preselected on the submit page.",
       "noLanguage": "Not chosen",
       "timezoneHint": "Used for contest start times and submission times.",
       "interfaceLanguage": "Interface language",
-      "deviceOnly": "Saved on this device",
-      "deviceOnlyNote": "The interface language applies to this browser only and is not saved to the account."
+      "deviceOnly": "This browser only, not saved to your account."
     },
     "locales": {
       "vi": "Tiếng Việt",
@@ -398,21 +395,15 @@
     },
     "profile": {
       "lead": "Public details and the defaults used when you submit.",
-      "saved": "Profile saved.",
       "firstNameHint": "Shown on your profile page, the rankings and comments. The username {username} cannot change.",
       "aboutViews": "About text views",
       "aboutTab": {
         "write": "Write",
         "saved": "Saved version"
       },
-      "aboutHelp": "Markdown is supported. The server renders the saved text, so “Saved version” changes only after you save.",
+      "aboutHelp": "Markdown supported. The “Saved” tab updates after you save.",
       "aboutEmpty": "No about text yet.",
-      "noChanges": "No unsaved changes.",
-      "unsaved": "You have unsaved changes.",
       "fixToSave": "Fix {count} error(s), then save again.",
-      "undo": "Undo",
-      "save": "Save changes",
-      "saving": "Saving…",
       "fieldName": {
         "firstName": "Display name",
         "about": "About you",

@@ -25,21 +25,32 @@ async function openProfile(routes: Record<string, MockHandler> = {}, about = '')
     'PATCH /profile': echo,
     ...routes,
   });
-  const { wrapper } = await mountApp('/settings');
-  return { wrapper, calls };
+  const { wrapper, router } = await mountApp('/settings');
+  return { wrapper, calls, router };
 }
 
 describe('Settings › Profile', () => {
+  it('asks before a section change drops unsaved edits', async () => {
+    const { wrapper, router } = await openProfile();
+    await nameInput(wrapper).setValue('Trần Minh Thư');
+    await router.push('/settings/security').catch(() => undefined);
+    await flushPromises();
+    expect(router.currentRoute.value.path).toBe('/settings');
+    expect(document.body.textContent).toContain('1 thay đổi chưa lưu sẽ mất');
+  });
+
   it('saves only the edited field and says so', async () => {
     const { wrapper, calls } = await openProfile();
     await nameInput(wrapper).setValue('Trần Minh Thư');
-    expect(wrapper.text()).toContain('Có thay đổi chưa lưu.');
+    expect(wrapper.text()).toContain('1 thay đổi chưa lưu');
     await saveButton(wrapper).trigger('submit');
     await flushPromises();
     expect(patches(calls)).toEqual([{ firstName: 'Trần Minh Thư' }]);
-    expect(wrapper.get('#main [role="status"]').text()).toBe('Đã lưu hồ sơ.');
-    expect(wrapper.find('#main [role="status"] [data-testid="inline-bit"]').exists()).toBe(true);
-    expect(wrapper.text()).toContain('Không có thay đổi chưa lưu.');
+    // The save bar is the one place that reports the result.
+    const statuses = wrapper.findAll('#main [role="status"]');
+    expect(statuses.map((status) => status.text())).toEqual([
+      expect.stringMatching(/^Đã lưu lúc \d\d:\d\d$/),
+    ]);
   });
 
   it('counts an over-long name as it is typed, sends nothing, names the field and focuses it', async () => {

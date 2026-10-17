@@ -6,7 +6,7 @@ import LengthCounter from './LengthCounter.vue';
 import { profileFieldId } from './profile-field-ids';
 import { FIRST_NAME_MAX_LENGTH, storedLength } from './profile-draft';
 
-/** Board SetProfile, first card: the public name and the about text. */
+/** Board SetProfile, first card: the public name, then the default slot (the submit defaults), then the about text. */
 defineProps<{ username: string; savedAboutHtml: string; errors: Record<string, string> }>();
 const firstName = defineModel<string>('firstName', { required: true });
 const about = defineModel<string>('about', { required: true });
@@ -29,6 +29,7 @@ defineExpose({ showAboutWriteTab: () => aboutEditor.value?.showWriteTab() });
       <LengthCounter :used="storedLength(firstName)" :max="FIRST_NAME_MAX_LENGTH" />
     </template>
   </AuthField>
+  <slot />
   <AboutEditor
     ref="aboutEditor"
     v-model="about"
