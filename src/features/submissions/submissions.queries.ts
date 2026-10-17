@@ -31,12 +31,19 @@ export const useSubmissionQuery = (id: Ref<string>) => {
   });
 };
 
-/** The source of one submission per viewer. The submission page mounts it once the detail is known (a 403 would repeat); the diff page deliberately fires detail and source together, so a forbidden side costs two doomed requests. */
-export const useSubmissionSourceQuery = (id: Ref<string>) => {
+/**
+ * The source of one submission per viewer. The submission page asks only once the detail's `sourceAccess` is granted
+ * (`enabled`); the diff page deliberately fires detail and source together, so a forbidden side costs two doomed requests.
+ */
+export const useSubmissionSourceQuery = (
+  id: Ref<string>,
+  enabled: MaybeRefOrGetter<boolean> = true,
+) => {
   const viewerId = useViewerId();
   return useQuery({
     queryKey: computed(() => ['submissions', 'source', viewerId.value, id.value]),
     queryFn: () => fetchSubmissionSource(id.value),
+    enabled: () => toValue(enabled),
   });
 };
 

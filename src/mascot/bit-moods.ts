@@ -9,7 +9,7 @@ export interface BitMoodSpec {
   labelKey: string;
 }
 
-/** The moods Bit shows beside a notice or a verdict. InlineBit and SubmissionSummary both read this one table. */
+/** The moods Bit shows beside a notice or a verdict. InlineBit reads this one table. */
 export const BIT_MOODS = {
   crown: { look: PLACEMENT_LOOKS.accepted, eyesShut: false, labelKey: 'bit.accepted' },
   sweat: { look: PLACEMENT_LOOKS.rejected, eyesShut: true, labelKey: 'bit.rejected' },

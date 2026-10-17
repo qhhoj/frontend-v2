@@ -67,15 +67,30 @@ test.describe('submission page', () => {
     ).toBeVisible();
   });
 
-  test('a hidden source keeps the summary and explains itself', async ({ page, api }) => {
-    api.routes['GET /submissions/sub-1/source'] = {
-      status: 403,
-      body: { error: { code: 'hidden', message: 'x' } },
+  test('a hidden source keeps the result and explains itself', async ({ page, api }) => {
+    const stranger = { id: 'someone-else', username: 'user_07', rating: null };
+    api.routes['GET /submissions/sub-1'] = {
+      body: { data: submissionDetail({ sourceAccess: 'hidden', user: stranger }) },
     };
     await page.goto('/submissions/sub-1');
     await expect(page.getByTestId('score')).toBeVisible();
-    await expect(page.getByText('Bạn không có quyền xem bài nộp này')).toBeVisible();
+    await expect(page.getByText('Bạn không xem được mã nguồn của bài nộp này.')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Nộp lại' })).toHaveCount(0);
+  });
+
+  test('a visitor opens the result; the source asks to sign in and comes back here', async ({
+    page,
+    api,
+  }) => {
+    api.signedIn = false;
+    api.routes['GET /submissions/sub-1'] = {
+      body: { data: submissionDetail({ sourceAccess: 'sign_in' }) },
+    };
+    await page.goto('/submissions/sub-1');
+    await expect(page.getByTestId('score')).toBeVisible();
+    await expect(page.getByTestId('case-row')).not.toHaveCount(0);
+    await page.getByTestId('source-locked').getByRole('link', { name: 'Đăng nhập' }).click();
+    await expect(page).toHaveURL(/\/login\?redirect=\/submissions\/sub-1$/);
   });
 });
 

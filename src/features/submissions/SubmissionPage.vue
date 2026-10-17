@@ -19,8 +19,10 @@ import CasesTableSkeleton from './CasesTableSkeleton.vue';
 import SourceView from './SourceView.vue';
 import SourceViewSkeleton from './SourceViewSkeleton.vue';
 import TestOverview from './TestOverview.vue';
-import SubmissionSummary from './SubmissionSummary.vue';
-import SubmissionSummarySkeleton from './SubmissionSummarySkeleton.vue';
+import SubmissionFacts from './SubmissionFacts.vue';
+import SubmissionFactsSkeleton from './SubmissionFactsSkeleton.vue';
+import SubmissionHero from './SubmissionHero.vue';
+import SubmissionHeroSkeleton from './SubmissionHeroSkeleton.vue';
 import SubmissionExternalRun from './SubmissionExternalRun.vue';
 import SubmissionStaffPanel from './SubmissionStaffPanel.vue';
 import { forbiddenMessageKey } from './forbidden-reason';
@@ -30,6 +32,10 @@ import InternalErrorNotice from './InternalErrorNotice.vue';
 import { isProblemDeleted } from './deleted-problem';
 import CompareWithForm from './CompareWithForm.vue';
 import { submissionShortId } from './submission-short-id';
+
+/** P-11: the result, the tests and the source in the main column; the facts beside it from lg, after it below. */
+const LAYOUT = 'grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start';
+const MAIN = 'flex min-w-0 flex-col gap-5';
 
 const route = useRoute();
 const locale = useLocaleStore();
@@ -42,7 +48,7 @@ usePageTitle(() => translate('pages.submissionTitle', { id: shortId.value }));
 // The problem gives the points and the name; it may be unreadable for this viewer, then the row's own name stands in.
 /** Loading another user's code into the viewer's editor is surprising, so only the author may resubmit. */
 const viewerId = useViewerId();
-const isOwn = computed(() => row.value?.user?.id === viewerId.value);
+const isOwn = computed(() => viewerId.value !== null && row.value?.user?.id === viewerId.value);
 const problemCode = computed(() => row.value?.problem?.code ?? null);
 /** A deleted problem answers 404: never ask for it, never offer to resubmit to it. */
 const isDeletedProblem = computed(() => isProblemDeleted(row.value));
@@ -50,6 +56,13 @@ const problemQuery = useProblemQuery(
   computed(() => problemCode.value ?? ''),
   toRef(locale, 'locale'),
   computed(() => problemCode.value !== null && !isDeletedProblem.value),
+);
+
+const problemName = computed(
+  () => problemQuery.data.value?.name ?? row.value?.problem?.name ?? null,
+);
+const canResubmit = computed(
+  () => isOwn.value && problemCode.value !== null && !isDeletedProblem.value,
 );
 
 const isNotFound = computed(
@@ -71,12 +84,18 @@ const verdict = computed(() => {
 <template>
   <NotFoundPage v-if="isNotFound" />
   <div v-else class="page-column">
-    <nav :aria-label="$t('common.breadcrumb')" class="flex items-center gap-2 text-sm">
+    <nav
+      :aria-label="$t('common.breadcrumb')"
+      class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1 text-sm"
+    >
       <RouterLink :to="{ name: 'submissions' }" class="text-muted hover:underline">{{
         $t('pages.submissions')
       }}</RouterLink>
       <span aria-hidden="true" class="text-muted">/</span>
-      <h1 class="font-mono font-semibold">{{ shortId }}</h1>
+      <h1 class="min-w-0 font-semibold [overflow-wrap:anywhere]">
+        {{ problemName ?? shortId }}
+      </h1>
+      <span v-if="problemName" class="font-mono text-meta text-muted">{{ shortId }}</span>
     </nav>
     <p role="status" aria-live="polite" class="sr-only">
       {{ verdict ? $t(verdict.labelKey) : '' }}
@@ -94,61 +113,72 @@ const verdict = computed(() => {
       @retry="query.refetch()"
     >
       <template #skeleton>
-        <SubmissionSummarySkeleton />
-        <SourceViewSkeleton />
-        <CasesTableSkeleton />
+        <div :class="LAYOUT">
+          <div :class="MAIN">
+            <SubmissionHeroSkeleton />
+            <CasesTableSkeleton />
+            <SourceViewSkeleton />
+          </div>
+          <SubmissionFactsSkeleton />
+        </div>
       </template>
-      <template v-if="row && verdict">
-        <p
-          v-if="live.stale"
-          data-testid="stale-reload"
-          class="flex flex-wrap items-center gap-3 text-sm text-muted"
-        >
-          <InlineBit kind="sweat" />
-          {{ $t('submission.staleReload') }}
-          <AppButton @click="refollow()">
-            {{ $t('submission.reload') }}
-          </AppButton>
-        </p>
-        <SubmissionSummary
-          :submission="row"
-          :verdict="verdict"
-          :problem-name="problemQuery.data.value?.name ?? null"
-          :problem-points="problemQuery.data.value?.points ?? null"
-          :is-problem-loading="problemQuery.isLoading.value"
-          :is-live="isLive"
-        />
-        <TestOverview
-          v-if="!isDeletedProblem"
-          :cases="row.cases"
-          :batches="row.batches"
-          :points="row.points"
-          :problem-points="row.problem?.points ?? null"
-          :case-points="row.casePoints"
-          :case-total="row.caseTotal"
-          :running="isLive"
-        />
-        <InternalErrorNotice v-if="row.status === 'IE'" :message="row.error" />
-        <SubmissionExternalRun v-if="row.externalRun" :run="row.externalRun" />
-        <SubmissionStaffPanel :submission="row" />
-        <SourceView
-          :id="row.id"
-          :problem-code="isDeletedProblem ? null : problemCode"
-          :is-own="isOwn"
-          :language-key="row.language?.key ?? null"
-          :language-name="row.language?.name ?? null"
-        />
-        <DeletedProblemNotice v-if="isDeletedProblem" :name="row.problem?.name ?? ''" />
-        <CasesTable
-          v-else
-          :cases="row.cases"
-          :batches="row.batches"
-          :total-cases="row.totalCases"
-          :running="isLive"
-          :compile-error="row.status === 'CE' ? row.error : null"
-        />
-        <CompareWithForm :current-id="row.id" />
-      </template>
+      <div v-if="row && verdict" :class="LAYOUT">
+        <div :class="MAIN">
+          <SubmissionHero
+            :submission="row"
+            :verdict="verdict"
+            :problem-points="problemQuery.data.value?.points ?? null"
+            :is-problem-loading="problemQuery.isLoading.value"
+            :is-live="isLive"
+            :can-resubmit="canResubmit"
+          />
+          <p
+            v-if="live.stale"
+            data-testid="stale-reload"
+            class="flex flex-wrap items-center gap-3 text-sm text-muted"
+          >
+            <InlineBit kind="sweat" />
+            {{ $t('submission.staleReload') }}
+            <AppButton @click="refollow()">
+              {{ $t('submission.reload') }}
+            </AppButton>
+          </p>
+          <InternalErrorNotice v-if="row.status === 'IE'" :message="row.error" />
+          <SubmissionExternalRun v-if="row.externalRun" :run="row.externalRun" />
+          <SubmissionStaffPanel :submission="row" />
+          <DeletedProblemNotice v-if="isDeletedProblem" :name="row.problem?.name ?? ''" />
+          <CasesTable
+            v-else
+            :cases="row.cases"
+            :batches="row.batches"
+            :total-cases="row.totalCases"
+            :running="isLive"
+            :compile-error="row.status === 'CE' ? row.error : null"
+            :compile-log-hidden="row.status === 'CE' && !row.error"
+          >
+            <template #footer>
+              <TestOverview
+                :cases="row.cases"
+                :batches="row.batches"
+                :points="row.points"
+                :problem-points="row.problem?.points ?? null"
+                :case-points="row.casePoints"
+                :case-total="row.caseTotal"
+                :running="isLive"
+              />
+            </template>
+          </CasesTable>
+          <SourceView
+            :id="row.id"
+            :access="row.sourceAccess"
+            :language-key="row.language?.key ?? null"
+            :language-name="row.language?.name ?? null"
+          >
+            <CompareWithForm :current-id="row.id" />
+          </SourceView>
+        </div>
+        <SubmissionFacts :submission="row" :problem-name="problemName" />
+      </div>
     </QueryState>
   </div>
 </template>
