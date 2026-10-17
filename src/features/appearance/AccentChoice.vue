@@ -20,6 +20,7 @@ const isPressed = (accent: string) => shown.value.accent === accent;
       type="button"
       :disabled="disabled"
       :aria-label="$t(preset.labelKey)"
+      :title="$t(preset.labelKey)"
       :aria-pressed="isPressed(preset.id)"
       class="inline-flex size-11 items-center justify-center rounded-full border-2 disabled:cursor-not-allowed disabled:border-dashed disabled:bg-surface-strong"
       :class="

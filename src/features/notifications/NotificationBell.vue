@@ -46,6 +46,11 @@ const badge = computed(() => {
   return unread.value > BADGE_MAX ? `${BADGE_MAX}+` : formatNumber(unread.value, locale.locale);
 });
 const latest = computed(() => (listQuery.data.value?.items ?? []).slice(0, LATEST_ROWS));
+const bellLabel = computed(() =>
+  unread.value > 0
+    ? translate('notifications.bellWithCount', { count: unread.value })
+    : translate('notifications.bell'),
+);
 /** Polite, counts only: said when the count rises, never per row. */
 const arrivedText = ref('');
 /** The gap between emptying and refilling the region: shorter than a frame and browsers merge the two, so an identical text goes unread. */
@@ -111,9 +116,8 @@ const drawerPt = computed(() => ({
       class="relative inline-flex size-11 items-center justify-center rounded-pill border border-line bg-surface-strong hover:bg-surface-hover"
       aria-haspopup="dialog"
       :aria-expanded="isOpen"
-      :aria-label="
-        unread ? $t('notifications.bellWithCount', { count: unread }) : $t('notifications.bell')
-      "
+      :aria-label="bellLabel"
+      :title="bellLabel"
       @click="isOpen = !isOpen"
     >
       <Bell aria-hidden="true" class="size-5" />
