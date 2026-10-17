@@ -1,7 +1,15 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installFakeEventSource, latestEventSource, pageStreams } from '@/test/fake-event-source';
-import { submissionCase, submissionDetail } from '@/test/fixtures';
+import {
+  contestDetail,
+  contestProblem,
+  participationSummary,
+  problemDetail,
+  submissionCase,
+  submissionDetail,
+} from '@/test/fixtures';
+import { contestPageRoutes } from '@/test/contest-routes';
 import { mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import {
@@ -323,5 +331,54 @@ describe('submission page', () => {
     expect(wrapper.find('[data-testid="pending-row"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="stale-reload"]').exists()).toBe(false);
     expect(pageStreams()).toHaveLength(1);
+  });
+});
+
+describe("submission page in the viewer's running contest (P-14 B)", () => {
+  const contest = contestDetail({
+    formatName: 'ioi',
+    problems: [contestProblem(0, { code: 'duongdi', partial: true }), contestProblem(1)],
+  });
+  const routes = (date = '2026-10-08T09:58:00Z') => ({
+    ...signedInViewer(),
+    ...submissionPageRoutes(submissionDetail({ date })),
+    ...problemPageRoutes(problemDetail({ code: 'duongdi', partial: true, points: 100 })),
+    ...contestPageRoutes(contest),
+    'GET /contests/current': ok({ contest, participation: participationSummary() }),
+  });
+  beforeEach(() =>
+    vi.useFakeTimers({
+      now: Date.parse('2026-10-08T10:00:00Z'),
+      toFake: ['Date', 'setTimeout', 'clearTimeout'],
+    }),
+  );
+
+  it('scores it in contest points first, names the contest and offers the next problem', async () => {
+    mockApi(routes());
+    const { wrapper } = await openSubmission('sub-1');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="submission-next"]').exists()).toBe(true),
+    );
+    // 7 of 20 case points of a 100-point partial contest problem.
+    expect(wrapper.get('[data-testid="score"]').text()).toBe('35 / 100 điểm kỳ thi');
+    expect(wrapper.get('[data-testid="hero-line"]').text()).toMatch(/^Điểm bài /);
+    expect(wrapper.get('nav[aria-label="Đường dẫn"]').text()).toContain('QHH Round #42 (Div. 2)');
+    expect(wrapper.get('h1').text()).toBe('A. Đường đi ngắn nhất');
+    expect(wrapper.get('[data-testid="submission-next"] a').text()).toContain('Bài B');
+    expect(wrapper.find('[data-fact="contest"]').exists()).toBe(true);
+    expect(wrapper.get('[data-testid="submission-facts"]').text()).toContain('phút 118');
+  });
+
+  it('keeps the problem score for a submission made before the run started', async () => {
+    const calls = mockApi(routes('2026-10-08T07:00:00Z'));
+    const { wrapper } = await openSubmission('sub-1');
+    // The run and the contest's problems are known, so the page has decided.
+    await vi.waitFor(() =>
+      expect(calls.some((call) => call.path === `/contests/${contest.key}`)).toBe(true),
+    );
+    await flushPromises();
+    expect(wrapper.get('[data-testid="score"]').text()).toMatch(/\/ 100/);
+    expect(wrapper.find('[data-testid="submission-next"]').exists()).toBe(false);
+    expect(wrapper.get('[data-testid="score"]').text()).not.toContain('kỳ thi');
   });
 });
