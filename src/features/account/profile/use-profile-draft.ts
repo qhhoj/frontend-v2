@@ -33,12 +33,13 @@ function useDraftState(source: () => Profile | undefined) {
   const patch = computed(() =>
     draft.value && saved.value ? changedFields(draft.value, saved.value) : {},
   );
-  const dirty = computed(() => Object.keys(patch.value).length > 0);
+  const changedCount = computed(() => Object.keys(patch.value).length);
+  const dirty = computed(() => changedCount.value > 0);
   const problems = computed(() => (draft.value ? lengthProblems(draft.value) : []));
   const reset = () => {
     if (saved.value) draft.value = copyDraft(saved.value);
   };
-  return { draft, saved, patch, dirty, problems, reset };
+  return { draft, saved, patch, changedCount, dirty, problems, reset };
 }
 type DraftState = ReturnType<typeof useDraftState>;
 type Refetch = () => Promise<{ data: Profile | undefined }>;
@@ -61,14 +62,14 @@ function useDraftSaving(form: DraftState, refetch: Refetch) {
   const pending = ref(false);
   const error = ref<unknown>(null);
   const attempted = ref(false);
-  const succeeded = ref(false);
+  /** When the last save succeeded: the save bar says "Đã lưu lúc 10:42". */
+  const savedAt = ref<Date | null>(null);
 
   async function save(): Promise<boolean> {
     const current = form.draft.value;
     if (!current || !form.dirty.value || pending.value) return false;
     attempted.value = true;
     if (form.problems.value.length) return false;
-    succeeded.value = false;
     const sent = copyDraft(current);
     pending.value = true;
     error.value = null;
@@ -76,7 +77,7 @@ function useDraftSaving(form: DraftState, refetch: Refetch) {
       const stored = draftOf(await update(form.patch.value));
       form.draft.value = settleAfterSave(form.draft.value ?? sent, sent, stored);
       form.saved.value = stored;
-      succeeded.value = true;
+      savedAt.value = new Date();
       attempted.value = false;
       return true;
     } catch (caught) {
@@ -92,9 +93,7 @@ function useDraftSaving(form: DraftState, refetch: Refetch) {
     error.value = null;
     attempted.value = false;
   };
-  /** "Đã lưu hồ sơ" stays until the viewer edits again. */
-  const justSaved = computed(() => succeeded.value && !form.dirty.value);
-  return { pending, error, attempted, justSaved, save, clear };
+  return { pending, error, attempted, savedAt, save, clear };
 }
 
 /** The profile form: draft, length problems, the save and its failure, undo. */
@@ -106,6 +105,6 @@ export function useProfileDraft() {
     form.reset();
     saving.clear();
   };
-  const { draft, saved, dirty, problems } = form;
-  return { query, draft, saved, dirty, problems, undo, ...saving };
+  const { draft, saved, dirty, changedCount, problems } = form;
+  return { query, draft, saved, dirty, changedCount, problems, undo, ...saving };
 }

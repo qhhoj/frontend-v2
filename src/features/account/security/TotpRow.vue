@@ -64,7 +64,7 @@ function regenerate() {
     </span>
     <Chip v-if="enabled" tone="success">{{ $t('settings.twoFactor.on') }}</Chip>
     <span class="flex flex-wrap gap-2">
-      <AppButton v-if="!enabled" tone="primary" :disabled="busy" @click="emit('enable')">
+      <AppButton v-if="!enabled" :disabled="busy" @click="emit('enable')">
         {{ $t('settings.totp.enable') }}
       </AppButton>
       <template v-else>

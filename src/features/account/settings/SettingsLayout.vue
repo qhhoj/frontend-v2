@@ -6,6 +6,7 @@ import PageHeader from '@/components/ui/PageHeader.vue';
 import type { PageCrumb } from '@/components/ui/PageHeader.vue';
 import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
+import InterfaceLanguageSelect from './InterfaceLanguageSelect.vue';
 
 /** The four sections; only Appearance is open to anonymous visitors. */
 const SECTIONS = [
@@ -51,7 +52,9 @@ const crumbs = computed<PageCrumb[]>(() => [
 
 <template>
   <div class="mx-auto flex w-full max-w-[1216px] flex-col gap-4 px-4 pt-5 pb-12 md:px-8">
-    <PageHeader :title="$t('pages.settings')" :crumbs="crumbs" />
+    <PageHeader :title="$t('pages.settings')" :crumbs="crumbs">
+      <template #actions><InterfaceLanguageSelect /></template>
+    </PageHeader>
     <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
       <nav
         v-if="sections.length > 1"

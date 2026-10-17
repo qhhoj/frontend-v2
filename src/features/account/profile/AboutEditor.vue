@@ -66,10 +66,10 @@ watch(
         :id="TEXT_ID"
         v-model="about"
         name="about"
-        rows="8"
+        rows="3"
         :aria-invalid="error ? 'true' : undefined"
         :aria-describedby="describedBy"
-        class="scroll-mb-28 block min-h-[150px] w-full resize-y rounded-row border bg-surface-solid px-3.5 py-3 font-mono text-meta leading-relaxed text-content"
+        class="scroll-mb-28 block min-h-24 max-h-96 not-supports-[field-sizing:content]:min-h-40 w-full resize-y rounded-row border field-sizing-content bg-surface-solid px-3.5 py-3 font-mono text-meta leading-relaxed text-content"
         :class="error ? 'border-negative' : 'border-line-strong'"
       />
     </div>
@@ -79,7 +79,7 @@ watch(
       role="tabpanel"
       tabindex="0"
       :aria-labelledby="`${idOf('panel-saved')}-tab`"
-      class="min-h-[150px] rounded-row border border-line bg-surface-strong px-4 py-3"
+      class="min-h-24 rounded-row border border-line bg-surface-strong px-4 py-3"
     >
       <UserContent v-if="savedHtml" :html="savedHtml" />
       <p v-else class="text-sm text-muted">{{ $t('settings.profile.aboutEmpty') }}</p>

@@ -45,7 +45,7 @@ describe('useProfileDraft', () => {
     expect(form.dirty.value).toBe(false);
   });
 
-  it('sends only the changed keys, then is clean and says saved until the next edit', async () => {
+  it('sends only the changed keys, then is clean and stamps the save time', async () => {
     const { form, calls } = await mountDraft({
       'GET /profile': ok(profile({ firstName: 'Thư' })),
       'PATCH /profile': echo,
@@ -55,9 +55,10 @@ describe('useProfileDraft', () => {
     await expect(form.save()).resolves.toBe(true);
     expect(patches(calls)).toEqual([{ about: 'Học sinh lớp 11' }]);
     expect(form.dirty.value).toBe(false);
-    expect(form.justSaved.value).toBe(true);
+    expect(form.savedAt.value).toBeInstanceOf(Date);
+    expect(form.changedCount.value).toBe(0);
     form.draft.value!.about = 'Học sinh lớp 12';
-    expect(form.justSaved.value).toBe(false);
+    expect(form.changedCount.value).toBe(1);
   });
 
   it('is clean after the backend trims the name it stored', async () => {

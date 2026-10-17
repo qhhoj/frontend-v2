@@ -52,4 +52,29 @@ describe('SaveBar', () => {
     expect(statusOf(bar)).toBe('Sửa lỗi trước khi lưu.');
     expect(bar.findAll('button')[1]!.attributes('aria-disabled')).toBe('true');
   });
+
+  it('with hideIdleOnPhone, hides on phones only while it has nothing to say', async () => {
+    const isHiddenOnPhone = (bar: ReturnType<typeof mountComponent>) =>
+      bar.classes().includes('max-sm:hidden');
+    const bar = mountComponent(SaveBar, { props: { dirtyCount: 0, hideIdleOnPhone: true } });
+    expect(isHiddenOnPhone(bar)).toBe(true);
+    await bar.setProps({ dirtyCount: 1 } as never);
+    expect(isHiddenOnPhone(bar)).toBe(false);
+    await bar.setProps({ dirtyCount: 0, savedAt: '2026-10-12T07:02:00Z' } as never);
+    expect(isHiddenOnPhone(bar)).toBe(false);
+    vi.advanceTimersByTime(SAVED_NOTE_MS);
+    await bar.vm.$nextTick();
+    expect(isHiddenOnPhone(bar)).toBe(true);
+    const plain = mountComponent(SaveBar, { props: { dirtyCount: 0 } });
+    expect(isHiddenOnPhone(plain)).toBe(false);
+  });
+
+  it('tells the save time in the given zone, and in the site zone for one the browser does not know', async () => {
+    const bar = mountComponent(SaveBar, { props: { dirtyCount: 1, timeZone: 'UTC' } });
+    await bar.setProps({ dirtyCount: 0, savedAt: '2026-10-12T07:02:00Z' } as never);
+    expect(statusOf(bar)).toBe('Đã lưu lúc 07:02');
+    const unknown = mountComponent(SaveBar, { props: { dirtyCount: 1, timeZone: 'Mars/Base' } });
+    await unknown.setProps({ dirtyCount: 0, savedAt: '2026-10-12T07:02:00Z' } as never);
+    expect(statusOf(unknown)).toBe('Đã lưu lúc 14:02');
+  });
 });
