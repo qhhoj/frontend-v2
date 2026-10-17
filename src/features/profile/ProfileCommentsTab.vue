@@ -7,26 +7,16 @@ import EmptyState from '@/components/EmptyState.vue';
 import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
-import SubmitSignInLink from '@/features/problems/SubmitSignInLink.vue';
 import RecentCommentRow from '@/features/community/RecentCommentRow.vue';
 import { useUserCommentsQuery } from '@/features/users/users.queries';
-import { hasPermission } from '@/lib/permissions';
-import { useSessionStore } from '@/stores/session.store';
 import ProfileTabSkeleton from './ProfileTabSkeleton.vue';
 
-/** Who may list a user's comments: the same right the API checks. */
-const COMMENTS_PERMISSION = 'judge.view_all_user_comment';
+/** Staff only: the router sends anyone without `USER_COMMENTS_PERMISSION` to the not-found page (Q-05 A). */
 const route = useRoute();
-const session = useSessionStore();
 const username = computed(() => String(route.params.username));
-const isSignedIn = computed(() => session.status === 'authenticated');
-const isAllowed = computed(() => hasPermission(session.user, COMMENTS_PERMISSION));
-// Idle without the right: the list is never asked for, so a viewer without it sees no request.
 const { data, error, isPending, hasNextPage, isFetchingNextPage, fetchNextPage, refetch } =
-  useUserCommentsQuery(
-    username,
-    computed(() => isSignedIn.value && isAllowed.value),
-  );
+  useUserCommentsQuery(username);
+/** A right revoked since `/auth/me` was read: a retry cannot help, so the page says so with no retry. */
 const isForbidden = computed(() => error.value instanceof ApiError && error.value.status === 403);
 const comments = computed(() => data.value?.pages.flatMap((page) => page.items) ?? []);
 /** One clock for the whole list, so every row ages together. */
@@ -34,14 +24,7 @@ const now = Date.now();
 </script>
 
 <template>
-  <StatePanel v-if="!isSignedIn" kind="signIn" :title="$t('profileTabs.commentsSignIn')">
-    <SubmitSignInLink label-key="profileTabs.signIn" />
-  </StatePanel>
-  <StatePanel
-    v-else-if="!isAllowed || isForbidden"
-    kind="forbidden"
-    :title="$t('profileTabs.commentsForbidden')"
-  />
+  <StatePanel v-if="isForbidden" kind="forbidden" :title="$t('profileTabs.commentsForbidden')" />
   <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
     <template #skeleton><ProfileTabSkeleton :rows="3" kind="list" /></template>
     <Card v-if="!comments.length" as="div">

@@ -1,5 +1,6 @@
 import type { RouteLocationNormalized, RouteLocationRaw } from 'vue-router';
 import { canEnterAdmin } from '@/features/admin/admin-access';
+import { allowsAny } from '@/lib/permissions';
 import type { useSessionStore } from '@/stores/session.store';
 import { safeRedirect } from './safe-redirect';
 
@@ -84,6 +85,8 @@ const accessRule: Rule = (to, session) => {
   if (to.meta.requiresAuth && session.status !== 'authenticated') return toLogin(to);
   if (to.meta.guestOnly && session.status === 'authenticated') return { name: 'home' };
   if (to.meta.adminArea && !canEnterAdmin(session.user)) return notFound(to);
+  if (to.meta.notFoundWithout && !allowsAny(session.user, to.meta.notFoundWithout))
+    return notFound(to);
   return null;
 };
 
@@ -103,6 +106,7 @@ export async function resolveNavigation(
     await session.ensureLoaded();
   } catch {
     // Without a session the admin-area and password rules cannot run: send those routes to sign-in rather than skip them.
+    if (to.meta.notFoundWithout) return notFound(to);
     return to.meta.requiresAuth || to.meta.adminArea ? toLogin(to) : true;
   }
   for (const rule of RULES) {

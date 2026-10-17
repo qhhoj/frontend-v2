@@ -1534,10 +1534,13 @@
     "write": "Viết bài",
     "joined": "{name} · Tham gia {date}",
     "rating": "Rating",
+    "solvedLead": "Đã giải",
     "ratingSummary": "Cao nhất {max} · thấp nhất {min} · {count} kỳ thi",
     "tabs": {
       "overview": "Tổng quan",
       "solved": "Bài đã giải",
+      "submissions": "Bài nộp",
+      "submissionCount": "{count} bài nộp",
       "pp": "Điểm PP",
       "blog": "Bài viết",
       "comments": "Bình luận"
@@ -1603,9 +1606,7 @@
     "noPosts": "Chưa có bài viết nào.",
     "olderComments": "Tải bình luận cũ hơn",
     "noComments": "Chưa có bình luận nào.",
-    "commentsSignIn": "Đăng nhập để xem bình luận của người dùng",
     "commentsForbidden": "Bạn không có quyền xem bình luận của người dùng này",
-    "signIn": "Đăng nhập",
     "title": "Mục hồ sơ"
   },
   "orgs": {
@@ -2185,8 +2186,7 @@
   },
   "shortLink": {
     "notFoundHint": "Bạn có thể không có quyền xem trang này.",
-    "copy": "Sao chép",
-    "copyAriaLabel": "Sao chép liên kết",
+    "copy": "Sao chép liên kết",
     "creating": "Đang tạo liên kết…",
     "copied": "Đã sao chép",
     "copiedAnnounce": "Đã sao chép {url}",

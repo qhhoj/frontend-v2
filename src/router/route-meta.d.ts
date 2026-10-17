@@ -15,6 +15,8 @@ declare module 'vue-router' {
     allowPartial?: boolean;
     /** `'auth'`: the page draws its own top bar (only a route that renders `AuthLayout`). `'admin'`: AppShell renders AdminShell instead of the site header (plan 8f-1). */
     layout?: 'auth' | 'admin';
+    /** A public page only holders of this right may open; anyone else (signed out too) gets the not-found page, its existence unrevealed (Q-05 A, the profile's comments). */
+    notFoundWithout?: PermissionRule;
     /** Admin screens: the permission (or any-of list) the screen needs; viewers without it (and without `capability`) see AdminForbidden in place. */
     permission?: PermissionRule;
     /** Admin screens: an object right that also opens the screen. */
