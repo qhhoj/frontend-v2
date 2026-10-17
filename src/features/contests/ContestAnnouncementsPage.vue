@@ -17,6 +17,7 @@ import {
   markAnnouncementsSeen,
   seenAnnouncementId,
 } from './announcement-seen';
+import ContestAnnouncementComposer from './ContestAnnouncementComposer.vue';
 import ContestCompactHeader from './ContestCompactHeader.vue';
 import ContestNotFound from './ContestNotFound.vue';
 import ContestTabs from './ContestTabs.vue';
@@ -64,6 +65,7 @@ const goTo = (next: number) =>
     <template v-else>
       <ContestTabs :contest-key="key" :phase="contest?.phase" />
       <ContestCompactHeader v-if="contest" :contest="contest" />
+      <ContestAnnouncementComposer v-if="contest?.viewer.canEdit" :contest="contest" />
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
           <Card as="div" class="px-5">

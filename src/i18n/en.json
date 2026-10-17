@@ -87,7 +87,9 @@
       "submissions": "Submissions",
       "stats": "Statistics",
       "ranking": "Ranking",
-      "replay": "Replay"
+      "replay": "Replay",
+      "manage": "Manage",
+      "manageContest": "Manage contest"
     },
     "submissions": {
       "statusTitle": "Judging state",
@@ -148,7 +150,19 @@
       "empty": "No announcements yet.",
       "emptyPage": "No announcements yet.",
       "paused": "Live updates paused.",
-      "reconnect": "Reconnect"
+      "reconnect": "Reconnect",
+      "compose": {
+        "title": "New announcement",
+        "onlyOrganisers": "Only organisers see this box",
+        "titleLabel": "Title",
+        "titlePlaceholder": "e.g. Problem C: limit fixed",
+        "bodyLabel": "Body",
+        "bodyHint": "Markdown.",
+        "recipients": "Sent to {count} contestant | Sent to {count} contestants",
+        "notPushed": "Live push is off: contestants only see it on this tab.",
+        "post": "Post announcement",
+        "posted": "Announcement posted."
+      }
     },
     "rules": {
       "intro": "About",

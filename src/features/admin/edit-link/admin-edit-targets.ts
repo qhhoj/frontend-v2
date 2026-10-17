@@ -22,13 +22,24 @@ export const problemEditTarget = (
     ? { name: adminRouteName('problemGeneral'), params: { code: problem.code } }
     : null;
 
+/** The editor tab that matches a public contest page: the problems list opens Problems, the board opens Ranking. */
+const CONTEST_SECTION_TABS: Record<string, AdminScreenId> = {
+  contest: 'contestProblems',
+  'contest-announcements': 'contestAnnouncements',
+  'contest-ranking': 'contestRanking',
+};
+
+/** `section` is the public page's route name; a page without a matching editor tab opens General. */
 export const contestEditTarget = (
   user: Viewer,
   contest: { key: string; viewer: { canEdit: boolean } },
-): RouteLocationRaw | null =>
-  contest.viewer.canEdit && open(user, 'contestGeneral')
-    ? { name: adminRouteName('contestGeneral'), params: { key: contest.key } }
+  section?: string,
+): RouteLocationRaw | null => {
+  const screen = (section && CONTEST_SECTION_TABS[section]) || 'contestGeneral';
+  return contest.viewer.canEdit && open(user, screen)
+    ? { name: adminRouteName(screen), params: { key: contest.key } }
     : null;
+};
 
 /** Organization admins already have the public Manage tab; only site staff who edit any organization get the link. */
 export const organizationEditTarget = (
