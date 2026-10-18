@@ -19,7 +19,8 @@ import TopPerformersCard from './TopPerformersCard.vue';
       <div class="flex min-w-0 flex-col gap-6">
         <TopPerformersCard />
         <TopContributorsCard :limit="3" />
-        <NewProblemsCard :limit="7" variant="home" />
+        <!-- P-05 note: at most 5 rows per side list, so the side column does not outgrow the main one. -->
+        <NewProblemsCard :limit="5" variant="home" />
         <RecentCommentsCard :limit="4" />
       </div>
     </div>
