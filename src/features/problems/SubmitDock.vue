@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { ChevronDown, ChevronUp, Maximize2, Minimize2 } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { Maximize2, Minimize2, X } from 'lucide-vue-next';
+import { computed, nextTick, ref } from 'vue';
 import IconButton from '@/components/ui/IconButton.vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import SubmitForm from './SubmitForm.vue';
 import SubmitSheet from './SubmitSheet.vue';
-import SubmitSignInLink from './SubmitSignInLink.vue';
 import { useDockHeight } from './use-dock-height';
 import type { useSubmitForm } from './use-submit-form';
 import {
@@ -15,28 +14,33 @@ import {
 } from './use-submit-fullscreen';
 
 const BODY_ID = 'submit-dock-body';
-/** The phone gets a bottom sheet, anything wider the pinned dock; both share the form state the page owns. */
+const RAIL_SUBMIT_BUTTON = '[data-testid="rail-submit"] button';
+/**
+ * Where the rail stacks under the statement (`usesSheet`: phones, tablets) a bottom sheet, beside it the pinned dock; both share the form state the page owns. P-02 B: the
+ * dock shows only once opened (the rail's "Nộp bài"), and closes away entirely; after a submit it carries the live
+ * result strip (Q-01 B).
+ */
 const props = defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;
-  isPhone: boolean;
+  usesSheet: boolean;
   isSignedIn: boolean;
-  resubmitId: string | null;
 }>();
-/** Whether the editor shows (dock expanded, sheet open); the rail's submit card can open it too. */
+/** Whether the editor shows (dock shown, sheet expanded); the rail's submit card opens the dock. */
 const open = defineModel<boolean>('open', { required: true });
-const isCollapsed = computed({
-  get: () => !open.value,
-  set: (collapsed) => (open.value = !collapsed),
-});
 const dock = ref<HTMLElement | null>(null);
-useDockHeight(dock);
+// A closed dock leaves no room behind; the sheet keeps its own.
+useDockHeight(dock, () => !props.usesSheet);
+/** Focus goes back to the rail's button that opened the dock. */
+async function closeDock() {
+  open.value = false;
+  await nextTick();
+  document.querySelector<HTMLElement>(RAIL_SUBMIT_BUTTON)?.focus();
+}
 
 const wantsFullscreen = useSubmitFullscreenPreference();
-/** The phone's sheet is full screen only while it is open; the dock, whenever the viewer is signed in. */
-const isFullscreen = computed(
-  () => wantsFullscreen.value && props.isSignedIn && (!props.isPhone || open.value),
-);
+/** Full screen only while the dock or sheet is open: a remembered preference never opens it on load. */
+const isFullscreen = computed(() => wantsFullscreen.value && props.isSignedIn && open.value);
 const fullscreenPanel = ref<HTMLElement | null>(null);
 useFullscreenEffects(isFullscreen, fullscreenPanel);
 /** Esc leaves, unless it was meant for an open dropdown inside the panel. */
@@ -73,30 +77,21 @@ function onPanelEscape(event: KeyboardEvent) {
     </div>
   </section>
   <SubmitSheet
-    v-else-if="isPhone"
+    v-else-if="usesSheet"
     v-model:open="open"
     :problem="problem"
     :form="form"
     :is-signed-in="isSignedIn"
-    :resubmit-id="resubmitId"
     @fullscreen="wantsFullscreen = true"
   />
   <section
-    v-else
+    v-else-if="open && isSignedIn"
     ref="dock"
     :aria-label="$t('submit.title')"
     class="fixed inset-x-0 bottom-0 z-30 border-t border-line-accent bg-surface-solid pb-[env(safe-area-inset-bottom)]"
   >
     <div class="mx-auto max-h-[70dvh] max-w-[920px] overflow-x-hidden overflow-y-auto px-4 py-2">
-      <SubmitSignInLink v-if="!isSignedIn" />
-      <SubmitForm
-        v-else
-        :id="BODY_ID"
-        :problem="problem"
-        :form="form"
-        layout="dock"
-        :collapsed="isCollapsed"
-      >
+      <SubmitForm :id="BODY_ID" :problem="problem" :form="form" layout="dock">
         <template #actions>
           <div class="flex items-center gap-2">
             <IconButton
@@ -108,15 +103,8 @@ function onPanelEscape(event: KeyboardEvent) {
             >
               <Maximize2 class="size-5" aria-hidden="true" />
             </IconButton>
-            <IconButton
-              :aria-expanded="!isCollapsed"
-              :aria-controls="BODY_ID"
-              :label="$t(isCollapsed ? 'submit.expand' : 'submit.collapse')"
-              tone="secondary"
-              @click="isCollapsed = !isCollapsed"
-            >
-              <ChevronUp v-if="isCollapsed" class="size-5" aria-hidden="true" />
-              <ChevronDown v-else class="size-5" aria-hidden="true" />
+            <IconButton :label="$t('submit.close')" tone="secondary" @click="closeDock">
+              <X class="size-5" aria-hidden="true" />
             </IconButton>
           </div>
         </template>

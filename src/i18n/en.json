@@ -1087,10 +1087,8 @@
       "railLabel": "Problem info",
       "submit": {
         "title": "Submit",
-        "language": "Language",
-        "open": "Open the submit panel",
-        "goTo": "Go to the submit panel",
-        "hint": "Paste code or drop a file."
+        "open": "Submit",
+        "hint": "Opens the code editor at the bottom of the page."
       },
       "facts": {
         "solvers": "Solvers",
@@ -1402,7 +1400,13 @@
       "fileRejected": "The file was rejected.",
       "sourceLength": "The source is longer than {max} characters."
     },
-    "versions": "View versions"
+    "versions": "Compiler versions",
+    "close": "Close the submit panel",
+    "result": {
+      "atTest": "{verdict} on test {test}",
+      "details": "See details",
+      "failedAt": "failed on test {test}"
+    }
   },
   "submission": {
     "ringLabel": "Graded {graded} of {total} tests",

@@ -11,24 +11,14 @@ const SHEET_ID = 'submit-sheet';
 /** The bar and the open sheet are one surface in two sizes. */
 const SHEET_SURFACE =
   'fixed inset-x-0 bottom-0 z-30 rounded-t-panel border-t border-line-accent bg-surface-solid pb-[env(safe-area-inset-bottom)]';
-const props = defineProps<{
+defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;
   isSignedIn: boolean;
-  /** `?resubmit=` of a signed-in viewer: the prefilled code is the point of the visit, so the sheet opens for it. */
-  resubmitId: string | null;
 }>();
 const emit = defineEmits<{ fullscreen: [] }>();
 /** Per page load: no storage. The page starts it closed so the statement is what the viewer sees first. */
 const isExpanded = defineModel<boolean>('open', { required: true });
-// Every time the id appears, not only on load: an anonymous viewer arrives with it after signing in.
-watch(
-  () => props.resubmitId,
-  (id) => {
-    if (id) isExpanded.value = true;
-  },
-  { immediate: true },
-);
 /** The bar the page reserves room for; the expanded sheet overlays the statement instead. */
 const bar = ref<HTMLElement | null>(null);
 const header = ref<{ focusTitle: () => void; focusToggle: () => void } | null>(null);

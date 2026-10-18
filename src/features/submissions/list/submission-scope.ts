@@ -53,13 +53,24 @@ export const scopeQueryKey = (
 ): readonly unknown[] => {
   switch (scope.kind) {
     case 'global':
-      return ['submissions', 'list', viewerId, apiQuery];
+      return ['submissions', LIST_KEY_PREFIXES.global, viewerId, apiQuery];
     case 'organization':
-      return ['submissions', 'organization', viewerId, scope.slug, apiQuery];
+      return ['submissions', LIST_KEY_PREFIXES.organization, viewerId, scope.slug, apiQuery];
     case 'contest':
-      return ['submissions', 'contest', viewerId, scope.key, apiQuery];
+      return ['submissions', LIST_KEY_PREFIXES.contest, viewerId, scope.key, apiQuery];
   }
 };
+
+/** The second key part of each scope's list cache; a new submission refreshes all of them (`newSubmissionListKeys`). */
+const LIST_KEY_PREFIXES = {
+  global: 'list',
+  organization: 'organization',
+  contest: 'contest',
+} as const satisfies Record<SubmissionScope['kind'], string>;
+
+/** The cache prefixes a submission the viewer just made belongs in, whichever list shows it. */
+export const newSubmissionListKeys = () =>
+  Object.values(LIST_KEY_PREFIXES).map((prefix) => ['submissions', prefix] as const);
 
 /** One page of the scope's list. */
 export const fetchScopePage = (

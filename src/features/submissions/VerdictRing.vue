@@ -15,7 +15,14 @@ const props = defineProps<{
   share?: number | null;
   /** Nothing to measure yet (final-only contest): an empty neutral ring, no points text. */
   isEmpty?: boolean;
+  /** `sm`: 40 px, for the problem page's result strip. */
+  size?: 'md' | 'sm';
 }>();
+const SIZES = {
+  md: { ring: 'size-18', hole: 'size-14 text-sm' },
+  sm: { ring: 'size-10', hole: 'size-8 text-tiny' },
+} as const;
+const sizeClasses = computed(() => SIZES[props.size ?? 'md']);
 const FULL_TURN_DEGREES = 360;
 const PERCENT = 100;
 
@@ -58,12 +65,12 @@ const centerText = computed(() => {
     role="img"
     :aria-label="label"
     :style="ringStyle"
-    class="flex size-18 shrink-0 items-center justify-center rounded-full"
+    :class="['flex shrink-0 items-center justify-center rounded-full', sizeClasses.ring]"
   >
     <span
       aria-hidden="true"
-      class="flex size-14 items-center justify-center rounded-full bg-surface-solid font-mono text-sm font-semibold tabular-nums"
-      :class="{ 'text-muted': isEmpty }"
+      class="flex items-center justify-center rounded-full bg-surface-solid font-mono font-semibold tabular-nums"
+      :class="[sizeClasses.hole, { 'text-muted': isEmpty }]"
       >{{ centerText }}</span
     >
   </div>

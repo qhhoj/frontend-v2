@@ -1087,10 +1087,8 @@
       "railLabel": "Thông tin bài",
       "submit": {
         "title": "Nộp bài",
-        "language": "Ngôn ngữ",
-        "open": "Mở khung nộp bài",
-        "goTo": "Đến khung nộp bài",
-        "hint": "Dán mã hoặc kéo thả tệp."
+        "open": "Nộp bài",
+        "hint": "Mở khung soạn mã ở cuối trang."
       },
       "facts": {
         "solvers": "Người giải",
@@ -1402,7 +1400,13 @@
       "fileRejected": "Tệp bị từ chối.",
       "sourceLength": "Mã nguồn vượt quá {max} ký tự."
     },
-    "versions": "Xem phiên bản"
+    "versions": "Phiên bản trình dịch",
+    "close": "Đóng khung nộp bài",
+    "result": {
+      "atTest": "{verdict} test {test}",
+      "details": "Xem chi tiết",
+      "failedAt": "lỗi ở test {test}"
+    }
   },
   "submission": {
     "ringLabel": "Đã chấm {graded} trên {total} test",

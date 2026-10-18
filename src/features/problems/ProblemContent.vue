@@ -9,7 +9,7 @@ import Tabs from '@/components/ui/Tabs.vue';
 import UserName from '@/components/UserName.vue';
 import CommentsSection from '@/features/comments/CommentsSection.vue';
 import ProblemArchivedNotice from '@/features/organizations/problems/ProblemArchivedNotice.vue';
-import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
+import { useMediaQuery } from '@/lib/use-media-query';
 import { useSessionStore } from '@/stores/session.store';
 import EditorialTab from './EditorialTab.vue';
 import NoStatement from './NoStatement.vue';
@@ -42,19 +42,27 @@ const props = defineProps<{
 const tab = defineModel<string>('tab', { required: true });
 defineEmits<{ gone: [] }>();
 const route = useRoute();
-// The submit form is this component's: the rail's card and the dock (desktop) or sheet (phone) are two doors to it.
+// The submit form is this component's: beside the statement the rail's card opens the dock; where the rail stacks
+// under the statement (phones, tablets) the sheet's bar is the only way in.
 const session = useSessionStore();
 const isSignedIn = computed(() => session.status === 'authenticated');
-const isPhone = useMediaQuery(PHONE_QUERY);
-/** The dock starts open, the phone sheet closed so the statement is what a phone viewer sees first. */
-const submitOpen = ref(!isPhone.value);
-// Crossing the breakpoint swaps dock and sheet; each starts the way a fresh page would.
-watch(isPhone, (phone) => (submitOpen.value = !phone));
+const usesSheet = useMediaQuery(() => props.layout.stacked);
+/** P-02 B: dock and sheet start closed, so the statement is what the viewer sees first. */
+const submitOpen = ref(false);
 // An anonymous viewer would only get a 401 for the fetch, so it is not started.
 const resubmitId = computed(() =>
   isSignedIn.value && typeof route.query.resubmit === 'string' ? route.query.resubmit : null,
 );
-const submitForm = useSubmitForm(toRef(props, 'problem'), resubmitId);
+// `?resubmit=`: the prefilled code is the point of the visit, so the dock or sheet opens for it. Every time the id
+// appears, not only on load: an anonymous viewer arrives with it after signing in.
+watch(
+  resubmitId,
+  (id) => {
+    if (id) submitOpen.value = true;
+  },
+  { immediate: true },
+);
+const submitForm = useSubmitForm(toRef(props, 'problem'), resubmitId, () => props.contest);
 const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id === 'editorial'));
 const { t } = useI18n();
 const tabItems = computed(() =>
@@ -129,12 +137,7 @@ function panelIdOf(tabId: string) {
       :aria-label="$t('problem.rail.railLabel')"
       :class="['-m-1 flex min-w-0 flex-col gap-3.5 p-1', layout.rail]"
     >
-      <ProblemSubmitCard
-        v-model:open="submitOpen"
-        :problem="problem"
-        :form="submitForm"
-        :is-signed-in="isSignedIn"
-      />
+      <ProblemSubmitCard v-if="!usesSheet" v-model:open="submitOpen" :is-signed-in="isSignedIn" />
       <ProblemFactsCard
         :problem="problem"
         :is-signed-in="isSignedIn"
@@ -151,6 +154,7 @@ function panelIdOf(tabId: string) {
         :page-key="problem.code"
         :contest-key="problem.contest?.contestKey ?? null"
         placeholder-key="comments.composer.problemPlaceholder"
+        fold-when-empty
         class="mt-3"
       />
       <div
@@ -172,8 +176,7 @@ function panelIdOf(tabId: string) {
     v-model:open="submitOpen"
     :problem="problem"
     :form="submitForm"
-    :is-phone="isPhone"
+    :uses-sheet="usesSheet"
     :is-signed-in="isSignedIn"
-    :resubmit-id="resubmitId"
   />
 </template>
