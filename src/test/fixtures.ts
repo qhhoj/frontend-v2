@@ -228,6 +228,7 @@ export const submissionItem = (
   casePoints: 10,
   caseTotal: 10,
   testSummary: null,
+  contest: null,
   time: 0.04,
   memory: 1024,
   ...overrides,
