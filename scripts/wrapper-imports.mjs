@@ -19,7 +19,6 @@ export const WRAPPER_IMPORTERS = [
   'src/components/SourceDiff.vue',
   'src/components/SourceDiffSkeleton.vue',
   'src/components/ui/Card.spec.ts',
-  'src/components/ui/DataTable.vue',
   'src/components/ui/FilterBar.vue',
   'src/components/ui/SaveBar.vue',
   'src/features/admin/activity/ActivityFilters.vue',

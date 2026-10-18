@@ -1135,7 +1135,6 @@
     "pointsAny": "Points",
     "pointsFilter": "Filter by points",
     "listName": "Problem list",
-    "scrollRegion": "Problem table, scrolls sideways",
     "pointsRange": "Points {min}–{max}",
     "pointsMin": "Points from",
     "pointsMax": "Points to",
@@ -1168,6 +1167,7 @@
     "signInToHide": "Sign in to hide solved problems",
     "filtering": "Filtering:",
     "clearAll": "Clear all",
+    "clearFilters": "Clear filters",
     "removeFilter": "Remove filter: {name}",
     "pointsChip": "{min}–{max} points",
     "count": "{n} problem | {n} problems",
@@ -1559,7 +1559,6 @@
     "jumpPlaceholder": "Go to a profile by username",
     "jumpSubmit": "Open",
     "pagerLabel": "Leaderboard pages",
-    "scrollRegion": "Leaderboard (scrollable)",
     "empty": "Nobody is on this board yet.",
     "title": "Leaderboard"
   },

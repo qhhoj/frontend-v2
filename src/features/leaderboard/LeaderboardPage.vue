@@ -1,15 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import Card from '@/components/ui/Card.vue';
-import NumberedPager from '@/components/NumberedPager.vue';
-import QueryState from '@/components/QueryState.vue';
-import StatePanel from '@/components/StatePanel.vue';
 import { useLeaderboardQuery } from '@/features/users/users.queries';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import LeaderboardTable from './LeaderboardTable.vue';
-import LeaderboardTableSkeleton from './LeaderboardTableSkeleton.vue';
 import MyRankLine from './MyRankLine.vue';
 import UsernameJump from './UsernameJump.vue';
 import { useLeaderboardRoute } from './use-leaderboard-route';
@@ -20,6 +15,7 @@ const session = useSessionStore();
 const locale = useLocaleStore();
 const listTop = ref<HTMLElement | null>(null);
 watch(page, () => listTop.value?.scrollIntoView({ block: 'start' }));
+const entries = computed(() => data.value?.items ?? []);
 const total = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.locale));
 </script>
 
@@ -36,24 +32,15 @@ const total = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.lo
       <UsernameJump />
     </header>
     <div ref="listTop" class="min-w-0">
-      <Card class="flex min-w-0 flex-col gap-4 p-4 sm:p-6">
-        <QueryState :loading="isPending" :error="error" @retry="refetch()">
-          <template #skeleton><LeaderboardTableSkeleton :sort="sort" /></template>
-          <StatePanel
-            v-if="!data?.items.length"
-            kind="communityEmpty"
-            :title="$t('leaderboard.empty')"
-          />
-          <template v-else>
-            <LeaderboardTable
-              :entries="data.items"
-              :sort="sort"
-              :viewer-name="session.user?.username ?? null"
-            />
-            <NumberedPager :meta="data.meta" :label="$t('leaderboard.pagerLabel')" />
-          </template>
-        </QueryState>
-      </Card>
+      <LeaderboardTable
+        :entries="entries"
+        :sort="sort"
+        :viewer-name="session.user?.username ?? null"
+        :loading="isPending"
+        :error="error"
+        :meta="data?.meta"
+        @retry="refetch()"
+      />
     </div>
   </div>
 </template>

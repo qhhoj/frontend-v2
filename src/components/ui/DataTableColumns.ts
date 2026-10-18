@@ -4,11 +4,16 @@
  */
 export type ColumnPriority = 'primary' | 'badge' | 'secondary' | 'meta';
 
-/** The `?sort=` values a column switches between; `first` is the direction of the first click (text asc, numbers/dates desc). */
+/**
+ * The `?sort=` values a column switches between; `first` is the direction of the first click (text asc, numbers/dates desc).
+ * `asc` is left out for a column that sorts one way only (a leaderboard's numbers, highest first). `clears` makes the click
+ * after both directions return to the list's own order (no sort), instead of flipping back.
+ */
 export interface ColumnSort {
-  asc: string;
+  asc?: string;
   desc: string;
   first?: 'asc' | 'desc';
+  clears?: boolean;
 }
 
 export interface DataTableColumn {
@@ -30,21 +35,22 @@ export interface DataTableColumn {
   cellClass?: string;
 }
 
-/** The sort value after a header click: the first direction, then flipping. */
-export function nextSort(sort: ColumnSort, current: string | undefined): string {
-  if (current === sort.desc) return sort.asc;
-  if (current === sort.asc) return sort.desc;
-  return (sort.first ?? 'asc') === 'asc' ? sort.asc : sort.desc;
+/** The sort value after a header click: the first direction, then the other, then (`clears`) none, else flipping. */
+export function nextSort(sort: ColumnSort, current: string | undefined): string | undefined {
+  const first = ((sort.first ?? 'asc') === 'asc' ? sort.asc : sort.desc) ?? sort.desc;
+  const second = first === sort.desc ? sort.asc : sort.desc;
+  if (current === first) return second ?? first;
+  if (current !== undefined && current === second) return sort.clears ? undefined : first;
+  return first;
 }
 
 export function ariaSortOf(
   sort: ColumnSort | undefined,
   current: string | undefined,
 ): 'ascending' | 'descending' | undefined {
-  if (!sort) return undefined;
-  if (current === sort.asc) return 'ascending';
+  if (!sort || current === undefined) return undefined;
   if (current === sort.desc) return 'descending';
-  return undefined;
+  return current === sort.asc ? 'ascending' : undefined;
 }
 
 /** The "1–50 / 312" range of a numbered page. */

@@ -2,6 +2,7 @@
   "title": "Bình luận bị báo cáo",
   "lead": "Báo cáo đang mở, mới nhất trước: ẩn bình luận ngay tại đây, hoặc ẩn và xử lý trong một bước; bỏ qua báo cáo không cần xử lý. Đánh dấu nhiều thẻ để xử lý cùng lúc.",
   "empty": "Không còn báo cáo nào cần xử lý.",
+  "emptyNext": "Xem mọi bình luận",
   "reporters": "{count} người báo cáo",
   "chips": {
     "hidden": "Đã ẩn",

@@ -80,6 +80,19 @@ describe('problem list', () => {
     expect(router.currentRoute.value.query).toEqual({});
   });
 
+  it('offers to clear the filters inside an empty result, and only when there are filters', async () => {
+    mockApi(anonymous(page([])));
+    const { wrapper, router } = await mountApp('/problems?search=zzz');
+    const clear = () =>
+      wrapper.findAll('#main button').find((button) => button.text() === 'Xóa bộ lọc');
+    expect(wrapper.text()).toContain('Không có bài phù hợp.');
+    await clear()!.trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.query).toEqual({});
+    expect(wrapper.text()).toContain('Không có bài phù hợp.');
+    expect(clear()).toBeUndefined();
+  });
+
   it('opens a random problem under the current filters', async () => {
     const calls = mockApi({
       ...anonymous(),

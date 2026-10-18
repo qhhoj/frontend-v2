@@ -13,7 +13,8 @@ import { participationKind } from './current-contest';
 /**
  * P-15 B: the one contest bar under the site header on every page while the viewer takes part in a contest. It answers
  * "how long is left", "where do I go back to" and "is there news" without leaving the statement. 48 px, 40 px on a phone,
- * where the status is its dot and only the ranking and the announcements stay as links (M-02, M-06). On the contest's
+ * where the status is its dot and only the ranking and the announcements stay as links (M-02, M-06); on a coarse pointer the bar
+ * is 44 px and its links fill it, so each is a 44 px target (D-17). On the contest's
  * own pages its tab row is the navigation, so the bar keeps only the status and the clock: one active link and one
  * unread badge per screen (M-01, Q-B). Shown by `AppShell` through `useCurrentContest`.
  */
@@ -61,12 +62,11 @@ const isOnContestPage = computed(() => route.params.key === contestKey.value);
 const currentLink = computed(() =>
   navSectionOverride.value === '/contests' ? (CLAIMED_BY[String(route.name ?? '')] ?? null) : null,
 );
-/** 44 px hit areas on a coarse pointer at every width (M-02): the link is 40 px tall and its `::after` reaches 2 px past it. */
-const COARSE_HIT =
-  'pointer-coarse:min-w-11 pointer-coarse:after:absolute pointer-coarse:after:-inset-y-0.5 pointer-coarse:after:inset-x-0';
+/** 44 px targets on a coarse pointer at every width (M-02, D-17): the link is as tall as the bar, at least as wide. */
+const COARSE_TARGET = 'pointer-coarse:h-11 pointer-coarse:min-w-11';
 const LINK = [
-  'relative inline-flex h-8 items-center justify-center gap-1.5 rounded-pill border border-transparent px-2.5 text-meta md:px-3 font-semibold whitespace-nowrap text-muted hover:bg-surface-hover hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-surface-solid aria-[current=page]:text-accent-soft-text pointer-coarse:h-10',
-  COARSE_HIT,
+  'inline-flex h-8 items-center justify-center gap-1.5 rounded-pill border border-transparent px-2.5 text-meta md:px-3 font-semibold whitespace-nowrap text-muted hover:bg-surface-hover hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-surface-solid aria-[current=page]:text-accent-soft-text',
+  COARSE_TARGET,
 ];
 </script>
 
@@ -79,12 +79,12 @@ const LINK = [
       !session.impersonatorId && 'sticky top-0',
     ]"
   >
-    <div class="page-gutter flex h-10 items-center gap-2 md:h-12 md:gap-3">
+    <div class="page-gutter flex h-10 items-center gap-2 pointer-coarse:h-11 md:h-12 md:gap-3">
       <RouterLink
         :to="{ name: 'contest', params: { key: contestKey } }"
         :class="[
-          'relative flex min-w-0 items-center gap-1.5 text-sm font-semibold text-accent-soft-text hover:underline pointer-coarse:h-10',
-          COARSE_HIT,
+          'flex min-w-0 items-center gap-1.5 text-sm font-semibold text-accent-soft-text hover:underline',
+          COARSE_TARGET,
         ]"
       >
         <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-accent" />
