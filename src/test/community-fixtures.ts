@@ -188,6 +188,7 @@ export const ticketItem = (overrides: Partial<TicketListItem> = {}): TicketListI
   title: 'Test 17 của bài Trò chơi trên cây có vẻ sai',
   creator: VIEWER,
   assignees: [{ id: communityId(905), username: 'colan', rating: null }],
+  contest: null,
   link: {
     type: 'problem',
     id: communityId(802),
@@ -224,7 +225,7 @@ export const ticketDetail = (overrides: Partial<TicketDetail> = {}): TicketDetai
     notes: '',
     messages,
     timeline: messages.map(messageEntry),
-    can: { editNotes: false, markGood: false, assign: false },
+    can: { editNotes: false, markGood: false, assign: false, claim: false },
     ...overrides,
   };
 };

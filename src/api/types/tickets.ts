@@ -18,8 +18,10 @@ export type TicketPermissions = Schemas['TicketPermissionsResponse'];
 /** backend: ticket.response.ts (TicketDetailResponse) */
 export type TicketDetail = Schemas['TicketDetailResponse'];
 /** backend: tickets/core/dto/ticket-list.dto.ts; `open=true` lists open tickets, `open=false` closed ones, unset lists both. */
-export type TicketListQuery = Required<Omit<QueryOf<'/tickets'>, 'open' | 'awaiting'>> &
-  Pick<QueryOf<'/tickets'>, 'open' | 'awaiting'>;
+export type TicketListQuery = Required<
+  Omit<QueryOf<'/tickets'>, 'open' | 'awaiting' | 'q' | 'aboutMine'>
+> &
+  Pick<QueryOf<'/tickets'>, 'open' | 'awaiting' | 'q' | 'aboutMine'>;
 /** backend: tickets/editing/dto/update-ticket.dto.ts */
 export type TicketPatch = JsonBodyOf<'/tickets/{id}', 'patch'>;
 /** backend: tickets/posting/dto/new-ticket.dto.ts */

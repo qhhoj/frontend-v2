@@ -170,6 +170,7 @@ export const userPage = (overrides: Partial<UserPage> = {}): UserPage => ({
   displayRank: 'user',
   aboutHtml: '',
   contributionPoints: 0,
+  submissionCount: 0,
   ratingSummary: { min: 1200, max: 2104, contests: 3 },
   organizations: [],
   dateJoined: '2024-09-14T03:00:00Z',
@@ -630,6 +631,7 @@ export const submissionDetail = (overrides: Partial<SubmissionDetail> = {}): Sub
     submissionCase({ position: 3, status: 'WA', points: 0 }),
   ],
   batches: null,
+  contest: null,
   totalCases: 20,
   viewer: {
     canAbort: false,

@@ -3,7 +3,9 @@ import { expect, list, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { ok } from './fixtures/reply';
 
-const STAFF_TICKET = ticketDetail({ can: { editNotes: true, markGood: true, assign: true } });
+const STAFF_TICKET = ticketDetail({
+  can: { editNotes: true, markGood: true, assign: true, claim: false },
+});
 const PATH = `/tickets/${STAFF_TICKET.id}`;
 const withStaffTicket = (api: FakeApi, replies = [cannedReply()]) => {
   api.signedIn = true;

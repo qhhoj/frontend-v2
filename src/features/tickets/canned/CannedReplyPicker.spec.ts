@@ -8,7 +8,9 @@ import type { ApiCall, MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { signedInViewer } from '@/test/problem-routes';
 
-const STAFF_TICKET = ticketDetail({ can: { editNotes: true, markGood: true, assign: true } });
+const STAFF_TICKET = ticketDetail({
+  can: { editNotes: true, markGood: true, assign: true, claim: false },
+});
 async function openTicket(detail: TicketDetail, replies: MockHandler) {
   const calls = mockApi({
     ...signedInViewer(),
