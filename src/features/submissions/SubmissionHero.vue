@@ -116,7 +116,7 @@ const problem = computed(() => {
           <SkeletonBlock v-if="isProblemLoading" text class="w-40" />
           <template v-else
             >{{ score
-            }}<span v-if="maxScore" class="text-2xl whitespace-nowrap text-muted">
+            }}<span v-if="maxScore" class="text-2xl text-muted">
               / {{ maxScore }}</span
             ></template
           >

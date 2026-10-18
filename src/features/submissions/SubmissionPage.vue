@@ -34,7 +34,8 @@ import CompareWithForm from './CompareWithForm.vue';
 import { submissionShortId } from './submission-short-id';
 
 /** The score card (staff actions inside) beside the facts card from lg; the tests and the source below, full width. */
-const SUMMARY = 'grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]';
+const SUMMARY =
+  'grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start';
 const STACK = 'flex min-w-0 flex-col gap-5';
 
 const route = useRoute();

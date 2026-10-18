@@ -9,7 +9,7 @@ Root problem it fixes: the same control was built four ways (admin `controls.ts`
 | Group | Names |
 |---|---|
 | Type (font size only) | `text-tiny` 11 · `text-caption` 12 · `text-meta` 13 · `text-sm` 14 · `text-base` 16 · `text-title` 17 · `text-page` 26 · `text-stat` 26 (+ `font-mono`) · `text-hero` 40 · `text-score` 56 (submission score) |
-| Leading | tiny/caption 16 px · meta 18 · sm 20 · base 24 · title 22 · page 1.25 · stat/hero 1 |
+| Leading | tiny/caption 16 px · meta 18 · sm 20 · base 24 · title 22 · page 1.25 · stat/hero/score 1 |
 | Control height | `--qh-control` 44 (md) · `--qh-control-sm` 36, 44 on coarse pointers · `--qh-control-lg` 56 (swap card submit) |
 | Radius by role | `rounded-control` (`--qh-radius-control`: pill; 12 in admin) · inputs, code `rounded-cell` 12 · inset tiles, notices `rounded-row` 16 · cards, dialogs `rounded-card` 24 · chips, tabs, segmented `rounded-pill`. `tile` 20 and `panel` 28: no new uses |
 | Z | `z-sticky` 10 · `z-savebar` 20 · `z-header` 30 · `z-bit` 40 · `z-overlay` 50 · `z-toast` 1200 (above PrimeVue's 1000/1100) |
