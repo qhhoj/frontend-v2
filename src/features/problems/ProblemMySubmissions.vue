@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import type { SubmissionListItem } from '@/api/types/submissions';
 import { IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import InlineBit from '@/components/InlineBit.vue';
 import Card from '@/components/ui/Card.vue';
@@ -15,16 +17,19 @@ import { useNow } from '@/lib/use-now';
 import { submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
-import { scoreOnScale } from './submit-result';
+import { railScore } from './rail-score';
 import type { ScoreScale } from './submit-result';
 
 const SHOWN = 3;
 const CLOCK_TICK_MS = 60_000;
+const NO_SCORE = '–';
 /**
- * The signed-in viewer's last three submissions to this problem, scored like the result strip: on the contest's points
- * inside the viewer's contest (Q-10 A), else on the problem's.
+ * The signed-in viewer's last three submissions to this problem. Each scores on its own submission's scale (Q-10 A): the
+ * contest's points, labelled like the submission page, when it was made in a contest, else the problem's, labelled too.
+ * `scale` is the viewer's contest, which alone says what a contest row is out of.
  */
 const props = defineProps<{ code: string; scale: ScoreScale }>();
+const { t } = useI18n();
 const session = useSessionStore();
 const locale = useLocaleStore();
 const now = useNow(CLOCK_TICK_MS);
@@ -48,12 +53,22 @@ const isJudging = computed(() => {
   const first = latest.value[0];
   return first !== undefined && IN_PROGRESS_STATUSES.includes(first.status);
 });
-const score = (points: number | null) => {
-  const digits = props.scale.contest?.precision ?? 2;
-  const { score: earned, max } = scoreOnScale(points ?? 0, props.scale);
-  const shown = points === null ? '–' : formatNumber(earned, locale.locale, digits);
-  return `${shown} / ${formatNumber(max, locale.locale, digits)}`;
-};
+/** The score's value, and what it is out of with the scale's name: "250", "/ 250 điểm kỳ thi". */
+function scoreParts(submission: SubmissionListItem) {
+  const { scale, points, max, digits } = railScore(submission, props.scale);
+  const format = (value: number) => formatNumber(value, locale.locale, digits, false);
+  const maxText = max === null ? '' : format(max);
+  const outOf =
+    scale === 'site'
+      ? t('problem.rail.mine.siteOutOf', { max: maxText })
+      : max === null
+        ? t('problem.rail.mine.contestUnit')
+        : t('submission.contest.outOf', { max: maxText });
+  return { value: points === null ? NO_SCORE : format(points), outOf, scale };
+}
+const rows = computed(() =>
+  latest.value.map((submission) => ({ submission, score: scoreParts(submission) })),
+);
 </script>
 
 <template>
@@ -78,14 +93,17 @@ const score = (points: number | null) => {
       </p>
       <ol v-else class="flex flex-col">
         <li
-          v-for="submission in latest"
+          v-for="{ submission, score } in rows"
           :key="submission.id"
           class="flex min-h-11 items-center gap-2.5 border-t border-line"
         >
           <RouterLink :to="{ name: 'submission', params: { id: submission.id } }">
             <VerdictBadge :verdict="submissionVerdictOf(submission)" size="sm" />
           </RouterLink>
-          <span class="font-mono font-bold tabular-nums">{{ score(submission.points) }}</span>
+          <p :data-scale="score.scale" :title="submission.contest?.name" class="min-w-0">
+            <span class="font-mono font-bold tabular-nums">{{ score.value }}</span
+            >{{ ' ' }}<span class="text-meta whitespace-nowrap text-muted">{{ score.outOf }}</span>
+          </p>
           <time :datetime="submission.date" class="ml-auto text-meta text-muted">{{
             formatAgoCompact(submission.date, now, locale.locale)
           }}</time>

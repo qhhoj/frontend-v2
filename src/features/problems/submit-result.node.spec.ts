@@ -35,12 +35,12 @@ describe('scoreOnScale', () => {
   });
 
   it("carries the share of the problem's points over to the contest's", () => {
-    const contest = { points: 100, partial: true, precision: 0 };
+    const contest = { key: 'r42', points: 100, partial: true, precision: 0 };
     expect(scoreOnScale(400, { problemPoints: 1600, contest })).toEqual({ score: 25, max: 100 });
   });
 
   it('pays a contest problem without partial scores only for a full score', () => {
-    const contest = { points: 100, partial: false, precision: 0 };
+    const contest = { key: 'r42', points: 100, partial: false, precision: 0 };
     expect(scoreOnScale(400, { problemPoints: 1600, contest })).toEqual({ score: 0, max: 100 });
     expect(scoreOnScale(1600, { problemPoints: 1600, contest })).toEqual({ score: 100, max: 100 });
   });

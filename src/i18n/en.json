@@ -1108,7 +1108,9 @@
         "contestPoints": "Contest points"
       },
       "mine": {
-        "title": "My submissions"
+        "title": "My submissions",
+        "contestUnit": "contest points",
+        "siteOutOf": "/ {max} problem points"
       },
       "links": {
         "label": "Problem links",

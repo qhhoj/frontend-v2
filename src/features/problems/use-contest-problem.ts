@@ -42,15 +42,18 @@ export function useScoreScale(
   const { contestProblem } = useContestProblem(problem, contest);
   return computed<ScoreScale>(() => {
     const inContest = contestProblem.value;
+    const current = contest();
     return {
       problemPoints: problem().points,
-      contest: inContest
-        ? {
-            points: inContest.points,
-            partial: inContest.partial,
-            precision: contest()?.pointsPrecision ?? 0,
-          }
-        : null,
+      contest:
+        inContest && current
+          ? {
+              key: current.key,
+              points: inContest.points,
+              partial: inContest.partial,
+              precision: current.pointsPrecision,
+            }
+          : null,
     };
   });
 }
