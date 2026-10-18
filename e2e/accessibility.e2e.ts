@@ -57,7 +57,7 @@ const PAGES = [
     path: '/contests/r42/submissions',
     ready: {
       anonymous: 'Đăng nhập để xem bài nộp của bạn',
-      'signed-in': 'Chỉ hiện bài nộp của bạn',
+      'signed-in': 'Bài nộp của bạn',
     },
   },
   {
