@@ -6,7 +6,8 @@
     "general": "General",
     "accounts": "Accounts",
     "integrations": "Integrations",
-    "limits": "Limits"
+    "limits": "Limits",
+    "public": "Public texts"
   },
   "blocks": {
     "site": {
@@ -256,10 +257,8 @@
   },
   "reset": {
     "label": "Reset to default {value}",
-    "hint": "Default",
     "filled": "Default filled in, not saved yet. Stored value: {stored}.",
-    "isDefault": "Default",
-    "notDefault": "Not default",
+    "notDefault": "Changed",
     "on": "on",
     "off": "off",
     "empty": "(empty)"
@@ -316,5 +315,15 @@
         "enforce": "Enforce"
       }
     }
+  },
+  "search": {
+    "label": "Search settings",
+    "placeholder": "Search settings… (e.g. time zone, Polygon)",
+    "results": "No setting matches | {n} setting matches | {n} settings match"
+  },
+  "info": {
+    "label": "Details of {key}",
+    "default": "Default:",
+    "reset": "Reset"
   }
 }

@@ -1,87 +1,33 @@
 import { expect, test } from './fixtures/api';
-import type { FakeApi } from './fixtures/api';
 import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
 import { adminList, adminOk, signInAsStaff } from './fixtures/admin';
 import { siteData } from '../src/test/admin-fixtures/site';
 
+/** The site notice is a misc config key: its own permission opens the settings page on the "Văn bản công khai" tab. */
 const CONFIG_PERMS = ['judge.change_miscconfig'];
 
-/** Opening a key also loads its revision history. */
-function mockEmptyRevisions(api: FakeApi, key: string) {
-  api.routes[`GET /admin/site/config/${key}/revisions`] = adminList([]);
-}
-
 for (const viewport of AUDIT_VIEWPORTS)
-  test(`raw config at ${viewport.name}: the HTML preview is sandboxed and a script value never runs`, async ({
+  test(`site notice at ${viewport.name}: the old raw config address opens the notice, saved from the one save bar`, async ({
     page,
     api,
   }) => {
     await page.setViewportSize(viewport);
     signInAsStaff(api, CONFIG_PERMS);
     api.routes['GET /site'] = adminOk(siteData());
-    mockEmptyRevisions(api, 'announcement');
-    api.routes['PUT /admin/site/config/announcement'] = adminOk({
-      key: 'announcement',
-      value: '<script>window.ran = true</script>',
+    api.routes['GET /admin/site/config/top_notification/revisions'] = adminList([]);
+    api.routes['PUT /admin/site/config/top_notification'] = adminOk({
+      key: 'top_notification',
+      value: 'Bảo trì lúc 22:00',
     });
-    let dialogsOpened = 0;
-    page.on('dialog', () => (dialogsOpened += 1));
 
     await page.goto('/admin/config');
+    await expect(page).toHaveURL(/\/admin\/settings\?tab=public/);
+    await page.getByLabel('Nội dung thông báo').fill('Bảo trì lúc 22:00');
     expect(await axeViolationsIn(page)).toEqual([]);
-    await page.getByRole('button', { name: 'announcement' }).click();
-    await expect(page.locator('iframe[title="Xem trước giá trị HTML"]')).toHaveAttribute(
-      'sandbox',
-      '',
-    );
-    // Not axe-scanned: AxeBuilder hangs on a sandboxed srcdoc frame in this harness. The frame has its title.
-
-    await page.getByLabel('Giá trị (tối đa 20 000 ký tự)').fill('<script>alert(1)</script>');
-    await page.getByRole('button', { name: 'Lưu', exact: true }).click();
-    await expect(
-      page.getByRole('status').filter({ hasText: 'Đã lưu announcement.' }),
-    ).toBeVisible();
-    expect(api.requestsTo('PUT /admin/site/config/announcement')).toHaveLength(1);
-    expect(dialogsOpened).toBe(0);
-  });
-
-for (const viewport of AUDIT_VIEWPORTS)
-  test(`raw config at ${viewport.name}: a link key refuses a non-http value`, async ({
-    page,
-    api,
-  }) => {
-    await page.setViewportSize(viewport);
-    signInAsStaff(api, CONFIG_PERMS);
-    api.routes['GET /site'] = adminOk(siteData());
-    mockEmptyRevisions(api, 'discord_invite_link');
-
-    await page.goto('/admin/config');
-    await page.getByRole('button', { name: 'discord_invite_link' }).click();
-    await page.getByLabel('Giá trị (tối đa 20 000 ký tự)').fill('ftp://x');
-    await page.getByRole('button', { name: 'Lưu', exact: true }).click();
-    await expect(page.getByText('Khoá liên kết chỉ nhận http hoặc https.').first()).toBeVisible();
-    expect(await axeViolationsIn(page)).toEqual([]);
-    expect(api.requestsTo('PUT /admin/site/config/discord_invite_link')).toHaveLength(0);
-  });
-
-for (const viewport of AUDIT_VIEWPORTS)
-  test(`raw config at ${viewport.name}: deleting a key asks first`, async ({ page, api }) => {
-    await page.setViewportSize(viewport);
-    signInAsStaff(api, CONFIG_PERMS);
-    api.routes['GET /site'] = adminOk(siteData());
-    mockEmptyRevisions(api, 'contact_email');
-    api.routes['DELETE /admin/site/config/contact_email'] = { status: 204 };
-
-    await page.goto('/admin/config');
-    await page.getByRole('button', { name: 'contact_email' }).click();
-    await page.getByRole('button', { name: 'Xoá khoá', exact: true }).click();
-    // The confirm opens over the editor drawer, which is a dialog too.
-    const confirm = page.getByRole('dialog', { name: 'Xoá khoá contact_email?' });
-    await expect(confirm).toContainText('Mọi trang ngừng dùng giá trị này ngay.');
-    expect(await axeViolationsIn(page)).toEqual([]);
-    expect(api.requestsTo('DELETE /admin/site/config/contact_email')).toHaveLength(0);
-
-    await confirm.getByRole('button', { name: 'Xoá khoá', exact: true }).click();
-    await expect(page.getByRole('button', { name: 'contact_email' })).toHaveCount(0);
-    expect(api.requestsTo('DELETE /admin/site/config/contact_email')).toHaveLength(1);
+    const saveBar = page.getByTestId('settings-save-bar');
+    await expect(saveBar).toContainText('1 thay đổi chưa lưu');
+    await saveBar.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click();
+    await expect(saveBar.getByRole('status')).toContainText('Đã lưu lúc');
+    expect(api.requestsTo('PUT /admin/site/config/top_notification')).toHaveLength(1);
+    expect(api.requestsTo('GET /admin/settings')).toHaveLength(0);
   });

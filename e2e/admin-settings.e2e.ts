@@ -41,6 +41,7 @@ for (const viewport of AUDIT_VIEWPORTS)
     );
     await page.goto('/admin/settings?tab=limits');
     const row = page.locator('[data-key="similarity.minPercent"]');
+    await row.getByRole('button', { name: 'Chi tiết similarity.minPercent' }).click();
     await row.getByRole('button', { name: 'Về mặc định 50' }).focus();
     await page.keyboard.press('Enter');
     await expect(row.getByRole('spinbutton')).toHaveValue('50');

@@ -2,7 +2,6 @@ import type { Component } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import {
   Activity,
-  Braces,
   CloudDownload,
   Download,
   Building2,
@@ -112,7 +111,6 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     screenItem('similarity', GitCompare),
     screenItem('rejudge', RotateCcw),
     screenItem('pages', Files),
-    screenItem('config', Braces),
     screenItem('shortLinks', Link),
     screenItem('integrations', Plug),
     screenItem('activity', Activity),

@@ -1,68 +1,5 @@
 {
   "config": {
-    "title": "Cấu hình thô",
-    "lead": "Các khoá văn bản tự do mà trang web đọc: thông báo, chân trang, liên kết.",
-    "caption": "Các khoá cấu hình",
-    "warning": {
-      "title": "Mọi giá trị ở đây đều công khai",
-      "summary": "Ai cũng đọc được các giá trị này, nên đừng đặt bí mật ở đây; bí mật thuộc trang Cài đặt.",
-      "html": "Giá trị HTML (thông báo, chân trang) được làm sạch trước khi hiện trên trang.",
-      "tracking": "Mã theo dõi chỉ được dùng đúng đoạn mẫu của người vận hành trang."
-    },
-    "columns": {
-      "key": "Khoá",
-      "value": "Giá trị",
-      "kind": "Loại",
-      "length": "Ký tự"
-    },
-    "kinds": {
-      "html": "HTML",
-      "url": "URL",
-      "tracking": "Mã theo dõi",
-      "text": "Văn bản"
-    },
-    "add": "Thêm khoá",
-    "newHeading": "Khoá mới",
-    "editHeading": "Sửa {key}",
-    "keyLabel": "Khoá",
-    "keyHint": "1–30 ký tự, không có ký tự điều khiển.",
-    "valueLabel": "Giá trị (tối đa 20 000 ký tự)",
-    "valueHint": "Có thể để trống.",
-    "counter": "{length} / 20 000",
-    "previewTitle": "Xem trước giá trị HTML",
-    "previewLabel": "Xem trước trong khung cách ly (không chạy mã)",
-    "previewNote": "Thẻ script, sự kiện on…, iframe và liên kết javascript: không chạy trong khung xem trước; trang thật làm sạch khi hiện.",
-    "urlNote": "Khoá liên kết chỉ nhận http hoặc https.",
-    "trackingNote": "Chỉ dùng đúng đoạn mẫu theo dõi của người vận hành trang.",
-    "save": "Lưu",
-    "close": "Huỷ",
-    "delete": "Xoá khoá",
-    "deleteTitle": "Xoá khoá {key}?",
-    "deleteBody": "Mọi trang ngừng dùng giá trị này ngay.",
-    "saved": "Đã lưu {key}.",
-    "deleted": "Đã xoá {key}.",
-    "errors": {
-      "keyPattern": "Khoá phải có 1–30 ký tự, không có ký tự điều khiển.",
-      "keyTaken": "Khoá đã có.",
-      "tooLong": "Tối đa 20 000 ký tự.",
-      "url": "Khoá liên kết chỉ nhận http hoặc https."
-    },
-    "usedChip": "Trang đang dùng",
-    "unusedChip": "Chỉ trang cũ dùng: ở đây không đọc",
-    "knownHeading": "Khoá đã biết chưa đặt",
-    "setKnown": "Đặt",
-    "setKnownLabel": "Đặt {key}",
-    "known": {
-      "top_notification": "Thông báo trang: văn bản thuần hiện trên mọi trang cho mọi người xem, đến khi họ đóng.",
-      "announcement": "Trang cũ: khung thông báo HTML cuối mọi trang.",
-      "home_page_top": "Trang cũ: khối HTML đầu trang chủ.",
-      "footer": "Trang cũ: HTML thêm vào chân trang.",
-      "analytics": "Trang cũ: mã theo dõi trong phần đầu mọi trang.",
-      "meta_description": "Trang cũ: thẻ meta mô tả của trang chủ.",
-      "meta_keywords": "Trang cũ: thẻ meta từ khoá của trang chủ.",
-      "discord_invite_link": "Trang cũ: liên kết mời Discord ở trang chủ và trang đăng nhập.",
-      "discord_invite_shieldio": "Trang cũ: ảnh huy hiệu Discord (shields.io) cạnh liên kết mời."
-    },
     "history": {
       "title": "Lịch sử",
       "empty": "Chưa ghi nhận thay đổi nào.",
@@ -84,10 +21,9 @@
     "label": "Nội dung thông báo",
     "hint": "Văn bản thuần; giữ xuống dòng, HTML hiện đúng như gõ.",
     "preview": "Người xem sẽ thấy",
-    "publish": "Đăng thông báo",
-    "update": "Cập nhật thông báo",
     "takeDown": "Gỡ thông báo",
-    "saved": "Đã đăng thông báo.",
-    "removed": "Đã gỡ thông báo."
+    "tooLong": "Thông báo dài quá 20 000 ký tự.",
+    "live": "Đang hiện",
+    "takeDownHint": "Hộp trống: bấm Lưu để gỡ thông báo."
   }
 }

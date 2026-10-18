@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, invalid, issue, mockApi, ok, page } from '@/test/mock-api';
+import { fail, invalid, issue, mockApi, noContent, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import {
   cancelDialog,
@@ -32,6 +32,13 @@ const mountSettings = async () => {
 };
 const block = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], id: string) =>
   wrapper.get(`[data-block="${id}"]`);
+const keyRow = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], key: string) =>
+  wrapper.get(`[data-key="${key}"]`);
+/** Opens a key's ⓘ popover, which holds its history and reset. */
+const openInfo = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], key: string) => {
+  await keyRow(wrapper, key).get('[data-testid="setting-info"]').trigger('click');
+  await flushPromises();
+};
 /** The page's one save bar. */
 const saveBar = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
   wrapper.get('[data-testid="settings-save-bar"]');
@@ -115,8 +122,8 @@ describe('SiteSettingsPage', () => {
       }),
     );
     const { wrapper } = await mountSettings();
-    // The pdf block holds two keys, so each history button names its key.
-    await clickIn(block(wrapper, 'pdf'), 'Lịch sử · pdf.renderTimeoutMs');
+    await openInfo(wrapper, 'pdf.renderTimeoutMs');
+    await clickIn(keyRow(wrapper, 'pdf.renderTimeoutMs'), 'Lịch sử');
     expect(wrapper.get('[data-testid="revisions"]').text()).toContain('− 30000');
     await wrapper
       .get('[data-testid="revisions"]')
@@ -139,14 +146,13 @@ const withMinPercent = (stored: number) =>
       ? setting('similarity.minPercent', stored, { default: 50, isDefault: stored === 50 })
       : entry,
   );
-const keyRow = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], key: string) =>
-  wrapper.get(`[data-key="${key}"]`);
 
 describe('defaults', () => {
   it('"Huỷ thay đổi" still discards the filled default and shows the stored value again', async () => {
     mockApi(routes({ 'GET /admin/settings': ok(withMinPercent(65)) }));
     const { wrapper } = await mountSettings();
     const row = keyRow(wrapper, 'similarity.minPercent');
+    await openInfo(wrapper, 'similarity.minPercent');
     await row.get('button[aria-label="Về mặc định 50"]').trigger('click');
     await clickIn(saveBar(wrapper), 'Huỷ thay đổi');
     expect((row.get('input').element as HTMLInputElement).value).toBe('65');
@@ -167,6 +173,7 @@ describe('defaults', () => {
     );
     const { wrapper } = await mountSettings();
     const row = keyRow(wrapper, 'contest.officialMode');
+    await openInfo(wrapper, 'contest.officialMode');
     await row.get('button[aria-label="Về mặc định tắt"]').trigger('click');
     expect(switchNamed(row, 'Bật chế độ kỳ thi chính thức').attributes('aria-checked')).toBe(
       'false',
@@ -304,5 +311,74 @@ describe('one save bar for every tab', () => {
     await save.trigger('click');
     await flushPromises();
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+  });
+});
+
+describe('search', () => {
+  it('shows the matching rows of every tab, and the tabs again once the box is empty', async () => {
+    mockApi(routes());
+    const { wrapper } = await mountSettings();
+    const search = wrapper.get('input[type="search"]');
+    await search.setValue('mail.from');
+    expect(keyRow(wrapper, 'mail.from').isVisible()).toBe(true);
+    expect(keyRow(wrapper, 'mail.smtpUrl').isVisible()).toBe(false);
+    expect(block(wrapper, 'site').isVisible()).toBe(false);
+    expect(wrapper.text()).toContain('1 cài đặt khớp');
+    await search.setValue('');
+    expect(block(wrapper, 'site').isVisible()).toBe(true);
+    expect(keyRow(wrapper, 'mail.from').isVisible()).toBe(false);
+  });
+});
+
+describe('the site notice tab', () => {
+  const noticeRoutes = (notice: string | null, extra = {}) =>
+    routes({
+      ...staffViewer([...PERMS, 'judge.change_miscconfig']),
+      'GET /site': ok({
+        officialMode: false,
+        officialModeEndsAt: null,
+        config: notice === null ? {} : { top_notification: notice },
+      }),
+      ...extra,
+    });
+  const mountNotice = async () => {
+    const mounted = await mountApp('/admin/settings?tab=public');
+    await vi.waitFor(() => {
+      if (!mounted.wrapper.find('[data-block="notice"]').exists()) throw new Error('not yet');
+    });
+    return mounted;
+  };
+
+  it('publishes the notice from the one save bar', async () => {
+    const calls = mockApi(
+      noticeRoutes(null, {
+        'PUT /admin/site/config/top_notification': ok({
+          key: 'top_notification',
+          value: 'Bảo trì',
+        }),
+      }),
+    );
+    const { wrapper } = await mountNotice();
+    await block(wrapper, 'notice').get('textarea').setValue('  Bảo trì  ');
+    expect(saveBar(wrapper).text()).toContain('1 thay đổi chưa lưu');
+    await saveBar(wrapper).get('button[type="submit"]').trigger('click');
+    await flushPromises();
+    const put = calls.find((call) => call.method === 'PUT')!;
+    expect(put.path).toBe('/admin/site/config/top_notification');
+    expect(put.body).toEqual({ value: 'Bảo trì' });
+  });
+
+  it('takes the notice down when the box is emptied and saved', async () => {
+    const calls = mockApi(
+      noticeRoutes('Bảo trì', {
+        'DELETE /admin/site/config/top_notification': noContent(),
+      }),
+    );
+    const { wrapper } = await mountNotice();
+    await clickIn(block(wrapper, 'notice'), 'Gỡ thông báo');
+    await saveBar(wrapper).get('button[type="submit"]').trigger('click');
+    await flushPromises();
+    expect(calls.some((call) => call.method === 'DELETE')).toBe(true);
+    expect(calls.some((call) => call.method === 'PUT')).toBe(false);
   });
 });

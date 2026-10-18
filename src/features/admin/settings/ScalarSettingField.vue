@@ -7,15 +7,8 @@ import { useLocaleStore } from '@/stores/locale.store';
 import AdminField from '../ui/AdminField.vue';
 import AdminSwitch from '../ui/AdminSwitch.vue';
 import { INPUT } from '../ui/controls';
-import DefaultResetButton from './DefaultResetButton.vue';
 import { SETTING_KINDS } from './setting-blocks';
-import {
-  canResetToDefault,
-  defaultDraftOf,
-  isAtDefault,
-  isFilledFromDefault,
-  valueText,
-} from './setting-defaults';
+import { isFilledFromDefault, valueText } from './setting-defaults';
 import type { ScalarDraft } from './setting-values';
 
 const props = defineProps<{ setting: Setting }>();
@@ -36,13 +29,8 @@ const isOn = computed({
   get: () => draft.value.value === true,
   set: (next: boolean) => (draft.value = { value: next }),
 });
-const canReset = computed(() => canResetToDefault(props.setting));
-const atDefault = computed(() => isAtDefault(props.setting, draft.value));
 const isFilled = computed(() => isFilledFromDefault(props.setting, draft.value));
-const defaultText = computed(() => valueText(props.setting.default, locale.locale));
 const storedText = computed(() => valueText(props.setting.value, locale.locale));
-/** Fills the registry default into the box; nothing is sent until the block's "Lưu". */
-const resetToDefault = () => (draft.value = defaultDraftOf(props.setting));
 /** Browsers list every IANA zone; a missing `Intl.supportedValuesOf` leaves the box free text. */
 const timeZones = computed(() =>
   typeof Intl.supportedValuesOf === 'function' ? Intl.supportedValuesOf('timeZone') : [],
@@ -97,16 +85,7 @@ const timeZones = computed(() =>
           :class="INPUT"
         />
       </AdminField>
-      <DefaultResetButton
-        v-if="canReset"
-        :default-text="defaultText"
-        :is-at-default="atDefault"
-        @reset="resetToDefault"
-      />
     </div>
-    <p v-if="canReset" class="text-xs text-muted">
-      {{ $t('admin.settings.reset.hint') }} <span class="font-mono">{{ defaultText }}</span>
-    </p>
     <Notice v-if="isFilled" tone="info">
       {{ $t('admin.settings.reset.filled', { stored: storedText }) }}
     </Notice>

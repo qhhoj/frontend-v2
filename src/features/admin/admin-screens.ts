@@ -108,8 +108,11 @@ export const ADMIN_SCREENS = {
   tickets: { path: '/admin/tickets', permission: 'judge.change_ticket' },
   cannedReplies: { path: '/admin/tickets/canned', permission: 'judge.change_ticket' },
   activity: { path: '/admin/activity', permission: 'judge.can_see_user_activity' },
-  settings: { path: '/admin/settings', permission: 'judge.change_settings' },
-  config: { path: '/admin/config', permission: 'judge.change_miscconfig' },
+  // The site notice (misc config) lives in its "Văn bản công khai" tab, so either permission opens the page.
+  settings: {
+    path: '/admin/settings',
+    permission: ['judge.change_settings', 'judge.change_miscconfig'],
+  },
   pages: { path: '/admin/pages', permission: 'flatpages.change_flatpage' },
   log: { path: '/admin/log', permission: 'judge.change_settings' },
   shortLinks: { path: '/admin/short-links', permission: 'judge.manage_short_link' },

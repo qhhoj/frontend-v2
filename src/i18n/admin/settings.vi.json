@@ -6,7 +6,8 @@
     "general": "Chung",
     "accounts": "Tài khoản",
     "integrations": "Kết nối",
-    "limits": "Giới hạn"
+    "limits": "Giới hạn",
+    "public": "Văn bản công khai"
   },
   "blocks": {
     "site": {
@@ -256,10 +257,8 @@
   },
   "reset": {
     "label": "Về mặc định {value}",
-    "hint": "Mặc định",
     "filled": "Đã điền giá trị mặc định, chưa lưu. Giá trị đang lưu: {stored}.",
-    "isDefault": "Mặc định",
-    "notDefault": "Khác mặc định",
+    "notDefault": "Đã đổi",
     "on": "bật",
     "off": "tắt",
     "empty": "(trống)"
@@ -316,5 +315,15 @@
         "enforce": "Bắt buộc"
       }
     }
+  },
+  "search": {
+    "label": "Tìm cài đặt",
+    "placeholder": "Tìm cài đặt… (vd. múi giờ, Polygon)",
+    "results": "Không có cài đặt nào khớp | {n} cài đặt khớp | {n} cài đặt khớp"
+  },
+  "info": {
+    "label": "Chi tiết {key}",
+    "default": "Mặc định:",
+    "reset": "Đặt lại"
   }
 }

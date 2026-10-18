@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/vue-query';
 import type { QueryClient } from '@tanstack/vue-query';
-import { computed } from 'vue';
+import { computed, toValue } from 'vue';
+import type { MaybeRefOrGetter } from 'vue';
 import { fetchSiteForAdmin } from '@/api/site-admin.api';
 import type { SiteData } from '@/api/types/site-admin';
 import { siteKey } from '@/features/official-mode/official-mode.queries';
@@ -10,11 +11,12 @@ import { configHistoryKey } from './config-history.queries';
 /** The prefix of every `/site` read: a write updates the answer by it. */
 export const siteAdminKey = ['admin', 'site'] as const;
 
-export const useSiteAdminQuery = () => {
+export const useSiteAdminQuery = (isEnabled: MaybeRefOrGetter<boolean> = true) => {
   const viewer = useViewerId();
   return useQuery({
     queryKey: computed(() => [...siteAdminKey, viewer.value]),
     queryFn: fetchSiteForAdmin,
+    enabled: computed(() => toValue(isEnabled)),
   });
 };
 
