@@ -102,6 +102,7 @@ const scoreOf = (row: RankingRow) => {
               <a
                 href="#ranking-board"
                 data-testid="podium-more"
+                :aria-label="$t('ranking.moreTiedLabel', { count: group.hiddenCount })"
                 class="text-meta font-semibold text-accent-text underline-offset-2 hover:underline"
                 >{{ $t('ranking.moreTied', { count: group.hiddenCount }) }}</a
               >
