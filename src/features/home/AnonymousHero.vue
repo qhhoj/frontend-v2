@@ -12,7 +12,7 @@ import { useHomeQuery } from '@/features/community/community.queries';
 /**
  * The counts come from `GET /home`; the hero itself never waits for them, and hides the counts when it fails. On phones (P-05
  * note) the hero is short so the running contest and the first post are on the first screen: no counts, one primary
- * ("Đăng ký tài khoản") with a text "Đăng nhập" (the top bar has the sign-in too), and a small Bit beside the title.
+ * ("Đăng ký tài khoản") with a text "Đăng nhập" (the menu sheet has the sign-in too), and a small Bit beside the title.
  */
 const locale = useLocaleStore();
 const { data: home, isPending, isError } = useHomeQuery();
