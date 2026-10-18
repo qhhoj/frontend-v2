@@ -144,8 +144,6 @@ const LIST_BADGES: Partial<Record<ContestActionKind, string>> = {
   registered: 'contests.list.badges.registered',
   finished: 'contests.list.badges.finished',
 };
-/** Only the actions that take the viewer into the contest (or back into it) are primary on a row. */
-const PRIMARY_KINDS: readonly ContestActionKind[] = ['join', 'rejoin', 'leave'];
 
 /**
  * A list row's button: the detail's action for the same facts, as a link to the detail (a row never joins by itself).
@@ -166,7 +164,8 @@ export function listCallToAction(item: ContestListItem, now: number): ListCallTo
   });
   return {
     labelKey: LIST_LABELS[kind],
-    isPrimary: PRIMARY_KINDS.includes(kind),
+    // One primary per view (M-14): only the viewer's current contest; joining or re-entering another stays outline.
+    isPrimary: item.viewer?.isCurrent ?? false,
     badgeKey: LIST_BADGES[kind] ?? null,
   };
 }
