@@ -3,7 +3,7 @@ import type { SubmissionListItem } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
 import { translate } from '@/i18n';
 import { computed } from 'vue';
-import { formatClock, formatDateTime, formatShortDate } from '@/lib/format';
+import { formatClock, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { VERDICT_TONE_CLASSES, submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -27,11 +27,9 @@ const { openRow, openRowInTab } = useRowOpen();
 const now = useNow(60_000);
 const isToday = (date: string) =>
   new Date(date).toDateString() === new Date(now.value).toDateString();
-/** The clock alone for today's rows, the date before it otherwise. */
+/** The clock for today's rows, the short date otherwise (the hover title carries the whole datetime). */
 const whenOf = (date: string) =>
-  isToday(date)
-    ? formatClock(date, locale.locale)
-    : `${formatShortDate(date, locale.locale)} ${formatClock(date, locale.locale)}`;
+  isToday(date) ? formatClock(date) : formatDate(date, 'short', locale.locale, { now: now.value });
 /** "0/2 test đúng" once judged, "đang chấm" before; null when the tests are hidden from this viewer. */
 function progressOf(row: SubmissionListItem): string | null {
   if (!isFinished(row)) return translate('submissions.strip.grading');
@@ -82,7 +80,7 @@ const views = computed(
         <p class="truncate font-semibold">{{ row.problem?.name ?? NO_VALUE }}</p>
         <p class="truncate font-mono text-meta text-muted tabular-nums">
           <template v-if="showUser && row.user">{{ row.user.username }} · </template>
-          <time :datetime="row.date" :title="formatDateTime(row.date, locale.locale)">{{
+          <time :datetime="row.date" :title="formatDate(row.date, 'datetime', locale.locale)">{{
             whenOf(row.date)
           }}</time>
           <template v-if="views.get(row.id)!.progress">

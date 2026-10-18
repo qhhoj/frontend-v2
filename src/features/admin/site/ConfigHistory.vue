@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { BUTTON } from '../ui/controls';
@@ -41,7 +41,7 @@ const hasMore = () =>
               :username="revision.editor.username"
               :rating="revision.editor.rating"
             />
-            <span class="text-muted">{{ formatDateTime(revision.at, locale.locale) }}</span>
+            <span class="text-muted">{{ formatDate(revision.at, 'datetime', locale.locale) }}</span>
           </p>
           <template v-for="side in ['before', 'after'] as const" :key="side">
             <div

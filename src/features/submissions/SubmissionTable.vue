@@ -4,7 +4,7 @@ import type { SubmissionListItem } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import UserLink from '@/components/UserLink.vue';
-import { formatDateTime, formatAgoCompact } from '@/lib/format';
+import { formatAgoCompact, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import SubmissionCompactList from './SubmissionCompactList.vue';
@@ -199,7 +199,7 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
               v-if="isShown('when')"
               :class="[bodyCell, tierOf('when'), 'whitespace-nowrap text-muted']"
             >
-              <time :datetime="row.date" :title="formatDateTime(row.date, locale.locale)">{{
+              <time :datetime="row.date" :title="formatDate(row.date, 'datetime', locale.locale)">{{
                 formatAgoCompact(row.date, now, locale.locale)
               }}</time>
             </td>

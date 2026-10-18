@@ -7,7 +7,8 @@ import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
-import { formatNumber, formatNumericDate } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { hasPermission } from '@/lib/permissions';
 import { ratingTier, tierColor } from '@/lib/rating-tiers';
 import { TIER_TEXT_CLASSES } from '@/lib/tier-classes';
@@ -37,7 +38,7 @@ const canBan = computed(
     !banReason.value,
 );
 const isSignedIn = computed(() => session.status === 'authenticated');
-const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, locale.locale));
+const joinedDate = computed(() => formatDate(props.user.dateJoined, 'date', locale.locale));
 </script>
 
 <template>

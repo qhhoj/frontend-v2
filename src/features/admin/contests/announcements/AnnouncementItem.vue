@@ -5,7 +5,7 @@ import { deleteAnnouncement, resendAnnouncement } from '@/api/contest-editing.ap
 import type { Announcement } from '@/api/types/contest-editing';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import UserContent from '@/components/UserContent.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminStatus from '../../ui/AdminStatus.vue';
@@ -32,7 +32,7 @@ const listKey = (): AdminQueryKey => ['admin', 'contest-announcements', props.co
 const when = computed(() =>
   props.isJustPosted
     ? translate('admin.contests.announcements.justPosted')
-    : formatDateTime(props.announcement.createdAt, locale.locale),
+    : formatDate(props.announcement.createdAt, 'datetime', locale.locale),
 );
 
 const resend = useAdminMutation({

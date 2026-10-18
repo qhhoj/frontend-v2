@@ -1,5 +1,6 @@
 import type { Locale } from '@/i18n';
-import { INTL_LOCALES, formatNumber } from './format';
+import { formatNumber } from './format';
+import { formatMonthName } from './format-date';
 
 export const MEBIBYTE = 1024 * 1024;
 const FULL_PERCENT = 100;
@@ -21,13 +22,10 @@ export function meterPercent(meter: { used: number; limit: number }): {
   return { percent, barPercent: Math.min(FULL_PERCENT, percent) };
 }
 
-/** The usage month `YYYY-MM` (site time zone, from the server) as a month name without the year ("tháng 10", board M7A); built in UTC so no zone shifts it. */
+/** The usage month `YYYY-MM` (site time zone, from the server) as a month name without the year ("tháng 10", board M7A); no zone shifts it. */
 export function monthLabel(month: string, locale: Locale): string {
   const [year, monthNumber] = month.split('-').map(Number);
-  return new Intl.DateTimeFormat(INTL_LOCALES[locale], {
-    month: 'long',
-    timeZone: 'UTC',
-  }).format(new Date(Date.UTC(year ?? 1970, (monthNumber ?? 1) - 1, 1)));
+  return formatMonthName(year ?? 1970, monthNumber ?? 1, locale);
 }
 
 /** `dd/MM` of the day the quota resets: the first of the month after `month` (`YYYY-MM`), as board M7A's "cho đến 01/11". */

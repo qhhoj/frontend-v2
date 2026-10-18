@@ -3,7 +3,7 @@ import type { CreditEntry } from '@/api/types/organization-usage';
 import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
 import { actorName } from '@/lib/actor';
-import { formatNumericDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { ORG_BITS } from '../org-bits';
 import { ledgerAmountText, ledgerReasonKey } from './quota-text';
@@ -42,7 +42,7 @@ const CELL = 'py-2 pr-3 align-middle';
         <tbody>
           <tr v-for="(entry, index) in entries" :key="index" class="border-t border-line">
             <td :class="CELL" class="whitespace-nowrap tabular-nums">
-              {{ formatNumericDateTime(entry.createdAt, locale.locale) }}
+              {{ formatDate(entry.createdAt, 'datetime', locale.locale) }}
             </td>
             <td :class="CELL">
               {{ $t(ledgerReasonKey(entry.reason)) }}

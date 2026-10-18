@@ -7,7 +7,8 @@ import UserName from '@/components/UserName.vue';
 import Chip from '@/components/ui/Chip.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
-import { formatNumber, formatNumericDateTime } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import TicketEventRow from './TicketEventRow.vue';
 import { TICKET_BITS } from './ticket-bits';
@@ -22,7 +23,7 @@ const events = computed(() => eventCount(props.ticket.timeline, props.ticket.can
 const hasHitCap = computed(() => eventCount(props.ticket.timeline, true) >= TICKET_TIMELINE_CAP);
 const isAssignee = (username: string) =>
   props.ticket.assignees.some((assignee) => assignee.username === username);
-const when = (at: string) => formatNumericDateTime(at, locale.locale);
+const when = (at: string) => formatDate(at, 'datetime', locale.locale);
 </script>
 
 <template>

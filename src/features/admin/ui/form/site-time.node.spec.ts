@@ -7,6 +7,21 @@ describe('site time', () => {
     expect(formatInZone('2026-12-31T17:30:00Z')).toBe('01/01/2027 00:30');
   });
 
+  it('shows the site day alone when asked, rolling over at the site midnight', () => {
+    expect(formatInZone('2026-12-31T17:30:00Z', 'Asia/Ho_Chi_Minh', 'date')).toBe('01/01/2027');
+    expect(formatInZone('2026-12-31T17:30:00Z', 'UTC', 'date')).toBe('31/12/2026');
+    expect(formatInZone(null, 'UTC', 'date')).toBe('');
+  });
+
+  it('reads a day alone as the start of that day, and refuses a time of day in that mode', () => {
+    expect(parseInZone('01/01/2027', 'Asia/Ho_Chi_Minh', true)).toEqual({
+      ok: true,
+      iso: '2026-12-31T17:00:00.000Z',
+    });
+    expect(parseInZone('01/01/2027 08:00', 'Asia/Ho_Chi_Minh', true)).toEqual({ ok: false });
+    expect(parseInZone('', 'UTC', true)).toEqual({ ok: true, iso: null });
+  });
+
   it('reads typed site time back as the same instant', () => {
     expect(parseInZone('08/10/2026 13:00')).toEqual({ ok: true, iso: '2026-10-08T06:00:00.000Z' });
     expect(parseInZone(formatInZone('2026-03-01T23:59:00Z'))).toEqual({

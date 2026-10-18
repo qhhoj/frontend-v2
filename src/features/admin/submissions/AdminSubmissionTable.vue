@@ -9,16 +9,16 @@ import VerdictBadge from '@/components/VerdictBadge.vue';
 import SubmissionProblemName from '@/features/submissions/SubmissionProblemName.vue';
 import { formatCaseMemory, formatCaseTime } from '@/lib/format';
 import { copyText } from '@/lib/clipboard';
-import { submissionVerdictOf } from '@/lib/verdicts';
+import { formatClock, formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
+import { submissionVerdictOf } from '@/lib/verdicts';
 import { useAdminToast } from '../ui/feedback/use-admin-toast';
 import { shortId } from '../ui/short-id';
-import { SITE_TIME_ZONE, formatInZone } from '../ui/form/site-time';
+import { SITE_TIME_ZONE } from '../ui/form/site-time';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
 import type { RowMenuItem } from '../ui/table/AdminRowMenu.vue';
 import type { AdminColumn } from '../ui/table/table-columns';
-import { formatShortSiteTime } from './submission-time';
 
 /**
  * Staff columns of the old changelist (time, memory, points, language); cards below 768 px. The verdict opens the submission
@@ -82,7 +82,6 @@ const columns = computed<AdminColumn[]>(() => [
     key: 'date',
     label: t('admin.submissions.table.date'),
     priority: 'meta',
-    cellClass: NUMBER_CELL,
   },
 ]);
 const pointsText = (item: SubmissionListItem) =>
@@ -148,11 +147,14 @@ const menuItems = (row: SubmissionListItem): RowMenuItem[] => [
     </template>
     <template #cell-language="{ row }">{{ row.language?.name ?? '—' }}</template>
     <template #cell-date="{ row }">
-      <time
-        class="text-muted"
-        :datetime="row.date"
-        :title="`${formatInZone(row.date)} (${SITE_TIME_ZONE})`"
-        >{{ formatShortSiteTime(row.date, locale.locale) }}</time
+      <!-- The day and the clock wrap apart in a tight table, never in the middle of the date. -->
+      <time class="text-muted" :datetime="row.date" :title="SITE_TIME_ZONE"
+        ><span class="whitespace-nowrap">{{
+          formatDate(row.date, 'date', locale.locale, { timeZone: SITE_TIME_ZONE })
+        }}</span>
+        <span class="whitespace-nowrap">{{
+          formatClock(row.date, { timeZone: SITE_TIME_ZONE })
+        }}</span></time
       >
     </template>
     <template #actions="{ row }">

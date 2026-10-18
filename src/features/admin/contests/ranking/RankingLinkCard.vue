@@ -12,7 +12,7 @@ import type { RankingLink } from '@/api/types/contest-editing';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import CopyButton from '@/components/CopyButton.vue';
 import QueryState from '@/components/QueryState.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { failureTextOf } from '../../ui/admin-errors';
 import AdminStatus from '../../ui/AdminStatus.vue';
@@ -141,7 +141,7 @@ async function saveLink() {
           <p class="text-sm text-muted">
             {{
               $t('admin.contests.ranking.link.regeneratedAt', {
-                time: formatDateTime(link.regeneratedAt, locale.locale),
+                time: formatDate(link.regeneratedAt, 'datetime', locale.locale),
               })
             }}
           </p>

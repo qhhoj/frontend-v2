@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { formatNumericDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePendingRequestQuery } from './organizations.queries';
 
@@ -12,7 +12,7 @@ const { data: request } = usePendingRequestQuery(
   () => props.requestId,
 );
 const sentAt = computed(() =>
-  request.value ? formatNumericDateTime(request.value.createdAt, locale.locale) : '',
+  request.value ? formatDate(request.value.createdAt, 'datetime', locale.locale) : '',
 );
 </script>
 

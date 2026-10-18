@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import type { ContestDetail } from '@/api/types/contests';
 import { contestProgress, freezeFraction, freezeStart } from '@/lib/contest-time';
-import { formatClock } from '@/lib/format';
+import { formatClock } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { timelineLabels } from './contest-clock';
 
@@ -25,7 +25,7 @@ const FREEZE_HATCH =
 const labels = computed(() => timelineLabels(props.contest, locale.locale));
 const freezeClock = computed(() => {
   const from = freezeStart(props.contest);
-  return from === null ? '' : formatClock(new Date(from).toISOString(), locale.locale);
+  return from === null ? '' : formatClock(new Date(from).toISOString());
 });
 </script>
 

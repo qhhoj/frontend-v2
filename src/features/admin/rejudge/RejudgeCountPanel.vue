@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { translate } from '@/i18n';
-import { formatClock, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatClock } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
 import type { ChipTone } from '../ui/AdminChip.vue';
@@ -41,7 +42,7 @@ const view = computed<CountView | null>(() => {
     };
   if (state.count === 0)
     return { figure, chip: say('noneChip'), tone: 'neutral', sentence: say('none') };
-  const time = formatClock(state.countedAt, locale.locale);
+  const time = formatClock(state.countedAt);
   return {
     figure,
     chip: say('allowedChip'),

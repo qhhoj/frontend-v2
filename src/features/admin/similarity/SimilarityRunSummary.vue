@@ -2,7 +2,8 @@
 import { computed } from 'vue';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import Notice from '@/components/ui/Notice.vue';
-import { formatDateTime, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
 import type { SimilarityRun } from '@/api/types/similarity';
@@ -17,7 +18,9 @@ const pairs = computed(() => totalPairs(props.run));
 const hasFailedGroup = computed(() => props.run.groups.some((group) => group.failed));
 const count = (value: number) => formatNumber(value, locale.locale);
 const instantOrNotYet = (instant: string | null) =>
-  instant ? formatDateTime(instant, locale.locale) : translate('admin.similarity.summary.notYet');
+  instant
+    ? formatDate(instant, 'datetime', locale.locale)
+    : translate('admin.similarity.summary.notYet');
 </script>
 
 <template>

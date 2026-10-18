@@ -4,7 +4,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { ApiError } from '@/api/client';
 import { resolvePolygonLink } from '@/api/polygon.api';
 import type { PolygonProblem } from '@/api/types/polygon';
-import { formatNumericDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../../ui/AdminChip.vue';
 import { CARD, INPUT, buttonClass } from '../../ui/controls';
@@ -77,7 +77,7 @@ const refusal = computed<LinkRefusal | null>(() =>
 );
 const builtAt = computed(() =>
   preview.value?.latestPackage.createdAt
-    ? formatNumericDateTime(preview.value.latestPackage.createdAt, locale.locale)
+    ? formatDate(preview.value.latestPackage.createdAt, 'datetime', locale.locale)
     : '-',
 );
 </script>

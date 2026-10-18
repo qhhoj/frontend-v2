@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
@@ -63,7 +63,7 @@ const ACTION_TONE: Record<string, ChipTone> = {
                 $t('admin.organizations.history.goneEditor')
               }}</span>
               <time :datetime="revision.at" class="ml-auto font-mono text-xs text-muted">{{
-                formatDateTime(revision.at, locale.locale)
+                formatDate(revision.at, 'datetime', locale.locale)
               }}</time>
             </div>
             <dl class="flex flex-col gap-1.5">

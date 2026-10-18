@@ -3,13 +3,11 @@ import AppButton from '@/components/ui/AppButton.vue';
 import { Star } from 'lucide-vue-next';
 import type { Balloon } from '@/api/types/contest-ops';
 import { ratingTextClass } from '@/lib/tier-classes';
-import { formatClock } from '@/lib/format';
-import { useLocaleStore } from '@/stores/locale.store';
+import { formatClock } from '@/lib/format-date';
 import { isDelivered, solvedAtText, swatchClassOf } from './balloon-queue';
 
 defineProps<{ balloon: Balloon; isBusy: boolean }>();
 const emit = defineEmits<{ toggle: [] }>();
-const locale = useLocaleStore();
 </script>
 
 <template>
@@ -37,7 +35,7 @@ const locale = useLocaleStore();
           {{
             $t('balloons.deliveredBy', {
               name: balloon.deliveredBy ?? '—',
-              time: formatClock(balloon.deliveredAt, locale.locale),
+              time: formatClock(balloon.deliveredAt),
             })
           }}
         </template>

@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { AuditEntry } from '@/api/types/audit-admin';
-import { auditFilterFromQuery, auditObjectLink, toAuditRequest } from './audit';
+import {
+  auditFilterFromQuery,
+  auditObjectLink,
+  dayOfInstant,
+  dayStartInstant,
+  toAuditRequest,
+} from './audit';
 
 const entry = (patch: Partial<AuditEntry>): AuditEntry => ({
   id: '0192a000-0000-7000-8000-000000000001',
@@ -48,5 +54,24 @@ describe('audit feed helpers', () => {
       name: 'admin-log',
       query: { view: 'settings', key: 'mail.from' },
     });
+  });
+});
+
+describe('days and instants for the date boxes', () => {
+  it('starts a day at midnight of the zone', () => {
+    expect(dayStartInstant('2026-10-01', 'Asia/Ho_Chi_Minh')).toBe('2026-09-30T17:00:00.000Z');
+    expect(dayStartInstant('2026-10-01', 'UTC')).toBe('2026-10-01T00:00:00.000Z');
+    expect(dayStartInstant('', 'UTC')).toBeNull();
+  });
+
+  it('names the calendar day an instant falls on in the zone, across a year boundary', () => {
+    expect(dayOfInstant('2025-12-31T17:00:00.000Z', 'Asia/Ho_Chi_Minh')).toBe('2026-01-01');
+    expect(dayOfInstant('2025-12-31T17:00:00.000Z', 'UTC')).toBe('2025-12-31');
+    expect(dayOfInstant(null, 'UTC')).toBe('');
+  });
+
+  it('round-trips a day', () => {
+    const start = dayStartInstant('2026-01-01', 'Asia/Ho_Chi_Minh');
+    expect(dayOfInstant(start, 'Asia/Ho_Chi_Minh')).toBe('2026-01-01');
   });
 });

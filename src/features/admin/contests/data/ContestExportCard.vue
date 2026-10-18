@@ -6,7 +6,8 @@ import type { EditableContest } from '@/api/types/contest-editing';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
-import { formatDateTime, formatFileSize } from '@/lib/format';
+import { formatFileSize } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
@@ -75,7 +76,7 @@ const isReady = computed(() => status.value?.state === 'ready');
           {{
             $t('admin.contestData.export.ready', {
               size: formatFileSize(status.size),
-              readyAt: status.readyAt ? formatDateTime(status.readyAt, locale.locale) : '',
+              readyAt: status.readyAt ? formatDate(status.readyAt, 'datetime', locale.locale) : '',
             })
           }}
         </p>
@@ -103,7 +104,7 @@ const isReady = computed(() => status.value?.state === 'ready');
         >
           {{
             $t('admin.contestData.export.waitUntil', {
-              time: formatDateTime(status.nextPrepareAt, locale.locale),
+              time: formatDate(status.nextPrepareAt, 'datetime', locale.locale),
             })
           }}
         </p>

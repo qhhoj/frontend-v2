@@ -4,7 +4,7 @@ import { contestFeedStreamUrl, contestFeedUrl } from '@/api/contest-ops.api';
 import type { MintedFeedKey } from '@/api/types/contest-ops';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import CopyButton from '@/components/CopyButton.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminBit from '../../shell/AdminBit.vue';
 import { absoluteUrl } from './feed-key';
@@ -53,7 +53,7 @@ const rows = computed(() => [
       {{
         $t('admin.contestData.feed.reveal.meta', {
           mode: $t(`admin.contestData.feed.modes.${minted.mode}`),
-          expiresAt: formatDateTime(minted.expiresAt, locale.locale),
+          expiresAt: formatDate(minted.expiresAt, 'datetime', locale.locale),
         })
       }}
     </p>

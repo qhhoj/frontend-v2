@@ -7,7 +7,7 @@ import type { CommentReportOutcome, CommentReportQueueItem } from '@/api/types/c
 import EmptyState from '@/components/EmptyState.vue';
 import UserName from '@/components/UserName.vue';
 import AppButton from '@/components/ui/AppButton.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { adminRouteName } from '../admin-screens';
 import AdminChip from '../ui/AdminChip.vue';
@@ -52,7 +52,7 @@ const columns = computed<AdminColumn[]>(() => [
   { key: 'page', label: t('admin.comments.columns.page') },
 ]);
 const when = (item: CommentReportQueueItem) =>
-  formatDateTime(item.lastSettledAt ?? item.lastReportedAt, locale.locale);
+  formatDate(item.lastSettledAt ?? item.lastReportedAt, 'datetime', locale.locale);
 const canHideAndResolve = (item: CommentReportQueueItem) =>
   !item.comment.deleted && !item.comment.hidden;
 

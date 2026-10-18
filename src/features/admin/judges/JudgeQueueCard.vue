@@ -2,7 +2,8 @@
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { formatAgo, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatAgo } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';

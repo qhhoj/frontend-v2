@@ -7,7 +7,8 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
-import { formatNumber, formatNumericDateTime } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AdminStatus from '../ui/AdminStatus.vue';
@@ -47,7 +48,7 @@ const removal = useAdminMutation<void, void>({
 });
 
 const numberOf = (value: number) => formatNumber(value, locale.locale);
-const timeOf = (value: string) => formatNumericDateTime(value, locale.locale);
+const timeOf = (value: string) => formatDate(value, 'datetime', locale.locale);
 const DEVICE_LABEL_KEYS: Record<string, string> = {
   mobile: 'admin.activity.summary.mobile',
   desktop: 'admin.activity.summary.desktop',

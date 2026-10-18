@@ -6,7 +6,7 @@ import BitLoop from '@/components/BitLoop.vue';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import { LONG_COUNTDOWN_SECONDS, countdownTarget, freezeStart } from '@/lib/contest-time';
-import { formatClock, formatShortDate } from '@/lib/format';
+import { formatClock, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 
@@ -28,12 +28,11 @@ watch(
 /** Days and hours (`28 ngày 14 giờ`, P-18) are longer than a clock: one line at the stat size instead of the hero's. */
 const isLong = (until: string) => Date.parse(until) - now.value >= LONG_COUNTDOWN_SECONDS * 1000;
 const sizeOf = (until: string) => (isLong(until) ? 'text-stat' : 'text-3xl md:text-5xl');
-const instantLabel = (instant: string) =>
-  `${formatClock(instant, locale.locale)} · ${formatShortDate(instant, locale.locale)}`;
+const instantLabel = (instant: string) => formatDate(instant, 'datetime', locale.locale);
 const LABELS = { start: 'contests.detail.notStarted', end: 'contests.detail.timeLeft' } as const;
 const freezeClock = computed(() => {
   const from = freezeStart(props.contest);
-  return from === null ? null : formatClock(new Date(from).toISOString(), locale.locale);
+  return from === null ? null : formatClock(new Date(from).toISOString());
 });
 </script>
 

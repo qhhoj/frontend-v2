@@ -2,7 +2,8 @@
 import type { SubmissionListItem } from '@/api/types/submissions';
 import UserLink from '@/components/UserLink.vue';
 import { translate } from '@/i18n';
-import { formatAgoCompact, formatCaseMemory, formatCaseTime, formatDateTime } from '@/lib/format';
+import { formatCaseMemory, formatCaseTime } from '@/lib/format';
+import { formatAgoCompact, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { VERDICT_TONE_CLASSES, submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -119,7 +120,7 @@ const PILL =
             v-if="isShown('when')"
             class="whitespace-nowrap"
             :datetime="row.date"
-            :title="formatDateTime(row.date, locale.locale)"
+            :title="formatDate(row.date, 'datetime', locale.locale)"
             >{{ formatAgoCompact(row.date, now, locale.locale) }}</time
           >
         </div>

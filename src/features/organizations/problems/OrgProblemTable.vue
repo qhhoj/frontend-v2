@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { OrganizationProblem } from '@/api/types/organization-problems';
-import { formatDate } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
 import OrgProblemActions from './OrgProblemActions.vue';
@@ -112,7 +112,7 @@ const CELL = 'py-2 pr-3 align-middle';
             class="hidden text-right whitespace-nowrap tabular-nums @3xl:table-cell"
             :class="CELL"
           >
-            {{ formatDate(row.updatedAt, locale.locale) }}
+            {{ formatDate(row.updatedAt, 'date', locale.locale) }}
           </td>
           <td v-if="isAdmin" class="py-2">
             <div class="flex justify-end gap-2">

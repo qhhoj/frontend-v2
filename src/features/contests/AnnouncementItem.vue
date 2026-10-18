@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Chip from '@/components/ui/Chip.vue';
 import UserContent from '@/components/UserContent.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import type { Announcement } from '@/api/types/contests';
 import { useLocaleStore } from '@/stores/locale.store';
 
@@ -16,7 +16,7 @@ const locale = useLocaleStore();
   >
     <p class="flex items-center gap-2 text-caption text-muted">
       <time :datetime="announcement.createdAt">{{
-        formatDateTime(announcement.createdAt, locale.locale)
+        formatDate(announcement.createdAt, 'datetime', locale.locale)
       }}</time>
       <Chip v-if="isUnread" data-testid="unread-pill" tone="accent">{{
         $t('contests.announcements.new')

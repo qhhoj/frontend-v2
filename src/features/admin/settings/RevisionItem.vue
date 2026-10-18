@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { SettingRevision } from '@/api/types/settings-admin';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { BUTTON } from '../ui/controls';
 import { shortId } from '../ui/short-id';
@@ -31,7 +31,7 @@ const lineText = (field: string, text: string) => (field === 'value' ? text : `$
   <article data-testid="revision" class="flex flex-col gap-2 rounded-row border border-line p-3">
     <header class="flex flex-wrap items-center gap-2 text-sm text-muted">
       <time :datetime="revision.createdAt">{{
-        formatDateTime(revision.createdAt, locale.locale)
+        formatDate(revision.createdAt, 'datetime', locale.locale)
       }}</time>
       <span>· {{ revision.actor ? shortId(revision.actor) : '—' }}</span>
       <AdminChip v-for="field in revision.changedFields" :key="field" class="font-mono">

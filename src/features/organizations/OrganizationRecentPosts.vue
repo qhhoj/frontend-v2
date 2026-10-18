@@ -4,7 +4,8 @@ import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import UserLink from '@/components/UserLink.vue';
-import { formatNumber, formatNumericDate } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useOrganization } from './use-organization';
 import { useOrganizationPostsQuery } from './organizations.queries';
@@ -50,7 +51,7 @@ const isEmpty = computed(() => query.isSuccess.value && posts.value.length === 0
               :username="post.authors[0].username"
               :rating="post.authors[0].rating"
             />
-            <span>{{ formatNumericDate(post.publishOn, locale.locale) }}</span>
+            <span>{{ formatDate(post.publishOn, 'date', locale.locale) }}</span>
             <span>{{
               $t('orgs.postStats', {
                 score: formatNumber(post.score, locale.locale),

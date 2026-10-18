@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { viewerTimeZone } from '@/lib/format-date';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import AdminField from '../ui/AdminField.vue';
 import { BUTTON, INPUT } from '../ui/controls';
-import { AUDIT_TYPES } from './audit';
+import AdminDateTimeField from '../ui/form/AdminDateTimeField.vue';
+import { AUDIT_TYPES, dayOfInstant, dayStartInstant } from './audit';
 import type { AuditFilter, AuditType } from './audit';
 
 const props = defineProps<{ filter: AuditFilter }>();
@@ -18,6 +20,11 @@ const actor = useDebouncedText(
 const change = (patch: Partial<AuditFilter>) => emit('change', { ...props.filter, ...patch });
 const typeOptions = computed(() =>
   AUDIT_TYPES.map((type) => ({ type, label: t(`admin.audit.types.${type}`) })),
+);
+/** The day range is read in the viewer's calendar (`toAuditRequest`), so the date boxes show that zone. */
+const zone = viewerTimeZone();
+const isRangeInverted = computed(
+  () => props.filter.from !== '' && props.filter.to !== '' && props.filter.from > props.filter.to,
 );
 const isFiltered = computed(() => Object.values(props.filter).some((value) => value !== ''));
 /** One change; the actor box follows the URL back to empty, which also drops a pause still pending. */
@@ -63,26 +70,23 @@ function clear() {
         </option>
       </select>
     </AdminField>
-    <AdminField v-slot="{ id }" :label="$t('admin.audit.filters.from')">
-      <input
-        :id="id"
-        type="date"
-        :value="filter.from"
-        :max="filter.to || undefined"
-        :class="INPUT"
-        @change="change({ from: ($event.target as HTMLInputElement).value })"
-      />
-    </AdminField>
-    <AdminField v-slot="{ id }" :label="$t('admin.audit.filters.to')">
-      <input
-        :id="id"
-        type="date"
-        :value="filter.to"
-        :min="filter.from || undefined"
-        :class="INPUT"
-        @change="change({ to: ($event.target as HTMLInputElement).value })"
-      />
-    </AdminField>
+    <AdminDateTimeField
+      :model-value="dayStartInstant(filter.from, zone)"
+      :label="$t('admin.audit.filters.from')"
+      :time-zone="zone"
+      hint=""
+      date-only
+      @update:model-value="change({ from: dayOfInstant($event, zone) })"
+    />
+    <AdminDateTimeField
+      :model-value="dayStartInstant(filter.to, zone)"
+      :label="$t('admin.audit.filters.to')"
+      :time-zone="zone"
+      :error="isRangeInverted ? $t('admin.audit.filters.rangeInverted') : undefined"
+      hint=""
+      date-only
+      @update:model-value="change({ to: dayOfInstant($event, zone) })"
+    />
     <button
       v-if="isFiltered"
       type="button"

@@ -4,7 +4,8 @@ import { computed, ref } from 'vue';
 import { fetchLiveActivity } from '@/api/activity-admin.api';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { formatNumber, formatNumericDateTimeSeconds } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
@@ -67,7 +68,7 @@ const numberOf = (value: number) => formatNumber(value, locale.locale);
               class="max-w-full"
             />
             <time :datetime="entry.lastSeenAt" class="font-mono text-xs text-muted tabular-nums">
-              {{ formatNumericDateTimeSeconds(entry.lastSeenAt, locale.locale) }}
+              {{ formatDate(entry.lastSeenAt, 'datetime', locale.locale) }}
             </time>
           </li>
         </ul>

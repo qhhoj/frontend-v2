@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { TicketListItem } from '@/api/types/tickets';
 import UserName from '@/components/UserName.vue';
-import { formatAgo, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatAgo } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import TicketLinkChip from './TicketLinkChip.vue';

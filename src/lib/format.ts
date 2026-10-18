@@ -37,20 +37,6 @@ export const formatFixed = (value: number, locale: Locale, digits: number) =>
     maximumFractionDigits: digits,
   }).format(value);
 
-export function formatRelative(date: string, now: number, locale: Locale): string {
-  const seconds = Math.round((Date.parse(date) - now) / 1000);
-  const magnitude = Math.abs(seconds);
-  const [value, unit]: [number, Intl.RelativeTimeFormatUnit] =
-    magnitude < 60
-      ? [seconds, 'second']
-      : magnitude < 3600
-        ? [Math.round(seconds / 60), 'minute']
-        : magnitude < 86_400
-          ? [Math.round(seconds / 3600), 'hour']
-          : [Math.round(seconds / 86_400), 'day'];
-  return new Intl.RelativeTimeFormat(INTL_LOCALES[locale], { numeric: 'auto' }).format(value, unit);
-}
-
 export const greetingKey = (hour: number) =>
   hour >= 5 && hour < 11
     ? 'home.greeting.morning'
@@ -87,138 +73,11 @@ export const formatFileSize = (bytes: number) =>
     ? `${(Math.floor((bytes / BYTES_PER_MEGABYTE) * 10) / 10).toFixed(1)} MB`
     : `${Math.round(bytes / 1024)} KB`;
 
-/** An instant in the viewer's own time zone (a contestant must see 14:05 for 14:05), e.g. `Oct 8, 2026, 10:00 AM`. */
-export const formatDateTime = (date: string, locale: Locale) =>
-  new Intl.DateTimeFormat(INTL_LOCALES[locale], { dateStyle: 'medium', timeStyle: 'short' }).format(
-    new Date(date),
-  );
-
-/** The UTC calendar date of a timestamp (the site time zone is not known to the SPA), e.g. `Oct 8, 2026`. */
-export const formatDate = (date: string, locale: Locale) =>
-  new Intl.DateTimeFormat(INTL_LOCALES[locale], { dateStyle: 'medium', timeZone: 'UTC' }).format(
-    new Date(date),
-  );
-
-/** An instant as a numeric date with a two-digit year, e.g. `20/09/25`, for axis labels (viewer's zone like `formatNumericDate`). */
-export const formatShortNumericDate = (date: string, locale: Locale) =>
-  new Intl.DateTimeFormat(INTL_LOCALES[locale], {
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit',
-  }).format(new Date(date));
-
-/** The month and two-digit year as `09/25` in both locales (vi spells a bare month out as "tháng 09, 25"), for axis labels. */
-export const formatMonthYear = (date: string, locale: Locale) => {
-  const parts = new Intl.DateTimeFormat(INTL_LOCALES[locale], {
-    month: '2-digit',
-    year: '2-digit',
-  }).formatToParts(new Date(date));
-  const part = (type: string) => parts.find((item) => item.type === type)!.value;
-  return `${part('month')}/${part('year')}`;
-};
-
-/** Contest start and end are instants: they show in the viewer's own zone (decisions.md, "Dates from the API"). */
-export const formatClock = (date: string, locale: Locale) =>
-  new Intl.DateTimeFormat(INTL_LOCALES[locale], {
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).format(new Date(date));
-
-/** The list's date chip: day number and short month (`11` / `thg 10`). */
-export function formatDayMonth(date: string, locale: Locale): { day: string; month: string } {
-  // One formatter for both parts: the combined pattern gives the short month its chip form (`thg 10`).
-  const parts = new Intl.DateTimeFormat(INTL_LOCALES[locale], {
-    day: 'numeric',
-    month: 'short',
-  }).formatToParts(new Date(date));
-  const valueOf = (type: 'day' | 'month') => parts.find((part) => part.type === type)?.value ?? '';
-  return { day: valueOf('day'), month: valueOf('month') };
-}
-
-/** `04/10` (vi) or `10/04` (en): the day and month parts joined with a slash, whatever separator ICU picks. */
-export const formatShortDate = (date: string, locale: Locale) =>
-  new Intl.DateTimeFormat(INTL_LOCALES[locale], { day: '2-digit', month: '2-digit' })
-    .formatToParts(new Date(date))
-    .filter((part) => part.type === 'day' || part.type === 'month')
-    .map((part) => part.value)
-    .join('/');
-
-/** `Thứ Năm, 08/10/2026`: the detail's date line. */
-export const formatWeekdayDate = (date: string, locale: Locale) =>
-  new Intl.DateTimeFormat(INTL_LOCALES[locale], {
-    weekday: 'long',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(new Date(date));
-
 /** `H:MM:SS` since the contest start: the time line of a points cell (Cells A). */
 export function formatElapsedSeconds(totalSeconds: number): string {
   const seconds = Math.max(0, Math.floor(totalSeconds));
   return `${Math.floor(seconds / 3600)}:${pad(Math.floor((seconds % 3600) / 60))}:${pad(seconds % 60)}`;
 }
-
-const NUMERIC_DATE: Intl.DateTimeFormatOptions = {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-};
-/** An instant as a numeric date in the viewer's zone: `08/10/2026` (vi), `10/08/2026` (en). */
-export const formatNumericDate = (date: string, locale: Locale) =>
-  new Intl.DateTimeFormat(INTL_LOCALES[locale], NUMERIC_DATE).format(new Date(date));
-/** `08/10/2026 20:12`, 24-hour clock in both locales. */
-export const formatNumericDateTime = (date: string, locale: Locale) => {
-  const time = new Intl.DateTimeFormat(INTL_LOCALES[locale], {
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).format(new Date(date));
-  return `${formatNumericDate(date, locale)} ${time}`;
-};
-/** `20:12:09`: the 24-hour time with seconds, in the viewer's zone. */
-export const formatClockSeconds = (date: string, locale: Locale) =>
-  new Intl.DateTimeFormat(INTL_LOCALES[locale], {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hourCycle: 'h23',
-  }).format(new Date(date));
-/** `08/10/2026 20:12:09`: the numeric date and a 24-hour time with seconds, in the viewer's zone. */
-export const formatNumericDateTimeSeconds = (date: string, locale: Locale) => {
-  const time = new Intl.DateTimeFormat(INTL_LOCALES[locale], {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hourCycle: 'h23',
-  }).format(new Date(date));
-  return `${formatNumericDate(date, locale)} ${time}`;
-};
-const WEEK_MS = 7 * 86_400_000;
-const COMPACT_UNITS = [
-  { unit: 'second', seconds: 1 },
-  { unit: 'minute', seconds: 60 },
-  { unit: 'hour', seconds: 3600 },
-  { unit: 'day', seconds: 86_400 },
-] as const;
-/** "5 phút" / "5m", "3 giờ" / "3h" within a week (a table cell under a "when" heading needs no "ago"), the short date (`04/10`) after. */
-export function formatAgoCompact(date: string, now: number, locale: Locale): string {
-  const elapsed = Math.max(0, now - Date.parse(date));
-  if (elapsed > WEEK_MS) return formatShortDate(date, locale);
-  const seconds = Math.floor(elapsed / 1000);
-  const { unit, seconds: size } =
-    COMPACT_UNITS.filter((entry) => seconds >= entry.seconds).pop() ?? COMPACT_UNITS[0];
-  return new Intl.NumberFormat(INTL_LOCALES[locale], {
-    style: 'unit',
-    unit,
-    unitDisplay: 'narrow',
-  }).format(Math.floor(seconds / size));
-}
-/** "2 giờ trước" within a week, the numeric date after. */
-export const formatAgo = (date: string, now: number, locale: Locale) =>
-  now - Date.parse(date) <= WEEK_MS
-    ? formatRelative(date, now, locale)
-    : formatNumericDate(date, locale);
 
 /** A vote score with its sign (`+4`, `−3`, `0`); the minus is U+2212 so it reads as a minus, not a hyphen. */
 export const signedScore = (score: number) =>

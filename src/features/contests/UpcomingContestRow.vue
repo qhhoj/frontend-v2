@@ -2,7 +2,8 @@
 import { computed } from 'vue';
 import type { ContestListItem } from '@/api/types/contests';
 import { spanMessage } from '@/lib/contest-time';
-import { formatClock, formatDayMonth, formatNumber, formatRelative } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatClock, formatDayMonth, formatRelative } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestCallLink from './ContestCallLink.vue';
@@ -22,8 +23,7 @@ const now = useNow(60_000);
 const call = computed(() => listCallToAction(props.contest, now.value));
 const dayChip = computed(() => formatDayMonth(props.contest.startTime, locale.locale));
 const timeRange = computed(
-  () =>
-    `${formatClock(props.contest.startTime, locale.locale)}–${endClockLabel(props.contest, locale.locale)}`,
+  () => `${formatClock(props.contest.startTime)}–${endClockLabel(props.contest)}`,
 );
 const durationText = computed(() =>
   spanText(

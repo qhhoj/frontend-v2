@@ -6,7 +6,7 @@ import type { ContestDetail } from '@/api/types/contests';
 import Card from '@/components/ui/Card.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import UserContent from '@/components/UserContent.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { EXTRAS_BITS } from './contest-extras-bits';
 import { hasRules, rulesExcerpt } from './join-rules';
@@ -47,7 +47,7 @@ const excerpt = computed(() => rulesExcerpt(props.contest.rules));
       {{
         $t('joinRules.accepted', {
           revision: acceptance.revision,
-          time: formatDateTime(acceptance.at, locale.locale),
+          time: formatDate(acceptance.at, 'datetime', locale.locale),
         })
       }}
     </p>

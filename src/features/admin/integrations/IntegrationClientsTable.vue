@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { NumberedPageMeta } from '@/api/client';
 import type { IntegrationClient, IntegrationScope } from '@/api/types/integration-clients';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
 import type { ChipTone } from '../ui/AdminChip.vue';
@@ -37,7 +37,7 @@ const columns = computed<AdminColumn[]>(() => [
   { key: 'lastUsed', label: t('admin.integrations.table.lastUsed'), priority: 'meta' },
   { key: 'cidrs', label: t('admin.integrations.table.cidrs'), priority: 'meta' },
 ]);
-const dateOf = (value: string) => formatDateTime(value, locale.locale);
+const dateOf = (value: string) => formatDate(value, 'datetime', locale.locale);
 type ClientState = 'revoked' | 'expired' | 'active';
 /** Revoked wins over expired: both end the key, but revoking is the staff's act. */
 const stateOf = (client: IntegrationClient): ClientState => {

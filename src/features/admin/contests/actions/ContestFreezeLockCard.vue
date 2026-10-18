@@ -6,7 +6,7 @@ import { updateContest } from '@/api/contest-editing.api';
 import type { ContestPatch, EditableContest } from '@/api/types/contest-editing';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { translate } from '@/i18n';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
 import { useViewerId } from '@/stores/use-viewer-id';
@@ -72,14 +72,16 @@ const freezeLine = computed(() => {
   const state = freeze.value;
   const key = `admin.contestOps.freezeLock.freezeState.${state.kind}`;
   if (state.kind === 'scheduled')
-    return translate(key, { time: formatDateTime(state.at.toISOString(), locale.locale) });
+    return translate(key, { time: formatDate(state.at.toISOString(), 'datetime', locale.locale) });
   if (state.kind === 'frozen')
-    return translate(key, { time: formatDateTime(state.since.toISOString(), locale.locale) });
+    return translate(key, {
+      time: formatDate(state.since.toISOString(), 'datetime', locale.locale),
+    });
   return translate(key);
 });
 const lockLine = computed(() => {
   if (lockedAfter.value === null) return translate('admin.contestOps.freezeLock.lockState.off');
-  const time = formatDateTime(lockedAfter.value, locale.locale);
+  const time = formatDate(lockedAfter.value, 'datetime', locale.locale);
   return translate(
     `admin.contestOps.freezeLock.lockState.${isLocked.value ? 'locked' : 'scheduled'}`,
     { time },

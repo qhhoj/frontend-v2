@@ -3,7 +3,8 @@ import { ExternalLink, RefreshCw } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { recalculateOrganization } from '@/api/organizations-admin.api';
 import type { OrganizationDetail } from '@/api/types/organizations';
-import { formatDate, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
 import { translate } from '@/i18n';
@@ -33,7 +34,7 @@ const stats = computed(() => [
   { key: 'points', text: number(props.organization.performancePoints) },
   {
     key: 'created',
-    text: formatDate(props.organization.createdAt, locale.locale),
+    text: formatDate(props.organization.createdAt, 'date', locale.locale),
     datetime: props.organization.createdAt,
   },
 ]);

@@ -3,7 +3,7 @@ import { formatDelta } from '@/lib/rating-delta';
 import { computed, ref } from 'vue';
 import type { RatingHistoryEntry } from '@/api/types/users';
 import { translate } from '@/i18n';
-import { formatMonthYear, formatNumericDate, formatShortNumericDate } from '@/lib/format';
+import { formatDate, formatMonthYear } from '@/lib/format-date';
 import {
   bandGeometry,
   chartPoints,
@@ -102,10 +102,7 @@ const best = computed(() =>
 );
 const current = computed(() => points.value.at(-1)!);
 
-const dateOf = (point: ChartPoint, short: boolean) =>
-  short
-    ? formatShortNumericDate(point.endTime, locale.locale)
-    : formatNumericDate(point.endTime, locale.locale);
+const dateOf = (point: ChartPoint) => formatDate(point.endTime, 'date', locale.locale);
 const xLabels = computed(() => {
   const labelled = labelledIndices(
     points.value.length,
@@ -123,7 +120,7 @@ const xLabels = computed(() => {
             spacing.value - 16,
           )
         : null,
-      date: showNames.value ? dateOf(point, true) : formatMonthYear(point.endTime, locale.locale),
+      date: showNames.value ? dateOf(point) : formatMonthYear(point.endTime),
     };
   });
   // Two labelled contests in one month would print the same text twice: keep the first.
@@ -143,7 +140,7 @@ const contestTitle = (point: ChartPoint) =>
 const rows = (point: ChartPoint) => ({
   name: contestTitle(point),
   place: [
-    dateOf(point, false),
+    dateOf(point),
     ...(point.rank === null ? [] : [translate('ratingChart.place', { rank: point.rank })]),
   ].join(' · '),
   rating: String(point.rating),

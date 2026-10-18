@@ -5,7 +5,7 @@ import { computed } from 'vue';
 import type { NotificationItem } from '@/api/types/notifications';
 import IconButton from '@/components/ui/IconButton.vue';
 import { translate } from '@/i18n';
-import { formatAgo } from '@/lib/format';
+import { formatAgo } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { kindIcon } from './notification-kinds';
 

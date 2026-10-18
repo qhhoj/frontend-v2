@@ -10,7 +10,7 @@ import StatePanel from '@/components/StatePanel.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Chip from '@/components/ui/Chip.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useMyDraftsQuery } from './blog.queries';
@@ -64,9 +64,9 @@ const posts = computed(() => data.value?.items ?? []);
               {{
                 postStateOf(post) === 'scheduled'
                   ? $t('blog.drafts.publishesAt', {
-                      time: formatDateTime(post.publishOn, locale.locale),
+                      time: formatDate(post.publishOn, 'datetime', locale.locale),
                     })
-                  : formatDateTime(post.publishOn, locale.locale)
+                  : formatDate(post.publishOn, 'datetime', locale.locale)
               }}
             </time>
           </li>

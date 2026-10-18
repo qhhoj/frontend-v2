@@ -2,7 +2,7 @@
 import GlassCard from '@/components/GlassCard.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useExternalJudgeStatusQuery } from './external-judge.queries';
 
@@ -50,7 +50,7 @@ const locale = useLocaleStore();
           <p v-if="query.data.value.checkedAt" class="mt-3 text-xs text-muted">
             {{
               $t('externalJudge.status.checkedAt', {
-                time: formatDateTime(query.data.value.checkedAt, locale.locale),
+                time: formatDate(query.data.value.checkedAt, 'datetime', locale.locale),
               })
             }}
           </p>

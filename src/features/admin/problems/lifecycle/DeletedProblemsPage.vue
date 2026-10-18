@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router';
 import type { DeletedProblem } from '@/api/types/problem-lifecycle';
 import { useFocusFallback } from '@/lib/use-focus-fallback';
 import { actorName } from '@/lib/actor';
-import { formatNumericDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
@@ -117,7 +117,7 @@ useFocusFallback(
         </template>
         <template #cell-deletedAt="{ row }">
           <span class="whitespace-nowrap">{{
-            formatNumericDateTime(row.deletedAt, locale.locale)
+            formatDate(row.deletedAt, 'datetime', locale.locale)
           }}</span>
         </template>
         <template #cell-deletedBy="{ row }">{{ actorName(row.deletedBy) }}</template>

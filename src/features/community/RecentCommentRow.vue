@@ -4,7 +4,8 @@ import type { RecentComment } from '@/api/types/comments';
 import UserLink from '@/components/UserLink.vue';
 import { commentRoute } from '@/lib/comment-links';
 import { htmlPlainText } from '@/lib/html-excerpt';
-import { formatAgo, signedScore } from '@/lib/format';
+import { signedScore } from '@/lib/format';
+import { formatAgo } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 
 /** One comment in a list of recent comments; `now` is the list's one clock, so every row ages together. */

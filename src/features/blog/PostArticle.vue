@@ -10,7 +10,7 @@ import { shortLinkPath } from '@/features/short-links/short-link-path';
 import type { PostDetail } from '@/api/types/blog';
 import type { VoteScore } from '@/api/types/votes';
 import { votePost } from '@/api/blog.api';
-import { formatNumericDate } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 
@@ -23,7 +23,7 @@ const isAuthor = computed(() =>
   props.post.authors.some((author) => author.id === session.user?.id),
 );
 const canVote = computed(() => session.user !== null && !isAuthor.value);
-const publishedOn = computed(() => formatNumericDate(props.post.publishOn, locale.locale));
+const publishedOn = computed(() => formatDate(props.post.publishOn, 'date', locale.locale));
 const send = (score: VoteScore) => votePost(props.post.id, score);
 const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] });
 </script>

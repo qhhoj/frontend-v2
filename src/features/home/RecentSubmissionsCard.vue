@@ -4,7 +4,7 @@ import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
-import { formatRelative } from '@/lib/format';
+import { formatRelative } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';

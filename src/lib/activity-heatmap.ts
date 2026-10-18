@@ -1,17 +1,13 @@
+import { formatDayKey } from '@/lib/format-date';
+
 export type HeatmapLevel = 0 | 1 | 2 | 3 | 4;
 export type HeatmapCell = { date: string; count: number; level: HeatmapLevel } | null;
 const DAY_MS = 86_400_000;
 const WEEKS = 53;
 const DAYS_PER_WEEK = 7;
 
-/** `YYYY-MM-DD` of `now` in `timezone` (`en-CA` formats dates that way). */
-export const todayIn = (timezone: string, now: number) =>
-  new Intl.DateTimeFormat('en-CA', {
-    timeZone: timezone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(now);
+/** `YYYY-MM-DD` of `now` in `timezone`. */
+export const todayIn = (timezone: string, now: number) => formatDayKey(now, timezone);
 
 /*
  * Day keys are calendar dates. All arithmetic is in UTC milliseconds of each day's midnight: `new Date('YYYY-MM-DD')` is UTC, but

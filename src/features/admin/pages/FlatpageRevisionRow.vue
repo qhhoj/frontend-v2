@@ -2,7 +2,7 @@
 import { ChevronDown, ChevronRight } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import type { FlatpageRevision } from '@/api/types/flatpages-admin';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
@@ -24,7 +24,7 @@ const lines = computed(() => changeLinesOf(props.revision.changes));
   <tbody data-testid="revision" class="contents">
     <tr class="border-t border-line align-top">
       <td class="px-3 py-2 font-mono text-xs whitespace-nowrap">
-        {{ formatDateTime(revision.at, localeStore.locale) }}
+        {{ formatDate(revision.at, 'datetime', localeStore.locale) }}
       </td>
       <td class="px-3 py-2">
         <AdminChip :tone="ACTION_TONES[revision.action]">{{

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SubmissionListItem } from '@/api/types/submissions';
 import UserLink from '@/components/UserLink.vue';
-import { formatAgoCompact, formatDateTime } from '@/lib/format';
+import { formatAgoCompact, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import SubmissionPickBox from './SubmissionPickBox.vue';
@@ -75,7 +75,7 @@ const costOf = (row: SubmissionListItem) =>
             v-if="isShown('when')"
             class="shrink-0"
             :datetime="row.date"
-            :title="formatDateTime(row.date, locale.locale)"
+            :title="formatDate(row.date, 'datetime', locale.locale)"
             >{{ formatAgoCompact(row.date, now, locale.locale) }}</time
           >
           <span v-if="isShown('when') && isShown('language')" aria-hidden="true">·</span>

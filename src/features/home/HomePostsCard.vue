@@ -7,7 +7,7 @@ import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import UserName from '@/components/UserName.vue';
 import { usePostsQuery } from '@/features/blog/blog.queries';
-import { formatAgo } from '@/lib/format';
+import { formatAgo } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 

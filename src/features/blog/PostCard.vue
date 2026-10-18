@@ -8,7 +8,7 @@ import VoteControl from '@/components/VoteControl.vue';
 import type { PostListItem } from '@/api/types/blog';
 import type { VoteScore } from '@/api/types/votes';
 import { votePost } from '@/api/blog.api';
-import { formatNumericDate } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { summaryExcerpt, summaryFirstImage } from './post-summary';
@@ -61,7 +61,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
           :rating="author.rating"
         />
         <time :datetime="post.publishOn">
-          {{ formatNumericDate(post.publishOn, locale.locale) }}
+          {{ formatDate(post.publishOn, 'date', locale.locale) }}
         </time>
         <RouterLink
           :to="{ name: 'post', params: { id: post.id }, hash: '#comments' }"

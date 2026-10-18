@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { Lock } from 'lucide-vue-next';
 import type { TotalPageMeta } from '@/api/client';
 import type { StaffUser } from '@/api/types/users-admin';
-import { formatAgo, formatDate, formatNumericDateTime } from '@/lib/format';
+import { formatAgo, formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
@@ -88,13 +88,13 @@ const columns = computed<AdminColumn[]>(() => [
       <span class="line-clamp-2">{{ row.banReason ?? $t('admin.users.list.reasonNone') }}</span>
     </template>
     <template #cell-joined="{ row }">
-      <span class="whitespace-nowrap">{{ formatDate(row.dateJoined, locale.locale) }}</span>
+      <span class="whitespace-nowrap">{{ formatDate(row.dateJoined, 'date', locale.locale) }}</span>
     </template>
     <template #cell-lastAccess="{ row }">
       <span
         v-if="row.lastAccess"
         class="whitespace-nowrap"
-        :title="formatNumericDateTime(row.lastAccess, locale.locale)"
+        :title="formatDate(row.lastAccess, 'datetime', locale.locale)"
       >
         {{ formatAgo(row.lastAccess, now, locale.locale) }}
       </span>

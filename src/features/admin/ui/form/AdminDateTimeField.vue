@@ -8,6 +8,7 @@ import { SITE_TIME_ZONE, formatInZone, parseInZone, zoneLabel } from './site-tim
 /**
  * A date and time typed and shown in the site's time zone as `dd/mm/yyyy hh:mm`, with the zone ("GMT+7") inside the box
  * and a "Bây giờ" shortcut. The model is an ISO instant (UTC) or null, the value the API sends and takes.
+ * With `dateOnly` the box takes `dd/mm/yyyy` alone (the model is the instant that day starts, and there is no "Bây giờ").
  * Text that does not read as a date leaves the model alone and says so when the box loses focus.
  */
 const model = defineModel<string | null>({ required: true });
@@ -20,6 +21,7 @@ const props = withDefaults(
     required?: boolean;
     timeZone?: string;
     showNow?: boolean;
+    dateOnly?: boolean;
     disabled?: boolean;
   }>(),
   {
@@ -28,38 +30,47 @@ const props = withDefaults(
     inputId: undefined,
     required: false,
     timeZone: SITE_TIME_ZONE,
-    showNow: true,
+    showNow: undefined,
+    dateOnly: false,
     disabled: false,
   },
 );
 const { t } = useI18n();
-const text = ref(formatInZone(model.value, props.timeZone));
+const hasNowButton = computed(() => props.showNow ?? !props.dateOnly);
+const render = (iso: string | null) =>
+  formatInZone(iso, props.timeZone, props.dateOnly ? 'date' : 'datetime');
+const parse = (value: string) => parseInZone(value, props.timeZone, props.dateOnly);
+const text = ref(render(model.value));
 const isUnreadable = ref(false);
 const zone = computed(() =>
   zoneLabel(props.timeZone, model.value ? new Date(model.value) : new Date()),
 );
 const shownError = computed(
-  () => props.error ?? (isUnreadable.value ? t('admin.form.dateTime.invalid') : undefined),
+  () =>
+    props.error ??
+    (isUnreadable.value
+      ? t(props.dateOnly ? 'admin.form.dateTime.invalidDate' : 'admin.form.dateTime.invalid')
+      : undefined),
 );
 
 /** A model change from outside (load, discard) rewrites the box unless the box already says that instant. */
 watch(model, (iso) => {
-  const typed = parseInZone(text.value, props.timeZone);
-  if (!typed.ok || typed.iso !== iso) text.value = formatInZone(iso, props.timeZone);
+  const typed = parse(text.value);
+  if (!typed.ok || typed.iso !== iso) text.value = render(iso);
   isUnreadable.value = false;
 });
 
 function onInput() {
-  const typed = parseInZone(text.value, props.timeZone);
+  const typed = parse(text.value);
   if (typed.ok) {
     isUnreadable.value = false;
     if (typed.iso !== model.value) model.value = typed.iso;
   }
 }
 function onBlur() {
-  const typed = parseInZone(text.value, props.timeZone);
+  const typed = parse(text.value);
   isUnreadable.value = !typed.ok;
-  if (typed.ok) text.value = formatInZone(typed.iso, props.timeZone);
+  if (typed.ok) text.value = render(typed.iso);
 }
 function setNow() {
   const now = new Date();
@@ -85,7 +96,9 @@ function setNow() {
           type="text"
           autocomplete="off"
           spellcheck="false"
-          :placeholder="$t('admin.form.dateTime.placeholder')"
+          :placeholder="
+            $t(dateOnly ? 'admin.form.dateTime.placeholderDate' : 'admin.form.dateTime.placeholder')
+          "
           :aria-describedby="describedBy"
           :aria-invalid="invalid === 'true'"
           :aria-required="required || undefined"
@@ -102,7 +115,7 @@ function setNow() {
         </span>
       </div>
       <button
-        v-if="showNow"
+        v-if="hasNowButton"
         type="button"
         :class="buttonClass('secondary', 'sm')"
         :aria-label="$t('admin.form.dateTime.nowLabel', { label })"

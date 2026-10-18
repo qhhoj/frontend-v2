@@ -11,7 +11,7 @@ import TicketStatusPill from '@/features/tickets/TicketStatusPill.vue';
 import { useTicketPatch } from '@/features/tickets/use-ticket-patch';
 import { useTicketQuery } from '@/features/tickets/tickets.queries';
 import { useTicketStream } from '@/features/tickets/use-ticket-stream';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useBottomScrollPadding } from '@/lib/use-bottom-scroll-padding';
 import { useLocaleStore } from '@/stores/locale.store';
 import { buttonClass } from '../ui/controls';
@@ -77,7 +77,7 @@ const toggleGood = () => {
             {{
               $t('admin.tickets.detail.byline', {
                 creator: ticket.creator.username,
-                date: formatDateTime(ticket.createdAt, locale.locale),
+                date: formatDate(ticket.createdAt, 'datetime', locale.locale),
               })
             }}
           </p>

@@ -4,7 +4,7 @@ import type { SubmissionDetail } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
 import UserLink from '@/components/UserLink.vue';
 import type { SubmissionInContest } from '@/features/contests/submission/submission-contest';
-import { formatClock, formatDateTime, formatRelative } from '@/lib/format';
+import { formatClock, formatDate, formatRelative } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import DeletedProblemChip from './DeletedProblemChip.vue';
@@ -73,14 +73,18 @@ const plainFacts = computed(() => [
         {{ $t('submission.facts.submitted') }}
       </dt>
       <dd class="min-w-0">
-        <time :datetime="submission.date" :title="formatDateTime(submission.date, locale.locale)">{{
-          inContest?.minute != null
-            ? $t('submission.contest.minute', {
-                time: formatClock(submission.date, locale.locale),
-                minute: inContest.minute,
-              })
-            : formatRelative(submission.date, now, locale.locale)
-        }}</time>
+        <time
+          :datetime="submission.date"
+          :title="formatDate(submission.date, 'datetime', locale.locale)"
+          >{{
+            inContest?.minute != null
+              ? $t('submission.contest.minute', {
+                  time: formatClock(submission.date),
+                  minute: inContest.minute,
+                })
+              : formatRelative(submission.date, now, locale.locale)
+          }}</time
+        >
       </dd>
       <template v-for="fact in plainFacts" :key="fact.key">
         <dt :data-fact="fact.key" class="text-meta text-muted">

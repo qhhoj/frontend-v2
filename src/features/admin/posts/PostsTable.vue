@@ -5,7 +5,8 @@ import { Eye, EyeOff, Megaphone, Pencil, Pin, PinOff } from 'lucide-vue-next';
 import type { TotalPageMeta } from '@/api/client';
 import type { PostListItem } from '@/api/types/blog';
 import { hasPermission } from '@/lib/permissions';
-import { formatDateTime, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import AdminChip from '../ui/AdminChip.vue';
@@ -158,7 +159,7 @@ const menuItems = (post: PostListItem): RowMenuItem[] => [
       </span>
     </template>
     <template #cell-publishOn="{ row }">{{
-      formatDateTime(row.publishOn, locale.locale)
+      formatDate(row.publishOn, 'datetime', locale.locale)
     }}</template>
     <template #cell-score="{ row }">{{ formatNumber(row.score, locale.locale) }}</template>
     <template #cell-comments="{ row }">{{

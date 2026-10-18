@@ -4,8 +4,7 @@ import { Activity } from 'lucide-vue-next';
 import { testPolygonConnection } from '@/api/polygon.api';
 import type { PolygonTestResult } from '@/api/types/polygon';
 import type { Setting } from '@/api/types/settings-admin';
-import { formatClock } from '@/lib/format';
-import { useLocaleStore } from '@/stores/locale.store';
+import { formatClock } from '@/lib/format-date';
 import PolygonSetterHowTo from '../problems/polygon/PolygonSetterHowTo.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
@@ -14,7 +13,6 @@ import { useAdminMutation } from '../ui/use-admin-mutation';
 
 /** Under the Polygon block: one `problems.list` call with the saved key, and the setter how-to with the account name. */
 const props = defineProps<{ settings: Setting[] }>();
-const locale = useLocaleStore();
 const accountName = computed(() => {
   const value = props.settings.find((entry) => entry.key === 'polygon.accountName')?.value;
   return typeof value === 'string' ? value : '';
@@ -30,7 +28,7 @@ const check = useAdminMutation({
 });
 
 function run() {
-  checkedAt.value = formatClock(new Date().toISOString(), locale.locale);
+  checkedAt.value = formatClock(new Date().toISOString());
   void check.run(undefined);
 }
 </script>

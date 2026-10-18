@@ -5,7 +5,7 @@ import QueryState from '@/components/QueryState.vue';
 import Modal from '@/components/ui/Modal.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import UserLink from '@/components/UserLink.vue';
-import { formatNumericDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useRevisionsQuery } from './comments.queries';
 import { unifiedDiff, versionsOf } from './revision-versions';
@@ -87,7 +87,7 @@ const SIGN = { same: ' ', removed: '−', added: '+' };
               >
                 <span class="font-semibold">{{ nameOf(version) }}</span>
                 <span v-if="version.at" class="text-xs text-muted">
-                  {{ formatNumericDateTime(version.at, locale.locale) }}
+                  {{ formatDate(version.at, 'datetime', locale.locale) }}
                 </span>
                 <UserLink
                   v-if="version.editor"

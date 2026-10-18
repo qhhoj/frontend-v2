@@ -2,7 +2,8 @@
 import type { PostListItem } from '@/api/types/blog';
 import Card from '@/components/ui/Card.vue';
 import UserContent from '@/components/UserContent.vue';
-import { formatDate, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 
 /** One post in a user's blog list: its title, a two-line summary, and the date, score and comment count. */
@@ -24,7 +25,7 @@ const locale = useLocaleStore();
     <p class="text-xs text-muted">
       {{
         $t('profileTabs.postLine', {
-          date: formatDate(post.publishOn, locale.locale),
+          date: formatDate(post.publishOn, 'date', locale.locale),
           score: formatNumber(post.score, locale.locale),
           count: formatNumber(post.commentCount, locale.locale),
         })

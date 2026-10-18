@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { PostListItem } from '@/api/types/blog';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import Notice from '@/components/ui/Notice.vue';
-import { formatNumericDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { unhidePlanOf } from './post-visibility';
 
@@ -12,7 +12,7 @@ const visible = defineModel<boolean>('visible', { required: true });
 defineEmits<{ confirm: [] }>();
 const locale = useLocaleStore();
 const plan = computed(() => unhidePlanOf(props.post, Date.now()));
-const publishTime = computed(() => formatNumericDateTime(props.post.publishOn, locale.locale));
+const publishTime = computed(() => formatDate(props.post.publishOn, 'datetime', locale.locale));
 const authors = computed(() => props.post.authors.map((author) => author.username).join(', '));
 </script>
 

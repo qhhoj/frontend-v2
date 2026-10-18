@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { formatNumber, formatShortDate } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useHomeQuery } from './community.queries';
 import CommunityCard from './CommunityCard.vue';
@@ -47,7 +48,7 @@ const problems = computed(() => (home.value?.newProblems ?? []).slice(0, props.l
             {{
               $t('blog.problemLine', {
                 code: problem.code,
-                date: formatShortDate(problem.date, locale.locale),
+                date: formatDate(problem.date, 'short', locale.locale),
               })
             }}
           </span>

@@ -6,7 +6,8 @@ import ScrollRegion from '@/components/ScrollRegion.vue';
 import { formatLabel } from '@/lib/contest-format';
 import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { spanMessage } from '@/lib/contest-time';
-import { formatNumber, formatShortDate } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
 import FactLine from '@/components/FactLine.vue';
@@ -36,7 +37,7 @@ const callOf = (contest: ContestListItem) => listCallToAction(contest, Date.now(
 /** The start date and the length, in one cell: `04/10 · 4 giờ`. */
 const whenText = (contest: ContestListItem) => {
   const lengthSeconds = (Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000;
-  return `${formatShortDate(contest.startTime, locale.locale)} · ${spanText(spanMessage(lengthSeconds))}`;
+  return `${formatDate(contest.startTime, 'short', locale.locale)} · ${spanText(spanMessage(lengthSeconds))}`;
 };
 /** P-04 B: a phone gets compact rows: name, then format · date · length · contestants (the format first, so it is never
  * the fact cut off), and the action at the end. */
@@ -45,7 +46,7 @@ const compactFacts = (contest: ContestListItem) => {
   const lengthSeconds = (Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000;
   return [
     formatLabel(contest.formatName),
-    formatShortDate(contest.startTime, locale.locale),
+    formatDate(contest.startTime, 'short', locale.locale),
     spanText(spanMessage(lengthSeconds)),
     translate('contests.list.contestantCount', {
       count: formatNumber(contest.userCount, locale.locale),

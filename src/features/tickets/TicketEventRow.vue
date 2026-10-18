@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import type { Component } from 'vue';
 import type { TicketTimelineEvent, TicketTimelineType } from '@/api/types/tickets';
 import { translate } from '@/i18n';
-import { formatNumericDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { eventTextKey } from './ticket-thread';
 
@@ -35,6 +35,6 @@ const text = computed(() =>
   >
     <component :is="ICONS[event.type]" aria-hidden="true" class="size-4 shrink-0" />
     <span class="text-content">{{ text }}</span>
-    <time :datetime="event.at">{{ formatNumericDateTime(event.at, locale.locale) }}</time>
+    <time :datetime="event.at">{{ formatDate(event.at, 'datetime', locale.locale) }}</time>
   </p>
 </template>
