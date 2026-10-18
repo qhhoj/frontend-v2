@@ -20,6 +20,18 @@ test('a signed-in viewer finds their rank and lands on their row', async ({ page
   await expect(page.locator('#user-user_01')).toBeInViewport();
 });
 
+test.describe('on a touch screen', () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 800 } });
+
+  test('the "find my rank" button is a 44 px touch target', async ({ page, api }) => {
+    api.signedIn = true;
+    await page.goto('/users');
+    const box = await page.getByRole('button', { name: 'Tìm hạng của tôi' }).boundingBox();
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+  });
+});
+
 test('the exact-username box opens that profile', async ({ page }) => {
   await page.goto('/users');
   await page.getByLabel('Tên đăng nhập').fill('khoa.tran');

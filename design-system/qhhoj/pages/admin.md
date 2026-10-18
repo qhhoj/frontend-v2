@@ -214,8 +214,8 @@ Colour and opacity transitions use `--qh-duration-fast` (150 ms). Drawers and sh
   - Row actions: Tắt/Bật (toggle), and ⋯ (Chặn, Cấp khoá mới, Ngắt, Xoá).
   - Details open in the drawer.
 - **Languages**:
-  - The summary strip and the "PAS chỉ chạy trên một máy" warning become one `AdminNotice` (caution).
-  - Table: Mã, Tên, Đuôi, Bài mới chip, Máy chấm "5/5" + a meter with text (not colour alone). Phone: cards.
+  - One `LanguageCoverageNotice` (kit `Notice`, compact) replaces the summary strip and the per-language warnings. Title "N ngôn ngữ cần thêm máy chấm", then one line of keys per kind: those no online judge runs (the notice turns danger) and those only one judge runs (warning). The language and online-judge counts are the table footer.
+  - Table: Mã, Bài mới chip, Tên, Đuôi tệp, Máy chấm "5 / 5" + a meter and "n trực tuyến" (not colour alone), and "Máy chạy" ("Xem máy" lists each judge's runtime). Phone: cards.
 - **Organizations / quotas / requests**:
   - One screen with AdminTabs Tổ chức · Yêu cầu · Hạn mức (counts in tabs).
   - Quotas: two meters per row (credits, storage) with % text, and caution above 80 %.
