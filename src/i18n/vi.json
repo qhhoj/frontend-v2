@@ -1404,7 +1404,8 @@
     "close": "Đóng khung nộp bài",
     "result": {
       "atTest": "{verdict} test {test}",
-      "details": "Xem chi tiết"
+      "details": "Xem chi tiết",
+      "failedAt": "lỗi ở test {test}"
     }
   },
   "submission": {

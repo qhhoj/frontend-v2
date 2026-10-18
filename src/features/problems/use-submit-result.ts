@@ -48,6 +48,8 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
       ? formatNumber(points, locale.locale, 2, false)
       : formatNumber(points, locale.locale, precision);
   };
+  /** While grading: "Đang chấm · test 4". Finished: the score and where it failed ("0 / 1000 · lỗi ở test 1"); the ring
+   *  carries the verdict code, so the text never repeats it (M-12). */
   const text = computed(() => {
     if (!row.value || !isFinished.value) {
       const test = live.currentTestcase || row.value?.currentTestcase || 0;
@@ -55,12 +57,19 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
       return test ? translate('submit.result.atTest', { verdict: label, test }) : label;
     }
     const failed = firstFailedTest(row.value.cases);
-    const code = failed
-      ? translate('submit.result.atTest', { verdict: verdict.value.code, test: failed })
-      : verdict.value.code;
-    if (row.value.points === null) return code;
-    const { score, max } = scoreOnScale(row.value.points, scale.value);
-    return `${format(score)} / ${format(max)} · ${code}`;
+    const parts: string[] = [];
+    if (row.value.points !== null) {
+      const { score, max } = scoreOnScale(row.value.points, scale.value);
+      parts.push(`${format(score)} / ${format(max)}`);
+    }
+    if (failed) parts.push(translate('submit.result.failedAt', { test: failed }));
+    return parts.length ? parts.join(' · ') : translate(verdict.value.labelKey);
+  });
+  /** What a screen reader hears once the grading ends: the verdict's name, then the text. */
+  const announcement = computed(() => {
+    if (!isFinished.value) return '';
+    const label = translate(verdict.value.labelKey);
+    return text.value === label ? label : `${label} · ${text.value}`;
   });
 
   // A finished grading can change the viewer's status on the problem and its solver count.
@@ -76,6 +85,7 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
     progress,
     partialShare,
     text,
+    announcement,
   };
 }
 export type SubmitResult = ReturnType<typeof useSubmitResult>;

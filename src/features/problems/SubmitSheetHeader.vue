@@ -20,8 +20,10 @@ defineExpose({
 
 <template>
   <header>
-    <!-- The drag zone is its own strip: pointer capture on the whole header would swallow the button's click. -->
+    <!-- The drag zone is its own strip: pointer capture on the whole header would swallow the button's click. Dragging only
+         collapses, so the collapsed bar has none and stays one 56 px row (M-06). -->
     <div
+      v-if="isExpanded"
       class="flex h-6 touch-none items-center justify-center"
       @pointerdown="drag.onPointerdown"
       @pointermove="drag.onPointermove"
@@ -30,7 +32,10 @@ defineExpose({
     >
       <span aria-hidden="true" class="h-1 w-10 rounded-pill bg-line-strong"></span>
     </div>
-    <div class="flex items-center justify-between gap-3 px-4 pb-1">
+    <div
+      class="flex items-center justify-between gap-3 px-4"
+      :class="isExpanded ? 'pb-1' : 'py-1.5'"
+    >
       <h2 ref="title" tabindex="-1" class="font-display text-base font-bold outline-none">
         {{ $t('submit.title') }}
       </h2>

@@ -98,7 +98,10 @@ describe('after a submit (Q-01 B)', () => {
     await flushPromises();
     expect(router.currentRoute.value.path).toBe('/problems/duongdi');
     const strip = dockOf(wrapper).get('[data-testid="submit-result"]');
-    await vi.waitFor(() => expect(strip.text()).toContain('0 / 1600 · WA test 3'));
+    const shown = strip.get('p[aria-hidden="true"]');
+    await vi.waitFor(() => expect(shown.text()).toBe('0 / 1600 · lỗi ở test 3'));
+    // The ring shows the verdict; screen readers hear its name before the score.
+    expect(strip.get('[role="status"]').text()).toMatch(/^\S.* · 0 \/ 1600 · lỗi ở test 3$/);
     expect(strip.get('[data-testid="submit-result-link"]').attributes('href')).toBe(
       '/submissions/sub-9',
     );

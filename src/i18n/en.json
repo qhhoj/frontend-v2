@@ -1404,7 +1404,8 @@
     "close": "Close the submit panel",
     "result": {
       "atTest": "{verdict} on test {test}",
-      "details": "See details"
+      "details": "See details",
+      "failedAt": "failed on test {test}"
     }
   },
   "submission": {
