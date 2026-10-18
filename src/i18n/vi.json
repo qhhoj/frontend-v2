@@ -14,7 +14,8 @@
     "organizations": "Tổ chức",
     "more": "Thêm",
     "menu": "Menu",
-    "openMenu": "Mở menu"
+    "openMenu": "Mở menu",
+    "openMenuUnread": "Mở menu, {count} thông báo chưa đọc"
   },
   "pages": {
     "publicRanking": "Bảng xếp hạng công khai",

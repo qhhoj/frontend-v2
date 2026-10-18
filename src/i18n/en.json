@@ -14,7 +14,8 @@
     "organizations": "Organizations",
     "more": "More",
     "menu": "Menu",
-    "openMenu": "Open the menu"
+    "openMenu": "Open the menu",
+    "openMenuUnread": "Open the menu, {count} unread notifications"
   },
   "pages": {
     "publicRanking": "Public ranking",

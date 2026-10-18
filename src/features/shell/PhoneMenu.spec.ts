@@ -32,6 +32,23 @@ describe('phone menu (P-01 A)', () => {
     expect(useLocaleStore().locale).toBe('en');
   });
 
+  it('carries the notifications instead of a bell: a dot on the button, the count in the sheet', async () => {
+    mockApi({
+      ...blogListRoutes,
+      'GET /auth/me': signedIn(),
+      'GET /profile': ok(profile()),
+      'GET /notifications/unread-count': ok({ count: 3 }),
+    });
+    const { wrapper } = await openOnPhone('/blog');
+    expect(wrapper.find('[data-testid="notification-bell"]').exists()).toBe(false);
+    const button = wrapper.get('[data-testid="phone-menu"]');
+    expect(button.attributes('aria-label')).toBe('Mở menu, 3 thông báo chưa đọc');
+    expect(button.find('[data-testid="phone-menu-dot"]').exists()).toBe(true);
+    const row = sheet()!.querySelector('[data-testid="phone-menu-notifications"]')!;
+    expect(row.getAttribute('href')).toBe('/notifications');
+    expect(row.textContent).toContain('3 chưa đọc');
+  });
+
   it("lists the account's pages for staff and closes when one is followed", async () => {
     mockApi({
       ...blogListRoutes,
