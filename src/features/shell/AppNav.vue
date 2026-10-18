@@ -88,7 +88,8 @@ const measureBar = () => {
 // --- phone mode: the strip scrolls and fades where items are clipped ---
 const startClipped = ref(false);
 const endClipped = ref(false);
-const FADE_PX = 24;
+/** Wide enough that a clipped item visibly fades out instead of looking cut (M-05). */
+const FADE_PX = 32;
 const fadeMask = computed(() => {
   if (!isPhone.value) return undefined;
   const start = startClipped.value ? `transparent 0, black ${FADE_PX}px` : 'black 0';
@@ -156,7 +157,8 @@ watch(isPhone, refresh, { flush: 'post' });
       @scroll="readClipping"
       @focusin="onFocusIn"
     >
-      <div ref="track" class="flex w-max gap-0.5">
+      <!-- On a phone the track keeps 12 px clear at both ends of the strip, away from the logo and the menu button. -->
+      <div ref="track" class="flex w-max gap-0.5 max-md:px-3">
         <RouterLink
           v-for="item in visibleItems"
           :key="item.path"

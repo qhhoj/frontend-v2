@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Bell } from 'lucide-vue-next';
 import Drawer from 'primevue/drawer';
-import { computed, onScopeDispose, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import type { NotificationItem } from '@/api/types/notifications';
 import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -9,7 +9,6 @@ import AppButton from '@/components/ui/AppButton.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
-import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import NotificationList from './NotificationList.vue';
@@ -19,16 +18,17 @@ import { NOTIFICATION_BITS } from './notification-bits';
 import {
   DRAWER_QUERY,
   LATEST_ROWS,
-  useInvalidateNotificationLists,
   useMarkAllRead,
   useNotificationsQuery,
   useUnreadCountQuery,
 } from './notifications.queries';
-import { useNotificationStream } from './use-notification-stream';
+import { unreadBadge } from './use-notification-alerts';
 import { useOpenNotification } from './use-open-notification';
 
-/** M1B: the bell beside the user menu; its drawer shows the latest five rows (full screen on a phone). */
-const BADGE_MAX = 99;
+/**
+ * M1B: the bell beside the user menu (from `md`; a phone reaches notifications from the menu sheet); its drawer shows the
+ * latest five rows. The live stream and the arrival announcements are the header's (`useNotificationAlerts`).
+ */
 const session = useSessionStore();
 const locale = useLocaleStore();
 const isOpen = ref(false);
@@ -36,47 +36,16 @@ const bellButton = ref<HTMLButtonElement | null>(null);
 const countQuery = useUnreadCountQuery();
 const listQuery = useNotificationsQuery(DRAWER_QUERY, isOpen);
 const markAll = useMarkAllRead();
-const invalidateLists = useInvalidateNotificationLists();
 const opener = useOpenNotification();
-useNotificationStream();
 
 const unread = computed(() => countQuery.data.value?.count ?? 0);
-const badge = computed(() => {
-  if (unread.value <= 0) return '';
-  return unread.value > BADGE_MAX ? `${BADGE_MAX}+` : formatNumber(unread.value, locale.locale);
-});
+const badge = computed(() => unreadBadge(unread.value, locale.locale));
 const latest = computed(() => (listQuery.data.value?.items ?? []).slice(0, LATEST_ROWS));
 const bellLabel = computed(() =>
   unread.value > 0
     ? translate('notifications.bellWithCount', { count: unread.value })
     : translate('notifications.bell'),
 );
-/** Polite, counts only: said when the count rises, never per row. */
-const arrivedText = ref('');
-/** The gap between emptying and refilling the region: shorter than a frame and browsers merge the two, so an identical text goes unread. */
-const REANNOUNCE_GAP_MS = 100;
-let announceTimer: ReturnType<typeof setTimeout> | undefined;
-/** Cleared first, so two identical rises ("1 thông báo mới" twice) still change the region and are read again. */
-function announceArrivals(gained: number) {
-  clearTimeout(announceTimer);
-  arrivedText.value = '';
-  if (gained > 0)
-    announceTimer = setTimeout(
-      () => (arrivedText.value = translate('notifications.arrived', { count: gained })),
-      REANNOUNCE_GAP_MS,
-    );
-}
-onScopeDispose(() => clearTimeout(announceTimer));
-watch(
-  () => countQuery.data.value?.count,
-  (count, before) => {
-    const hasRisen = count !== undefined && before !== undefined && count > before;
-    announceArrivals(hasRisen ? count - before : 0);
-    // Contest announcements are `high` and send no nudge (B1): only the polled count tells the banner and the lists.
-    if (hasRisen) void invalidateLists();
-  },
-);
-
 async function openRow(item: NotificationItem) {
   if ((await opener.open(item)) === 'opened') isOpen.value = false;
 }
@@ -130,7 +99,6 @@ const drawerPt = computed(() => ({
         {{ badge }}
       </span>
     </button>
-    <p class="sr-only" aria-live="polite" data-testid="notification-arrived">{{ arrivedText }}</p>
     <Drawer
       v-model:visible="isOpen"
       position="right"

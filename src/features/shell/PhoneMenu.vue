@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LogOut, Menu } from 'lucide-vue-next';
+import { Bell, LogOut, Menu } from 'lucide-vue-next';
 import Drawer from 'primevue/drawer';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -8,6 +8,7 @@ import BrandWordmark from '@/components/ui/BrandWordmark.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import ModeChoice from '@/features/appearance/ModeChoice.vue';
 import { useLogout } from '@/features/auth/use-logout';
+import { unreadBadge } from '@/features/notifications/use-notification-alerts';
 import OfficialModePill from '@/features/official-mode/OfficialModePill.vue';
 import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
@@ -20,8 +21,10 @@ import { useAccountLinks } from './account-links';
 /**
  * P-01 A: the phone header's menu. A sheet drops from the top with what the desktop row shows beside the navigation:
  * the language, the light/dark mode (the rest of the look is one link away), the official-mode pill and the account
- * (its pages and sign-out, or sign-in and register). Any navigation closes it; focus goes back to the menu button.
+ * (its pages and sign-out, or sign-in and register), and for a signed-in viewer the notifications with their unread count,
+ * which a dot on the menu button signals too. Any navigation closes it; focus goes back to the menu button.
  */
+const props = defineProps<{ unread: number }>();
 const LANGUAGES: ReadonlyArray<{ value: Locale; label: string }> = [
   { value: 'vi', label: 'Tiếng Việt' },
   { value: 'en', label: 'English' },
@@ -36,6 +39,8 @@ const route = useRoute();
 const links = useAccountLinks();
 const logout = useLogout();
 const isOpen = ref(false);
+const badge = computed(() => unreadBadge(props.unread, locale.locale));
+const hasUnread = computed(() => session.user !== null && props.unread > 0);
 const opener = ref<HTMLButtonElement | null>(null);
 watch(
   () => route.fullPath,
@@ -69,13 +74,19 @@ const drawerPt = computed(() => ({
     ref="opener"
     type="button"
     data-testid="phone-menu"
-    class="inline-flex size-11 items-center justify-center rounded-pill border border-line bg-surface-strong hover:bg-surface-hover"
+    class="relative inline-flex size-11 items-center justify-center rounded-pill border border-line bg-surface-strong hover:bg-surface-hover"
     aria-haspopup="dialog"
     :aria-expanded="isOpen"
-    :aria-label="$t('nav.openMenu')"
+    :aria-label="hasUnread ? $t('nav.openMenuUnread', { count: unread }) : $t('nav.openMenu')"
     @click="isOpen = true"
   >
     <Menu aria-hidden="true" class="size-5" />
+    <span
+      v-if="hasUnread"
+      aria-hidden="true"
+      data-testid="phone-menu-dot"
+      class="absolute top-1.5 right-1.5 size-2.5 rounded-pill bg-accent ring-2 ring-surface-strong"
+    />
   </button>
   <Drawer
     v-model:visible="isOpen"
@@ -95,6 +106,22 @@ const drawerPt = computed(() => ({
         <span :class="['min-w-0 truncate', ratingTextClass(session.user.rating)]">{{
           session.user.username
         }}</span>
+      </RouterLink>
+      <RouterLink
+        :to="{ name: 'notifications' }"
+        :class="ROW"
+        data-testid="phone-menu-notifications"
+      >
+        <Bell aria-hidden="true" class="size-5 text-muted" />
+        <span class="flex-1">{{ $t('notifications.drawerTitle') }}</span>
+        <template v-if="badge">
+          <span
+            aria-hidden="true"
+            class="min-w-5 rounded-pill bg-accent px-1.5 text-center text-xs leading-5 font-bold text-on-accent"
+            >{{ badge }}</span
+          >
+          <span class="sr-only">{{ $t('notifications.unreadCount', { count: unread }) }}</span>
+        </template>
       </RouterLink>
       <RouterLink v-for="link in links" :key="link.labelKey" :to="link.to" :class="ROW">
         <component :is="link.icon" aria-hidden="true" class="size-5 text-muted" />
