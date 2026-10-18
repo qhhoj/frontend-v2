@@ -53,15 +53,9 @@ const activeTab = computed(() => {
   const tab = tabFromQuery(route.query.tab);
   return tabsShown.value.includes(tab) ? tab : (tabsShown.value[0] ?? tab);
 });
-const isLoading = computed(
-  () =>
-    (canSettings.value && settings.isPending.value) || (canNotice.value && site.isPending.value),
-);
-const loadError = computed(() => settings.error.value ?? site.error.value);
-function retry() {
-  if (canSettings.value) void settings.refetch();
-  if (canNotice.value) void site.refetch();
-}
+/** The page waits for the settings only; the notice block loads on its own, so a `/site` failure never hides a setting. */
+const isLoading = computed(() => canSettings.value && settings.isPending.value);
+const loadError = computed(() => (canSettings.value ? settings.error.value : null));
 const isNoticeLoaded = computed(() => canNotice.value && site.data.value !== undefined);
 const notice = computed(() => site.data.value?.config[SITE_NOTICE_KEY] ?? null);
 
@@ -163,7 +157,7 @@ function discardAll() {
 const historyKey = ref<SettingKey | null>(null);
 const panel = ref<{ revealPanel: () => void } | null>(null);
 /** The history panel belongs to a key of the tab on screen. */
-watch(activeTab, () => (historyKey.value = null));
+watch([activeTab, () => hits.value === null], () => (historyKey.value = null));
 
 /** Opens a key's history and brings it into view: on a phone the panel sits below every block. */
 async function openHistory(key: SettingKey) {
@@ -198,7 +192,7 @@ const SAVE_FORM_ID = 'site-settings-save';
     </p>
   </div>
   <Tabs
-    v-if="!hits"
+    v-if="!hits && !isLoading && !loadError"
     :items="tabItems"
     :model-value="activeTab"
     :label="t('admin.settings.tabsLabel')"
@@ -206,7 +200,7 @@ const SAVE_FORM_ID = 'site-settings-save';
     :more-label="t('admin.shell.moreTabs')"
   />
   <AdminLeaveGuard :dirty-count="dirtyCount" />
-  <QueryState :loading="isLoading" :error="loadError" @retry="retry">
+  <QueryState :loading="isLoading" :error="loadError" @retry="settings.refetch()">
     <template #skeleton
       ><SkeletonBlock
         data-skeleton-region="settings-block"
@@ -249,6 +243,14 @@ const SAVE_FORM_ID = 'site-settings-save';
                 :settings="block.settings"
               />
             </SettingBlock>
+            <QueryState
+              v-if="tab === NOTICE_BLOCK.tab && canNotice && !isNoticeLoaded"
+              :loading="site.isPending.value"
+              :error="site.error.value"
+              @retry="site.refetch()"
+            >
+              <template #skeleton><SkeletonBlock class="h-64 w-full" /></template>
+            </QueryState>
             <SiteNoticeBlock
               v-if="tab === NOTICE_BLOCK.tab && isNoticeLoaded"
               :ref="bindBlock(NOTICE_BLOCK.id)"

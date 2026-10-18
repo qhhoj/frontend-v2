@@ -26,15 +26,17 @@ const props = defineProps<{ current: string | null; shown?: boolean }>();
 const emit = defineEmits<{ dirty: [count: number] }>();
 const headingId = useId();
 const queryClient = useQueryClient();
-const text = ref(props.current ?? '');
-watch(
-  () => props.current,
-  (value) => (text.value = value ?? ''),
-);
+/** The stored notice as the box compares it: a blank one shows nothing, so it counts as none. */
+const stored = computed(() => props.current?.trim() ?? '');
+const text = ref(stored.value);
+/** Another write updates the box only while it holds no edit of its own. */
+watch(stored, (value, previous) => {
+  if (text.value.trim() === previous) text.value = value;
+});
 const trimmed = computed(() => text.value.trim());
-const isChanged = computed(() => trimmed.value !== (props.current ?? ''));
+const isChanged = computed(() => trimmed.value !== stored.value);
 watch(isChanged, (changed) => emit('dirty', changed ? 1 : 0), { immediate: true });
-const tooLong = computed(() => text.value.length > NOTICE_MAX);
+const tooLong = computed(() => trimmed.value.length > NOTICE_MAX);
 const failure = ref<string | null>(null);
 const isHistoryOpen = ref(false);
 
@@ -55,7 +57,7 @@ async function save(): Promise<BlockSaveOutcome> {
   return 'saved';
 }
 const discard = () => {
-  text.value = props.current ?? '';
+  text.value = stored.value;
   failure.value = null;
 };
 defineExpose({ save, discard });
@@ -91,7 +93,7 @@ defineExpose({ save, discard });
         />
       </AdminField>
       <div class="flex shrink-0 items-center gap-1">
-        <AdminChip v-if="current" tone="accent">{{ $t('admin.site.notice.live') }}</AdminChip>
+        <AdminChip v-if="stored" tone="accent">{{ $t('admin.site.notice.live') }}</AdminChip>
         <SettingInfo
           :setting-key="SITE_NOTICE_KEY"
           :default-text="null"
@@ -108,14 +110,14 @@ defineExpose({ save, discard });
     </div>
     <div>
       <button
-        v-if="current !== null && text !== ''"
+        v-if="stored && text !== ''"
         type="button"
         :class="buttonClass('secondary', 'sm')"
         @click="text = ''"
       >
         {{ $t('admin.site.notice.takeDown') }}
       </button>
-      <p v-else-if="current !== null" class="m-0 text-meta text-muted">
+      <p v-else-if="stored" class="m-0 text-meta text-muted">
         {{ $t('admin.site.notice.takeDownHint') }}
       </p>
     </div>

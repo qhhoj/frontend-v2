@@ -2,12 +2,25 @@ import type { Setting } from '@/api/types/settings-admin';
 import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
 import { formatNumber } from '@/lib/format';
+import { SETTING_KINDS } from './setting-blocks';
+import type { SettingKind } from './setting-blocks';
 import type { ScalarDraft, SettingDraft } from './setting-values';
 
 const sameValue = (left: unknown, right: unknown) => JSON.stringify(left) === JSON.stringify(right);
 
-/** A secret's `default` reads `{ set: false }`: not a value anyone can send, so only plain settings can be reset. */
-export const canResetToDefault = (setting: Setting) => !setting.hasSecret;
+/** The kinds that hold one plain value (`ScalarSettingField`): only those have a default a box can take. */
+const SCALAR_KINDS: readonly SettingKind['kind'][] = [
+  'timeZone',
+  'boolean',
+  'integer',
+  'text',
+  'choice',
+  'url',
+];
+
+/** A secret's `default` reads `{ set: false }`, and OAuth or webhook values are no single box: only plain settings can be reset. */
+export const canResetToDefault = (setting: Setting) =>
+  !setting.hasSecret && SCALAR_KINDS.includes(SETTING_KINDS[setting.key].kind);
 
 export const defaultDraftOf = (setting: Setting): ScalarDraft => ({ value: setting.default });
 
