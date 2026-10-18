@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { mockApi, ok, page } from '@/test/mock-api';
+import { mockApi, ok, page, sequence } from '@/test/mock-api';
 import { submissionStats } from '@/test/fixtures';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
@@ -48,6 +48,29 @@ describe('AdminShell', () => {
     expect(tileLabels()[0]).toContain('Cần xử lý');
     expect(tileLabels()[1]).toContain('Hàng đợi chấm');
     expect(tileLabels()[2]).toContain('Máy chấm trực tuyến');
+  });
+
+  it('keeps the tiles where they are when a later poll changes which figures need attention', async () => {
+    mockApi({
+      ...staffViewer(['judge.change_judge', 'judge.change_comment']),
+      'GET /submissions/stats': sequence(
+        ok(submissionStats({ queueLength: 0, judgesOnline: 2, judgesTotal: 2 })),
+        ok(submissionStats({ queueLength: 7, judgesOnline: 2, judgesTotal: 2 })),
+      ),
+      'GET /comments/reports': page([{}, {}], { pageSize: 20 }),
+    });
+    const { wrapper, queryClient } = await mountApp('/admin');
+    await waitForAdminShell(wrapper);
+    const tiles = () => wrapper.findAll('[aria-labelledby="admin-overview-title"] li');
+    await vi.waitFor(() => expect(tiles()[0]!.text()).toContain('Bình luận bị báo cáo'));
+    await queryClient.invalidateQueries({ queryKey: ['submissions', 'stats'] });
+    // The poll marks the queue tile as waiting, but it stays below the reports tile it was placed after.
+    await vi.waitFor(() => expect(tiles()[1]!.find('[data-attention]').exists()).toBe(true));
+    expect(tiles().map((tile) => tile.text())).toEqual([
+      expect.stringContaining('Bình luận bị báo cáo'),
+      expect.stringContaining('Hàng đợi chấm'),
+      expect.stringContaining('Máy chấm trực tuyến'),
+    ]);
   });
 
   it('gives a contest organiser the tile of tickets about their contests, without the problem tiles', async () => {

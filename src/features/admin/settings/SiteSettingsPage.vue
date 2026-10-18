@@ -193,8 +193,14 @@ const SAVE_FORM_ID = 'site-settings-save';
       :placeholder="t('admin.settings.search.placeholder')"
       :maxlength="100"
     />
-    <!-- Always mounted, so a screen reader announces the first count, not only the later ones. -->
-    <p role="status" class="m-0 text-meta text-muted empty:hidden">{{ searchStatus }}</p>
+    <!-- Always mounted and never `display: none`, so a screen reader announces the first count, not only the later ones; `empty:sr-only` takes it out of the layout while there is no text. -->
+    <p
+      role="status"
+      data-testid="settings-search-status"
+      class="m-0 text-meta text-muted empty:sr-only"
+    >
+      {{ searchStatus }}
+    </p>
   </div>
   <Tabs
     v-if="!hits && !isLoading && !loadError"
