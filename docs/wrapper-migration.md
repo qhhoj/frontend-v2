@@ -13,7 +13,7 @@ Counts are importing files, specs included; the bracket is how many of them are 
 | `features/admin/ui/AdminChip.vue`                                     | 47     | `Chip`                                                                 |
 | `features/admin/ui/table/AdminDataTable.vue`                          | 34 (1) | `DataTable`                                                            |
 | `features/admin/ui/AdminPageHeader.vue`                               | 33     | `PageHeader`                                                           |
-| `features/admin/ui/feedback/AdminNotice.vue`                          | 23     | `Notice`                                                               |
+| `features/admin/ui/feedback/AdminNotice.vue`                          | 22     | `Notice`                                                               |
 | `components/GlassCard.vue`                                            | 22 (1) | `Card`                                                                 |
 
 A file that imports several wrappers is counted once per wrapper; the allow-list holds 277 distinct files.
