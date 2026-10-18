@@ -3557,6 +3557,16 @@
             ],
             "nullable": true,
             "type": "string"
+          },
+          "ratingChange": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RatingChangeResponse"
+              }
+            ],
+            "description": "What this contest did to the viewer's rating (live participation); null until ratings are applied, while the board is frozen for the viewer, or when unrated.",
+            "nullable": true,
+            "type": "object"
           }
         },
         "required": [
@@ -3569,6 +3579,7 @@
           "canViewBalloons",
           "canSeeFullScoreboard",
           "boardFrozenAt",
+          "ratingChange",
           "isCurrent"
         ],
         "type": "object"
@@ -4255,16 +4266,12 @@
       "CreateOrganizationRequestDto": {
         "properties": {
           "reason": {
-            "description": "Why the user wants to join; must not be blank.",
+            "default": "",
+            "description": "Why the user wants to join; optional (trimmed, empty when not given).",
             "maxLength": 4096,
-            "minLength": 1,
-            "pattern": "\\S",
             "type": "string"
           }
         },
-        "required": [
-          "reason"
-        ],
         "type": "object"
       },
       "CreatePostDto": {
@@ -7755,7 +7762,7 @@
             "type": "string"
           },
           "reason": {
-            "description": "The reason the requester gave.",
+            "description": "The reason the requester gave; empty when none.",
             "type": "string"
           },
           "state": {
@@ -10799,6 +10806,16 @@
             "nullable": true,
             "type": "number"
           },
+          "ratingChange": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RatingChangeResponse"
+              }
+            ],
+            "description": "What this contest did to the participant's rating once ratings are applied; null before, for unrated rows and on a frozen board.",
+            "nullable": true,
+            "type": "object"
+          },
           "score": {
             "description": "Total score.",
             "type": "number"
@@ -10829,7 +10846,8 @@
           "isDisqualified",
           "score",
           "cumtime",
-          "tiebreaker"
+          "tiebreaker",
+          "ratingChange"
         ],
         "type": "object"
       },
@@ -10857,6 +10875,24 @@
           "username",
           "rating",
           "organization"
+        ],
+        "type": "object"
+      },
+      "RatingChangeResponse": {
+        "properties": {
+          "delta": {
+            "description": "The rating after this contest minus the one before it; null on the user's first rated contest.",
+            "nullable": true,
+            "type": "number"
+          },
+          "rating": {
+            "description": "The rating after this contest.",
+            "type": "number"
+          }
+        },
+        "required": [
+          "rating",
+          "delta"
         ],
         "type": "object"
       },

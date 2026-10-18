@@ -8385,6 +8385,8 @@ export interface components {
              * @enum {string|null}
              */
             liveStatus: "finished" | "participating" | "registered" | null;
+            /** @description What this contest did to the viewer's rating (live participation); null until ratings are applied, while the board is frozen for the viewer, or when unrated. */
+            ratingChange: components["schemas"]["RatingChangeResponse"] | null;
         };
         CreateAnnouncementDto: {
             /** @description Announcement body in Markdown; it is rendered to HTML when saved. */
@@ -8690,7 +8692,10 @@ export interface components {
             slug: string;
         };
         CreateOrganizationRequestDto: {
-            /** @description Why the user wants to join; must not be blank. */
+            /**
+             * @description Why the user wants to join; optional (trimmed, empty when not given).
+             * @default
+             */
             reason: string;
         };
         CreatePostDto: {
@@ -9913,7 +9918,7 @@ export interface components {
             id: string;
             /** @description Slug of the organization asked to join. */
             organizationSlug: string;
-            /** @description The reason the requester gave. */
+            /** @description The reason the requester gave; empty when none. */
             reason: string;
             /** @description P pending, A approved or R rejected. */
             state: components["schemas"]["OrganizationRequestState"];
@@ -10953,6 +10958,8 @@ export interface components {
             participationId: string;
             /** @description Null on a board that shows only the viewer's row. */
             rank: number | null;
+            /** @description What this contest did to the participant's rating once ratings are applied; null before, for unrated rows and on a frozen board. */
+            ratingChange: components["schemas"]["RatingChangeResponse"] | null;
             /** @description Total score. */
             score: number;
             /** @description Tiebreak value used when scores and times are equal. */
@@ -10977,6 +10984,12 @@ export interface components {
             pageSize: number;
             /** @description 1-based position of the user. */
             rank: number;
+        };
+        RatingChangeResponse: {
+            /** @description The rating after this contest minus the one before it; null on the user's first rated contest. */
+            delta: number | null;
+            /** @description The rating after this contest. */
+            rating: number;
         };
         RatingHistoryEntryResponse: {
             /** @description Null when the viewer may not see the contest. */

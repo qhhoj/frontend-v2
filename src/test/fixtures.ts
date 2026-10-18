@@ -365,6 +365,7 @@ export const contestViewer = (overrides: Partial<ContestViewer> = {}): ContestVi
   inContest: false,
   canViewBalloons: false,
   liveParticipation: null,
+  ratingChange: null,
   ...overrides,
 });
 
@@ -465,6 +466,7 @@ export const rankingRow = (
   score,
   cumtime,
   tiebreaker: 0,
+  ratingChange: null,
   cells,
 });
 
