@@ -22,7 +22,7 @@ for (const viewport of AUDIT_VIEWPORTS)
     await page.goto('/admin/languages');
     // A table from 768 px, one card per language below.
     await expect(page.getByText('5 / 5', { exact: true }).first()).toBeVisible();
-    await expect(page.getByText('PAS chỉ chạy trên một máy')).toBeVisible();
+    await expect(page.getByText('Chỉ một máy chạy PAS')).toBeVisible();
     expect(await axeViolationsIn(page)).toEqual([]);
     expect(await fitsWidth(page)).toBe(true);
   });

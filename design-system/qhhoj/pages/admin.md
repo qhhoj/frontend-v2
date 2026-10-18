@@ -81,10 +81,10 @@ These are defined in `src/features/admin/ui/admin-density.css` under `@media (po
 - **Header**: sticky inside the card (`top: 0` of the scroll region), 13/600 muted, sentence case (`text-meta text-muted`, as in every `DataTable`). Sortable headers are buttons with `aria-sort` and a 14 px chevron.
 - **Rows**: 40 px. Hover uses `surface-hover`. The primary column is a link (name 14/600 + mono code 12 muted underneath). Status columns use chips. Numbers are right-aligned and mono.
 - **Row actions**: at most one visible text or icon action (e.g. "Sửa"), plus a `⋯` menu (`AdminRowMenu`). Destructive items go last, in red, separated, and always confirm. Icon-only buttons have an `aria-label` and a tooltip.
-- **Selection and bulk bar**: the checkbox column shows only when bulk actions exist. The bulk bar (`AdminBulkBar`) replaces the toolbar while a selection exists. It shows "3 đã chọn · Bỏ chọn" and the actions, has no shadow, and uses a `surface-strong` fill.
+- **Selection and bulk bar**: the checkbox column shows only when bulk actions exist; each box is 16 px with a 44 px hit area on coarse pointers (`DataTableCheckbox`). The bulk bar (`AdminBulkBar`) replaces the toolbar while a selection exists. It shows "3 đã chọn · Bỏ chọn" and the actions, has no shadow, and uses a `surface-strong` fill.
 - **States** (via `QueryState`): skeleton rows matching the real row count; empty (EmptyState: one nightcap Bit, one line, one action); filtered-empty ("Không có kết quả cho bộ lọc này · Xoá bộ lọc"); error with retry inside the card.
 - **Pager**: `NumberedPager` plus "1–50 / 312". Hidden when there is only one page.
-- **Mobile (< 768)**: card list, one card per row. Line 1: primary column + status chip. Line 2: meta columns joined with "·". Line 3: actions. Columns with `priority: 'meta'` move into a "Chi tiết" disclosure. The page never scrolls horizontally. A table that must keep its grid (test lists) scrolls inside `ScrollRegion` with a fade edge, not a text hint.
+- **Mobile (< 768)**: card list, one card per row. Line 1: primary column + status chip. Line 2: the secondary columns as "Label value" facts at most two lines, separated by a gap, never by "·" (a wrapped dot orphans); a fact is never split, and a `stacked` column is a fact without its label. Line 3: the "Chi tiết" button (`AppButton` sm, 44 on coarse pointers) for the columns with `priority: 'meta'`, and the actions. Badges sit beside the title, or under it when they would squeeze it. The page never scrolls horizontally. A table that must keep its grid (test lists) scrolls inside `ScrollRegion` with a fade edge, not a text hint.
 
 ### Filter bar: `AdminFilterBar` (new)
 One row:
@@ -195,7 +195,7 @@ Colour and opacity transitions use `--qh-duration-fast` (150 ms). Drawers and sh
   - Deleted tab: columns Bài, Xoá lúc, Người xoá, "Còn 20 ngày" chip (caution under 7), and actions Khôi phục + ⋯ Xoá hẳn.
 - **Contests**:
   - Same pattern. Filter: Tất cả · Đang diễn ra · Sắp diễn ra · Đã kết thúc; popover with Thẻ, Tổ chức, Rating.
-  - Columns: Kỳ thi (name + key), Giai đoạn chip, Thời gian as one line "08/10 15:00 → 18:24 · 3 giờ 24 phút" (mono), Thí sinh (right), and chips Rating / Riêng tư.
+  - Columns: Kỳ thi (name + key), Giai đoạn chip, Thời gian as one line "08/10 15:00 → 18:24 (3 giờ 24 phút)" (mono), Thí sinh (right), and chips Rating / Riêng tư.
   - Phone: card with phase chip and time line.
 - **Users** (with the drawer, below):
   - Header actions: "Tạo tài khoản" (primary) and "Vai trò" (secondary).

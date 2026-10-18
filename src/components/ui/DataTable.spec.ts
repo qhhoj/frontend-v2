@@ -132,4 +132,41 @@ describe('DataTable', () => {
     });
     expect(wrapper.text()).toContain('Còn nữa');
   });
+
+  describe('as cards on a narrow screen', () => {
+    const CARD_COLUMNS: DataTableColumn[] = [
+      ...COLUMNS,
+      { key: 'note', label: 'Ghi chú', priority: 'meta' },
+    ];
+    const mountCards = () => {
+      stubMatchMedia().setQuery(COMPACT_LIST_QUERY, true);
+      return mountComponent(DataTable, {
+        props: {
+          ...BASE,
+          columns: CARD_COLUMNS,
+          rows: ROWS.map((row) => ({ ...row, note: `ghi chú ${row.code}` })),
+          selectable: true,
+        },
+      });
+    };
+
+    it('opens a row\'s meta columns from its "Chi tiết" button, one row at a time', async () => {
+      const wrapper = mountCards();
+      const [first, second] = wrapper.findAll('li button[aria-expanded]');
+      const detailsOf = (toggle: typeof first) =>
+        wrapper.get(`#${toggle!.attributes('aria-controls')}`);
+      expect(detailsOf(first).isVisible()).toBe(false);
+      await first!.trigger('click');
+      expect(first!.attributes('aria-expanded')).toBe('true');
+      expect(detailsOf(first).isVisible()).toBe(true);
+      expect(detailsOf(first).text()).toContain('ghi chú a');
+      expect(detailsOf(second).isVisible()).toBe(false);
+    });
+
+    it('selects a card from its checkbox', async () => {
+      const wrapper = mountCards();
+      await wrapper.get('li input[type="checkbox"]').setValue(true);
+      expect(wrapper.emitted('update:selected')?.at(-1)).toEqual([new Set(['a'])]);
+    });
+  });
 });

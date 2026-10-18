@@ -113,6 +113,7 @@ const columns = computed<AdminColumn[]>(() => [
     key: 'time',
     label: t('admin.contests.list.columns.time'),
     priority: 'secondary',
+    stacked: true,
     sort: { asc: 'oldest', desc: 'newest', first: 'desc' },
   },
   {

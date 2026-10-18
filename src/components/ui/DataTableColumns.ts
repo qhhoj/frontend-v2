@@ -1,6 +1,7 @@
 /**
  * Column definitions for `DataTable`. When the table stacks to cards, `primary` heads each card, `badge` columns sit
- * beside it, `secondary` ones form a "Label value · Label value" line, and `meta` ones go into a "Chi tiết" disclosure.
+ * beside it (under it when they would squeeze it to a few letters), `secondary` ones form a "Label value  Label value" line (a fact is never split, no separator to orphan), and
+ * `meta` ones go into a "Chi tiết" disclosure.
  */
 export type ColumnPriority = 'primary' | 'badge' | 'secondary' | 'meta';
 

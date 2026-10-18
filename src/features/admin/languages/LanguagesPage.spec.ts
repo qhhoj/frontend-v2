@@ -23,7 +23,7 @@ describe('LanguagesPage', () => {
     expect(wrapper.findAll('tbody tr')).toHaveLength(5);
     expect(calls.some((call) => call.path === '/judges')).toBe(false);
     expect(wrapper.text()).not.toContain('trực tuyến');
-    expect(wrapper.text()).not.toContain('chỉ chạy trên một máy');
+    expect(wrapper.text()).not.toContain('Chỉ một máy chạy');
   });
 
   it('opens for a holder of add_language alone without asking for the list, and says it is add only', async () => {

@@ -1,10 +1,10 @@
 {
   "title": "Programming languages",
   "lead": "The languages submissions can use, and the judges that run them.",
-  "single": {
-    "title": "{key} runs on one judge only",
-    "body": "Submissions in {key} wait if judge {judge} is turned off or blocked.",
-    "many": "{count} languages run on one judge only"
+  "attention": {
+    "title": "{count} language needs more judge coverage | {count} languages need more judge coverage",
+    "unserved": "No online judge runs {keys}: submissions will wait.",
+    "single": "Only one judge runs {keys}: submissions will wait if it is turned off or blocked."
   },
   "table": {
     "key": "Key",
@@ -84,9 +84,5 @@
     "add": "Add language"
   },
   "addOnly": "You can add new languages only; the list of existing languages is not available to you.",
-  "judgesUnavailable": "The judges could not be loaded, so judge coverage is not shown.",
-  "unserved": {
-    "title": "No judge runs {key}",
-    "body": "No online judge (neither blocked nor disabled) runs {name}: submissions in it will wait."
-  }
+  "judgesUnavailable": "The judges could not be loaded, so judge coverage is not shown."
 }

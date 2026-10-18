@@ -1,10 +1,10 @@
 {
   "title": "Ngôn ngữ lập trình",
   "lead": "Danh sách ngôn ngữ nộp bài và những máy chấm đang chạy chúng.",
-  "single": {
-    "title": "{key} chỉ chạy trên một máy",
-    "body": "Bài nộp {key} sẽ chờ nếu máy {judge} tắt hoặc bị chặn.",
-    "many": "{count} ngôn ngữ chỉ chạy trên một máy"
+  "attention": {
+    "title": "{count} ngôn ngữ cần thêm máy chấm",
+    "unserved": "Không máy chấm trực tuyến nào chạy {keys}: bài nộp sẽ nằm chờ.",
+    "single": "Chỉ một máy chạy {keys}: bài nộp sẽ chờ nếu máy đó tắt hoặc bị chặn."
   },
   "table": {
     "key": "Mã",
@@ -84,9 +84,5 @@
     "add": "Thêm ngôn ngữ"
   },
   "addOnly": "Bạn chỉ được thêm ngôn ngữ mới, không xem hay sửa được danh sách ngôn ngữ hiện có.",
-  "judgesUnavailable": "Không tải được máy chấm, nên không hiện máy chấm hỗ trợ.",
-  "unserved": {
-    "title": "Không máy chấm nào chạy {key}",
-    "body": "Không máy chấm trực tuyến (không bị khóa hay tạm dừng) nào chạy {name}: bài nộp bằng ngôn ngữ này sẽ nằm chờ."
-  }
+  "judgesUnavailable": "Không tải được máy chấm, nên không hiện máy chấm hỗ trợ."
 }
