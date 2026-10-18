@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { mockApi } from '@/test/mock-api';
+import { mockApi, ok, page } from '@/test/mock-api';
+import { submissionStats } from '@/test/fixtures';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 import { staffViewer } from '@/test/admin-routes';
@@ -29,6 +30,24 @@ describe('AdminShell', () => {
     expect(dashboard).not.toContain('judge.');
     expect(wrapper.text()).not.toContain('Máy chấm');
     expect(wrapper.find('[data-testid="admin-bit"]').attributes('data-placement')).toBe('greeting');
+  });
+
+  it('puts the figures that wait for staff ahead of the calm judging ones', async () => {
+    mockApi({
+      ...staffViewer(['judge.change_judge', 'judge.change_comment']),
+      'GET /submissions/stats': ok(
+        submissionStats({ queueLength: 0, judgesOnline: 2, judgesTotal: 2 }),
+      ),
+      'GET /comments/reports': page([{}, {}], { pageSize: 20 }),
+    });
+    const { wrapper } = await mountApp('/admin');
+    await waitForAdminShell(wrapper);
+    const tileLabels = () =>
+      wrapper.findAll('[aria-labelledby="admin-overview-title"] li').map((tile) => tile.text());
+    await vi.waitFor(() => expect(tileLabels()[0]).toContain('Bình luận bị báo cáo'));
+    expect(tileLabels()[0]).toContain('Cần xử lý');
+    expect(tileLabels()[1]).toContain('Hàng đợi chấm');
+    expect(tileLabels()[2]).toContain('Máy chấm trực tuyến');
   });
 
   it('keeps the URL and shows the forbidden panel, not the screen, without the permission', async () => {

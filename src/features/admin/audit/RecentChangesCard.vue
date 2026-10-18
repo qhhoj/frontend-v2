@@ -16,7 +16,8 @@ import { useAuditLinkOf } from './use-audit-link';
 
 /**
  * The dashboard's activity feed (P-33): the five newest changes as short sentences ("bitcoder đã sửa bài tập trash_02"),
- * for viewers who may open the change log, where the field names and notes are.
+ * for viewers who may open the change log, where the field names and notes are. An object link is 40 px tall; on a
+ * coarse pointer its `::after` reaches 2 px past it, for a 44 px hit area.
  */
 const RECENT_LIMIT = 5;
 const session = useSessionStore();
@@ -84,7 +85,7 @@ const rows = computed(() =>
               <RouterLink
                 v-if="link"
                 :to="link"
-                class="-my-2.5 inline-block py-2.5 font-mono font-semibold text-accent-text hover:underline"
+                class="relative -my-2.5 inline-block py-2.5 font-mono font-semibold text-accent-text hover:underline pointer-coarse:after:absolute pointer-coarse:after:-inset-y-0.5 pointer-coarse:after:inset-x-0"
                 >{{ sentence.object }}</RouterLink
               >
               <span v-else class="font-mono" :class="entry.object.deleted && 'line-through'">{{

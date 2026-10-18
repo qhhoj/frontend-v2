@@ -80,14 +80,15 @@ export function useNavCounts() {
   }));
 }
 
-/** How many problems the viewer may edit are public and how many are not (the setter tiles). */
-export function useEditableProblemCounts() {
+/** How many problems the viewer may edit are public and how many are not (the setter tiles); `isEnabled` for problem editors. */
+export function useEditableProblemCounts(isEnabled: () => boolean) {
   const viewer = useViewerId();
   const countOf = (visibility: 'public' | 'private') =>
     useQuery({
       // Under the problem index's key, so every problem write that refreshes the index refreshes these counts too.
       queryKey: computed(() => [...PROBLEM_INDEX_KEY, 'counts', visibility, viewer.value]),
       queryFn: () => fetchAdminProblems({ visibility, pageSize: 1 }),
+      enabled: computed(isEnabled),
     });
   const unpublished = countOf('private');
   const published = countOf('public');
