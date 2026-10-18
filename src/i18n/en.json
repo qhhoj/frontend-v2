@@ -106,7 +106,8 @@
       "empty": "No submissions in this contest yet.",
       "all": "All",
       "ownHeading": "Your submissions",
-      "onlyYou": "only you see these"
+      "onlyYou": "only you see these",
+      "openProblem": "Open problem {label}"
     },
     "detail": {
       "authors": "Set by:",
