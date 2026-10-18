@@ -1,23 +1,21 @@
 <script setup lang="ts">
-import { Flag, LifeBuoy, UserPlus } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { usePermissions } from '@/stores/use-permissions';
-import { ADMIN_SCREENS, adminRouteName } from '../../admin-screens';
+import { ADMIN_SCREENS, PROBLEM_EDIT } from '../../admin-screens';
 import { ORGANIZATION_QUEUE_PERMISSION } from '../../organizations/join-requests.queries';
-import { useAdminCounts } from './admin-overview.queries';
-import JudgingTiles from './JudgingTiles.vue';
 import OverviewTile from './OverviewTile.vue';
+import { JUDGING_STAFF, useOverviewTiles } from './use-overview-tiles';
 
-/** Who sees the queue and judge figures: the staff who can act on judging. */
-const JUDGING_STAFF = ['judge.change_judge', 'judge.rejudge_submission'];
-const { can, canAny } = usePermissions();
-const counts = useAdminCounts();
+/** The dashboard's figures, the ones that need attention first, so the first row is what waits (P-33). */
+const { canAny } = usePermissions();
+const tiles = useOverviewTiles();
 const hasTiles = computed(() =>
   canAny([
     ...JUDGING_STAFF,
     ADMIN_SCREENS.tickets.permission,
     ADMIN_SCREENS.commentReports.permission,
     ORGANIZATION_QUEUE_PERMISSION,
+    PROBLEM_EDIT,
   ]),
 );
 </script>
@@ -27,34 +25,17 @@ const hasTiles = computed(() =>
     <h2 id="admin-overview-title" class="font-display text-base font-semibold">
       {{ $t('admin.shell.overview.title') }}
     </h2>
-    <ul class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
-      <JudgingTiles v-if="canAny(JUDGING_STAFF)" />
+    <ul class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
       <OverviewTile
-        v-if="can(ADMIN_SCREENS.tickets.permission)"
-        :icon="LifeBuoy"
-        :label="$t('admin.shell.overview.tickets')"
-        :value="counts.awaitingTickets.value"
-        :detail="$t('admin.shell.overview.ticketsDetail')"
-        :to="{ name: adminRouteName('tickets') }"
-        :needs-attention="!!counts.awaitingTickets.value"
-      />
-      <OverviewTile
-        v-if="can(ADMIN_SCREENS.commentReports.permission)"
-        :icon="Flag"
-        :label="$t('admin.shell.overview.reports')"
-        :value="counts.openReports.value"
-        :detail="$t('admin.shell.overview.reportsDetail')"
-        :to="{ name: adminRouteName('commentReports') }"
-        :needs-attention="!!counts.openReports.value"
-      />
-      <OverviewTile
-        v-if="can(ORGANIZATION_QUEUE_PERMISSION)"
-        :icon="UserPlus"
-        :label="$t('admin.shell.overview.requests')"
-        :value="counts.pendingRequests.value"
-        :detail="$t('admin.shell.overview.requestsDetail')"
-        :to="{ name: adminRouteName('organizations'), query: { view: 'requests' } }"
-        :needs-attention="!!counts.pendingRequests.value"
+        v-for="tile in tiles"
+        :key="tile.key"
+        :icon="tile.icon"
+        :label="tile.label"
+        :value="tile.value"
+        :detail="tile.detail"
+        :to="tile.to"
+        :needs-attention="tile.needsAttention"
+        :link-text="tile.linkText"
       />
     </ul>
   </section>

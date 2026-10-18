@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ArrowRight } from 'lucide-vue-next';
+import { computed } from 'vue';
 import type { Component } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import AdminChip from '../../ui/AdminChip.vue';
@@ -6,16 +8,20 @@ import { CARD } from '../../ui/controls';
 
 /**
  * One figure on the dashboard, linking to its filtered list: `value` null is not loaded yet. A `needsAttention` figure gets
- * a caution border, the accent figure and a "Cần xử lý" chip, so the state never rests on colour alone.
+ * a caution border, the accent figure and a "Cần xử lý" chip, so the state never rests on colour alone. `linkText` says
+ * where the tile goes ("Xem 3 phiếu →"), so it reads as a link (P-33).
  */
-defineProps<{
+const props = defineProps<{
   icon: Component;
   label: string;
   value: string | number | null;
   detail?: string;
   to: RouteLocationRaw;
   needsAttention?: boolean;
+  /** The link line for a count above zero ("Xem 3 phiếu"); at zero, while loading or for a text value it reads "Mở danh sách". */
+  linkText: string;
 }>();
+const hasCount = computed(() => typeof props.value === 'number' && props.value > 0);
 </script>
 
 <template>
@@ -49,6 +55,12 @@ defineProps<{
         </AdminChip>
       </span>
       <span v-if="detail" class="text-xs text-muted">{{ detail }}</span>
+      <span
+        class="mt-auto inline-flex items-center gap-1 pt-1 text-sm font-semibold text-accent-text"
+      >
+        {{ hasCount ? linkText : $t('admin.shell.overview.links.open') }}
+        <ArrowRight aria-hidden="true" class="size-3.5" :stroke-width="2" />
+      </span>
     </RouterLink>
   </li>
 </template>

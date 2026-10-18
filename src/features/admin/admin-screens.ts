@@ -13,7 +13,7 @@ export interface AdminScreen {
 }
 
 /** The backend's `canEdit` needs `edit_own_problem` for every edit; `edit_all_problem` only widens which problems. */
-const PROBLEM_EDIT = 'judge.edit_own_problem';
+export const PROBLEM_EDIT = 'judge.edit_own_problem';
 const CONTEST_EDIT = ['judge.edit_own_contest', 'judge.edit_all_contest'] as const;
 /** Syncing a Polygon-linked problem and changing its link (backend `POLYGON_SYNC_PERMISSION`); importing needs only the rights of the change (create, or edit for an update). */
 export const SYNC_POLYGON = 'judge.sync_polygon_problem';

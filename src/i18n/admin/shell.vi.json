@@ -120,7 +120,20 @@
     "reportsDetail": "Bình luận còn báo cáo chưa xử lý.",
     "requests": "Yêu cầu vào tổ chức",
     "requestsDetail": "Yêu cầu đang chờ duyệt ở mọi tổ chức.",
-    "attention": "Cần xử lý"
+    "attention": "Cần xử lý",
+    "unpublished": "Bài chưa công khai",
+    "unpublishedDetail": "Bài bạn sửa được, chỉ người ra đề thấy.",
+    "published": "Bài công khai",
+    "publishedDetail": "Bài bạn sửa được, đang hiện cho mọi người.",
+    "links": {
+      "queue": "Xem hàng đợi",
+      "judges": "Xem máy chấm",
+      "tickets": "Xem {n} phiếu",
+      "reports": "Xem {n} báo cáo",
+      "requests": "Xem {n} yêu cầu",
+      "problems": "Xem {n} bài",
+      "open": "Mở danh sách"
+    }
   },
   "recent": {
     "title": "Lối tắt"

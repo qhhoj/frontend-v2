@@ -13,7 +13,8 @@ import RecentScreens from './recent/RecentScreens.vue';
 
 /**
  * The admin home (pages/admin.md, "Dashboard"): the greeting with the one staff Bit and the quick actions, what waits for
- * staff, then the recent changes beside this account's shortcuts. The sidebar lists every screen, so this page does not.
+ * staff, this account's shortcuts as one chip row, then the five newest changes as sentences (P-33). The sidebar lists every
+ * screen, so this page does not.
  */
 const session = useSessionStore();
 const ACTION_ICONS = {
@@ -54,9 +55,7 @@ const actions = computed(() =>
       </div>
     </header>
     <OverviewTiles />
-    <div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
-      <RecentChangesCard />
-      <RecentScreens />
-    </div>
+    <RecentScreens />
+    <RecentChangesCard class="max-w-4xl" />
   </div>
 </template>
