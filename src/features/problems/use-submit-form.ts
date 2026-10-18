@@ -6,7 +6,7 @@ import { MAX_SOURCE_LENGTH, codePointCount } from '@/lib/source';
 import { useSubmitMessage } from './submit-message';
 import { useResubmitPrefill } from './use-resubmit-prefill';
 import type { ResubmitPrefill } from './use-resubmit-prefill';
-import { useContestProblem } from './use-contest-problem';
+import { useScoreScale } from './use-contest-problem';
 import { useSourceTemplate } from './use-source-template';
 import { useSubmitFile } from './use-submit-file';
 import { useSubmitLanguage } from './use-submit-language';
@@ -57,19 +57,9 @@ export function useSubmitForm(
     ),
     report,
   });
-  const { contestProblem } = useContestProblem(() => problem.value, contest);
   const result = useSubmitResult(
     lastSubmissionId,
-    computed(() => {
-      const inContest = contestProblem.value;
-      const precision = contest()?.pointsPrecision ?? 0;
-      return {
-        problemPoints: problem.value.points,
-        contest: inContest
-          ? { points: inContest.points, partial: inContest.partial, precision }
-          : null,
-      };
-    }),
+    useScoreScale(() => problem.value, contest),
   );
   const canSubmit = computed(() => isReady.value && !submitting.value);
 

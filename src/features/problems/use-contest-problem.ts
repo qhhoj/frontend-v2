@@ -4,6 +4,7 @@ import type { ProblemDetail } from '@/api/types/problems';
 import { ownResultContext } from '@/features/contests/own-result';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import type { ScoreScale } from './submit-result';
 
 /**
  * This problem as the viewer's contest lists it (P-15): its contest points and the context of the viewer's own cell. Null
@@ -28,4 +29,28 @@ export function useContestProblem(
       : null;
   });
   return { contestProblem, ownContext, contestPoints };
+}
+
+/**
+ * What a score on this problem is out of (Q-10 A): the contest's points and decimals inside the viewer's contest, else the
+ * problem's own. The result strip and the rail's "Bài nộp của tôi" both score on it.
+ */
+export function useScoreScale(
+  problem: () => ProblemDetail,
+  contest: () => ContestDetail | null | undefined,
+) {
+  const { contestProblem } = useContestProblem(problem, contest);
+  return computed<ScoreScale>(() => {
+    const inContest = contestProblem.value;
+    return {
+      problemPoints: problem().points,
+      contest: inContest
+        ? {
+            points: inContest.points,
+            partial: inContest.partial,
+            precision: contest()?.pointsPrecision ?? 0,
+          }
+        : null,
+    };
+  });
 }

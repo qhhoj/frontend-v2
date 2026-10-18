@@ -25,6 +25,7 @@ import StatementNote from './StatementNote.vue';
 import SubmitDock from './SubmitDock.vue';
 import { hasNoStatement } from './statement-presence';
 import type { PROBLEM_LAYOUT } from './problem-layout';
+import { useScoreScale } from './use-contest-problem';
 import { useSubmitForm } from './use-submit-form';
 
 const DEFAULT_TAB = 'statement';
@@ -63,6 +64,10 @@ watch(
   { immediate: true },
 );
 const submitForm = useSubmitForm(toRef(props, 'problem'), resubmitId, () => props.contest);
+const scoreScale = useScoreScale(
+  () => props.problem,
+  () => props.contest,
+);
 const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id === 'editorial'));
 const { t } = useI18n();
 const tabItems = computed(() =>
@@ -144,7 +149,7 @@ function panelIdOf(tabId: string) {
         :contest="contest"
         :narrow="layout.facts"
       />
-      <ProblemMySubmissions v-if="isSignedIn" :code="problem.code" :points="problem.points" />
+      <ProblemMySubmissions v-if="isSignedIn" :code="problem.code" :scale="scoreScale" />
       <ProblemLinksCard :problem="problem" :has-editorial="hasEditorial" />
     </aside>
     <div :class="['min-w-0', layout.left]">
