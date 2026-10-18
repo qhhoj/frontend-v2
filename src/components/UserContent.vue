@@ -14,7 +14,9 @@ import { highlightMarkdownBlocks } from './markdown-code-highlight';
 const props = defineProps<{ html: string }>();
 const root = ref<HTMLElement | null>(null);
 /** Fenced code gets colours after each render; `v-html` swaps the whole subtree when `html` changes. */
-const highlight = () => root.value && highlightMarkdownBlocks(root.value);
+const highlight = () => {
+  if (root.value) void highlightMarkdownBlocks(root.value);
+};
 onMounted(highlight);
 watch(() => props.html, highlight, { flush: 'post' });
 </script>
