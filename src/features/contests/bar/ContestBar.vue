@@ -58,11 +58,11 @@ const isOnContestPage = computed(() => route.params.key === contestKey.value);
 const currentLink = computed(() =>
   navSectionOverride.value === '/contests' ? (CLAIMED_BY[String(route.name ?? '')] ?? null) : null,
 );
-/** 44 px hit areas on a coarse pointer (M-02): the pill fills the 40 px bar and its `::after` reaches 2 px past it. */
+/** 44 px hit areas on a coarse pointer at every width (M-02): the link is 40 px tall and its `::after` reaches 2 px past it. */
 const COARSE_HIT =
   'pointer-coarse:min-w-11 pointer-coarse:after:absolute pointer-coarse:after:-inset-y-0.5 pointer-coarse:after:inset-x-0';
 const LINK = [
-  'relative inline-flex h-8 items-center justify-center gap-1.5 rounded-pill border border-transparent px-2.5 text-meta md:px-3 font-semibold whitespace-nowrap text-muted hover:bg-surface-hover hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-surface-solid aria-[current=page]:text-accent-soft-text max-md:pointer-coarse:h-10',
+  'relative inline-flex h-8 items-center justify-center gap-1.5 rounded-pill border border-transparent px-2.5 text-meta md:px-3 font-semibold whitespace-nowrap text-muted hover:bg-surface-hover hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-surface-solid aria-[current=page]:text-accent-soft-text pointer-coarse:h-10',
   COARSE_HIT,
 ];
 </script>
@@ -80,7 +80,7 @@ const LINK = [
       <RouterLink
         :to="{ name: 'contest', params: { key: contestKey } }"
         :class="[
-          'relative flex min-w-0 items-center gap-1.5 text-sm font-semibold text-accent-soft-text hover:underline max-md:h-10',
+          'relative flex min-w-0 items-center gap-1.5 text-sm font-semibold text-accent-soft-text hover:underline pointer-coarse:h-10',
           COARSE_HIT,
         ]"
       >
