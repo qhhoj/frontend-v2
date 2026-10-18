@@ -37,7 +37,6 @@ export const orgProblem = (overrides: Partial<OrganizationProblem> = {}): Organi
   isArchived: false,
   tags: [TAGS[0]!, TAGS[2]!],
   updatedAt: '2026-10-08T09:30:00Z',
-  canEdit: false,
   ...overrides,
 });
 /** Four live rows as board M7A draws them. */

@@ -55,7 +55,10 @@ describe('OrgProblemsPage', () => {
   });
 
   it('gives a pencil to the problem editor only on the rows the viewer may edit, member or not', async () => {
-    const rows = [orgProblem({ canEdit: true }), orgProblem({ code: 'lhp_tree', name: 'Cây' })];
+    const rows = [
+      orgProblem({ canEdit: true }),
+      orgProblem({ code: 'lhp_tree', name: 'Cây', canEdit: false }),
+    ];
     mockApi({ ...signedInViewer(), ...orgProblemRoutes(MEMBER_STATE, rows) });
     const { wrapper } = await mountTab();
     const pencils = wrapper.findAll('[data-testid="problem-edit"]');
