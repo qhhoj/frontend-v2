@@ -2795,6 +2795,7 @@
     "pendingBadge": "{count} pending requests",
     "info": {
       "title": "Organization details",
+      "foldLead": "Logo, name, address, about and how to join.",
       "avatar": "Avatar",
       "avatarLead": "Shown next to the organization name everywhere.",
       "avatarChange": "Change image",

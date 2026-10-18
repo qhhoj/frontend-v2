@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { TriangleAlert } from 'lucide-vue-next';
+import { ChevronDown, TriangleAlert } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import FormField from '@/components/ui/FormField.vue';
 import SaveBar from '@/components/ui/SaveBar.vue';
 import TextInput from '@/components/ui/TextInput.vue';
-import SettingsCard from '@/features/account/settings/SettingsCard.vue';
+import Card from '@/components/ui/Card.vue';
 import { useOrganizationEditor } from '@/features/admin/organizations/use-organization-editor';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import MarkdownField from '@/features/admin/ui/MarkdownField.vue';
@@ -17,7 +17,8 @@ import OrganizationSettingsSection from './OrganizationSettingsSection.vue';
 
 /**
  * Legacy `OrganizationForm` for the organization's own administrators: logo, name, address, about and join mode, in a two-column
- * settings card (section title left, controls right), then the save bar: save stays aria-disabled until something changed. The staff
+ * settings card (section title left, controls right), folded until opened (P-32: the join requests come first, the
+ * profile is edited rarely), then the save bar: save stays aria-disabled until something changed. The staff
  * fields (short name, places, unlisted) stay on the admin editor, linked for `judge.edit_all_organization` holders.
  */
 const props = defineProps<{ slug: string }>();
@@ -55,8 +56,19 @@ function reset() {
 </script>
 
 <template>
-  <SettingsCard :title="$t('orgAdmin.info.title')">
-    <form class="flex flex-col gap-6" novalidate @submit.prevent="submit">
+  <Card as="details" data-testid="org-info" class="group">
+    <summary
+      class="flex min-h-11 cursor-pointer list-none flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3 md:px-7 [&::-webkit-details-marker]:hidden"
+    >
+      <ChevronDown
+        aria-hidden="true"
+        class="size-4 shrink-0 -rotate-90 text-muted transition-transform group-open:rotate-0"
+        :stroke-width="1.75"
+      />
+      <h2 class="font-display text-base font-semibold">{{ $t('orgAdmin.info.title') }}</h2>
+      <span class="text-sm text-muted">{{ $t('orgAdmin.info.foldLead') }}</span>
+    </summary>
+    <form class="flex flex-col gap-6 px-5 pb-5 md:px-7 md:pb-7" novalidate @submit.prevent="submit">
       <div class="flex flex-col divide-y divide-line">
         <OrganizationSettingsSection
           :title="$t('orgAdmin.info.avatar')"
@@ -155,5 +167,5 @@ function reset() {
         @discard="reset"
       />
     </form>
-  </SettingsCard>
+  </Card>
 </template>
