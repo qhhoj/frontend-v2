@@ -13,6 +13,11 @@ const freezePercent = computed(() => {
   const fraction = freezeFraction(props.contest);
   return fraction === null ? null : fraction * 100;
 });
+/** Closer than this share of the bar to the end, the centred freeze label would run past the bar's right edge: it sits flush right instead. */
+const NEAR_END_PERCENT = 10;
+const isFreezeNearEnd = computed(
+  () => freezePercent.value !== null && 100 - freezePercent.value < NEAR_END_PERCENT,
+);
 /** Stripes in the theme's line and surface tokens, as the approved mock draws the frozen stretch. */
 const FREEZE_HATCH =
   'repeating-linear-gradient(45deg, var(--color-line-strong) 0 4px, var(--color-surface-hover) 4px 8px)';
@@ -30,10 +35,12 @@ const freezeClock = computed(() => {
       v-if="freezePercent !== null"
       class="relative hidden h-5 font-mono text-caption text-muted tabular-nums md:block"
     >
+      <!-- Under 10 % from the end the centred label would run off the bar: it sits flush right instead. -->
       <span
         data-testid="freeze-label"
-        class="absolute -translate-x-1/2 font-semibold whitespace-nowrap text-verdict-tle"
-        :style="{ left: `${freezePercent}%` }"
+        class="absolute font-semibold whitespace-nowrap text-verdict-tle"
+        :class="isFreezeNearEnd ? 'right-0' : '-translate-x-1/2'"
+        :style="isFreezeNearEnd ? undefined : { left: `${freezePercent}%` }"
         >{{ $t('contests.detail.freezeAt', { time: freezeClock }) }}</span
       >
     </div>
