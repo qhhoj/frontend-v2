@@ -79,6 +79,6 @@ test('the owner who is not staff has no staff panel, even when the server flags 
   });
   api.routes['GET /submissions/sub-1'] = adminOk(judging);
   await page.goto('/submissions/sub-1');
-  await expect(page.getByRole('heading', { name: '#sub-1' })).toBeVisible();
+  await expect(page.getByTestId('submission-hero')).toBeVisible();
   await expect(page.locator(PANEL)).toHaveCount(0);
 });

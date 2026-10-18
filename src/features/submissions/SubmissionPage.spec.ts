@@ -2,7 +2,6 @@ import { flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installFakeEventSource, latestEventSource, pageStreams } from '@/test/fake-event-source';
 import { submissionCase, submissionDetail } from '@/test/fixtures';
-import { loginRoutes } from '@/test/auth-routes';
 import { mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import {
@@ -225,11 +224,33 @@ describe('submission page', () => {
     expect(region()[0]!.text()).toBe(before);
   });
 
-  it('sends an anonymous viewer to sign in and keeps the address', async () => {
-    mockApi({ ...anonymousViewer, ...loginRoutes });
-    const { router } = await mountApp('/submissions/sub-1');
-    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('login'));
-    expect(router.currentRoute.value.query.redirect).toBe('/submissions/sub-1');
+  it('shows a visitor the result and the tests, and locks the source behind sign-in without asking for it', async () => {
+    const calls = mockApi({
+      ...anonymousViewer,
+      ...submissionPageRoutes(submissionDetail({ sourceAccess: 'sign_in' })),
+      ...problemPageRoutes(),
+    });
+    const { wrapper, router } = await openSubmission('sub-1');
+    expect(router.currentRoute.value.name).toBe('submission');
+    expect(wrapper.findAll('[data-testid="case-row"]')).toHaveLength(3);
+    expect(wrapper.get('[data-testid="hero-line"]').text()).toContain('Test 3 sai kết quả');
+    await flushPromises();
+    expect(wrapper.get('[data-testid="source-locked"]').text()).toContain('Đăng nhập');
+    expect(calls.some((call) => call.path.endsWith('/source'))).toBe(false);
+    expect(wrapper.find('[data-testid="compare-open"]').exists()).toBe(false);
+    expect(wrapper.find('a[href*="resubmit"]').exists()).toBe(false);
+  });
+
+  it('gives the author Nộp lại as the one primary action, beside the way back to the problem', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...submissionPageRoutes(),
+      ...problemPageRoutes(),
+    });
+    const { wrapper } = await openSubmission('sub-1');
+    const actions = wrapper.get('[data-testid="submission-hero"]').findAll('a');
+    expect(actions.map((link) => link.text())).toEqual(['Về đề bài', 'Nộp lại']);
+    expect(actions[1]!.attributes('href')).toContain('resubmit=sub-1');
   });
 
   it('never announces a bare final status while the final read is on its way, and shows no provisional score beside the final verdict', async () => {

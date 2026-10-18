@@ -42,6 +42,7 @@ const base = computed(() => `${API_BASE}/submissions/${encodeURIComponent(props.
         target="_blank"
         rel="noopener"
         :aria-label="$t('submission.source.raw')"
+        :title="$t('submission.source.rawHint')"
       >
         <template #icon><ExternalLink aria-hidden="true" class="size-4" /></template>
         <span class="max-sm:sr-only">{{ $t('submission.source.rawShort') }}</span>
