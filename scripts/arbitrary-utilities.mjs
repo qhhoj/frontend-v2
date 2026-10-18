@@ -10,18 +10,15 @@ const QUOTED = /(['"`])((?:(?!\1).)*)\1/g;
  * StatGrid redesigns (phase 3, P8/P11); the tiny radii are marks too small for a role radius.
  */
 export const ALLOWED = {
-  'features/submissions/SubmissionSummary.vue': ['text-[56px]'],
-  'features/submissions/SubmissionSummarySkeleton.vue': ['text-[56px]'],
   'features/home/LiveContestCard.vue': ['text-[32px]'],
   'features/contests/replay/ContestReplayPage.vue': ['sm:text-[40px]'],
-  'features/contests/RankingPodium.vue': ['text-[22px]'],
   'features/contests/ContestProblemsTable.vue': ['text-[22px]'],
   'features/auth/LoginBrandPanel.vue': ['text-[34px]'],
   'features/appearance/AppearancePreview.vue': ['text-[22px]'],
   'components/CryingBit.vue': ['rounded-[50%]'],
   'features/runtimes/JudgeCard.vue': ['rounded-[2px]'],
   'features/submissions/list/TestStrip.vue': ['rounded-[2px]', 'rounded-[3px]'],
-  'features/problems/ProblemTable.vue': ['rounded-[3px]'],
+  'features/problems/ProblemTierMark.vue': ['rounded-[3px]'],
   'features/submissions/VerdictDistributionBar.vue': ['rounded-[3px]'],
   'features/not-found/NotFoundPage.vue': ['rounded-[4px]'],
   // The admin filter strip's frame: it wraps to two rows on a phone, where a pill radius would read as a blob.

@@ -5,6 +5,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ContestDetail, ContestPhase, ContestProblem } from '@/api/types/contests';
 import Card from '@/components/ui/Card.vue';
+import FactLine from '@/components/FactLine.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -50,6 +51,14 @@ const capLineOf = (problem: ContestProblem): string | null => {
 const capLines = computed(
   () => new Map(problems.value.map((problem) => [problem.problemId, capLineOf(problem)])),
 );
+/** A phone row's meta: code, attempt cap, limits, points; each a whole fact (M-13). */
+const phoneFacts = (problem: ContestProblem) =>
+  [
+    problem.code,
+    capLines.value.get(problem.problemId),
+    limitsText(problem),
+    t('contests.problems.pointsShort', { points: pointsOf(problem) }),
+  ].filter((fact): fact is string => Boolean(fact));
 </script>
 
 <template>
@@ -163,18 +172,9 @@ const capLines = computed(
               :to="problemLink(problem)"
               class="flex min-h-11 min-w-0 items-center font-semibold"
               ><span class="sr-only">{{ problem.label }}. </span
-              ><span class="truncate">{{ problem.name }}</span></RouterLink
+              ><span class="line-clamp-2">{{ problem.name }}</span></RouterLink
             >
-            <p class="text-caption text-muted">
-              {{ problem.code
-              }}<template v-if="capLines.get(problem.problemId)">
-                · {{ capLines.get(problem.problemId) }}</template
-              >
-              ·
-              {{ limitsText(problem) }}
-              ·
-              {{ $t('contests.problems.pointsShort', { points: pointsOf(problem) }) }}
-            </p>
+            <FactLine class="font-mono text-caption text-muted" :facts="phoneFacts(problem)" />
           </div>
           <OwnResultChip v-if="hasOwnResults" :problem="problem" :context="context" />
         </li>

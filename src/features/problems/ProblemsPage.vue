@@ -122,7 +122,14 @@ const LEGEND_MARKS = [
     <div ref="listTop" class="flex scroll-mt-20 flex-col gap-3" :aria-busy="isPlaceholderData">
       <div v-if="data" class="flex min-h-11 flex-wrap items-center justify-between gap-2">
         <p data-testid="problems-count" class="text-sm text-muted">{{ countText }}</p>
-        <NumberedPager stepper align="end" :meta="data.meta" :label="$t('problems.pagerTop')" />
+        <!-- A phone keeps the count, search, sort and "Bộ lọc" above the rows; its pager is the one under them (M-18). -->
+        <NumberedPager
+          stepper
+          align="end"
+          class="max-sm:hidden"
+          :meta="data.meta"
+          :label="$t('problems.pagerTop')"
+        />
       </div>
       <Card as="div" class="overflow-hidden">
         <QueryState :loading="isPending" :error="error" @retry="refetch()">

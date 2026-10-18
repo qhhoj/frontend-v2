@@ -311,7 +311,8 @@
         "noMatch": "No contest matches these filters",
         "pastLastPage": "This page does not exist.",
         "backToFirstPage": "Back to page 1"
-      }
+      },
+      "contestantCount": "{count} contestants"
     },
     "print": {
       "toolbar": "Print options",
@@ -1179,6 +1180,14 @@
       "points": "Points",
       "acRate": "AC",
       "userCount": "Solved"
+    },
+    "solverCount": "{count} solved",
+    "filterPanel": "Filters",
+    "tier": {
+      "1": "Easy",
+      "2": "Medium",
+      "3": "Hard",
+      "4": "Very hard"
     }
   },
   "submissions": {

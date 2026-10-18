@@ -311,7 +311,8 @@
         "noMatch": "Không có kỳ thi nào khớp bộ lọc",
         "pastLastPage": "Trang này không tồn tại.",
         "backToFirstPage": "Về trang 1"
-      }
+      },
+      "contestantCount": "{count} thí sinh"
     },
     "print": {
       "toolbar": "Tùy chọn in",
@@ -1179,6 +1180,14 @@
       "points": "Điểm",
       "acRate": "AC",
       "userCount": "Đã giải"
+    },
+    "solverCount": "{count} giải",
+    "filterPanel": "Bộ lọc",
+    "tier": {
+      "1": "Dễ",
+      "2": "Trung bình",
+      "3": "Khó",
+      "4": "Rất khó"
     }
   },
   "submissions": {
