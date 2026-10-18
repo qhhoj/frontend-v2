@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test';
 import { CONTEST_FIXTURE_NOW, expect, test } from './fixtures/api';
+import { dockOf, openDock } from './fixtures/submit-dock';
 
 /** Runs after the FakeApi's strong-device script, so this device reports two cores. */
 const weakDevice = (page: Page) =>
@@ -62,7 +63,8 @@ test('the code editor is a plain textarea with the Tab hint in low-power mode', 
   await page.addInitScript(() => localStorage.setItem('qhhoj.lowPower', 'on'));
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/problems/duongdi');
-  const dock = page.getByRole('region', { name: 'Nộp bài' });
+  await openDock(page);
+  const dock = dockOf(page);
   await expect(dock.getByTestId('editor-tab-hint')).toBeVisible();
   await expect(dock.locator('textarea')).toHaveCount(1);
   await expect(page.locator('.cm-editor')).toHaveCount(0);

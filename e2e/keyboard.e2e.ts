@@ -3,6 +3,7 @@ import { problemDetail } from '../src/test/fixtures';
 import { THEMES } from '../src/theme/registry';
 import { expect, pdfReady, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
+import { dockOf, railSubmitButton } from './fixtures/submit-dock';
 
 test('choosing a mode in the panel with the keyboard applies it', async ({ page, api }) => {
   void api;
@@ -114,13 +115,23 @@ test.describe('focus rings on the problem page', () => {
     await expectFocusRing(link);
   });
 
-  test('dock toggle, language picker, editor and the file dropzone', async ({ page }) => {
+  test('rail submit button, dock buttons, language picker, editor and the file dropzone', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto('/problems/duongdi');
-    const dock = page.getByRole('region', { name: 'Nộp bài' });
-    const toggle = dock.getByRole('button', { name: 'Thu gọn' });
-    await toggle.focus();
-    await expectFocusRing(toggle);
+    // P-02 B: the dock starts closed; the keyboard opens it from the rail card, which puts the caret in the editor.
+    const open = railSubmitButton(page);
+    await open.focus();
+    await expectFocusRing(open);
+    await page.keyboard.press('Enter');
+    const dock = dockOf(page);
+    await expect(dock.locator('.cm-editor.cm-focused')).toBeVisible();
+    for (const name of ['Toàn màn hình', 'Đóng khung nộp bài']) {
+      const button = dock.getByRole('button', { name });
+      await button.focus();
+      await expectFocusRing(button);
+    }
     await dock.locator('.cm-content').first().focus();
     await expect(dock.locator('.cm-editor.cm-focused')).toBeVisible();
     // The ring is on the wrapper: the editor's scroll box would clip one drawn on itself.

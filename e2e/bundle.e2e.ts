@@ -1,4 +1,5 @@
 import { expect, test } from './fixtures/api';
+import { openDock } from './fixtures/submit-dock';
 
 /** The editor and its language packs are lazy chunks (about 25 kB plus 30-100 kB each): a modulepreload would fetch them for every visitor. */
 const HEAVY_CHUNK = /\/assets\/(code-editor-cm|code-editor-core|code-lang-[\w-]+)-[\w-]+\.js/;
@@ -33,6 +34,7 @@ test('the dock loads the editor and only the pack of its language', async ({ pag
   const requested: string[] = [];
   page.on('request', (request) => requested.push(request.url()));
   await page.goto('/problems/duongdi');
+  await openDock(page);
   await expect(page.locator('.cm-content').first()).toBeVisible();
   const chunks = requested.filter((url) => HEAVY_CHUNK.test(url));
   expect(chunks.some((url) => url.includes('code-editor-cm'))).toBe(true);

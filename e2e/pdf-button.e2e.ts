@@ -24,7 +24,10 @@ const UNAVAILABLE = {
   body: JSON.stringify({ error: { code: 'pdf_unavailable', message: 'x' } }),
 };
 
-/** The problem page's header button, reached with Tab as a keyboard user would. */
+/**
+ * The problem page's PDF pill, reached with Tab as a keyboard user would. Since board C (#57) it draws only "PDF" (or the
+ * seconds left to wait); what the press does in the current phase is in its accessible name.
+ */
 const headerButton = (page: Page) => page.getByTestId('pdf-button');
 async function focusByTab(page: Page, target: Locator) {
   for (let step = 0; step < 80; step++) {
@@ -70,7 +73,9 @@ test('a keyboard user starts the PDF with Enter, keeps focus while it prepares a
   await page.goto(`/problems/${CODE}`);
   await focusByTab(page, headerButton(page));
   await page.keyboard.press('Enter');
-  await expect(page.locator('#main button[aria-busy="true"]')).toHaveText(/Đang chuẩn bị PDF/);
+  await expect(page.locator('#main button[aria-busy="true"]')).toHaveAccessibleName(
+    /Đang chuẩn bị PDF/,
+  );
   await expect(headerButton(page)).toBeFocused();
   await expectAxeClean(page);
 
@@ -97,7 +102,7 @@ test('a failed preparation says so, announces it once and can be tried again aft
   await expect(page.locator('#main')).toContainText('Không thể chuẩn bị PDF');
   await expectAxeClean(page);
 
-  await expect(headerButton(page)).toHaveText('Thử lại');
+  await expect(headerButton(page)).toHaveAccessibleName('Thử lại');
   await page.keyboard.press('Enter');
   await expect(page.getByRole('link', { name: 'Mở PDF' })).toBeVisible();
 });
@@ -114,7 +119,8 @@ test('a 503 makes the button wait out Retry-After, and a press during the wait a
   await focusByTab(page, headerButton(page));
   await page.keyboard.press('Enter');
   await expect(headerButton(page)).toHaveAttribute('aria-disabled', 'true');
-  await expect(headerButton(page)).toContainText('Thử lại sau');
+  await expect(headerButton(page)).toHaveAccessibleName(/^Thử lại sau \d+ giây$/);
+  await expect(headerButton(page)).toHaveText(/^\d+s$/);
   await expectAxeClean(page);
 
   // aria-disabled is not a disabled control: the key still reaches it, and the handler must ignore it.

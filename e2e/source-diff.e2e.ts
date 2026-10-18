@@ -28,6 +28,11 @@ function diffRoutes(api: FakeApi, rightSource = RIGHT_SOURCE) {
 test('picks two rows in the list and compares them', async ({ page, api }) => {
   diffRoutes(api);
   await page.goto('/submissions');
+  // Q-04 C: the rows' compare boxes wait behind the "So sánh" toggle.
+  const toggle = page.getByTestId('compare-mode');
+  await expect(page.getByRole('checkbox', { name: /dif-1/ })).toHaveCount(0);
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('checkbox', { name: /dif-1/ }).check();
   await page.getByRole('checkbox', { name: /dif-2/ }).check();
   await page.getByTestId('diff-compare').click();
@@ -42,6 +47,11 @@ test('compares from the submission page with the form, this one on the right', a
 }) => {
   diffRoutes(api);
   await page.goto(`/submissions/${RIGHT}`);
+  // Board M6C (#239): the form sits behind the "So sánh với bài khác…" disclosure at the foot of the source card.
+  const opener = page.getByTestId('compare-open');
+  await expect(page.getByTestId('compare-form')).toBeHidden();
+  await opener.click();
+  await expect(opener).toHaveAttribute('aria-expanded', 'true');
   await page.getByLabel('Mã bài nộp hoặc liên kết để so sánh').fill(`/submissions/${LEFT}`);
   await page.getByRole('button', { name: 'So sánh', exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/submissions/diff\\?left=${LEFT}&right=${RIGHT}`));

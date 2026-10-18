@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 import { problemDetail, submissionDetail } from '../src/test/fixtures';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
+import { openDock } from './fixtures/submit-dock';
 
 const SHOTS_DIR = process.env.SHOTS_DIR;
 const VIEWPORTS = [
@@ -15,6 +16,11 @@ async function openProblem(page: Page, api: FakeApi, size: { width: number; heig
   await page.setViewportSize(size);
   await page.goto('/problems/duongdi');
   await expect(page.locator('#main h1')).toBeVisible();
+}
+/** A computer opens the dock from the rail card (P-02 B); a phone expands the sheet's bar. */
+async function openSubmitPanel(page: Page, size: { name: string }) {
+  if (size.name === '390') await page.getByRole('button', { name: 'Mở rộng' }).click();
+  else await openDock(page);
 }
 const fullPanel = (page: Page) => page.locator('[role="dialog"][aria-modal="true"]');
 const shot = async (page: Page, name: string) => {
@@ -31,7 +37,7 @@ for (const size of VIEWPORTS)
     }) => {
       api.routes['GET /submissions/sub-9'] = { body: { data: submissionDetail({ id: 'sub-9' }) } };
       await openProblem(page, api, size);
-      if (size.name === '390') await page.getByRole('button', { name: 'Mở rộng' }).click();
+      await openSubmitPanel(page, size);
       await shot(page, `docked-${size.name}`);
       await page.getByRole('button', { name: 'Toàn màn hình' }).click();
       await expect(fullPanel(page)).toBeVisible();
@@ -45,12 +51,15 @@ for (const size of VIEWPORTS)
       await fullPanel(page).locator('.cm-content').click();
       await page.keyboard.type('int main() {}');
       await fullPanel(page).getByRole('button', { name: 'Nộp bài' }).click();
-      await expect(page).toHaveURL(/\/submissions\/sub-9$/);
+      // Q-01 B: the viewer stays on the problem; the panel shows the live result strip.
+      await expect(fullPanel(page).getByTestId('submit-result')).toBeVisible();
+      await expect(page).toHaveURL(/\/problems\/duongdi$/);
+      expect(api.requestsTo('POST /problems/duongdi/submit')).toHaveLength(1);
     });
 
     test('Esc exits and returns focus to the expand button', async ({ page, api }) => {
       await openProblem(page, api, size);
-      if (size.name === '390') await page.getByRole('button', { name: 'Mở rộng' }).click();
+      await openSubmitPanel(page, size);
       await page.getByRole('button', { name: 'Toàn màn hình' }).click();
       await expect(fullPanel(page)).toBeFocused();
       await page.keyboard.press('Escape');
