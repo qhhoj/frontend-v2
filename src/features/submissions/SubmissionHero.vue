@@ -4,6 +4,8 @@ import { computed } from 'vue';
 import { FINISHED_STATUSES, IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import type { SubmissionDetail } from '@/api/types/submissions';
 import AppButton from '@/components/ui/AppButton.vue';
+import BitLoop from '@/components/BitLoop.vue';
+import BitMascot from '@/components/BitMascot.vue';
 import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
@@ -11,6 +13,8 @@ import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { provisionalPoints, ringProgress } from '@/lib/grading';
 import { PARTIAL_CODE, verdictOfCode, type Verdict } from '@/lib/verdicts';
+import { BIT_MOODS } from '@/mascot/bit-moods';
+import { verdictBitMood } from '@/mascot/verdict-bit';
 import { useLocaleStore } from '@/stores/locale.store';
 import { heroParts } from './hero-line';
 import VerdictRing from './VerdictRing.vue';
@@ -20,9 +24,10 @@ const SCORE_FRACTION_DIGITS = 2;
 const NO_VALUE = '—';
 
 /**
- * The result at a glance (P-11): the 72 px ring, the verdict and score on one line, the failing test, the passed count, time,
- * memory and language on the next, and what to do now: "Nộp lại" for the author, "Về đề bài" for everyone (the primary
- * action when there is nothing to resubmit). Keep `SubmissionHeroSkeleton.vue` in step.
+ * The score card: the 128 px ring, the verdict, the score and the Bit mascot, then the failing test, passed count, time,
+ * memory and language, and what to do now: "Nộp lại" for the author, "Về đề bài" for everyone (the primary action when
+ * there is nothing to resubmit). The default slot is the footer of the same card (staff actions). Keep
+ * `SubmissionHeroSkeleton.vue` in step.
  */
 const props = defineProps<{
   submission: SubmissionDetail;
@@ -61,6 +66,11 @@ const partialShare = computed(() => {
   if (props.verdict.code !== PARTIAL_CODE || !max || props.submission.points === null) return null;
   return props.submission.points / max;
 });
+/** Only a finished submission has a final verdict worth a crown or a sweat drop; until then the hourglass Bit judges. */
+const bit = computed(() => {
+  const mood = isFinished.value ? verdictBitMood(props.verdict) : null;
+  return mood ? BIT_MOODS[mood] : null;
+});
 const line = computed(() =>
   heroParts(props.submission)
     .map((part) => {
@@ -81,61 +91,74 @@ const problem = computed(() => {
 </script>
 
 <template>
-  <Card
-    as="div"
-    data-testid="submission-hero"
-    class="flex flex-wrap items-center gap-x-5 gap-y-4 rounded-card p-5 sm:px-6"
-  >
-    <VerdictRing
-      :progress="isFinished ? null : ringProgress(submission)"
-      :verdict="verdict"
-      :share="partialShare"
-      :is-empty="submission.status === 'PD'"
-    />
-    <div class="min-w-0 flex-1 basis-40">
-      <p class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <span v-if="isLive" data-testid="grading-line" class="flex items-center gap-2 text-sm">
+  <Card as="div" data-testid="submission-hero" class="min-w-0 overflow-hidden rounded-card">
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-4 p-6 sm:p-8">
+      <VerdictRing
+        size="lg"
+        :progress="isFinished ? null : ringProgress(submission)"
+        :verdict="verdict"
+        :share="partialShare"
+        :is-empty="submission.status === 'PD'"
+      />
+      <div class="min-w-0 flex-1 basis-40">
+        <p v-if="isLive" data-testid="grading-line" class="flex items-center gap-2 text-sm">
           <span
             aria-hidden="true"
             class="size-2.5 rounded-full bg-positive motion-safe:animate-pulse"
           />
           {{ $t(verdict.labelKey) }}
-        </span>
-        <VerdictLabel v-else :verdict="verdict" />
-        <span
+        </p>
+        <p v-else class="text-sm"><VerdictLabel :verdict="verdict" /></p>
+        <p
           data-testid="score"
-          class="font-mono text-stat leading-none font-semibold whitespace-nowrap tabular-nums"
+          class="mt-1 font-mono text-score leading-none font-semibold tabular-nums"
         >
-          <SkeletonBlock v-if="isProblemLoading" text class="w-24" />
+          <SkeletonBlock v-if="isProblemLoading" text class="w-40" />
           <template v-else
-            >{{ score
-            }}<span v-if="maxScore" class="text-sm text-muted"> / {{ maxScore }}</span></template
+            >{{ score }}{{ ' '
+            }}<span v-if="maxScore" class="text-2xl whitespace-nowrap text-muted"
+              >/ {{ maxScore }}</span
+            ></template
           >
-        </span>
-        <span v-if="isProvisional" data-testid="provisional" class="text-meta text-muted">
+        </p>
+        <p v-if="isProvisional" data-testid="provisional" class="text-meta text-muted">
           {{ $t('submission.provisional') }}
-        </span>
-      </p>
-      <p v-if="line" data-testid="hero-line" class="mt-1.5 text-meta text-muted">{{ line }}</p>
-      <p v-if="submission.isPretested" class="mt-1 text-meta text-muted">
-        {{ $t('submission.pretest') }}
-      </p>
+        </p>
+        <p v-if="line" data-testid="hero-line" class="mt-2 text-meta text-muted">{{ line }}</p>
+        <p v-if="submission.isPretested" class="mt-1 text-meta text-muted">
+          {{ $t('submission.pretest') }}
+        </p>
+      </div>
+      <BitLoop
+        v-if="!isFinished"
+        data-testid="judging-bit"
+        kind="judging"
+        class="ml-auto self-start [--bit-px:4px] sm:self-center sm:[--bit-px:6px]"
+      />
+      <BitMascot
+        v-else-if="bit"
+        :look="bit.look"
+        :label="$t(bit.labelKey)"
+        :closed-eyes="bit.eyesShut"
+        class="ml-auto self-start [--bit-px:4px] sm:self-center sm:[--bit-px:6px]"
+      />
+      <div v-if="problem" class="flex w-full flex-wrap gap-2">
+        <AppButton
+          :tone="canResubmit ? 'secondary' : 'primary'"
+          :to="{ name: 'problem', params: { code: problem } }"
+        >
+          {{ $t('submission.actions.problem') }}
+        </AppButton>
+        <AppButton
+          v-if="canResubmit"
+          tone="primary"
+          :to="{ name: 'problem', params: { code: problem }, query: { resubmit: submission.id } }"
+        >
+          <template #icon><Send aria-hidden="true" class="size-4" /></template>
+          {{ $t('submission.actions.resubmit') }}
+        </AppButton>
+      </div>
     </div>
-    <div v-if="problem" class="flex flex-wrap gap-2 sm:ml-auto">
-      <AppButton
-        :tone="canResubmit ? 'secondary' : 'primary'"
-        :to="{ name: 'problem', params: { code: problem } }"
-      >
-        {{ $t('submission.actions.problem') }}
-      </AppButton>
-      <AppButton
-        v-if="canResubmit"
-        tone="primary"
-        :to="{ name: 'problem', params: { code: problem }, query: { resubmit: submission.id } }"
-      >
-        <template #icon><Send aria-hidden="true" class="size-4" /></template>
-        {{ $t('submission.actions.resubmit') }}
-      </AppButton>
-    </div>
+    <slot />
   </Card>
 </template>

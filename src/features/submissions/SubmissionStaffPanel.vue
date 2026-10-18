@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { STAFF_ICONS } from '@/features/admin/ui/staff-action-icons';
-import Chip from '@/components/ui/Chip.vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import { ApiError } from '@/api/client';
 import { abortSubmission, rejectSubmission, rejudgeSubmission } from '@/api/submission-actions.api';
 import type { SubmissionDetail } from '@/api/types/submissions';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import AdminBit from '@/features/admin/shell/AdminBit.vue';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import SubmissionLockControl from './SubmissionLockControl.vue';
 import { BUTTON } from '@/features/admin/ui/controls';
@@ -160,16 +158,12 @@ async function confirmAction() {
   <section
     v-if="isVisible"
     data-testid="staff-panel"
-    class="glass flex flex-col gap-4 rounded-card p-5"
+    class="flex flex-col gap-3 border-t border-line bg-surface-hover p-6 sm:p-8"
     aria-labelledby="staff-panel-title"
   >
-    <header class="flex flex-wrap items-center gap-3">
-      <Chip>{{ $t('admin.staff.chip') }}</Chip>
-      <AdminBit placement="header" />
-      <h2 id="staff-panel-title" class="font-display text-base font-bold">
-        {{ $t('admin.staff.title') }}
-      </h2>
-    </header>
+    <h2 id="staff-panel-title" class="text-meta font-semibold text-muted">
+      {{ $t('admin.staff.title') }}
+    </h2>
     <p class="text-sm text-muted">{{ $t(stateLineKey) }}</p>
     <p v-if="lockLine" class="text-sm text-muted">
       {{

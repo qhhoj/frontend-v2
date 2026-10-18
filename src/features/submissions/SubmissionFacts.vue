@@ -27,8 +27,8 @@ const plainFacts = computed(() => [
 </script>
 
 <template>
-  <Card as="aside" data-testid="submission-facts" class="rounded-card p-5 sm:px-6">
-    <dl class="grid grid-cols-[auto_1fr] gap-x-5 gap-y-3 text-sm">
+  <Card as="aside" data-testid="submission-facts" class="rounded-card p-6 sm:p-8">
+    <dl class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-sm">
       <dt data-fact="problem" class="text-meta text-muted">
         {{ $t('submission.facts.problem') }}
       </dt>

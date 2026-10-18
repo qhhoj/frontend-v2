@@ -15,10 +15,11 @@ const props = defineProps<{
   share?: number | null;
   /** Nothing to measure yet (final-only contest): an empty neutral ring, no points text. */
   isEmpty?: boolean;
-  /** `sm`: 40 px, for the problem page's result strip. */
-  size?: 'md' | 'sm';
+  /** `sm`: 40 px, for the problem page's result strip; `lg`: 128 px, the submission page's score card. */
+  size?: 'lg' | 'md' | 'sm';
 }>();
 const SIZES = {
+  lg: { ring: 'size-32', hole: 'size-24 text-title' },
   md: { ring: 'size-18', hole: 'size-14 text-sm' },
   sm: { ring: 'size-10', hole: 'size-8 text-tiny' },
 } as const;

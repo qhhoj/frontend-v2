@@ -26,6 +26,7 @@
   --text-page: 26px;
   --text-stat: 26px;
   --text-hero: 40px;
+  --text-score: 56px;
   /* Z scale: z-sticky, z-savebar, z-header, z-bit, z-overlay, z-toast. PrimeVue stacks its own overlays at
      1000 and modals at 1100, so a toast sits above them. */
   --z-index-sticky: 10;
