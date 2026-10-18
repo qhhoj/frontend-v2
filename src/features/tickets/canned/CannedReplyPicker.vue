@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { MessageSquareText } from 'lucide-vue-next';
-import FocusTrap from 'primevue/focustrap';
-import Popover from 'primevue/popover';
 import { computed, ref, useId } from 'vue';
 import type { CannedReply } from '@/api/types/tickets';
 import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import AppButton from '@/components/ui/AppButton.vue';
+import Popover from '@/components/ui/Popover.vue';
 import { adminRouteName } from '@/features/admin/admin-screens';
 import { TICKET_BITS } from '../ticket-bits';
 import { useCannedRepliesQuery } from '../tickets.queries';
@@ -17,7 +16,6 @@ import type { CannedContext } from './canned-text';
 /** The staff composer's list of canned replies; reads them the first time it opens. */
 const props = defineProps<{ context: CannedContext }>();
 const emit = defineEmits<{ pick: [text: string, title: string] }>();
-const vFocustrap = FocusTrap;
 const titleId = useId();
 const SKELETON_ROWS = 3;
 const popover = ref<InstanceType<typeof Popover>>();
@@ -41,16 +39,8 @@ function choose(reply: CannedReply) {
     <template #icon><MessageSquareText aria-hidden="true" class="size-[18px]" /></template>
     {{ $t('cannedPicker.open') }}
   </AppButton>
-  <Popover
-    ref="popover"
-    :pt="{ root: { role: 'dialog', 'aria-labelledby': titleId } }"
-    @show="isOpen = true"
-    @hide="isOpen = false"
-  >
-    <div
-      v-focustrap="{ autoFocus: true }"
-      class="flex w-[min(24rem,calc(100vw-4rem))] flex-col gap-3"
-    >
+  <Popover ref="popover" :labelledby="titleId" @show="isOpen = true" @hide="isOpen = false">
+    <div class="flex w-[min(24rem,calc(100vw-4rem))] flex-col gap-3">
       <p :id="titleId" class="font-display text-lg font-bold">{{ $t('cannedPicker.title') }}</p>
       <p class="text-meta text-muted">{{ $t('cannedPicker.hint') }}</p>
       <QueryState

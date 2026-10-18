@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { History, Info, RotateCcw } from 'lucide-vue-next';
-import Popover from 'primevue/popover';
 import { ref } from 'vue';
 import IconButton from '@/components/ui/IconButton.vue';
+import Popover from '@/components/ui/Popover.vue';
 import { buttonClass } from '../ui/controls';
 
 /**
  * The ⓘ beside a setting: its key, its default, its history and the reset, kept out of the way until asked for (P-34).
  * The popover renders in the body like every Popover (inside the row PrimeVue's page coordinates land off by the admin
- * main area), so the focus order is kept by hand: PrimeVue moves focus to the `autofocus` button on show, Escape and
- * the popover's own buttons send it back to the ⓘ.
+ * main area). Closing it from one of its own buttons sends focus back to the ⓘ; a target the action focuses afterwards
+ * (the history panel's heading) still takes it from there.
  */
 const props = defineProps<{
   settingKey: string;
@@ -18,25 +18,15 @@ const props = defineProps<{
   isAtDefault: boolean;
 }>();
 const emit = defineEmits<{ history: []; reset: [] }>();
-const popover = ref<InstanceType<typeof Popover> | null>(null);
-const openerId = () => `info-${props.settingKey}`;
-/**
- * Closing from one of its own buttons would drop focus to the body, so it goes back to the ⓘ first; a target the action
- * focuses afterwards (the history panel's heading) still takes it from there.
- */
-const close = () => {
-  popover.value?.hide();
-  document.getElementById(openerId())?.focus();
-};
-
+const popover = ref<InstanceType<typeof Popover>>();
 const openHistory = () => {
-  close();
+  popover.value?.hide();
   emit('history');
 };
 /** It only fills the box: the user presses "Lưu" like for any edit. */
 const reset = () => {
   if (props.isAtDefault) return;
-  close();
+  popover.value?.hide();
   emit('reset');
 };
 </script>
@@ -44,7 +34,7 @@ const reset = () => {
 <template>
   <span class="inline-flex">
     <IconButton
-      :id="openerId()"
+      :id="`info-${settingKey}`"
       :label="$t('admin.settings.info.label', { key: settingKey })"
       size="sm"
       aria-haspopup="dialog"
@@ -53,15 +43,7 @@ const reset = () => {
     >
       <Info class="size-4" :stroke-width="1.75" />
     </IconButton>
-    <Popover
-      ref="popover"
-      :pt="{
-        root: {
-          role: 'dialog',
-          'aria-label': $t('admin.settings.info.dialog', { key: settingKey }),
-        },
-      }"
-    >
+    <Popover ref="popover" :label="$t('admin.settings.info.dialog', { key: settingKey })">
       <div class="flex max-w-72 min-w-56 flex-col gap-2 text-sm">
         <code class="font-mono text-xs break-all text-muted">{{ settingKey }}</code>
         <p v-if="defaultText !== null" class="m-0">
@@ -69,13 +51,7 @@ const reset = () => {
           <span class="font-mono">{{ defaultText }}</span>
         </p>
         <div class="flex flex-wrap gap-2">
-          <!-- autofocus: PrimeVue's Popover focuses it on show -->
-          <button
-            type="button"
-            autofocus
-            :class="buttonClass('secondary', 'sm')"
-            @click="openHistory"
-          >
+          <button type="button" :class="buttonClass('secondary', 'sm')" @click="openHistory">
             <History aria-hidden="true" class="size-4" :stroke-width="1.75" />
             {{ $t('admin.settings.history') }}
           </button>
