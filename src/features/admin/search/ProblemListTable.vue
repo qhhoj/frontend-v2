@@ -19,7 +19,7 @@ import HighlightedText from './HighlightedText.vue';
 /**
  * One page of the staff problem list (`tr[data-code]`, a card per problem on phones): sortable Bài / Điểm / Ngày đăng
  * headers bound to `?sort=`; the title opens the editor and "⋯" holds Xem · Nhân bản… · Xoá… (the admin row contract).
- * Points read as a plain number, with a "từng phần" chip when partial. `toolbar` and `bulk` pass through.
+ * Points read as a plain number; the "từng phần" chip sits with the status chips. `toolbar` and `bulk` pass through.
  */
 defineProps<{
   items: ProblemListItem[];
@@ -44,7 +44,12 @@ const columns = computed<AdminColumn[]>(() => [
     priority: 'primary',
     sort: { asc: 'name', desc: '-name' },
   },
-  { key: 'status', label: t('admin.problemList.columns.status'), priority: 'badge' },
+  {
+    key: 'status',
+    label: t('admin.problemList.columns.status'),
+    priority: 'badge',
+    cellClass: 'max-w-80',
+  },
   { key: 'group', label: t('admin.problemList.columns.group'), cellClass: 'max-w-48 truncate' },
   { key: 'authors', label: t('admin.problemList.columns.authors') },
   {
@@ -124,6 +129,9 @@ const menuItems = (code: string) =>
         <AdminChip v-if="row.isOrganizationPrivate" tone="info" :icon="Building2">
           {{ $t('admin.problemList.orgPrivate') }}
         </AdminChip>
+        <AdminChip v-if="row.partial" :title="$t('admin.problemList.partialHint')">
+          {{ $t('admin.problemList.partial') }}
+        </AdminChip>
       </span>
     </template>
     <template #cell-group="{ row }">{{ row.group?.fullName ?? '—' }}</template>
@@ -140,14 +148,7 @@ const menuItems = (code: string) =>
         </span>
       </span>
     </template>
-    <template #cell-points="{ row }">
-      <span class="inline-flex items-center gap-1.5">
-        <AdminChip v-if="row.partial" :title="$t('admin.problemList.partialHint')">
-          {{ $t('admin.problemList.partial') }}
-        </AdminChip>
-        <span class="tabular-nums">{{ formatNumber(row.points, locale.locale) }}</span>
-      </span>
-    </template>
+    <template #cell-points="{ row }">{{ formatNumber(row.points, locale.locale) }}</template>
     <template #cell-date="{ row }">
       {{ row.date ? formatDate(row.date, locale.locale) : '—' }}
     </template>

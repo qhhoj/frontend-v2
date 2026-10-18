@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="Row">
-import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-vue-next';
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { ArrowDown, ArrowUp, ChevronDown, ChevronsUpDown } from 'lucide-vue-next';
+import { computed, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
 import EmptyState from '@/components/EmptyState.vue';
@@ -13,6 +13,7 @@ import AppButton from './AppButton.vue';
 import { CARD_VARIANTS } from './Card.variants';
 import { useRowOpen } from './use-row-open';
 import AdminBulkBar from '@/features/admin/ui/table/AdminBulkBar.vue';
+import DataTableCheckbox from './DataTableCheckbox.vue';
 import { ariaSortOf, nextSort, rangeOf, stickyOffsets } from './DataTableColumns';
 import type { DataTableColumn } from './DataTableColumns';
 
@@ -125,6 +126,15 @@ function toggleRow(row: Row, isOn: boolean) {
 }
 const clearSelection = () => (selected.value = new Set());
 
+/** Card rows whose "Chi tiết" (the `meta` columns) is open, by row key. */
+const openDetails = ref(new Set<string>());
+const detailsId = useId();
+function toggleDetails(key: string) {
+  const next = new Set(openDetails.value);
+  if (!next.delete(key)) next.add(key);
+  openDetails.value = next;
+}
+
 /** The default cell: a string or number field of the row; anything else needs a `cell-<key>` slot. */
 const cellText = (row: Row, key: string) => {
   const value = (row as Record<string, unknown>)[key];
@@ -163,7 +173,6 @@ const HEAD_TEXT = 'text-meta font-semibold whitespace-nowrap text-muted';
 const SORT_BUTTON =
   'inline-flex min-h-6 items-center gap-1 rounded-cell hover:text-content pointer-coarse:min-h-11';
 const FRAME = computed(() => CARD_VARIANTS[isCompact.value ? 'flat' : 'glass']);
-const CHECKBOX = 'size-4 accent-[var(--qh-accent)] align-middle';
 const frameStyle = computed(() => (props.maxHeight ? { maxHeight: props.maxHeight } : undefined));
 
 const range = computed(() => {
@@ -316,7 +325,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
       </ul>
       <ul v-else-if="isCards" class="m-0 flex list-none flex-col p-0" :aria-label="label">
         <li
-          v-for="row in rows"
+          v-for="(row, index) in rows"
           :key="rowKey(row)"
           v-bind="rowAttrs?.(row)"
           class="flex flex-col gap-1.5 border-b border-line px-4 py-3 last:border-b-0"
@@ -325,71 +334,95 @@ const offset = computed(() => (props.selectable ? 1 : 0));
           @auxclick="openRowInTab(row, $event)"
         >
           <div class="flex min-w-0 items-start gap-3">
-            <input
-              v-if="selectable"
-              type="checkbox"
-              :class="[CHECKBOX, 'mt-1']"
-              :checked="selected.has(rowKey(row))"
-              :aria-label="$t('admin.table.selectRow', { name: labelOf(row) })"
-              @change="toggleRow(row, ($event.target as HTMLInputElement).checked)"
-            />
-            <div class="min-w-0 flex-1">
-              <slot :name="`cell-${primary!.key}`" :row="row">
-                <RouterLink v-if="rowTo" :to="rowTo(row)" class="font-semibold hover:underline">
-                  {{ cellText(row, primary!.key) }}
-                </RouterLink>
-                <template v-else>{{ cellText(row, primary!.key) }}</template>
-              </slot>
-            </div>
-            <div v-if="badges.length" class="flex shrink-0 flex-wrap justify-end gap-1">
-              <template v-for="column in badges" :key="column.key">
-                <slot :name="`cell-${column.key}`" :row="row">{{ cellText(row, column.key) }}</slot>
-              </template>
-            </div>
-          </div>
-          <p v-if="secondary.length" class="m-0 flex flex-wrap gap-x-2 gap-y-1 text-sm text-muted">
-            <template v-for="(column, index) in secondary" :key="column.key">
-              <span v-if="index > 0 && !column.stacked" aria-hidden="true">·</span>
-              <span
-                class="inline-flex max-w-full min-w-0 items-baseline gap-1"
-                :class="column.stacked && 'basis-full'"
+            <span v-if="selectable" class="mt-1 flex shrink-0">
+              <DataTableCheckbox
+                :checked="selected.has(rowKey(row))"
+                :label="$t('admin.table.selectRow', { name: labelOf(row) })"
+                @change="toggleRow(row, $event)"
+              />
+            </span>
+            <div class="flex min-w-0 flex-1 flex-wrap items-start gap-x-3 gap-y-1">
+              <div class="min-w-0 flex-1 basis-28">
+                <slot :name="`cell-${primary!.key}`" :row="row">
+                  <RouterLink v-if="rowTo" :to="rowTo(row)" class="font-semibold hover:underline">
+                    {{ cellText(row, primary!.key) }}
+                  </RouterLink>
+                  <template v-else>{{ cellText(row, primary!.key) }}</template>
+                </slot>
+              </div>
+              <div
+                v-if="badges.length"
+                class="flex max-w-full shrink-0 flex-wrap justify-end gap-1"
               >
-                <span v-if="!column.stacked" class="whitespace-nowrap">{{ column.label }}</span>
-                <span
-                  class="min-w-0 [overflow-wrap:anywhere]"
-                  :class="[
-                    column.stacked ? 'w-full' : 'text-content',
-                    column.align === 'end' && 'font-mono tabular-nums whitespace-nowrap',
-                    column.mono && 'font-mono',
-                  ]"
-                >
+                <template v-for="column in badges" :key="column.key">
                   <slot :name="`cell-${column.key}`" :row="row">{{
                     cellText(row, column.key)
                   }}</slot>
-                </span>
-              </span>
-            </template>
-          </p>
-          <div v-if="meta.length || $slots.actions" class="flex items-start gap-2">
-            <details v-if="meta.length" class="min-w-0 flex-1 text-sm">
-              <summary class="w-fit cursor-pointer py-1 font-semibold text-accent-text">
-                {{ $t('admin.table.details') }}
-              </summary>
-              <dl class="m-0 mt-1 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1">
-                <template v-for="column in meta" :key="column.key">
-                  <dt class="text-muted">{{ column.label }}</dt>
-                  <dd class="m-0 min-w-0 break-words">
-                    <slot :name="`cell-${column.key}`" :row="row">{{
-                      cellText(row, column.key)
-                    }}</slot>
-                  </dd>
                 </template>
-              </dl>
-            </details>
+              </div>
+            </div>
+          </div>
+          <p
+            v-if="secondary.length"
+            class="m-0 flex flex-wrap gap-x-4 gap-y-1 text-muted"
+            :class="isCompact ? 'text-meta' : 'text-sm'"
+          >
+            <span
+              v-for="column in secondary"
+              :key="column.key"
+              class="inline-flex max-w-full min-w-0 items-center gap-1"
+              :class="column.stacked && 'basis-full'"
+            >
+              <span v-if="!column.stacked" class="whitespace-nowrap">{{ column.label }}</span>
+              <span
+                class="min-w-0 [overflow-wrap:anywhere]"
+                :class="[
+                  column.stacked ? 'w-full' : 'text-content',
+                  column.align === 'end' && 'font-mono tabular-nums whitespace-nowrap',
+                  column.mono && 'font-mono',
+                ]"
+              >
+                <slot :name="`cell-${column.key}`" :row="row">{{ cellText(row, column.key) }}</slot>
+              </span>
+            </span>
+          </p>
+          <div v-if="meta.length || $slots.actions" class="flex items-center gap-2">
+            <AppButton
+              v-if="meta.length"
+              tone="ghost"
+              size="sm"
+              :class="isCompact && '-ml-2.5'"
+              :aria-expanded="openDetails.has(rowKey(row))"
+              :aria-controls="`${detailsId}-${index}`"
+              @click="toggleDetails(rowKey(row))"
+            >
+              {{ $t('admin.table.details') }}
+              <template #icon>
+                <ChevronDown
+                  aria-hidden="true"
+                  class="size-4 transition-transform"
+                  :class="openDetails.has(rowKey(row)) && 'rotate-180'"
+                  :stroke-width="1.75"
+                />
+              </template>
+            </AppButton>
             <div v-if="$slots.actions" class="ml-auto flex shrink-0 flex-wrap items-center gap-2">
               <slot name="actions" :row="row" />
             </div>
           </div>
+          <dl
+            v-if="meta.length"
+            v-show="openDetails.has(rowKey(row))"
+            :id="`${detailsId}-${index}`"
+            class="m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 text-sm"
+          >
+            <template v-for="column in meta" :key="column.key">
+              <dt class="text-muted">{{ column.label }}</dt>
+              <dd class="m-0 min-w-0 break-words">
+                <slot :name="`cell-${column.key}`" :row="row">{{ cellText(row, column.key) }}</slot>
+              </dd>
+            </template>
+          </dl>
         </li>
       </ul>
 
@@ -410,12 +443,10 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                   :class="[HEAD_CELL, 'w-10', headPin(0).class]"
                   :style="headPin(0).style"
                 >
-                  <input
-                    type="checkbox"
-                    :class="CHECKBOX"
+                  <DataTableCheckbox
                     :checked="isAllPicked"
                     :indeterminate="isSomePicked"
-                    :aria-label="$t('admin.table.selectPage')"
+                    :label="$t('admin.table.selectPage')"
                     @change="toggleAll"
                   />
                 </th>
@@ -477,12 +508,10 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                 @auxclick="openRowInTab(row, $event)"
               >
                 <td v-if="selectable" :class="[CELL, bodyPin(0)?.class]" :style="bodyPin(0)?.style">
-                  <input
-                    type="checkbox"
-                    :class="CHECKBOX"
+                  <DataTableCheckbox
                     :checked="selected.has(rowKey(row))"
-                    :aria-label="$t('admin.table.selectRow', { name: labelOf(row) })"
-                    @change="toggleRow(row, ($event.target as HTMLInputElement).checked)"
+                    :label="$t('admin.table.selectRow', { name: labelOf(row) })"
+                    @change="toggleRow(row, $event)"
                   />
                 </td>
                 <td
