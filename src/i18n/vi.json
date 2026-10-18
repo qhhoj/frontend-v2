@@ -2795,6 +2795,7 @@
     "pendingBadge": "{count} yêu cầu đang chờ",
     "info": {
       "title": "Thông tin tổ chức",
+      "foldLead": "Ảnh, tên, địa chỉ, giới thiệu và cách tham gia.",
       "avatar": "Ảnh đại diện",
       "avatarLead": "Hiện cạnh tên tổ chức ở mọi nơi.",
       "avatarChange": "Đổi ảnh",
