@@ -33,9 +33,10 @@ describe('RankingTable', () => {
       ...rankingRow(rank, `p${rank}`, `user_0${rank}`, 1, 0, {}),
       ratingChange,
     });
-    const mountRows = (rows: ReturnType<typeof rated>[]) =>
+    /** `shown`: the rows left by a search; the board keeps all of them. */
+    const mountRows = (rows: ReturnType<typeof rated>[], shown = rows) =>
       mount(RankingTable, {
-        props: { ranking: ranking(), rows, context, viewerId: null },
+        props: { ranking: ranking({ rows }), rows: shown, context, viewerId: null },
         global: { plugins: [i18n] },
       });
 
@@ -51,6 +52,13 @@ describe('RankingTable', () => {
       expect(cells.map((cell) => cell.text())).toEqual(['+42 → 1843', '-7 → 1189', '1500', '—']);
       expect(cells[0]!.classes()).toContain('text-positive');
       expect(cells[1]!.classes()).toContain('text-negative');
+    });
+
+    it('keeps the column while a search shows only an unrated row', () => {
+      const unrated = rated(null, 2);
+      const wrapper = mountRows([rated({ rating: 1843, delta: 42 }, 1), unrated], [unrated]);
+      expect(wrapper.text()).toContain('Δ rating');
+      expect(wrapper.get('[data-testid="rating-change"]').text()).toBe('—');
     });
 
     it('has no rating column before ratings are applied', () => {
