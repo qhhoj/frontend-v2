@@ -12,6 +12,18 @@ describe('Switch', () => {
     expect(wrapper.emitted('update:modelValue')).toEqual([[true]]);
   });
 
+  it('is described by its description and toggles from its label too', async () => {
+    const wrapper = mountComponent(Switch, {
+      props: { modelValue: false, label: 'Hiển thị', description: 'Thí sinh thấy kỳ thi' },
+    });
+    const control = wrapper.get('[role="switch"]');
+    expect(wrapper.get(`#${control.attributes('aria-describedby')}`).text()).toBe(
+      'Thí sinh thấy kỳ thi',
+    );
+    await wrapper.get(`#${control.attributes('aria-labelledby')}`).trigger('click');
+    expect(wrapper.emitted('update:modelValue')).toEqual([[true]]);
+  });
+
   it('takes its name from a title elsewhere on the page', () => {
     const wrapper = mountComponent(Switch, { props: { modelValue: true, labelledby: 'look' } });
     expect(wrapper.get('[role="switch"]').attributes('aria-labelledby')).toBe('look');
@@ -26,6 +38,7 @@ describe('Switch', () => {
     expect(control.attributes('aria-disabled')).toBe('true');
     expect(wrapper.get(`#${control.attributes('aria-describedby')}`).text()).toBe('Cần quyền');
     await control.trigger('click');
+    await wrapper.get(`#${control.attributes('aria-labelledby')}`).trigger('click');
     expect(wrapper.emitted('update:modelValue')).toBeUndefined();
   });
 });

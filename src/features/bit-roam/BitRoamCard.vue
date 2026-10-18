@@ -2,8 +2,8 @@
 import { computed } from 'vue';
 import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
-import LevelSlider from '@/features/appearance/LevelSlider.vue';
 import Switch from '@/components/ui/Switch.vue';
+import LevelSlider from '@/features/appearance/LevelSlider.vue';
 import { useSessionStore } from '@/stores/session.store';
 import { BIT_ROAM_MAX, useBitRoamStore } from './bit-roam.store';
 import { useBitRoamChoice } from './use-bit-roam-choice';
@@ -30,6 +30,7 @@ const saveNoteKey = computed(() =>
       </div>
       <Switch
         :model-value="store.choice.on"
+        size="lg"
         labelledby="bit-roam-label"
         @update:model-value="(on) => update({ on })"
       />

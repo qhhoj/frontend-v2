@@ -5,7 +5,6 @@ import { ArrowUpRight, Check, Copy, Globe, Lightbulb, Lock, Minus } from 'lucide
 import type { EditableProblem } from '@/api/types/problem-editing';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import Chip from '@/components/ui/Chip.vue';
 import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminBit from '../shell/AdminBit.vue';
@@ -42,16 +41,19 @@ function statusOf(detail: EditableProblem): { key: string; tone: ChipTone; icon:
 }
 const status = computed(() => (problem.data.value ? statusOf(problem.data.value) : null));
 /** Which statements exist (a chip per slot, check or minus), so a missing translation shows before contest day. */
-const written = computed(() =>
-  problem.data.value?.editor
-    ? STATEMENT_SLOTS.map((slot) => ({ slot, isWritten: writtenSlots(problem.data.value!)[slot] }))
-    : [],
-);
-/** "Tiếng Việt: đã có" — the chip's tooltip and its spoken text. */
-const slotText = (item: { slot: (typeof STATEMENT_SLOTS)[number]; isWritten: boolean }) =>
-  translate(`admin.problems.statements.written.${item.isWritten ? 'yes' : 'no'}`, {
-    slot: translate(`admin.problems.statements.slots.${item.slot}`),
-  });
+const written = computed(() => {
+  const loaded = problem.data.value;
+  if (!loaded?.editor) return [];
+  const slots = writtenSlots(loaded);
+  return STATEMENT_SLOTS.map((slot) => ({
+    slot,
+    isWritten: slots[slot],
+    /** "Tiếng Việt: đã có", spoken in place of the chip's short code and icon. */
+    spoken: translate(`admin.problems.statements.written.${slots[slot] ? 'yes' : 'no'}`, {
+      slot: translate(`admin.problems.statements.slots.${slot}`),
+    }),
+  }));
+});
 
 /** The tabs stick to the top: a focused field or a section jumped to lands below them, never under them. */
 const root = document.documentElement;
@@ -107,16 +109,15 @@ function openClone(close: () => void) {
               :aria-label="$t('admin.problems.statements.written.label')"
             >
               <li v-for="item in written" :key="item.slot" :data-slot="item.slot">
-                <Chip
-                  :tone="item.isWritten ? 'success' : 'neutral'"
+                <AdminChip
+                  :tone="item.isWritten ? 'positive' : 'neutral'"
                   :icon="item.isWritten ? Check : Minus"
-                  :title="slotText(item)"
                 >
                   <span aria-hidden="true">{{
                     $t(`admin.problems.statements.written.short.${item.slot}`)
                   }}</span>
-                  <span class="sr-only">{{ slotText(item) }}</span>
-                </Chip>
+                  <span class="sr-only">{{ item.spoken }}</span>
+                </AdminChip>
               </li>
             </ul>
           </template>
