@@ -32,6 +32,7 @@ export const orgProblem = (overrides: Partial<OrganizationProblem> = {}): Organi
   code: 'lhp_lis',
   name: 'Dãy con tăng dài nhất',
   points: 100,
+  canEdit: true,
   isPublic: false,
   isArchived: false,
   tags: [TAGS[0]!, TAGS[2]!],

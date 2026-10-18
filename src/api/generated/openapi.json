@@ -3721,11 +3721,11 @@
             "type": "boolean"
           },
           "isOrganizationPrivate": {
-            "description": "Only members of the listed organizations may see it.",
+            "description": "Only members of the listed organizations may see it. Clearing it on a visible contest that becomes public needs `judge.change_contest_visibility`.",
             "type": "boolean"
           },
           "isPrivate": {
-            "description": "Only the listed contestants may see it.",
+            "description": "Only the listed contestants may see it. Clearing it on a visible contest that becomes public needs `judge.change_contest_visibility`.",
             "type": "boolean"
           },
           "isRated": {
@@ -7213,6 +7213,32 @@
         ],
         "type": "object"
       },
+      "NewContestTicketDto": {
+        "properties": {
+          "body": {
+            "description": "Message text in Markdown.",
+            "maxLength": 8192,
+            "minLength": 1,
+            "type": "string"
+          },
+          "problem": {
+            "description": "Code of one of the contest's problems the question is about; omit for the contest as a whole.",
+            "maxLength": 100,
+            "type": "string"
+          },
+          "title": {
+            "description": "Ticket title.",
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "body"
+        ],
+        "type": "object"
+      },
       "NewGeneralTicketDto": {
         "properties": {
           "body": {
@@ -7687,6 +7713,10 @@
       },
       "OrganizationProblemResponse": {
         "properties": {
+          "canEdit": {
+            "description": "Whether the viewer may edit the problem (the row's pencil to its editor).",
+            "type": "boolean"
+          },
           "code": {
             "description": "Problem code.",
             "type": "string"
@@ -7727,7 +7757,8 @@
           "isPublic",
           "isArchived",
           "updatedAt",
-          "tags"
+          "tags",
+          "canEdit"
         ],
         "type": "object"
       },
@@ -11103,7 +11134,7 @@
             "type": "string"
           },
           "languageId": {
-            "description": "The account's default programming language.",
+            "description": "The account's default programming language; C++17 when omitted.",
             "format": "uuid",
             "type": "string"
           },
@@ -12507,7 +12538,7 @@
       "SocialCompleteDto": {
         "properties": {
           "languageId": {
-            "description": "The account's default programming language.",
+            "description": "The account's default programming language; C++17 when omitted.",
             "format": "uuid",
             "type": "string"
           },
@@ -13040,6 +13071,35 @@
         ],
         "type": "object"
       },
+      "SubmissionContestResponse": {
+        "properties": {
+          "key": {
+            "description": "The contest's key.",
+            "type": "string"
+          },
+          "minute": {
+            "description": "Whole minutes from the start of the run it was made in to the submission, as the scoreboard counts them (`participationStart`); only for the submitter's own submission made within that run, null otherwise.",
+            "nullable": true,
+            "type": "number"
+          },
+          "name": {
+            "description": "The contest's name.",
+            "type": "string"
+          },
+          "points": {
+            "description": "Points this submission scored in the contest (the case ratio of the contest problem's points, as the scoreboard counts them); null when the problem left the contest and no contest row holds them.",
+            "nullable": true,
+            "type": "number"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "points",
+          "minute"
+        ],
+        "type": "object"
+      },
       "SubmissionDetailResponse": {
         "properties": {
           "batches": {
@@ -13065,6 +13125,16 @@
             },
             "nullable": true,
             "type": "array"
+          },
+          "contest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SubmissionContestResponse"
+              }
+            ],
+            "description": "The contest it was submitted in, when the viewer may see that contest; null otherwise and outside a contest.",
+            "nullable": true,
+            "type": "object"
           },
           "currentTestcase": {
             "description": "Number of the case being judged while the submission runs; null unless the viewer sees every case result (it would tell where judging stopped).",
@@ -13232,6 +13302,7 @@
           "batches",
           "externalRun",
           "totalCases",
+          "contest",
           "id",
           "user",
           "problem",
@@ -14519,6 +14590,23 @@
         ],
         "type": "string"
       },
+      "TicketContestResponse": {
+        "properties": {
+          "key": {
+            "description": "Contest key.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Contest name.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "name"
+        ],
+        "type": "object"
+      },
       "TicketDetailResponse": {
         "properties": {
           "assignees": {
@@ -14535,6 +14623,16 @@
               }
             ],
             "description": "What the caller may do with the ticket."
+          },
+          "contest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TicketContestResponse"
+              }
+            ],
+            "description": "The contest it was filed from, whose editors read it; null outside a contest.",
+            "nullable": true,
+            "type": "object"
           },
           "createdAt": {
             "description": "When the ticket was filed, ISO 8601.",
@@ -14607,6 +14705,7 @@
           "creator",
           "assignees",
           "link",
+          "contest",
           "isOpen",
           "isContributive",
           "messageCount",
@@ -14672,28 +14771,29 @@
       "TicketLinkResponse": {
         "properties": {
           "id": {
-            "description": "Id of the problem or issue.",
+            "description": "Id of the problem, issue or contest.",
             "type": "string"
           },
           "key": {
-            "description": "The problem code; null for a general issue and for a deleted problem.",
+            "description": "The problem code or contest key; null for a general issue and for a deleted problem or contest.",
             "nullable": true,
             "type": "string"
           },
           "title": {
-            "description": "The problem name, or the issue url.",
+            "description": "The problem or contest name, or the issue url.",
             "type": "string"
           },
           "type": {
-            "description": "problem for a ticket about a problem, general for a site issue.",
+            "description": "problem for a ticket about a problem, general for a site issue, contest for a question to a contest's organisers.",
             "enum": [
+              "contest",
               "general",
               "problem"
             ],
             "type": "string"
           },
           "url": {
-            "description": "SPA path for a problem, the absolute url for a general issue; empty when the problem is gone.",
+            "description": "SPA path for a problem or contest, the absolute url for a general issue; empty when the problem or contest is gone.",
             "type": "string"
           }
         },
@@ -14714,6 +14814,16 @@
               "$ref": "#/components/schemas/UserSummaryResponse"
             },
             "type": "array"
+          },
+          "contest": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TicketContestResponse"
+              }
+            ],
+            "description": "The contest it was filed from, whose editors read it; null outside a contest.",
+            "nullable": true,
+            "type": "object"
           },
           "createdAt": {
             "description": "When the ticket was filed, ISO 8601.",
@@ -14768,6 +14878,7 @@
           "creator",
           "assignees",
           "link",
+          "contest",
           "isOpen",
           "isContributive",
           "messageCount",
@@ -14814,6 +14925,10 @@
             "description": "The caller may change the assignees.",
             "type": "boolean"
           },
+          "claim": {
+            "description": "The caller may take the ticket on themselves or hand it back (`POST`/`DELETE /tickets/{id}/claim`).",
+            "type": "boolean"
+          },
           "editNotes": {
             "description": "The caller may edit the notes.",
             "type": "boolean"
@@ -14826,12 +14941,17 @@
         "required": [
           "editNotes",
           "markGood",
-          "assign"
+          "assign",
+          "claim"
         ],
         "type": "object"
       },
       "TicketSummaryResponse": {
         "properties": {
+          "aboutMineOpen": {
+            "description": "Open tickets about the viewer's own problems and contests (the list's `aboutMine`); 0 unless the viewer may edit problems or contests.",
+            "type": "number"
+          },
           "assignedOpen": {
             "description": "Open tickets the viewer is assigned to.",
             "type": "number"
@@ -14843,7 +14963,8 @@
         },
         "required": [
           "assignedOpen",
-          "awaitingStaff"
+          "awaitingStaff",
+          "aboutMineOpen"
         ],
         "type": "object"
       },
@@ -15127,11 +15248,11 @@
             "type": "boolean"
           },
           "isOrganizationPrivate": {
-            "description": "Only members of the listed organizations may see it.",
+            "description": "Only members of the listed organizations may see it. Clearing it on a visible contest that becomes public needs `judge.change_contest_visibility`.",
             "type": "boolean"
           },
           "isPrivate": {
-            "description": "Only the listed contestants may see it.",
+            "description": "Only the listed contestants may see it. Clearing it on a visible contest that becomes public needs `judge.change_contest_visibility`.",
             "type": "boolean"
           },
           "isRated": {
@@ -16499,6 +16620,10 @@
             "nullable": true,
             "type": "object"
           },
+          "submissionCount": {
+            "description": "Submissions of the user this viewer may see: the total of the submission list filtered to the user.",
+            "type": "number"
+          },
           "username": {
             "description": "Login name.",
             "type": "string"
@@ -16513,6 +16638,7 @@
           "points",
           "performancePoints",
           "problemCount",
+          "submissionCount",
           "contributionPoints",
           "rating",
           "rank",
@@ -28000,6 +28126,154 @@
         "x-enveloped": true
       }
     },
+    "/api/internal/contests/{key}/tickets": {
+      "get": {
+        "description": "Returns the questions and problem tickets filed from a contest: all of\nthem for staff and the contest's editors, otherwise only the caller's own.\nFails with 404 `not_found` when the caller cannot see the contest. Paged\nwith `page`.",
+        "operationId": "TicketsController_contestList",
+        "parameters": [
+          {
+            "description": "Key of the contest.",
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "1-based page number.",
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 10000,
+              "minimum": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/TicketListItemResponse"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PageMetaResponse"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "List the tickets filed from a contest",
+        "tags": [
+          "Tickets"
+        ],
+        "x-enveloped": true
+      },
+      "post": {
+        "description": "Opens a ticket filed from a contest the caller can see (404 `not_found`\notherwise): about the contest, or about one of its problems given by\n`problem` code (404 when it is not a problem of the contest the caller can\nsee). The assignees are the contest's authors and curators, and its editors\ncan read it. Same limits, refusals and notifications as filing a ticket\nabout a problem.",
+        "operationId": "TicketCreationController_forContest",
+        "parameters": [
+          {
+            "description": "Key of the contest.",
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewContestTicketDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TicketDetailResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Ask a contest's organisers",
+        "tags": [
+          "Tickets"
+        ]
+      }
+    },
     "/api/internal/contributors": {
       "get": {
         "description": "Public. Pages of users ranked by contribution points, with the same entry shape as the user leaderboard.",
@@ -34045,7 +34319,7 @@
         ]
       },
       "patch": {
-        "description": "Needs edit rights on the problem (404 `not_found` when it is invisible to\nthe caller, 403 `forbidden` when visible but not editable). Send only the\nfields to change; `licenseId` and `date` accept null, other fields refuse\nit. The same permission gates as on creation apply to the fields they\nprotect. Changing the description re-renders the statement; changing the\ncode moves the test data directory (400 `data_directory_taken` if one\nexists) and changing points, partial scoring or organization privacy\nrescores the problem. Writes a revision and returns the updated problem.\nWithout `judge.edit_all_problem`, `organizations` and\n`isOrganizationPrivate` (a move) need the organization problem creation\nrights in every organization added or removed (403\n`organization_rights`) and `judge.add_problem` to leave every organization\nfor the site (403 `site_problem_rights`). A move keeps the code; only a\nnew code of an organization-private problem must carry its first\norganization's prefix (400 `organization_code_prefix`, superusers\nexempt). A move into an organization spends its problem credits and must\nfit its storage (403 `quota_exceeded`).",
+        "description": "Needs edit rights on the problem (404 `not_found` when it is invisible to\nthe caller, 403 `forbidden` when visible but not editable). Send only the\nfields to change; `licenseId` and `date` accept null, other fields refuse\nit. The same permission gates as on creation apply to the fields they\nprotect. Changing the description re-renders the statement; changing the\ncode moves the test data directory (400 `data_directory_taken` if one\nexists) and changing points, partial scoring or organization privacy\nrescores the problem. Writes a revision and returns the updated problem.\nWithout `judge.edit_all_problem`, `organizations` and\n`isOrganizationPrivate` (a move) need the organization problem creation\nrights in every organization added or removed (403\n`organization_rights`) and `judge.add_problem` to leave every organization\nfor the site (403 `site_problem_rights`). Any edit that makes a public\nproblem visible to everyone by leaving organization privacy needs\n`judge.change_public_visibility` (403 `site_publish_rights`); without it,\nan edit of `isPublic` or `isOrganizationPrivate` saves only while both\nare as its gates read them (409 `conflict`). A move keeps the code; only a\nnew code of an organization-private problem must carry its first\norganization's prefix (400 `organization_code_prefix`, superusers\nexempt). A move into an organization spends its problem credits and must\nfit its storage (403 `quota_exceeded`).",
         "operationId": "ProblemEditingController_edit",
         "parameters": [
           {
@@ -39229,7 +39503,7 @@
     },
     "/api/internal/tickets": {
       "get": {
-        "description": "Returns tickets the caller may read: their own and those assigned to them,\ntickets of problems they can edit, and every ticket for holders of\n`judge.change_ticket`. Filter with `open`, `awaiting` (open tickets whose\nnewest message is not from staff), `own` (only tickets they filed\nor are assigned to), and repeated `user` and `assignee` usernames (at most\n10 each; unknown names match nothing). Paged with `page`.",
+        "description": "Returns tickets the caller may read: their own and those assigned to them,\ntickets of problems they can edit, tickets filed from contests they can\nedit, and every ticket for holders of\n`judge.change_ticket`. Filter with `open`, `awaiting` (open tickets whose\nnewest message is not from staff), `own` (only tickets they filed\nor are assigned to), and repeated `user` and `assignee` usernames (at most\n10 each; unknown names match nothing). Paged with `page`.",
         "operationId": "TicketsController_list",
         "parameters": [
           {
@@ -39269,6 +39543,26 @@
             "required": false,
             "schema": {
               "type": "boolean"
+            }
+          },
+          {
+            "description": "true limits the list to tickets about what the caller makes: problems they author, curate or suggested, and contests they author or curate (tickets filed from them), whatever else they may read.",
+            "in": "query",
+            "name": "aboutMine",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Text in the title (ignoring case and Vietnamese accents), or the exact username of the creator; blank filters nothing.",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "maxLength": 100,
+              "pattern": "^[^\\0]*$",
+              "type": "string"
             }
           },
           {
@@ -39463,7 +39757,7 @@
     },
     "/api/internal/tickets/{id}": {
       "get": {
-        "description": "Returns the ticket with its messages, notes, assignees and timeline.\nReadable by its creator, its assignees, editors of the linked problem and\nstaff. Fails with 404 `not_found` for an unknown id and 403 `forbidden`\nfor a ticket the caller may not read.",
+        "description": "Returns the ticket with its messages, notes, assignees and timeline.\nReadable by its creator, its assignees, editors of the linked problem,\neditors of the contest it was filed from and staff. Fails with 404 `not_found` for an unknown id and 403 `forbidden`\nfor a ticket the caller may not read.",
         "operationId": "TicketsController_detail",
         "parameters": [
           {
@@ -39584,6 +39878,124 @@
           }
         },
         "summary": "Update a ticket",
+        "tags": [
+          "Tickets"
+        ]
+      }
+    },
+    "/api/internal/tickets/{id}/claim": {
+      "delete": {
+        "description": "Removes the caller from the ticket's handlers; the others stay. Same\nrights as taking it.",
+        "operationId": "TicketClaimsController_release",
+        "parameters": [
+          {
+            "description": "Id of the ticket.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TicketDetailResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Hand a ticket back",
+        "tags": [
+          "Tickets"
+        ]
+      },
+      "post": {
+        "description": "Makes the caller the ticket's handler (\"Nhận phiếu\"): staff with\n`judge.change_ticket`, an editor of the linked problem, or an editor of\nthe contest the ticket was filed from. A ticket the\ncaller already handles is returned unchanged. Fails with 409\n`ticket_claimed` when someone else already handles it, also when two\npeople claim at the same moment (exactly one wins), and with 409\n`ticket_closed` on a closed ticket. Reassigning a handled ticket is\n`PATCH /tickets/{id}` with `assignees` (staff).",
+        "operationId": "TicketClaimsController_claim",
+        "parameters": [
+          {
+            "description": "Id of the ticket.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TicketDetailResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Take a ticket",
         "tags": [
           "Tickets"
         ]

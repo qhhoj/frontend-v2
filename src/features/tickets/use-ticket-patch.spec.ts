@@ -7,7 +7,9 @@ import { signedInViewer } from '@/test/problem-routes';
 
 describe('ticket patch conflict', () => {
   it('reloads the ticket and says it changed when the server answers 409 conflict', async () => {
-    const stale = ticketDetail({ can: { editNotes: false, markGood: true, assign: false } });
+    const stale = ticketDetail({
+      can: { editNotes: false, markGood: true, assign: false, claim: false },
+    });
     const fresh = { ...stale, isContributive: true };
     const calls = mockApi({
       ...signedInViewer(),

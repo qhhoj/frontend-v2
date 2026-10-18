@@ -102,7 +102,7 @@ describe('ticket page: staff controls follow the backend permission', () => {
   });
 });
 
-const EDITABLE = { editNotes: true, markGood: false, assign: false };
+const EDITABLE = { editNotes: true, markGood: false, assign: false, claim: false };
 describe('ticket page: drafts follow refetches unless edited', () => {
   it('shows the notes the refetch brings when the viewer has not typed', async () => {
     mockApi({
@@ -142,7 +142,7 @@ describe('ticket page: drafts follow refetches unless edited', () => {
 
 describe('ticket page: drafts follow refetches unless edited', () => {
   it('shows the assignees the refetch brings when the viewer has not typed', async () => {
-    const staff = { editNotes: true, markGood: true, assign: true };
+    const staff = { editNotes: true, markGood: true, assign: true, claim: false };
     mockApi({
       ...signedInViewer({ user: sessionUser({ isStaff: true }) }),
       [`GET /tickets/${id}`]: sequence(

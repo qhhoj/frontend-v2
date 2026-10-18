@@ -3146,6 +3146,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/contests/{key}/tickets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the tickets filed from a contest
+         * @description Returns the questions and problem tickets filed from a contest: all of
+         *     them for staff and the contest's editors, otherwise only the caller's own.
+         *     Fails with 404 `not_found` when the caller cannot see the contest. Paged
+         *     with `page`.
+         */
+        get: operations["TicketsController_contestList"];
+        put?: never;
+        /**
+         * Ask a contest's organisers
+         * @description Opens a ticket filed from a contest the caller can see (404 `not_found`
+         *     otherwise): about the contest, or about one of its problems given by
+         *     `problem` code (404 when it is not a problem of the contest the caller can
+         *     see). The assignees are the contest's authors and curators, and its editors
+         *     can read it. Same limits, refusals and notifications as filing a ticket
+         *     about a problem.
+         */
+        post: operations["TicketCreationController_forContest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/contests/bulk/tag": {
         parameters: {
             query?: never;
@@ -4822,7 +4854,11 @@ export interface paths {
          *     `isOrganizationPrivate` (a move) need the organization problem creation
          *     rights in every organization added or removed (403
          *     `organization_rights`) and `judge.add_problem` to leave every organization
-         *     for the site (403 `site_problem_rights`). A move keeps the code; only a
+         *     for the site (403 `site_problem_rights`). Any edit that makes a public
+         *     problem visible to everyone by leaving organization privacy needs
+         *     `judge.change_public_visibility` (403 `site_publish_rights`); without it,
+         *     an edit of `isPublic` or `isOrganizationPrivate` saves only while both
+         *     are as its gates read them (409 `conflict`). A move keeps the code; only a
          *     new code of an organization-private problem must carry its first
          *     organization's prefix (400 `organization_code_prefix`, superusers
          *     exempt). A move into an organization spends its problem credits and must
@@ -6648,7 +6684,8 @@ export interface paths {
         /**
          * List tickets
          * @description Returns tickets the caller may read: their own and those assigned to them,
-         *     tickets of problems they can edit, and every ticket for holders of
+         *     tickets of problems they can edit, tickets filed from contests they can
+         *     edit, and every ticket for holders of
          *     `judge.change_ticket`. Filter with `open`, `awaiting` (open tickets whose
          *     newest message is not from staff), `own` (only tickets they filed
          *     or are assigned to), and repeated `user` and `assignee` usernames (at most
@@ -6673,8 +6710,8 @@ export interface paths {
         /**
          * Get a ticket
          * @description Returns the ticket with its messages, notes, assignees and timeline.
-         *     Readable by its creator, its assignees, editors of the linked problem and
-         *     staff. Fails with 404 `not_found` for an unknown id and 403 `forbidden`
+         *     Readable by its creator, its assignees, editors of the linked problem,
+         *     editors of the contest it was filed from and staff. Fails with 404 `not_found` for an unknown id and 403 `forbidden`
          *     for a ticket the caller may not read.
          */
         get: operations["TicketsController_detail"];
@@ -6697,6 +6734,38 @@ export interface paths {
          *     changed meanwhile.
          */
         patch: operations["TicketUpdatesController_update"];
+        trace?: never;
+    };
+    "/api/internal/tickets/{id}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Take a ticket
+         * @description Makes the caller the ticket's handler ("Nhận phiếu"): staff with
+         *     `judge.change_ticket`, an editor of the linked problem, or an editor of
+         *     the contest the ticket was filed from. A ticket the
+         *     caller already handles is returned unchanged. Fails with 409
+         *     `ticket_claimed` when someone else already handles it, also when two
+         *     people claim at the same moment (exactly one wins), and with 409
+         *     `ticket_closed` on a closed ticket. Reassigning a handled ticket is
+         *     `PATCH /tickets/{id}` with `assignees` (staff).
+         */
+        post: operations["TicketClaimsController_claim"];
+        /**
+         * Hand a ticket back
+         * @description Removes the caller from the ticket's handlers; the others stay. Same
+         *     rights as taking it.
+         */
+        delete: operations["TicketClaimsController_release"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/internal/tickets/{id}/messages": {
@@ -8441,9 +8510,9 @@ export interface components {
             hideProblemAuthors?: boolean;
             /** @description Hide problem tags from contestants. */
             hideProblemTags?: boolean;
-            /** @description Only members of the listed organizations may see it. */
+            /** @description Only members of the listed organizations may see it. Clearing it on a visible contest that becomes public needs `judge.change_contest_visibility`. */
             isOrganizationPrivate?: boolean;
-            /** @description Only the listed contestants may see it. */
+            /** @description Only the listed contestants may see it. Clearing it on a visible contest that becomes public needs `judge.change_contest_visibility`. */
             isPrivate?: boolean;
             /** @description Whether the contest changes ratings. */
             isRated?: boolean;
@@ -9715,6 +9784,14 @@ export interface components {
              */
             parentId?: string;
         };
+        NewContestTicketDto: {
+            /** @description Message text in Markdown. */
+            body: string;
+            /** @description Code of one of the contest's problems the question is about; omit for the contest as a whole. */
+            problem?: string;
+            /** @description Ticket title. */
+            title: string;
+        };
         NewGeneralTicketDto: {
             /** @description Message text in Markdown. */
             body: string;
@@ -9885,6 +9962,8 @@ export interface components {
          */
         OrganizationProblemBulkAction: "add-tag" | "archive" | "remove-tag" | "unarchive";
         OrganizationProblemResponse: {
+            /** @description Whether the viewer may edit the problem (the row's pencil to its editor). */
+            canEdit: boolean;
             /** @description Problem code. */
             code: string;
             /** @description Whether the organization archived the problem. */
@@ -11070,7 +11149,7 @@ export interface components {
             email: string;
             /**
              * Format: uuid
-             * @description The account's default programming language.
+             * @description The account's default programming language; C++17 when omitted.
              */
             languageId?: string;
             /**
@@ -11579,7 +11658,7 @@ export interface components {
         SocialCompleteDto: {
             /**
              * Format: uuid
-             * @description The account's default programming language.
+             * @description The account's default programming language; C++17 when omitted.
              */
             languageId?: string;
             /**
@@ -11781,6 +11860,16 @@ export interface components {
             /** @description Points available for the case. */
             total: number;
         };
+        SubmissionContestResponse: {
+            /** @description The contest's key. */
+            key: string;
+            /** @description Whole minutes from the start of the run it was made in to the submission, as the scoreboard counts them (`participationStart`); only for the submitter's own submission made within that run, null otherwise. */
+            minute: number | null;
+            /** @description The contest's name. */
+            name: string;
+            /** @description Points this submission scored in the contest (the case ratio of the contest problem's points, as the scoreboard counts them); null when the problem left the contest and no contest row holds them. */
+            points: number | null;
+        };
         SubmissionDetailResponse: {
             /** @description Batch summaries when the problem shows only those (B). */
             batches: components["schemas"]["SubmissionBatchResponse"][] | null;
@@ -11790,6 +11879,8 @@ export interface components {
             cases: components["schemas"]["SubmissionCaseResponse"][] | null;
             /** @description Points available over all test cases. */
             caseTotal: number;
+            /** @description The contest it was submitted in, when the viewer may see that contest; null otherwise and outside a contest. */
+            contest: components["schemas"]["SubmissionContestResponse"] | null;
             /** @description Number of the case being judged while the submission runs; null unless the viewer sees every case result (it would tell where judging stopped). */
             currentTestcase: number | null;
             /**
@@ -12324,11 +12415,19 @@ export interface components {
          * @enum {string}
          */
         TestcaseVisibility: "A" | "C" | "O";
+        TicketContestResponse: {
+            /** @description Contest key. */
+            key: string;
+            /** @description Contest name. */
+            name: string;
+        };
         TicketDetailResponse: {
             /** @description Users assigned to handle the ticket. */
             assignees: components["schemas"]["UserSummaryResponse"][];
             /** @description What the caller may do with the ticket. */
             can: components["schemas"]["TicketPermissionsResponse"];
+            /** @description The contest it was filed from, whose editors read it; null outside a contest. */
+            contest: components["schemas"]["TicketContestResponse"] | null;
             /**
              * Format: date-time
              * @description When the ticket was filed, ISO 8601.
@@ -12378,23 +12477,25 @@ export interface components {
             ticketId: string;
         };
         TicketLinkResponse: {
-            /** @description Id of the problem or issue. */
+            /** @description Id of the problem, issue or contest. */
             id: string;
-            /** @description The problem code; null for a general issue and for a deleted problem. */
+            /** @description The problem code or contest key; null for a general issue and for a deleted problem or contest. */
             key: string | null;
-            /** @description The problem name, or the issue url. */
+            /** @description The problem or contest name, or the issue url. */
             title: string;
             /**
-             * @description problem for a ticket about a problem, general for a site issue.
+             * @description problem for a ticket about a problem, general for a site issue, contest for a question to a contest's organisers.
              * @enum {string}
              */
-            type: "general" | "problem";
-            /** @description SPA path for a problem, the absolute url for a general issue; empty when the problem is gone. */
+            type: "contest" | "general" | "problem";
+            /** @description SPA path for a problem or contest, the absolute url for a general issue; empty when the problem or contest is gone. */
             url: string;
         };
         TicketListItemResponse: {
             /** @description Users assigned to handle the ticket. */
             assignees: components["schemas"]["UserSummaryResponse"][];
+            /** @description The contest it was filed from, whose editors read it; null outside a contest. */
+            contest: components["schemas"]["TicketContestResponse"] | null;
             /**
              * Format: date-time
              * @description When the ticket was filed, ISO 8601.
@@ -12436,12 +12537,16 @@ export interface components {
         TicketPermissionsResponse: {
             /** @description The caller may change the assignees. */
             assign: boolean;
+            /** @description The caller may take the ticket on themselves or hand it back (`POST`/`DELETE /tickets/{id}/claim`). */
+            claim: boolean;
             /** @description The caller may edit the notes. */
             editNotes: boolean;
             /** @description The caller may mark the ticket good. */
             markGood: boolean;
         };
         TicketSummaryResponse: {
+            /** @description Open tickets about the viewer's own problems and contests (the list's `aboutMine`); 0 unless the viewer may edit problems or contests. */
+            aboutMineOpen: number;
             /** @description Open tickets the viewer is assigned to. */
             assignedOpen: number;
             /** @description Open tickets whose newest message is not from staff; 0 unless the viewer holds `judge.change_ticket`. */
@@ -12542,9 +12647,9 @@ export interface components {
             hideProblemAuthors?: boolean;
             /** @description Hide problem tags from contestants. */
             hideProblemTags?: boolean;
-            /** @description Only members of the listed organizations may see it. */
+            /** @description Only members of the listed organizations may see it. Clearing it on a visible contest that becomes public needs `judge.change_contest_visibility`. */
             isOrganizationPrivate?: boolean;
-            /** @description Only the listed contestants may see it. */
+            /** @description Only the listed contestants may see it. Clearing it on a visible contest that becomes public needs `judge.change_contest_visibility`. */
             isPrivate?: boolean;
             /** @description Whether the contest changes ratings. */
             isRated?: boolean;
@@ -13065,6 +13170,8 @@ export interface components {
             ratingSummary: components["schemas"]["RatingSummaryResponse"] | null;
             /** @description Moderation details; null unless the viewer holds `judge.ban_user`. */
             staff: components["schemas"]["UserPageStaffResponse"] | null;
+            /** @description Submissions of the user this viewer may see: the total of the submission list filtered to the user. */
+            submissionCount: number;
             /** @description Login name. */
             username: string;
         };
@@ -19289,6 +19396,84 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["SubmissionListItemResponse"][];
                         meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    TicketsController_contestList: {
+        parameters: {
+            query?: {
+                /** @description 1-based page number. */
+                page?: number;
+            };
+            header?: never;
+            path: {
+                /** @description Key of the contest. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TicketListItemResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    TicketCreationController_forContest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Key of the contest. */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NewContestTicketDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TicketDetailResponse"];
                     };
                 };
             };
@@ -25556,6 +25741,8 @@ export interface operations {
     TicketsController_list: {
         parameters: {
             query?: {
+                /** @description true limits the list to tickets about what the caller makes: problems they author, curate or suggested, and contests they author or curate (tickets filed from them), whatever else they may read. */
+                aboutMine?: boolean;
                 /** @description Usernames of assignees; repeat the parameter, at most 10. */
                 assignee?: string[];
                 /** @description true keeps open tickets whose newest message is not from staff (what the staff badge counts). */
@@ -25566,6 +25753,8 @@ export interface operations {
                 own?: boolean;
                 /** @description 1-based page number. */
                 page?: number;
+                /** @description Text in the title (ignoring case and Vietnamese accents), or the exact username of the creator; blank filters nothing. */
+                q?: string;
                 /** @description Usernames of ticket creators; repeat the parameter, at most 10. */
                 user?: string[];
             };
@@ -25649,6 +25838,76 @@ export interface operations {
                 "application/json": components["schemas"]["UpdateTicketDto"];
             };
         };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TicketDetailResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    TicketClaimsController_claim: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the ticket. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["TicketDetailResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    TicketClaimsController_release: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the ticket. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
