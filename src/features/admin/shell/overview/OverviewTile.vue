@@ -17,6 +17,7 @@ defineProps<{
   detail?: string;
   to: RouteLocationRaw;
   needsAttention?: boolean;
+  /** The link line for a loaded count ("Xem 3 phiếu"); while `value` is null the line reads "Mở danh sách". */
   linkText: string;
 }>();
 </script>
@@ -55,7 +56,7 @@ defineProps<{
       <span
         class="mt-auto inline-flex items-center gap-1 pt-1 text-sm font-semibold text-accent-text"
       >
-        {{ linkText }}
+        {{ typeof value === 'number' ? linkText : $t('admin.shell.overview.links.open') }}
         <ArrowRight aria-hidden="true" class="size-3.5" :stroke-width="2" />
       </span>
     </RouterLink>

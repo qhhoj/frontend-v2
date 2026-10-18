@@ -49,11 +49,14 @@ describe('admin search palette', () => {
     const { router, box } = await openPalette('/admin');
     type(box, 'ap');
     await vi.waitFor(() => expect(optionTexts().join()).toContain('A cộng B'));
-    // The dashboard's setter tiles count problems too; only the palette sends a search text.
+    // The dashboard's setter tiles count problems too: one-row pages of public or private problems, never a search.
+    const isSetterCount = (call: (typeof calls)[number]) =>
+      call.path === '/problems' &&
+      call.query.get('pageSize') === '1' &&
+      ['public', 'private'].includes(call.query.get('visibility') ?? '') &&
+      !call.query.has('q');
     const searched = calls.filter(
-      (call) =>
-        !['/auth/me', '/profile'].includes(call.path) &&
-        !(call.path === '/problems' && !call.query.has('q')),
+      (call) => !['/auth/me', '/profile'].includes(call.path) && !isSetterCount(call),
     );
     expect(searched.map((call) => call.path)).toEqual(['/problems']);
     expect(searched[0]!.query.get('visibility')).toBe('all');

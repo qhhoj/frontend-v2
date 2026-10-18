@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/vue-query';
 import { computed, onScopeDispose } from 'vue';
 import { fetchAdminProblems } from '@/api/admin-index.api';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { PROBLEM_INDEX_KEY } from '../../problems/problem-editing.queries';
 import { useSubmissionStatsQuery } from '@/features/submissions/submissions.queries';
 import { TICKET_SUMMARY_POLL_MS, useTicketSummaryQuery } from '@/features/tickets/tickets.queries';
 import { usePermissions } from '@/stores/use-permissions';
@@ -79,18 +80,21 @@ export function useNavCounts() {
   }));
 }
 
-/** How many problems the viewer may edit are public and how many are not (the setter tiles); `null` until loaded. */
+/** How many problems the viewer may edit are public and how many are not (the setter tiles). */
 export function useEditableProblemCounts() {
   const viewer = useViewerId();
   const countOf = (visibility: 'public' | 'private') =>
     useQuery({
-      queryKey: computed(() => ['admin', 'problem-counts', visibility, viewer.value]),
+      // Under the problem index's key, so every problem write that refreshes the index refreshes these counts too.
+      queryKey: computed(() => [...PROBLEM_INDEX_KEY, 'counts', visibility, viewer.value]),
       queryFn: () => fetchAdminProblems({ visibility, pageSize: 1 }),
     });
   const unpublished = countOf('private');
   const published = countOf('public');
+  /** The count, `—` when the request failed (the tile still links to the list), null while loading. */
   const totalOf = (query: typeof unpublished) =>
     computed(() => {
+      if (query.isError.value) return '—';
       const meta = query.data.value?.meta;
       return meta && 'total' in meta ? meta.total : null;
     });

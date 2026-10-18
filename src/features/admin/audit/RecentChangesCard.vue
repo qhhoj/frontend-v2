@@ -5,6 +5,7 @@ import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import Card from '@/components/ui/Card.vue';
 import { formatAgo, formatDateTime } from '@/lib/format';
+import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { canUseAdmin } from '../admin-access';
@@ -26,6 +27,8 @@ const recent = useRecentChangesQuery(RECENT_LIMIT, canSeeLog);
 const entries = computed(() => recent.data.value?.items ?? []);
 const textOf = (key: string) => (i18n.te(key) ? i18n.t(key) : null);
 const linkOf = useAuditLinkOf();
+/** Relative times move on while the dashboard stays open. */
+const now = useNow(60_000);
 const rows = computed(() =>
   entries.value.map((entry) => ({
     entry,
@@ -81,12 +84,15 @@ const rows = computed(() =>
               <RouterLink
                 v-if="link"
                 :to="link"
-                class="font-mono font-semibold text-accent-text hover:underline"
+                class="-my-2.5 inline-block py-2.5 font-mono font-semibold text-accent-text hover:underline"
                 >{{ sentence.object }}</RouterLink
               >
               <span v-else class="font-mono" :class="entry.object.deleted && 'line-through'">{{
                 sentence.object
               }}</span>
+              <span v-if="entry.object.deleted" class="text-meta text-muted">
+                ({{ $t('admin.audit.deleted') }})</span
+              >
             </template>
           </i18n-t>
           <time
@@ -94,7 +100,7 @@ const rows = computed(() =>
             :title="formatDateTime(entry.at, locale.locale)"
             class="shrink-0 text-meta text-muted tabular-nums"
           >
-            {{ formatAgo(entry.at, Date.now(), locale.locale) }}
+            {{ formatAgo(entry.at, now, locale.locale) }}
           </time>
         </li>
       </Card>
