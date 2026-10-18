@@ -52,8 +52,11 @@ const LINKS = computed<BarLink[]>(() => [
   },
   { name: 'contest-announcements', label: t('contests.tabs.announcements') },
 ]);
-/** A page of this contest that is not a tab's own route: its problem lights "Đề bài". */
-const CLAIMED_BY: Record<string, string> = { problem: 'contest' };
+/** A page of this contest that is not a tab's own route: its problem lights "Đề bài", its submission "Bài nộp". */
+const CLAIMED_BY: Record<string, string> = {
+  problem: 'contest',
+  submission: 'contest-submissions',
+};
 const isOnContestPage = computed(() => route.params.key === contestKey.value);
 const currentLink = computed(() =>
   navSectionOverride.value === '/contests' ? (CLAIMED_BY[String(route.name ?? '')] ?? null) : null,

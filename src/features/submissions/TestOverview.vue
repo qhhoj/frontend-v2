@@ -38,6 +38,8 @@ const props = defineProps<{
   caseTotal: number;
   /** The grading goes on: points are not final yet. */
   running: boolean;
+  /** The hero leads with contest points, so this total is named as the problem's (M-17). */
+  inContest?: boolean;
 }>();
 
 const POINT_FRACTION_DIGITS = 2;
@@ -220,7 +222,9 @@ const explanation = computed(() => {
     <div
       class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t-2 border-content px-4 py-4 sm:px-6"
     >
-      <span class="font-bold">{{ $t('submission.overview.total') }}</span>
+      <span class="font-bold">{{
+        $t(inContest ? 'submission.overview.problemTotal' : 'submission.overview.total')
+      }}</span>
       <span
         data-testid="overview-total"
         class="font-mono text-title font-bold whitespace-nowrap tabular-nums"

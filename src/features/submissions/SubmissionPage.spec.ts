@@ -1,7 +1,16 @@
 import { flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { installFakeEventSource, latestEventSource, pageStreams } from '@/test/fake-event-source';
-import { submissionCase, submissionDetail } from '@/test/fixtures';
+import {
+  contestDetail,
+  contestProblem,
+  participationSummary,
+  problemDetail,
+  submissionCase,
+  submissionDetail,
+} from '@/test/fixtures';
+import { contestPageRoutes } from '@/test/contest-routes';
+import type { SubmissionDetail } from '@/api/types/submissions';
 import { mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import {
@@ -323,5 +332,96 @@ describe('submission page', () => {
     expect(wrapper.find('[data-testid="pending-row"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="stale-reload"]').exists()).toBe(false);
     expect(pageStreams()).toHaveLength(1);
+  });
+});
+
+describe('submission page of a contest submission (P-14 B)', () => {
+  const contest = contestDetail({
+    formatName: 'ioi',
+    problems: [contestProblem(0, { code: 'duongdi', partial: true }), contestProblem(1)],
+  });
+  /** The API's block for someone's submission; the submitter's own within its run also carries the minute. */
+  const block = { key: contest.key, name: contest.name, points: 35, minute: null };
+  const routes = (detail: Partial<SubmissionDetail>) => ({
+    ...signedInViewer(),
+    ...submissionPageRoutes(submissionDetail(detail)),
+    ...problemPageRoutes(problemDetail({ code: 'duongdi', partial: true, points: 100 })),
+    ...contestPageRoutes(contest),
+    'GET /contests/current': ok({ contest, participation: participationSummary() }),
+  });
+  beforeEach(() =>
+    vi.useFakeTimers({
+      now: Date.parse('2026-10-08T10:00:00Z'),
+      toFake: ['Date', 'setTimeout', 'clearTimeout'],
+    }),
+  );
+
+  it('in the running run: contest points first, the next problem and the minute of the run', async () => {
+    mockApi(routes({ date: '2026-10-08T09:58:00Z', contest: { ...block, minute: 118 } }));
+    const { wrapper } = await openSubmission('sub-1');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="submission-next"]').exists()).toBe(true),
+    );
+    expect(wrapper.get('[data-testid="score"]').text()).toBe('35 / 100 điểm kỳ thi');
+    expect(wrapper.get('[data-testid="hero-line"]').text()).toMatch(/^Điểm bài /);
+    expect(wrapper.get('nav[aria-label="Đường dẫn"]').text()).toContain('QHH Round #42 (Div. 2)');
+    expect(wrapper.get('h1').text()).toBe('A. Đường đi ngắn nhất');
+    expect(wrapper.get('[data-testid="submission-next"]').text()).toContain('Bài B');
+    expect(wrapper.find('[data-fact="contest"]').exists()).toBe(true);
+    expect(wrapper.get('[data-testid="submission-facts"]').text()).toContain('phút 118');
+    expect(
+      wrapper.get('[data-testid="overview-total"]').element.previousElementSibling?.textContent,
+    ).toBe('Điểm bài');
+  });
+
+  it("from an earlier run: contest points and the API's minute, no next problem", async () => {
+    mockApi(routes({ date: '2026-10-08T07:00:00Z', contest: { ...block, minute: 42 } }));
+    const { wrapper } = await openSubmission('sub-1');
+    await vi.waitFor(() =>
+      expect(wrapper.get('[data-testid="score"]').text()).toBe('35 / 100 điểm kỳ thi'),
+    );
+    expect(wrapper.find('[data-fact="contest"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="submission-next"]').exists()).toBe(false);
+    expect(wrapper.get('[data-testid="submission-facts"]').text()).toContain('phút 42');
+  });
+
+  it("someone else's submission in the viewer's run: contest points, no next problem or minute", async () => {
+    mockApi(
+      routes({
+        date: '2026-10-08T09:58:00Z',
+        contest: block,
+        user: { id: 'other-user', username: 'user_02', rating: null },
+      }),
+    );
+    const { wrapper } = await openSubmission('sub-1');
+    await vi.waitFor(() =>
+      expect(wrapper.get('[data-testid="score"]').text()).toBe('35 / 100 điểm kỳ thi'),
+    );
+    expect(wrapper.find('[data-testid="submission-next"]').exists()).toBe(false);
+    expect(wrapper.get('[data-testid="submission-facts"]').text()).not.toMatch(/· phút \d/);
+  });
+
+  it('without contest points: the contest row and the problem score', async () => {
+    mockApi(routes({ date: '2026-10-08T09:58:00Z', contest: { ...block, points: null } }));
+    const { wrapper } = await openSubmission('sub-1');
+    await vi.waitFor(() => expect(wrapper.find('[data-fact="contest"]').exists()).toBe(true));
+    expect(wrapper.get('[data-testid="score"]').text()).toMatch(/\/ 100/);
+    expect(wrapper.get('[data-testid="score"]').text()).not.toContain('kỳ thi');
+    expect(
+      wrapper.get('[data-testid="overview-total"]').element.previousElementSibling?.textContent,
+    ).toBe('Tổng');
+  });
+
+  it('outside a contest: the problem score and no contest row', async () => {
+    const calls = mockApi(routes({ date: '2026-10-08T09:58:00Z', contest: null }));
+    const { wrapper } = await openSubmission('sub-1');
+    await vi.waitFor(() =>
+      expect(calls.some((call) => call.path === '/problems/duongdi')).toBe(true),
+    );
+    await flushPromises();
+    expect(wrapper.get('[data-testid="score"]').text()).toMatch(/\/ 100/);
+    expect(wrapper.get('[data-testid="score"]').text()).not.toContain('kỳ thi');
+    expect(wrapper.find('[data-fact="contest"]').exists()).toBe(false);
+    expect(calls.some((call) => call.path === `/contests/${contest.key}`)).toBe(false);
   });
 });
