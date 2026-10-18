@@ -16,7 +16,7 @@ import AppearancePreview from './AppearancePreview.vue';
 import LevelSlider from './LevelSlider.vue';
 import LowPowerChoice from './LowPowerChoice.vue';
 import ModeChoice from './ModeChoice.vue';
-import SettingSwitch from './SettingSwitch.vue';
+import Switch from '@/components/ui/Switch.vue';
 import { useAppearanceChoice } from './use-appearance-choice';
 
 const appearance = useAppearanceStore();
@@ -59,7 +59,7 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
             <p id="own-look-label" class="font-semibold">{{ $t('appearance.customLook') }}</p>
             <p class="mt-1 text-meta text-muted">{{ $t('appearance.customLookHelp') }}</p>
           </div>
-          <SettingSwitch :checked="isOn" labelledby="own-look-label" @toggle="toggle" />
+          <Switch :model-value="isOn" labelledby="own-look-label" @update:model-value="toggle" />
         </div>
 
         <div>

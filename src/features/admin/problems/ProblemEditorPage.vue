@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { ArrowUpRight, Copy, Globe, Lightbulb, Lock } from 'lucide-vue-next';
+import { ArrowUpRight, Check, Copy, Globe, Lightbulb, Lock, Minus } from 'lucide-vue-next';
 import type { EditableProblem } from '@/api/types/problem-editing';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import Chip from '@/components/ui/Chip.vue';
+import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminChip from '../ui/AdminChip.vue';
@@ -39,12 +41,17 @@ function statusOf(detail: EditableProblem): { key: string; tone: ChipTone; icon:
   return { key: 'private', tone: 'neutral', icon: Lock };
 }
 const status = computed(() => (problem.data.value ? statusOf(problem.data.value) : null));
-/** "VI ✓ · EN — · Gốc ✓": which statements exist, so a missing translation shows before contest day. */
+/** Which statements exist (a chip per slot, check or minus), so a missing translation shows before contest day. */
 const written = computed(() =>
   problem.data.value?.editor
     ? STATEMENT_SLOTS.map((slot) => ({ slot, isWritten: writtenSlots(problem.data.value!)[slot] }))
     : [],
 );
+/** "Tiếng Việt: đã có" — the chip's tooltip and its spoken text. */
+const slotText = (item: { slot: (typeof STATEMENT_SLOTS)[number]; isWritten: boolean }) =>
+  translate(`admin.problems.statements.written.${item.isWritten ? 'yes' : 'no'}`, {
+    slot: translate(`admin.problems.statements.slots.${item.slot}`),
+  });
 
 /** The tabs stick to the top: a focused field or a section jumped to lands below them, never under them. */
 const root = document.documentElement;
@@ -93,27 +100,25 @@ function openClone(close: () => void) {
             <AdminChip v-if="status" :tone="status.tone" :icon="status.icon">
               {{ $t(`admin.problems.header.${status.key}`) }}
             </AdminChip>
-            <AdminChip
+            <ul
               v-if="written.length"
               data-testid="statement-slots"
-              :title="$t('admin.problems.statements.written.label')"
+              class="m-0 inline-flex list-none flex-wrap gap-1 p-0"
+              :aria-label="$t('admin.problems.statements.written.label')"
             >
-              <span class="sr-only">{{ $t('admin.problems.statements.written.label') }}:</span>
-              <template v-for="(item, index) in written" :key="item.slot">
-                <span v-if="index > 0" aria-hidden="true">&nbsp;·&nbsp;</span>
-                <span :class="item.isWritten ? 'text-positive' : 'text-muted'">
-                  <span aria-hidden="true"
-                    >{{ $t(`admin.problems.statements.written.short.${item.slot}`) }}
-                    {{ item.isWritten ? '✓' : '—' }}</span
-                  >
-                  <span class="sr-only">{{
-                    $t(`admin.problems.statements.written.${item.isWritten ? 'yes' : 'no'}`, {
-                      slot: $t(`admin.problems.statements.slots.${item.slot}`),
-                    })
+              <li v-for="item in written" :key="item.slot" :data-slot="item.slot">
+                <Chip
+                  :tone="item.isWritten ? 'success' : 'neutral'"
+                  :icon="item.isWritten ? Check : Minus"
+                  :title="slotText(item)"
+                >
+                  <span aria-hidden="true">{{
+                    $t(`admin.problems.statements.written.short.${item.slot}`)
                   }}</span>
-                </span>
-              </template>
-            </AdminChip>
+                  <span class="sr-only">{{ slotText(item) }}</span>
+                </Chip>
+              </li>
+            </ul>
           </template>
           <template #actions>
             <RouterLink :to="{ name: 'problem', params: { code } }" :class="buttonClass()">
