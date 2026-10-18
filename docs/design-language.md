@@ -8,16 +8,20 @@ Root problem it fixes: the same control was built four ways (admin `controls.ts`
 
 | Group | Names |
 |---|---|
-| Type (font size only) | `text-tiny` 11 · `text-caption` 12 · `text-meta` 13 · `text-sm` 14 · `text-base` 16 · `text-title` 17 · `text-page` 26 · `text-stat` 26 (+ `font-mono`) · `text-hero` 40 · `text-score` 56 (submission score) |
-| Leading | tiny/caption 16 px · meta 18 · sm 20 · base 24 · title 22 · page 1.25 · stat/hero/score 1 |
+| Type (font size only) | `text-tiny` 11 · `text-caption` 12 · `text-meta` 13 · `text-sm` 14 · `text-base` 16 · `text-title` 17 · `text-subtitle` 18 · `text-section` 20 · `text-display` 24 · `text-page` 26 · `text-stat` 26 (+ `font-mono`) · `text-hero` 40 · `text-score` 56 (submission score) |
+| Leading | tiny/caption 16 px · meta 18 · sm 20 · base 24 · title 22 · subtitle/section/display set none (add a `leading-*`) · page 1.25 · stat/hero/score 1 |
 | Control height | `--qh-control` 44 (md) · `--qh-control-sm` 36, 44 on coarse pointers · `--qh-control-lg` 56 (swap card submit) |
 | Radius by role | `rounded-control` (`--qh-radius-control`: pill; 12 in admin) · inputs, code `rounded-cell` 12 · inset tiles, notices `rounded-row` 16 · cards, dialogs `rounded-card` 24 · chips, tabs, segmented `rounded-pill`. `tile` 20 and `panel` 28: no new uses |
+| Control border | `border-line-control` (`--qh-line-control`): the border of inputs, selects, textareas and secondary buttons, at least 3:1 on the ground, the card and the inner tile (WCAG 1.4.11, checked per theme in `themes.node.spec.ts`). `border-line` stays the hairline of cards and dividers; `border-line-strong` the edge of menus and popovers |
+| Elevation | `shadow-float` (`--qh-shadow-float`, `0 8px 24px`, 12 % ink in light, 50 % black in dark): floating surfaces only, which the preset gives Modal, menus, Select lists and popovers, and `AdminToastHost` its toasts. Cards, tables and sticky bars stay flat |
+| Icons | Lucide at three sizes: 14 (`size-3.5`) dense admin chrome and small chips · 16 (`size-4`) the default, in buttons, inputs and rows · 20 (`size-5`) hero and empty states. `IconButton` and `Chip` draw an icon that has no `size-*` class of its own at the size of their button (16, 20 in `lg`) or chip (14 sm, 16 md) |
+| Placeholder | muted text (`placeholder:text-muted` in `TextInput`; the base layer sets the same colour for any other field) |
 | Z | `z-sticky` 10 · `z-savebar` 20 · `z-header` 30 · `z-bit` 40 · `z-overlay` 50 · `z-toast` 1200 (above PrimeVue's 1000/1100) |
 | Status colour | `warning`/`warning-bg` = verdict-tle pair · `info`/`info-bg` = tag-5 pair (aliases in tokens.css, every theme and accent preset) |
 | Spacing | page blocks 24 · card padding 16/20/24 → 32 · form fields 20 · inside a field 6 · button groups 8 |
 | Motion | 150/200 ms on colour, border, opacity only; 0 under reduced motion |
 
-`sm` and `base` are Tailwind's own steps and carry their leading; the new steps set font size only, so replacing an exact `text-[Npx]` is pixel-identical.
+`sm` and `base` are Tailwind's own steps and carry their leading; the new steps set font size only, so replacing an exact `text-[Npx]` is pixel-identical. `subtitle`, `section` and `display` (18, 20, 24) name the sizes pages already use. The stock `text-lg` … `text-5xl` still render until the sweep that moves their call sites onto these names; the lint ban lands with that sweep.
 
 Admin scope: `AdminShell` puts `qh-admin` on `<html>` while mounted (teleported dialogs included). It sets `--qh-radius-control` to 12 px and `--qh-control` to `--qh-control-sm`.
 
@@ -25,7 +29,9 @@ Lint (`npm run lint:tokens`, `scripts/check-tokens.mjs`) errors on raw colours, 
 
 ## Primitives (`src/components/ui/`)
 
-Built: AppButton/IconButton (+ `buttonClasses`), Chip, Card (+ `CARD_VARIANTS`), Notice, FormField + TextInput/TextArea/SelectField, SaveBar + `useLeaveGuard`, Tabs, SegmentedControl, PageHeader, DataTable, FilterBar, Modal, StatGrid, ProgressBar. Props and when to use each: `.claude/skills/qhhoj-web-style/SKILL.md` §3. `Admin*`, `GlassCard`, `PillTabs`, `Settings*` and `Auth*` parts are thin wrappers over them; new code imports `ui/` directly.
+Built: AppButton/IconButton (+ `buttonClasses`), Chip, Card (+ `CARD_VARIANTS`), Notice, FormField + TextInput/TextArea/SelectField, SaveBar + `useLeaveGuard`, Tabs, SegmentedControl, Switch, PageHeader, DataTable, FilterBar, Modal, Popover, StatGrid, ProgressBar. Props and when to use each: `.claude/skills/qhhoj-web-style/SKILL.md` §3. `Admin*`, `GlassCard`, `PillTabs`, `Settings*` and `Auth*` parts are thin wrappers over them; new code imports `ui/` directly. ESLint (`no-restricted-imports`, `scripts/wrapper-imports.mjs`) rejects a new import of `AdminField`, `AdminChip`, `AdminPageHeader`, `AdminDataTable`, `AdminNotice`, `GlassCard` or the `controls.ts` classes; the files that already import one are listed there, and `docs/wrapper-migration.md` keeps the count per wrapper.
+
+`Switch` is the one on/off control (`AdminSwitch` only adds `lockedBy`). `Popover` is PrimeVue's on the preset and behaves like `Modal`: focus moves to its first control, Tab stays inside, Escape and `hide()` return focus to the opener. `EmptyState` has an `action` slot for the next step; a list that is empty offers one there.
 
 Not built: MarkdownEditor, ListRow, SidebarLayout. Gaps: Notice icon override, Chip `to`, StatGrid slot values, a single toggle button.
 
@@ -35,7 +41,7 @@ Not built: MarkdownEditor, ListRow, SidebarLayout. Gaps: Notice icon override, C
 - Inputs 16 px, 44 px tall, 12 px corners. Targets ≥ 44 px on coarse pointers.
 - Hint ≤ one line (~60 chars); an error replaces it. Optional fields say "(tuỳ chọn)".
 - Feedback: standing state or refusal → inline Notice by its cause; form save → SaveBar text; row/bulk/background → toast. A failure is never toast-only.
-- Tables: th 13 muted, td 14; numbers right-aligned, mono, tabular, nowrap.
+- Tables: th 13 muted in sentence case (`text-meta text-muted`, comfortable and compact alike), td 14; numbers right-aligned, mono, tabular, nowrap.
 - Empty states offer one next step. Skeletons are shaped from the component.
 
 ## Answers (2026-10-12)
