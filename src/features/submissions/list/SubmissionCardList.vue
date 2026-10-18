@@ -99,8 +99,13 @@ const PILL =
             :username="row.user.username"
             :rating="row.user.rating"
           />
-          <template v-for="part in phoneMeta(row)" :key="part">
-            <span aria-hidden="true" class="mx-1 md:hidden">·</span>
+          <template v-for="(part, index) in phoneMeta(row)" :key="part">
+            <span
+              v-if="index > 0 || (isShown('user') && row.user)"
+              aria-hidden="true"
+              class="mx-1 md:hidden"
+              >·</span
+            >
             <span class="font-mono whitespace-nowrap md:hidden">{{ part }}</span>
           </template>
           <span

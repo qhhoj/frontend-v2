@@ -9,7 +9,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useRatingHistoryQuery, useUserPageQuery } from '@/features/users/users.queries';
 import { formatNumber, greetingKey } from '@/lib/format';
 import { ratingTier } from '@/lib/rating-tiers';
-import { sparklinePath } from '@/lib/sparkline';
+import { sparklineAreaPath, sparklinePath } from '@/lib/sparkline';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { useLocaleStore } from '@/stores/locale.store';
 
@@ -34,9 +34,15 @@ const delta = computed(() =>
 );
 const tier = computed(() => ratingTier(user.value?.rating ?? null));
 const greeting = greetingKey(new Date().getHours());
-const path = computed(() => sparklinePath(ratings.value, 640, 110));
 /** Q-03 B: an unrated student leads with the problems solved, a number that can grow every day; the rating once there is one. */
 const isRated = computed(() => tier.value !== null);
+/** The chart's box: a fixed 48 px band, at most 240 px wide, on the right of the card. */
+const CHART = { width: 240, height: 48 } as const;
+/** Two points make a bare diagonal that reads as a glitch, so the chart waits for a third. */
+const MIN_CHART_POINTS = 3;
+const showsChart = computed(() => isRated.value && ratings.value.length >= MIN_CHART_POINTS);
+const line = computed(() => sparklinePath(ratings.value, CHART.width, CHART.height));
+const area = computed(() => sparklineAreaPath(ratings.value, CHART.width, CHART.height));
 const headline = computed(() =>
   isRated.value
     ? String(user.value!.rating)
@@ -93,8 +99,8 @@ const tiles = computed(() =>
           <!-- The hero Bit's box (16 pixels of 5 px, 7 px from sm up), so the card keeps its height. -->
           <SkeletonBlock data-skeleton-region="bit" class="size-20 shrink-0 sm:size-28" />
         </div>
-        <div data-skeleton-region="chart" class="h-[110px]">
-          <SkeletonBlock class="h-full w-full" />
+        <div data-skeleton-region="chart" class="mt-4 flex h-12 justify-end">
+          <SkeletonBlock class="h-full w-full max-w-60" />
         </div>
         <div class="mt-3 grid grid-cols-[repeat(auto-fit,minmax(6.5rem,1fr))] gap-3">
           <div
@@ -161,35 +167,52 @@ const tiles = computed(() =>
             class="[--bit-px:5px] sm:[--bit-px:7px]"
           />
         </div>
-        <svg
-          v-if="isRated && ratings.length >= 2"
-          viewBox="0 0 640 110"
-          width="100%"
-          height="110"
-          role="img"
-          :aria-label="
-            $t(
-              'home.ratingChart',
-              { count: ratings.length, first: ratings[0], last: ratings.at(-1) },
-              ratings.length,
-            )
-          "
-        >
-          <defs>
-            <linearGradient :id="gradientId" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" style="stop-color: var(--qh-chart-line-start)" />
-              <stop offset="1" style="stop-color: var(--qh-accent)" />
-            </linearGradient>
-          </defs>
-          <path
-            :d="path"
-            fill="none"
-            :stroke="`url(#${gradientId})`"
-            stroke-width="3"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+        <div v-if="showsChart" class="mt-4 flex justify-end">
+          <svg
+            data-testid="rating-chart"
+            :viewBox="`0 0 ${CHART.width} ${CHART.height}`"
+            preserveAspectRatio="none"
+            class="h-12 w-full max-w-60"
+            role="img"
+            :aria-label="
+              $t(
+                'home.ratingChart',
+                { count: ratings.length, first: ratings[0], last: ratings.at(-1) },
+                ratings.length,
+              )
+            "
+          >
+            <defs>
+              <linearGradient :id="`${gradientId}-line`" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" style="stop-color: var(--qh-chart-line-start)" />
+                <stop offset="1" style="stop-color: var(--qh-accent)" />
+              </linearGradient>
+              <linearGradient :id="`${gradientId}-area`" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" style="stop-color: var(--qh-accent); stop-opacity: 0.22" />
+                <stop offset="1" style="stop-color: var(--qh-accent); stop-opacity: 0" />
+              </linearGradient>
+            </defs>
+            <path data-testid="rating-chart-area" :d="area" :fill="`url(#${gradientId}-area)`" />
+            <line
+              data-testid="rating-chart-baseline"
+              x1="0"
+              :x2="CHART.width"
+              :y1="CHART.height - 0.5"
+              :y2="CHART.height - 0.5"
+              style="stroke: var(--qh-line-strong)"
+              vector-effect="non-scaling-stroke"
+            />
+            <path
+              :d="line"
+              fill="none"
+              :stroke="`url(#${gradientId}-line)`"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              vector-effect="non-scaling-stroke"
+            />
+          </svg>
+        </div>
         <dl class="mt-3 grid grid-cols-[repeat(auto-fit,minmax(6.5rem,1fr))] gap-3">
           <div
             v-for="tile in tiles"

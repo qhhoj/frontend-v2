@@ -106,11 +106,14 @@ describe('the submission list page', () => {
     expect(router.currentRoute.value.query.user).toBe(username);
     const mine = wrapper.get('button[data-quick-filter="mine"]');
     expect(mine.attributes('aria-pressed')).toBe('true');
+    // Every row is the viewer's own: the name would only crowd out the run time.
+    expect(wrapper.get('[data-id]').text()).not.toContain(username);
     await mine.trigger('click');
     await vi.waitFor(() => expect(listCalls().at(-1)!.query.get('user')).toBeNull());
     await flushPromises();
     expect(router.currentRoute.value.query.user).toBeUndefined();
     expect(mine.attributes('aria-pressed')).toBe('false');
+    expect(wrapper.get('[data-id]').text()).toContain(username);
   });
 
   it('keeps a filter the viewer picks while "Của tôi" is still being decided', async () => {

@@ -18,3 +18,15 @@ export function sparklinePath(
     })
     .join(' ');
 }
+
+/** The region under `sparklinePath` down to the bottom edge, closed, for an area fill. */
+export function sparklineAreaPath(
+  values: readonly number[],
+  width: number,
+  height: number,
+  padding = 4,
+): string {
+  const line = sparklinePath(values, width, height, padding);
+  if (!line) return '';
+  return `${line} L${(width - padding).toFixed(1)} ${height} L${padding.toFixed(1)} ${height} Z`;
+}

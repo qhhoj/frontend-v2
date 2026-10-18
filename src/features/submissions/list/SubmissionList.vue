@@ -81,6 +81,14 @@ const hasFixedUser = computed(() => fixedUserOf(props.scope) !== null);
 const chipUsername = computed(() =>
   isSignedIn.value && !hasFixedUser.value ? (session.user?.username ?? null) : null,
 );
+/** "Của tôi" on: every row is the viewer's own, so the rows leave the name out and the run time keeps its room. */
+const isOwnList = computed(
+  () => chipUsername.value !== null && filters.value.user === chipUsername.value,
+);
+const shownColumns = computed(() => {
+  const columns = props.columnKeys ?? ALL_COLUMN_KEYS;
+  return isOwnList.value ? columns.filter((key) => key !== 'user') : columns;
+});
 const picks = useDiffPicks();
 /** Q-04 C: the rows' compare boxes wait behind "So sánh"; turning it off drops the picks. */
 const isComparing = ref(false);
@@ -210,12 +218,12 @@ watch(
           :submissions="rows"
           :highlight-ids="live.addedIds.value"
           :problem-labels="problemLabels ?? {}"
-          :show-user="!hasFixedUser"
+          :show-user="!hasFixedUser && !isOwnList"
         />
         <SubmissionCardList
           v-else
           :submissions="rows"
-          :columns="columnKeys ?? ALL_COLUMN_KEYS"
+          :columns="shownColumns"
           :highlight-ids="live.addedIds.value"
           :problem-labels="problemLabels ?? {}"
           :picked-ids="isSignedIn && isComparing ? picks.picked.value : undefined"
