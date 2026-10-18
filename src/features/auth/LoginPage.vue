@@ -9,7 +9,7 @@ import AuthError from './AuthError.vue';
 import AuthField from './AuthField.vue';
 import AuthNotice from './AuthNotice.vue';
 import AuthSubmit from './AuthSubmit.vue';
-import LoginBrandPanel from './LoginBrandPanel.vue';
+import AuthLayout from './AuthLayout.vue';
 import SocialButtons from './SocialButtons.vue';
 import { useAfterSignIn, usePreloadAfterSignIn } from './use-after-sign-in';
 import { useAuthAction } from './use-auth-action';
@@ -51,63 +51,60 @@ const submit = () =>
 </script>
 
 <template>
-  <div
-    class="relative grid min-h-[calc(100dvh-env(safe-area-inset-top))] grid-cols-1 content-start pb-[env(safe-area-inset-bottom)] lg:grid-cols-[minmax(0,7fr)_minmax(0,9fr)] lg:content-stretch"
-  >
-    <LoginBrandPanel />
-    <section class="flex items-center justify-center lg:p-8">
-      <form
-        ref="formElement"
-        method="post"
-        class="flex w-full max-w-[440px] flex-col gap-4 px-6 py-6 lg:glass lg:gap-[18px] lg:rounded-panel lg:p-8"
-        @submit.prevent="submit"
+  <AuthLayout :title="$t('pages.login')" brand>
+    <template #header-end>
+      <span class="flex items-center gap-1"
+        ><span class="text-muted max-sm:hidden">{{ $t('auth.noAccountPrompt') }}</span>
+        <RouterLink :to="{ name: 'register' }" :class="LINK">{{
+          $t('account.register')
+        }}</RouterLink></span
       >
-        <h1 class="page-title">{{ $t('pages.login') }}</h1>
-        <AuthNotice v-if="notice" dismissible @dismiss="noticeDismissed = true">{{
-          notice
-        }}</AuthNotice>
-        <AuthError :text="errorText">
-          <RouterLink v-if="notActivated" :to="{ name: 'activate-resend' }" :class="LINK">{{
-            $t('auth.resendLink')
-          }}</RouterLink>
-        </AuthError>
-        <AuthField
-          v-model="form.username"
-          name="username"
-          :label="$t('auth.username')"
-          autocomplete="username"
-          :error="fieldErrors.username"
-          placeholder="bitcoder"
-          required
-          spellcheck="false"
-          autocapitalize="none"
-          @input="dismiss('username')"
-        />
-        <AuthField
-          v-model="form.password"
-          type="password"
-          name="password"
-          :label="$t('auth.password')"
-          autocomplete="current-password"
-          :error="fieldErrors.password"
-          placeholder="••••••••"
-          required
-          @input="dismiss('password')"
-        />
-        <p class="-mt-1 flex justify-end text-sm">
-          <RouterLink :to="{ name: 'forgot-password' }" class="text-accent-text underline">{{
-            $t('auth.forgot')
-          }}</RouterLink>
-        </p>
-        <AuthSubmit :pending="pending">{{ $t('auth.submitLogin') }}</AuthSubmit>
-        <SocialButtons />
-        <p class="text-center text-sm text-muted">
-          {{ $t('auth.noAccountPrompt') }}
-          <RouterLink :to="{ name: 'register' }" :class="LINK">{{
-            $t('account.register')
-          }}</RouterLink>
-        </p>
-      </form>
-    </section>
-  </div>
+    </template>
+    <form ref="formElement" method="post" class="flex flex-col gap-4" @submit.prevent="submit">
+      <AuthNotice v-if="notice" dismissible @dismiss="noticeDismissed = true">{{
+        notice
+      }}</AuthNotice>
+      <AuthError :text="errorText">
+        <RouterLink v-if="notActivated" :to="{ name: 'activate-resend' }" :class="LINK">{{
+          $t('auth.resendLink')
+        }}</RouterLink>
+      </AuthError>
+      <AuthField
+        v-model="form.username"
+        name="username"
+        :label="$t('auth.username')"
+        autocomplete="username"
+        :error="fieldErrors.username"
+        placeholder="bitcoder"
+        required
+        spellcheck="false"
+        autocapitalize="none"
+        @input="dismiss('username')"
+      />
+      <AuthField
+        v-model="form.password"
+        type="password"
+        name="password"
+        :label="$t('auth.password')"
+        autocomplete="current-password"
+        :error="fieldErrors.password"
+        placeholder="••••••••"
+        required
+        @input="dismiss('password')"
+      />
+      <p class="-mt-1 flex justify-end text-sm">
+        <RouterLink :to="{ name: 'forgot-password' }" class="text-accent-text underline">{{
+          $t('auth.forgot')
+        }}</RouterLink>
+      </p>
+      <AuthSubmit :pending="pending">{{ $t('auth.submitLogin') }}</AuthSubmit>
+      <SocialButtons />
+      <p class="text-center text-sm text-muted">
+        {{ $t('auth.noAccountPrompt') }}
+        <RouterLink :to="{ name: 'register' }" :class="LINK">{{
+          $t('account.register')
+        }}</RouterLink>
+      </p>
+    </form>
+  </AuthLayout>
 </template>

@@ -3,23 +3,17 @@ import { computed, watch } from 'vue';
 import type { Language } from '@/api/types/problems';
 import QueryState from '@/components/QueryState.vue';
 import { useProblemMetaQuery } from '@/features/problems/problems.queries';
-import AuthSelect from './AuthSelect.vue';
 import PickerSkeleton from './PickerSkeleton.vue';
 import SchoolPicker from './SchoolPicker.vue';
 import { useOpenOrganizationsQuery } from './auth.queries';
 import { defaultLanguageId } from './signup-choices';
 
-withDefaults(defineProps<{ errors?: { organizationId?: string; languageId?: string } }>(), {
+withDefaults(defineProps<{ errors?: { organizationId?: string } }>(), {
   errors: () => ({}),
 });
 const organizationId = defineModel<string>('organizationId', { required: true });
-/** `undefined` until the parent sets it: only then does the C++17 default apply, so a remount keeps the viewer's choice. */
+/** Not shown (P-13): `undefined` until the languages load, then C++17, so the account starts with the ruled default. */
 const languageId = defineModel<string | undefined>('languageId');
-/** The select always holds a string; `undefined` shows as "Chưa chọn" until the default lands. */
-const languageIdValue = computed({
-  get: () => languageId.value ?? '',
-  set: (value: string) => (languageId.value = value),
-});
 const schools = useOpenOrganizationsQuery();
 const meta = useProblemMetaQuery();
 /** A file-only language (output only) cannot be somebody's default; the problem list's own filter applies too. */
@@ -39,8 +33,8 @@ watch(
 </script>
 
 <template>
-  <!-- One row of the signup grid (two columns from sm), the same row on social completion. -->
-  <div class="grid gap-4 sm:col-span-2 sm:grid-cols-2">
+  <!-- One full row of the signup grid. P-13: no language picker here; new accounts start at C++17 (set above), changed later in the settings or by the submit box, which remembers the last one. -->
+  <div class="sm:col-span-2">
     <QueryState
       :loading="schools.isPending.value"
       :error="schools.error.value"
@@ -54,26 +48,6 @@ watch(
         :schools="schools.data.value"
         :error="errors.organizationId"
       />
-    </QueryState>
-    <QueryState
-      :loading="meta.isPending.value"
-      :error="meta.error.value"
-      :registers-wait="false"
-      @retry="meta.refetch()"
-    >
-      <template #skeleton><PickerSkeleton /></template>
-      <AuthSelect
-        v-if="languages.length"
-        v-model="languageIdValue"
-        name="languageId"
-        :label="$t('auth.signup.language')"
-        :placeholder="$t('auth.signup.none')"
-        :error="errors.languageId"
-      >
-        <option v-for="language in languages" :key="language.id" :value="language.id">
-          {{ language.name }}
-        </option>
-      </AuthSelect>
     </QueryState>
   </div>
 </template>

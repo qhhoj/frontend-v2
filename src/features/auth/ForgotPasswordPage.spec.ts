@@ -4,11 +4,12 @@ import { signedOut } from '@/test/fixtures';
 import { fail, invalid, issue, mockApi, noContent } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { brandRoutes } from '@/test/auth-routes';
 
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 
 const forgotApi = (reply: MockHandler = noContent()) =>
-  mockApi({ 'GET /auth/me': signedOut, 'POST /auth/password/reset': reply });
+  mockApi({ 'GET /auth/me': signedOut, ...brandRoutes, 'POST /auth/password/reset': reply });
 
 const send = async (wrapper: Wrapper, email = 'user_01@example.com') => {
   await wrapper.get('input[name="email"]').setValue(email);
