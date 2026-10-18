@@ -20,6 +20,7 @@ import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
 import { contestEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import ContestTabs from './ContestTabs.vue';
 import { ownSubmissionsOnly } from './own-submissions';
+import { podiumRows } from './podium-rows';
 import RankingSkeleton from './RankingSkeleton.vue';
 import RankingPodium from './RankingPodium.vue';
 import RankingTable from './RankingTable.vue';
@@ -82,9 +83,7 @@ const rows = computed(() => {
   const all = ranking.value?.rows ?? [];
   return needle ? all.filter((row) => row.user.username.toLocaleLowerCase().includes(needle)) : all;
 });
-/** Ranks 1-3 including ties, capped so a mass tie does not fill the page. */
-const PODIUM_LIMIT = 6;
-const PODIUM_SKELETON_CARDS = 3;
+const PODIUM_SKELETON_CELLS = 3;
 /** The format is known before the board is, so the skeleton can have the penalty column the table will have. */
 /** The board's own problem list once it is known (a cached board), else the contest's: the skeleton has the table's column count. */
 const problemCount = computed(
@@ -96,11 +95,7 @@ const skeletonHasTimeColumn = computed(
     isPenaltyFormat(contest.value.formatName) &&
     showsCumtime(contest.value.formatName),
 );
-const podium = computed(() =>
-  (ranking.value?.rows ?? [])
-    .filter((row) => row.rank !== null && row.rank <= 3 && !row.isDisqualified)
-    .slice(0, PODIUM_LIMIT),
-);
+const podium = computed(() => podiumRows(ranking.value?.rows ?? []));
 const summary = computed(() =>
   contest.value
     ? rankingSummary(
@@ -214,23 +209,23 @@ const viewMode = computed(() => (withVirtual.value ? 'virtual' : 'official'));
     >
       <template #skeleton>
         <div class="flex flex-col gap-5">
-          <div data-skeleton-region="podium" class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <Card
-              v-for="place in PODIUM_SKELETON_CARDS"
+          <Card
+            as="div"
+            data-skeleton-region="podium"
+            class="grid divide-y divide-line overflow-hidden lg:grid-cols-3 lg:divide-x lg:divide-y-0"
+          >
+            <div
+              v-for="place in PODIUM_SKELETON_CELLS"
               :key="place"
-              as="div"
-              padding="md"
-              data-skeleton-region="podium-card"
-              class="flex items-center gap-3.5"
+              data-skeleton-region="podium-cell"
+              class="flex min-h-11.5 items-center gap-3 px-4 py-2 lg:px-5 lg:py-4"
             >
-              <SkeletonBlock round class="shrink-0" :class="place === 1 ? 'size-15' : 'size-13'" />
-              <SkeletonBlock class="size-6 shrink-0" />
-              <div class="min-w-0 flex-1">
-                <div class="text-lg"><SkeletonBlock text class="w-2/3" /></div>
-                <p class="font-mono text-meta"><SkeletonBlock text class="w-1/2" /></p>
-              </div>
-            </Card>
-          </div>
+              <SkeletonBlock round class="size-7 shrink-0" />
+              <SkeletonBlock round class="size-6 shrink-0" />
+              <SkeletonBlock text class="w-1/2" />
+              <SkeletonBlock text class="ml-auto w-10" />
+            </div>
+          </Card>
           <RankingSkeleton :problem-count="problemCount" :has-time-column="skeletonHasTimeColumn" />
         </div>
       </template>
@@ -248,7 +243,13 @@ const viewMode = computed(() => (withVirtual.value ? 'virtual' : 'official'));
           :context="rankingContext"
           :class="{ 'opacity-60': rankingStale }"
         />
-        <Card as="div" class="overflow-hidden" :class="{ 'opacity-60': rankingStale }">
+        <Card
+          id="ranking-board"
+          as="div"
+          tabindex="-1"
+          class="scroll-mt-4 overflow-hidden"
+          :class="{ 'opacity-60': rankingStale }"
+        >
           <RankingTable
             :ranking="ranking"
             :rows="rows"

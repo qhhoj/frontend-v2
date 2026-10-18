@@ -155,7 +155,7 @@ describe('contest ranking', () => {
     ).toBeGreaterThanOrEqual(2);
   });
 
-  it('shares medals between tied ranks and keeps a tied first place', async () => {
+  it('groups tied ranks into one podium cell and keeps rank order', async () => {
     const [problemA] = RANKING_PROBLEM_IDS;
     const cell = { [problemA]: { time: 60, points: 1, tries: 1 } };
     mockApi(
@@ -179,8 +179,64 @@ describe('contest ranking', () => {
       'user_12',
       'user_03',
     ]);
-    const [first, tiedFirst, third] = podium.findAll('span[aria-hidden="true"]');
-    expect(first!.classes()).toEqual(tiedFirst!.classes());
-    expect(third!.classes()).not.toEqual(first!.classes());
+    // One cell per rank in rank order: the tie at 1 shares a cell, and no rank 2 cell is invented.
+    const cells = podium.findAll('[data-podium-rank]');
+    expect(cells.map((cell) => cell.findAll('a').map((link) => link.text()))).toEqual([
+      ['user_07', 'user_12'],
+      ['user_03'],
+    ]);
+    expect(cells.map((cell) => cell.find('span[aria-hidden="true"]').text())).toEqual(['1', '3']);
+  });
+
+  it('stacks three names of a mass tie and links the rest to the board', async () => {
+    const [problemA] = RANKING_PROBLEM_IDS;
+    const cell = { [problemA]: { time: 60, points: 1, tries: 1 } };
+    const tied = ['user_11', 'user_12', 'user_13', 'user_14', 'user_15'].map((username) =>
+      rankingRow(1, `part-${username}`, username, 1, 10, cell),
+    );
+    mockApi(routes({ 'GET /contests/r42/ranking': ok(ranking({ rows: tied })) }));
+    const { wrapper } = await mountApp('/contests/r42/ranking');
+    const podium = wrapper.get('section[aria-label="Top 3"]');
+    expect(
+      podium.findAll('[data-podium-rank] li a:not([data-testid])').map((link) => link.text()),
+    ).toEqual(['user_11', 'user_12', 'user_13']);
+    const more = podium.get('[data-testid="podium-more"]');
+    expect(more.text()).toBe('+2 nữa');
+    expect(more.attributes('href')).toBe('#ranking-board');
+    expect(wrapper.find('#ranking-board').exists()).toBe(true);
+  });
+
+  it('keeps virtual rows off the podium and ranks the live rows among themselves', async () => {
+    const [problemA] = RANKING_PROBLEM_IDS;
+    const cell = { [problemA]: { time: 60, points: 1, tries: 1 } };
+    const virtualRow = { ...rankingRow(1, 'part-09', 'user_09', 3, 5, cell), virtual: 1 };
+    mockApi(
+      routes({
+        'GET /contests/r42/ranking': ok(
+          ranking({
+            rows: [
+              virtualRow,
+              rankingRow(2, 'part-07', 'user_07', 2, 10, cell),
+              rankingRow(3, 'part-12', 'user_12', 1, 10, cell),
+              rankingRow(4, 'part-03', 'user_03', 1, 20, cell),
+            ],
+          }),
+        ),
+      }),
+    );
+    const { wrapper } = await mountApp('/contests/r42/ranking?virtual=1');
+    const podium = wrapper.get('section[aria-label="Top 3"]');
+    expect(podium.text()).not.toContain('user_09');
+    const cells = podium.findAll('[data-podium-rank]');
+    expect(cells.map((cell) => cell.findAll('a').map((link) => link.text()))).toEqual([
+      ['user_07'],
+      ['user_12'],
+      ['user_03'],
+    ]);
+    expect(cells.map((cell) => cell.find('span[aria-hidden="true"]').text())).toEqual([
+      '1',
+      '2',
+      '3',
+    ]);
   });
 });

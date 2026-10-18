@@ -3329,8 +3329,8 @@ export interface paths {
         };
         /**
          * Stream the live judging progress of one submission
-         * @description Needs a signed-in user who may see the submission's detail (same access
-         *     rules and 404 or 403 errors). Server-Sent Events (`text/event-stream`): a
+         * @description Public, with the submission detail's access rules (404 or 403 errors);
+         *     the source rule plays no part, as the events carry none of it. Server-Sent Events (`text/event-stream`): a
          *     `state` event first with the current status, result and points, then
          *     `queued`, `processing`, `grading-begin` and `done` events, and `test-case`
          *     events only when the viewer may see every case result. `resync` means events
@@ -6159,15 +6159,20 @@ export interface paths {
         };
         /**
          * Get a submission with its judging details
-         * @description Needs a signed-in user. The owner, problem editors and users with
-         *     `judge.view_all_submission` always see it; others depend on the problem's
-         *     `submissionSourceVisibility` (everyone, only after solving the problem, or
-         *     owner and testers only). Test case results follow
+         * @description Public: the result (verdict, points, test case results) is open to anyone
+         *     who may see the submission's problem. Test case results follow
          *     `testcaseResultVisibility`: every case, batch summaries only, or totals
-         *     only; feedback and program output have their own rules. `viewer` tells which
-         *     of abort, rejudge and reject the caller may use. Errors: 404 `not_found`,
-         *     403 `hidden`, 403 `solve_first` (solve the problem to see it) and 403
-         *     `contest_running` (the contest's list is not open to the viewer yet).
+         *     only. The source is not part of it: `sourceAccess` tells whether the source
+         *     endpoint will answer (the owner, problem editors and
+         *     `judge.view_all_submission` always; others by the problem's
+         *     `submissionSourceVisibility`: everyone, only after solving the problem, or
+         *     owner and testers only; never visitors). Checker feedback, program output
+         *     and the compile log come only with source access, then by their own rules.
+         *     `viewer` tells which of abort, rejudge and reject the caller may use (all
+         *     false for visitors). Errors: 404 `not_found` and 403 `contest_running`
+         *     (another user's contest submission while the contest's list is not open to
+         *     the viewer). Visitors are limited to 300 requests per IP per minute (429
+         *     `rate_limited`).
          */
         get: operations["SubmissionsController_detail"];
         put?: never;
@@ -6318,8 +6323,9 @@ export interface paths {
         };
         /**
          * Get the source code of a submission
-         * @description Needs a signed-in user and follows the same access rules and errors as the
-         *     submission detail. Returns the submitted source text; for a file-only
+         * @description Needs a signed-in user with source access (the detail's `sourceAccess`
+         *     is `granted`). Errors: 404 `not_found`, 403 `hidden`, 403 `solve_first`
+         *     (solve the problem to see it) and 403 `contest_running`. Returns the submitted source text; for a file-only
          *     language it is the URL of the uploaded file.
          */
         get: operations["SubmissionsController_source"];
@@ -11775,7 +11781,7 @@ export interface components {
              * @description When the submission was made.
              */
             date: string;
-            /** @description Compile log or compiler warnings; an internal error's message (it can quote jury data) only for the problem's editors, null for everyone else, the submitter included. */
+            /** @description Compile log or compiler warnings, only for a viewer who may read the source (`sourceAccess` granted: a compile log quotes the code); an internal error's message (it can quote jury data) only for the problem's editors, null for everyone else, the submitter included. */
             error: string | null;
             /** @description The run on the external judge; only for viewers who may rejudge, and only for the current judging generation. */
             externalRun: components["schemas"]["SubmissionExternalRunResponse"] | null;
@@ -11810,6 +11816,8 @@ export interface components {
             rejudgedDate: string | null;
             /** @description Verdict: `AC` accepted, `WA` wrong answer, `TLE` time limit, `MLE` memory limit, `OLE` output limit, `IR` invalid return, `RTE` runtime error, `CE` compile error, `IE` internal error, `SC` short circuited, `AB` aborted, `RJ` rejected; null while unjudged. */
             result: components["schemas"]["SubmissionResult"] | null;
+            /** @description Whether `GET /submissions/{id}/source` will answer: `granted`; `sign_in` for visitors; `solve_first` until the viewer solves the problem; `hidden` otherwise. Without source access, cases carry no feedback or output. */
+            sourceAccess: components["schemas"]["SubmissionSourceAccess"];
             /** @description Judging state: `QU` queued, `P` processing, `G` grading, `D` done, `IE` internal error, `CE` compile error, `AB` aborted, `PD` pending final judging at contest end. */
             status: components["schemas"]["SubmissionStatus"];
             /** @description The first test results, only on the submission lists and only when the viewer could see them on the submission page (signed in; another user's contest submission only for the problem's editors and `judge.view_all_submission`); null otherwise. */
@@ -11948,6 +11956,11 @@ export interface components {
          * @enum {string}
          */
         SubmissionResult: "AB" | "AC" | "CE" | "IE" | "IR" | "MLE" | "OLE" | "RJ" | "RTE" | "SC" | "TLE" | "WA";
+        /**
+         * @description Whether `GET /submissions/{id}/source` will answer: `granted`; `sign_in` for visitors; `solve_first` until the viewer solves the problem; `hidden` otherwise. Without source access, cases carry no feedback or output.
+         * @enum {string}
+         */
+        SubmissionSourceAccess: "granted" | "hidden" | "sign_in" | "solve_first";
         SubmissionSourceResponse: {
             /** @description Name the raw and download links give the file (`<id>.<extension>`, `Main.java` for Java); null for a file-only language. */
             filename: string | null;
