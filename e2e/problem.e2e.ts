@@ -11,6 +11,7 @@ import { THEMES } from '../src/theme/registry';
 import { expect, pdfReady, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 import { applyTheme } from './fixtures/audit';
+import { dockOf, dockSubmitButton, openDock, railSubmitButton } from './fixtures/submit-dock';
 
 const DESKTOP = { width: 1280, height: 900 };
 const OVER_LIMIT_LENGTH = 65_537;
@@ -18,8 +19,6 @@ const OVER_LIMIT_LENGTH = 65_537;
 const REFUSAL_WAIT_MS = 500;
 /** The first poll answers 202 with a 3 s wait; the PDF is ready on the next one. */
 const PDF_READY_TIMEOUT_MS = 8000;
-const dockOf = (page: Page) => page.getByRole('region', { name: 'Nộp bài' });
-const submitButton = (page: Page) => dockOf(page).getByRole('button', { name: 'Nộp bài' });
 
 async function openProblem(page: Page, api: FakeApi, path = '/problems/duongdi') {
   api.signedIn = true;
@@ -27,6 +26,13 @@ async function openProblem(page: Page, api: FakeApi, path = '/problems/duongdi')
   await page.goto(path);
   await expect(page.locator('#main h1')).toBeVisible();
 }
+/** P-02 B: the dock starts closed, so a test that works in it opens it first, as a visitor does. */
+async function openProblemWithDock(page: Page, api: FakeApi, path?: string) {
+  await openProblem(page, api, path);
+  await openDock(page);
+}
+/** Q-01 B: after a submit the viewer stays on the problem and the form shows this strip. */
+const resultStrip = (page: Page) => dockOf(page).getByTestId('submit-result');
 const typeCode = async (page: Page, code: string) => {
   await page.locator('.cm-content').first().click();
   await page.keyboard.insertText(code);
@@ -103,8 +109,22 @@ test('the PDF button turns into an Open PDF link, announces it once and the last
 });
 
 test.describe('the submit dock', () => {
-  test('counts typed characters', async ({ page, api }) => {
+  test('starts closed, opens from the rail card with the editor focused and gives focus back when closed', async ({
+    page,
+    api,
+  }) => {
     await openProblem(page, api);
+    await expect(dockOf(page)).toHaveCount(0);
+    await railSubmitButton(page).click();
+    await expect(dockOf(page)).toBeVisible();
+    await expect(dockOf(page).locator('.cm-content')).toBeFocused();
+    await dockOf(page).getByRole('button', { name: 'Đóng khung nộp bài' }).click();
+    await expect(dockOf(page)).toHaveCount(0);
+    await expect(railSubmitButton(page)).toBeFocused();
+  });
+
+  test('counts typed characters', async ({ page, api }) => {
+    await openProblemWithDock(page, api);
     const counter = dockOf(page).getByTestId('source-counter');
     const before = await counter.innerText();
     await typeCode(page, 'return 0;');
@@ -114,7 +134,7 @@ test.describe('the submit dock', () => {
   for (const theme of THEMES)
     test(`colours a keyword with the syntax token of ${theme.id}`, async ({ page, api }) => {
       await applyTheme(page, api, theme);
-      await openProblem(page, api);
+      await openProblemWithDock(page, api);
       await typeCode(page, 'int main() { return 0; }');
       const keyword = dockOf(page).locator('.cm-content span', { hasText: /^return$/ });
       await expect(keyword).toBeVisible();
@@ -151,7 +171,7 @@ test.describe('the submit dock', () => {
         }),
       },
     };
-    await openProblem(page, api, '/problems/pascal');
+    await openProblemWithDock(page, api, '/problems/pascal');
     await typeCode(page, 'begin writeln(1); end.');
     await expect(dockOf(page).locator('.cm-content')).toContainText('writeln');
     const colours = await dockOf(page)
@@ -161,15 +181,21 @@ test.describe('the submit dock', () => {
     expect(pageErrors).toEqual([]);
   });
 
-  test('submits with the CSRF header and lands on the new submission', async ({ page, api }) => {
+  test('submits with the CSRF header, stays on the problem and links the result strip to the new submission', async ({
+    page,
+    api,
+  }) => {
     api.routes['GET /submissions/sub-9'] = { body: { data: submissionDetail({ id: 'sub-9' }) } };
-    await openProblem(page, api);
+    await openProblemWithDock(page, api);
     await typeCode(page, 'int main() {}');
-    await submitButton(page).click();
-    await expect(page).toHaveURL(/\/submissions\/sub-9$/);
-    await expect(page.getByTestId('score')).toBeVisible();
+    await dockSubmitButton(page).click();
+    await expect(resultStrip(page)).toBeVisible();
+    await expect(page).toHaveURL(/\/problems\/duongdi$/);
     const [sent] = api.requestsTo('POST /problems/duongdi/submit');
     expect(sent?.headers['x-csrf-token']).toBe('csrf-1');
+    await resultStrip(page).getByTestId('submit-result-link').click();
+    await expect(page).toHaveURL(/\/submissions\/sub-9$/);
+    await expect(page.getByTestId('score')).toBeVisible();
   });
 
   const pasteSource = (page: Page, length: number) =>
@@ -186,12 +212,12 @@ test.describe('the submit dock', () => {
     api,
   }) => {
     api.routes['GET /submissions/sub-9'] = { body: { data: submissionDetail({ id: 'sub-9' }) } };
-    await openProblem(page, api);
+    await openProblemWithDock(page, api);
     await page.locator('.cm-content').first().click();
     await pasteSource(page, OVER_LIMIT_LENGTH);
     await expect(dockOf(page).getByTestId('source-counter')).toHaveClass(/text-negative/);
     // aria-disabled keeps the button focusable, so the click reaches the handler and must be refused there.
-    await submitButton(page).click({ force: true });
+    await dockSubmitButton(page).click({ force: true });
     await page.waitForTimeout(REFUSAL_WAIT_MS);
     expect(api.requestsTo('POST /problems/duongdi/submit')).toEqual([]);
 
@@ -201,22 +227,22 @@ test.describe('the submit dock', () => {
     await page.keyboard.press('Delete');
     await page.keyboard.insertText('int main() {}');
     await expect(dockOf(page).getByTestId('source-counter')).not.toHaveClass(/text-negative/);
-    await submitButton(page).click();
-    await expect(page).toHaveURL(/\/submissions\/sub-9$/);
+    await dockSubmitButton(page).click();
+    await expect(resultStrip(page)).toBeVisible();
     expect(api.requestsTo('POST /problems/duongdi/submit')).toHaveLength(1);
   });
 
-  test('offers an anonymous visitor a sign-in link that comes back to the problem', async ({
+  test('offers an anonymous visitor a sign-in link in the rail card that comes back to the problem', async ({
     page,
     api,
   }) => {
     void api;
     await page.setViewportSize(DESKTOP);
     await page.goto('/problems/duongdi');
-    await expect(dockOf(page).getByRole('link', { name: 'Đăng nhập để nộp bài' })).toHaveAttribute(
-      'href',
-      '/login?redirect=/problems/duongdi',
-    );
+    await expect(
+      page.getByTestId('rail-submit').getByRole('link', { name: 'Đăng nhập để nộp bài' }),
+    ).toHaveAttribute('href', '/login?redirect=/problems/duongdi');
+    await expect(dockOf(page)).toHaveCount(0);
   });
 
   test('prefills the language and source from ?resubmit=', async ({ page, api }) => {
@@ -251,7 +277,7 @@ test.describe('a file-only language', () => {
     api,
   }) => {
     api.routes['GET /submissions/sub-9'] = { body: { data: submissionDetail({ id: 'sub-9' }) } };
-    await openProblem(page, api);
+    await openProblemWithDock(page, api);
     await pickScratch(page);
     const input = dockOf(page).locator('input[type="file"]');
     await input.setInputFiles({
@@ -267,7 +293,7 @@ test.describe('a file-only language', () => {
     });
     await expect(dockOf(page).getByText('catmaze-final.sb3')).toBeVisible();
     await dockOf(page).getByRole('button', { name: 'Nộp tệp' }).click();
-    await expect(page).toHaveURL(/\/submissions\/sub-9$/);
+    await expect(resultStrip(page)).toBeVisible();
     const [sent] = api.requestsTo('POST /problems/duongdi/submit/file');
     expect(sent?.headers['content-type']).toMatch(/^multipart\/form-data/);
     const body = sent?.postData?.toString('latin1') ?? '';
@@ -295,7 +321,7 @@ test.describe('a file-only language', () => {
         }),
       },
     };
-    await openProblem(page, api, '/problems/noupload');
+    await openProblemWithDock(page, api, '/problems/noupload');
     await pickScratch(page);
     await expect(dockOf(page).getByText('Ngôn ngữ này không nhận tệp tải lên.')).toBeVisible();
     await expect(dockOf(page).locator('input[type="file"]')).toHaveCount(0);
@@ -311,7 +337,7 @@ test('a contest problem with no attempts left says so and cannot be submitted', 
       data: problemDetail({ contest: { contestKey: 'r42', attemptsLeft: 0 } }),
     },
   };
-  await openProblem(page, api);
+  await openProblemWithDock(page, api);
   await expect(dockOf(page).getByText('Đã hết lượt nộp cho bài này.')).toBeVisible();
-  await expect(submitButton(page)).toHaveAttribute('aria-disabled', 'true');
+  await expect(dockSubmitButton(page)).toHaveAttribute('aria-disabled', 'true');
 });
