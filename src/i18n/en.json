@@ -1771,6 +1771,9 @@
     "menu": "Organization actions",
     "leaveTitle": "Leave {name}?",
     "leaveOpenBody": "An open organization: you can join again at any time.",
+    "leaveAdminNote": "You also give up the administrator rights. The organization needs at least one other administrator.",
+    "lastAdminTitle": "You are the only administrator",
+    "lastAdminBody": "Make someone else an administrator before you leave.",
     "left": "Left {name}",
     "joinedToast": "Joined {name}. To leave, open the ⋯ menu at the top of the organization page.",
     "openLine": "You can be in at most {max} open organizations."

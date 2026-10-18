@@ -27,6 +27,8 @@ const locale = useLocaleStore();
 const session = useSessionStore();
 const editTarget = computed(() => organizationEditTarget(session.user, props.organization));
 const state = computed(() => membershipState(props.organization, session.user !== null));
+/** Members leave through ⋯, administrators too (the chip shows them as administrators, not members). */
+const isMember = computed(() => session.user !== null && !!props.organization.viewer?.isMember);
 const places = computed(() => slotsLine(props.organization));
 const founded = computed(() => formatNumericDate(props.organization.createdAt, locale.locale));
 const memberCount = computed(() => formatNumber(props.organization.memberCount, locale.locale));
@@ -69,11 +71,7 @@ const phoneLines = computed(() => [
             compact
             :path="shortLinkPath({ kind: 'organization', slug: organization.slug })"
           />
-          <OrganizationMenu
-            v-if="state === 'member'"
-            :organization="organization"
-            class="ml-auto shrink-0"
-          />
+          <OrganizationMenu v-if="isMember" :organization="organization" class="ml-auto shrink-0" />
         </div>
         <!-- Phone: two lines at most, each cut with an ellipsis; from md every fact on one wrapping line. -->
         <div data-testid="organization-facts" class="min-w-0 text-sm text-muted tabular-nums">
