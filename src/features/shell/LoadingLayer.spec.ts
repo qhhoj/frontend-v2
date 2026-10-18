@@ -45,7 +45,7 @@ describe('LoadingLayer', () => {
     expect(region().text()).toBe('');
   });
 
-  it('walks the Bits off when loading ends, and hides the layer once they are gone', async () => {
+  it('fades the Bits out where they stand once loading ends, and hides the layer after the fade', async () => {
     const wrapper = await mountSettled();
     const loading = useLoadingStore();
     const source = Symbol('page');
@@ -53,10 +53,21 @@ describe('LoadingLayer', () => {
     await vi.advanceTimersByTimeAsync(LOADING_TIMING.showAfterMs);
     loading.end(source);
     await vi.advanceTimersByTimeAsync(LOADING_TIMING.settleMs);
-    expect(wrapper.get('[data-testid="loading-bits"]').attributes('data-phase')).toBe('leaving');
-    await vi.advanceTimersByTimeAsync(LOADING_TIMING.leaveMs);
     expect(wrapper.get('[data-testid="loading-bits"]').attributes('data-phase')).toBe('fading');
     await vi.advanceTimersByTimeAsync(LOADING_TIMING.fadeMs);
+    expect(wrapper.find('[data-testid="loading-bits"]').exists()).toBe(false);
+  });
+
+  it('stops the swarm once the page has painted, though a section below it still loads', async () => {
+    const wrapper = await mountSettled();
+    const loading = useLoadingStore();
+    const page = Symbol('page');
+    loading.begin(page);
+    await vi.advanceTimersByTimeAsync(LOADING_TIMING.showAfterMs);
+    expect(wrapper.find('[data-testid="loading-bits"]').attributes('data-phase')).toBe('walking');
+    loading.paint(page);
+    loading.begin(Symbol('comments'));
+    await vi.advanceTimersByTimeAsync(LOADING_TIMING.settleMs + LOADING_TIMING.fadeMs);
     expect(wrapper.find('[data-testid="loading-bits"]').exists()).toBe(false);
   });
 

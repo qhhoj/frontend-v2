@@ -5,12 +5,12 @@ import { useLoadingPhase } from './use-loading-phase';
 
 /** The single place that turns "the app is waiting on first data" into a mascot swarm and one polite announcement. */
 const loading = useLoadingStore();
-const { phase, gone } = useLoadingPhase(() => loading.isWaiting);
+const { phase } = useLoadingPhase(() => loading.isWaiting);
 </script>
 
 <template>
   <p role="status" aria-live="polite" class="sr-only">
     {{ phase === 'walking' ? $t('common.loading') : '' }}
   </p>
-  <LoadingBit :phase="phase" @gone="gone" />
+  <LoadingBit :phase="phase" />
 </template>

@@ -3,9 +3,10 @@ import { SPRITE_SIZE } from './bit-sprite';
 /**
  * Pure movement of the loading Bits (no DOM, no clock; randomness is injected so specs are deterministic).
  * - `stepWalker`: wander inside the walk bounds at a drifting speed, bouncing off the edges; a walker found outside the bounds
- *   (it was leaving) heads straight for their centre instead, with no wobble and no jump, and wanders again once inside.
- * - `leaveHeading`, `stepLeaver`, `isGone`: the exit. The heading to the nearest viewport edge is chosen once; the Bit then keeps
- *   its own speed in a straight line, legs stepping, until its whole sprite box is outside the viewport.
+ *   (its lane moved) heads straight for their centre instead, with no wobble and no jump, and wanders again once inside.
+ * - `loadingLanes`: where the loading swarm may walk (the gutters beside the content column, else a band along the bottom).
+ * - `leaveHeading`, `stepLeaver`, `isGone`: the exit of shooed roaming Bits. The heading to the nearest viewport edge is chosen
+ *   once; the Bit then keeps its own speed in a straight line, legs stepping, until its whole sprite box is outside the viewport.
  */
 
 /** Random numbers in [0, 1); `Math.random` in the app, a seeded generator in specs. */
@@ -75,13 +76,39 @@ export const secondsOf = (frameMs: number) =>
   // NaN counts as no time passed; negative frames are clamped too, so sqrt() never sees a negative.
   (Number.isNaN(frameMs) ? 0 : clamp(frameMs, 0, MAX_FRAME_MS)) / 1000;
 
+type Viewport = { width: number; height: number };
+
 /** Where a sprite box of `size` px may sit so it (and its hop) stays fully inside the viewport. */
-export const walkBounds = (viewport: { width: number; height: number }, size: number): Bounds => ({
+export const walkBounds = (viewport: Viewport, size: number): Bounds => ({
   minX: 0,
   minY: HOP_PX,
   maxX: Math.max(0, viewport.width - size),
   maxY: Math.max(HOP_PX, viewport.height - size),
 });
+
+/** The left and right edges, in viewport pixels, of the page's content column. */
+export interface Column {
+  left: number;
+  right: number;
+}
+
+/** A gutter takes a lane when a Bit fits with half a body of room to walk sideways (1440 px yes, 1366 px no). */
+const LANE_WIDTH_IN_BITS = 1.5;
+
+/**
+ * Where the loading Bits walk, one lane per Bit in turn: the two gutters beside the content column when each is wide
+ * enough, else a band along the bottom of the viewport (the footer's place), so they never cross the header or the content.
+ */
+export const loadingLanes = (viewport: Viewport, size: number, column: Column | null): Bounds[] => {
+  const whole = walkBounds(viewport, size);
+  const minGutter = size * LANE_WIDTH_IN_BITS;
+  if (column && column.left >= minGutter && viewport.width - column.right >= minGutter)
+    return [
+      { ...whole, maxX: column.left - size },
+      { ...whole, minX: column.right },
+    ];
+  return [{ ...whole, minY: Math.max(whole.minY, whole.maxY - size / 2) }];
+};
 
 export const spawnWalker = (bounds: Bounds, random: Random): Walker => {
   const heading = random() * FULL_TURN;
@@ -149,8 +176,6 @@ function walkIn(walker: Walker, bounds: Bounds, reach: number): Move {
     heading,
   };
 }
-
-type Viewport = { width: number; height: number };
 
 /** The heading, chosen once, that takes the walker's box out through the nearest of the four viewport edges. */
 export const leaveHeading = (walker: Walker, viewport: Viewport, size: number): number => {

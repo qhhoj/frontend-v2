@@ -44,7 +44,7 @@ function installNavigationLoading(router: Router) {
   router.beforeEach((to) => {
     const source = sourceOf(to) || Symbol('navigation');
     navigationSources.set(to, source);
-    useLoadingStore().begin(source);
+    useLoadingStore().beginPage(source);
     // The page's code downloads while the session loads, not after it.
     preloadRouteComponents(to);
     return resolveNavigation(to, useSessionStore());

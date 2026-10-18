@@ -32,19 +32,6 @@ const boxesOverFrames = (page: Page, frames: number): Promise<Box[][]> =>
     [BITS, frames] as const,
   );
 
-const pathLength = (samples: Box[][], index: number) =>
-  samples
-    .slice(1)
-    .reduce(
-      (total, boxes, step) =>
-        total +
-        Math.hypot(
-          boxes[index].x - samples[step][index].x,
-          boxes[index].y - samples[step][index].y,
-        ),
-      0,
-    );
-
 test.describe('loading with motion', () => {
   test.use({ reducedMotion: 'no-preference' });
 
@@ -83,7 +70,7 @@ test.describe('loading with motion', () => {
     await expect(page).toHaveURL(/\/blog$/);
   });
 
-  test('when the data arrives the Bits keep walking out of the viewport and the layer goes', async ({
+  test('when the data arrives the layer goes at once, no Bit walking on over the content', async ({
     page,
     api,
   }) => {
@@ -93,11 +80,59 @@ test.describe('loading with motion', () => {
     release();
     await expect(page.getByText(LOADED_ROW).first()).toBeVisible();
     await expect(page.locator('[data-skeleton]')).toHaveCount(0);
-    await expect(page.locator(LAYER)).toHaveAttribute('data-phase', 'leaving');
-    const samples = await boxesOverFrames(page, 20);
-    for (let index = 0; index < 5; index += 1)
-      expect(pathLength(samples, index), `Bit ${index} keeps walking`).toBeGreaterThan(0);
     await expect(page.locator('[role="status"]')).toHaveText('');
-    await expect(page.locator(BITS)).toHaveCount(0, { timeout: 8000 });
+    await expect(page.locator(BITS)).toHaveCount(0, { timeout: 1000 });
+  });
+
+  test('the swarm stops once the statement paints, though the comments below still load', async ({
+    page,
+    api,
+  }) => {
+    const releaseProblem = api.hold('GET /problems/duongdi');
+    api.hold('GET /comments/pages/problem/duongdi');
+    await page.goto('/problems/duongdi');
+    await expect(page.locator(BITS)).toHaveCount(5, { timeout: 5000 });
+    releaseProblem();
+    await expect(page.locator('#main h1')).toBeVisible();
+    await expect(page.locator(BITS)).toHaveCount(0, { timeout: 1000 });
+  });
+
+  /** The content box of the public header: every page column shares its edges. */
+  const contentColumn = (page: Page) =>
+    page.locator('[data-page-column]').evaluate((header) => {
+      const box = header.getBoundingClientRect();
+      const style = getComputedStyle(header);
+      return {
+        left: box.left + parseFloat(style.paddingLeft),
+        right: box.right - parseFloat(style.paddingRight),
+      };
+    });
+
+  test('the Bits keep to the gutters beside the content column on a wide screen', async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    api.hold('GET /problems');
+    await page.goto('/problems');
+    await expect(page.locator(BITS)).toHaveCount(5, { timeout: 5000 });
+    const column = await contentColumn(page);
+    for (const boxes of await boxesOverFrames(page, 60))
+      for (const box of boxes)
+        expect(box.x + box.width <= column.left || box.x >= column.right).toBe(true);
+  });
+
+  test('on a phone the Bits walk along the bottom of the viewport', async ({ page, api }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    api.hold('GET /problems');
+    await page.goto('/problems');
+    await expect(page.locator(BITS)).toHaveCount(3, { timeout: 5000 });
+    const header = await page.locator('[data-page-column]').boundingBox();
+    for (const boxes of await boxesOverFrames(page, 60))
+      for (const box of boxes) {
+        expect(box.y).toBeGreaterThan(844 / 2);
+        expect(box.y + box.height).toBeLessThanOrEqual(844);
+        expect(box.y).toBeGreaterThan(header!.y + header!.height);
+      }
   });
 });

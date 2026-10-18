@@ -6,6 +6,7 @@ import {
   SPEED_BAND,
   isGone,
   leaveHeading,
+  loadingLanes,
   spawnWalker,
   stepLeaver,
   stepWalker,
@@ -167,5 +168,40 @@ describe('stepLeaver', () => {
     }
     expect(walker.x).toBeGreaterThanOrEqual(VIEWPORT.width);
     expect(frames).toBeCloseTo((VIEWPORT.width - 900) / ((75 * 16) / 1000), -1);
+  });
+});
+
+describe('loadingLanes', () => {
+  const SIZE = LOADING_BIT_SIZE;
+  const WIDE = { width: 1440, height: 900 };
+
+  it('gives one lane per gutter, each keeping the whole sprite beside the column', () => {
+    const [left, right] = loadingLanes(WIDE, SIZE, { left: 112, right: 1328 });
+    expect(left!.maxX + SIZE).toBeLessThanOrEqual(112);
+    expect(right!.minX).toBeGreaterThanOrEqual(1328);
+    expect(right!.maxX + SIZE).toBeLessThanOrEqual(WIDE.width);
+    expect(left!.maxY).toBe(right!.maxY);
+  });
+
+  it.each([
+    ['a gutter with no room to walk beside a Bit', { left: SIZE * 1.5 - 1, right: 1328 }],
+    ['the other gutter too narrow', { left: 112, right: WIDE.width - SIZE * 1.5 + 1 }],
+    ['no column at all', null],
+  ])('falls back to one band along the bottom with %s', (_name, column) => {
+    const lanes = loadingLanes(WIDE, SIZE, column);
+    expect(lanes).toHaveLength(1);
+    expect(lanes[0]!.minX).toBe(0);
+    expect(lanes[0]!.maxY + SIZE).toBe(WIDE.height);
+    expect(lanes[0]!.minY).toBeGreaterThan(WIDE.height / 2);
+  });
+
+  it('keeps a walker inside its lane, however long it wanders', () => {
+    const [left] = loadingLanes(WIDE, SIZE, { left: 112, right: 1328 });
+    let walker = spawnWalker(left!, seededRandom(3));
+    const random = seededRandom(5);
+    for (let frame = 0; frame < 2000; frame++) {
+      walker = stepWalker(walker, left!, 16, random);
+      expect(walker.x).toBeLessThanOrEqual(left!.maxX);
+    }
   });
 });
