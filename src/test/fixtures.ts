@@ -358,7 +358,6 @@ export const listViewer = (overrides: Partial<ContestListViewer> = {}): ContestL
 export const contestViewer = (overrides: Partial<ContestViewer> = {}): ContestViewer => ({
   ...listViewer(),
   boardFrozenAt: null,
-  ratingChange: null,
   canSeeFullScoreboard: false,
   canEdit: false,
   isEditor: false,
