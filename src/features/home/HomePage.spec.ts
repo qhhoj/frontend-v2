@@ -114,6 +114,25 @@ describe('home', () => {
     expect(wrapper.find('[data-testid="rating-hero"] svg[role="img"]').exists()).toBe(false);
   });
 
+  it('draws the rating chart as an area over a baseline from three ratings, never from two', async () => {
+    mockApi(signedInRoutes());
+    const three = await mountApp('/');
+    await flushPromises();
+    const chart = three.wrapper.get('[data-testid="rating-chart"]');
+    expect(chart.find('[data-testid="rating-chart-area"]').attributes('d')).toMatch(/Z$/);
+    expect(chart.find('[data-testid="rating-chart-baseline"]').exists()).toBe(true);
+    three.wrapper.unmount();
+    mockApi(
+      signedInRoutes({
+        'GET /users/user_01/ratings': ok(ratingHistory().filter((entry) => entry.rating !== 2018)),
+      }),
+    );
+    const { wrapper } = await mountApp('/');
+    await flushPromises();
+    expect(wrapper.get('[data-testid="hero-figure"]').text()).toBe('2104');
+    expect(wrapper.find('[data-testid="rating-chart"]').exists()).toBe(false);
+  });
+
   it('shows anonymous viewers the public cards only', async () => {
     mockApi({ ...publicRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/');
