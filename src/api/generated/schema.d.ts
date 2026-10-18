@@ -3832,8 +3832,10 @@ export interface paths {
          *     substring of name, short name or slug; `open` and `unlisted` (true or
          *     false) keep only organizations in that state; `administered=true` keeps
          *     only the organizations the viewer may administer (the admin screen's
-         *     list), `false` the others. Paged with `page` and `pageSize` (default 100,
-         *     at most 100). Anonymous callers may use it.
+         *     list), `false` the others. `canCreate=problem` or `contest` keeps only the
+         *     organizations the viewer may create that for (what the create routes
+         *     accept), 401 when anonymous. Paged with `page` and `pageSize` (default
+         *     100, at most 100). Anonymous callers may use it without `canCreate`.
          */
         get: operations["OrganizationsController_list"];
         put?: never;
@@ -11996,6 +11998,8 @@ export interface components {
             casePoints: number;
             /** @description Points available over all test cases. */
             caseTotal: number;
+            /** @description The contest it was submitted in, when the viewer may see that contest; null otherwise and outside a contest. */
+            contest: components["schemas"]["SubmissionContestResponse"] | null;
             /**
              * Format: date-time
              * @description When the submission was made.
@@ -20516,6 +20520,8 @@ export interface operations {
             query?: {
                 /** @description true: only organizations the viewer may administer (their admin, or every one with `judge.edit_all_organization`); false: only the others. */
                 administered?: boolean;
+                /** @description Only the organizations the viewer may create this for: the ones `POST /organizations/{slug}/problems` or `/contests` accept (an administrator, or every organization with `judge.edit_all_organization`, who holds `judge.create_organization_problem` or `judge.create_private_contest`). Needs a signed-in viewer (401 otherwise). */
+                canCreate?: "contest" | "problem";
                 /** @description true: only open organizations; false: only private ones. */
                 open?: boolean;
                 /** @description 1-based page number. */
