@@ -25,7 +25,7 @@ const holdsCurrent = (navGroup: AdminNavGroup) => navGroup.items.some((item) => 
 const ITEM_CLASS =
   'flex min-h-(--qa-control) items-center gap-2.5 rounded-cell px-2.5 text-sm hover:bg-surface-hover aria-[current=page]:bg-accent-soft aria-[current=page]:font-semibold aria-[current=page]:text-accent-soft-text';
 const GROUP_CLASS =
-  'flex min-h-8 w-full items-center justify-between rounded-cell px-2.5 text-xs font-semibold tracking-wider text-muted uppercase';
+  'flex min-h-8 w-full items-center justify-between rounded-cell px-2.5 text-xs font-semibold tracking-wider text-muted uppercase pointer-coarse:min-h-11';
 </script>
 
 <template>
