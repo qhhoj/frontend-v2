@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from
 import { useRoute } from 'vue-router';
 import { translate } from '@/i18n';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
+import { useIsFirstNavigationPending } from '@/router/first-navigation';
 import NavOverflowMenu from './NavOverflowMenu.vue';
 import { navSectionOverride } from './nav-section';
 import { NAV_ITEM_CLASS, scrollToClearFade, splitNavItems } from './nav-overflow';
@@ -13,6 +14,8 @@ import { NAV_ITEM_CLASS, scrollToClearFade, splitNavItems } from './nav-overflow
  * fades where items are clipped.
  */
 const route = useRoute();
+/** Before the first navigation lands the route is the start location (`/`): no item is current yet. */
+const isFirstNavigationPending = useIsFirstNavigationPending();
 const NAV_ITEMS = [
   { path: '/', labelKey: 'nav.home' },
   { path: '/problems', labelKey: 'nav.problems' },
@@ -24,6 +27,7 @@ const NAV_ITEMS = [
 ] as const;
 /** A section stays current on its sub-pages (`/problems/aplusb` is in Problems), unless the page claims another (`useNavSection`). */
 const isCurrent = (path: string) => {
+  if (isFirstNavigationPending.value) return false;
   if (navSectionOverride.value !== null) return path === navSectionOverride.value;
   return path === '/'
     ? route.path === '/'

@@ -94,40 +94,58 @@ describe('LoadingBit', () => {
       return { x: Number(left), y: Number(top) };
     });
 
-  it('keeps walking while leaving, never stopping or blinking, and emits gone once every Bit is out', async () => {
+  it('stops every Bit where it stands when the layer fades, and walks on from there for a new wait', async () => {
     const wrapper = mountBits('walking');
     frames.runFrame(16);
-    await wrapper.setProps({ phase: 'leaving' });
-    expect(frames.isQueued()).toBe(true);
-    const start = coordinates(wrapper);
-    let timestamp = 16;
-    for (let frame = 0; frame < 20; frame++) frames.runFrame((timestamp += 16));
-    expect(coordinates(wrapper)).not.toEqual(start);
-    expect(wrapper.findAll('[data-blinking="true"]')).toHaveLength(0);
-    expect(wrapper.emitted('gone')).toBeUndefined();
-    // 120 px/s at most: a 1280 px wide viewport is crossed well within a minute of frames.
-    for (let frame = 0; frame < 4000 && !wrapper.emitted('gone'); frame++)
-      frames.runFrame((timestamp += 16));
-    expect(wrapper.emitted('gone')).toBeDefined();
-    for (const { x, y } of coordinates(wrapper))
-      expect(x < -64 || x > 1280 || y < -70 || y > 806).toBe(true);
-  });
-
-  it('keeps walking while the layer fades, and walks back in for a new wait', async () => {
-    const wrapper = mountBits('walking');
-    frames.runFrame(16);
-    await wrapper.setProps({ phase: 'leaving' });
     frames.runFrame(32);
     await wrapper.setProps({ phase: 'fading' });
     expect(wrapper.get('[data-testid="loading-bits"]').classes()).toContain('opacity-0');
-    const fading = positions(wrapper);
+    expect(frames.isQueued()).toBe(false);
+    const stopped = positions(wrapper);
     frames.runFrame(48);
-    const walkedOn = positions(wrapper);
-    expect(walkedOn).not.toEqual(fading);
+    expect(positions(wrapper)).toEqual(stopped);
     await wrapper.setProps({ phase: 'walking' });
     expect(wrapper.get('[data-testid="loading-bits"]').classes()).toContain('opacity-100');
-    expect(positions(wrapper)).toEqual(walkedOn);
+    expect(positions(wrapper)).toEqual(stopped);
     expect(frames.isQueued()).toBe(true);
+  });
+
+  /** A public header 1280 px wide in a 1440 px viewport, 32 px padding: the content column runs from 112 to 1328. */
+  const addPageColumn = () => {
+    const header = document.createElement('header');
+    header.dataset.pageColumn = '';
+    header.style.paddingLeft = '32px';
+    header.style.paddingRight = '32px';
+    vi.spyOn(header, 'getBoundingClientRect').mockReturnValue(
+      DOMRect.fromRect({ x: 80, y: 0, width: 1280, height: 72 }),
+    );
+    document.body.append(header);
+    return header;
+  };
+
+  it('keeps every Bit in the gutters beside the content column, all the way up and down', () => {
+    setViewport(1440, 900);
+    const header = addPageColumn();
+    const wrapper = mountBits('walking');
+    const seenY = new Set<number>();
+    for (let frame = 1; frame <= 600; frame++) {
+      frames.runFrame(frame * 16);
+      for (const { x, y } of coordinates(wrapper)) {
+        expect(x <= 112 - 64 || x >= 1328, `x ${x} is in a gutter`).toBe(true);
+        seenY.add(Math.round(y / 100));
+      }
+    }
+    expect(seenY.size).toBeGreaterThan(3);
+    header.remove();
+  });
+
+  it('walks along the bottom of the viewport where the gutters are narrower than a Bit', () => {
+    setViewport(390, 844);
+    const wrapper = mountBits('walking');
+    for (let frame = 1; frame <= 300; frame++) {
+      frames.runFrame(frame * 16);
+      for (const { y } of coordinates(wrapper)) expect(y).toBeGreaterThanOrEqual(844 - 64 - 32 - 6);
+    }
   });
 
   it('puts the Bit in its corner when reduced motion turns on mid-walk', async () => {
@@ -142,14 +160,13 @@ describe('LoadingBit', () => {
     expect((bits(wrapper)[0]!.element.firstElementChild as HTMLElement).style.transform).toBe('');
   });
 
-  it('under reduced motion stands one Bit in a corner, never animates, and is gone as soon as loading ends', async () => {
+  it('under reduced motion stands one Bit in a corner and never animates, not even while it fades', async () => {
     stubMatchMedia({ reducedMotion: true });
     const wrapper = mountBits('walking');
     expect(bits(wrapper)).toHaveLength(1);
     expect(bits(wrapper)[0]!.classes()).toEqual(expect.arrayContaining(['bottom-4', 'left-4']));
     expect(frames.request).not.toHaveBeenCalled();
-    await wrapper.setProps({ phase: 'leaving' });
-    expect(wrapper.emitted('gone')).toHaveLength(1);
+    await wrapper.setProps({ phase: 'fading' });
     expect(frames.request).not.toHaveBeenCalled();
     await wrapper.setProps({ phase: 'hidden' });
     expect(bits(wrapper)).toHaveLength(0);

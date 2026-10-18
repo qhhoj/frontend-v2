@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { hopOffset, legStep } from './bit-walk';
-import type { Walker } from './bit-walk';
+import type { Column, Walker } from './bit-walk';
 
 /**
  * The DOM side shared by every swarm of walking Bits (the loading swarm, the roaming Bits): one animation loop, and a placer
@@ -12,6 +12,21 @@ export const viewportSize = () => ({
   width: document.documentElement.clientWidth,
   height: document.documentElement.clientHeight,
 });
+
+/**
+ * The content column of the page: the content box of the element marked `data-page-column` (the public header, whose edges
+ * every page column shares), or null where there is none (admin and sign-in layouts).
+ */
+export function pageColumn(): Column | null {
+  const element = document.querySelector<HTMLElement>('[data-page-column]');
+  if (!element) return null;
+  const box = element.getBoundingClientRect();
+  const style = getComputedStyle(element);
+  return {
+    left: box.left + parseFloat(style.paddingLeft),
+    right: box.right - parseFloat(style.paddingRight),
+  };
+}
 
 /**
  * Elements of a swarm (`SwarmBit` roots, bound with `bind(index)`) and the writer of their transforms. `place` moves the box

@@ -2,10 +2,12 @@
 import Menu from 'primevue/menu';
 import type { MenuItem } from 'primevue/menuitem';
 import { computed, ref } from 'vue';
+import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { ratingTextClass } from '@/lib/tier-classes';
 import { useRoute, useRouter } from 'vue-router';
 import { useLogout } from '@/features/auth/use-logout';
+import { useIsFirstNavigationPending } from '@/router/first-navigation';
 import { translate } from '@/i18n';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { useSessionStore } from '@/stores/session.store';
@@ -15,6 +17,8 @@ const session = useSessionStore();
 const route = useRoute();
 const router = useRouter();
 const logout = useLogout();
+/** Until the session answers, a neutral pill: never "Đăng nhập" for a viewer who may be signed in. */
+const isSessionPending = useIsFirstNavigationPending();
 const menu = ref<InstanceType<typeof Menu>>();
 const isOpen = ref(false);
 
@@ -49,6 +53,12 @@ const items = computed<MenuItem[]>(() => [
     </button>
     <Menu ref="menu" :model="items" popup @show="isOpen = true" @hide="isOpen = false" />
   </template>
+  <SkeletonBlock
+    v-else-if="isSessionPending"
+    pill
+    data-testid="account-placeholder"
+    class="h-11 w-36"
+  />
   <div v-else class="flex items-center gap-2">
     <AppButton :to="{ name: 'login', query: { redirect: route.fullPath } }">
       {{ $t('account.login') }}

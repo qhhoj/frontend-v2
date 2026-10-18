@@ -20,7 +20,11 @@ const alerts = useNotificationAlerts();
 </script>
 
 <template>
-  <header class="page-gutter relative flex items-center gap-x-2 py-1.5 md:gap-x-5 md:py-4">
+  <!-- `data-page-column`: the loading Bits keep to the gutters beside this column (`pageColumn`). -->
+  <header
+    data-page-column
+    class="page-gutter relative flex items-center gap-x-2 py-1.5 md:gap-x-5 md:py-4"
+  >
     <BrandWordmark />
     <OfficialModePill v-if="!isPhone" />
     <AppNav />

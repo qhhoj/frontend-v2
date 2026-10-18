@@ -14,6 +14,7 @@ import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
 import { ratingTextClass } from '@/lib/tier-classes';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
+import { useIsFirstNavigationPending } from '@/router/first-navigation';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { useAccountLinks } from './account-links';
@@ -38,6 +39,8 @@ const locale = useLocaleStore();
 const route = useRoute();
 const links = useAccountLinks();
 const logout = useLogout();
+/** Until the session answers the sheet offers neither sign-out nor sign-in. */
+const isSessionPending = useIsFirstNavigationPending();
 const isOpen = ref(false);
 const badge = computed(() => unreadBadge(props.unread, locale.locale));
 const hasUnread = computed(() => session.user !== null && props.unread > 0);
@@ -151,7 +154,7 @@ const drawerPt = computed(() => ({
         <template #icon><LogOut class="size-4" aria-hidden="true" /></template>
         {{ $t('account.logout') }}
       </AppButton>
-      <div v-else class="grid grid-cols-2 gap-2">
+      <div v-else-if="!isSessionPending" class="grid grid-cols-2 gap-2">
         <AppButton block :to="{ name: 'login', query: { redirect: route.fullPath } }">
           {{ $t('account.login') }}
         </AppButton>

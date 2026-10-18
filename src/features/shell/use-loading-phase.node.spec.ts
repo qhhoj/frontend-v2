@@ -3,13 +3,13 @@ import type { Ref } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { LOADING_TIMING, useLoadingPhase, type LoadingPhase } from './use-loading-phase';
 
-const { showAfterMs, settleMs, leaveMs, fadeMs } = LOADING_TIMING;
+const { showAfterMs, settleMs, fadeMs } = LOADING_TIMING;
 
 function setup(initiallyWaiting = false) {
   const waiting = ref(initiallyWaiting);
   const scope = effectScope();
-  const { phase, gone } = scope.run(() => useLoadingPhase(() => waiting.value))!;
-  return { waiting, phase, gone, scope };
+  const { phase } = scope.run(() => useLoadingPhase(() => waiting.value))!;
+  return { waiting, phase, scope };
 }
 
 describe('useLoadingPhase', () => {
@@ -38,51 +38,42 @@ describe('useLoadingPhase', () => {
     expect(phase.value).toBe('walking');
   });
 
-  const startLeaving = (waiting: Ref<boolean>) => {
+  const startFading = (waiting: Ref<boolean>) => {
     waiting.value = true;
     vi.advanceTimersByTime(showAfterMs);
     waiting.value = false;
     vi.advanceTimersByTime(settleMs);
   };
 
-  it('leaves once the wait has been over for the settle time, not before', () => {
+  it('fades once the wait has been over for the settle time, not before, and never walks on', () => {
     const { waiting, phase } = setup();
+    const seen: LoadingPhase[] = [];
+    watch(phase, (next) => seen.push(next), { flush: 'sync' });
     waiting.value = true;
     vi.advanceTimersByTime(showAfterMs);
     waiting.value = false;
     vi.advanceTimersByTime(settleMs - 1);
     expect(phase.value).toBe('walking');
     vi.advanceTimersByTime(1);
-    expect(phase.value).toBe('leaving');
-  });
-
-  it('fades the Bits still on screen at leaveMs, then hides after fadeMs', () => {
-    const { waiting, phase } = setup();
-    startLeaving(waiting);
-    vi.advanceTimersByTime(leaveMs - 1);
-    expect(phase.value).toBe('leaving');
-    vi.advanceTimersByTime(1);
     expect(phase.value).toBe('fading');
     vi.advanceTimersByTime(fadeMs - 1);
     expect(phase.value).toBe('fading');
     vi.advanceTimersByTime(1);
     expect(phase.value).toBe('hidden');
+    expect(seen).toEqual(['walking', 'fading', 'hidden']);
   });
 
-  it('walks again when a new wait begins while leaving or fading', () => {
+  it('walks again when a new wait begins while fading', () => {
     const { waiting, phase } = setup();
-    startLeaving(waiting);
-    vi.advanceTimersByTime(leaveMs / 2);
-    expect(phase.value).toBe('leaving');
-    waiting.value = true;
-    expect(phase.value).toBe('walking');
-    vi.advanceTimersByTime(leaveMs + fadeMs + 1000);
-    expect(phase.value).toBe('walking'); // the old leave and fade timers were cancelled
-    waiting.value = false;
-    vi.advanceTimersByTime(settleMs + leaveMs);
+    startFading(waiting);
     expect(phase.value).toBe('fading');
     waiting.value = true;
     expect(phase.value).toBe('walking');
+    vi.advanceTimersByTime(fadeMs + 1000);
+    expect(phase.value).toBe('walking'); // the old fade timer was cancelled
+    waiting.value = false;
+    vi.advanceTimersByTime(settleMs);
+    expect(phase.value).toBe('fading');
   });
 
   it.each([450, 500, 550, 599])(
@@ -94,7 +85,7 @@ describe('useLoadingPhase', () => {
       waiting.value = true;
       vi.advanceTimersByTime(waitMs);
       waiting.value = false;
-      vi.advanceTimersByTime(showAfterMs + settleMs + leaveMs + fadeMs);
+      vi.advanceTimersByTime(showAfterMs + settleMs + fadeMs);
       expect(seen).toEqual([]);
       expect(phase.value).toBe('hidden');
     },
@@ -123,19 +114,11 @@ describe('useLoadingPhase', () => {
       },
     ],
     [
-      'leave',
-      (waiting: Ref<boolean>) => {
-        vi.advanceTimersByTime(showAfterMs);
-        waiting.value = false;
-        vi.advanceTimersByTime(settleMs);
-      },
-    ],
-    [
       'fade',
       (waiting: Ref<boolean>) => {
         vi.advanceTimersByTime(showAfterMs);
         waiting.value = false;
-        vi.advanceTimersByTime(settleMs + leaveMs);
+        vi.advanceTimersByTime(settleMs);
       },
     ],
   ])(

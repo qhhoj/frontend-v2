@@ -15,25 +15,34 @@ describe('useWaitingWhile', () => {
   /** Installing the router starts the first navigation, which is itself a waiting source; let it land. */
   let settleFirstNavigation: () => Promise<unknown> = () => Promise.resolve();
 
-  it('registers a waiting source while the condition holds, and releases it when it ends or the component goes', async () => {
-    const condition = ref(true);
+  /** A component waiting on each condition, as a page with one `QueryState` per condition would. */
+  const mountProbe = (...conditions: Array<() => boolean>) => {
     const Probe = defineComponent({
       setup() {
         const router = useRouter();
         settleFirstNavigation = () => router.isReady();
-        useWaitingWhile(() => condition.value);
+        conditions.forEach((condition) => useWaitingWhile(condition));
         return () => h('p');
       },
     });
-    const wrapper = mountComponent(Probe);
+    return mountComponent(Probe);
+  };
+
+  it('registers a waiting source while the condition holds, and releases it when it ends', async () => {
+    const condition = ref(true);
+    mountProbe(() => condition.value);
     const loading = useLoadingStore();
     await settleFirstNavigation();
     expect(loading.isWaiting).toBe(true);
     condition.value = false;
     await flushPromises();
     expect(loading.isWaiting).toBe(false);
-    condition.value = true;
-    await flushPromises();
+  });
+
+  it('releases its waiting source when the component goes', async () => {
+    const wrapper = mountProbe(() => true);
+    const loading = useLoadingStore();
+    await settleFirstNavigation();
     expect(loading.isWaiting).toBe(true);
     wrapper.unmount();
     expect(loading.isWaiting).toBe(false);
@@ -67,6 +76,27 @@ describe('useWaitingWhile', () => {
     expect(answers).toHaveLength(2); // the refetch is in flight
     expect(loading.isWaiting).toBe(false);
     answers[1]?.('second');
+    await flushPromises();
+    expect(loading.isWaiting).toBe(false);
+  });
+
+  it('marks the page painted when the content shows, so a wait that starts later does not count', async () => {
+    const isCardLoading = ref(false);
+    const isSectionLoading = ref(false);
+    mountProbe(
+      () => isCardLoading.value,
+      () => isSectionLoading.value,
+    );
+    const loading = useLoadingStore();
+    await settleFirstNavigation();
+    isCardLoading.value = true;
+    await flushPromises();
+    expect(loading.isWaiting).toBe(true);
+    isCardLoading.value = false;
+    isSectionLoading.value = true;
+    await flushPromises();
+    expect(loading.isWaiting).toBe(false);
+    isCardLoading.value = true; // the card loads again (a new key): the page has content, its skeleton says enough
     await flushPromises();
     expect(loading.isWaiting).toBe(false);
   });
