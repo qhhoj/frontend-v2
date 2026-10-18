@@ -6,7 +6,7 @@ import { PROBLEM_INDEX_KEY } from '../../problems/problem-editing.queries';
 import { useSubmissionStatsQuery } from '@/features/submissions/submissions.queries';
 import { TICKET_SUMMARY_POLL_MS, useTicketSummaryQuery } from '@/features/tickets/tickets.queries';
 import { usePermissions } from '@/stores/use-permissions';
-import { ADMIN_SCREENS } from '../../admin-screens';
+import { ADMIN_SCREENS, CONTEST_EDIT_OWN, PROBLEM_EDIT, TICKET_STAFF } from '../../admin-screens';
 import { useCommentReportsQuery } from '../../comments/comment-reports.queries';
 import {
   ORGANIZATION_QUEUE_PERMISSION,
@@ -25,13 +25,18 @@ function pollWhileVisible(refresh: () => void) {
   onScopeDispose(() => clearInterval(timer));
 }
 
+/** Whoever makes problems or contests has tickets about them (the summary's `aboutMineOpen`) and the maker tiles. */
+export const isMakerOf = (can: (permission: string) => boolean) =>
+  can(PROBLEM_EDIT) || can(CONTEST_EDIT_OWN);
+
 /**
  * What waits for staff: `null` where the viewer cannot act on it (or the count has not arrived), never a 0 they cannot use.
  * Each count is the first page its own screen reads (same query, same cache), so acting there updates the badge too.
  */
 export function useAdminCounts() {
   const { can, canAny } = usePermissions();
-  const canTickets = computed(() => can(ADMIN_SCREENS.tickets.permission));
+  const canTickets = computed(() => can(TICKET_STAFF));
+  const isMaker = computed(() => isMakerOf(can));
   const canQueue = computed(() => canAny(ADMIN_SCREENS.submissions.permission));
   const canReports = computed(() => can(ADMIN_SCREENS.commentReports.permission));
   const canRequests = computed(() => can(ORGANIZATION_QUEUE_PERMISSION));
@@ -46,6 +51,10 @@ export function useAdminCounts() {
     },
     awaitingTickets: computed(() =>
       canTickets.value ? (tickets.data.value?.awaitingStaff ?? null) : null,
+    ),
+    /** Open tickets about the viewer's problems and contests (the setter tile, and the badge for makers without the ticket right). */
+    aboutMineTickets: computed(() =>
+      isMaker.value ? (tickets.data.value?.aboutMineOpen ?? null) : null,
     ),
     openReports: computed(() =>
       canReports.value ? (reports.data.value?.meta.total ?? null) : null,
@@ -74,7 +83,8 @@ export function useNavCounts() {
   const waiting = (value: number | null): NavCount => ({ value, needsAction: true });
   return computed<Partial<Record<AdminNavId, NavCount>>>(() => ({
     submissions: { value: counts.queuedSubmissions.value, needsAction: false },
-    tickets: waiting(counts.awaitingTickets.value),
+    // Ticket staff answer whatever waits; a setter only the tickets about their problems.
+    tickets: waiting(counts.awaitingTickets.value ?? counts.aboutMineTickets.value),
     commentReports: waiting(counts.openReports.value),
     organizations: waiting(counts.pendingRequests.value),
   }));

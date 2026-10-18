@@ -6,7 +6,8 @@ import TicketAlertsStrip from '@/features/tickets/TicketAlertsStrip.vue';
 import { ticketQueryFromRoute } from '@/features/tickets/ticket-filters';
 import { useTicketsQuery } from '@/features/tickets/tickets.queries';
 import { useTicketStream } from '@/features/tickets/use-ticket-stream';
-import { adminRouteName } from '../admin-screens';
+import { usePermissions } from '@/stores/use-permissions';
+import { TICKET_STAFF, adminRouteName } from '../admin-screens';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import { buttonClass } from '../ui/controls';
 import TicketQueueDetail from './TicketQueueDetail.vue';
@@ -16,8 +17,11 @@ import { seedQueueQuery, ticketIdOf } from './ticket-queue';
 
 const route = useRoute();
 const router = useRouter();
+const { can } = usePermissions();
+/** Ticket staff see every ticket; a problem setter reaches the queue for the tickets about their problems. */
+const isStaff = can(TICKET_STAFF);
 // The first visit writes the queue's defaults into the URL once, and the first request already uses them.
-const seeded = seedQueueQuery(route.query);
+const seeded = seedQueueQuery(route.query, isStaff);
 if (seeded !== route.query) void router.replace({ query: seeded });
 const filters = shallowRef(ticketQueryFromRoute(seeded));
 /** Follows the URL only while this screen is the current route: leaving it clears the query and must not refetch. */
@@ -40,7 +44,7 @@ const resultText = computed(() => {
 <template>
   <div class="flex w-full flex-col gap-4">
     <AdminPageHeader :title="$t('admin.tickets.title')" :lead="$t('admin.tickets.lead')">
-      <template #actions>
+      <template v-if="isStaff" #actions>
         <RouterLink :to="{ name: adminRouteName('cannedReplies') }" :class="buttonClass()">
           {{ $t('admin.cannedReplies.openFromQueue') }}
         </RouterLink>
@@ -52,7 +56,12 @@ const resultText = computed(() => {
       {{ $t('admin.tickets.live') }}
     </p>
     <p class="sr-only" aria-live="polite" data-testid="queue-live">{{ announcement }}</p>
-    <TicketQueueFilters :filters="filters" :ticket-id="ticketId" :result-text="resultText" />
+    <TicketQueueFilters
+      :filters="filters"
+      :ticket-id="ticketId"
+      :result-text="resultText"
+      :is-staff="isStaff"
+    />
     <div
       class="grid items-start gap-4"
       :class="ticketId && 'xl:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]'"

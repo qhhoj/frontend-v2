@@ -13,10 +13,14 @@ import type { CannedContext } from './canned/canned-text';
 
 /** Same limit as the backend's `NewTicketMessageDto`: 8192 characters, counted as code points. */
 const MESSAGE_MAX_CODE_POINTS = 8192;
-/** `cannedContext`: set for handlers (`can.assign`), it brings the canned-reply picker. */
+/**
+ * `cannedContext`: set for handlers (`can.assign`), it brings the canned-reply picker. The `options` slot sits beside Send.
+ * `compact` (a box pinned under a thread): one row, "Trả lời…" and Send, until it takes focus or holds text; then the
+ * full box, so it never covers the thread it answers.
+ */
 const props = withDefaults(
-  defineProps<{ ticketId: string; cannedContext?: CannedContext | null }>(),
-  { cannedContext: null },
+  defineProps<{ ticketId: string; cannedContext?: CannedContext | null; compact?: boolean }>(),
+  { cannedContext: null, compact: false },
 );
 const emit = defineEmits<{ sent: [] }>();
 const client = useQueryClient();
@@ -37,6 +41,18 @@ const { isPending, error, mutate } = useMutation({
   },
 });
 const failureKey = computed(() => (error.value ? replyFailureKey(error.value) : null));
+
+const hasFocus = ref(false);
+const isFolded = computed(
+  () => props.compact && !hasFocus.value && draft.value === '' && !failureKey.value,
+);
+/** Focus moving to another control of the box, or into a dialog it opened (the canned-reply picker), keeps it open. */
+const onFocusOut = (event: FocusEvent) => {
+  const next = event.relatedTarget;
+  const form = event.currentTarget as HTMLElement;
+  hasFocus.value =
+    next instanceof Element && (form.contains(next) || next.closest('[role="dialog"]') !== null);
+};
 
 /** `conflict` is the message cap and `forbidden` a muted account (the backend's one `forbidden` here); anything else (429 included) shows its own message. */
 const REPLY_FAILURE_KEYS: Readonly<Record<string, string>> = {
@@ -62,25 +78,41 @@ async function insertCanned(filled: string, title: string) {
 </script>
 
 <template>
-  <GlassCard as="section" class="p-5">
-    <form data-testid="ticket-reply" class="flex flex-col gap-3" novalidate @submit.prevent="send">
-      <label class="flex flex-col gap-1.5 text-sm font-semibold">
-        {{ $t('ticket.reply') }}
+  <GlassCard as="section" :class="isFolded ? 'p-1.5' : 'p-5'">
+    <form
+      data-testid="ticket-reply"
+      :data-folded="isFolded || undefined"
+      :class="isFolded ? 'flex items-center gap-2' : 'flex flex-col gap-3'"
+      novalidate
+      @submit.prevent="send"
+      @focusin="hasFocus = true"
+      @focusout="onFocusOut"
+    >
+      <label
+        class="flex flex-col gap-1.5 text-sm font-semibold"
+        :class="isFolded && 'min-w-0 flex-1'"
+      >
+        <span :class="isFolded && 'sr-only'">{{ $t('ticket.reply') }}</span>
         <textarea
           ref="textarea"
           v-model="draft"
           name="reply"
-          rows="4"
-          :placeholder="$t('ticket.replyPlaceholder')"
-          class="min-h-28 rounded-cell border border-line bg-surface px-3.5 py-2.5 text-base font-normal text-content placeholder:text-muted"
+          :rows="isFolded ? 1 : 4"
+          :placeholder="isFolded ? $t('ticket.replyFolded') : $t('ticket.replyPlaceholder')"
+          class="rounded-cell border border-line bg-surface px-3.5 py-2.5 text-base font-normal text-content placeholder:text-muted"
+          :class="isFolded ? 'min-h-11 resize-none' : 'min-h-28'"
         />
       </label>
       <p v-if="failureKey" role="alert" class="text-meta text-negative">
         {{ $t(failureKey) }}
       </p>
       <p class="sr-only" aria-live="polite" data-testid="canned-inserted">{{ insertedText }}</p>
-      <div class="flex flex-wrap items-center gap-2">
+      <AppButton v-if="isFolded" type="submit" tone="primary" disabled>
+        {{ $t('ticket.send') }}
+      </AppButton>
+      <div v-else class="flex flex-wrap items-center gap-2">
         <CannedReplyPicker v-if="cannedContext" :context="cannedContext" @pick="insertCanned" />
+        <slot name="options" />
         <AppButton
           type="submit"
           tone="primary"

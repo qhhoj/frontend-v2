@@ -42,6 +42,7 @@ const when = (at: string) => formatNumericDateTime(at, locale.locale);
     <template v-for="row in rows" :key="row.key">
       <article
         v-if="row.kind === 'message'"
+        data-testid="ticket-message"
         class="flex gap-3 rounded-card border border-line bg-surface p-4"
       >
         <UserAvatar :username="row.message.author.username" :size="32" />

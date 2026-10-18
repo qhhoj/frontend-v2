@@ -1,28 +1,41 @@
-import { Eye, EyeOff, Flag, Hourglass, LifeBuoy, Server, UserPlus } from 'lucide-vue-next';
+import {
+  Eye,
+  EyeOff,
+  Flag,
+  Hourglass,
+  LifeBuoy,
+  MessageSquareWarning,
+  Server,
+  UserPlus,
+} from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useSubmissionStatsQuery } from '@/features/submissions/submissions.queries';
 import { usePermissions } from '@/stores/use-permissions';
-import { ADMIN_SCREENS, PROBLEM_EDIT, adminRouteName } from '../../admin-screens';
+import { ADMIN_SCREENS, PROBLEM_EDIT, TICKET_STAFF, adminRouteName } from '../../admin-screens';
 import { ORGANIZATION_QUEUE_PERMISSION } from '../../organizations/join-requests.queries';
-import { useAdminCounts, useEditableProblemCounts } from './admin-overview.queries';
+import { isMakerOf, useAdminCounts, useEditableProblemCounts } from './admin-overview.queries';
 import { attentionFirst } from './overview-tiles';
 import type { OverviewTileSpec } from './overview-tiles';
 
 /** Who sees the queue and judge figures: the staff who can act on judging. */
 export const JUDGING_STAFF = ['judge.change_judge', 'judge.rejudge_submission'];
 const LABEL = 'admin.shell.overview';
+const ABOUT_MINE_QUEUE = { scope: 'all', open: '1', about: 'mine' };
 
 /**
  * The dashboard's figures for this viewer (P-33), the ones that need attention first. Each tile links to its filtered
  * list; a figure the viewer cannot act on is left out, and its query never runs.
  */
 export function useOverviewTiles() {
+  const counts = useAdminCounts();
   const judging = useJudgingTiles();
-  const queues = useQueueTiles();
-  const setter = useSetterTiles();
-  return computed(() => attentionFirst([...judging.value, ...queues.value, ...setter.value]));
+  const queues = useQueueTiles(counts);
+  const maker = useMakerTiles(counts);
+  return computed(() => attentionFirst([...judging.value, ...queues.value, ...maker.value]));
 }
+
+type AdminCounts = ReturnType<typeof useAdminCounts>;
 
 /** The public submission strip's numbers (the queue counts what a signed-out viewer may see). */
 function useJudgingTiles() {
@@ -62,10 +75,9 @@ function useJudgingTiles() {
 }
 
 /** What waits for staff: tickets, reported comments, join requests; each where the viewer may answer it. */
-function useQueueTiles() {
+function useQueueTiles(counts: AdminCounts) {
   const { t } = useI18n();
   const { can } = usePermissions();
-  const counts = useAdminCounts();
   const waiting = (key: string, icon: OverviewTileSpec['icon'], value: number | null) => ({
     key,
     icon,
@@ -76,7 +88,7 @@ function useQueueTiles() {
     linkText: t(`${LABEL}.links.${key}`, value ?? 0),
   });
   return computed<OverviewTileSpec[]>(() => [
-    ...(can(ADMIN_SCREENS.tickets.permission)
+    ...(can(TICKET_STAFF)
       ? [
           {
             ...waiting('tickets', LifeBuoy, counts.awaitingTickets.value),
@@ -103,32 +115,55 @@ function useQueueTiles() {
   ]);
 }
 
-/** The problem setter's figures: the problems they may edit, not yet public and public, each opening that list. */
-function useSetterTiles() {
+type Translate = ReturnType<typeof useI18n>['t'];
+/** The plural of the link line needs a number; a failed or loading count shows the tile's generic line anyway. */
+const numberOf = (value: number | string | null) => (typeof value === 'number' ? value : 0);
+
+const problemsTile = (
+  translate: Translate,
+  key: 'unpublished' | 'published',
+  value: number | string | null,
+): OverviewTileSpec => ({
+  key,
+  icon: key === 'unpublished' ? EyeOff : Eye,
+  label: translate(`${LABEL}.${key}`),
+  value,
+  detail: translate(`${LABEL}.${key}Detail`),
+  to: {
+    name: adminRouteName('problems'),
+    query: { status: key === 'unpublished' ? 'private' : 'public' },
+  },
+  linkText: translate(`${LABEL}.links.problems`, numberOf(value)),
+});
+
+const aboutMineTile = (translate: Translate, value: number | null): OverviewTileSpec => ({
+  key: 'aboutMine',
+  icon: MessageSquareWarning,
+  label: translate(`${LABEL}.aboutMine`),
+  value,
+  detail: translate(`${LABEL}.aboutMineDetail`),
+  to: { name: adminRouteName('tickets'), query: ABOUT_MINE_QUEUE },
+  needsAttention: !!value,
+  linkText: translate(`${LABEL}.links.tickets`, value ?? 0),
+});
+
+/**
+ * The maker's figures: the open tickets about their problems and contests, and, for problem editors, the problems they
+ * may edit, not yet public and public; each opens that list.
+ */
+function useMakerTiles(counts: AdminCounts) {
   const { t } = useI18n();
   const { can } = usePermissions();
-  const isShown = () => can(PROBLEM_EDIT);
-  const counts = useEditableProblemCounts(isShown);
-  /** The plural of the link line needs a number; a failed or loading count shows the tile's generic line anyway. */
-  const numberOf = (value: number | string | null) => (typeof value === 'number' ? value : 0);
-  const problems = (key: 'unpublished' | 'published', value: number | string | null) => ({
-    key,
-    icon: key === 'unpublished' ? EyeOff : Eye,
-    label: t(`${LABEL}.${key}`),
-    value,
-    detail: t(`${LABEL}.${key}Detail`),
-    to: {
-      name: adminRouteName('problems'),
-      query: { status: key === 'unpublished' ? 'private' : 'public' },
-    },
-    linkText: t(`${LABEL}.links.problems`, numberOf(value)),
+  const canProblems = () => can(PROBLEM_EDIT);
+  const problemCounts = useEditableProblemCounts(canProblems);
+  return computed<OverviewTileSpec[]>(() => {
+    if (!isMakerOf(can)) return [];
+    const aboutMine = aboutMineTile(t, counts.aboutMineTickets.value);
+    if (!canProblems()) return [aboutMine];
+    return [
+      problemsTile(t, 'unpublished', problemCounts.unpublished.value),
+      aboutMine,
+      problemsTile(t, 'published', problemCounts.published.value),
+    ];
   });
-  return computed<OverviewTileSpec[]>(() =>
-    isShown()
-      ? [
-          problems('unpublished', counts.unpublished.value),
-          problems('published', counts.published.value),
-        ]
-      : [],
-  );
 }

@@ -3,6 +3,7 @@ import { mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { problemItem, problemMeta } from '@/test/fixtures';
 import { staffViewer } from '@/test/admin-routes';
+import { ticketItem } from '@/test/community-fixtures';
 
 const STATS = {
   judgedToday: 0,
@@ -45,6 +46,7 @@ describe('admin search palette', () => {
       // The editor the hit opens: what it shows does not matter here.
       'GET /problems/aplusb': { status: 404, body: { error: { code: 'not_found', message: '' } } },
       'GET /problems/meta': ok(problemMeta()),
+      'GET /tickets': page([]),
     });
     const { router, box } = await openPalette('/admin');
     type(box, 'ap');
@@ -56,11 +58,14 @@ describe('admin search palette', () => {
       ['public', 'private'].includes(call.query.get('visibility') ?? '') &&
       !call.query.has('q');
     const searched = calls.filter(
-      (call) => !['/auth/me', '/profile'].includes(call.path) && !isSetterCount(call),
+      (call) =>
+        !['/auth/me', '/profile', '/tickets/summary'].includes(call.path) && !isSetterCount(call),
     );
-    expect(searched.map((call) => call.path)).toEqual(['/problems']);
-    expect(searched[0]!.query.get('visibility')).toBe('all');
-    expect(searched[0]!.query.get('q')).toBe('ap');
+    // A setter also handles the tickets about their problems (P-31), so the ticket index is asked too.
+    expect(searched.map((call) => call.path).sort()).toEqual(['/problems', '/tickets']);
+    const problemSearch = searched.find((call) => call.path === '/problems')!;
+    expect(problemSearch.query.get('visibility')).toBe('all');
+    expect(problemSearch.query.get('q')).toBe('ap');
     press(box, 'ArrowDown');
     press(box, 'Enter');
     await vi.waitFor(() =>
@@ -81,5 +86,24 @@ describe('admin search palette', () => {
     expect(document.body.querySelector('[role="dialog"] [role="status"]')?.textContent).toContain(
       'ít nhất 2',
     );
+  });
+
+  it('finds a ticket by its title and opens it beside the queue', async () => {
+    const calls = mockApi({
+      ...staffViewer(['judge.change_ticket']),
+      'GET /tickets': page([ticketItem({ id: 't-1', title: 'Test 7 sai đáp án' })]),
+      'GET /tickets/t-1': { status: 404, body: { error: { code: 'not_found', message: '' } } },
+    });
+    const { router, box } = await openPalette('/admin');
+    type(box, 'sai');
+    await vi.waitFor(() => expect(optionTexts().join()).toContain('Test 7 sai đáp án'));
+    const search = calls.find((call) => call.path === '/tickets' && call.query.has('q'))!;
+    expect(Object.fromEntries(search.query)).toMatchObject({ q: 'sai', own: 'false' });
+    press(box, 'ArrowDown');
+    press(box, 'Enter');
+    await vi.waitFor(() =>
+      expect(router.currentRoute.value.query).toMatchObject({ q: 'sai', ticket: 't-1' }),
+    );
+    expect(router.currentRoute.value.path).toBe('/admin/tickets');
   });
 });

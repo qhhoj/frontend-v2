@@ -103,6 +103,7 @@
       "screens": "Mục quản trị",
       "problems": "Bài tập",
       "contests": "Kỳ thi",
+      "tickets": "Phiếu hỗ trợ",
       "users": "Người dùng",
       "organizations": "Tổ chức"
     },
@@ -123,6 +124,8 @@
     "attention": "Cần xử lý",
     "unpublished": "Bài chưa công khai",
     "unpublishedDetail": "Bài bạn sửa được, chỉ người ra đề thấy.",
+    "aboutMine": "Phiếu về bài của tôi",
+    "aboutMineDetail": "Phiếu đang mở về bài hoặc kỳ thi bạn soạn.",
     "published": "Bài công khai",
     "publishedDetail": "Bài bạn sửa được, đang hiện cho mọi người.",
     "links": {

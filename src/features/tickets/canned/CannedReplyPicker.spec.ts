@@ -9,7 +9,7 @@ import { mountApp } from '@/test/mount';
 import { signedInViewer } from '@/test/problem-routes';
 
 const STAFF_TICKET = ticketDetail({
-  can: { editNotes: true, markGood: true, assign: true, claim: false },
+  can: { editNotes: true, markGood: true, assign: true, claim: true },
 });
 async function openTicket(detail: TicketDetail, replies: MockHandler) {
   const calls = mockApi({

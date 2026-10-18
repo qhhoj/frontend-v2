@@ -103,6 +103,7 @@
       "screens": "Admin screens",
       "problems": "Problems",
       "contests": "Contests",
+      "tickets": "Tickets",
       "users": "Users",
       "organizations": "Organizations"
     },
@@ -123,6 +124,8 @@
     "attention": "Needs action",
     "unpublished": "Unpublished problems",
     "unpublishedDetail": "Problems you can edit, seen only by their setters.",
+    "aboutMine": "Tickets on my problems",
+    "aboutMineDetail": "Open tickets about problems or contests you make.",
     "published": "Public problems",
     "publishedDetail": "Problems you can edit, shown to everyone.",
     "links": {

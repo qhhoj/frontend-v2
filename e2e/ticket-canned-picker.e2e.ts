@@ -4,7 +4,7 @@ import type { FakeApi } from './fixtures/api';
 import { ok } from './fixtures/reply';
 
 const STAFF_TICKET = ticketDetail({
-  can: { editNotes: true, markGood: true, assign: true, claim: false },
+  can: { editNotes: true, markGood: true, assign: true, claim: true },
 });
 const PATH = `/tickets/${STAFF_TICKET.id}`;
 const withStaffTicket = (api: FakeApi, replies = [cannedReply()]) => {

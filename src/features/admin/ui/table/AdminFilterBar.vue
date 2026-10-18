@@ -5,7 +5,7 @@ import type { ActiveFilter } from '@/components/ui/FilterBar.vue';
 
 export type { ActiveFilter };
 
-/** The admin list filter row: the shared `FilterBar` (search, view switch, filter panel, chips). */
+/** The admin list filter row: the shared `FilterBar` (search, inline selects, view switch, filter panel, chips). */
 withDefaults(
   defineProps<{
     searchLabel: string;
@@ -31,6 +31,7 @@ defineEmits<{ remove: [key: string]; 'clear-all': [] }>();
     @remove="$emit('remove', $event)"
     @clear-all="$emit('clear-all')"
   >
+    <template v-if="$slots.selects" #selects><slot name="selects" /></template>
     <template v-if="$slots.view" #view><slot name="view" /></template>
     <template v-if="$slots.filters" #filters><slot name="filters" /></template>
   </FilterBar>

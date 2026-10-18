@@ -7,18 +7,21 @@
     "open": "Đang mở",
     "closed": "Đã đóng",
     "all": "Tất cả",
-    "own": "Chỉ phiếu của tôi",
+    "own": "Phiếu tôi gửi hoặc được giao",
     "assignee": "Người phụ trách",
     "peopleHint": "Nhiều tên cách nhau bằng dấu phẩy.",
     "awaiting": "Đang chờ ban quản trị trả lời",
-    "creatorSearch": "Người gửi (tên đăng nhập)",
-    "assigneeChip": "Phụ trách: {names}"
+    "assigneeChip": "Phụ trách: {names}",
+    "mine": "Phiếu của tôi",
+    "aboutMine": "Về bài của tôi",
+    "search": "Tìm tiêu đề hoặc người gửi",
+    "userChip": "Người gửi: {names}"
   },
   "table": {
     "caption": "Danh sách phiếu",
     "status": "Trạng thái",
     "ticket": "Phiếu",
-    "assignees": "Phụ trách",
+    "assignees": "Xử lý",
     "messages": "Tin",
     "updated": "Gần nhất",
     "open": "Mở",
@@ -32,15 +35,25 @@
     "byline": "{creator} · mở {date}",
     "close": "Đóng phiếu",
     "reopen": "Mở lại phiếu",
-    "closeAfterReply": "Đóng phiếu sau khi gửi"
+    "closeAfterReply": "Đóng phiếu sau khi gửi",
+    "claim": "Nhận phiếu",
+    "release": "Trả phiếu",
+    "handledBy": "Đang xử lý: {names}",
+    "markGoodHelp": "Đóng góp tốt là gì?",
+    "markGoodHint": "Cộng điểm đóng góp cho người gửi. Không đánh dấu được phiếu của chính mình."
   },
-  "move": {
-    "heading": "Tiêu đề và bài liên kết",
+  "handling": {
+    "heading": "Xử lý",
+    "assignees": "Người xử lý",
+    "assigneesHint": "Tên đăng nhập, cách nhau bằng dấu phẩy.",
+    "assigneesMax": "Tối đa 20 người xử lý.",
+    "notes": "Ghi chú nội bộ",
+    "notesHint": "Người đọc phiếu thấy ghi chú; người xử lý sửa được.",
     "title": "Tiêu đề",
-    "problem": "Mã bài",
-    "problemHint": "Gắn phiếu sang bài khác; người soạn bài đó sẽ thấy phiếu. Để nguyên nếu giữ liên kết.",
-    "save": "Lưu tiêu đề và liên kết",
-    "saved": "Đã cập nhật phiếu."
+    "problem": "Mã bài liên kết",
+    "problemHint": "Gắn phiếu sang bài khác; để nguyên nếu giữ liên kết.",
+    "save": "Lưu",
+    "saved": "Đã lưu."
   },
   "total": "{count} phiếu"
 }

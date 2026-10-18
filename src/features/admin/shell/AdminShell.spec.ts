@@ -50,6 +50,18 @@ describe('AdminShell', () => {
     expect(tileLabels()[2]).toContain('Máy chấm trực tuyến');
   });
 
+  it('gives a contest organiser the tile of tickets about their contests, without the problem tiles', async () => {
+    const calls = mockApi({
+      ...staffViewer(['judge.edit_own_contest']),
+      'GET /tickets/summary': ok({ assignedOpen: 0, awaitingStaff: 0, aboutMineOpen: 2 }),
+    });
+    const { wrapper } = await mountApp('/admin');
+    await waitForAdminShell(wrapper);
+    await vi.waitFor(() => expect(wrapper.text()).toContain('Phiếu về bài của tôi'));
+    expect(wrapper.text()).not.toContain('Bài chưa công khai');
+    expect(calls.some((call) => call.path === '/admin/problems')).toBe(false);
+  });
+
   it('keeps the URL and shows the forbidden panel, not the screen, without the permission', async () => {
     const calls = mockApi(staffViewer(['judge.add_problem']));
     const { wrapper, router } = await mountApp('/admin/similarity');
