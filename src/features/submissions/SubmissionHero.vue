@@ -115,9 +115,9 @@ const problem = computed(() => {
         >
           <SkeletonBlock v-if="isProblemLoading" text class="w-40" />
           <template v-else
-            >{{ score
-            }}<span v-if="maxScore" class="text-2xl text-muted">
-              / {{ maxScore }}</span
+            >{{ score }}{{ ' '
+            }}<span v-if="maxScore" class="text-2xl whitespace-nowrap text-muted"
+              >/ {{ maxScore }}</span
             ></template
           >
         </p>
@@ -133,14 +133,14 @@ const problem = computed(() => {
         v-if="!isFinished"
         data-testid="judging-bit"
         kind="judging"
-        class="ml-auto [--bit-px:4px] sm:[--bit-px:6px]"
+        class="ml-auto self-start [--bit-px:4px] sm:self-center sm:[--bit-px:6px]"
       />
       <BitMascot
         v-else-if="bit"
         :look="bit.look"
         :label="$t(bit.labelKey)"
         :closed-eyes="bit.eyesShut"
-        class="ml-auto [--bit-px:4px] sm:[--bit-px:6px]"
+        class="ml-auto self-start [--bit-px:4px] sm:self-center sm:[--bit-px:6px]"
       />
       <div v-if="problem" class="flex w-full flex-wrap gap-2">
         <AppButton
