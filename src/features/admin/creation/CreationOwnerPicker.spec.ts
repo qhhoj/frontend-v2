@@ -68,6 +68,18 @@ async function mountAdmin(path: string, readyMarker: string) {
   await flushPromises();
   return mounted;
 }
+/** Holds back the organizations read (not the rest of the page) until the returned function is called. */
+function holdOrganizations() {
+  const respond = globalThis.fetch;
+  let release = () => {};
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  vi.stubGlobal('fetch', (url: string, init?: RequestInit) =>
+    url.includes('/organizations') ? gate.then(() => respond(url, init)) : respond(url, init),
+  );
+  return release;
+}
 const mountProblemForm = () => mountAdmin('/admin/problems/new', '[data-testid="creation-owner"]');
 const mountContestForm = () => mountAdmin('/admin/contests/new', '[data-testid="creation-owner"]');
 const ownerText = (wrapper: Mounted['wrapper']) =>
@@ -178,6 +190,9 @@ describe('an owner picker with nothing to offer', () => {
         .exists(),
     ).toBe(false);
     expect(wrapper.findAll('button').some((button) => button.text() === 'Tạo bài')).toBe(false);
+    // Where the button would be, the form says why, and its "after creating" note is gone.
+    expect(wrapper.get('[data-testid="creation-blocked"]').text()).toContain('Chưa có nơi để tạo');
+    expect(wrapper.text()).not.toContain('Sau khi tạo');
   });
 
   it('keeps the contest save bar from submitting, and says so', async () => {
@@ -191,11 +206,30 @@ describe('an owner picker with nothing to offer', () => {
     );
     const submit = wrapper.get('button[type="submit"]');
     expect(submit.attributes('aria-disabled')).toBe('true');
-    expect(wrapper.text()).toContain('Chưa có nơi để tạo kỳ thi');
+    expect(wrapper.text()).toContain('Chưa có nơi để tạo: xem mục');
     await submit.trigger('click');
     await wrapper.get('form').trigger('submit');
     await flushPromises();
     expect(calls.filter((call) => call.method === 'POST')).toEqual([]);
+  });
+
+  it('keeps the contest save bar disabled while the list loads, blaming no missing owner, then frees it', async () => {
+    mockApi({
+      ...viewer({ contest: ORG_ONLY }, ['judge.create_private_contest']),
+      'GET /organizations': listBy,
+    });
+    const release = holdOrganizations();
+    const mounted = await mountApp('/admin/contests/new');
+    mountedApps.push(mounted);
+    const { wrapper } = mounted;
+    await vi.waitFor(() => expect(wrapper.text()).toContain('Đang tải tổ chức…'));
+    const submit = wrapper.get('button[type="submit"]');
+    expect(submit.attributes('aria-disabled')).toBe('true');
+    expect(wrapper.text()).not.toContain('Chưa có nơi để tạo');
+    release();
+    await vi.waitFor(() => expect(submit.attributes('aria-disabled')).toBeUndefined());
+    expect(wrapper.text()).toContain('Trường có dấu * là bắt buộc.');
+    expect(wrapper.text()).not.toContain('Chưa có nơi để tạo');
   });
 
   it('shows a load failure as its own state, and a retry brings the organizations', async () => {

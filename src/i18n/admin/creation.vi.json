@@ -2,6 +2,7 @@
   "owner": {
     "label": "Thuộc về",
     "loading": "Đang tải tổ chức…",
+    "blocked": "Chưa có nơi để tạo: xem mục “Thuộc về”.",
     "orgPrivate": "chỉ thành viên thấy",
     "fixed": "Cố định",
     "site": "Không thuộc tổ chức",

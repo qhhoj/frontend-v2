@@ -272,7 +272,6 @@
     "submit": "Tạo kỳ thi",
     "lead": "Điền thông tin và thời gian; mọi mục khác có thể sửa sau. Sau khi tạo: thêm bài.",
     "required": "Trường có dấu * là bắt buộc.",
-    "ownerBlocked": "Chưa có nơi để tạo kỳ thi: xem mục “Thuộc về”.",
     "cancel": "Huỷ",
     "done": "Đã tạo kỳ thi {key}. Tiếp theo: thêm bài."
   },

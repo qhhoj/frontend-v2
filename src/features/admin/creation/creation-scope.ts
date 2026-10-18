@@ -1,8 +1,10 @@
 import { computed } from 'vue';
+import type { CreatableKind } from '@/api/organizations-admin.api';
 import type { Schemas } from '@/api/schemas';
 import { useSessionStore } from '@/stores/session.store';
 
-export type CreationKind = 'problem' | 'contest';
+/** What a create form makes: the `canCreate` values of `GET /organizations` (`problem`, `contest`). */
+export type CreationKind = CreatableKind;
 export type CreationScope = Schemas['CreationScopeResponse'];
 
 const NONE: CreationScope = { site: false, organizations: false };

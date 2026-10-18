@@ -12,8 +12,8 @@ import type { CreationKind } from './creation-scope';
 
 /**
  * Who owns the new problem or contest. Radio chips for a few organizations, a select for many, a fixed line when there is
- * one choice, a notice (why, and where to go) when there is none; nothing for a viewer with no creation scope. The
- * organizations are the ones the backend says the viewer may create this kind in; "Không thuộc tổ chức" only for site-wide
+ * one choice, a notice (why, and where to go) when there is none; nothing for a viewer with no creation scope. The form
+ * beside it learns the outcome through `ready` and `blocked` and says why it cannot be submitted. The organizations are the ones the backend says the viewer may create this kind in; "Không thuộc tổ chức" only for site-wide
  * creators. `layout`: `strip` is one wrapping row above the form; `field` is a labelled field inside the form card, where a
  * site-wide creator always gets the select.
  */
@@ -23,12 +23,12 @@ const props = withDefaults(defineProps<{ kind: CreationKind; layout?: 'strip' | 
 const owner = defineModel<CreationOwner | null>({ required: true });
 /** False until the owners are known, and while there is nowhere to create, so the form waits instead of posting to the wrong place. */
 const isReady = defineModel<boolean>('ready', { default: false });
+/** True once the owners are known and the viewer has nowhere to create, so the form says why next to its submit (not while loading). */
+const isBlocked = defineModel<boolean>('blocked', { default: false });
 const route = useRoute();
-const { scope } = useCreationScope(props.kind);
+const { scope, canCreate: isOffered } = useCreationScope(props.kind);
 const owners = useCreationOwnersQuery(props.kind);
 const options = computed(() => owners.data.value ?? []);
-/** A viewer with no creation scope (one who may only suggest a problem) has no owner to pick. */
-const isOffered = computed(() => scope.value.site || scope.value.organizations);
 const isLoading = computed(() => scope.value.organizations && owners.isPending.value);
 const choiceCount = computed(() => options.value.length + (scope.value.site ? 1 : 0));
 /**
@@ -55,6 +55,7 @@ watch(
     if (!isReady.value)
       owner.value = initialOwner(options.value, requestedSlug.value, scope.value.site);
     isReady.value = choiceCount.value > 0;
+    isBlocked.value = isOffered.value && !isReady.value;
   },
   { immediate: true },
 );

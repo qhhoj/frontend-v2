@@ -2,6 +2,7 @@
   "owner": {
     "label": "Belongs to",
     "loading": "Loading organizations…",
+    "blocked": "Nowhere to create yet: see “Belongs to”.",
     "orgPrivate": "members only",
     "fixed": "Fixed",
     "site": "No organization",
