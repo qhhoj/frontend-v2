@@ -2,10 +2,15 @@
 import { computed } from 'vue';
 import type { OrganizationProblem } from '@/api/types/organization-problems';
 import { formatDate } from '@/lib/format';
+import EditLink from '@/components/EditLink.vue';
+import { adminRouteName } from '@/features/admin/admin-screens';
 import { useLocaleStore } from '@/stores/locale.store';
 import OrgTagChip from './OrgTagChip.vue';
 
-/** The rows of board M7A; administrators also get a selection box per row and the two row actions. */
+/**
+ * The rows of board M7A; administrators also get a selection box per row and the two row actions. A row the viewer may
+ * edit (`canEdit`, whatever their organization role) gets a pencil to the problem's editor (P-32).
+ */
 const props = defineProps<{
   rows: OrganizationProblem[];
   isAdmin: boolean;
@@ -90,6 +95,13 @@ const ACTION =
               class="font-semibold text-content hover:underline"
               >{{ row.name }}</RouterLink
             >
+            <EditLink
+              v-if="row.canEdit"
+              data-testid="problem-edit"
+              class="ml-1 align-middle"
+              :label="$t('orgProblems.editProblem', { code: row.code })"
+              :to="{ name: adminRouteName('problemGeneral'), params: { code: row.code } }"
+            />
             <span
               v-if="row.isArchived"
               class="ml-2 rounded-pill bg-surface-hover px-2 py-0.5 text-xs font-semibold text-content"
