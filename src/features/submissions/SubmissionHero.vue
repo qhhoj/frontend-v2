@@ -124,7 +124,7 @@ const problem = computed(() => {
         :share="partialShare"
         :is-empty="submission.status === 'PD'"
       />
-      <div class="order-1 min-w-0 flex-1 basis-40 @xl:order-none">
+      <div class="order-1 min-w-0 flex-1 basis-full @xl:order-none @xl:basis-40">
         <p v-if="isLive" data-testid="grading-line" class="flex items-center gap-2 text-sm">
           <span
             aria-hidden="true"

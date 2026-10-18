@@ -9,7 +9,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
   <Card as="div" class="@container min-w-0 rounded-card">
     <div class="flex flex-wrap items-center gap-x-6 gap-y-4 p-6 sm:p-8">
       <SkeletonBlock data-skeleton-region="ring" round class="size-32 shrink-0" />
-      <div class="order-1 min-w-0 flex-1 basis-40 @xl:order-none">
+      <div class="order-1 min-w-0 flex-1 basis-full @xl:order-none @xl:basis-40">
         <p data-skeleton-region="line" class="flex min-h-7 items-center text-sm">
           <SkeletonBlock text class="w-32" />
         </p>
