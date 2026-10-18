@@ -5,8 +5,8 @@ import { countdownView } from './contest-time';
 export type Translate = (key: string, named: Record<string, number>, plural: number) => string;
 
 /**
- * Days and hours in words, the one wording of P-18: `13 ngày 21 giờ`, or `13 ng 21 g` (`short`) where there is no
- * room. A whole number of days drops the hours.
+ * Days and hours in words, the one wording of P-18: `13 ngày 21 giờ`, or `13 ng 21 g` (`short`) in a ranking cell,
+ * where there is no room. A whole number of days drops the hours.
  */
 export function daysHoursText(
   tr: Translate,
@@ -30,8 +30,8 @@ export function daysHoursText(
  */
 export function useCountdownText() {
   const { t } = useI18n();
-  return (seconds: number, short = false): string => {
+  return (seconds: number): string => {
     const view = countdownView(seconds);
-    return view.kind === 'clock' ? view.text : daysHoursText(t, view, short);
+    return view.kind === 'clock' ? view.text : daysHoursText(t, view, false);
   };
 }

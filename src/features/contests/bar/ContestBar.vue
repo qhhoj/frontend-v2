@@ -6,15 +6,16 @@ import type { CurrentParticipation } from '@/api/types/contests';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import { navSectionOverride } from '@/features/shell/nav-section';
 import { usePublishedHeight } from '@/features/problems/use-dock-height';
-import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useSessionStore } from '@/stores/session.store';
 import { useUnreadAnnouncementCount } from '../announcement-seen';
 import { participationKind } from './current-contest';
 
 /**
  * P-15 B: the one contest bar under the site header on every page while the viewer takes part in a contest. It answers
- * "how long is left", "where do I go back to" and "is there news" without leaving the statement. 48 px, 44 px on a phone,
- * where only the ranking and the announcements stay as links. Shown by `AppShell` through `useCurrentContest`.
+ * "how long is left", "where do I go back to" and "is there news" without leaving the statement. 48 px, 40 px on a phone,
+ * where the status is its dot and only the ranking and the announcements stay as links (M-02, M-06). On the contest's
+ * own pages its tab row is the navigation, so the bar keeps only the status and the clock: one active link and one
+ * unread badge per screen (M-01, Q-B). Shown by `AppShell` through `useCurrentContest`.
  */
 const props = defineProps<{ current: CurrentParticipation }>();
 const { t } = useI18n();
@@ -32,8 +33,6 @@ const root = ref<HTMLElement | null>(null);
 usePublishedHeight(root, '--contest-bar-height');
 /** The impersonation banner is the one sticky strip above: the bar then scrolls away rather than slide under it. */
 const session = useSessionStore();
-/** A phone's 44 px bar abbreviates a multi-day clock (`28 ng 14 g`). */
-const isPhone = useMediaQuery(PHONE_QUERY);
 
 interface BarLink {
   name: string;
@@ -55,13 +54,17 @@ const LINKS = computed<BarLink[]>(() => [
 ]);
 /** A page of this contest that is not a tab's own route: its problem lights "Đề bài". */
 const CLAIMED_BY: Record<string, string> = { problem: 'contest' };
-const currentLink = computed(() => {
-  const name = String(route.name ?? '');
-  if (route.params.key === contestKey.value) return name;
-  return navSectionOverride.value === '/contests' ? (CLAIMED_BY[name] ?? null) : null;
-});
-const LINK =
-  'relative inline-flex h-8 items-center gap-1.5 rounded-pill border border-transparent px-2.5 text-meta md:px-3 font-semibold whitespace-nowrap text-muted hover:bg-surface-hover hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-surface-solid aria-[current=page]:text-accent-soft-text pointer-coarse:after:absolute pointer-coarse:after:-inset-y-1.5 pointer-coarse:after:inset-x-0';
+const isOnContestPage = computed(() => route.params.key === contestKey.value);
+const currentLink = computed(() =>
+  navSectionOverride.value === '/contests' ? (CLAIMED_BY[String(route.name ?? '')] ?? null) : null,
+);
+/** 44 px hit areas on a coarse pointer at every width (M-02): the link is 40 px tall and its `::after` reaches 2 px past it. */
+const COARSE_HIT =
+  'pointer-coarse:min-w-11 pointer-coarse:after:absolute pointer-coarse:after:-inset-y-0.5 pointer-coarse:after:inset-x-0';
+const LINK = [
+  'relative inline-flex h-8 items-center justify-center gap-1.5 rounded-pill border border-transparent px-2.5 text-meta md:px-3 font-semibold whitespace-nowrap text-muted hover:bg-surface-hover hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-surface-solid aria-[current=page]:text-accent-soft-text pointer-coarse:h-10',
+  COARSE_HIT,
+];
 </script>
 
 <template>
@@ -73,25 +76,26 @@ const LINK =
       !session.impersonatorId && 'sticky top-0',
     ]"
   >
-    <div class="page-gutter flex h-11 items-center gap-2 md:h-12 md:gap-3">
+    <div class="page-gutter flex h-10 items-center gap-2 md:h-12 md:gap-3">
       <RouterLink
         :to="{ name: 'contest', params: { key: contestKey } }"
-        class="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-accent-soft-text hover:underline"
+        :class="[
+          'relative flex min-w-0 items-center gap-1.5 text-sm font-semibold text-accent-soft-text hover:underline pointer-coarse:h-10',
+          COARSE_HIT,
+        ]"
       >
         <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-accent" />
-        <span class="truncate"
-          >{{ statusText }}<span class="hidden md:inline"> · {{ current.contest.name }}</span></span
-        >
+        <!-- A phone shows the dot; the status stays the link's name (M-02). -->
+        <span class="truncate max-md:sr-only">{{ statusText }} · {{ current.contest.name }}</span>
       </RouterLink>
       <p class="shrink-0 font-bold text-content">
         <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
         <CountdownTimer
           :key="current.participation.endTime"
           :until="current.participation.endTime"
-          :short="isPhone"
         />
       </p>
-      <nav :aria-label="$t('contestBar.label')" class="ml-auto shrink-0">
+      <nav v-if="!isOnContestPage" :aria-label="$t('contestBar.label')" class="ml-auto shrink-0">
         <ul class="m-0 flex list-none items-center gap-0.5 p-0 md:gap-1">
           <li v-for="link in LINKS" :key="link.name" :class="link.isWide && 'hidden md:block'">
             <RouterLink
