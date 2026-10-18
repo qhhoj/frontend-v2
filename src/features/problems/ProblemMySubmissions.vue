@@ -15,11 +15,16 @@ import { useNow } from '@/lib/use-now';
 import { submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
+import { scoreOnScale } from './submit-result';
+import type { ScoreScale } from './submit-result';
 
 const SHOWN = 3;
 const CLOCK_TICK_MS = 60_000;
-/** The signed-in viewer's last three submissions to this problem. */
-const props = defineProps<{ code: string; points: number }>();
+/**
+ * The signed-in viewer's last three submissions to this problem, scored like the result strip: on the contest's points
+ * inside the viewer's contest (Q-10 A), else on the problem's.
+ */
+const props = defineProps<{ code: string; scale: ScoreScale }>();
 const session = useSessionStore();
 const locale = useLocaleStore();
 const now = useNow(CLOCK_TICK_MS);
@@ -43,8 +48,12 @@ const isJudging = computed(() => {
   const first = latest.value[0];
   return first !== undefined && IN_PROGRESS_STATUSES.includes(first.status);
 });
-const score = (points: number | null) =>
-  `${points === null ? '–' : formatNumber(points, locale.locale, 2)} / ${formatNumber(props.points, locale.locale, 2)}`;
+const score = (points: number | null) => {
+  const digits = props.scale.contest?.precision ?? 2;
+  const { score: earned, max } = scoreOnScale(points ?? 0, props.scale);
+  const shown = points === null ? '–' : formatNumber(earned, locale.locale, digits);
+  return `${shown} / ${formatNumber(max, locale.locale, digits)}`;
+};
 </script>
 
 <template>
