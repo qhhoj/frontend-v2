@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import EmptyState from '@/components/EmptyState.vue';
 import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
-import Card from '@/components/ui/Card.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
-import QueryState from '@/components/QueryState.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
 import { translate } from '@/i18n';
 import { formatNumber, formatProblemPoints } from '@/lib/format';
@@ -18,7 +15,6 @@ import ProblemFilterChips from './ProblemFilterChips.vue';
 import ProblemFilters from './ProblemFilters.vue';
 import ProblemStatusMark from './ProblemStatusMark.vue';
 import ProblemTable from './ProblemTable.vue';
-import ProblemTableSkeleton from './ProblemTableSkeleton.vue';
 import { filterChips } from './problem-filter-chips';
 import { useProblemListQuery, useProblemMetaQuery } from './problems.queries';
 import { useProblemFilters } from './use-problem-filters';
@@ -131,20 +127,18 @@ const LEGEND_MARKS = [
           :label="$t('problems.pagerTop')"
         />
       </div>
-      <Card as="div" class="overflow-hidden">
-        <QueryState :loading="isPending" :error="error" @retry="refetch()">
-          <template #skeleton><ProblemTableSkeleton /></template>
-          <EmptyState v-if="!problems.length">{{ $t('problems.empty') }}</EmptyState>
-          <ProblemTable
-            v-else
-            :problems="problems"
-            :sort="filters.sort"
-            :signed-in="session.user !== null"
-            @sort="update({ sort: $event })"
-          />
-          <NumberedPager v-if="data" class="p-4" :meta="data.meta" :label="$t('problems.pager')" />
-        </QueryState>
-      </Card>
+      <ProblemTable
+        :problems="problems"
+        :sort="filters.sort"
+        :signed-in="session.user !== null"
+        :loading="isPending"
+        :error="error"
+        :meta="data?.meta"
+        :filtered="chips.length > 0"
+        @sort="update({ sort: $event })"
+        @retry="refetch()"
+        @clear-filters="clearAll"
+      />
     </div>
   </div>
 </template>

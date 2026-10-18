@@ -2,7 +2,6 @@
 import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-vue-next';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
-import { useRouter } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
 import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
@@ -10,24 +9,30 @@ import QueryState from '@/components/QueryState.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useMediaQuery } from '@/lib/use-media-query';
-import { CARD, buttonClass } from '@/features/admin/ui/controls';
+import AppButton from './AppButton.vue';
+import { CARD_VARIANTS } from './Card.variants';
+import { useRowOpen } from './use-row-open';
 import AdminBulkBar from '@/features/admin/ui/table/AdminBulkBar.vue';
 import { ariaSortOf, nextSort, rangeOf, stickyOffsets } from './DataTableColumns';
 import type { DataTableColumn } from './DataTableColumns';
 
 /**
  * The list table: a card with an optional toolbar, sortable headers, optional row selection with the bulk bar in place of
- * the toolbar, row actions at the end, loading (a skeleton shaped from the columns), error, empty and filtered-empty
- * states, and a footer (the `pager` range and NumberedPager, or the `footer` slot).
+ * the toolbar, row actions at the end, loading (a skeleton shaped from the columns, header row included), error, empty and
+ * filtered-empty states, and a footer (the `pager` range and NumberedPager, or the `footer` slot).
  *
- * `stack="card"`: below `stackBelow` px each row is a card instead (see `DataTableColumns.ts`); only one of the two is
- * rendered, so row hooks such as `data-code` (`rowAttrs`) exist once. `stack="scroll"`: always the table, scrolling
- * sideways inside its card with the first `stickyColumns` columns pinned and a shade beside them once scrolled.
- * `density="compact"` is the admin look (40 px rows, small pager); `comfortable` the public one. Both draw the header the same
- * way: `text-meta text-muted`, sentence case.
- * `rowTo` makes a row open a page on click; the primary cell is the link, so keyboard and screen readers use that.
+ * `stack="card"`: below `stackBelow` px each row is a card instead (see `DataTableColumns.ts`, or the `card` slot for a
+ * row of your own: an `<li>`); only one of the two is rendered, so row hooks such as `data-code` (`rowAttrs`) exist once.
+ * `stack="scroll"`: always the table, scrolling sideways inside its card with the first `stickyColumns` columns pinned and a
+ * shade beside them once scrolled.
+ * `density="compact"` is the admin look (40 px rows, flat card, small pager); `comfortable` the public one (48 px rows, the
+ * page card, the regular pager). A row is at least that tall: cells carry no vertical padding, so a two-line cell (a name
+ * over its code) fits the 48 px. Both draw the header the same way: `text-meta text-muted`, sentence case.
+ * `rowTo` makes a row open a page on click (Ctrl/Cmd or middle click: a new tab; never at the end of a text selection);
+ * the primary cell is the link, so keyboard and screen readers use that.
  *
- * Slots: `toolbar`, `bulk` (actions while rows are selected), `cell-<key>` ({ row }), `actions` ({ row }), `empty`, `footer`.
+ * Slots: `toolbar`, `bulk` (actions while rows are selected), `cell-<key>` ({ row }), `actions` ({ row }), `card` ({ row },
+ * a stacked row), `empty`, `footer`.
  * Models: `sort` (the `?sort=` value), `selected` (row keys). `selectable` adds the checkbox column.
  */
 const props = withDefaults(
@@ -84,6 +89,7 @@ defineSlots<
     toolbar?: () => unknown;
     bulk?: (scope: { count: number }) => unknown;
     actions?: (scope: { row: Row }) => unknown;
+    card?: (scope: { row: Row }) => unknown;
     empty?: () => unknown;
     footer?: () => unknown;
   } & Record<`cell-${string}`, (scope: { row: Row }) => unknown>
@@ -146,14 +152,17 @@ const growsOf = (column: DataTableColumn) =>
 const growClass = (column: DataTableColumn) => growsOf(column) && 'w-full max-w-0';
 const CELL_BASE =
   'border-b border-line px-3 align-middle [overflow-wrap:anywhere] [:where(&)]:max-w-64';
+/** A body cell is the row's minimum height (admin 40 px, public 48 px); a header cell is as tall as an admin row, or 40 px. */
 const CELL = computed(
-  () => `${isCompact.value ? 'h-[var(--qa-row,2.5rem)]' : 'h-(--qh-control)'} ${CELL_BASE}`,
+  () => `${isCompact.value ? 'h-[var(--qa-row,2.5rem)]' : 'h-12'} ${CELL_BASE}`,
 );
-const HEAD = computed(
-  () => `${isCompact.value ? 'h-9' : 'h-10'} text-meta font-semibold whitespace-nowrap text-muted`,
+const HEAD_CELL = computed(
+  () => `${isCompact.value ? 'h-[var(--qa-row,2.5rem)]' : 'h-10'} ${CELL_BASE}`,
 );
-const SORT_BUTTON = 'inline-flex min-h-6 items-center gap-1 rounded-cell hover:text-content';
-const FRAME = computed(() => (isCompact.value ? CARD : 'glass rounded-card'));
+const HEAD_TEXT = 'text-meta font-semibold whitespace-nowrap text-muted';
+const SORT_BUTTON =
+  'inline-flex min-h-6 items-center gap-1 rounded-cell hover:text-content pointer-coarse:min-h-11';
+const FRAME = computed(() => CARD_VARIANTS[isCompact.value ? 'flat' : 'glass']);
 const CHECKBOX = 'size-4 accent-[var(--qh-accent)] align-middle';
 const frameStyle = computed(() => (props.maxHeight ? { maxHeight: props.maxHeight } : undefined));
 
@@ -171,13 +180,11 @@ const skeletonWidth = (column: DataTableColumn) => {
   return growsOf(column) ? 'w-3/4' : 'w-16';
 };
 
-const router = useRouter();
-const INTERACTIVE = 'a, button, input, label, select, textarea, summary';
+const { open: openTarget, openInTab } = useRowOpen();
 /** A click anywhere on a `rowTo` row opens it, except on its own links and controls. */
-function openRow(row: Row, event: MouseEvent) {
-  if (!props.rowTo || (event.target as Element).closest(INTERACTIVE)) return;
-  void router.push(props.rowTo(row));
-}
+const openRow = (row: Row, event: MouseEvent) => props.rowTo && openTarget(event, props.rowTo(row));
+const openRowInTab = (row: Row, event: MouseEvent) =>
+  props.rowTo && openInTab(event, props.rowTo(row));
 
 /** Pinned columns (`stack="scroll"`): the checkbox column, if any, plus the first `stickyColumns` ones. */
 const pinnedCount = computed(() =>
@@ -259,6 +266,20 @@ const offset = computed(() => (props.selectable ? 1 : 0));
           </li>
         </ul>
         <table v-else class="w-full border-collapse text-sm [&_tr:last-child_td]:border-b-0">
+          <thead>
+            <tr>
+              <th v-if="selectable" scope="col" :class="[HEAD_CELL, 'w-10']" />
+              <th
+                v-for="column in columns"
+                :key="column.key"
+                scope="col"
+                :class="[HEAD_CELL, HEAD_TEXT, alignClass(column), growClass(column)]"
+              >
+                <SkeletonBlock v-if="!column.hideLabel" text class="w-12 max-w-full" />
+              </th>
+              <th v-if="$slots.actions" scope="col" :class="[HEAD_CELL, 'w-px']" />
+            </tr>
+          </thead>
           <tbody>
             <tr v-for="index in skeletonRows" :key="index">
               <td v-if="selectable" :class="[CELL, 'w-10']"><SkeletonBlock class="size-4" /></td>
@@ -281,19 +302,18 @@ const offset = computed(() => (props.selectable ? 1 : 0));
         <slot name="empty">
           <div v-if="filtered" class="flex flex-col items-center gap-3 px-4 py-8 text-center">
             <p class="text-muted">{{ $t('admin.table.emptyFiltered') }}</p>
-            <button
-              type="button"
-              :class="buttonClass('secondary', 'sm')"
-              @click="$emit('clear-filters')"
-            >
+            <AppButton size="sm" @click="$emit('clear-filters')">
               {{ $t('admin.table.clearFilters') }}
-            </button>
+            </AppButton>
           </div>
           <EmptyState v-else>{{ emptyText ?? $t('admin.table.empty') }}</EmptyState>
         </slot>
       </template>
 
-      <!-- Narrow screens: one card per row. -->
+      <!-- Narrow screens: one card per row, the page's own (`card` slot) or the built-in one. -->
+      <ul v-else-if="isCards && $slots.card" class="m-0 list-none p-0" :aria-label="label">
+        <template v-for="row in rows" :key="rowKey(row)"><slot name="card" :row="row" /></template>
+      </ul>
       <ul v-else-if="isCards" class="m-0 flex list-none flex-col p-0" :aria-label="label">
         <li
           v-for="row in rows"
@@ -302,6 +322,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
           class="flex flex-col gap-1.5 border-b border-line px-4 py-3 last:border-b-0"
           :class="[selected.has(rowKey(row)) && 'bg-accent-soft', rowTo && 'cursor-pointer']"
           @click="openRow(row, $event)"
+          @auxclick="openRowInTab(row, $event)"
         >
           <div class="flex min-w-0 items-start gap-3">
             <input
@@ -386,7 +407,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                 <th
                   v-if="selectable"
                   scope="col"
-                  :class="[CELL, 'w-10', headPin(0).class]"
+                  :class="[HEAD_CELL, 'w-10', headPin(0).class]"
                   :style="headPin(0).style"
                 >
                   <input
@@ -404,9 +425,9 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                   scope="col"
                   :aria-sort="ariaSortOf(column.sort, sort)"
                   :class="[
-                    CELL,
+                    HEAD_CELL,
+                    HEAD_TEXT,
                     headPin(index + offset).class,
-                    HEAD,
                     column.align === 'end' ? 'text-right' : 'text-left',
                   ]"
                   :style="headPin(index + offset).style"
@@ -436,7 +457,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                 <th
                   v-if="$slots.actions"
                   scope="col"
-                  :class="[CELL, 'sticky top-0 z-10 bg-surface-solid', isCompact ? 'h-9' : 'h-10']"
+                  :class="[HEAD_CELL, 'sticky top-0 z-10 bg-surface-solid']"
                 >
                   <span class="sr-only">{{ $t('admin.table.actions') }}</span>
                 </th>
@@ -453,6 +474,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                   rowTo && 'cursor-pointer',
                 ]"
                 @click="openRow(row, $event)"
+                @auxclick="openRowInTab(row, $event)"
               >
                 <td v-if="selectable" :class="[CELL, bodyPin(0)?.class]" :style="bodyPin(0)?.style">
                   <input

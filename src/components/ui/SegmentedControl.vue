@@ -19,8 +19,8 @@ export interface SegmentOption<V extends string | number = string> {
 
 /**
  * One choice out of a few, as pills inside one pill frame. `md` fills its width with equal segments (settings);
- * `sm` is the admin chip density and wraps on a narrow phone instead of being clipped, the current segment scrolled into
- * view when the row still overflows. Links make it a `nav`; buttons a `group` of `aria-pressed` toggles.
+ * `sm` is the admin chip density (a 44 px segment on a coarse pointer) and wraps on a narrow phone instead of being clipped, the
+ * current segment scrolled into view when the row still overflows. Links make it a `nav`; buttons a `group` of `aria-pressed` toggles.
  */
 const props = withDefaults(
   defineProps<{
@@ -60,7 +60,7 @@ const FRAME = {
 };
 const SEGMENT = {
   md: 'min-h-11 flex-1 px-2 leading-tight',
-  sm: 'inline-flex min-h-7 shrink-0 items-center gap-1.5 px-3 font-semibold whitespace-nowrap pointer-coarse:min-h-9',
+  sm: 'inline-flex min-h-7 shrink-0 items-center gap-1.5 px-3 font-semibold whitespace-nowrap pointer-coarse:min-h-11',
 };
 /** One active look for every tab set: accent-soft fill, accent border. Disabled keeps full-contrast text, no opacity. */
 const ACTIVE =

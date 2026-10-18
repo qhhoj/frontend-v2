@@ -4,6 +4,8 @@ import type { Mock } from 'vitest';
 import { leaderboardEntry, userPage } from '@/test/fixtures';
 import { organizationSummary } from '@/test/community-fixtures';
 import { fail, hangRequestsExcept, mockApi, ok, page } from '@/test/mock-api';
+import { WIDE_QUERY } from '@/lib/use-media-query';
+import { stubMatchMedia } from '@/test/match-media';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
@@ -21,13 +23,18 @@ const board = page(
 
 /** jsdom has no scrollIntoView: each test gets a mock, and the original (absent) method is put back after it. */
 let scrollIntoView: Mock;
+let media: ReturnType<typeof stubMatchMedia>;
 const originalScrollIntoView = Reflect.get(Element.prototype, 'scrollIntoView') as unknown;
 beforeEach(() => {
   scrollIntoView = vi.fn();
   Element.prototype.scrollIntoView = scrollIntoView;
+  // A computer by default: all five number columns. The phone tests narrow it.
+  media = stubMatchMedia();
+  media.setQuery(WIDE_QUERY, true);
 });
 afterEach(() => {
   Object.assign(Element.prototype, { scrollIntoView: originalScrollIntoView });
+  vi.unstubAllGlobals();
 });
 
 describe('leaderboard page: reads the board from the URL', () => {
@@ -41,7 +48,22 @@ describe('leaderboard page: reads the board from the URL', () => {
     expect(row.get('a[href="/users/dinhphuc"]').classes()).toContain('text-tier-specialist');
     expect(row.text()).toContain('PBC');
     expect(wrapper.get('th[aria-sort="descending"]').text()).toBe('Tổng điểm');
-    expect(wrapper.findAll('th[aria-sort="none"]')).toHaveLength(4);
+    expect(wrapper.findAll('thead th[aria-sort]')).toHaveLength(1);
+    expect(wrapper.findAll('thead th button')).toHaveLength(5);
+  });
+
+  it('shows only the sorted number below lg and sorts from a select above the table', async () => {
+    media.setQuery(WIDE_QUERY, false);
+    mockApi({ ...anonymousViewer, 'GET /users': board });
+    const { wrapper, router } = await mountApp('/users?sort=points');
+    expect(wrapper.findAll('thead th').map((cell) => cell.text())).toEqual([
+      'Hạng',
+      'Người dùng',
+      'Tổng điểm',
+    ]);
+    await wrapper.get('select').setValue('problemCount');
+    await flushPromises();
+    expect(router.currentRoute.value.fullPath).toBe('/users?sort=problemCount');
   });
 
   it('sorts by a clicked column heading and returns to the first page', async () => {

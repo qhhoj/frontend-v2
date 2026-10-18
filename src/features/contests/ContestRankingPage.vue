@@ -9,6 +9,7 @@ import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import Notice from '@/components/ui/Notice.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { rankingSummary } from './ranking-summary';
@@ -209,16 +210,17 @@ async function goToMyRow() {
                   : $t('ranking.myRow', { rank: myRow.rank })
               }}
             </AppButton>
-            <label
-              class="glass flex h-(--qh-control) items-center gap-2 rounded-pill px-4 text-muted"
-            >
+            <label class="relative block w-48 text-muted">
               <span class="sr-only">{{ $t('ranking.searchLabel') }}</span>
-              <Search class="size-4 shrink-0" aria-hidden="true" />
-              <input
+              <Search
+                class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+                aria-hidden="true"
+              />
+              <TextInput
                 v-model="search"
                 type="search"
                 :placeholder="$t('ranking.searchLabel')"
-                class="h-full w-36 bg-transparent text-content"
+                class="pl-9"
               />
             </label>
           </div>

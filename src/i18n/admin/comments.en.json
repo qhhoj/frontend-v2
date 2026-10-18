@@ -2,6 +2,7 @@
   "title": "Reported comments",
   "lead": "Open reports, newest first: hide the comment here, or hide and resolve in one step; dismiss reports that need no action. Tick several to settle them at once.",
   "empty": "No open reports.",
+  "emptyNext": "See all comments",
   "reporters": "{count} reporter | {count} reporters",
   "chips": {
     "hidden": "Hidden",

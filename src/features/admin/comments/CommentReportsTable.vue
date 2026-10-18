@@ -4,9 +4,12 @@ import { useI18n } from 'vue-i18n';
 import { CheckCheck, Eye, EyeOff, X } from 'lucide-vue-next';
 import type { TotalPageMeta } from '@/api/client';
 import type { CommentReportOutcome, CommentReportQueueItem } from '@/api/types/comments';
+import EmptyState from '@/components/EmptyState.vue';
 import UserName from '@/components/UserName.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { formatDateTime } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import { adminRouteName } from '../admin-screens';
 import AdminChip from '../ui/AdminChip.vue';
 import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
@@ -98,9 +101,18 @@ const rowName = (item: CommentReportQueueItem) =>
     :selectable="isOpenTab"
     :loading="loading"
     :error="error"
-    :empty-text="isOpenTab ? $t('admin.comments.empty') : $t('admin.comments.emptySettled')"
     @retry="$emit('retry')"
   >
+    <template #empty>
+      <EmptyState>
+        {{ isOpenTab ? $t('admin.comments.empty') : $t('admin.comments.emptySettled') }}
+        <template v-if="isOpenTab" #action>
+          <AppButton :to="{ name: adminRouteName('comments') }">
+            {{ $t('admin.comments.emptyNext') }}
+          </AppButton>
+        </template>
+      </EmptyState>
+    </template>
     <template #bulk><slot name="bulk" /></template>
     <template #cell-comment="{ row }"><CommentExcerpt :comment="row.comment" /></template>
     <template #cell-state="{ row }">

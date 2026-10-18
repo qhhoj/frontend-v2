@@ -3,8 +3,11 @@ import type { MaybeRefOrGetter } from 'vue';
 
 /** The phone layout: below Tailwind's `md` breakpoint. */
 export const PHONE_QUERY = '(max-width: 767.98px)';
+/** From Tailwind's `lg` breakpoint up: the leaderboard shows every number column. */
+export const WIDE_QUERY = '(min-width: 1024px)';
 /** Public lists swap their table for compact rows (P-04 B): below Tailwind's `sm` breakpoint. */
-export const COMPACT_LIST_QUERY = '(max-width: 639.98px)';
+export const COMPACT_LIST_BELOW_PX = 640;
+export const COMPACT_LIST_QUERY = `(max-width: ${COMPACT_LIST_BELOW_PX - 0.02}px)`;
 
 /** Follows a media query (a getter switches queries); false where `matchMedia` does not exist. */
 export function useMediaQuery(query: MaybeRefOrGetter<string>) {
