@@ -108,7 +108,7 @@ function openClone(close: () => void) {
               class="m-0 inline-flex list-none flex-wrap gap-1 p-0"
               :aria-label="$t('admin.problems.statements.written.label')"
             >
-              <li v-for="item in written" :key="item.slot" :data-slot="item.slot">
+              <li v-for="item in written" :key="item.slot" :data-written-slot="item.slot">
                 <AdminChip
                   :tone="item.isWritten ? 'positive' : 'neutral'"
                   :icon="item.isWritten ? Check : Minus"
