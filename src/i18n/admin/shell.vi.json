@@ -128,10 +128,10 @@
     "links": {
       "queue": "Xem hàng đợi",
       "judges": "Xem máy chấm",
-      "tickets": "Mở hàng phiếu | Xem 1 phiếu | Xem {n} phiếu",
-      "reports": "Mở báo cáo | Xem 1 báo cáo | Xem {n} báo cáo",
-      "requests": "Mở yêu cầu | Xem 1 yêu cầu | Xem {n} yêu cầu",
-      "problems": "Mở danh sách | Xem 1 bài | Xem {n} bài",
+      "tickets": "Xem {n} phiếu",
+      "reports": "Xem {n} báo cáo",
+      "requests": "Xem {n} yêu cầu",
+      "problems": "Xem {n} bài",
       "open": "Mở danh sách"
     }
   },

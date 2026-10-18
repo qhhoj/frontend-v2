@@ -128,10 +128,10 @@
     "links": {
       "queue": "View the queue",
       "judges": "View judges",
-      "tickets": "Open the queue | View 1 ticket | View {n} tickets",
-      "reports": "Open reports | View 1 report | View {n} reports",
-      "requests": "Open requests | View 1 request | View {n} requests",
-      "problems": "Open the list | View 1 problem | View {n} problems",
+      "tickets": "View {n} ticket | View {n} tickets",
+      "reports": "View {n} report | View {n} reports",
+      "requests": "View {n} request | View {n} requests",
+      "problems": "View {n} problem | View {n} problems",
       "open": "Open the list"
     }
   },

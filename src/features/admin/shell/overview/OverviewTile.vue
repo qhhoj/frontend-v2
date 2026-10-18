@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArrowRight } from 'lucide-vue-next';
+import { computed } from 'vue';
 import type { Component } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import AdminChip from '../../ui/AdminChip.vue';
@@ -10,16 +11,17 @@ import { CARD } from '../../ui/controls';
  * a caution border, the accent figure and a "Cần xử lý" chip, so the state never rests on colour alone. `linkText` says
  * where the tile goes ("Xem 3 phiếu →"), so it reads as a link (P-33).
  */
-defineProps<{
+const props = defineProps<{
   icon: Component;
   label: string;
   value: string | number | null;
   detail?: string;
   to: RouteLocationRaw;
   needsAttention?: boolean;
-  /** The link line for a loaded count ("Xem 3 phiếu"); while `value` is null the line reads "Mở danh sách". */
+  /** The link line for a count above zero ("Xem 3 phiếu"); at zero, while loading or for a text value it reads "Mở danh sách". */
   linkText: string;
 }>();
+const hasCount = computed(() => typeof props.value === 'number' && props.value > 0);
 </script>
 
 <template>
@@ -56,7 +58,7 @@ defineProps<{
       <span
         class="mt-auto inline-flex items-center gap-1 pt-1 text-sm font-semibold text-accent-text"
       >
-        {{ typeof value === 'number' ? linkText : $t('admin.shell.overview.links.open') }}
+        {{ hasCount ? linkText : $t('admin.shell.overview.links.open') }}
         <ArrowRight aria-hidden="true" class="size-3.5" :stroke-width="2" />
       </span>
     </RouterLink>
