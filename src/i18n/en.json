@@ -1311,7 +1311,8 @@
     "refreshFailed": "Could not refresh the board, retrying.",
     "scrollHint": "Swipe sideways to see the problems →",
     "tied": "tied",
-    "tiedAt": "Tied for {rank}"
+    "tiedAt": "Tied for {rank}",
+    "moreTied": "+{count} more"
   },
   "formats": {
     "default": "Points",

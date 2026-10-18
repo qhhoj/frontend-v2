@@ -188,6 +188,24 @@ describe('contest ranking', () => {
     expect(cells.map((cell) => cell.find('span[aria-hidden="true"]').text())).toEqual(['1', '3']);
   });
 
+  it('stacks three names of a mass tie and links the rest to the board', async () => {
+    const [problemA] = RANKING_PROBLEM_IDS;
+    const cell = { [problemA]: { time: 60, points: 1, tries: 1 } };
+    const tied = ['user_11', 'user_12', 'user_13', 'user_14', 'user_15'].map((username) =>
+      rankingRow(1, `part-${username}`, username, 1, 10, cell),
+    );
+    mockApi(routes({ 'GET /contests/r42/ranking': ok(ranking({ rows: tied })) }));
+    const { wrapper } = await mountApp('/contests/r42/ranking');
+    const podium = wrapper.get('section[aria-label="Top 3"]');
+    expect(
+      podium.findAll('[data-podium-rank] li a:not([data-testid])').map((link) => link.text()),
+    ).toEqual(['user_11', 'user_12', 'user_13']);
+    const more = podium.get('[data-testid="podium-more"]');
+    expect(more.text()).toBe('+2 nữa');
+    expect(more.attributes('href')).toBe('#ranking-board');
+    expect(wrapper.find('#ranking-board').exists()).toBe(true);
+  });
+
   it('keeps virtual rows off the podium and ranks the live rows among themselves', async () => {
     const [problemA] = RANKING_PROBLEM_IDS;
     const cell = { [problemA]: { time: 60, points: 1, tries: 1 } };

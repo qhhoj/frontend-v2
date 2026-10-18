@@ -243,7 +243,13 @@ const viewMode = computed(() => (withVirtual.value ? 'virtual' : 'official'));
           :context="rankingContext"
           :class="{ 'opacity-60': rankingStale }"
         />
-        <Card as="div" class="overflow-hidden" :class="{ 'opacity-60': rankingStale }">
+        <Card
+          id="ranking-board"
+          as="div"
+          tabindex="-1"
+          class="scroll-mt-4 overflow-hidden"
+          :class="{ 'opacity-60': rankingStale }"
+        >
           <RankingTable
             :ranking="ranking"
             :rows="rows"

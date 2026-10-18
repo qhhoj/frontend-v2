@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { rankingRow } from '@/test/fixtures';
-import { PODIUM_LIMIT, podiumRows } from './podium-rows';
+import { podiumRows } from './podium-rows';
 
 const row = (
   rank: number | null,
@@ -73,8 +73,8 @@ describe('podiumRows', () => {
     ]);
   });
 
-  it('caps a mass tie', () => {
+  it('keeps every row of a mass tie for the podium to count', () => {
     const tied = Array.from({ length: 9 }, (_unused, index) => row(1, `user_${10 + index}`));
-    expect(podiumRows(tied)).toHaveLength(PODIUM_LIMIT);
+    expect(podiumRows([...tied, row(10, 'user_01')])).toHaveLength(9);
   });
 });

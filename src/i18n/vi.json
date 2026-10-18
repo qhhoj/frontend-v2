@@ -1311,7 +1311,8 @@
     "refreshFailed": "Không cập nhật được bảng, đang thử lại.",
     "scrollHint": "Vuốt ngang để xem các bài →",
     "tied": "đồng hạng",
-    "tiedAt": "Đồng hạng {rank}"
+    "tiedAt": "Đồng hạng {rank}",
+    "moreTied": "+{count} nữa"
   },
   "formats": {
     "default": "Tính điểm",

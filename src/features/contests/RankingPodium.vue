@@ -12,7 +12,8 @@ import type { RankingContext } from '@/lib/ranking-cells';
 /**
  * One card split into a cell per podium rank (P-24 B). From lg up the cells sit side by side between hairlines, a tied
  * rank stacking its names in one cell; below lg every person is a 46 px row of one list. DOM order is rank order in
- * both layouts, and names wrap instead of being cut.
+ * both layouts, and names wrap at word breaks instead of being cut. A mass tie shows its first names and links the rest
+ * to the board.
  */
 const props = defineProps<{
   rows: RankingRow[];
@@ -26,6 +27,8 @@ const COIN =
 const coinOf = (rank: number) => `${COIN} ${COINS[rank] ?? COINS[3]}`;
 /** Static classes, so Tailwind sees each one: a board with a tie at 1 has fewer than three ranks. */
 const COLUMNS: Record<number, string> = { 1: '', 2: 'lg:grid-cols-2', 3: 'lg:grid-cols-3' };
+/** Names stacked in one tied cell before the rest become "+N nữa". */
+const NAMES_PER_RANK = 3;
 const groups = computed(() => {
   const byRank: Array<{ rank: number; rows: RankingRow[] }> = [];
   for (const row of props.rows) {
@@ -34,7 +37,12 @@ const groups = computed(() => {
     if (last?.rank === rank) last.rows.push(row);
     else byRank.push({ rank, rows: [row] });
   }
-  return byRank;
+  return byRank.map(({ rank, rows }) => ({
+    rank,
+    isTied: rows.length > 1,
+    shown: rows.slice(0, NAMES_PER_RANK),
+    hiddenCount: Math.max(rows.length - NAMES_PER_RANK, 0),
+  }));
 });
 const scoreOf = (row: RankingRow) => {
   if (!isPenaltyFormat(props.context.formatName))
@@ -63,7 +71,7 @@ const scoreOf = (row: RankingRow) => {
         <div class="min-w-0 flex-1">
           <ul class="divide-y divide-line lg:flex lg:flex-col lg:gap-1.5 lg:divide-y-0">
             <li
-              v-for="row in group.rows"
+              v-for="row in group.shown"
               :key="row.participationId"
               class="flex min-h-11.5 items-center gap-3 px-4 py-2 lg:min-h-0 lg:p-0"
             >
@@ -72,24 +80,34 @@ const scoreOf = (row: RankingRow) => {
               }}</span>
               <span class="sr-only">{{ $t('ranking.columns.rank') }} {{ group.rank }}:</span>
               <UserAvatar :username="row.user.username" :size="24" />
-              <UserName
-                :username="row.user.username"
-                :rating="row.user.rating"
-                class="min-w-0 font-semibold [overflow-wrap:anywhere]"
-              />
+              <span class="min-w-0 flex-1">
+                <UserName
+                  :username="row.user.username"
+                  :rating="row.user.rating"
+                  class="min-w-0 font-semibold break-words"
+                />
+                <span v-if="group.isTied" class="block text-meta text-muted lg:hidden">{{
+                  $t('ranking.tied')
+                }}</span>
+              </span>
               <span
-                v-if="group.rows.length > 1"
-                class="ml-auto shrink-0 text-meta text-muted lg:hidden"
-                >{{ $t('ranking.tied') }}</span
-              >
-              <span
-                class="shrink-0 font-mono text-sm whitespace-nowrap tabular-nums lg:text-muted"
-                :class="group.rows.length > 1 ? 'lg:ml-auto' : 'ml-auto'"
+                class="shrink-0 text-right font-mono text-sm whitespace-nowrap tabular-nums lg:text-muted"
                 >{{ scoreOf(row) }}</span
               >
             </li>
+            <li
+              v-if="group.hiddenCount"
+              class="flex min-h-11.5 items-center px-4 py-2 lg:min-h-0 lg:p-0"
+            >
+              <a
+                href="#ranking-board"
+                data-testid="podium-more"
+                class="text-meta font-semibold text-accent-text underline-offset-2 hover:underline"
+                >{{ $t('ranking.moreTied', { count: group.hiddenCount }) }}</a
+              >
+            </li>
           </ul>
-          <p v-if="group.rows.length > 1" class="mt-1 hidden text-caption text-muted lg:block">
+          <p v-if="group.isTied" class="mt-1 hidden text-caption text-muted lg:block">
             {{ $t('ranking.tiedAt', { rank: group.rank }) }}
           </p>
         </div>
