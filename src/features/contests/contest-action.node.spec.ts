@@ -145,7 +145,21 @@ describe('listCallToAction', () => {
     endTime: '2026-10-08T07:00:00Z',
   };
   it.each([
-    ['a visitor on a running contest', contestItem(), 'contests.list.enter', null, true],
+    ['a visitor on a running contest', contestItem(), 'contests.list.enter', null, false],
+    [
+      'a running contest the viewer registered for',
+      contestItem({ viewer: listViewer({ liveStatus: 'registered' }) }),
+      'contests.list.enter',
+      null,
+      false,
+    ],
+    [
+      'a running contest the viewer took part in but is not current',
+      contestItem({ viewer: listViewer({ liveStatus: 'participating' }) }),
+      'contests.actions.rejoin',
+      null,
+      false,
+    ],
     [
       'a visitor on a running contest whose registration closed',
       contestItem(registrationClosed),
