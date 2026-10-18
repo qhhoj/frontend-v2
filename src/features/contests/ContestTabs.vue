@@ -1,8 +1,15 @@
 <script setup lang="ts">
+import { Settings } from 'lucide-vue-next';
 import { computed, toRef } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 import type { ContestPhase } from '@/api/types/contests';
 import PillTabs, { type PillTab } from '@/components/PillTabs.vue';
+import {
+  contestEditTarget,
+  type ContestEditScreen,
+} from '@/features/admin/edit-link/admin-edit-targets';
+import { useSessionStore } from '@/stores/session.store';
 import AnnouncementLiveRegion from './AnnouncementLiveRegion.vue';
 import { useUnreadAnnouncementCount } from './announcement-seen';
 import { useContestQuery } from './contests.queries';
@@ -31,6 +38,24 @@ const unread = useUnreadAnnouncementCount(toRef(props, 'contestKey'));
 /** Balloon volunteers and editors of a contest with balloons on get the queue's tab; read from the cached contest answer. */
 const { data: contest } = useContestQuery(() => props.contestKey);
 const canViewBalloons = computed(() => contest.value?.viewer.canViewBalloons ?? false);
+const route = useRoute();
+const session = useSessionStore();
+/** The editor tab that matches a public contest page: the problem list opens Problems, the board opens Ranking; others General. */
+const EDIT_SCREEN_OF_PAGE: Record<string, ContestEditScreen> = {
+  contest: 'contestProblems',
+  'contest-announcements': 'contestAnnouncements',
+  'contest-ranking': 'contestRanking',
+};
+/** Editors' "Quản lý": the admin editor's tab that matches the page they are on (P-20 A). */
+const manageTarget = computed(() =>
+  contest.value
+    ? contestEditTarget(
+        session.user,
+        contest.value,
+        EDIT_SCREEN_OF_PAGE[props.current ?? String(route.name)],
+      )
+    : null,
+);
 /** The announcements stream runs while the contest can still get announcements; it waits until the phase is known. */
 const isStreaming = computed(() => props.phase !== undefined && props.phase !== 'ended');
 const tabs = computed<PillTab[]>(() => {
@@ -59,6 +84,17 @@ const tabs = computed<PillTab[]>(() => {
 </script>
 
 <template>
-  <PillTabs :tabs="tabs" :label="t('contests.tabs.label')" />
+  <div class="flex items-center gap-2">
+    <PillTabs class="min-w-0 flex-1" :tabs="tabs" :label="t('contests.tabs.label')" />
+    <RouterLink
+      v-if="manageTarget"
+      :to="manageTarget"
+      data-testid="contest-manage-tab"
+      class="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-pill border border-dashed border-line-strong px-4 text-sm font-semibold whitespace-nowrap text-muted hover:bg-surface-hover hover:text-content max-sm:px-3"
+    >
+      <Settings aria-hidden="true" class="size-4" />
+      <span class="max-sm:sr-only">{{ t('contests.tabs.manage') }}</span>
+    </RouterLink>
+  </div>
   <AnnouncementLiveRegion :contest-key="contestKey" :is-streaming="isStreaming" />
 </template>
