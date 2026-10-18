@@ -59,6 +59,7 @@ const typeOptions = computed(() =>
 );
 const errorOf = (field: string) => localErrors.value[field] ?? props.serverErrors[field];
 const isOwnerReady = ref(false);
+const isOwnerBlocked = ref(false);
 const isCreate = computed(() => form.value.mode === 'create');
 const { scope } = useCreationScope('problem');
 const { canAny } = usePermissions();
@@ -78,6 +79,11 @@ const missingOnSubmit = (mode: ImportMode) =>
 const isWaitingForOwner = computed(
   () => isCreate.value && canUseMode('create') && !isOwnerReady.value,
 );
+/** The message key of why the submit does nothing, shown beside it: no place to create (a file cannot fix that), else no file. */
+const submitReason = computed(() => {
+  if (isWaitingForOwner.value && isOwnerBlocked.value) return 'admin.creation.owner.blocked';
+  return props.withFile && !form.value.file ? 'admin.polygon.form.submitNeedsFile' : null;
+});
 const isSubmitBlocked = computed(
   () => props.isPending || (props.withFile && !form.value.file) || isWaitingForOwner.value,
 );
@@ -152,6 +158,7 @@ function submit() {
         v-if="isCreate && canUseMode('create')"
         v-model="form.owner"
         v-model:ready="isOwnerReady"
+        v-model:blocked="isOwnerBlocked"
         kind="problem"
       />
 
@@ -298,17 +305,17 @@ function submit() {
       <div class="flex flex-wrap items-center gap-2 border-t border-line pt-4">
         <slot name="actions" />
         <p
-          v-if="withFile && !form.file"
+          v-if="submitReason"
           id="import-submit-reason"
-          class="ml-auto text-sm text-muted"
+          class="min-w-0 flex-1 basis-56 text-sm text-muted @lg:text-right"
         >
-          {{ $t('admin.polygon.form.submitNeedsFile') }}
+          {{ $t(submitReason) }}
         </p>
         <button
           type="submit"
-          :class="[buttonClass('primary'), !(withFile && !form.file) && 'ml-auto']"
+          :class="[buttonClass('primary'), !submitReason && 'ml-auto']"
           :aria-disabled="isSubmitBlocked || undefined"
-          :aria-describedby="withFile && !form.file ? 'import-submit-reason' : undefined"
+          :aria-describedby="submitReason ? 'import-submit-reason' : undefined"
         >
           {{ $t('admin.polygon.form.submit') }}
         </button>

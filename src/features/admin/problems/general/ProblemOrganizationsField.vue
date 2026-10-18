@@ -6,7 +6,6 @@ import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
 import { useCreationOwnersQuery } from '../../creation/creation-owners';
 import type { CreationOwner } from '../../creation/creation-owners';
-import { useCreationScope } from '../../creation/creation-scope';
 import { INPUT } from '../../ui/controls';
 import { shortId } from '../../ui/short-id';
 import { useOrganizationNames } from '../../ui/use-organization-names';
@@ -14,7 +13,7 @@ import type { ProblemForm } from './problem-form';
 
 /**
  * Moving a problem between organizations, for an editor without `judge.edit_all_problem` (backend
- * `OrganizationProblemRules`): they add and remove only organizations they may create problems for (the creation owners),
+ * `OrganizationProblemRules`): they add and remove only organizations they may create problems for (the owners `canCreate=problem` lists),
  * and leave every organization for the site only with `judge.add_problem`. Joining the first organization makes the problem
  * private to it, leaving the last one makes it a site problem. A move keeps the problem code.
  */
@@ -22,9 +21,8 @@ const form = defineModel<ProblemForm>({ required: true });
 defineProps<{ error?: string }>();
 const id = useId();
 const { can } = usePermissions();
-const { scope } = useCreationScope('problem');
-const owners = useCreationOwnersQuery(() => scope.value.organizations);
-const managed = computed(() => (scope.value.organizations ? (owners.data.value ?? []) : []));
+const owners = useCreationOwnersQuery('problem');
+const managed = computed(() => owners.data.value ?? []);
 const ownerOf = (organizationId: string): CreationOwner | undefined =>
   managed.value.find((owner) => owner.id === organizationId);
 const names = useOrganizationNames(() =>

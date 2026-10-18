@@ -2,12 +2,28 @@
   "owner": {
     "label": "Thuộc về",
     "loading": "Đang tải tổ chức…",
+    "blocked": "Chưa có nơi để tạo: xem mục “Thuộc về”.",
     "orgPrivate": "chỉ thành viên thấy",
     "fixed": "Cố định",
     "site": "Không thuộc tổ chức",
     "privateHint": "Chỉ thành viên tổ chức thấy, cho đến khi bạn công khai.",
     "siteHint": "Bài của trang, ẩn cho đến khi bạn công khai.",
-    "chooseHint": "Chọn tổ chức nếu chỉ dành cho thành viên của họ."
+    "chooseHint": "Chọn tổ chức nếu chỉ dành cho thành viên của họ.",
+    "none": {
+      "problem": {
+        "title": "Chưa có tổ chức nào để tạo bài tập",
+        "body": "Chỉ quản trị viên của tổ chức, có quyền tạo bài tập tổ chức, mới tạo được ở đó. Tài khoản của bạn chưa đủ điều kiện ở tổ chức nào."
+      },
+      "contest": {
+        "title": "Chưa có tổ chức nào để tạo kỳ thi",
+        "body": "Chỉ quản trị viên của tổ chức, có quyền tạo kỳ thi riêng tư, mới tạo được ở đó. Tài khoản của bạn chưa đủ điều kiện ở tổ chức nào."
+      },
+      "action": "Xem các tổ chức"
+    },
+    "failed": {
+      "title": "Không tải được danh sách tổ chức",
+      "body": "Kiểm tra kết nối rồi thử lại."
+    }
   },
   "problem": {
     "timeHint": "Giây, ví dụ 1.",

@@ -1,23 +1,29 @@
 import { useQuery } from '@tanstack/vue-query';
-import { computed, toValue } from 'vue';
-import type { MaybeRefOrGetter } from 'vue';
-import { fetchAdminOrganizations } from '@/api/organizations-admin.api';
+import { computed } from 'vue';
+import { fetchCreationOrganizations } from '@/api/organizations-admin.api';
 import type { OrganizationListItem } from '@/api/types/organizations';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { useCreationScope } from './creation-scope';
+import type { CreationKind } from './creation-scope';
 
-/** Who owns a new problem or contest: an organization the viewer administers, or `null` for the site. */
+/** Who owns a new problem or contest: an organization the viewer may create it in, or `null` for the site. */
 export type CreationOwner = Pick<
   OrganizationListItem,
   'slug' | 'name' | 'shortName' | 'problemCodePrefix'
 >;
 
-/** The organizations the viewer may create for: the ones they administer (the backend refuses the rest). */
-export function useCreationOwnersQuery(enabled: MaybeRefOrGetter<boolean>) {
+/**
+ * The organizations the viewer may create this kind in, as `GET /organizations?canCreate=<kind>` lists them (the backend
+ * decides: an administrator holding the create right). Idle for a viewer whose session has no organization scope; its
+ * `kind` is in the key, as a problem list is not a contest list.
+ */
+export function useCreationOwnersQuery(kind: CreationKind) {
   const viewer = useViewerId();
+  const { scope } = useCreationScope(kind);
   return useQuery({
-    queryKey: computed(() => ['organizations', 'administered', 'creation', viewer.value]),
-    queryFn: async () => (await fetchAdminOrganizations(1, '', {})).items,
-    enabled: computed(() => toValue(enabled)),
+    queryKey: computed(() => ['organizations', 'creation', kind, viewer.value]),
+    queryFn: () => fetchCreationOrganizations(kind),
+    enabled: computed(() => scope.value.organizations),
     staleTime: 60_000,
   });
 }

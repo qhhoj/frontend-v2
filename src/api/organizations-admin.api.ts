@@ -1,3 +1,4 @@
+import { fetchEveryOrganization } from './organizations.api';
 import { apiGetPage, apiSend } from './typed';
 import type { JsonBodyOf, QueryOf } from './typed';
 import type { JoinRequestState } from './types/organizations';
@@ -35,6 +36,13 @@ export const fetchAdminOrganizations = (
   apiGetPage('/organizations', {
     query: { page, pageSize: 50, ...(search ? { search } : {}), ...filters, administered: true },
   });
+
+/** What a create form offers an owner for: `GET /organizations?canCreate=`. */
+export type CreatableKind = NonNullable<QueryOf<'/organizations'>['canCreate']>;
+
+/** Every organization the viewer may create a problem or a contest in; the backend applies the create rules (it needs a signed-in viewer). */
+export const fetchCreationOrganizations = (kind: CreatableKind) =>
+  fetchEveryOrganization({ canCreate: kind });
 
 /** Creates, edits and member removals, newest first (20 per page); administrators only. */
 export const fetchOrganizationHistory = (slug: string, page: number) =>

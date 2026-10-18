@@ -40,6 +40,7 @@ const form = ref<ProblemForm>({
 });
 const owner = ref<CreationOwner | null>(null);
 const isOwnerReady = ref(false);
+const isOwnerBlocked = ref(false);
 const localErrors = ref<FieldErrors>({});
 const suggestedCode = ref('');
 
@@ -107,7 +108,12 @@ watch(
 <template>
   <form class="flex max-w-3xl flex-col gap-5" novalidate @submit.prevent="create">
     <section :class="CARD" class="flex flex-col gap-5 p-4 sm:p-5">
-      <CreationOwnerPicker v-model="owner" v-model:ready="isOwnerReady" kind="problem" />
+      <CreationOwnerPicker
+        v-model="owner"
+        v-model:ready="isOwnerReady"
+        v-model:blocked="isOwnerBlocked"
+        kind="problem"
+      />
       <div class="grid gap-5 sm:grid-cols-2">
         <ProblemCodeField
           v-model="form.code"
@@ -230,6 +236,9 @@ watch(
         >
           {{ $t('admin.problems.general.create.createButton') }}
         </button>
+        <p v-if="isOwnerBlocked" class="text-sm text-muted" data-testid="creation-blocked">
+          {{ $t('admin.creation.owner.blocked') }}
+        </p>
         <button
           v-if="canSuggest"
           type="button"
@@ -240,7 +249,9 @@ watch(
           {{ $t('admin.problems.general.create.suggestButton') }}
         </button>
       </div>
-      <p class="text-sm text-muted">{{ $t('admin.creation.problem.nextNote') }}</p>
+      <p v-if="!isOwnerBlocked" class="text-sm text-muted">
+        {{ $t('admin.creation.problem.nextNote') }}
+      </p>
       <AdminStatus
         v-if="createMutation.failure.value"
         kind="refused"

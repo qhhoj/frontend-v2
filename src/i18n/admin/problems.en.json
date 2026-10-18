@@ -149,8 +149,8 @@
     "suggesterPending": "awaiting review",
     "orgSite": "Main site (no organization)",
     "orgAdd": "Add to an organization…",
-    "orgMoveHint": "You can add or remove only organizations you manage.",
-    "orgNotManaged": "You do not manage {name}, so you cannot remove it.",
+    "orgMoveHint": "You can add or remove only organizations you may create problems in.",
+    "orgNotManaged": "You may not create problems in {name}, so you cannot remove it.",
     "orgSiteNeeds": "Add the new organization before saving: moving the problem to the main site needs the “Create problems” permission."
   },
   "status": {

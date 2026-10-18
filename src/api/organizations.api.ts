@@ -43,15 +43,26 @@ export const decideJoinRequest = (slug: string, id: string, state: 'A' | 'R') =>
     body: { state },
   });
 
+/** The list's own filters (`administered`, `canCreate`, `open`, …); paging is the caller's. */
+export type OrganizationFilters = Omit<QueryOf<'/organizations'>, 'page' | 'pageSize' | 'search'>;
+
+/** Every page of `GET /organizations` under `filters`, read in the API's order (by name). */
+export async function fetchEveryOrganization(
+  filters: OrganizationFilters = {},
+): Promise<OrganizationListItem[]> {
+  const organizations: OrganizationListItem[] = [];
+  for (let pageNumber = 1; ; pageNumber += 1) {
+    const { items, meta } = await apiGetPage('/organizations', {
+      query: { ...filters, page: pageNumber, pageSize: ORGANIZATION_PAGE_SIZE },
+    });
+    organizations.push(...items);
+    if (pageNumber * ORGANIZATION_PAGE_SIZE >= (meta.total ?? 0)) return organizations;
+  }
+}
+
 /**
  * The organizations a signup may join: open and listed (registration refuses any other with `organization_unavailable`).
  * The list is sorted by name and has no `open` filter (ask A2), so every page is read and filtered here.
  */
-export async function fetchOpenOrganizations(): Promise<OrganizationListItem[]> {
-  const joinable: OrganizationListItem[] = [];
-  for (let pageNumber = 1; ; pageNumber += 1) {
-    const { items, meta } = await fetchOrganizations(pageNumber);
-    joinable.push(...items.filter(isJoinable));
-    if (pageNumber * ORGANIZATION_PAGE_SIZE >= (meta.total ?? 0)) return joinable;
-  }
-}
+export const fetchOpenOrganizations = async (): Promise<OrganizationListItem[]> =>
+  (await fetchEveryOrganization()).filter(isJoinable);
