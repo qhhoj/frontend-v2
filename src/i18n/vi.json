@@ -1182,7 +1182,13 @@
       "userCount": "Đã giải"
     },
     "solverCount": "{count} giải",
-    "filterPanel": "Bộ lọc"
+    "filterPanel": "Bộ lọc",
+    "tier": {
+      "1": "Dễ",
+      "2": "Trung bình",
+      "3": "Khó",
+      "4": "Rất khó"
+    }
   },
   "submissions": {
     "title": "Bài nộp",

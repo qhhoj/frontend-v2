@@ -21,7 +21,7 @@ export const ALLOWED = {
   'components/CryingBit.vue': ['rounded-[50%]'],
   'features/runtimes/JudgeCard.vue': ['rounded-[2px]'],
   'features/submissions/list/TestStrip.vue': ['rounded-[2px]', 'rounded-[3px]'],
-  'features/problems/ProblemTable.vue': ['rounded-[3px]'],
+  'features/problems/ProblemTierMark.vue': ['rounded-[3px]'],
   'features/submissions/VerdictDistributionBar.vue': ['rounded-[3px]'],
   'features/not-found/NotFoundPage.vue': ['rounded-[4px]'],
   // The admin filter strip's frame: it wraps to two rows on a phone, where a pill radius would read as a blob.

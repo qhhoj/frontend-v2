@@ -4,7 +4,7 @@ import type { RouteLocationRaw } from 'vue-router';
 /**
  * P-04 B: one row of a public list on a phone (below `sm`), where the desktop table would scroll sideways. A list is a `<ul>`
  * of these inside one card: an optional `lead` column (solved mark, rank), the title on up to two lines with a `meta` line
- * under it, and a `trail` column on the right (points, a small button). The title link covers the whole row; a control in `trail`
+ * under it (a `FactLine`, which wraps between facts), and a `trail` column on the right (points, a small button). The title link covers the whole row; a control in `trail`
  * takes `relative` to stay clickable above it.
  */
 defineProps<{ to: RouteLocationRaw; title: string }>();
@@ -23,7 +23,7 @@ defineProps<{ to: RouteLocationRaw; title: string }>();
         class="line-clamp-2 text-sm font-semibold text-content after:absolute after:inset-0 hover:text-accent-text"
         >{{ title }}</RouterLink
       >
-      <span v-if="$slots.meta" class="truncate text-caption text-muted">
+      <span v-if="$slots.meta" class="text-caption text-muted">
         <slot name="meta" />
       </span>
     </span>

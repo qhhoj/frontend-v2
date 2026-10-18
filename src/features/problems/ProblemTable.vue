@@ -6,10 +6,11 @@ import ScrollRegion from '@/components/ScrollRegion.vue';
 import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { formatNumber, formatProblemPoints } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
+import FactLine from '@/components/FactLine.vue';
 import ProblemStatusMark from './ProblemStatusMark.vue';
+import ProblemTierMark from './ProblemTierMark.vue';
 import ProblemTableColumns from './ProblemTableColumns.vue';
 import ProblemTableHead from './ProblemTableHead.vue';
-import { tierOf } from './problem-tier';
 import { useRowLink } from './use-row-link';
 
 defineProps<{
@@ -30,8 +31,6 @@ const typesText = (problem: ProblemListItem) => {
   const named = problem.types.filter((type) => type.name !== UNCATEGORIZED_TYPE_NAME);
   return named.length ? named.map((type) => problemTypeLabel(type)).join(', ') : '—';
 };
-
-const TIER_CLASS = { 1: 'bg-diff-1', 2: 'bg-diff-2', 3: 'bg-diff-3', 4: 'bg-diff-4' } as const;
 </script>
 
 <template>
@@ -45,20 +44,15 @@ const TIER_CLASS = { 1: 'bg-diff-1', 2: 'bg-diff-2', 3: 'bg-diff-3', 4: 'bg-diff
       <template v-if="signedIn" #lead
         ><ProblemStatusMark :status="problem.viewerStatus"
       /></template>
-      <template #meta
-        ><span class="font-mono"
-          >{{ problem.code }} · AC {{ formatNumber(problem.acRate, locale.locale, 1) }}%</span
-        ></template
-      >
+      <template #meta>
+        <FactLine
+          class="font-mono"
+          :facts="[problem.code, `AC ${formatNumber(problem.acRate, locale.locale, 1)}%`]"
+        />
+      </template>
       <template #trail>
         <span class="inline-flex items-center gap-[7px] font-mono text-sm font-medium tabular-nums">
-          <span
-            aria-hidden="true"
-            data-testid="tier-mark"
-            :data-tier="tierOf(problem.points)"
-            class="size-[9px] rounded-[3px]"
-            :class="TIER_CLASS[tierOf(problem.points)]"
-          />
+          <ProblemTierMark :points="problem.points" />
           {{ formatProblemPoints(problem.points, problem.partial, locale.locale) }}
         </span>
         <span class="text-caption text-muted tabular-nums">{{
@@ -100,13 +94,7 @@ const TIER_CLASS = { 1: 'bg-diff-1', 2: 'bg-diff-2', 3: 'bg-diff-3', 4: 'bg-diff
           </td>
           <td class="px-3 py-2">
             <span class="inline-flex items-center gap-[7px] font-medium tabular-nums">
-              <span
-                aria-hidden="true"
-                data-testid="tier-mark"
-                :data-tier="tierOf(problem.points)"
-                class="size-[9px] rounded-[3px]"
-                :class="TIER_CLASS[tierOf(problem.points)]"
-              />
+              <ProblemTierMark :points="problem.points" />
               {{ formatProblemPoints(problem.points, problem.partial, locale.locale) }}
             </span>
           </td>

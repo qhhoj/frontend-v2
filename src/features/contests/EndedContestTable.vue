@@ -9,6 +9,7 @@ import { spanMessage } from '@/lib/contest-time';
 import { formatNumber, formatShortDate } from '@/lib/format';
 import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
+import FactLine from '@/components/FactLine.vue';
 import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
 import ContestOrganizationChips from './ContestOrganizationChips.vue';
@@ -36,16 +37,20 @@ const whenText = (contest: ContestListItem) => {
   const lengthSeconds = (Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000;
   return `${formatShortDate(contest.startTime, locale.locale)} · ${spanText(spanMessage(lengthSeconds))}`;
 };
-/** P-04 B: a phone gets compact rows: name, then date · length · contestants · format, and the action at the end. */
+/** P-04 B: a phone gets compact rows: name, then format · date · length · contestants (the format first, so it is never
+ * the fact cut off), and the action at the end. */
 const isCompact = useMediaQuery(COMPACT_LIST_QUERY);
-const compactMeta = (contest: ContestListItem) =>
-  [
-    whenText(contest),
+const compactFacts = (contest: ContestListItem) => {
+  const lengthSeconds = (Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000;
+  return [
+    formatLabel(contest.formatName),
+    formatShortDate(contest.startTime, locale.locale),
+    spanText(spanMessage(lengthSeconds)),
     translate('contests.list.contestantCount', {
       count: formatNumber(contest.userCount, locale.locale),
     }),
-    formatLabel(contest.formatName),
-  ].join(' · ');
+  ];
+};
 </script>
 
 <template>
@@ -61,7 +66,7 @@ const compactMeta = (contest: ContestListItem) =>
         :to="{ name: 'contest', params: { key: contest.key } }"
         :title="contest.name"
       >
-        <template #meta>{{ compactMeta(contest) }}</template>
+        <template #meta><FactLine :facts="compactFacts(contest)" /></template>
         <template #trail>
           <ContestCallLink
             compact
