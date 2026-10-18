@@ -325,6 +325,7 @@
   "info": {
     "label": "Details of {key}",
     "default": "Default:",
-    "reset": "Reset"
+    "reset": "Reset",
+    "dialog": "About {key}"
   }
 }

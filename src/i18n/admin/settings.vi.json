@@ -325,6 +325,7 @@
   "info": {
     "label": "Chi tiết {key}",
     "default": "Mặc định:",
-    "reset": "Đặt lại"
+    "reset": "Đặt lại",
+    "dialog": "Thông tin {key}"
   }
 }

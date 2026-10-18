@@ -34,11 +34,20 @@ const block = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], id: str
   wrapper.get(`[data-block="${id}"]`);
 const keyRow = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], key: string) =>
   wrapper.get(`[data-key="${key}"]`);
-/** Opens a key's ⓘ popover, which holds its history and reset. */
+/** Opens a key's ⓘ popover, which holds its history and reset; it renders in the body, outside the row. */
 const openInfo = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], key: string) => {
   await keyRow(wrapper, key).get('[data-testid="setting-info"]').trigger('click');
   await flushPromises();
+  return document.body.querySelector<HTMLElement>(
+    `[role="dialog"][aria-label="Thông tin ${key}"]`,
+  )!;
 };
+const clickButton = async (button: HTMLElement | null | undefined) => {
+  button!.click();
+  await flushPromises();
+};
+const buttonNamed = (scope: HTMLElement, text: string) =>
+  [...scope.querySelectorAll('button')].find((button) => button.textContent?.trim() === text);
 /** The page's one save bar. */
 const saveBar = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
   wrapper.get('[data-testid="settings-save-bar"]');
@@ -122,8 +131,7 @@ describe('SiteSettingsPage', () => {
       }),
     );
     const { wrapper } = await mountSettings();
-    await openInfo(wrapper, 'pdf.renderTimeoutMs');
-    await clickIn(keyRow(wrapper, 'pdf.renderTimeoutMs'), 'Lịch sử');
+    await clickButton(buttonNamed(await openInfo(wrapper, 'pdf.renderTimeoutMs'), 'Lịch sử'));
     expect(wrapper.get('[data-testid="revisions"]').text()).toContain('− 30000');
     await wrapper
       .get('[data-testid="revisions"]')
@@ -152,8 +160,8 @@ describe('defaults', () => {
     mockApi(routes({ 'GET /admin/settings': ok(withMinPercent(65)) }));
     const { wrapper } = await mountSettings();
     const row = keyRow(wrapper, 'similarity.minPercent');
-    await openInfo(wrapper, 'similarity.minPercent');
-    await row.get('button[aria-label="Về mặc định 50"]').trigger('click');
+    const info = await openInfo(wrapper, 'similarity.minPercent');
+    await clickButton(info.querySelector('button[aria-label="Về mặc định 50"]'));
     await clickIn(saveBar(wrapper), 'Huỷ thay đổi');
     expect((row.get('input').element as HTMLInputElement).value).toBe('65');
     expect(row.text()).not.toContain('Đã điền giá trị mặc định');
@@ -173,10 +181,35 @@ describe('defaults', () => {
     );
     const { wrapper } = await mountSettings();
     const row = keyRow(wrapper, 'contest.officialMode');
-    await openInfo(wrapper, 'contest.officialMode');
-    await row.get('button[aria-label="Về mặc định tắt"]').trigger('click');
+    const info = await openInfo(wrapper, 'contest.officialMode');
+    await clickButton(info.querySelector('button[aria-label="Về mặc định tắt"]'));
     expect(switchNamed(row, 'Bật chế độ kỳ thi chính thức').attributes('aria-checked')).toBe(
       'false',
+    );
+  });
+});
+
+describe('the ⓘ popover', () => {
+  it('is a named dialog, takes focus on open and gives it back to the ⓘ after a reset', async () => {
+    mockApi(routes({ 'GET /admin/settings': ok(withMinPercent(65)) }));
+    const { wrapper } = await mountSettings();
+    const info = await openInfo(wrapper, 'similarity.minPercent');
+    expect(document.activeElement).toBe(buttonNamed(info, 'Lịch sử'));
+    await clickButton(info.querySelector('button[aria-label="Về mặc định 50"]'));
+    await vi.waitFor(() => expect(document.activeElement?.id).toBe('info-similarity.minPercent'));
+  });
+
+  it('leaves focus on the history heading it opened', async () => {
+    mockApi(
+      routes({
+        'GET /admin/settings/pdf.renderTimeoutMs/revisions': page([], { pageSize: 20 }),
+      }),
+    );
+    const { wrapper } = await mountSettings();
+    await clickButton(buttonNamed(await openInfo(wrapper, 'pdf.renderTimeoutMs'), 'Lịch sử'));
+    await flushPromises();
+    expect(wrapper.get('[data-testid="revisions"]').element.contains(document.activeElement)).toBe(
+      true,
     );
   });
 });

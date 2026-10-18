@@ -84,6 +84,12 @@ const searchRows = computed<SearchableRow[]>(() => [
     : []),
 ]);
 const hits = computed(() => settingSearchHits(searchText.value, searchRows.value));
+const searchStatus = computed(() => {
+  if (!hits.value) return '';
+  return hits.value.size
+    ? t('admin.settings.search.results', hits.value.size)
+    : t('admin.settings.search.noResults');
+});
 const blockHasHits = (block: SettingBlockSpec) =>
   !hits.value ||
   (block.id === NOTICE_BLOCK.id
@@ -187,13 +193,8 @@ const SAVE_FORM_ID = 'site-settings-save';
       :placeholder="t('admin.settings.search.placeholder')"
       :maxlength="100"
     />
-    <p v-if="hits" role="status" class="m-0 text-meta text-muted">
-      {{
-        hits.size
-          ? t('admin.settings.search.results', hits.size)
-          : t('admin.settings.search.noResults')
-      }}
-    </p>
+    <!-- Always mounted, so a screen reader announces the first count, not only the later ones. -->
+    <p role="status" class="m-0 text-meta text-muted empty:hidden">{{ searchStatus }}</p>
   </div>
   <Tabs
     v-if="!hits && !isLoading && !loadError"
