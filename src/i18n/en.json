@@ -2569,6 +2569,7 @@
     "archivedChip": "Archived",
     "noTags": "No tags",
     "editTags": "Tags",
+    "editProblem": "Edit problem {code}",
     "editTagsLabel": "Edit the tags of {code}",
     "archiveRow": "Archive",
     "archiveRowLabel": "Archive {code}",

@@ -5,7 +5,7 @@ import type { ApiCall } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, openDialog } from '@/test/admin-routes';
 import { signedInViewer } from '@/test/problem-routes';
-import { ORG_PROBLEMS, TAGS, bulkResult, problemTag } from '@/test/f4-fixtures';
+import { ORG_PROBLEMS, TAGS, bulkResult, orgProblem, problemTag } from '@/test/f4-fixtures';
 import { ADMIN_STATE, MEMBER_STATE, STRANGER_STATE, orgProblemRoutes } from '@/test/f4-routes';
 
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
@@ -52,6 +52,16 @@ describe('OrgProblemsPage', () => {
     expect(wrapper.text()).toContain('Thành viên thường chỉ đọc');
     expect(wrapper.find('input[type="checkbox"]').exists()).toBe(false);
     expect(buttonNamed(wrapper, 'Sửa thẻ của lhp_lis')).toBeUndefined();
+  });
+
+  it('gives a pencil to the problem editor only on the rows the viewer may edit, member or not', async () => {
+    const rows = [orgProblem({ canEdit: true }), orgProblem({ code: 'lhp_tree', name: 'Cây' })];
+    mockApi({ ...signedInViewer(), ...orgProblemRoutes(MEMBER_STATE, rows) });
+    const { wrapper } = await mountTab();
+    const pencils = wrapper.findAll('[data-testid="problem-edit"]');
+    expect(pencils).toHaveLength(1);
+    expect(pencils[0]!.attributes('href')).toBe('/admin/problems/lhp_lis/general');
+    expect(pencils[0]!.attributes('aria-label')).toBe('Sửa bài lhp_lis');
   });
 
   it('shows a stranger the forbidden state and never asks for the list', async () => {

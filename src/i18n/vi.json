@@ -2569,6 +2569,7 @@
     "archivedChip": "Đã lưu trữ",
     "noTags": "Chưa gắn thẻ",
     "editTags": "Thẻ",
+    "editProblem": "Sửa bài {code}",
     "editTagsLabel": "Sửa thẻ của {code}",
     "archiveRow": "Lưu trữ",
     "archiveRowLabel": "Lưu trữ {code}",
