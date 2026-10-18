@@ -13,6 +13,7 @@ import { useSessionStore } from '@/stores/session.store';
 import AnnouncementLiveRegion from './AnnouncementLiveRegion.vue';
 import { useUnreadAnnouncementCount } from './announcement-seen';
 import { useContestQuery } from './contests.queries';
+import { useStreamedContest } from './live/use-streamed-contest';
 
 /** `current` names the tab to light up on a page that is not a tab's own route (a problem's best submissions lights `contest`). */
 const { t } = useI18n();
@@ -56,8 +57,15 @@ const manageTarget = computed(() =>
       )
     : null,
 );
-/** The announcements stream runs while the contest can still get announcements; it waits until the phase is known. */
-const isStreaming = computed(() => props.phase !== undefined && props.phase !== 'ended');
+/** This page streams announcements while the contest can still get them, unless the app shell streams it (the viewer is in it). */
+const streamed = useStreamedContest();
+const isStreaming = computed(
+  () =>
+    props.phase !== undefined &&
+    props.phase !== 'ended' &&
+    !streamed.isPending.value &&
+    streamed.contest.value?.key !== props.contestKey,
+);
 const tabs = computed<PillTab[]>(() => {
   const own = visibleTabs.value.map((tab) => ({
     key: tab.name,

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { announcement } from '@/test/fixtures';
 import {
+  closedAlertMarks,
   isUnread,
   loadSeenAnnouncement,
   markAnnouncementsSeen,
@@ -44,5 +45,17 @@ describe('announcement read state', () => {
     } finally {
       vi.restoreAllMocks();
     }
+  });
+
+  it('keeps closed alerts apart from read marks, across a reload', () => {
+    closedAlertMarks.raise(VIEWER, 'r45', announcement(4).id);
+    loadSeenAnnouncement(VIEWER, 'r45');
+    expect(seenAnnouncementId(VIEWER, 'r45')).toBe('');
+    localStorage.setItem(
+      'qhhoj.contest-announcement-alert-closed.' + VIEWER + ':r45',
+      announcement(6).id,
+    );
+    closedAlertMarks.load(VIEWER, 'r45');
+    expect(closedAlertMarks.get(VIEWER, 'r45')).toBe(announcement(6).id);
   });
 });
