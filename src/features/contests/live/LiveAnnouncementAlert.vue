@@ -74,7 +74,8 @@ const announcementsTab = computed(() => ({
     aria-live="polite"
     class="flex flex-col md:fixed md:right-6 md:bottom-[calc(var(--dock-height,0px)+1.5rem)] md:z-toast md:w-96 md:gap-3"
   >
-    <p v-if="isOnAnnouncementsTab" class="sr-only">{{ message }}</p>
+    <!-- Always there, so the title is spoken when it changes; empty off the tab, where the alert speaks instead. -->
+    <p class="sr-only">{{ isOnAnnouncementsTab ? message : '' }}</p>
     <AnnouncementsPausedNotice
       v-if="!isOnThisContest"
       :contest-key="key"

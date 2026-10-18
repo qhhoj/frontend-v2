@@ -83,9 +83,18 @@ describe('announcement alert of the contest the viewer is in', () => {
     });
     const { wrapper, router } = await mountApp('/contests/r42/announcements');
     expect(alert(wrapper).exists()).toBe(false);
+    const spoken = () => wrapper.get('[data-testid="contest-announcement-live"] p.sr-only').text();
+    latestEventSource().emit('announcement', {
+      contestId: 'c',
+      announcementId: announcement(3).id,
+    });
+    await flushPromises();
+    expect(spoken()).toBe('Thông báo mới: Thông báo 3');
     await router.push('/contests/r42');
     await flushPromises();
     expect(alert(wrapper).exists()).toBe(false);
+    // Off the tab the old title is not read again.
+    expect(spoken()).toBe('');
   });
 
   it('opens nothing once the contest itself has ended (a virtual run)', async () => {
