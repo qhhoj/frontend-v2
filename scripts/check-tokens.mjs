@@ -59,7 +59,7 @@ const arbitraryOffences = files(root).flatMap((path) =>
 
 if (arbitraryOffences.length) {
   console.error(
-    `Arbitrary size/radius/z-index classes (use text-tiny|caption|meta|sm|base|title|page|stat|hero, rounded-<role>, z-<layer>; docs/design-language.md):\n${arbitraryOffences.join('\n')}`,
+    `Arbitrary size/radius/z-index classes (use text-tiny|caption|meta|sm|base|title|subtitle|section|display|page|stat|hero, rounded-<role>, z-<layer>; docs/design-language.md):\n${arbitraryOffences.join('\n')}`,
   );
   process.exit(1);
 }

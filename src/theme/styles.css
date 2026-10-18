@@ -23,6 +23,9 @@
   --text-caption: 12px;
   --text-meta: 13px;
   --text-title: 17px;
+  --text-subtitle: 18px;
+  --text-section: 20px;
+  --text-display: 24px;
   --text-page: 26px;
   --text-stat: 26px;
   --text-hero: 40px;
@@ -48,6 +51,7 @@
   --color-skeleton: var(--qh-skeleton);
   --color-line: var(--qh-line);
   --color-line-strong: var(--qh-line-strong);
+  --color-line-control: var(--qh-line-control);
   --color-content: var(--qh-text);
   --color-muted: var(--qh-text-muted);
   --color-line-accent: var(--qh-line-accent);
@@ -142,6 +146,7 @@
   --radius-skeleton: var(--qh-radius-skeleton);
   --radius-control: var(--qh-radius-control);
   --shadow-glow: var(--qh-glow);
+  --shadow-float: var(--qh-shadow-float);
   --blur-glass: var(--qh-blur-live);
   --ease-standard: var(--qh-ease);
   --default-transition-duration: var(--qh-duration-fast);
@@ -309,6 +314,11 @@
   :focus-visible {
     outline: 2px solid var(--qh-focus-ring);
     outline-offset: 2px;
+  }
+  /* One placeholder recipe: muted text. Tailwind's preflight draws the content colour at 50 %, about 3.5:1, which fails 4.5:1. */
+  ::placeholder {
+    color: var(--qh-text-muted);
+    opacity: 1;
   }
   /* Tailwind 4 preflight no longer gives buttons a pointer: every clickable control gets one here, every disabled one a not-allowed. */
   button:not(:disabled),

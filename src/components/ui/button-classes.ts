@@ -17,7 +17,7 @@ const ADMIN_DISABLED =
 /** Admin tones, as `controls.ts` has always drawn them. */
 const ADMIN_TONES: Record<ButtonTone, string> = {
   primary: `border-accent bg-accent text-on-accent hover:border-accent-2 hover:bg-accent-2 ${ADMIN_DISABLED}`,
-  secondary: `border-line-strong bg-surface-solid text-content hover:bg-surface-hover ${ADMIN_DISABLED}`,
+  secondary: `border-line-control bg-surface-solid text-content hover:bg-surface-hover ${ADMIN_DISABLED}`,
   ghost:
     'border-transparent bg-transparent text-content hover:bg-surface-hover aria-disabled:text-muted disabled:text-muted',
   danger: `border-negative bg-surface-solid text-negative hover:bg-surface-hover ${ADMIN_DISABLED}`,
@@ -28,7 +28,7 @@ const PILL_TONES: Record<ButtonTone, string> = {
   primary:
     'bg-gradient-accent font-bold text-on-accent aria-disabled:bg-none aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text',
   secondary:
-    'border border-line-strong bg-surface-solid font-semibold text-content hover:bg-surface-hover aria-disabled:text-muted disabled:text-muted',
+    'border border-line-control bg-surface-solid font-semibold text-content hover:bg-surface-hover aria-disabled:text-muted disabled:text-muted',
   ghost:
     'border border-transparent bg-transparent font-semibold text-content hover:bg-surface-hover aria-disabled:text-muted disabled:text-muted',
   danger:

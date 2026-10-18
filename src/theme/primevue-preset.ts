@@ -10,7 +10,8 @@ export const primeVuePreset: PrimeVuePTOptions = {
     label: { class: 'flex-1 truncate py-2 focus-visible:outline-none' },
     dropdown: { class: 'flex w-10 items-center justify-center text-muted' },
     overlay: {
-      class: 'mt-2 rounded-tile border border-line-strong bg-surface-solid p-1 text-content',
+      class:
+        'mt-2 rounded-tile border border-line-strong bg-surface-solid p-1 text-content shadow-float',
     },
     listContainer: { class: 'max-h-72 overflow-auto' },
     header: { class: 'p-1 pb-2' },
@@ -40,7 +41,8 @@ export const primeVuePreset: PrimeVuePTOptions = {
   },
   menu: {
     root: {
-      class: 'min-w-52 rounded-tile border border-line-strong bg-surface-solid p-1 text-content',
+      class:
+        'min-w-52 rounded-tile border border-line-strong bg-surface-solid p-1 text-content shadow-float',
     },
     list: { class: 'm-0 list-none rounded-tile p-0' },
     item: ({ context }) => ({
@@ -58,13 +60,14 @@ export const primeVuePreset: PrimeVuePTOptions = {
   },
   popover: {
     root: {
-      class: 'z-50 mt-2 rounded-tile border border-line-strong bg-surface-solid p-4 text-content',
+      class:
+        'z-50 mt-2 rounded-tile border border-line-strong bg-surface-solid p-4 text-content shadow-float',
     },
   },
   dialog: {
     root: {
       class:
-        'flex max-h-[calc(100dvh-2rem)] w-[min(28rem,calc(100vw-2rem))] flex-col rounded-panel border border-line-strong bg-surface-solid text-content',
+        'flex max-h-[calc(100dvh-2rem)] w-[min(28rem,calc(100vw-2rem))] flex-col rounded-panel border border-line-strong bg-surface-solid text-content shadow-float',
     },
     header: { class: 'flex shrink-0 items-start justify-between gap-3 px-6 pt-5' },
     title: { class: 'font-display text-xl font-semibold' },

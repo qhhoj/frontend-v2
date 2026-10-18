@@ -23,7 +23,8 @@ import type { DataTableColumn } from './DataTableColumns';
  * `stack="card"`: below `stackBelow` px each row is a card instead (see `DataTableColumns.ts`); only one of the two is
  * rendered, so row hooks such as `data-code` (`rowAttrs`) exist once. `stack="scroll"`: always the table, scrolling
  * sideways inside its card with the first `stickyColumns` columns pinned and a shade beside them once scrolled.
- * `density="compact"` is the admin look (40 px rows, upper-case headers, small pager); `comfortable` the public one.
+ * `density="compact"` is the admin look (40 px rows, small pager); `comfortable` the public one. Both draw the header the same
+ * way: `text-meta text-muted`, sentence case.
  * `rowTo` makes a row open a page on click; the primary cell is the link, so keyboard and screen readers use that.
  *
  * Slots: `toolbar`, `bulk` (actions while rows are selected), `cell-<key>` ({ row }), `actions` ({ row }), `empty`, `footer`.
@@ -148,15 +149,10 @@ const CELL_BASE =
 const CELL = computed(
   () => `${isCompact.value ? 'h-[var(--qa-row,2.5rem)]' : 'h-(--qh-control)'} ${CELL_BASE}`,
 );
-const HEAD = computed(() =>
-  isCompact.value
-    ? 'h-9 text-xs font-semibold tracking-wide whitespace-nowrap text-muted uppercase'
-    : 'h-10 text-meta font-semibold whitespace-nowrap text-muted',
+const HEAD = computed(
+  () => `${isCompact.value ? 'h-9' : 'h-10'} text-meta font-semibold whitespace-nowrap text-muted`,
 );
-const SORT_BUTTON = computed(
-  () =>
-    `inline-flex min-h-6 items-center gap-1 rounded-cell hover:text-content ${isCompact.value ? 'uppercase' : ''}`,
-);
+const SORT_BUTTON = 'inline-flex min-h-6 items-center gap-1 rounded-cell hover:text-content';
 const FRAME = computed(() => (isCompact.value ? CARD : 'glass rounded-card'));
 const CHECKBOX = 'size-4 accent-[var(--qh-accent)] align-middle';
 const frameStyle = computed(() => (props.maxHeight ? { maxHeight: props.maxHeight } : undefined));

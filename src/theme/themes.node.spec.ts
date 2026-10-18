@@ -256,6 +256,16 @@ describe.each(themes)('theme $id', ({ id, tokens }) => {
       ).toBeGreaterThanOrEqual(1.1);
   });
 
+  it('draws control borders at 3:1 on the ground, the card and the inner tile they sit on (WCAG 1.4.11)', () => {
+    const ground = colour('ground');
+    const failures = ['ground', 'surface-solid', 'surface-strong', 'surface-hover']
+      .map((name) => [name, over(colour(name), ground)] as const)
+      .map(([name, base]) => [name, contrastRatio(colour('line-control'), base)] as const)
+      .filter(([, ratio]) => ratio < 3)
+      .map(([name, ratio]) => `--qh-line-control on --qh-${name}: ${ratio.toFixed(2)}`);
+    expect(failures).toEqual([]);
+  });
+
   it('keeps coin text at 4.5:1 on both stops of every coin gradient', () => {
     const failures = COINS.flatMap((coin) => {
       const stops = [...(tokens.get(coin) ?? '').matchAll(/#[0-9a-f]{6}/gi)].map(([stop]) => stop);
