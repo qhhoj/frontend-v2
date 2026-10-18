@@ -1108,7 +1108,9 @@
         "contestPoints": "Điểm kỳ thi"
       },
       "mine": {
-        "title": "Bài nộp của tôi"
+        "title": "Bài nộp của tôi",
+        "contestUnit": "điểm kỳ thi",
+        "siteOutOf": "/ {max} điểm bài"
       },
       "links": {
         "label": "Liên kết của bài",

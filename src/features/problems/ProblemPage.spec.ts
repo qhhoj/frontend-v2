@@ -252,8 +252,13 @@ describe('problem page inside a contest', () => {
       ...problemPageRoutes(inContest),
       'GET /contests/r42': ok(solved),
       'GET /contests/r42/announcements': page([]),
-      // A full score on the problem's 1600 points is the contest's 250 in the rail (Q-10 A).
-      'GET /submissions': page([submissionItem({ points: 1600 })]),
+      // A submission made in the contest scores its own contest points in the rail (Q-10 A).
+      'GET /submissions': page([
+        submissionItem({
+          points: 1600,
+          contest: { key: 'r42', name: solved.name, points: 250, minute: 12 },
+        }),
+      ]),
       'GET /contests/current': ok({
         contest: {
           key: 'r42',
@@ -282,7 +287,9 @@ describe('problem page inside a contest', () => {
     expect(strip.find('[data-testid="strip-own-result"]').exists()).toBe(true);
     expect(strip.find('[data-testid="strip-status"]').exists()).toBe(false);
     expect(strip.text()).not.toContain('người giải');
-    expect(wrapper.get('[data-testid="rail-my-submissions"]').text()).toContain('250 / 250');
+    expect(wrapper.get('[data-testid="rail-my-submissions"]').text()).toContain(
+      '250 / 250 điểm kỳ thi',
+    );
     await wrapper.get('[data-testid="rail-submit"] button').trigger('click');
     await flushPromises();
     expect(wrapper.get('[data-testid="submit-contest"]').text()).toContain(
