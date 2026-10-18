@@ -8,7 +8,7 @@ defineProps<{ tag: Pick<ProblemTag, 'name' | 'color'> }>();
 
 <template>
   <span
-    class="inline-flex items-center rounded-pill px-2.5 py-0.5 text-xs font-semibold"
+    class="inline-flex items-center rounded-pill px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap"
     :class="TAG_CHIP_CLASSES[tag.color]"
     >{{ tag.name }}</span
   >

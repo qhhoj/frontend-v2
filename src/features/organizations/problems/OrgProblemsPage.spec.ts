@@ -7,6 +7,8 @@ import { confirmDialog, openDialog } from '@/test/admin-routes';
 import { signedInViewer } from '@/test/problem-routes';
 import { ORG_PROBLEMS, TAGS, bulkResult, orgProblem, problemTag } from '@/test/f4-fixtures';
 import { ADMIN_STATE, MEMBER_STATE, STRANGER_STATE, orgProblemRoutes } from '@/test/f4-routes';
+import { COMPACT_LIST_QUERY } from '@/lib/use-media-query';
+import { stubMatchMedia } from '@/test/match-media';
 
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 const LIST = '/organizations/lhp/problems';
@@ -309,5 +311,51 @@ describe('org bulk actions', () => {
       expect(member.wrapper.text()).toContain('Liên hệ người quản lý bài');
       expect(member.wrapper.find('[data-testid="org-tab-create-problem"]').exists()).toBe(false);
     });
+  });
+});
+
+describe('OrgProblemsPage on a phone', () => {
+  const cardsOf = (wrapper: Wrapper) =>
+    wrapper.findAll('ul[aria-label="Bài tập của tổ chức"] > li');
+  const onPhone = () => stubMatchMedia().setQuery(COMPACT_LIST_QUERY, true);
+
+  it('lists each problem as a card with its name, code, tags and both actions, and still archives', async () => {
+    onPhone();
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...orgProblemRoutes(),
+      'POST /organizations/lhp/problems/lhp_tree/archive': noContent(),
+    });
+    const { wrapper } = await mountTab();
+    expect(wrapper.find('table').exists()).toBe(false);
+    const cards = cardsOf(wrapper);
+    expect(cards).toHaveLength(ORG_PROBLEMS.length);
+    expect(cards[1]!.text()).toContain('Trò chơi trên cây');
+    expect(cards[1]!.text()).toContain('lhp_tree');
+    expect(cards[1]!.text()).toContain('Đồ thị');
+    expect(cards[1]!.findAll('button').map((button) => button.text())).toEqual(['Thẻ', 'Lưu trữ']);
+    await buttonNamed(wrapper, 'Lưu trữ lhp_tree')!.trigger('click');
+    await flushPromises();
+    expect(calls.filter((call) => call.method === 'POST')).toHaveLength(1);
+  });
+
+  it('ticks single cards and the whole page into the same bulk bar as the table', async () => {
+    onPhone();
+    mockApi({ ...signedInViewer(), ...orgProblemRoutes() });
+    const { wrapper } = await mountTab();
+    await tick(wrapper, 'lhp_lis');
+    expect(wrapper.get('[data-testid="org-bulk-bar"]').text()).toContain('Đã chọn 1 bài');
+    await wrapper.get('input[aria-label="Chọn tất cả bài trên trang"]').setValue(true);
+    await flushPromises();
+    expect(wrapper.get('[data-testid="org-bulk-bar"]').text()).toContain('Đã chọn 4 bài');
+  });
+
+  it('shows a member the cards read-only: no tick boxes and no actions', async () => {
+    onPhone();
+    mockApi({ ...signedInViewer(), ...orgProblemRoutes(MEMBER_STATE) });
+    const { wrapper } = await mountTab();
+    expect(cardsOf(wrapper)).toHaveLength(ORG_PROBLEMS.length);
+    expect(wrapper.find('input[type="checkbox"]').exists()).toBe(false);
+    expect(buttonNamed(wrapper, 'Lưu trữ lhp_lis')).toBeUndefined();
   });
 });

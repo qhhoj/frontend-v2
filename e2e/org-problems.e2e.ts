@@ -1,5 +1,5 @@
 import { expect, test } from './fixtures/api';
-import { axeViolationsIn } from './fixtures/audit';
+import { AUDIT_VIEWPORTS, axeViolationsIn } from './fixtures/audit';
 import { installOrgProblems } from './fixtures/f4-api';
 
 const TAB = '/organizations/lhp/problems';
@@ -31,3 +31,24 @@ test('bulk archive reports a partial result with the sweating Bit', async ({ pag
   await expect(result.getByTestId('inline-bit')).toBeVisible();
   await expect(bar.getByText('Đã chọn 1 bài')).toBeVisible();
 });
+
+const ROW_ACTION_HEIGHT = 44;
+
+for (const viewport of AUDIT_VIEWPORTS)
+  test(`org problems at ${viewport.name}: row actions stay whole and nothing scrolls sideways`, async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize(viewport);
+    installOrgProblems(api, { canAdminister: true });
+    await page.goto(TAB);
+    const archive = page.getByRole('button', { name: 'Lưu trữ lhp_tree' });
+    await expect(archive).toBeVisible();
+    expect((await archive.boundingBox())!.height).toBeLessThanOrEqual(ROW_ACTION_HEIGHT);
+    const [scrollWidth, clientWidth] = await page.evaluate(() => [
+      document.documentElement.scrollWidth,
+      document.documentElement.clientWidth,
+    ]);
+    expect(scrollWidth).toBeLessThanOrEqual(clientWidth);
+    expect(await axeViolationsIn(page)).toEqual([]);
+  });

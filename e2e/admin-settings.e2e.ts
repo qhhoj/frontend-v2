@@ -22,6 +22,23 @@ test('site settings: Enter on "Thay thế" reveals the password box with focus i
   expect(api.requestsTo('PATCH /admin/settings/mail.smtpUrl')).toHaveLength(0);
 });
 
+test('site settings: the search status stays in the accessibility tree while empty, takes no space, and shows the count', async ({
+  page,
+  api,
+}) => {
+  signInAsStaff(api, ['judge.change_settings']);
+  api.routes['GET /admin/settings'] = adminOk(ALL_SETTINGS);
+  await page.goto('/admin/settings');
+  const status = page.getByRole('status').and(page.getByTestId('settings-search-status'));
+  await expect(status).toBeEmpty();
+  await expect(status).toHaveCount(1);
+  expect((await status.boundingBox())!.width).toBeLessThanOrEqual(1);
+
+  await page.locator('input[type="search"]').fill('mail');
+  await expect(status).toContainText('cài đặt khớp');
+  expect((await status.boundingBox())!.width).toBeGreaterThan(1);
+});
+
 for (const viewport of AUDIT_VIEWPORTS)
   test(`site settings at ${viewport.name}: a reset fills the default and only "Lưu" sends it`, async ({
     page,

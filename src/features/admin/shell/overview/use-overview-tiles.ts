@@ -15,8 +15,8 @@ import { usePermissions } from '@/stores/use-permissions';
 import { ADMIN_SCREENS, PROBLEM_EDIT, TICKET_STAFF, adminRouteName } from '../../admin-screens';
 import { ORGANIZATION_QUEUE_PERMISSION } from '../../organizations/join-requests.queries';
 import { isMakerOf, useAdminCounts, useEditableProblemCounts } from './admin-overview.queries';
-import { attentionFirst } from './overview-tiles';
 import type { OverviewTileSpec } from './overview-tiles';
+import { useFrozenTileOrder } from './use-frozen-tile-order';
 
 /** Who sees the queue and judge figures: the staff who can act on judging. */
 export const JUDGING_STAFF = ['judge.change_judge', 'judge.rejudge_submission'];
@@ -24,15 +24,16 @@ const LABEL = 'admin.shell.overview';
 const ABOUT_MINE_QUEUE = { scope: 'all', open: '1', about: 'mine' };
 
 /**
- * The dashboard's figures for this viewer (P-33), the ones that need attention first. Each tile links to its filtered
- * list; a figure the viewer cannot act on is left out, and its query never runs.
+ * The dashboard's figures for this viewer (P-33), the ones that need attention first (the order settles once every figure
+ * has loaded, see `useFrozenTileOrder`). Each tile links to its filtered list; a figure the viewer cannot act on is left
+ * out, and its query never runs.
  */
 export function useOverviewTiles() {
   const counts = useAdminCounts();
   const judging = useJudgingTiles();
   const queues = useQueueTiles(counts);
   const maker = useMakerTiles(counts);
-  return computed(() => attentionFirst([...judging.value, ...queues.value, ...maker.value]));
+  return useFrozenTileOrder(computed(() => [...judging.value, ...queues.value, ...maker.value]));
 }
 
 type AdminCounts = ReturnType<typeof useAdminCounts>;

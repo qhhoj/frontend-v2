@@ -2,14 +2,20 @@
 import { computed } from 'vue';
 import type { OrganizationProblem } from '@/api/types/organization-problems';
 import { formatDate } from '@/lib/format';
-import EditLink from '@/components/EditLink.vue';
-import { adminRouteName } from '@/features/admin/admin-screens';
+import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
-import OrgTagChip from './OrgTagChip.vue';
+import OrgProblemActions from './OrgProblemActions.vue';
+import OrgProblemCardList from './OrgProblemCardList.vue';
+import OrgProblemName from './OrgProblemName.vue';
+import OrgSelectBox from './OrgSelectBox.vue';
+import OrgProblemTags from './OrgProblemTags.vue';
 
 /**
  * The rows of board M7A; administrators also get a selection box per row and the two row actions. A row the viewer may
- * edit (`canEdit`, whatever their organization role) gets a pencil to the problem's editor (P-32).
+ * edit (`canEdit`, whatever their organization role) gets a pencil to the problem's editor (P-32). Under 640 px the rows
+ * are cards (`OrgProblemCardList`), so the name keeps the full width; only one of the two layouts is rendered. The tags and
+ * date columns need the table itself to be 48rem wide (the tag catalogue narrows the card on a laptop); below that the
+ * tags sit under the name and the date is left out.
  */
 const props = defineProps<{
   rows: OrganizationProblem[];
@@ -22,6 +28,7 @@ const emit = defineEmits<{
   'toggle-archive': [row: OrganizationProblem];
 }>();
 const locale = useLocaleStore();
+const isCards = useMediaQuery(COMPACT_LIST_QUERY);
 const codes = computed(() => props.rows.map((row) => row.code));
 const isAllSelected = computed(
   () => codes.value.length > 0 && codes.value.every((code) => selected.value.includes(code)),
@@ -37,12 +44,22 @@ function toggleRow(code: string) {
     : [...selected.value, code];
 }
 const CELL = 'py-2 pr-3 align-middle';
-const ACTION =
-  'inline-flex min-h-11 items-center rounded-pill border border-line px-3 text-sm font-semibold hover:bg-surface-hover aria-disabled:cursor-progress aria-disabled:text-muted';
 </script>
 
 <template>
-  <div class="overflow-x-auto">
+  <OrgProblemCardList
+    v-if="isCards"
+    :rows="rows"
+    :is-admin="isAdmin"
+    :busy-code="busyCode"
+    :selected="selected"
+    :is-all-selected="isAllSelected"
+    @toggle-all="toggleAll"
+    @toggle-row="(row) => toggleRow(row.code)"
+    @edit-tags="(row) => emit('edit-tags', row)"
+    @toggle-archive="(row) => emit('toggle-archive', row)"
+  />
+  <div v-else class="@container overflow-x-auto">
     <table class="w-full text-left text-sm">
       <caption class="sr-only">
         {{
@@ -52,22 +69,18 @@ const ACTION =
       <thead class="text-muted">
         <tr>
           <th v-if="isAdmin" scope="col" class="w-11 py-2 pr-3">
-            <label class="inline-flex size-11 items-center justify-center">
-              <input
-                type="checkbox"
-                class="size-5"
-                :checked="isAllSelected"
-                :aria-label="$t('orgProblems.selectAll')"
-                @change="toggleAll"
-              />
-            </label>
+            <OrgSelectBox
+              :checked="isAllSelected"
+              :label="$t('orgProblems.selectAll')"
+              @change="toggleAll"
+            />
           </th>
           <th scope="col" :class="CELL">{{ $t('orgProblems.columns.code') }}</th>
           <th scope="col" :class="CELL">{{ $t('orgProblems.columns.name') }}</th>
-          <th scope="col" class="hidden md:table-cell" :class="CELL">
+          <th scope="col" class="hidden @3xl:table-cell" :class="CELL">
             {{ $t('orgProblems.columns.tags') }}
           </th>
-          <th scope="col" class="hidden text-right md:table-cell" :class="CELL">
+          <th scope="col" class="hidden text-right whitespace-nowrap @3xl:table-cell" :class="CELL">
             {{ $t('orgProblems.columns.updated') }}
           </th>
           <th v-if="isAdmin" scope="col" class="py-2 text-right">
@@ -78,75 +91,37 @@ const ACTION =
       <tbody>
         <tr v-for="row in rows" :key="row.code" class="border-t border-line">
           <td v-if="isAdmin" class="py-2 pr-3">
-            <label class="inline-flex size-11 items-center justify-center">
-              <input
-                type="checkbox"
-                class="size-5"
-                :checked="selected.includes(row.code)"
-                :aria-label="$t('orgProblems.selectRow', { code: row.code })"
-                @change="toggleRow(row.code)"
-              />
-            </label>
+            <OrgSelectBox
+              :checked="selected.includes(row.code)"
+              :label="$t('orgProblems.selectRow', { code: row.code })"
+              @change="toggleRow(row.code)"
+            />
           </td>
           <td :class="CELL" class="font-mono font-semibold">{{ row.code }}</td>
           <td :class="CELL">
-            <RouterLink
-              :to="{ name: 'problem', params: { code: row.code } }"
-              class="font-semibold text-content hover:underline"
-              >{{ row.name }}</RouterLink
-            >
-            <EditLink
-              v-if="row.canEdit"
-              data-testid="problem-edit"
-              class="ml-1 align-middle"
-              :label="$t('orgProblems.editProblem', { code: row.code })"
-              :to="{ name: adminRouteName('problemGeneral'), params: { code: row.code } }"
-            />
-            <span
-              v-if="row.isArchived"
-              class="ml-2 rounded-pill bg-surface-hover px-2 py-0.5 text-xs font-semibold text-content"
-              >{{ $t('orgProblems.archivedChip') }}</span
-            >
+            <OrgProblemName :row="row" />
+            <OrgProblemTags v-if="row.tags.length" :tags="row.tags" class="mt-1 @3xl:hidden" />
           </td>
-          <td class="hidden md:table-cell" :class="CELL">
+          <td class="hidden @3xl:table-cell" :class="CELL">
             <span v-if="row.tags.length === 0" class="text-muted">{{
               $t('orgProblems.noTags')
             }}</span>
-            <span v-else class="flex flex-wrap gap-1.5">
-              <OrgTagChip v-for="tag in row.tags" :key="tag.id" :tag="tag" />
-            </span>
+            <OrgProblemTags v-else :tags="row.tags" />
           </td>
-          <td class="hidden text-right tabular-nums md:table-cell" :class="CELL">
+          <td
+            class="hidden text-right whitespace-nowrap tabular-nums @3xl:table-cell"
+            :class="CELL"
+          >
             {{ formatDate(row.updatedAt, locale.locale) }}
           </td>
           <td v-if="isAdmin" class="py-2">
-            <div class="flex flex-col items-end gap-2 md:flex-row md:justify-end">
-              <button
-                type="button"
-                :class="ACTION"
-                :aria-label="$t('orgProblems.editTagsLabel', { code: row.code })"
-                @click="emit('edit-tags', row)"
-              >
-                {{ $t('orgProblems.editTags') }}
-              </button>
-              <button
-                type="button"
-                :class="ACTION"
-                :aria-disabled="busyCode === row.code ? 'true' : undefined"
-                :aria-label="
-                  $t(
-                    row.isArchived
-                      ? 'orgProblems.unarchiveRowLabel'
-                      : 'orgProblems.archiveRowLabel',
-                    {
-                      code: row.code,
-                    },
-                  )
-                "
-                @click="emit('toggle-archive', row)"
-              >
-                {{ $t(row.isArchived ? 'orgProblems.unarchiveRow' : 'orgProblems.archiveRow') }}
-              </button>
+            <div class="flex justify-end gap-2">
+              <OrgProblemActions
+                :row="row"
+                :is-busy="busyCode === row.code"
+                @edit-tags="emit('edit-tags', row)"
+                @toggle-archive="emit('toggle-archive', row)"
+              />
             </div>
           </td>
         </tr>
