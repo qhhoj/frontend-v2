@@ -21,7 +21,8 @@ interface SubmitRequestInput {
 
 /**
  * The submit request (JSON for text, multipart for a file) and what follows (Q-01 B): the viewer stays on the problem
- * and `lastSubmissionId` names the new submission for the live result strip, or the error shows.
+ * and `lastSubmissionId` names the new submission for the live result strip, or the error shows. A new
+ * submission also marks the user pages stale, so the profile's "Bài nộp" count (`submissionCount`) includes it.
  */
 export function useSubmitRequest(input: SubmitRequestInput) {
   const queryClient = useQueryClient();
@@ -41,6 +42,7 @@ export function useSubmitRequest(input: SubmitRequestInput) {
     try {
       const { id } = await send();
       lastSubmissionId.value = id;
+      void queryClient.invalidateQueries({ queryKey: ['users', 'page'] });
       // The new row joins the viewer's lists; in a contest, the attempts left drop.
       for (const queryKey of newSubmissionListKeys())
         void queryClient.invalidateQueries({ queryKey });
