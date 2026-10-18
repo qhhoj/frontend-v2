@@ -7,12 +7,14 @@ import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
+import ContestEditLink from './ContestEditLink.vue';
 import { listCallToAction } from './contest-action';
 import { endClockLabel } from './contest-clock';
 import { useSpanText } from './use-span-text';
 import ViewerBadge from './ViewerBadge.vue';
 
-const props = defineProps<{ contest: ContestListItem }>();
+/** `withEdit`: an organization's list, where its administrators get a pencil on the contests they edit (P-32). */
+const props = defineProps<{ contest: ContestListItem; withEdit?: boolean }>();
 const locale = useLocaleStore();
 const spanText = useSpanText();
 /** Relative start words move in minutes: a tick a minute is enough. */
@@ -58,6 +60,7 @@ const startsInText = computed(() =>
         <ContestChips :contest="contest" with-tags with-code-needed />
         <ViewerBadge :badge-key="call.badgeKey" />
         <span class="font-mono text-caption text-muted">{{ contest.key }}</span>
+        <ContestEditLink v-if="withEdit" :contest="contest" />
       </div>
     </div>
     <div class="text-sm">

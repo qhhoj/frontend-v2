@@ -313,7 +313,8 @@
         "pastLastPage": "Trang này không tồn tại.",
         "backToFirstPage": "Về trang 1"
       },
-      "contestantCount": "{count} thí sinh"
+      "contestantCount": "{count} thí sinh",
+      "edit": "Sửa kỳ thi {name}"
     },
     "print": {
       "toolbar": "Tùy chọn in",
@@ -1700,6 +1701,7 @@
       "submissions": "Bài nộp"
     },
     "noContests": "Tổ chức chưa có kỳ thi nào",
+    "noContestsCreator": "Tổ chức chưa có kỳ thi nào. Tạo kỳ thi đầu tiên cho thành viên.",
     "noAbout": "Tổ chức chưa có giới thiệu.",
     "posts": "Bài viết của tổ chức",
     "noPosts": "Chưa có bài viết.",
@@ -2570,6 +2572,7 @@
     "forbiddenBody": "Tham gia tổ chức để xem danh sách này.",
     "emptyTitle": "Tổ chức chưa có bài tập nào",
     "emptyBody": "Bài tập gắn với tổ chức hiện ở đây. Liên hệ người quản lý bài để thêm.",
+    "emptyBodyCreator": "Bài tập gắn với tổ chức hiện ở đây. Tạo bài đầu tiên cho thành viên.",
     "filteredEmpty": "Không có bài nào khớp bộ lọc.",
     "filteredEmptyTag": "Không có bài nào với thẻ “{tag}” đang dùng.",
     "showArchived": "Xem đã lưu trữ",

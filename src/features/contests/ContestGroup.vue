@@ -134,6 +134,7 @@ const clearTagTarget = computed(() => ({
           :key="contest.key"
           :contest="contest"
           :wide="isSoleRunning"
+          :with-edit="Boolean(organizationId)"
         />
       </div>
       <Card v-else-if="phase === 'upcoming'" as="div">
@@ -142,6 +143,7 @@ const clearTagTarget = computed(() => ({
             v-for="contest in shownContests"
             :key="contest.key"
             :contest="contest"
+            :with-edit="Boolean(organizationId)"
           />
         </ul>
       </Card>
