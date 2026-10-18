@@ -38,7 +38,7 @@ export const staffViewer = (
 
 export const superuserViewer = () => staffViewer([], { isSuperuser: true });
 
-/** An `AdminSwitch` by its visible label: the switch is named through `aria-labelledby`, not `aria-label`. */
+/** A `Switch` by its visible label: the switch is named through `aria-labelledby`, not `aria-label`. */
 export function switchNamed(wrapper: Pick<VueWrapper, 'findAll' | 'get'>, label: string) {
   const found = wrapper
     .findAll('[role="switch"]')

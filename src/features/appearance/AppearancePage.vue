@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import BitMascot from '@/components/BitMascot.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
+import Switch from '@/components/ui/Switch.vue';
 import SettingsLayout from '@/features/account/settings/SettingsLayout.vue';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { useMediaQuery } from '@/lib/use-media-query';
@@ -16,7 +17,6 @@ import AppearancePreview from './AppearancePreview.vue';
 import LevelSlider from './LevelSlider.vue';
 import LowPowerChoice from './LowPowerChoice.vue';
 import ModeChoice from './ModeChoice.vue';
-import SettingSwitch from './SettingSwitch.vue';
 import { useAppearanceChoice } from './use-appearance-choice';
 
 const appearance = useAppearanceStore();
@@ -59,7 +59,12 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
             <p id="own-look-label" class="font-semibold">{{ $t('appearance.customLook') }}</p>
             <p class="mt-1 text-meta text-muted">{{ $t('appearance.customLookHelp') }}</p>
           </div>
-          <SettingSwitch :checked="isOn" labelledby="own-look-label" @toggle="toggle" />
+          <Switch
+            :model-value="isOn"
+            size="lg"
+            labelledby="own-look-label"
+            @update:model-value="toggle"
+          />
         </div>
 
         <div>
