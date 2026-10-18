@@ -1771,6 +1771,9 @@
     "menu": "Thao tác với tổ chức",
     "leaveTitle": "Rời {name}?",
     "leaveOpenBody": "Tổ chức mở: bạn có thể tham gia lại bất cứ lúc nào.",
+    "leaveAdminNote": "Bạn cũng mất quyền quản trị. Tổ chức cần còn ít nhất một quản trị viên khác.",
+    "lastAdminTitle": "Bạn là quản trị viên duy nhất",
+    "lastAdminBody": "Hãy chỉ định một quản trị viên khác trước khi rời tổ chức.",
     "left": "Đã rời {name}",
     "joinedToast": "Đã tham gia {name}. Muốn rời, mở menu ⋯ ở đầu trang tổ chức.",
     "openLine": "Mỗi người tham gia tối đa {max} tổ chức mở."

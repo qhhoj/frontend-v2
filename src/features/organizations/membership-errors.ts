@@ -20,9 +20,16 @@ const LOCKED_COPY: MembershipErrorCopy = {
   body: 'officialMode.lockedBody',
 };
 
+/** The last administrator may not leave (owner decision 2026-10-18): they hand over first. */
+const LAST_ADMIN_COPY: MembershipErrorCopy = {
+  title: 'orgMembership.lastAdminTitle',
+  body: 'orgMembership.lastAdminBody',
+};
+
 /** Translation keys for the card that explains a failed membership action. */
 export function membershipErrorCopy(action: MembershipAction, error: unknown): MembershipErrorCopy {
   if (error instanceof ApiError && error.code === 'locked_in_official_contest') return LOCKED_COPY;
+  if (hasIssueCode(error, 'last_admin')) return LAST_ADMIN_COPY;
   if (hasIssueCode(error, 'busy')) {
     return { title: 'orgMembership.failedTitle', body: 'admin.ui.issues.busy' };
   }

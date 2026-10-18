@@ -3,7 +3,7 @@ import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { joinRequest, organizationDetail } from '@/test/community-fixtures';
 import { organizationRoutes } from '@/test/community-routes';
-import { fail, mockApi, ok, sequence } from '@/test/mock-api';
+import { fail, failWithCode, mockApi, ok, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import Modal from '@/components/ui/Modal.vue';
 import { signedInViewer } from '@/test/problem-routes';
@@ -152,6 +152,31 @@ describe('membership header: member and join', () => {
       '/organizations/lhp/leave',
     ]);
     await vi.waitFor(() => expect(document.body.textContent).toContain('Đã rời'));
+  });
+
+  it('lets an administrator leave through ⋯, says the rights go, and asks the last one to hand over', async () => {
+    const lhp = organizationDetail({ viewer: { ...MEMBER, canAdminister: true } });
+    mockApi({
+      ...signedInViewer(),
+      ...organizationRoutes(lhp),
+      'POST /organizations/lhp/leave': failWithCode(409, 'user', 'last_admin'),
+    });
+    const { wrapper } = await mountApp('/organizations/lhp');
+    expect(wrapper.get('[data-testid="membership-chip"]').text()).toBe('Quản trị viên');
+    await wrapper.get('[data-testid="organization-menu"] button').trigger('click');
+    await flushPromises();
+    const leaveItem = [...document.body.querySelectorAll('[role="menuitem"]')].find((item) =>
+      item.textContent?.includes('Rời tổ chức'),
+    ) as HTMLElement;
+    (leaveItem.firstElementChild as HTMLElement).click();
+    await flushPromises();
+    const dialog = document.body.querySelector('[role="dialog"]')!;
+    expect(dialog.textContent).toContain('Bạn cũng mất quyền quản trị.');
+    dialog.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    await flushPromises();
+    expect(dialog.querySelector('[role="alert"]')!.textContent).toContain(
+      'Bạn là quản trị viên duy nhất',
+    );
   });
 
   it('turns a join into a chip and a toast, not a panel', async () => {

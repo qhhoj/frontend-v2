@@ -15,7 +15,8 @@ import { useMembership } from './use-membership';
 
 /**
  * The member's ⋯ menu in the organization header: "Rời tổ chức", a rare and destructive step, behind a confirm dialog. A failure
- * stays in the dialog; leaving closes it and says so in a toast.
+ * stays in the dialog; leaving closes it and says so in a toast. An administrator may leave too while another one remains; the
+ * dialog says the rights go with it, and the last one's refusal (`last_admin`) asks them to hand over first.
  */
 const props = defineProps<{ organization: OrganizationDetail }>();
 const { t } = useI18n();
@@ -45,9 +46,14 @@ const items = computed<MenuItem[]>(() => [{ label: t('orgMembership.leave'), com
 const errorCopy = computed(() =>
   membership.error.value ? membershipErrorCopy('leave', membership.error.value) : null,
 );
-const body = computed(() =>
-  t(props.organization.isOpen ? 'orgMembership.leaveOpenBody' : 'orgMembership.privateLeave'),
-);
+const body = computed(() => {
+  const rejoin = t(
+    props.organization.isOpen ? 'orgMembership.leaveOpenBody' : 'orgMembership.privateLeave',
+  );
+  return props.organization.viewer?.canAdminister
+    ? `${t('orgMembership.leaveAdminNote')} ${rejoin}`
+    : rejoin;
+});
 </script>
 
 <template>
