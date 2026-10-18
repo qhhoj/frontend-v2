@@ -42,8 +42,8 @@ const openInfo = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']
     `[role="dialog"][aria-label="Thông tin ${key}"]`,
   )!;
 };
-const clickButton = async (button: HTMLElement | null | undefined) => {
-  button!.click();
+const clickButton = async (button: Element | null | undefined) => {
+  (button as HTMLElement).click();
   await flushPromises();
 };
 const buttonNamed = (scope: HTMLElement, text: string) =>
