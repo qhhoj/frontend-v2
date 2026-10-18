@@ -22,6 +22,6 @@ const sentAt = computed(() =>
       {{ $t('orgMembership.sentAt', { date: sentAt }) }}
     </p>
     <p class="text-muted">{{ $t('orgMembership.pendingLine') }}</p>
-    <p v-if="request" class="line-clamp-1">{{ request.reason }}</p>
+    <p v-if="request?.reason" class="line-clamp-1">{{ request.reason }}</p>
   </div>
 </template>

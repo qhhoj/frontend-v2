@@ -98,6 +98,7 @@
   },
   "queue": {
     "title": "Yêu cầu tham gia của mọi tổ chức",
+    "noReason": "Không ghi lý do",
     "states": {
       "label": "Trạng thái yêu cầu",
       "P": "Chờ duyệt",

@@ -1709,7 +1709,7 @@
     "signIn": "Đăng nhập để tham gia",
     "join": "Tham gia tổ chức",
     "requestTitle": "Gửi yêu cầu tham gia",
-    "reason": "Lý do (bắt buộc, tối đa 4096 ký tự)",
+    "reason": "Lý do (không bắt buộc, tối đa 4096 ký tự)",
     "send": "Gửi yêu cầu",
     "pending": "Đang chờ duyệt",
     "sentAt": "gửi {date}",

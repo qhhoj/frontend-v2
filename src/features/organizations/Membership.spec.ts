@@ -77,6 +77,40 @@ describe('membership panel: requests', () => {
     expect(wrapper.get('[data-testid="membership-chip"]').text()).toBe('Đang chờ duyệt');
     expect(wrapper.findComponent(Modal).props('visible')).toBe(false);
   });
+
+  it('sends a request without a reason, which is optional', async () => {
+    const outsider = {
+      isMember: false,
+      canAdminister: false,
+      canCreateProblem: false,
+      canCreateContest: false,
+      pendingRequestId: null,
+    };
+    const unexplained = joinRequest({ reason: '' });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...organizationRoutes(hcmus(outsider)),
+      'GET /organizations/hcmus': sequence(
+        ok(hcmus(outsider)),
+        ok(hcmus({ ...outsider, pendingRequestId: unexplained.id })),
+      ),
+      'POST /organizations/hcmus/requests': ok(unexplained),
+      [`GET /organizations/hcmus/requests/${unexplained.id}`]: ok(unexplained),
+    });
+    const { wrapper } = await mountApp('/organizations/hcmus');
+    await panelButton(wrapper, 'Gửi yêu cầu tham gia').trigger('click');
+    await flushPromises();
+    const dialog = document.body.querySelector('[role="dialog"]')!;
+    const textarea = dialog.querySelector('textarea')!;
+    textarea.value = '   ';
+    textarea.dispatchEvent(new Event('input'));
+    await flushPromises();
+    expect(dialog.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(false);
+    dialog.querySelector('form')!.dispatchEvent(new Event('submit'));
+    await flushPromises();
+    expect(calls.find((call) => call.method === 'POST')!.body).toEqual({ reason: '' });
+    expect(wrapper.get('[data-testid="membership-chip"]').text()).toBe('Đang chờ duyệt');
+  });
 });
 
 const MEMBER = {

@@ -1709,7 +1709,7 @@
     "signIn": "Sign in to join",
     "join": "Join",
     "requestTitle": "Ask to join",
-    "reason": "Reason (required, up to 4096 characters)",
+    "reason": "Reason (optional, up to 4096 characters)",
     "send": "Send request",
     "pending": "Waiting for approval",
     "sentAt": "sent {date}",
