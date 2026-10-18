@@ -31,6 +31,7 @@ const judgesOnline = computed(() =>
     :detail="$t('admin.shell.overview.queueDetail')"
     :to="queueLink"
     :needs-attention="(stats.data.value?.queueLength ?? 0) > 0"
+    :link-text="$t('admin.shell.overview.links.queue')"
   />
   <OverviewTile
     :icon="Server"
@@ -39,5 +40,6 @@ const judgesOnline = computed(() =>
     :detail="$t('admin.shell.overview.judgesDetail')"
     :to="judgesLink"
     :needs-attention="stats.data.value?.judgesOnline === 0"
+    :link-text="$t('admin.shell.overview.links.judges')"
   />
 </template>

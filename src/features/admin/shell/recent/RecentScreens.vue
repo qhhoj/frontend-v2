@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ChevronRight, History } from 'lucide-vue-next';
+import { History } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useSessionStore } from '@/stores/session.store';
 import { canUseAdmin } from '../../admin-access';
-import { CARD } from '../../ui/controls';
 import { shortcutsOf, useRecentScreens } from './recent-screens';
 
 const router = useRouter();
@@ -29,35 +28,27 @@ const openable = computed(() =>
 </script>
 
 <template>
-  <section
+  <nav
     v-if="openable.length > 0"
     aria-labelledby="admin-recent-title"
-    class="flex min-w-0 flex-col gap-3"
+    class="flex min-w-0 flex-wrap items-center gap-2"
     data-testid="admin-recent"
   >
-    <h2 id="admin-recent-title" class="font-display text-base font-semibold">
+    <h2 id="admin-recent-title" class="mr-1 font-display text-sm font-semibold text-muted">
       {{ $t('admin.shell.recent.title') }}
     </h2>
-    <ul :class="[CARD, 'm-0 flex list-none flex-col divide-y divide-line overflow-hidden p-0']">
-      <li v-for="entry in openable" :key="entry.path">
-        <RouterLink
-          :to="entry.path"
-          class="flex min-h-[var(--qa-row,2.5rem)] min-w-0 items-center gap-3 px-4 py-2 text-sm hover:bg-surface-hover"
-        >
-          <History aria-hidden="true" class="size-4 shrink-0 text-muted" :stroke-width="1.75" />
-          <span class="min-w-0 flex-1">
-            <span class="block truncate font-semibold">{{ $t(entry.titleKey) }}</span>
-            <span v-if="entry.detail" class="block truncate font-mono text-xs text-muted">{{
-              entry.detail
-            }}</span>
-          </span>
-          <ChevronRight
-            aria-hidden="true"
-            class="size-4 shrink-0 text-muted"
-            :stroke-width="1.75"
-          />
-        </RouterLink>
-      </li>
-    </ul>
-  </section>
+    <RouterLink
+      v-for="entry in openable"
+      :key="entry.path"
+      :to="entry.path"
+      :title="entry.detail ?? undefined"
+      class="inline-flex min-h-(--qa-control) max-w-full min-w-0 items-center gap-1.5 rounded-pill border border-line bg-surface-solid px-3 text-sm hover:bg-surface-hover"
+    >
+      <History aria-hidden="true" class="size-3.5 shrink-0 text-muted" :stroke-width="1.75" />
+      <span class="truncate font-semibold">{{ $t(entry.titleKey) }}</span>
+      <span v-if="entry.detail" class="truncate font-mono text-xs text-muted">{{
+        entry.detail
+      }}</span>
+    </RouterLink>
+  </nav>
 </template>

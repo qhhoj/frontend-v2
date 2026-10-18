@@ -3,14 +3,11 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { AuditEntry } from '@/api/types/audit-admin';
 import { formatNumericDateTimeSeconds } from '@/lib/format';
-import { useRouter } from 'vue-router';
 import { useLocaleStore } from '@/stores/locale.store';
-import { useSessionStore } from '@/stores/session.store';
-import { canUseAdmin } from '../admin-access';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { shortId } from '../ui/short-id';
-import { auditObjectLink } from './audit';
 import AdminChip from '../ui/AdminChip.vue';
+import { useAuditLinkOf } from './use-audit-link';
 
 /** One change: when, who, what was done to which object, and the fields it touched (names only). */
 const props = defineProps<{ entry: AuditEntry }>();
@@ -25,19 +22,8 @@ const typeLabel = computed(() =>
 const actionLabel = computed(() =>
   labelOr(`admin.audit.actions.${props.entry.action}`, props.entry.action),
 );
-const router = useRouter();
-const session = useSessionStore();
-/** An admin screen the viewer may not open shows as plain text, never a link to the forbidden page. */
-const link = computed(() => {
-  const target = auditObjectLink(props.entry);
-  if (!target) return null;
-  const { meta } = router.resolve(target);
-  const isOpenable = canUseAdmin(session.user, {
-    permission: meta.permission ?? null,
-    capability: meta.capability,
-  });
-  return isOpenable ? target : null;
-});
+const linkOf = useAuditLinkOf();
+const link = computed(() => linkOf(props.entry));
 const objectName = computed(() => props.entry.object.label ?? shortId(props.entry.object.id));
 </script>
 

@@ -49,7 +49,12 @@ describe('admin search palette', () => {
     const { router, box } = await openPalette('/admin');
     type(box, 'ap');
     await vi.waitFor(() => expect(optionTexts().join()).toContain('A cộng B'));
-    const searched = calls.filter((call) => !['/auth/me', '/profile'].includes(call.path));
+    // The dashboard's setter tiles count problems too; only the palette sends a search text.
+    const searched = calls.filter(
+      (call) =>
+        !['/auth/me', '/profile'].includes(call.path) &&
+        !(call.path === '/problems' && !call.query.has('q')),
+    );
     expect(searched.map((call) => call.path)).toEqual(['/problems']);
     expect(searched[0]!.query.get('visibility')).toBe('all');
     expect(searched[0]!.query.get('q')).toBe('ap');

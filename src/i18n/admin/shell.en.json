@@ -120,7 +120,19 @@
     "reportsDetail": "Comments with reports not yet settled.",
     "requests": "Organization join requests",
     "requestsDetail": "Requests waiting for a decision across organizations.",
-    "attention": "Needs action"
+    "attention": "Needs action",
+    "unpublished": "Unpublished problems",
+    "unpublishedDetail": "Problems you can edit, seen only by their setters.",
+    "published": "Public problems",
+    "publishedDetail": "Problems you can edit, shown to everyone.",
+    "links": {
+      "queue": "View the queue",
+      "judges": "View judges",
+      "tickets": "Open the queue | View 1 ticket | View {n} tickets",
+      "reports": "Open reports | View 1 report | View {n} reports",
+      "requests": "Open requests | View 1 request | View {n} requests",
+      "problems": "Open the list | View 1 problem | View {n} problems"
+    }
   },
   "recent": {
     "title": "Shortcuts"

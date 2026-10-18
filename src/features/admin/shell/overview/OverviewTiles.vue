@@ -2,11 +2,12 @@
 import { Flag, LifeBuoy, UserPlus } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { usePermissions } from '@/stores/use-permissions';
-import { ADMIN_SCREENS, adminRouteName } from '../../admin-screens';
+import { ADMIN_SCREENS, PROBLEM_EDIT, adminRouteName } from '../../admin-screens';
 import { ORGANIZATION_QUEUE_PERMISSION } from '../../organizations/join-requests.queries';
 import { useAdminCounts } from './admin-overview.queries';
 import JudgingTiles from './JudgingTiles.vue';
 import OverviewTile from './OverviewTile.vue';
+import SetterTiles from './SetterTiles.vue';
 
 /** Who sees the queue and judge figures: the staff who can act on judging. */
 const JUDGING_STAFF = ['judge.change_judge', 'judge.rejudge_submission'];
@@ -18,6 +19,7 @@ const hasTiles = computed(() =>
     ADMIN_SCREENS.tickets.permission,
     ADMIN_SCREENS.commentReports.permission,
     ORGANIZATION_QUEUE_PERMISSION,
+    PROBLEM_EDIT,
   ]),
 );
 </script>
@@ -27,7 +29,7 @@ const hasTiles = computed(() =>
     <h2 id="admin-overview-title" class="font-display text-base font-semibold">
       {{ $t('admin.shell.overview.title') }}
     </h2>
-    <ul class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+    <ul class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
       <JudgingTiles v-if="canAny(JUDGING_STAFF)" />
       <OverviewTile
         v-if="can(ADMIN_SCREENS.tickets.permission)"
@@ -37,6 +39,7 @@ const hasTiles = computed(() =>
         :detail="$t('admin.shell.overview.ticketsDetail')"
         :to="{ name: adminRouteName('tickets') }"
         :needs-attention="!!counts.awaitingTickets.value"
+        :link-text="$t('admin.shell.overview.links.tickets', counts.awaitingTickets.value ?? 0)"
       />
       <OverviewTile
         v-if="can(ADMIN_SCREENS.commentReports.permission)"
@@ -46,6 +49,7 @@ const hasTiles = computed(() =>
         :detail="$t('admin.shell.overview.reportsDetail')"
         :to="{ name: adminRouteName('commentReports') }"
         :needs-attention="!!counts.openReports.value"
+        :link-text="$t('admin.shell.overview.links.reports', counts.openReports.value ?? 0)"
       />
       <OverviewTile
         v-if="can(ORGANIZATION_QUEUE_PERMISSION)"
@@ -55,7 +59,9 @@ const hasTiles = computed(() =>
         :detail="$t('admin.shell.overview.requestsDetail')"
         :to="{ name: adminRouteName('organizations'), query: { view: 'requests' } }"
         :needs-attention="!!counts.pendingRequests.value"
+        :link-text="$t('admin.shell.overview.links.requests', counts.pendingRequests.value ?? 0)"
       />
+      <SetterTiles v-if="can(PROBLEM_EDIT)" />
     </ul>
   </section>
 </template>

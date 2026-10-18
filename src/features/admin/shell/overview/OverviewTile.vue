@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ArrowRight } from 'lucide-vue-next';
 import type { Component } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import AdminChip from '../../ui/AdminChip.vue';
@@ -6,7 +7,8 @@ import { CARD } from '../../ui/controls';
 
 /**
  * One figure on the dashboard, linking to its filtered list: `value` null is not loaded yet. A `needsAttention` figure gets
- * a caution border, the accent figure and a "Cần xử lý" chip, so the state never rests on colour alone.
+ * a caution border, the accent figure and a "Cần xử lý" chip, so the state never rests on colour alone. `linkText` says
+ * where the tile goes ("Xem 3 phiếu →"), so it reads as a link (P-33).
  */
 defineProps<{
   icon: Component;
@@ -15,6 +17,7 @@ defineProps<{
   detail?: string;
   to: RouteLocationRaw;
   needsAttention?: boolean;
+  linkText: string;
 }>();
 </script>
 
@@ -49,6 +52,12 @@ defineProps<{
         </AdminChip>
       </span>
       <span v-if="detail" class="text-xs text-muted">{{ detail }}</span>
+      <span
+        class="mt-auto inline-flex items-center gap-1 pt-1 text-sm font-semibold text-accent-text"
+      >
+        {{ linkText }}
+        <ArrowRight aria-hidden="true" class="size-3.5" :stroke-width="2" />
+      </span>
     </RouterLink>
   </li>
 </template>

@@ -1,4 +1,7 @@
+import { useQuery } from '@tanstack/vue-query';
 import { computed, onScopeDispose } from 'vue';
+import { fetchAdminProblems } from '@/api/admin-index.api';
+import { useViewerId } from '@/stores/use-viewer-id';
 import { useSubmissionStatsQuery } from '@/features/submissions/submissions.queries';
 import { TICKET_SUMMARY_POLL_MS, useTicketSummaryQuery } from '@/features/tickets/tickets.queries';
 import { usePermissions } from '@/stores/use-permissions';
@@ -74,4 +77,22 @@ export function useNavCounts() {
     commentReports: waiting(counts.openReports.value),
     organizations: waiting(counts.pendingRequests.value),
   }));
+}
+
+/** How many problems the viewer may edit are public and how many are not (the setter tiles); `null` until loaded. */
+export function useEditableProblemCounts() {
+  const viewer = useViewerId();
+  const countOf = (visibility: 'public' | 'private') =>
+    useQuery({
+      queryKey: computed(() => ['admin', 'problem-counts', visibility, viewer.value]),
+      queryFn: () => fetchAdminProblems({ visibility, pageSize: 1 }),
+    });
+  const unpublished = countOf('private');
+  const published = countOf('public');
+  const totalOf = (query: typeof unpublished) =>
+    computed(() => {
+      const meta = query.data.value?.meta;
+      return meta && 'total' in meta ? meta.total : null;
+    });
+  return { unpublished: totalOf(unpublished), published: totalOf(published) };
 }
