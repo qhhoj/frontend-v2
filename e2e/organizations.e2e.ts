@@ -100,7 +100,9 @@ test('a signed-in visitor asks to join a private organization and sees the reque
   api.routes[`GET /organizations/hcmus/requests/${REQUEST_ID}`] = ok(request);
   await page.goto('/organizations/hcmus');
   await page.getByRole('button', { name: 'Gửi yêu cầu tham gia' }).click();
-  await page.getByLabel('Lý do (bắt buộc, tối đa 4096 ký tự)').fill('Em muốn tham gia đội tuyển.');
+  await page
+    .getByLabel('Lý do (không bắt buộc, tối đa 4096 ký tự)')
+    .fill('Em muốn tham gia đội tuyển.');
   await page.getByRole('dialog').getByRole('button', { name: 'Gửi yêu cầu' }).click();
   await expect(page.getByTestId('membership-chip')).toHaveText('Đang chờ duyệt');
 });
