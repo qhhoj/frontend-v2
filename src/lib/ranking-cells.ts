@@ -57,10 +57,6 @@ const roundTo = (value: number, precision: number) => {
 const isFullPoints = (points: number, problem: RankingProblem, precision: number) =>
   points > 0 && roundTo(points, precision) >= roundTo(problem.points, precision);
 
-/** icpc counts minutes, every other format seconds (backend: libs/contests/src/formats). */
-export const formatCumtime = (formatName: ContestFormatName, cumtime: number) =>
-  formatName === 'icpc' ? String(cumtime) : formatElapsed(cumtime);
-
 /** ioi16 and final_submission never accumulate time. */
 const NO_CUMTIME_FORMATS = new Set<ContestFormatName>(['ioi16', 'final_submission']);
 export const showsCumtime = (formatName: ContestFormatName) => !NO_CUMTIME_FORMATS.has(formatName);
@@ -87,6 +83,13 @@ function cellElapsed(
     spoken: daysHoursText(inLocale, span, false),
   };
 }
+
+/**
+ * icpc counts minutes, every other format seconds (backend: libs/contests/src/formats). A total in seconds says days
+ * and hours from 100 hours, as the cells do (P-18).
+ */
+export const formatCumtime = (formatName: ContestFormatName, cumtime: number, locale: Locale) =>
+  formatName === 'icpc' ? String(cumtime) : cellElapsed(cumtime, formatElapsed, locale).shown;
 
 const EMPTY: RankingCellView = {
   kind: 'empty',

@@ -187,9 +187,9 @@ describe('ranking cells, points formats (Cells A)', () => {
 
 describe('ranking helpers', () => {
   it('prints cumulative time in the unit its format stores', () => {
-    expect(formatCumtime('icpc', 512)).toBe('512');
-    expect(formatCumtime('vnoj', 3_540)).toBe('0:59');
-    expect(formatCumtime('ioi', 7_260)).toBe('2:01');
+    expect(formatCumtime('icpc', 512, 'en')).toBe('512');
+    expect(formatCumtime('vnoj', 3_540, 'en')).toBe('0:59');
+    expect(formatCumtime('ioi', 7_260, 'en')).toBe('2:01');
   });
 
   it('counts solved problems from the cells, frozen and partial ones excluded', () => {
@@ -276,6 +276,13 @@ describe('ranking cells past 99 hours (P-18)', () => {
     expect(rankingCell({ time: LONG, points: 1, tries: 1 }, problem(), 'me', icpc).time).toBe(
       '113d 23h',
     );
+  });
+
+  it('says a total time of 100 hours or more in days and hours; icpc minutes stay a number', () => {
+    expect(formatCumtime('ioi', 100 * 3600 - 60, 'en')).toBe('99:59');
+    expect(formatCumtime('ioi', LONG, 'vi')).toBe('113 ng 23 g');
+    expect(formatCumtime('vnoj', LONG, 'en')).toBe('113d 23h');
+    expect(formatCumtime('icpc', 9_000, 'en')).toBe('9000');
   });
 
   it('switches at exactly 100 hours and drops zero hours', () => {

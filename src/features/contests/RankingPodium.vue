@@ -48,7 +48,7 @@ const scoreOf = (row: RankingRow) => {
   if (!isPenaltyFormat(props.context.formatName))
     return formatNumber(row.score, props.context.locale, props.context.pointsPrecision);
   const solved = solvedCount(row, props.problems, props.context);
-  return `${translate('ranking.solvedCount', { count: solved }, solved)} · ${formatCumtime(props.context.formatName, row.cumtime)}`;
+  return `${translate('ranking.solvedCount', { count: solved }, solved)} · ${formatCumtime(props.context.formatName, row.cumtime, props.context.locale)}`;
 };
 </script>
 

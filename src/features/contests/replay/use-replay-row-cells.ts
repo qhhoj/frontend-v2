@@ -33,7 +33,7 @@ function buildRowCells(
       view: rankingCell(row.cells[problem.problemId], problem, row.id, context),
     })),
     score,
-    cumtime: formatCumtime(context.formatName, row.cumtime),
+    cumtime: formatCumtime(context.formatName, row.cumtime, context.locale),
     source: { revision: row.revision, context },
   };
 }

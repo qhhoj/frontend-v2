@@ -178,11 +178,15 @@ const scoreHeaderKey = computed(() => {
               <small
                 v-if="hasCombinedScore && !row.isDisqualified"
                 class="block text-tiny font-medium text-muted"
-                >{{ formatCumtime(context.formatName, row.cumtime) }}</small
+                >{{ formatCumtime(context.formatName, row.cumtime, context.locale) }}</small
               >
             </td>
             <td v-if="hasTimeColumn">
-              {{ row.isDisqualified ? '—' : formatCumtime(context.formatName, row.cumtime) }}
+              {{
+                row.isDisqualified
+                  ? '—'
+                  : formatCumtime(context.formatName, row.cumtime, context.locale)
+              }}
             </td>
             <td
               v-if="hasRatingColumn"
