@@ -53,10 +53,10 @@ const { current: currentContest } = useCurrentContest(
       <template v-if="route.meta.layout !== 'auth'">
         <AppHeader class="print:hidden" />
         <ContestBar v-if="currentContest" :current="currentContest" />
+        <LiveAnnouncementAlert class="print:hidden" />
         <SiteNoticeBanner class="print:hidden" />
         <OfficialModeBanner class="print:hidden" />
         <HighPriorityBanner class="print:hidden" />
-        <LiveAnnouncementAlert class="print:hidden" />
       </template>
       <main id="main" tabindex="-1" class="relative flex-1 focus-visible:outline-none">
         <slot />

@@ -45,12 +45,15 @@ describe('announcement alert of the contest the viewer is in', () => {
     await flushPromises();
     expect(alert(wrapper).text()).toContain('Bài C: sửa giới hạn');
     expect(alert(wrapper).get('a').attributes('href')).toBe('/contests/r42/announcements');
-    expect(wrapper.get('[data-testid="contest-announcement-live"]').text()).toBe(
-      'Thông báo mới: Bài C: sửa giới hạn',
-    );
+    const region = wrapper.get('[data-testid="contest-announcement-live"]');
+    expect([region.attributes('role'), region.attributes('aria-live')]).toEqual([
+      'status',
+      'polite',
+    ]);
+    expect(region.find('[data-testid="announcement-alert"]').exists()).toBe(true);
   });
 
-  it('goes when closed, while the tab still counts it unread', async () => {
+  it('goes when closed and stays closed, while the tab still counts it unread', async () => {
     mockApi({
       ...inContest(),
       ...contestPageRoutes(contestDetail(), [announcement(2), announcement(1)]),
@@ -63,6 +66,14 @@ describe('announcement alert of the contest the viewer is in', () => {
       .trigger('click');
     expect(alert(wrapper).exists()).toBe(false);
     expect(wrapper.get('a[href="/contests/r42/announcements"]').text()).toContain('2 chưa đọc');
+    wrapper.unmount();
+    // The close is kept like the read mark: a reload does not bring the same announcement back.
+    mockApi({
+      ...inContest(),
+      ...contestPageRoutes(contestDetail(), [announcement(2), announcement(1)]),
+    });
+    const reloaded = await mountApp('/contests/r42');
+    expect(alert(reloaded.wrapper).exists()).toBe(false);
   });
 
   it('stays off the Announcements tab, which marks it read', async () => {
@@ -78,7 +89,12 @@ describe('announcement alert of the contest the viewer is in', () => {
   });
 
   it('opens nothing once the contest itself has ended (a virtual run)', async () => {
-    mockApi({ ...inContest('2020-01-01T00:00:00Z'), ...contestListRoutes({}) });
+    mockApi({
+      ...inContest('2020-01-01T00:00:00Z'),
+      ...contestListRoutes({}),
+      // The contest bar still counts unread announcements; only the stream and the alert stop.
+      'GET /contests/r42/announcements': page([announcement(1)]),
+    });
     const { wrapper } = await mountApp('/contests');
     expect(openStreams()).toEqual([]);
     expect(alert(wrapper).exists()).toBe(false);
