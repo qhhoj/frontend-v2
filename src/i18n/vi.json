@@ -1431,7 +1431,8 @@
       "user": "Người nộp",
       "language": "Ngôn ngữ",
       "judge": "Máy chấm",
-      "submitted": "Nộp lúc"
+      "submitted": "Nộp lúc",
+      "contest": "Kỳ thi"
     },
     "pretest": "Bài nộp này chỉ chấm với bộ test mẫu (pretest).",
     "overview": {
@@ -1448,6 +1449,7 @@
       "failed": "Test {number} {verdict}",
       "skipped": "{count} bỏ qua",
       "total": "Tổng",
+      "problemTotal": "Điểm bài",
       "passed": "{count} đúng",
       "partial": "{count} đúng một phần",
       "lowest": "thấp nhất ở test {number}",
@@ -1514,6 +1516,12 @@
       "signIn": "Đăng nhập để xem mã nguồn, nếu đề bài cho phép.",
       "solveFirst": "Giải bài này để xem mã nguồn.",
       "signInAction": "Đăng nhập"
+    },
+    "contest": {
+      "outOf": "/ {max} điểm kỳ thi",
+      "problemScore": "Điểm bài {score} / {max}",
+      "next": "Bài {label} · {name}",
+      "minute": "{time} · phút {minute}"
     }
   },
   "states": {

@@ -1431,7 +1431,8 @@
       "user": "Author",
       "language": "Language",
       "judge": "Judge",
-      "submitted": "Submitted"
+      "submitted": "Submitted",
+      "contest": "Contest"
     },
     "pretest": "This submission was graded on the pretests only.",
     "overview": {
@@ -1448,6 +1449,7 @@
       "failed": "Test {number} {verdict}",
       "skipped": "{count} skipped",
       "total": "Total",
+      "problemTotal": "Problem score",
       "passed": "{count} correct",
       "partial": "{count} partially correct",
       "lowest": "lowest at test {number}",
@@ -1514,6 +1516,12 @@
       "signIn": "Sign in to see the source, if the problem allows it.",
       "solveFirst": "Solve this problem to see the source.",
       "signInAction": "Sign in"
+    },
+    "contest": {
+      "outOf": "/ {max} contest points",
+      "problemScore": "Problem score {score} / {max}",
+      "next": "Problem {label} · {name}",
+      "minute": "{time} · minute {minute}"
     }
   },
   "states": {

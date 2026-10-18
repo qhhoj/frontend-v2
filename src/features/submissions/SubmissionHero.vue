@@ -40,6 +40,8 @@ const props = defineProps<{
   isLive: boolean;
   /** Only the author resubmits; never to a deleted problem. */
   canResubmit: boolean;
+  /** A judged contest submission (P-14 B, Q-10 A): the contest points lead, the problem's score moves to the line below. */
+  contestScore?: { points: string; max: string } | null;
 }>();
 const locale = useLocaleStore();
 const format = (points: number) =>
@@ -71,8 +73,17 @@ const bit = computed(() => {
   const mood = isFinished.value ? verdictBitMood(props.verdict) : null;
   return mood ? BIT_MOODS[mood] : null;
 });
+const contestOutOf = computed(() =>
+  props.contestScore ? translate('submission.contest.outOf', { max: props.contestScore.max }) : '',
+);
+/** In a contest the problem's own score is the line's first part. */
+const problemScore = computed(() =>
+  props.contestScore && maxScore.value
+    ? translate('submission.contest.problemScore', { score: score.value, max: maxScore.value })
+    : null,
+);
 const line = computed(() =>
-  heroParts(props.submission)
+  [...(problemScore.value ? [{ text: problemScore.value }] : []), ...heroParts(props.submission)]
     .map((part) => {
       if ('text' in part) return part.text;
       if (part.key === 'passed') return translate('submission.overview.allPassed', part.values);
@@ -114,6 +125,10 @@ const problem = computed(() => {
           class="mt-1 font-mono text-score leading-none font-semibold tabular-nums"
         >
           <SkeletonBlock v-if="isProblemLoading" text class="w-40" />
+          <template v-else-if="contestScore"
+            >{{ contestScore.points }}
+            <span class="text-2xl whitespace-nowrap text-muted">{{ contestOutOf }}</span></template
+          >
           <template v-else
             >{{ score }}{{ ' '
             }}<span v-if="maxScore" class="text-2xl whitespace-nowrap text-muted"
