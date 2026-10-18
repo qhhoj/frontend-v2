@@ -108,7 +108,8 @@
       "empty": "Chưa có bài nộp nào trong kỳ thi.",
       "all": "Tất cả",
       "ownHeading": "Bài nộp của bạn",
-      "onlyYou": "chỉ bạn thấy"
+      "onlyYou": "chỉ bạn thấy",
+      "openProblem": "Mở đề bài {label}"
     },
     "detail": {
       "authors": "Ra đề:",

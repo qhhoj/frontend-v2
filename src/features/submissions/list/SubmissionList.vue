@@ -198,7 +198,12 @@ watch(
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton><SubmissionCardListSkeleton /></template>
         <Card v-if="!rows.length" as="div">
-          <EmptyState>{{ emptyText }}</EmptyState>
+          <EmptyState>
+            {{ emptyText }}
+            <template v-if="$slots.emptyAction" #action
+              ><slot name="emptyAction" :filters="filters"
+            /></template>
+          </EmptyState>
         </Card>
         <SubmissionLedgerList
           v-else-if="ledger"

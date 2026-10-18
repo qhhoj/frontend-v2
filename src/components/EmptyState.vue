@@ -6,7 +6,8 @@ import type { BitMood } from '@/mascot/bit-moods';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 
 /**
- * The one "nothing here" block of every list: Bit asleep in a nightcap above the message (default slot).
+ * The one "nothing here" block of every list: Bit asleep in a nightcap above the message (default slot), then its next
+ * step (`action` slot).
  * `compact` is the small one inside a card: the same 48 px Bit as InlineBit, decorative because the message beside it already
  * says the list is empty. `kind` picks that small Bit (asleep by default; `security` for the security page's key list). The full
  * block carries a label since it stands alone, and always sleeps.
@@ -31,5 +32,6 @@ withDefaults(defineProps<{ compact?: boolean; kind?: BitMood | BitKind }>(), {
       class="[--bit-px:4px] sm:[--bit-px:5px]"
     />
     <p><slot /></p>
+    <div v-if="$slots.action" class="mt-2"><slot name="action" /></div>
   </div>
 </template>

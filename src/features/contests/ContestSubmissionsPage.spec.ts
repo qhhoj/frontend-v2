@@ -121,6 +121,31 @@ describe('contest submissions tab', () => {
     await vi.waitFor(() => expect(listCalls(calls).at(-1)!.query.get('problem')).toBe('r42b'));
   });
 
+  it.each([
+    ['the first problem', '/contests/r42/submissions', 'Mở đề bài A', '/problems/r42a'],
+    [
+      'the filtered problem',
+      '/contests/r42/submissions?problem=r42b',
+      'Mở đề bài B',
+      '/problems/r42b',
+    ],
+  ])('offers %s from an empty list (M-20)', async (_case, path, label, href) => {
+    vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contestDetail({ problems: [contestProblem(0), contestProblem(1)] })),
+      'GET /contests/r42/submissions': page([]),
+      ...submissionListRoutes,
+    });
+    const { wrapper } = await mountApp(path);
+    const link = await vi.waitFor(() => {
+      const found = wrapper.findAll('a').find((anchor) => anchor.text() === label);
+      expect(found).toBeDefined();
+      return found!;
+    });
+    expect(link.attributes('href')).toBe(href);
+  });
+
   it('keeps the live switch and lights the letter, not an advanced panel, for a problem link', async () => {
     vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
     const twoProblems = contestDetail({ problems: [contestProblem(0), contestProblem(1)] });

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Lock } from 'lucide-vue-next';
+import AppButton from '@/components/ui/AppButton.vue';
 import Notice from '@/components/ui/Notice.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
+import type { ContestProblem } from '@/api/types/contests';
 import SubmitSignInLink from '@/features/problems/SubmitSignInLink.vue';
 import SubmissionList from '@/features/submissions/list/SubmissionList.vue';
 import type { ProblemPickerSource } from '@/features/submissions/list/problem-picker-options';
@@ -47,6 +49,11 @@ const isMissing = computed(
   () => contestError.value instanceof ApiError && contestError.value.status === 404,
 );
 usePageTitle(() => contest.value?.name);
+/** The empty list's next step (M-20): the filtered problem's statement, else the first one; the slot asks only when there is one. */
+const emptyNextOf = (code: string): ContestProblem => {
+  const problems = contest.value?.problems ?? [];
+  return problems.find((problem) => problem.code === code) ?? problems[0]!;
+};
 </script>
 
 <template>
@@ -93,6 +100,16 @@ usePageTitle(() => contest.value?.name);
         show-status-groups
         empty-key="contests.submissions.empty"
       >
+        <template v-if="contest?.problems?.length" #emptyAction="{ filters }">
+          <AppButton
+            tone="secondary"
+            :to="{ name: 'problem', params: { code: emptyNextOf(filters.problem).code } }"
+          >
+            {{
+              $t('contests.submissions.openProblem', { label: emptyNextOf(filters.problem).label })
+            }}
+          </AppButton>
+        </template>
         <template #filters="{ filters, update, advanced, toggleAdvanced }">
           <ContestSubmissionChips
             :filters="filters"
