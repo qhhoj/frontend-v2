@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { mountComponent } from '@/test/mount';
 import Switch from './Switch.vue';
 
@@ -40,5 +40,14 @@ describe('Switch', () => {
     await control.trigger('click');
     await wrapper.get(`#${control.attributes('aria-labelledby')}`).trigger('click');
     expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+  });
+
+  it('warns in development when it has neither a label nor a labelledby', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    mountComponent(Switch, { props: { modelValue: false, labelledby: 'look' } });
+    expect(warn).not.toHaveBeenCalled();
+    mountComponent(Switch, { props: { modelValue: false } });
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('no accessible name'));
+    warn.mockRestore();
   });
 });

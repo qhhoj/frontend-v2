@@ -25,6 +25,8 @@ const props = withDefaults(
 );
 const slots = defineSlots<{ note?: () => unknown }>();
 defineOptions({ name: 'UiSwitch' });
+if (import.meta.env.DEV && !props.label && !props.labelledby)
+  console.warn('[UiSwitch] give a `label` or a `labelledby`: the switch has no accessible name');
 const labelId = useId();
 const descriptionId = useId();
 const noteId = useId();
