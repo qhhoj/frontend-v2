@@ -1,6 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import { sessionUser } from '@/test/fixtures';
+import { sessionUser, userPage } from '@/test/fixtures';
 import { ppEntry, recentComment } from '@/test/community-fixtures';
 import { profileRoutes, profileTabRoutes } from '@/test/community-routes';
 import { fail, mockApi, ok, page, sequence } from '@/test/mock-api';
@@ -68,14 +68,18 @@ describe('profile tabs', () => {
     expect(calls.some((call) => call.path.endsWith('/comments'))).toBe(false);
   });
   it('links "Bài nộp" to the site list filtered to the user, with their count', async () => {
-    const calls = mockApi({ ...anonymousViewer, ...base });
+    const calls = mockApi({
+      ...anonymousViewer,
+      ...base,
+      ...profileRoutes(userPage({ submissionCount: 38 })),
+    });
     const { wrapper } = await mountApp('/users/user_01');
     await flushPromises();
     const tab = wrapper.get('a[href="/submissions?user=user_01"]');
     expect(tab.text()).toContain('Bài nộp');
     expect(tab.get('[data-testid="tab-badge"]').text()).toContain('38');
-    const counted = calls.find((call) => call.path === '/submissions')!;
-    expect([counted.query.get('user'), counted.query.get('pageSize')]).toEqual(['user_01', '1']);
+    // The count comes with the user page: no list request of its own.
+    expect(calls.some((call) => call.path === '/submissions')).toBe(false);
   });
   it('gives a full-score chip the accepted tone and a partial one the neutral tone, with one decimal when fractional', async () => {
     mockApi({

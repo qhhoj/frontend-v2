@@ -1,5 +1,6 @@
 import { defineComponent, ref } from 'vue';
 import { flushPromises } from '@vue/test-utils';
+import { QueryClient } from '@tanstack/vue-query';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   CPP17_ID,
@@ -169,6 +170,7 @@ describe('submitting text', () => {
       'POST /problems/duongdi/submit': ok({ id: 'sub-9' }),
       ...submittedRow,
     });
+    const invalidate = vi.spyOn(QueryClient.prototype, 'invalidateQueries');
     const { form, push } = mountForm();
     form.source.value = 'int main() { return 0; }';
     await form.submitNow();
@@ -178,6 +180,9 @@ describe('submitting text', () => {
     });
     expect(form.lastSubmissionId.value).toBe('sub-9');
     expect(push).not.toHaveBeenCalled();
+    // The profile's submission count comes with the user page.
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['users', 'page'] });
+    invalidate.mockRestore();
   });
   it("scores the result on the contest's points inside the viewer's contest (Q-10 A)", async () => {
     mockApi({
