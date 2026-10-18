@@ -20,6 +20,7 @@ describe('settings tabs', () => {
       accounts: 0,
       integrations: 0,
       limits: 3,
+      public: 0,
     });
   });
 });

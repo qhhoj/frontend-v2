@@ -41,8 +41,14 @@ for (const viewport of AUDIT_VIEWPORTS)
     );
     await page.goto('/admin/settings?tab=limits');
     const row = page.locator('[data-key="similarity.minPercent"]');
-    await row.getByRole('button', { name: 'Về mặc định 50' }).focus();
+    const info = row.getByRole('button', { name: 'Chi tiết similarity.minPercent' });
+    await info.click();
+    const popover = page.getByRole('dialog', { name: 'Thông tin similarity.minPercent' });
+    await expect(popover.getByRole('button', { name: 'Lịch sử' })).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(popover.getByRole('button', { name: 'Về mặc định 50' })).toBeFocused();
     await page.keyboard.press('Enter');
+    await expect(info).toBeFocused();
     await expect(row.getByRole('spinbutton')).toHaveValue('50');
     await expect(row).toContainText('Đã điền giá trị mặc định, chưa lưu. Giá trị đang lưu: 65.');
     expect(api.requestsTo('PATCH /admin/settings/similarity.minPercent')).toHaveLength(0);

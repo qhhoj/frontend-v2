@@ -47,8 +47,8 @@ export const SETTING_KINDS: Record<SettingKey, SettingKind> = {
   'externalJudge.maxWaitMinutes': { kind: 'integer', min: 1, max: 240 },
 };
 
-/** The page's tabs (`?tab=`), in this order: blocks grouped by topic so one view never holds every block. */
-export const SETTING_TABS = ['general', 'accounts', 'integrations', 'limits'] as const;
+/** The page's tabs (`?tab=`), in this order: blocks grouped by topic so one view never holds every block. `public` holds the texts visitors read (the site notice). */
+export const SETTING_TABS = ['general', 'accounts', 'integrations', 'limits', 'public'] as const;
 export type SettingTab = (typeof SETTING_TABS)[number];
 
 export interface SettingBlockSpec {
@@ -110,6 +110,9 @@ export const SETTING_BLOCKS: SettingBlockSpec[] = [
     ],
   },
 ];
+
+/** The site notice: a misc config key, not a setting, saved by its own block under the same save bar. */
+export const NOTICE_BLOCK: SettingBlockSpec = { id: 'notice', tab: 'public', keys: [] };
 
 /** A block with the settings the API actually sent, in the block's key order. */
 export interface ShownBlock extends SettingBlockSpec {

@@ -3,14 +3,17 @@ import { computed, reactive, ref, useId, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { updateSetting } from '@/api/settings-admin.api';
 import type { Setting, SettingKey } from '@/api/types/settings-admin';
-import { CircleCheck, History } from 'lucide-vue-next';
+import { CircleCheck } from 'lucide-vue-next';
+import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
 import AdminNotice from '../ui/feedback/AdminNotice.vue';
-import { CARD, buttonClass } from '../ui/controls';
+import { CARD } from '../ui/controls';
 import { isSameValue } from '../ui/form/dirty-form';
 import { useAdminToast } from '../ui/feedback/use-admin-toast';
 import { failureTextOf, fieldErrorsOf, hasIssueCode } from '../ui/admin-errors';
 import SettingField from './SettingField.vue';
+import SettingInfo from './SettingInfo.vue';
+import { canResetToDefault, defaultDraftOf, isAtDefault, valueText } from './setting-defaults';
 import type { ShownBlock } from './setting-blocks';
 import { checkBlock, sendKeysInOrder } from './setting-save';
 import type { BlockSaveOutcome } from './settings-page';
@@ -23,13 +26,26 @@ import { useStoreSettingAnswer } from './settings.queries';
  * changes, so an unsaved edit of another key of the block is never lost. The block validates and saves as a unit, but the
  * page's one save bar drives it: it reports its changed keys (`dirty`) and exposes `save` and `discard`.
  */
-const props = defineProps<{ block: ShownBlock }>();
+const props = defineProps<{
+  block: ShownBlock;
+  /** The rows a settings search shows; null shows every row. */
+  shownKeys?: ReadonlySet<string> | null;
+}>();
 const emit = defineEmits<{ history: [key: SettingKey]; dirty: [count: number] }>();
 const headingId = useId();
 const toast = useAdminToast();
 const composer = useI18n();
 const { t } = composer;
 const storeAnswer = useStoreSettingAnswer();
+const locale = useLocaleStore();
+const isShown = (key: SettingKey) => !props.shownKeys || props.shownKeys.has(key);
+/** The default as the ⓘ shows it; null for a secret, which has no default anyone can send. */
+const defaultTextOf = (setting: Setting) =>
+  canResetToDefault(setting) ? valueText(setting.default, locale.locale) : null;
+const isDraftAtDefault = (setting: Setting) =>
+  drafts[setting.key] ? isAtDefault(setting, drafts[setting.key]!) : true;
+/** Fills the registry default into the box; nothing is sent until "Lưu". */
+const resetToDefault = (setting: Setting) => (drafts[setting.key] = defaultDraftOf(setting));
 
 const drafts = reactive<Drafts>({});
 const storedJsonByKey = new Map<SettingKey, string>();
@@ -120,9 +136,6 @@ function onCleared(answer: Setting) {
   toast.show({ text });
 }
 
-/** A block of several keys names the key for screen readers ("Lịch sử · mail.from"); the key is shown beside the button. */
-const historySuffix = (key: SettingKey) => (props.block.keys.length > 1 ? ` · ${key}` : '');
-
 defineExpose({ save, discard: discardEdits });
 </script>
 
@@ -143,40 +156,31 @@ defineExpose({ save, discard: discardEdits });
     <div class="flex flex-col gap-4 px-4 py-4 sm:px-5">
       <div
         v-for="setting in block.settings"
+        v-show="isShown(setting.key)"
         :key="setting.key"
         :data-key="setting.key"
-        class="flex flex-col gap-3 border-t border-line pt-4 first:border-t-0 first:pt-0"
+        class="flex items-start gap-2 border-t border-line pt-4 first:border-t-0 first:pt-0"
       >
-        <div class="flex flex-wrap items-center gap-2">
-          <code class="font-mono text-xs break-all text-muted">{{ setting.key }}</code>
-          <AdminChip data-testid="default-chip" :tone="setting.isDefault ? 'neutral' : 'accent'">
-            {{
-              setting.isDefault
-                ? t('admin.settings.reset.isDefault')
-                : t('admin.settings.reset.notDefault')
-            }}
-          </AdminChip>
-          <button
-            :id="`history-${setting.key}`"
-            type="button"
-            class="ml-auto"
-            :class="buttonClass('ghost', 'sm')"
-            @click="emit('history', setting.key)"
-          >
-            <History aria-hidden="true" class="size-4" :stroke-width="1.75" />
-            {{ t('admin.settings.history')
-            }}<span v-if="historySuffix(setting.key)" class="sr-only">{{
-              historySuffix(setting.key)
-            }}</span>
-          </button>
-        </div>
         <SettingField
           v-if="drafts[setting.key]"
+          class="min-w-0 flex-1"
           :setting="setting"
           :model-value="drafts[setting.key]!"
           @update:model-value="drafts[setting.key] = $event"
           @cleared="onCleared"
         />
+        <div class="flex shrink-0 items-center gap-1">
+          <AdminChip v-if="!setting.isDefault" data-testid="changed-chip" tone="accent">
+            {{ t('admin.settings.reset.notDefault') }}
+          </AdminChip>
+          <SettingInfo
+            :setting-key="setting.key"
+            :default-text="defaultTextOf(setting)"
+            :is-at-default="isDraftAtDefault(setting)"
+            @history="emit('history', setting.key)"
+            @reset="resetToDefault(setting)"
+          />
+        </div>
       </div>
       <slot />
     </div>

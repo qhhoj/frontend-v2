@@ -11,11 +11,12 @@ export const settingsKey = ['admin', 'settings'] as const;
 export const settingRevisionsPrefix = (key: SettingKey) =>
   ['admin', 'setting-revisions', key] as const;
 
-export function useSettingsQuery() {
+export function useSettingsQuery(isEnabled: MaybeRefOrGetter<boolean> = true) {
   const viewer = useViewerId();
   return useQuery({
     queryKey: computed(() => [...settingsKey, viewer.value]),
     queryFn: fetchSettings,
+    enabled: computed(() => toValue(isEnabled)),
   });
 }
 

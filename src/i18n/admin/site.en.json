@@ -1,68 +1,5 @@
 {
   "config": {
-    "title": "Raw config",
-    "lead": "Free-text keys the site reads: the notice, footer and links.",
-    "caption": "Config keys",
-    "warning": {
-      "title": "Every value here is public",
-      "summary": "Anyone can read these values, so never put a secret here; secrets belong on the Settings page.",
-      "html": "HTML values (announcement, footer) are cleaned before they show on the site.",
-      "tracking": "Tracking code must be the site operator's own snippet, as given."
-    },
-    "columns": {
-      "key": "Key",
-      "value": "Value",
-      "kind": "Kind",
-      "length": "Characters"
-    },
-    "kinds": {
-      "html": "HTML",
-      "url": "URL",
-      "tracking": "Tracking code",
-      "text": "Text"
-    },
-    "add": "Add key",
-    "newHeading": "New key",
-    "editHeading": "Edit {key}",
-    "keyLabel": "Key",
-    "keyHint": "1–30 characters, no control characters.",
-    "valueLabel": "Value (up to 20 000 characters)",
-    "valueHint": "May be empty.",
-    "counter": "{length} / 20 000",
-    "previewTitle": "HTML value preview",
-    "previewLabel": "Preview in an isolated frame (runs no code)",
-    "previewNote": "Script tags, on… event attributes, iframes and javascript: links do not run in the preview; the live page cleans the value when it shows.",
-    "urlNote": "A link key accepts only http or https.",
-    "trackingNote": "Use only the site operator's own tracking snippet, as given.",
-    "save": "Save",
-    "close": "Cancel",
-    "delete": "Delete key",
-    "deleteTitle": "Delete key {key}?",
-    "deleteBody": "Every page stops using this value at once.",
-    "saved": "Saved {key}.",
-    "deleted": "Deleted {key}.",
-    "errors": {
-      "keyPattern": "The key needs 1–30 characters, no control characters.",
-      "keyTaken": "This key is taken.",
-      "tooLong": "Up to 20 000 characters.",
-      "url": "A link key accepts only http or https."
-    },
-    "usedChip": "Used by the site",
-    "unusedChip": "Old site only: not read here",
-    "knownHeading": "Known keys not set",
-    "setKnown": "Set",
-    "setKnownLabel": "Set {key}",
-    "known": {
-      "top_notification": "Site notice: plain text shown above every page to every visitor until they close it.",
-      "announcement": "Old site: HTML announcement box at the bottom of every page.",
-      "home_page_top": "Old site: HTML block at the top of the home page.",
-      "footer": "Old site: HTML added to the footer.",
-      "analytics": "Old site: tracking script in every page head.",
-      "meta_description": "Old site: the description meta tag of the home page.",
-      "meta_keywords": "Old site: the keywords meta tag of the home page.",
-      "discord_invite_link": "Old site: Discord invite link on the home and login pages.",
-      "discord_invite_shieldio": "Old site: Discord badge image (shields.io) beside the invite."
-    },
     "history": {
       "title": "History",
       "empty": "No change recorded yet.",
@@ -84,10 +21,9 @@
     "label": "Notice text",
     "hint": "Plain text; line breaks are kept, HTML is shown as typed.",
     "preview": "What visitors see",
-    "publish": "Publish notice",
-    "update": "Update notice",
     "takeDown": "Take down",
-    "saved": "Notice published.",
-    "removed": "Notice taken down."
+    "tooLong": "The notice is longer than 20,000 characters.",
+    "live": "Showing",
+    "takeDownHint": "The box is empty: press Save to take the notice down."
   }
 }

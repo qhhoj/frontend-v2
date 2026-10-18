@@ -49,7 +49,6 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   cannedReplies: () => import('./canned-replies/CannedRepliesPage.vue'),
   activity: () => import('./activity/UserActivityPage.vue'),
   settings: () => import('./settings/SiteSettingsPage.vue'),
-  config: () => import('./site/MiscConfigPage.vue'),
   pages: () => import('./pages/FlatpagesPage.vue'),
   log: () => import('./settings/AdminLogPage.vue'),
   shortLinks: () => import('./short-links/ShortLinksPage.vue'),
@@ -78,6 +77,8 @@ const screenRoute = (id: AdminScreenId): RouteRecordRaw => {
 export const adminRoutes: RouteRecordRaw[] = [
   ...(Object.keys(ADMIN_SCREENS) as AdminScreenId[]).map(screenRoute),
   { path: '/admin/problems/:code', redirect: { name: 'admin-problemGeneral' } },
+  // "Cấu hình thô" became the settings page's "Văn bản công khai" tab (P-34).
+  { path: '/admin/config', redirect: { name: 'admin-settings', query: { tab: 'public' } } },
   { path: '/admin/contests/:key', redirect: { name: 'admin-contestGeneral' } },
   {
     path: '/admin/:pathMatch(.*)*',
