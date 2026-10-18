@@ -153,7 +153,12 @@ const bulkFailure = computed(() => {
       <template #cell-user="{ row }">
         <div class="flex min-w-0 flex-col items-start gap-1 py-2">
           <AdminUserLabel :username="row.username" />
-          <p class="m-0 text-sm break-words whitespace-pre-line">{{ row.reason }}</p>
+          <p v-if="row.reason" class="m-0 text-sm break-words whitespace-pre-line">
+            {{ row.reason }}
+          </p>
+          <p v-else class="m-0 text-sm text-muted">
+            {{ $t('admin.organizations.queue.noReason') }}
+          </p>
           <time :datetime="row.createdAt" class="font-mono text-xs text-muted tabular-nums">{{
             timeOf(row.createdAt)
           }}</time>

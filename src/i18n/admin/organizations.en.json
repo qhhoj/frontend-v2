@@ -98,6 +98,7 @@
   },
   "queue": {
     "title": "Join requests from every organization",
+    "noReason": "No reason given",
     "states": {
       "label": "Request state",
       "P": "Awaiting review",

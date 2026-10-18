@@ -5,11 +5,11 @@ import AppButton from '@/components/ui/AppButton.vue';
 import FormField from '@/components/ui/FormField.vue';
 import TextArea from '@/components/ui/TextArea.vue';
 
-/** The reason for a join request: `v-model` holds the text, `submit` fires only with a non-blank reason. */
+/** The optional reason for a join request (owner decision 2026-10-18): `v-model` holds the text, `submit` fires blank or not. */
 const props = defineProps<{ busy: boolean }>();
 const reason = defineModel<string>({ required: true });
 const emit = defineEmits<{ submit: [] }>();
-const canSend = computed(() => reason.value.trim() !== '' && !props.busy);
+const canSend = computed(() => !props.busy);
 const send = () => {
   if (canSend.value) emit('submit');
 };
