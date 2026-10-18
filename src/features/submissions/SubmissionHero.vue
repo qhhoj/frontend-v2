@@ -76,6 +76,15 @@ const bit = computed(() => {
 const contestOutOf = computed(() =>
   props.contestScore ? translate('submission.contest.outOf', { max: props.contestScore.max }) : '',
 );
+/**
+ * The score card's headline and its muted "out of": the contest's points in a contest, else the problem's. The "out of"
+ * is one unbreakable piece: it stays on the headline's line while there is room and wraps whole when there is not.
+ */
+const scoreText = computed(() =>
+  props.contestScore
+    ? { value: props.contestScore.points, outOf: contestOutOf.value }
+    : { value: score.value, outOf: maxScore.value ? `/ ${maxScore.value}` : '' },
+);
 /** In a contest the problem's own score is the line's first part. */
 const problemScore = computed(() =>
   props.contestScore && maxScore.value
@@ -102,7 +111,11 @@ const problem = computed(() => {
 </script>
 
 <template>
-  <Card as="div" data-testid="submission-hero" class="min-w-0 overflow-hidden rounded-card">
+  <Card
+    as="div"
+    data-testid="submission-hero"
+    class="@container min-w-0 overflow-hidden rounded-card"
+  >
     <div class="flex flex-wrap items-center gap-x-6 gap-y-4 p-6 sm:p-8">
       <VerdictRing
         size="lg"
@@ -111,7 +124,7 @@ const problem = computed(() => {
         :share="partialShare"
         :is-empty="submission.status === 'PD'"
       />
-      <div class="min-w-0 flex-1 basis-40">
+      <div class="order-1 min-w-0 flex-1 basis-40 @xl:order-none">
         <p v-if="isLive" data-testid="grading-line" class="flex items-center gap-2 text-sm">
           <span
             aria-hidden="true"
@@ -122,18 +135,15 @@ const problem = computed(() => {
         <p v-else class="text-sm"><VerdictLabel :verdict="verdict" /></p>
         <p
           data-testid="score"
-          class="mt-1 font-mono text-score leading-none font-semibold tabular-nums"
+          class="mt-1 font-mono text-xl leading-none font-semibold tabular-nums"
         >
-          <SkeletonBlock v-if="isProblemLoading" text class="w-40" />
-          <template v-else-if="contestScore"
-            >{{ contestScore.points }}
-            <span class="text-2xl whitespace-nowrap text-muted">{{ contestOutOf }}</span></template
-          >
-          <template v-else
-            >{{ score }}{{ ' '
-            }}<span v-if="maxScore" class="text-2xl whitespace-nowrap text-muted"
-              >/ {{ maxScore }}</span
-            ></template
+          <span class="text-score">
+            <SkeletonBlock v-if="isProblemLoading" text class="w-40" />
+            <template v-else>{{ scoreText.value }}</template>
+          </span>
+          <template v-if="!isProblemLoading && scoreText.outOf"
+            >{{ ' '
+            }}<span class="whitespace-nowrap text-muted">{{ scoreText.outOf }}</span></template
           >
         </p>
         <p v-if="isProvisional" data-testid="provisional" class="text-meta text-muted">
@@ -148,16 +158,16 @@ const problem = computed(() => {
         v-if="!isFinished"
         data-testid="judging-bit"
         kind="judging"
-        class="ml-auto self-start [--bit-px:4px] sm:self-center sm:[--bit-px:6px]"
+        class="ml-auto [--bit-px:4px] @2xl:[--bit-px:6px]"
       />
       <BitMascot
         v-else-if="bit"
         :look="bit.look"
         :label="$t(bit.labelKey)"
         :closed-eyes="bit.eyesShut"
-        class="ml-auto self-start [--bit-px:4px] sm:self-center sm:[--bit-px:6px]"
+        class="ml-auto [--bit-px:4px] @2xl:[--bit-px:6px]"
       />
-      <div v-if="problem" class="flex w-full flex-wrap gap-2">
+      <div v-if="problem" class="order-2 flex w-full flex-wrap gap-2 @xl:order-none">
         <AppButton
           :tone="canResubmit ? 'secondary' : 'primary'"
           :to="{ name: 'problem', params: { code: problem } }"
