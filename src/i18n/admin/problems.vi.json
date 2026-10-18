@@ -149,7 +149,7 @@
     "suggesterPending": "đang chờ duyệt",
     "orgSite": "Trang chính (không thuộc tổ chức nào)",
     "orgAdd": "Thêm vào tổ chức…",
-    "orgMoveHint": "Bạn chỉ thêm hoặc bỏ được tổ chức mình quản trị.",
+    "orgMoveHint": "Bạn chỉ thêm hoặc bỏ được tổ chức mà bạn có quyền tạo bài tập.",
     "orgNotManaged": "Bạn không quản trị {name} nên không bỏ được.",
     "orgSiteNeeds": "Hãy thêm tổ chức mới trước khi lưu: đưa bài về trang chính cần quyền “Tạo bài”."
   },

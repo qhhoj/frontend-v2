@@ -30,6 +30,10 @@ const form = ref(emptyContestForm());
  */
 const owner = ref<CreationOwner | null>(null);
 const isOwnerReady = ref(false);
+/** The picker is not ready while it loads and while there is nowhere to create; the save bar says so instead of doing nothing. */
+const ownerBlockedText = computed(() =>
+  isOwnerReady.value ? undefined : translate('admin.contests.create.ownerBlocked'),
+);
 const localErrors = computed(() => checkContestForm(form.value));
 /** Errors show once a save was tried, not while the first field is still being typed. */
 const hasTried = ref(false);
@@ -85,9 +89,12 @@ async function create() {
         allow-clean
         :pending="mutation.isPending.value"
         :save-label="$t('admin.contests.create.submit')"
+        :blocked-reason="ownerBlockedText"
       >
         <template #status>
-          <span class="text-muted">{{ $t('admin.contests.create.required') }}</span>
+          <span class="text-muted">{{
+            ownerBlockedText ?? $t('admin.contests.create.required')
+          }}</span>
         </template>
         <template #actions>
           <RouterLink :to="{ name: 'admin-contests' }" :class="buttonClass('ghost')">

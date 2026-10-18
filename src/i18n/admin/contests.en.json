@@ -272,6 +272,7 @@
     "submit": "Create contest",
     "lead": "Fill in the details and the times; everything else can be changed later. Next: add problems.",
     "required": "Fields marked * are required.",
+    "ownerBlocked": "Nowhere to create the contest yet: see “Belongs to”.",
     "cancel": "Cancel",
     "done": "Created contest {key}. Next: add problems."
   },

@@ -7,7 +7,22 @@
     "site": "No organization",
     "privateHint": "Only the organization's members see it, until you publish it.",
     "siteHint": "A site problem, hidden until you publish it.",
-    "chooseHint": "Pick an organization if only its members should take part."
+    "chooseHint": "Pick an organization if only its members should take part.",
+    "none": {
+      "problem": {
+        "title": "No organization to create a problem in",
+        "body": "Only an organization's administrators who may create organization problems can create there. Your account does not qualify in any organization."
+      },
+      "contest": {
+        "title": "No organization to create a contest in",
+        "body": "Only an organization's administrators who may create private contests can create there. Your account does not qualify in any organization."
+      },
+      "action": "See organizations"
+    },
+    "failed": {
+      "title": "Could not load the organizations",
+      "body": "Check your connection and try again."
+    }
   },
   "problem": {
     "timeHint": "Seconds, e.g. 1.",
