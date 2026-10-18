@@ -33,9 +33,9 @@ import { isProblemDeleted } from './deleted-problem';
 import CompareWithForm from './CompareWithForm.vue';
 import { submissionShortId } from './submission-short-id';
 
-/** P-11: the result, the tests and the source in the main column; the facts beside it from lg, after it below. */
-const LAYOUT = 'grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start';
-const MAIN = 'flex min-w-0 flex-col gap-5';
+/** The score card (staff actions inside) beside the facts card from lg; the tests and the source below, full width. */
+const SUMMARY = 'grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]';
+const STACK = 'flex min-w-0 flex-col gap-5';
 
 const route = useRoute();
 const locale = useLocaleStore();
@@ -113,17 +113,15 @@ const verdict = computed(() => {
       @retry="query.refetch()"
     >
       <template #skeleton>
-        <div :class="LAYOUT">
-          <div :class="MAIN">
-            <SubmissionHeroSkeleton />
-            <CasesTableSkeleton />
-            <SourceViewSkeleton />
-          </div>
+        <div :class="SUMMARY">
+          <SubmissionHeroSkeleton />
           <SubmissionFactsSkeleton />
         </div>
+        <CasesTableSkeleton />
+        <SourceViewSkeleton />
       </template>
-      <div v-if="row && verdict" :class="LAYOUT">
-        <div :class="MAIN">
+      <div v-if="row && verdict" :class="STACK">
+        <div :class="SUMMARY">
           <SubmissionHero
             :submission="row"
             :verdict="verdict"
@@ -131,53 +129,54 @@ const verdict = computed(() => {
             :is-problem-loading="problemQuery.isLoading.value"
             :is-live="isLive"
             :can-resubmit="canResubmit"
-          />
-          <p
-            v-if="live.stale"
-            data-testid="stale-reload"
-            class="flex flex-wrap items-center gap-3 text-sm text-muted"
           >
-            <InlineBit kind="sweat" />
-            {{ $t('submission.staleReload') }}
-            <AppButton @click="refollow()">
-              {{ $t('submission.reload') }}
-            </AppButton>
-          </p>
-          <InternalErrorNotice v-if="row.status === 'IE'" :message="row.error" />
-          <SubmissionExternalRun v-if="row.externalRun" :run="row.externalRun" />
-          <SubmissionStaffPanel :submission="row" />
-          <DeletedProblemNotice v-if="isDeletedProblem" :name="row.problem?.name ?? ''" />
-          <CasesTable
-            v-else
-            :cases="row.cases"
-            :batches="row.batches"
-            :total-cases="row.totalCases"
-            :running="isLive"
-            :compile-error="row.status === 'CE' ? row.error : null"
-            :compile-log-hidden="row.status === 'CE' && !row.error"
-          >
-            <template #footer>
-              <TestOverview
-                :cases="row.cases"
-                :batches="row.batches"
-                :points="row.points"
-                :problem-points="row.problem?.points ?? null"
-                :case-points="row.casePoints"
-                :case-total="row.caseTotal"
-                :running="isLive"
-              />
-            </template>
-          </CasesTable>
-          <SourceView
-            :id="row.id"
-            :access="row.sourceAccess"
-            :language-key="row.language?.key ?? null"
-            :language-name="row.language?.name ?? null"
-          >
-            <CompareWithForm :current-id="row.id" />
-          </SourceView>
+            <SubmissionStaffPanel :submission="row" />
+          </SubmissionHero>
+          <SubmissionFacts :submission="row" :problem-name="problemName" />
         </div>
-        <SubmissionFacts :submission="row" :problem-name="problemName" />
+        <p
+          v-if="live.stale"
+          data-testid="stale-reload"
+          class="flex flex-wrap items-center gap-3 text-sm text-muted"
+        >
+          <InlineBit kind="sweat" />
+          {{ $t('submission.staleReload') }}
+          <AppButton @click="refollow()">
+            {{ $t('submission.reload') }}
+          </AppButton>
+        </p>
+        <InternalErrorNotice v-if="row.status === 'IE'" :message="row.error" />
+        <SubmissionExternalRun v-if="row.externalRun" :run="row.externalRun" />
+        <DeletedProblemNotice v-if="isDeletedProblem" :name="row.problem?.name ?? ''" />
+        <CasesTable
+          v-else
+          :cases="row.cases"
+          :batches="row.batches"
+          :total-cases="row.totalCases"
+          :running="isLive"
+          :compile-error="row.status === 'CE' ? row.error : null"
+          :compile-log-hidden="row.status === 'CE' && !row.error"
+        >
+          <template #footer>
+            <TestOverview
+              :cases="row.cases"
+              :batches="row.batches"
+              :points="row.points"
+              :problem-points="row.problem?.points ?? null"
+              :case-points="row.casePoints"
+              :case-total="row.caseTotal"
+              :running="isLive"
+            />
+          </template>
+        </CasesTable>
+        <SourceView
+          :id="row.id"
+          :access="row.sourceAccess"
+          :language-key="row.language?.key ?? null"
+          :language-name="row.language?.name ?? null"
+        >
+          <CompareWithForm :current-id="row.id" />
+        </SourceView>
       </div>
     </QueryState>
   </div>
