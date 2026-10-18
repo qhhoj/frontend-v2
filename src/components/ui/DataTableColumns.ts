@@ -17,6 +17,9 @@ export interface ColumnSort {
   clears?: boolean;
 }
 
+/** Whole class names, so Tailwind finds them. */
+const HIDE_BELOW = { md: 'max-md:hidden', lg: 'max-lg:hidden', xl: 'max-xl:hidden' } as const;
+
 export interface DataTableColumn {
   key: string;
   label: string;
@@ -34,7 +37,13 @@ export interface DataTableColumn {
   stacked?: boolean;
   /** Extra classes on this column's cells (a width, `max-w-48 truncate`). */
   cellClass?: string;
+  /** Table only: the column (header, cells, skeleton) is hidden below this breakpoint, so a minor column cannot squeeze the primary one. Not for a pinned column. */
+  hideBelow?: keyof typeof HIDE_BELOW;
 }
+
+/** The class that hides a `hideBelow` column in the table, if it has one. */
+export const hiddenClass = (column: Pick<DataTableColumn, 'hideBelow'>) =>
+  column.hideBelow && HIDE_BELOW[column.hideBelow];
 
 /** The sort value after a header click: the first direction, then the other, then (`clears`) none, else flipping. */
 export function nextSort(sort: ColumnSort, current: string | undefined): string | undefined {

@@ -125,6 +125,25 @@ describe('DataTable', () => {
     expect(second!.classes()).not.toContain('sticky');
   });
 
+  it('hides a hideBelow column in the header, every row and the skeleton alike, and only that column', () => {
+    const columns: DataTableColumn[] = [
+      ...COLUMNS,
+      { key: 'note', label: 'Ghi chú', hideBelow: 'lg' },
+    ];
+    /** The column index of every hidden header or body cell. */
+    const hiddenIndexes = (wrapper: ReturnType<typeof mountComponent>) =>
+      wrapper
+        .findAll('th, td')
+        .filter((cell) => cell.classes().includes('max-lg:hidden'))
+        .map((cell) => (cell.element as HTMLTableCellElement).cellIndex);
+    const loaded = mountComponent(DataTable, { props: { ...BASE, columns } });
+    expect(hiddenIndexes(loaded)).toEqual([2, 2, 2]);
+    const loading = mountComponent(DataTable, {
+      props: { ...BASE, columns, loading: true, skeletonRows: 2 },
+    });
+    expect(hiddenIndexes(loading)).toEqual([2, 2, 2]);
+  });
+
   it('keeps a footer slot in place of the built-in pager', () => {
     const wrapper = mountComponent(DataTable, {
       props: BASE,

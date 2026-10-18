@@ -59,11 +59,17 @@ const REGION_ORDER = {
   submitLast: 'order-5',
 } as const;
 
-/** Everything that differs between the two layouts, so the template reads the same for both. */
+/**
+ * Everything that differs between the layouts, so the template reads the same for all. `versionsLink` is the link to the
+ * runtimes page: beside the language on the dock and full screen, on its own line under the picker and the upload button
+ * on the sheet (a grid: the picker takes the row's width, whether or not the upload button is there), so the picker stays
+ * usable on a 320 px phone.
+ */
 const LAYOUTS = {
   dock: {
     form: 'flex flex-wrap items-center gap-x-3 gap-y-2',
-    languageRow: '',
+    languageRow: 'flex items-center gap-x-2',
+    versionsLink: 'shrink-0',
     body: 'basis-full',
     editor: 'max-h-[30dvh] overflow-auto rounded-tile',
     editorMinLines: 4,
@@ -74,7 +80,8 @@ const LAYOUTS = {
   },
   sheet: {
     form: 'flex min-h-0 flex-1 flex-col gap-3',
-    languageRow: 'w-full',
+    languageRow: 'grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-y-1',
+    versionsLink: 'col-span-2 justify-self-start',
     body: 'flex min-h-0 flex-1 flex-col',
     editor: 'min-h-0 flex-1 overflow-auto rounded-tile',
     editorMinLines: 6,
@@ -85,7 +92,8 @@ const LAYOUTS = {
   },
   full: {
     form: 'flex h-full min-h-0 flex-col gap-3',
-    languageRow: '',
+    languageRow: 'flex items-center gap-x-2',
+    versionsLink: 'shrink-0',
     body: 'flex min-h-0 flex-1 flex-col',
     editor: 'min-h-0 flex-1 overflow-auto rounded-tile',
     editorMinLines: 6,
@@ -119,7 +127,7 @@ const hasSourceUpload = computed(() => !state.fileMode);
       >
         {{ problem.name }}
       </h2>
-      <div class="flex items-center gap-2" :class="[REGION_ORDER.languageRow, classes.languageRow]">
+      <div :class="[REGION_ORDER.languageRow, classes.languageRow]">
         <LanguagePicker
           :languages="problem.allowedLanguages"
           :selected-id="state.languageId"
@@ -127,17 +135,19 @@ const hasSourceUpload = computed(() => !state.fileMode);
           :is-sheet="isSheet"
           @pick="state.setLanguage"
         />
-        <RouterLink
-          :to="{ name: 'runtimes' }"
-          data-testid="runtimes-link"
-          class="inline-flex min-h-11 shrink-0 items-center text-sm text-accent-text underline"
-          >{{ $t('submit.versions') }}</RouterLink
-        >
         <SourceUploadButton
           v-if="isSheet && hasSourceUpload"
           icon-only
+          class="ml-2"
           @pick="(file) => state.loadFile(file)"
         />
+        <RouterLink
+          :to="{ name: 'runtimes' }"
+          data-testid="runtimes-link"
+          class="inline-flex min-h-11 items-center text-sm text-accent-text underline"
+          :class="classes.versionsLink"
+          >{{ $t('submit.versions') }}</RouterLink
+        >
       </div>
       <span v-if="state.languageLimits" :class="REGION_ORDER.info" class="text-sm text-muted">{{
         $t('submit.limits', {

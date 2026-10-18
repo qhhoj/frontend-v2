@@ -3,9 +3,11 @@ import { problemDetail, scratchLanguage } from '../src/test/fixtures';
 import { expect, test } from './fixtures/api';
 import type { FakeApi } from './fixtures/api';
 
-const PHONE_WIDTHS = [375, 320];
+const PHONE_WIDTHS = [390, 375, 360, 320];
 const PHONE_HEIGHT = 812;
 const MIN_TOUCH_TARGET_PX = 44;
+/** Room for the language's name beside its token and chevron: a picker squeezed to its icon cannot be read or picked. */
+const MIN_PICKER_WIDTH_PX = 120;
 const LONG_STATEMENT = Array.from(
   { length: 40 },
   (_unused, line) => `<p>Dòng ${line + 1} của đề bài.</p>`,
@@ -65,12 +67,30 @@ for (const width of PHONE_WIDTHS)
         sheet.getByRole('button', { name: 'Nộp bài' }),
         sheet.getByRole('combobox', { name: 'Ngôn ngữ' }),
         sheet.locator('label', { hasText: 'Tải tệp lên' }),
+        sheet.getByTestId('runtimes-link'),
       ])
         await expectTouchTarget(control);
       await expect(sheet.getByRole('button', { name: 'Nộp bài' })).toBeInViewport();
       await page.keyboard.press('Escape');
       await expect(sheetOf(page)).toHaveCount(0);
       await expect(page.getByRole('button', { name: 'Mở rộng' })).toBeFocused();
+    });
+
+    test('gives the language picker usable width, with the runtimes link under the row', async ({
+      page,
+      api,
+    }) => {
+      await openProblem(page, api, width);
+      await page.getByRole('button', { name: 'Mở rộng' }).click();
+      const sheet = sheetOf(page);
+      const picker = await boxOf(sheet.getByRole('combobox', { name: 'Ngôn ngữ' }));
+      const upload = await boxOf(sheet.locator('label', { hasText: 'Tải tệp lên' }));
+      const link = await boxOf(sheet.getByTestId('runtimes-link'));
+      expect(picker.width).toBeGreaterThanOrEqual(MIN_PICKER_WIDTH_PX);
+      expect(upload.x).toBeGreaterThan(picker.x + picker.width);
+      expect(link.y).toBeGreaterThanOrEqual(
+        Math.max(picker.y + picker.height, upload.y + upload.height),
+      );
     });
 
     test('keeps the file-only state inside the sheet without sideways scroll', async ({

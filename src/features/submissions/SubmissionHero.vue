@@ -135,7 +135,7 @@ const problem = computed(() => {
         <p v-else class="text-sm"><VerdictLabel :verdict="verdict" /></p>
         <p
           data-testid="score"
-          class="mt-1 font-mono text-xl leading-none font-semibold tabular-nums"
+          class="mt-1 font-mono text-section leading-none font-semibold tabular-nums"
         >
           <span class="text-score">
             <SkeletonBlock v-if="isProblemLoading" text class="w-40" />

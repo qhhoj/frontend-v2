@@ -233,6 +233,23 @@ describe('problem list', () => {
     expect(wrapper.findAll('tbody svg[role="img"]')).toHaveLength(0);
   });
 
+  it("repeats a problem's types under its name for the table that hides the types column, leaving out the catch-all type", async () => {
+    const uncategorized = { id: 'type-uncat', name: 'uncategorized', fullName: 'Chưa phân loại' };
+    const [lis, , dpbitree] = threeProblems;
+    mockApi(
+      anonymous(
+        page([
+          { ...lis!, types: [...lis!.types, uncategorized] },
+          { ...dpbitree!, types: [uncategorized] },
+        ]),
+      ),
+    );
+    const { wrapper } = await mountApp('/problems');
+    const [typed, untyped] = wrapper.findAll('tbody tr').map((row) => row.get('td').text());
+    expect(typed).toMatch(/lis · Quy hoạch động$/);
+    expect(untyped).toMatch(/dpbitree$/);
+  });
+
   it('opens a problem from a click anywhere in its row, but not at the end of a text selection', async () => {
     mockApi({
       ...anonymous(),

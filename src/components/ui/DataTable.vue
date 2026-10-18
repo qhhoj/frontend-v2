@@ -14,7 +14,7 @@ import { CARD_VARIANTS } from './Card.variants';
 import { useRowOpen } from './use-row-open';
 import AdminBulkBar from '@/features/admin/ui/table/AdminBulkBar.vue';
 import DataTableCheckbox from './DataTableCheckbox.vue';
-import { ariaSortOf, nextSort, rangeOf, stickyOffsets } from './DataTableColumns';
+import { ariaSortOf, hiddenClass, nextSort, rangeOf, stickyOffsets } from './DataTableColumns';
 import type { DataTableColumn } from './DataTableColumns';
 
 /**
@@ -282,7 +282,13 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                 v-for="column in columns"
                 :key="column.key"
                 scope="col"
-                :class="[HEAD_CELL, HEAD_TEXT, alignClass(column), growClass(column)]"
+                :class="[
+                  HEAD_CELL,
+                  HEAD_TEXT,
+                  alignClass(column),
+                  growClass(column),
+                  hiddenClass(column),
+                ]"
               >
                 <SkeletonBlock v-if="!column.hideLabel" text class="w-12 max-w-full" />
               </th>
@@ -295,7 +301,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
               <td
                 v-for="column in columns"
                 :key="column.key"
-                :class="[CELL, alignClass(column), growClass(column)]"
+                :class="[CELL, alignClass(column), growClass(column), hiddenClass(column)]"
               >
                 <SkeletonBlock text :class="skeletonWidth(column)" />
               </td>
@@ -460,6 +466,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                     HEAD_TEXT,
                     headPin(index + offset).class,
                     column.align === 'end' ? 'text-right' : 'text-left',
+                    hiddenClass(column),
                   ]"
                   :style="headPin(index + offset).style"
                 >
@@ -522,6 +529,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                     alignClass(column),
                     growClass(column),
                     column.cellClass,
+                    hiddenClass(column),
                     bodyPin(index + offset)?.class,
                   ]"
                   :style="bodyPin(index + offset)?.style"

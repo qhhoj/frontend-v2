@@ -58,6 +58,7 @@ const columns = computed<DataTableColumn[]>(() => [
   {
     key: 'types',
     label: t('problems.columns.types'),
+    hideBelow: 'lg',
     cellClass: 'w-64 max-w-64 truncate text-caption text-muted',
   },
   {
@@ -82,11 +83,14 @@ const columns = computed<DataTableColumn[]>(() => [
 const changeSort = (value: string | undefined) =>
   emit('sort', value !== undefined && isProblemSort(value) ? value : null);
 
-/** The catch-all type says nothing in a list: a problem with no other type shows a dash. */
-const typesText = (problem: ProblemListItem) => {
-  const named = problem.types.filter((type) => type.name !== UNCATEGORIZED_TYPE_NAME);
-  return named.length ? named.map((type) => problemTypeLabel(type)).join(', ') : '—';
-};
+/** The catch-all type says nothing in a list, so it is left out. */
+const namedTypes = (problem: ProblemListItem) =>
+  problem.types
+    .filter((type) => type.name !== UNCATEGORIZED_TYPE_NAME)
+    .map((type) => problemTypeLabel(type))
+    .join(', ');
+/** The types column: a problem with no other type shows a dash. */
+const typesText = (problem: ProblemListItem) => namedTypes(problem) || '—';
 const pointsText = (problem: ProblemListItem) =>
   formatProblemPoints(problem.points, problem.partial, locale.locale);
 </script>
@@ -122,7 +126,11 @@ const pointsText = (problem: ProblemListItem) =>
         class="block truncate font-medium text-content hover:text-accent-text"
         >{{ row.name }}</RouterLink
       >
-      <span class="font-mono text-caption text-muted">{{ row.code }}</span>
+      <span class="block truncate text-caption text-muted">
+        <span class="font-mono">{{ row.code }}</span>
+        <!-- Below `lg` the types column is hidden, so the name does not truncate: its types go on this line. -->
+        <span v-if="namedTypes(row)" class="lg:hidden"> · {{ namedTypes(row) }}</span>
+      </span>
     </template>
     <template #cell-types="{ row }">{{ typesText(row) }}</template>
     <template #cell-points="{ row }">

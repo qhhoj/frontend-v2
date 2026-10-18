@@ -9,7 +9,11 @@ import { useSessionStore } from '@/stores/session.store';
 import { rankLocation, rowAnchor } from './leaderboard-columns';
 import { revealRow } from './reveal-row';
 
-/** The signed-in viewer's rank on this sort as one inline "· Your rank: 123" that scrolls to their row. Nothing while loading, when the account is not on the board, or when the request fails. */
+/**
+ * The signed-in viewer's rank on this sort as one inline "· Your rank: 123" that scrolls to their row. Nothing while loading,
+ * when the account is not on the board, or when the request fails. On a coarse pointer the button is 44 px tall, and its
+ * negative margin keeps the sentence's line as tall as before.
+ */
 const props = defineProps<{ sort: LeaderboardSort }>();
 const session = useSessionStore();
 const router = useRouter();
@@ -29,7 +33,7 @@ const findMe = async () => {
     ·
     <button
       type="button"
-      class="font-semibold text-accent-text hover:underline"
+      class="inline-flex items-center font-semibold text-accent-text hover:underline pointer-coarse:-my-3 pointer-coarse:min-h-11"
       :aria-label="$t('leaderboard.findMe')"
       @click="findMe"
     >
