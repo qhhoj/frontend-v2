@@ -122,6 +122,7 @@ export const editableContest = (overrides: Partial<EditableContest> = {}): Edita
     isCurrent: false,
     liveStatus: null,
     liveParticipation: null,
+    ratingChange: null,
   },
   settings: contestSettings(),
   ...overrides,
