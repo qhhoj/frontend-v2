@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import PillTabs, { type PillTab } from '@/components/PillTabs.vue';
-import { useUserSubmissionCountQuery } from '@/features/users/users.queries';
+import { useUserPageQuery } from '@/features/users/users.queries';
 import { formatNumber } from '@/lib/format';
 import { hasPermission } from '@/lib/permissions';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -13,7 +13,8 @@ const props = defineProps<{ username: string }>();
 const session = useSessionStore();
 const locale = useLocaleStore();
 const { t } = useI18n();
-const { data: submissionCount } = useUserSubmissionCountQuery(() => props.username);
+/** The user page (already loaded by the profile header) carries the count the viewer may see. */
+const { data: user } = useUserPageQuery(() => props.username);
 
 const tabOf = (route: string, key: string): PillTab => ({
   key: route,
@@ -22,7 +23,7 @@ const tabOf = (route: string, key: string): PillTab => ({
 });
 /** P-07 A: the user's submissions are one tap away, on the site list filtered to them, with their count. */
 const submissionsTab = computed<PillTab>(() => {
-  const count = submissionCount.value;
+  const count = user.value?.submissionCount;
   const text = count == null ? null : formatNumber(count, locale.locale);
   return {
     key: 'submissions',

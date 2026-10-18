@@ -14,7 +14,6 @@ import {
   fetchUserPage,
   fetchUserPosts,
 } from '@/api/users.api';
-import { fetchSubmissions } from '@/api/submissions.api';
 import { useViewerId } from '@/stores/use-viewer-id';
 
 /** Idle while `username` is empty (anonymous viewer). The answer lists organizations by the viewer's rights. */
@@ -109,17 +108,5 @@ export const useUserCommentsQuery = (username: MaybeRefOrGetter<string>) => {
     queryFn: ({ pageParam }) => fetchUserComments(toValue(username), pageParam),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.meta.nextBefore ?? undefined,
-  });
-};
-
-/** P-07: how many submissions the viewer may see from this user (the total of `/submissions?user=`), or null when the page has no total. */
-export const useUserSubmissionCountQuery = (username: MaybeRefOrGetter<string>) => {
-  const viewer = useViewerId();
-  const query = computed(() => ({ user: toValue(username), pageSize: 1 }));
-  return useQuery({
-    // What a viewer may see depends on who asks, so the viewer is part of the key.
-    queryKey: computed(() => ['submissions', 'list', 'count', query.value, viewer.value]),
-    queryFn: () => fetchSubmissions(query.value),
-    select: (result) => ('total' in result.meta ? result.meta.total : null),
   });
 };

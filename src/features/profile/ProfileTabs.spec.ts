@@ -74,8 +74,8 @@ describe('profile tabs', () => {
     const tab = wrapper.get('a[href="/submissions?user=user_01"]');
     expect(tab.text()).toContain('Bài nộp');
     expect(tab.get('[data-testid="tab-badge"]').text()).toContain('38');
-    const counted = calls.find((call) => call.path === '/submissions')!;
-    expect([counted.query.get('user'), counted.query.get('pageSize')]).toEqual(['user_01', '1']);
+    // The count comes with the user page: no list request of its own.
+    expect(calls.some((call) => call.path === '/submissions')).toBe(false);
   });
   it('gives a full-score chip the accepted tone and a partial one the neutral tone, with one decimal when fractional', async () => {
     mockApi({
