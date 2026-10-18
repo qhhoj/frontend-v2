@@ -20,8 +20,8 @@ const Host = defineComponent({
       { default: () => h('p', 'Hồ sơ') },
     ),
     h(ConfirmDialog, {
-      title: 'Xoá?',
-      confirmLabel: 'Xoá',
+      title: 'Xóa?',
+      confirmLabel: 'Xóa',
       visible: isConfirming.value,
       'onUpdate:visible': (next: boolean) => (isConfirming.value = next),
     }),

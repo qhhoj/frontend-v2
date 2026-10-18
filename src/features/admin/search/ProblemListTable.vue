@@ -18,7 +18,7 @@ import HighlightedText from './HighlightedText.vue';
 
 /**
  * One page of the staff problem list (`tr[data-code]`, a card per problem on phones): sortable Bài / Điểm / Ngày đăng
- * headers bound to `?sort=`; the title opens the editor and "⋯" holds Xem · Nhân bản… · Xoá… (the admin row contract).
+ * headers bound to `?sort=`; the title opens the editor and "⋯" holds Xem · Nhân bản… · Xóa… (the admin row contract).
  * Points read as a plain number; the "từng phần" chip sits with the status chips. `toolbar` and `bulk` pass through.
  */
 defineProps<{

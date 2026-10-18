@@ -107,7 +107,7 @@ describe('ContestList', () => {
       'Xem trang công khai',
       'Nhân bản…',
       'Bảng xếp hạng',
-      expect.stringContaining('Xoá…'),
+      expect.stringContaining('Xóa…'),
     ]);
     expect(items.at(-1)).toMatchObject({ disabled: true });
     expect(items.at(-1)!.text).toContain('Hãy ẩn kỳ thi');

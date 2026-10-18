@@ -200,7 +200,6 @@
     "button": "Delete organization",
     "dialogTitle": "Delete {name}?",
     "typeSlug": "Type the address {slug} to confirm",
-    "confirm": "Delete",
     "done": "Deleted the organization {slug}"
   },
   "detail": {

@@ -98,7 +98,6 @@ const MENU_ITEM =
       v-model:visible="isAnonymousConfirmOpen"
       :title="$t('admin.activity.confirm.anonymousTitle')"
       :body="$t('admin.activity.confirm.anonymousBody')"
-      :confirm-label="$t('admin.activity.confirm.delete')"
       tone="danger"
       :busy="anonymousRemoval.isPending.value"
       @confirm="anonymousRemoval.run()"

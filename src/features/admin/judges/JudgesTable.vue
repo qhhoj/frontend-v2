@@ -17,7 +17,7 @@ import { pingMs } from './judge-stats';
 import { JUDGE_SEARCH_ID } from './judges.queries';
 
 /**
- * The judges list: one visible row action (Tắt / Bật lại), the rest in ⋯ with Chặn and Xoá last. Each row keeps
+ * The judges list: one visible row action (Tắt / Bật lại), the rest in ⋯ with Chặn and Xóa last. Each row keeps
  * `data-testid="judge-row"`; below 768 px the rows are cards.
  */
 defineProps<{ judges: Judge[]; filtered: boolean; isBusy: boolean }>();
@@ -48,7 +48,7 @@ const pingText = (judge: Judge) => {
   return ms === null ? t('admin.judges.stats.noLoad') : t('admin.judges.row.ping', { ms });
 };
 
-/** Chặn and Xoá are the destructive ones (listed last, in red); Xoá exists only for a judge that is not connected. */
+/** Chặn and Xóa are the destructive ones (listed last, in red); Xóa exists only for a judge that is not connected. */
 function menuOf(judge: Judge): RowMenuItem[] {
   const item = (action: JudgeAction, label: string, icon: Component, danger = false) => ({
     label,

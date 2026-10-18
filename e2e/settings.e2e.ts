@@ -138,11 +138,11 @@ test('security keys: a virtual authenticator registers a key that then lists', a
   // WebAuthn refuses an IP address as the relying-party host: the page is opened as `localhost` on the same server.
   const { port } = new URL(String(testInfo.project.use.baseURL));
   await page.goto(`http://localhost:${port}/settings/security`);
-  await page.getByRole('button', { name: 'Thêm khoá' }).click();
+  await page.getByRole('button', { name: 'Thêm khóa' }).click();
   const form = page.locator('form[data-step="add-key"]');
-  await form.getByLabel('Tên khoá').fill('YubiKey 5C');
+  await form.getByLabel('Tên khóa').fill('YubiKey 5C');
   await form.getByLabel('Mật khẩu hiện tại').fill('mật khẩu');
-  await page.getByRole('button', { name: 'Đăng ký khoá' }).click();
-  await expect(page.locator('#main').getByRole('status')).toHaveText('Đã thêm khoá YubiKey 5C.');
-  await expect(page.getByRole('button', { name: 'Xoá YubiKey 5C' })).toBeVisible();
+  await page.getByRole('button', { name: 'Đăng ký khóa' }).click();
+  await expect(page.locator('#main').getByRole('status')).toHaveText('Đã thêm khóa YubiKey 5C.');
+  await expect(page.getByRole('button', { name: 'Xóa YubiKey 5C' })).toBeVisible();
 });

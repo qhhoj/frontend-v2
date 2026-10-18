@@ -32,7 +32,7 @@
       "suggested": "Đã gửi đề xuất {code}.",
       "required": "Các mục có * là bắt buộc.",
       "createdToast": "Đã tạo bài {code}.",
-      "cancel": "Huỷ"
+      "cancel": "Hủy"
     },
     "sections": {
       "basics": "Thông tin thêm",
@@ -413,8 +413,8 @@
       "checkerFile": "Tệp checker (.cpp, .pas, .java)",
       "checkerFileMissing": "Chưa có tệp checker. Bài sẽ không chấm được cho tới khi tải lên.",
       "percentage": "Điểm checker là phần trăm",
-      "percentageHint": "Bật: \"points 50\" là 50% điểm test. Tắt: \"points N\" là N điểm của test.",
-      "themisHint": "Checker tìm file theo tên trong mã nguồn của nó và theo tên file vào/ra bên dưới. Nếu checker dùng tên file của bài, chọn \"Qua file\".",
+      "percentageHint": "Bật: “points 50” là 50% điểm test. Tắt: “points N” là N điểm của test.",
+      "themisHint": "Checker tìm file theo tên trong mã nguồn của nó và theo tên file vào/ra bên dưới. Nếu checker dùng tên file của bài, chọn “Qua file”.",
       "graderTitle": "Cách chạy bài",
       "graderDescription": "Bài nộp đọc dữ liệu và trả kết quả như thế nào.",
       "graderLegend": "Kiểu bài",
@@ -457,12 +457,12 @@
       "headerFile": "Header (.h)",
       "allowMain": "Cho phép thí sinh tự viết main",
       "allowMainHint": "Tắt: bài nộp có hàm main sẽ bị từ chối.",
-      "advancedTitle": "Tuỳ chọn nâng cao",
+      "advancedTitle": "Tùy chọn nâng cao",
       "advancedDescription": "Hiếm khi cần đổi.",
       "outputLimitHint": "Số byte output tối đa. Để trống: mặc định của máy chấm.",
       "outputPrefixHint": "Số byte đầu của output được lưu để xem lại.",
       "unicodeHint": "Coi khoảng trắng Unicode là khoảng trắng khi so sánh.",
-      "nobigmathHint": "Máy chấm hiện tại chưa hỗ trợ; bài bật tuỳ chọn này sẽ không chấm được.",
+      "nobigmathHint": "Máy chấm hiện tại chưa hỗ trợ; bài bật tùy chọn này sẽ không chấm được.",
       "errors": {
         "precision": "Nhập số nguyên từ 0 đến {max}.",
         "weights": "Cần ít nhất một dòng có điểm lớn hơn 0.",
@@ -478,8 +478,8 @@
         "reason": "Lý do"
       },
       "checkerOptionsTitle": "Trình chấm chi tiết",
-      "checkerOptionsDescription": "Quy tắc so sánh và các tuỳ chọn của nó; loại trình chấm chọn ở tab Cơ bản.",
-      "checkerNoOptions": "Loại trình chấm này không có tuỳ chọn thêm.",
+      "checkerOptionsDescription": "Quy tắc so sánh và các tùy chọn của nó; loại trình chấm chọn ở tab Cơ bản.",
+      "checkerNoOptions": "Loại trình chấm này không có tùy chọn thêm.",
       "ioOtherGrader": "Bài kiểu “{grader}” không đọc input theo cách này. Đổi kiểu bài ở tab Nâng cao."
     },
     "basic": {
@@ -503,8 +503,7 @@
       "replace": "Tải lại",
       "remove": "Xóa {name}",
       "removeTitle": "Xóa {name}?",
-      "removeBody": "Bài sẽ không dùng tệp này nữa cho tới khi tải lại.",
-      "removeConfirm": "Xóa"
+      "removeBody": "Bài sẽ không dùng tệp này nữa cho tới khi tải lại."
     }
   },
   "files": {

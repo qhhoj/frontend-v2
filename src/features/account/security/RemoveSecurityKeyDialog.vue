@@ -11,7 +11,7 @@ import { useAuthAction } from '@/features/auth/use-auth-action';
 import { useSessionStore } from '@/stores/session.store';
 import { SECURITY_KEYS_KEY } from './security.queries';
 
-/** Board SetSecurityD "Xoá khoá bảo mật?": the backend wants the current password. */
+/** Board SetSecurityD "Xóa khóa bảo mật?": the backend wants the current password. */
 const props = defineProps<{ securityKey: SecurityKey | null }>();
 const visible = defineModel<boolean>('visible', { required: true });
 const emit = defineEmits<{ removed: [key: SecurityKey] }>();

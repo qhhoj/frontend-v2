@@ -159,7 +159,7 @@ const SCREENS: Screen[] = [
     'GET /problems/deleted',
     (index) => ({
       code: `del${index}`,
-      name: 'Bài đã xoá',
+      name: 'Bài đã xóa',
       daysLeft: 20,
       deletedAt: '2026-10-01T00:00:00Z',
       deletedBy: { id: 'u', rating: null, username: 'bitcoder' },

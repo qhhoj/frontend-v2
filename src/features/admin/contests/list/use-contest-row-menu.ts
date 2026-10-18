@@ -8,7 +8,7 @@ import { deleteBlockedBy } from '../lifecycle/contest-delete';
 
 /**
  * A contest row's "⋯" items, by the admin row contract: Xem · Nhân bản… · (ranking, and the Actions tab where rating runs
- * once a rated contest has ended) · Xoá…, the delete disabled with its reason while the contest is visible.
+ * once a rated contest has ended) · Xóa…, the delete disabled with its reason while the contest is visible.
  */
 export function useContestRowMenu(open: {
   clone: (contest: ContestListItem) => void;

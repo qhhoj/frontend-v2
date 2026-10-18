@@ -46,7 +46,7 @@ const tabs = computed(() => {
 });
 const LIST = { name: 'admin-contests' } as const;
 
-/** The header's "⋯ Thêm": Nhân bản… and Xoá…, the same dialogs as the list's row menu and the Actions tab. */
+/** The header's "⋯ Thêm": Nhân bản… and Xóa…, the same dialogs as the list's row menu and the Actions tab. */
 const router = useRouter();
 const { can } = usePermissions();
 const isCloneOpen = ref(false);

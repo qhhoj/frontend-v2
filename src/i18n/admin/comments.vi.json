@@ -6,7 +6,7 @@
   "reporters": "{count} người báo cáo",
   "chips": {
     "hidden": "Đã ẩn",
-    "deleted": "Đã xoá",
+    "deleted": "Đã xóa",
     "visible": "Đang hiện"
   },
   "resolve": "Đã xử lý",
@@ -95,24 +95,24 @@
     "hint": "Lưu thành một phiên bản mới: tác giả và người kiểm duyệt xem được lịch sử.",
     "save": "Lưu",
     "loading": "Đang tải bình luận…",
-    "loadFailed": "Không tải được bình luận. Có thể nó đã bị xoá hoặc ngoài quyền của bạn.",
+    "loadFailed": "Không tải được bình luận. Có thể nó đã bị xóa hoặc ngoài quyền của bạn.",
     "blank": "Bình luận không được để trống.",
     "tooLong": "Tối đa {max} ký tự.",
     "done": "Đã sửa bình luận."
   },
   "locks": {
-    "title": "Trang khoá bình luận",
-    "lead": "Các trang chỉ người có quyền vượt khoá mới bình luận được, khoá mới nhất trước. Mở khoá để thảo luận lại.",
-    "empty": "Không trang nào đang khoá bình luận.",
-    "unlock": "Mở khoá",
+    "title": "Trang khóa bình luận",
+    "lead": "Các trang chỉ người có quyền vượt khóa mới bình luận được, khóa mới nhất trước. Mở khóa để thảo luận lại.",
+    "empty": "Không trang nào đang khóa bình luận.",
+    "unlock": "Mở khóa",
     "unlocked": "Đã mở lại bình luận ở “{title}”.",
-    "pager": "Trang danh sách khoá",
+    "pager": "Trang danh sách khóa",
     "columns": {
       "page": "Trang",
       "type": "Loại",
       "key": "Mã"
     },
-    "unlockNamed": "Mở khoá {title}"
+    "unlockNamed": "Mở khóa {title}"
   },
   "columns": {
     "comment": "Bình luận",
@@ -126,7 +126,7 @@
     "title": "Bình luận",
     "reports": "Bị báo cáo",
     "all": "Tất cả",
-    "locks": "Trang khoá bình luận",
+    "locks": "Trang khóa bình luận",
     "tabsLabel": "Mục bình luận"
   }
 }

@@ -106,7 +106,6 @@ const menuItems = computed<RowMenuItem[]>(() => [
       v-model:visible="isConfirmOpen"
       :title="$t('admin.contests.announcements.deleteTitle', { title: announcement.title })"
       :body="$t('admin.contests.announcements.deleteBody')"
-      :confirm-label="$t('admin.contests.announcements.delete')"
       tone="danger"
       :return-focus-to="composeHeading"
       :busy="remove.isPending.value"

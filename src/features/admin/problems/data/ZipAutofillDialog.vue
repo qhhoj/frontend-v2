@@ -20,7 +20,7 @@ const props = defineProps<{
   archiveFiles: string[];
   cases: KeyedCase[];
   problemPoints: number | null;
-  /** The dismiss button's text; "Huỷ" by default. */
+  /** The dismiss button's text; "Hủy" by default. */
   dismissLabel?: string;
 }>();
 const emit = defineEmits<{ apply: [rows: KeyedCase[], mode: AutofillMode] }>();

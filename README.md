@@ -30,7 +30,7 @@ API_ORIGIN=http://localhost:3001 npm run dev
 | `npm test`             | Vitest: `*.node.spec.ts` in Node, the other specs in jsdom                                                                                               |
 | `npm run test:scripts` | Vitest: the specs of `scripts/` (api-gen, build helpers)                                                                                                 |
 | `npm run e2e`          | Playwright on :4310 (`E2E_PORT` for parallel runs): builds `dist/`, previews it and answers the API with a fake (`npx playwright install chromium` once) |
-| `npm run lint`         | ESLint, `prettier --check`, `lint:tokens` (no colour literals outside themes)                                                                            |
+| `npm run lint`         | ESLint, `prettier --check`, `lint:tokens` (no colour literals outside themes), `lint:copy` (Vietnamese spelling and quotes in `vi.json`)                 |
 | `npm run typecheck`    | `vue-tsc --build`                                                                                                                                        |
 | `npm run check`        | lint, typecheck, test                                                                                                                                    |
 
@@ -51,6 +51,7 @@ src/
   test/                     Vitest setup, mount and API mocks, fixtures (shared with e2e)
 e2e/                        Playwright specs and the fake API (e2e/fixtures/api.ts)
 scripts/check-tokens.mjs    lint:tokens
+scripts/check-vi-copy.mjs   lint:copy
 design-system/qhhoj/        design notes (Clay & ivory default, Glass optional)
 ```
 

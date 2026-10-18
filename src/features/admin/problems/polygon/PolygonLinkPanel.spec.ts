@@ -33,7 +33,7 @@ describe('PolygonLinkPanel', () => {
     );
     expect(panel.text()).toContain('Tự đồng bộ: bật');
     expect(buttonsOf(panel).some((label) => label.startsWith('Đồng bộ ngay'))).toBe(false);
-    expect(buttonsOf(panel)).not.toContain('Huỷ liên kết');
+    expect(buttonsOf(panel)).not.toContain('Hủy liên kết');
     expect(panel.find('[role="switch"]').exists()).toBe(false);
   });
 
@@ -41,6 +41,6 @@ describe('PolygonLinkPanel', () => {
     const panel = await mountPanel(['judge.sync_polygon_problem']);
     expect(panel.find('[data-testid="polygon-link-read-only"]').exists()).toBe(false);
     expect(buttonsOf(panel).some((label) => label.startsWith('Đồng bộ ngay'))).toBe(true);
-    expect(buttonsOf(panel)).toContain('Huỷ liên kết');
+    expect(buttonsOf(panel)).toContain('Hủy liên kết');
   });
 });

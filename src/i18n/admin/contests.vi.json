@@ -77,7 +77,7 @@
       "hidden": "Đang ẩn",
       "private": "Riêng tư",
       "organization": "Tổ chức",
-      "locked": "Đã khoá chấm",
+      "locked": "Đã khóa chấm",
       "rated": "Có rating",
       "pending": "{count} chờ chấm"
     },
@@ -250,7 +250,7 @@
       "formats": {
         "ioi": "Điểm từng phần theo test; lấy lần nộp cao nhất.",
         "icpc": "Đúng/sai cả bài; xếp theo số bài và thời gian phạt.",
-        "default": "Cộng điểm cao nhất mỗi bài; hoà thì ai xong sớm hơn."
+        "default": "Cộng điểm cao nhất mỗi bài; hòa thì ai xong sớm hơn."
       },
       "otherFormat": "Kỳ thi đang dùng thể thức {format}. Đổi thể thức khác ở tab Nâng cao.",
       "moreFormats": "VNOJ, IOI 2016, Ultimate, Lần nộp cuối và cấu hình thể thức ở tab Nâng cao.",
@@ -272,7 +272,7 @@
     "submit": "Tạo kỳ thi",
     "lead": "Điền thông tin và thời gian; mọi mục khác có thể sửa sau. Sau khi tạo: thêm bài.",
     "required": "Trường có dấu * là bắt buộc.",
-    "cancel": "Huỷ",
+    "cancel": "Hủy",
     "done": "Đã tạo kỳ thi {key}. Tiếp theo: thêm bài."
   },
   "problems": {
@@ -372,7 +372,6 @@
       "remove": "Xóa bảng chính thức",
       "removeTitle": "Xóa bảng xếp hạng chính thức?",
       "removeBody": "Bảng tự động sẽ hiện lại cho mọi người.",
-      "removeConfirm": "Xóa",
       "empty": "Chưa có bảng chính thức."
     },
     "link": {

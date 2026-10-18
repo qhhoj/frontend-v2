@@ -55,7 +55,7 @@ describe('lengthErrors', () => {
       ),
     ).toEqual({
       firstName: 'Tên hiển thị tối đa 30 ký tự (đang dùng 54).',
-      about: 'Phần giới thiệu dài quá 65.536 ký tự. Hãy xoá bớt 376 ký tự.',
+      about: 'Phần giới thiệu dài quá 65.536 ký tự. Hãy xóa bớt 376 ký tự.',
     });
   });
 });

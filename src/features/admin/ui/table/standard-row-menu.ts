@@ -4,7 +4,7 @@ import { translate } from '@/i18n';
 import type { RowMenuItem } from './AdminRowMenu.vue';
 
 /**
- * The admin row contract: the row's title opens its editor; "⋯" lists Xem · Nhân bản… · Xoá…, always in that order and
+ * The admin row contract: the row's title opens its editor; "⋯" lists Xem · Nhân bản… · Xóa…, always in that order and
  * with the same words, then any list-specific `extra` items before the destructive one. An action the account may not
  * take is left out; a delete that is refused for this row (`remove.blockedBy`) stays listed, disabled, with the reason.
  */

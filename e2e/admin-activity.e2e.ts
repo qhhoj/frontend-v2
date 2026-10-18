@@ -50,11 +50,11 @@ test('deleting a user’s logs names the user and runs only after the confirm', 
   mockActivity(api);
   api.routes['DELETE /admin/user-activity/users/tuan_k'] = { status: 204 };
   await page.goto('/admin/activity?summary=tuan_k');
-  await page.getByRole('button', { name: 'Xoá nhật ký của tuan_k' }).click();
+  await page.getByRole('button', { name: 'Xóa nhật ký của tuan_k' }).click();
   await expect(dialogOf(page)).toContainText('tuan_k');
   await expect(dialogOf(page)).toContainText('không hoàn tác');
   expect(api.requestsTo('DELETE /admin/user-activity/users/tuan_k')).toHaveLength(0);
-  await confirmInDialog(page, 'Xoá');
+  await confirmInDialog(page, 'Xóa');
   await expect
     .poll(() => api.requestsTo('DELETE /admin/user-activity/users/tuan_k').length)
     .toBe(1);

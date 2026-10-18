@@ -6,7 +6,7 @@
       "actions": {
         "create": "Tạo",
         "edit": "Sửa",
-        "delete": "Xoá"
+        "delete": "Xóa"
       },
       "before": "Trước",
       "after": "Sau",

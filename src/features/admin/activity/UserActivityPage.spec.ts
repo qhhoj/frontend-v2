@@ -113,13 +113,13 @@ describe('UserActivityPage', () => {
     expect(wrapper.get('[data-testid="user-summary"]').text()).toContain('3.482 yêu cầu');
     await wrapper
       .findAll('button')
-      .find((button) => button.text() === 'Xoá nhật ký của tuan_k')!
+      .find((button) => button.text() === 'Xóa nhật ký của tuan_k')!
       .trigger('click');
     await flushPromises();
     expect(document.body.querySelector('[role="dialog"]')?.textContent).toContain('không hoàn tác');
     expect(document.body.querySelector('[role="dialog"]')?.textContent).toContain('tuan_k');
     expect(calls.some((call) => call.method === 'DELETE')).toBe(false);
-    await confirmDialog('Xoá');
+    await confirmDialog('Xóa');
     expect(
       calls.some((call) => call.method === 'DELETE' && call.path.endsWith('/users/tuan_k')),
     ).toBe(true);

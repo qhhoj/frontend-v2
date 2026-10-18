@@ -58,8 +58,7 @@
     "userTitle": "Delete the logs of {username}?",
     "userBody": "Every row and sign-in session of this person is deleted for good; this cannot be undone.",
     "anonymousTitle": "Delete all guest logs?",
-    "anonymousBody": "Every guest row is deleted for good; this cannot be undone.",
-    "delete": "Delete"
+    "anonymousBody": "Every guest row is deleted for good; this cannot be undone."
   },
   "notice": {
     "title": "Deleting logs cannot be undone",

@@ -141,7 +141,7 @@ describe('two-factor page', () => {
     stubPasskey(() => Promise.resolve(null));
     twoFactorApi(['totp']);
     const { wrapper } = await mountApp('/login/2fa');
-    expect(buttonNamed(wrapper, 'Dùng khoá bảo mật')).toBeUndefined();
+    expect(buttonNamed(wrapper, 'Dùng khóa bảo mật')).toBeUndefined();
     expect(boxesOf(wrapper)).toHaveLength(6);
   });
 
@@ -149,7 +149,7 @@ describe('two-factor page', () => {
     stubPasskey(() => Promise.resolve({ toJSON: () => ({ id: 'cred-1' }) }));
     const calls = twoFactorApi(['totp', 'webauthn'], KEY_OPTIONS);
     const { wrapper, router } = await mountApp('/login/2fa?redirect=/blog');
-    await click(wrapper, 'Dùng khoá bảo mật');
+    await click(wrapper, 'Dùng khóa bảo mật');
     expect(calls.find((call) => call.path === '/auth/2fa/webauthn/login/verify')?.body).toEqual({
       response: { id: 'cred-1' },
     });
@@ -162,7 +162,7 @@ describe('two-factor page', () => {
     stubPasskey(() => Promise.reject(new DOMException('cancelled', 'NotAllowedError')));
     const calls = twoFactorApi(['totp', 'webauthn'], KEY_OPTIONS);
     const { wrapper } = await mountApp('/login/2fa');
-    await click(wrapper, 'Dùng khoá bảo mật');
+    await click(wrapper, 'Dùng khóa bảo mật');
     expect(wrapper.find('#main [role="alert"]').exists()).toBe(false);
     expect(verifiedWithKey(calls)).toBe(false);
     expect(buttonNamed(wrapper, 'Thử lại')).toBeDefined();
@@ -173,9 +173,9 @@ describe('two-factor page', () => {
     stubPasskey(() => Promise.reject(new DOMException('blocked', 'SecurityError')));
     twoFactorApi(['totp', 'webauthn'], KEY_OPTIONS);
     const { wrapper } = await mountApp('/login/2fa');
-    await click(wrapper, 'Dùng khoá bảo mật');
+    await click(wrapper, 'Dùng khóa bảo mật');
     expect(wrapper.get('#main [role="alert"]').text()).toBe(
-      'Xác minh khoá bảo mật không thành công.',
+      'Xác minh khóa bảo mật không thành công.',
     );
     expect(buttonNamed(wrapper, 'Thử lại')).toBeDefined();
     expect(buttonNamed(wrapper, 'Dùng mã dự phòng')).toBeDefined();
@@ -185,11 +185,11 @@ describe('two-factor page', () => {
     stubPasskey(() => Promise.resolve({ toJSON: () => ({ id: 'cred-1' }) }));
     const calls = twoFactorApi(['webauthn'], KEY_OPTIONS);
     const { wrapper, router } = await mountApp('/login/2fa');
-    expect(wrapper.get('h1').text()).toBe('Chạm vào khoá bảo mật');
+    expect(wrapper.get('h1').text()).toBe('Chạm vào khóa bảo mật');
     expect(wrapper.find('#main [role="status"]').exists()).toBe(true);
     expect(boxesOf(wrapper)).toHaveLength(0);
     expect(buttonNamed(wrapper, 'Dùng mã dự phòng')).toBeUndefined();
-    await click(wrapper, 'Dùng khoá bảo mật');
+    await click(wrapper, 'Dùng khóa bảo mật');
     expect(verifiedWithKey(calls)).toBe(true);
     await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('home'), {
       timeout: 15_000,
@@ -199,12 +199,12 @@ describe('two-factor page', () => {
   it('tells a security-key-only account in an unsupported browser why, and offers the way out', async () => {
     twoFactorApi(['webauthn']);
     const { wrapper } = await mountApp('/login/2fa');
-    expect(wrapper.get('h1').text()).toBe('Không dùng được khoá');
+    expect(wrapper.get('h1').text()).toBe('Không dùng được khóa');
     expect(wrapper.get('#main [role="alert"]').text()).toContain(
-      'Trình duyệt này chưa hỗ trợ khoá bảo mật.',
+      'Trình duyệt này chưa hỗ trợ khóa bảo mật.',
     );
     expect(boxesOf(wrapper)).toHaveLength(0);
-    expect(buttonNamed(wrapper, 'Dùng khoá bảo mật')).toBeUndefined();
+    expect(buttonNamed(wrapper, 'Dùng khóa bảo mật')).toBeUndefined();
     expect(buttonNamed(wrapper, 'Đăng xuất')).toBeDefined();
   });
 
@@ -236,7 +236,7 @@ describe('two-factor page', () => {
     });
     const { wrapper } = await mountApp('/login/2fa');
     await pasteCode(wrapper, '000000');
-    expect(wrapper.get('h1').text()).toBe('Không dùng được khoá');
+    expect(wrapper.get('h1').text()).toBe('Không dùng được khóa');
     expect(boxesOf(wrapper)).toHaveLength(0);
   });
 
@@ -251,7 +251,7 @@ describe('two-factor page', () => {
     );
     const { wrapper } = await mountApp('/login/2fa');
     await pasteCode(wrapper, '481923');
-    await click(wrapper, 'Dùng khoá bảo mật');
+    await click(wrapper, 'Dùng khóa bảo mật');
     expect(calls.some((call) => call.path === '/auth/2fa/webauthn/login/options')).toBe(false);
     expect(boxesOf(wrapper)).toHaveLength(6);
   });

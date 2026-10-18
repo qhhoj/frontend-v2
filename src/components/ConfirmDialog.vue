@@ -6,6 +6,8 @@ import Modal from '@/components/ui/Modal.vue';
 /**
  * One confirm step for the destructive or irreversible choices, in a `Modal` (the shared Dialog preset).
  * `confirm` only says the user chose it: the consumer closes the dialog (set `visible` false) once its request is done.
+ * The buttons say "Hủy" and, for the `danger` tone, "Xóa" (`common.cancel`, `common.delete`; "Xác nhận" for `neutral`):
+ * pass `cancelLabel` or `confirmLabel` only for an action with a name of its own ("Chặn", "Rời trang"), never to restate those words.
  * Busy blocks Cancel, Escape and the close button, and a second confirm, until the consumer clears it.
  * `canConfirm` is false while a required input in the body (a code, a password) is still empty: the confirm button turns
  * `aria-disabled` (focus is kept) and neither it nor Enter confirms.
@@ -21,7 +23,7 @@ const props = withDefaults(
   defineProps<{
     title: string;
     body?: string;
-    confirmLabel: string;
+    confirmLabel?: string;
     cancelLabel?: string;
     tone?: 'neutral' | 'danger';
     busy?: boolean;
@@ -31,6 +33,7 @@ const props = withDefaults(
   }>(),
   {
     body: undefined,
+    confirmLabel: undefined,
     cancelLabel: undefined,
     tone: 'neutral',
     busy: false,
@@ -99,7 +102,7 @@ onBeforeUnmount(returnFocus);
         :disabled="!canConfirm"
         :loading="busy"
       >
-        {{ confirmLabel }}
+        {{ confirmLabel ?? $t(tone === 'danger' ? 'common.delete' : 'common.confirm') }}
       </AppButton>
     </template>
   </Modal>

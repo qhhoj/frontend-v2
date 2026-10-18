@@ -13,7 +13,7 @@ import type { SaveBarProps } from './SaveBar.props';
  * Left: "3 thay đổi chưa lưu", "Đã lưu lúc 14:02" for 3 s after a save, or why saving is not possible, in a polite live region
  * (the `status` slot replaces it). `hideIdleOnPhone`: below `sm` the bar shows only while it has one of those to say, and
  * when it appears it keeps the focused field above itself.
- * Right: optional extra actions, "Huỷ thay đổi" (emits `discard`) and the submit button.
+ * Right: optional extra actions, "Hủy thay đổi" (emits `discard`) and the submit button.
  * The submit button is `type="submit"`: put the bar inside the `<form>`, or pass the form's id as `form`.
  * While there is nothing to save (no change, `pending`, or a `blockedReason`) both buttons are `aria-disabled`, keep focus,
  * and a click does nothing. `allowClean` (create forms) lets a form with no change be saved and hides the discard button.

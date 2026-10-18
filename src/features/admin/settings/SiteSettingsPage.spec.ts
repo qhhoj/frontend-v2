@@ -156,13 +156,13 @@ const withMinPercent = (stored: number) =>
   );
 
 describe('defaults', () => {
-  it('"Huỷ thay đổi" still discards the filled default and shows the stored value again', async () => {
+  it('"Hủy thay đổi" still discards the filled default and shows the stored value again', async () => {
     mockApi(routes({ 'GET /admin/settings': ok(withMinPercent(65)) }));
     const { wrapper } = await mountSettings();
     const row = keyRow(wrapper, 'similarity.minPercent');
     const info = await openInfo(wrapper, 'similarity.minPercent');
     await clickButton(info.querySelector('button[aria-label="Về mặc định 50"]'));
-    await clickIn(saveBar(wrapper), 'Huỷ thay đổi');
+    await clickIn(saveBar(wrapper), 'Hủy thay đổi');
     expect((row.get('input').element as HTMLInputElement).value).toBe('65');
     expect(row.text()).not.toContain('Đã điền giá trị mặc định');
   });
@@ -226,22 +226,22 @@ describe('clearing a secret', () => {
     );
     const { wrapper } = await mountSettings();
     const mail = block(wrapper, 'mail');
-    await clickIn(mail, 'Xoá bí mật');
-    expect(openDialog().textContent).toContain('Xoá URL SMTP?');
+    await clickIn(mail, 'Xóa bí mật');
+    expect(openDialog().textContent).toContain('Xóa URL SMTP?');
     expect(openDialog().textContent).toContain('không khôi phục được');
     expect(openDialog().textContent).toContain('Người gửi (mail.from) không đổi.');
     expect(patches(calls)).toEqual([]);
-    await confirmDialog('Xoá URL SMTP');
+    await confirmDialog('Xóa URL SMTP');
     expect(patches(calls)).toEqual([['/admin/settings/mail.smtpUrl', { value: '' }]]);
     expect(mail.text()).toContain('Chưa đặt');
-    expect(mail.text()).toContain('Đã xoá URL SMTP.');
-    expect(mail.findAll('button').some((button) => button.text() === 'Xoá bí mật')).toBe(false);
+    expect(mail.text()).toContain('Đã xóa URL SMTP.');
+    expect(mail.findAll('button').some((button) => button.text() === 'Xóa bí mật')).toBe(false);
   });
 
   it('sends nothing when the dialog is cancelled', async () => {
     const calls = mockApi(routes());
     const { wrapper } = await mountSettings();
-    await clickIn(block(wrapper, 'mail'), 'Xoá bí mật');
+    await clickIn(block(wrapper, 'mail'), 'Xóa bí mật');
     await cancelDialog();
     expect(patches(calls)).toEqual([]);
   });
@@ -249,10 +249,10 @@ describe('clearing a secret', () => {
   it('keeps the dialog open and says why when the server refuses', async () => {
     mockApi(routes({ 'PATCH /admin/settings/mail.smtpUrl': fail(403, 'forbidden') }));
     const { wrapper } = await mountSettings();
-    await clickIn(block(wrapper, 'mail'), 'Xoá bí mật');
-    await confirmDialog('Xoá URL SMTP');
+    await clickIn(block(wrapper, 'mail'), 'Xóa bí mật');
+    await confirmDialog('Xóa URL SMTP');
     expect(openDialog().textContent).toContain('Bạn không có quyền làm việc này.');
-    expect(block(wrapper, 'mail').text()).not.toContain('Đã xoá URL SMTP.');
+    expect(block(wrapper, 'mail').text()).not.toContain('Đã xóa URL SMTP.');
   });
 
   it('leaves an unsaved edit of another key in the block alone', async () => {
@@ -264,8 +264,8 @@ describe('clearing a secret', () => {
     const { wrapper } = await mountSettings();
     const mail = block(wrapper, 'mail');
     await mail.get('input').setValue('QHHOJ <ops@qhhoj.example>');
-    await clickIn(mail, 'Xoá bí mật');
-    await confirmDialog('Xoá URL SMTP');
+    await clickIn(mail, 'Xóa bí mật');
+    await confirmDialog('Xóa URL SMTP');
     expect((mail.get('input').element as HTMLInputElement).value).toBe('QHHOJ <ops@qhhoj.example>');
     expect(patches(calls)).toEqual([['/admin/settings/mail.smtpUrl', { value: '' }]]);
   });

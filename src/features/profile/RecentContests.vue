@@ -27,12 +27,18 @@ const rowKey = (row: RecentContestRow, index: number) => row.key ?? `hidden-${in
       <thead class="text-muted">
         <tr>
           <th scope="col" class="py-2 font-semibold">{{ $t('profile.columns.contest') }}</th>
-          <th scope="col" class="py-2 text-right font-semibold">
+          <th scope="col" class="py-2 pl-4 text-right font-semibold">
             <RankColumnHeader :label="$t('profile.columns.rank')" />
           </th>
-          <th scope="col" class="py-2 font-semibold">{{ $t('profile.columns.performance') }}</th>
-          <th scope="col" class="py-2 font-semibold">{{ $t('profile.columns.rating') }}</th>
-          <th scope="col" class="py-2 font-semibold">{{ $t('profile.columns.delta') }}</th>
+          <th scope="col" class="py-2 pl-4 text-right font-semibold">
+            {{ $t('profile.columns.performance') }}
+          </th>
+          <th scope="col" class="py-2 pl-4 text-right font-semibold">
+            {{ $t('profile.columns.rating') }}
+          </th>
+          <th scope="col" class="py-2 pl-4 text-right font-semibold">
+            {{ $t('profile.columns.delta') }}
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -47,10 +53,13 @@ const rowKey = (row: RecentContestRow, index: number) => row.key ?? `hidden-${in
             </RouterLink>
             <span v-else class="text-muted">{{ $t('ratingChart.hiddenContest') }}</span>
           </td>
-          <td class="py-2 text-right">{{ orDash(row.rank) }}</td>
-          <td class="py-2">{{ orDash(row.performance) }}</td>
-          <td class="py-2">{{ orDash(row.rating) }}</td>
-          <td class="py-2 font-semibold" :class="deltaClass(row.delta)">
+          <td class="py-2 pl-4 text-right tabular-nums">{{ orDash(row.rank) }}</td>
+          <td class="py-2 pl-4 text-right tabular-nums">{{ orDash(row.performance) }}</td>
+          <td class="py-2 pl-4 text-right tabular-nums">{{ orDash(row.rating) }}</td>
+          <td
+            class="py-2 pl-4 text-right font-semibold tabular-nums"
+            :class="deltaClass(row.delta)"
+          >
             {{ deltaText(row.delta) }}
           </td>
         </tr>

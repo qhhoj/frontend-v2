@@ -60,7 +60,6 @@
     "delete": "Xóa bộ ghost",
     "deleteTitle": "Xóa {count} ghost?",
     "deleteBody": "Ghost biến mất khỏi phát lại sau khi dựng lại. Tải CSV trước nếu cần giữ lại.",
-    "deleteConfirm": "Xóa",
     "deleted": "Đã xóa bộ ghost."
   },
   "title": "Ghost"

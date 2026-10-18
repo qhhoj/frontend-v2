@@ -503,8 +503,7 @@
       "replace": "Replace",
       "remove": "Remove {name}",
       "removeTitle": "Remove {name}?",
-      "removeBody": "The problem stops using this file until it is uploaded again.",
-      "removeConfirm": "Remove"
+      "removeBody": "The problem stops using this file until it is uploaded again."
     }
   },
   "files": {
