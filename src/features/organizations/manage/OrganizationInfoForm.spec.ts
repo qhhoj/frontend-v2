@@ -40,6 +40,25 @@ describe('organization settings form', () => {
     expect(save().attributes('aria-disabled')).toBe('true');
   });
 
+  it('opens and closes from its summary, but stays open while an edit is unsaved', async () => {
+    const wrapper = await openManage();
+    const fold = () => wrapper.get('[data-testid="org-info"]');
+    const toggle = () => fold().get('summary').trigger('click');
+    expect(fold().attributes('open')).toBeUndefined();
+    await toggle();
+    expect(fold().attributes('open')).toBeDefined();
+    await wrapper.get('#org-info-name').setValue('Tên mới');
+    await toggle();
+    expect(fold().attributes('open')).toBeDefined();
+    const cancel = fold()
+      .findAll('button')
+      .find((button) => button.text() === 'Huỷ thay đổi')!;
+    await cancel.trigger('click');
+    expect(fold().attributes('open')).toBeDefined();
+    await toggle();
+    expect(fold().attributes('open')).toBeUndefined();
+  });
+
   it('warns about old links only while the address differs from the saved one', async () => {
     const wrapper = await openManage();
     const warning = 'Đổi đường dẫn sẽ làm liên kết cũ không mở được.';
