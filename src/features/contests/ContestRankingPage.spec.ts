@@ -207,6 +207,7 @@ describe('contest ranking', () => {
     const more = podium.get('[data-testid="podium-more"]');
     expect(more.text()).toBe('+2 nữa');
     expect(more.attributes('href')).toBe('#ranking-board');
+    expect(more.attributes('aria-label')).toBe('2 thí sinh đồng hạng nữa, xem bảng');
     expect(wrapper.find('#ranking-board').exists()).toBe(true);
   });
 

@@ -1315,7 +1315,8 @@
     "moreTied": "+{count} more",
     "virtual": "virtual",
     "virtualLegend": "Rows marked “virtual” are virtual runs; rows without it are real results.",
-    "myRow": "Go to my row · #{rank}"
+    "myRow": "Go to my row · #{rank}",
+    "moreTiedLabel": "{count} more tied, see the board"
   },
   "formats": {
     "default": "Points",
