@@ -25,6 +25,49 @@ describe('RankingTable', () => {
     expect(wrapper.text()).not.toContain('9999');
   });
 
+  describe('rating change column', () => {
+    const rated = (
+      ratingChange: { rating: number; delta: number | null } | null,
+      rank: number,
+    ) => ({
+      ...rankingRow(rank, `p${rank}`, `user_0${rank}`, 1, 0, {}),
+      ratingChange,
+    });
+    /** `shown`: the rows left by a search; the board keeps all of them. */
+    const mountRows = (rows: ReturnType<typeof rated>[], shown = rows) =>
+      mount(RankingTable, {
+        props: { ranking: ranking({ rows }), rows: shown, context, viewerId: null },
+        global: { plugins: [i18n] },
+      });
+
+    it('shows the change and the new rating per row once ratings are applied', () => {
+      const wrapper = mountRows([
+        rated({ rating: 1843, delta: 42 }, 1),
+        rated({ rating: 1189, delta: -7 }, 2),
+        rated({ rating: 1500, delta: null }, 3),
+        rated(null, 4),
+      ]);
+      expect(wrapper.text()).toContain('Δ rating');
+      const cells = wrapper.findAll('[data-testid="rating-change"]');
+      expect(cells.map((cell) => cell.text())).toEqual(['+42 → 1843', '-7 → 1189', '1500', '—']);
+      expect(cells[0]!.classes()).toContain('text-positive');
+      expect(cells[1]!.classes()).toContain('text-negative');
+    });
+
+    it('keeps the column while a search shows only an unrated row', () => {
+      const unrated = rated(null, 2);
+      const wrapper = mountRows([rated({ rating: 1843, delta: 42 }, 1), unrated], [unrated]);
+      expect(wrapper.text()).toContain('Δ rating');
+      expect(wrapper.get('[data-testid="rating-change"]').text()).toBe('—');
+    });
+
+    it('has no rating column before ratings are applied', () => {
+      const wrapper = mountRows([rated(null, 1)]);
+      expect(wrapper.text()).not.toContain('Δ rating');
+      expect(wrapper.find('[data-testid="rating-change"]').exists()).toBe(false);
+    });
+  });
+
   describe('cell links', () => {
     const cell = { time: 100, points: 1, penalty: 0, tries: 1 } as never;
     const rows = () => [

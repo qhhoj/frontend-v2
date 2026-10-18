@@ -6,6 +6,8 @@ export const RANK_COLUMN_REM = 5;
 export const SCORE_COLUMN_REM = 7;
 export const TIME_COLUMN_REM = 7;
 export const PROBLEM_COLUMN_REM = 6;
+/** "+42 → 1843": shown once the contest's ratings are applied (P-22). */
+export const RATING_COLUMN_REM = 8;
 /** Narrowest the name column gets before the board scrolls sideways. */
 export const NAME_COLUMN_MIN_REM = 14;
 

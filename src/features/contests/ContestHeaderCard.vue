@@ -2,9 +2,11 @@
 import { computed } from 'vue';
 import type { ContestDetail, ParticipationSummary } from '@/api/types/contests';
 import Card from '@/components/ui/Card.vue';
+import Chip from '@/components/ui/Chip.vue';
 import UserLink from '@/components/UserLink.vue';
 import { phaseAt, spanMessage } from '@/lib/contest-time';
 import { formatNumber, formatWeekdayDate } from '@/lib/format';
+import { formatDelta } from '@/lib/rating-delta';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestChips from './ContestChips.vue';
@@ -34,6 +36,13 @@ const lengthSpan = computed(() =>
 const elapsedSpan = computed(() =>
   phase.value === 'running' ? spanMessage((now.value - startMs.value) / 1000) : null,
 );
+/** The viewer's own rating change once the contest's ratings are applied (P-22, Q-06 A). */
+const ratingChange = computed(() => props.contest.viewer.ratingChange);
+const ratingChangeTone = computed(() => {
+  const delta = ratingChange.value?.delta;
+  if (!delta) return 'neutral';
+  return delta > 0 ? 'success' : 'danger';
+});
 /** The day, when the bar's labels carry clocks only (a one-day contest); otherwise they already carry the dates. */
 const oneDay = computed(() =>
   isOneDay(props.contest) ? formatWeekdayDate(props.contest.startTime, locale.locale) : null,
@@ -105,6 +114,21 @@ const oneDay = computed(() =>
         :class="run && 'max-md:hidden'"
         @elapsed="emit('elapsed')"
       />
+      <Chip
+        v-if="ratingChange"
+        data-testid="viewer-rating-change"
+        size="md"
+        :tone="ratingChangeTone"
+        class="self-start font-mono tabular-nums"
+      >
+        {{
+          ratingChange.delta === null
+            ? $t('contests.detail.firstRating', { rating: ratingChange.rating })
+            : $t('contests.detail.ratingChange', {
+                change: `${formatDelta(ratingChange.delta)} → ${ratingChange.rating}`,
+              })
+        }}
+      </Chip>
       <slot name="actions" />
     </div>
   </Card>

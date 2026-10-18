@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatDelta } from '@/lib/rating-delta';
 import { computed, ref } from 'vue';
 import type { RatingHistoryEntry } from '@/api/types/users';
 import { translate } from '@/i18n';
@@ -136,7 +137,6 @@ const label = computed(() =>
     current: current.value.rating,
   }),
 );
-const signed = (delta: number) => (delta > 0 ? `+${delta}` : String(delta));
 const contestTitle = (point: ChartPoint) =>
   point.contestName ?? translate('ratingChart.hiddenContest');
 /** The tooltip's three rows, as text for screen readers and as the drawn rows. */
@@ -147,7 +147,7 @@ const rows = (point: ChartPoint) => ({
     ...(point.rank === null ? [] : [translate('ratingChart.place', { rank: point.rank })]),
   ].join(' · '),
   rating: String(point.rating),
-  delta: point.delta === null ? '' : `(${signed(point.delta)})`,
+  delta: point.delta === null ? '' : `(${formatDelta(point.delta)})`,
   tier: tierName(point.rating),
 });
 const spoken = (point: ChartPoint) => {

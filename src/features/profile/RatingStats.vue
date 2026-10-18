@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { deltaToneClass, formatDelta } from '@/lib/rating-delta';
 import { ratingTier, tierColor } from '@/lib/rating-tiers';
 import { TIER_TEXT_CLASSES } from '@/lib/tier-classes';
 
 /** The four figures above the rating chart: current (in its tier colour), highest, contests counted, and the latest change. */
 const props = defineProps<{ current: number; max: number; count: number; delta: number | null }>();
 const currentClass = computed(() => TIER_TEXT_CLASSES[tierColor(ratingTier(props.current))]);
-const deltaText = computed(() =>
-  props.delta === null ? '—' : props.delta > 0 ? `+${props.delta}` : String(props.delta),
-);
-const deltaClass = computed(() =>
-  !props.delta ? 'text-content' : props.delta > 0 ? 'text-positive' : 'text-negative',
-);
+const deltaText = computed(() => (props.delta === null ? '—' : formatDelta(props.delta)));
+const deltaClass = computed(() => deltaToneClass(props.delta));
 </script>
 
 <template>
