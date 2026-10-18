@@ -12,12 +12,12 @@ import { pageFromQuery } from '@/lib/paging';
 import { adminRouteName } from '../admin-screens';
 import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
 import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
-import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { buttonClass } from '../ui/controls';
 import AdminNotice from '../ui/feedback/AdminNotice.vue';
 import { useAdminToast } from '../ui/feedback/use-admin-toast';
 import CommentReportsTable from './CommentReportsTable.vue';
+import CommentsSectionHeader from './CommentsSectionHeader.vue';
 import {
   useBulkSettle,
   useCommentReportsQuery,
@@ -104,7 +104,7 @@ const isBusy = (item: CommentReportQueueItem) =>
 
 <template>
   <div class="flex w-full flex-col gap-4">
-    <AdminPageHeader :title="$t('admin.comments.title')" :lead="$t('admin.comments.lead')" />
+    <CommentsSectionHeader :lead="$t('admin.comments.lead')" />
     <AdminFilterTabs :tabs="tabs" :current="status" :label="$t('admin.comments.tabs.label')" />
 
     <AdminNotice

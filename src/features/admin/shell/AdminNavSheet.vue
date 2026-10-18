@@ -4,12 +4,13 @@ import { nextTick, onBeforeUnmount, ref, useId, watch } from 'vue';
 import LocaleToggle from '@/features/shell/LocaleToggle.vue';
 import AdminNav from './AdminNav.vue';
 import type { AdminNavId } from './admin-nav';
+import type { NavCount } from './overview/admin-overview.queries';
 
 /**
  * The phone and tablet nav: a full-height sheet over the page. A native modal <dialog> gives the focus trap, the inert
  * page behind and Escape; focus goes back to the element that opened it.
  */
-defineProps<{ counts: Partial<Record<AdminNavId, number | null>> }>();
+defineProps<{ counts: Partial<Record<AdminNavId, NavCount>> }>();
 const open = defineModel<boolean>('open', { required: true });
 
 const sheet = ref<HTMLDialogElement | null>(null);

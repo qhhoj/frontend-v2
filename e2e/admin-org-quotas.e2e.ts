@@ -47,12 +47,13 @@ test('edits a quota and says so in a toast', async ({ page, api }) => {
   );
 });
 
-test('the admin nav links the overview', async ({ page, api }) => {
+test('the overview is a tab of the organizations item in the admin nav', async ({ page, api }) => {
   signInAsStaff(api, EDIT);
   installUsageOverview(api, ROWS);
-  await page.goto('/admin');
-  await page.getByTestId('admin-nav').getByRole('link', { name: 'Hạn mức tổ chức' }).click();
-  await expect(page).toHaveURL(/\/admin\/organizations\/quotas$/);
+  await page.goto('/admin/organizations/quotas');
+  await expect(
+    page.getByTestId('admin-nav').getByRole('link', { name: 'Tổ chức' }),
+  ).toHaveAttribute('aria-current', 'page');
 });
 
 test('a clone refused by the quota names the credits and shows the refusal alert', async ({

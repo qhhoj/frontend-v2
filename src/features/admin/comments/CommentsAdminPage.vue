@@ -7,7 +7,6 @@ import { adminRouteName } from '../admin-screens';
 import AdminField from '../ui/AdminField.vue';
 import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
 import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
-import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { INPUT, buttonClass } from '../ui/controls';
 import AdminNotice from '../ui/feedback/AdminNotice.vue';
@@ -15,6 +14,7 @@ import { useAdminToast } from '../ui/feedback/use-admin-toast';
 import AdminFilterBar from '../ui/table/AdminFilterBar.vue';
 import AdminCommentsTable from './AdminCommentsTable.vue';
 import CommentEditDialog from './CommentEditDialog.vue';
+import CommentsSectionHeader from './CommentsSectionHeader.vue';
 import { COMMENT_STATES, apiQueryOf, filtersFromQuery, queryOfFilters } from './admin-comments';
 import type { CommentFilters } from './admin-comments';
 import { useAdminCommentsQuery, useBulkHide } from './admin-comments.queries';
@@ -134,13 +134,7 @@ const resultText = computed(() => {
 
 <template>
   <div class="flex w-full flex-col gap-4">
-    <AdminPageHeader :title="$t('admin.comments.all.title')" :lead="$t('admin.comments.all.lead')">
-      <template #actions>
-        <RouterLink :to="{ name: adminRouteName('commentReports') }" :class="buttonClass()">
-          {{ $t('admin.comments.all.reportsLink') }}
-        </RouterLink>
-      </template>
-    </AdminPageHeader>
+    <CommentsSectionHeader :lead="$t('admin.comments.all.lead')" />
 
     <AdminFilterBar
       v-model:search="searchModel"

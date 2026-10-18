@@ -33,6 +33,19 @@ export const SHELL_DEFAULTS: Readonly<Record<string, MockResponse>> = {
   'GET /admin/organization-requests': {
     body: { data: [], meta: { page: 1, pageSize: 50, total: 0 } },
   },
+  // The judge queue badge (staff who may open the submissions screen).
+  'GET /submissions/stats': {
+    body: {
+      data: {
+        judgedToday: 0,
+        acceptedToday: 0,
+        verdictsToday: [],
+        queueLength: 0,
+        judgesOnline: 0,
+        judgesTotal: 0,
+      },
+    },
+  },
 };
 
 const responseOf = ({ status = 200, body, headers }: MockResponse) =>

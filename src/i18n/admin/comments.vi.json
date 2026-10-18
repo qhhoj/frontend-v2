@@ -25,7 +25,6 @@
   "all": {
     "title": "Mọi bình luận",
     "lead": "Mọi bình luận trên trang, mới nhất trước. Tìm theo nội dung hoặc tác giả, rồi ẩn hoặc hiện một hay nhiều bình luận.",
-    "reportsLink": "Bình luận bị báo cáo",
     "filters": {
       "search": "Nội dung",
       "searchPlaceholder": "Từ trong bình luận",
@@ -121,5 +120,12 @@
     "createdAt": "Viết lúc",
     "reports": "Báo cáo"
   },
-  "rowName": "bình luận ở {page}"
+  "rowName": "bình luận ở {page}",
+  "section": {
+    "title": "Bình luận",
+    "reports": "Bị báo cáo",
+    "all": "Tất cả",
+    "locks": "Trang khoá bình luận",
+    "tabsLabel": "Mục bình luận"
+  }
 }

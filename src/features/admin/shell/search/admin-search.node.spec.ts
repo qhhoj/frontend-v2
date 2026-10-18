@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { ADMIN_NAV } from '../admin-nav';
+import { PALETTE_SCREENS } from '../admin-nav';
 import type { AdminNavItem } from '../admin-nav';
 import { matchScreens, steppedKey } from './admin-search';
 import type { PaletteEntry } from './admin-search';
 
-const items = ADMIN_NAV.flatMap((group) => group.items);
+const items = [...PALETTE_SCREENS];
 const LABELS: Partial<Record<string, string>> = {
   problems: 'Bài tập',
   judges: 'Máy chấm',

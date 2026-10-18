@@ -1,4 +1,5 @@
 import { computed, onScopeDispose } from 'vue';
+import { useSubmissionStatsQuery } from '@/features/submissions/submissions.queries';
 import { TICKET_SUMMARY_POLL_MS, useTicketSummaryQuery } from '@/features/tickets/tickets.queries';
 import { usePermissions } from '@/stores/use-permissions';
 import { ADMIN_SCREENS } from '../../admin-screens';
@@ -25,13 +26,15 @@ function pollWhileVisible(refresh: () => void) {
  * Each count is the first page its own screen reads (same query, same cache), so acting there updates the badge too.
  */
 export function useAdminCounts() {
-  const { can } = usePermissions();
+  const { can, canAny } = usePermissions();
   const canTickets = computed(() => can(ADMIN_SCREENS.tickets.permission));
+  const canQueue = computed(() => canAny(ADMIN_SCREENS.submissions.permission));
   const canReports = computed(() => can(ADMIN_SCREENS.commentReports.permission));
   const canRequests = computed(() => can(ORGANIZATION_QUEUE_PERMISSION));
   const tickets = useTicketSummaryQuery();
   const reports = useCommentReportsQuery(1, canReports);
   const requests = useAllJoinRequestsQuery('P', 1);
+  const stats = useSubmissionStatsQuery(canQueue);
   return {
     refreshQueues: () => {
       if (canReports.value) void reports.refetch();
@@ -46,17 +49,29 @@ export function useAdminCounts() {
     pendingRequests: computed(() =>
       canRequests.value ? (requests.data.value?.meta.total ?? null) : null,
     ),
+    /** Submissions waiting for or under judging (the public strip's count, polled on its own). */
+    queuedSubmissions: computed(() =>
+      canQueue.value ? (stats.data.value?.queueLength ?? null) : null,
+    ),
   };
 }
 
-/** The nav items that carry a count badge, and which count. */
+/** A nav badge: the count, and whether it waits for staff (attention colour) or only informs (the judge queue drains by itself). */
+export interface NavCount {
+  value: number | null;
+  needsAction: boolean;
+}
+
+/** The nav items that carry a count badge, and which count: every queue item (P-35). */
 export function useNavCounts() {
   const counts = useAdminCounts();
   // The shell mounts once per admin visit, so this is the one poll.
   pollWhileVisible(counts.refreshQueues);
-  return computed<Partial<Record<AdminNavId, number | null>>>(() => ({
-    tickets: counts.awaitingTickets.value,
-    commentReports: counts.openReports.value,
-    organizations: counts.pendingRequests.value,
+  const waiting = (value: number | null): NavCount => ({ value, needsAction: true });
+  return computed<Partial<Record<AdminNavId, NavCount>>>(() => ({
+    submissions: { value: counts.queuedSubmissions.value, needsAction: false },
+    tickets: waiting(counts.awaitingTickets.value),
+    commentReports: waiting(counts.openReports.value),
+    organizations: waiting(counts.pendingRequests.value),
   }));
 }

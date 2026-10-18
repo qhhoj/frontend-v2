@@ -4,11 +4,13 @@ import { routes } from '@/router/routes';
 import {
   ADMIN_NAV,
   heldPermission,
+  isCurrentItem,
   isCurrentNav,
   navCrumbsOf,
-  visibleDashboard,
+  PALETTE_SCREENS,
   visibleNav,
 } from './admin-nav';
+import { isGroupOpen, legacyFoldChoices, parseFoldChoices } from './use-nav-collapse';
 
 const staff = (permissions: string[], isSuperuser = false) => ({ isSuperuser, permissions });
 const idsOf = (groups: ReturnType<typeof visibleNav>) =>
@@ -69,24 +71,27 @@ describe('admin nav current section and dashboard', () => {
   });
 
   it('marks only the most specific item on a nested route, whichever items nest', () => {
-    expect(isCurrentNav('/admin/organizations', '/admin/organizations/quotas')).toBe(false);
-    expect(isCurrentNav('/admin/organizations/quotas', '/admin/organizations/quotas')).toBe(true);
+    expect(isCurrentNav('/admin/problems', '/admin/problems/import')).toBe(false);
     expect(isCurrentNav('/admin/organizations', '/admin/organizations/lhp')).toBe(true);
     const nested = ['/admin/a', '/admin/a/b', '/admin/a/b/c'];
     const current = nested.filter((path) => isCurrentNav(path, '/admin/a/b/c/d', nested));
     expect(current).toEqual(['/admin/a/b/c']);
     const highlighted = ADMIN_NAV.flatMap((navGroup) => navGroup.items).filter((item) =>
-      isCurrentNav(item.path, '/admin/organizations/quotas'),
+      isCurrentItem(item, '/admin/organizations/quotas'),
     );
-    expect(highlighted.map((item) => item.id)).toEqual(['organizationQuotas']);
+    // the quotas overview is a tab of the organizations screen, not an item of its own
+    expect(highlighted.map((item) => item.id)).toEqual(['organizations']);
   });
 
-  it('builds the dashboard from the same rules and names only a permission the viewer holds', () => {
-    const sections = visibleDashboard(staff(['judge.add_contest', 'judge.change_judge']));
-    expect(sections.map((section) => section.items.map((item) => item.id))).toEqual([
-      ['contests'],
-      ['judges'],
-    ]);
+  it('marks the comments item current on each of its three tabs, and gives every tab the same crumbs', () => {
+    const comments = allItems.find((entry) => entry.id === 'commentReports')!;
+    const tabs = ['/admin/comments', '/admin/comments/reports', '/admin/comments/locks'];
+    for (const path of tabs) expect(isCurrentItem(comments, path)).toBe(true);
+    const crumbs = tabs.map((path) => navCrumbsOf(path, (key) => key));
+    expect(crumbs).toEqual(tabs.map(() => [{ label: 'admin.shell.groups.community' }]));
+  });
+
+  it('names only a permission the viewer holds', () => {
     expect(
       heldPermission(
         ['judge.add_contest', 'judge.edit_own_contest'],
@@ -98,11 +103,44 @@ describe('admin nav current section and dashboard', () => {
   });
 });
 
+describe('admin palette screens', () => {
+  it('lists every screen once, the tabs without a nav item of their own included', () => {
+    const ids = PALETTE_SCREENS.map((screen) => screen.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids).toEqual(
+      expect.arrayContaining(['commentReports', 'comments', 'commentLocks', 'organizationQuotas']),
+    );
+  });
+});
+
+describe('admin nav folding', () => {
+  it('folds the tools until the viewer opens them, and keeps every other group open', () => {
+    expect(isGroupOpen({}, 'tools')).toBe(false);
+    expect(isGroupOpen({}, 'community')).toBe(true);
+    expect(isGroupOpen({ tools: true, community: false }, 'tools')).toBe(true);
+    expect(isGroupOpen({ tools: true, community: false }, 'community')).toBe(false);
+  });
+
+  it('keeps the groups a viewer folded under the old storage format', () => {
+    expect(legacyFoldChoices('["judging","users"]')).toEqual({ judging: false, users: false });
+    expect(legacyFoldChoices('{"tools":true}')).toEqual({});
+    expect(legacyFoldChoices(null)).toEqual({});
+  });
+
+  it('reads only boolean choices from storage, and nothing from a broken or old value', () => {
+    expect(parseFoldChoices('{"tools":true,"users":"yes"}')).toEqual({ tools: true });
+    expect(parseFoldChoices('["tools"]')).toEqual({});
+    expect(parseFoldChoices('not json')).toEqual({});
+    expect(parseFoldChoices(null)).toEqual({});
+  });
+});
+
 describe('admin header crumbs', () => {
   const LABELS: Record<string, string> = {
     'admin.shell.groups.judging': 'Judging',
     'admin.shell.groups.contests': 'Contests',
     'admin.shell.groups.users': 'Users',
+    'admin.shell.groups.tools': 'Tools',
     'admin.shell.screens.judges': 'Judges',
     'admin.shell.screens.contests': 'Contests',
   };
@@ -120,7 +158,11 @@ describe('admin header crumbs', () => {
     expect(navCrumbsOf('/admin/contests/r41/general', translate)).toEqual([
       { label: 'Contests', to: { name: 'admin-contests' } },
     ]);
-    expect(navCrumbsOf('/admin/organizations/quotas', translate)).toEqual([{ label: 'Users' }]);
+    expect(navCrumbsOf('/admin/contest-tags', translate)).toEqual([{ label: 'Tools' }]);
+    expect(navCrumbsOf('/admin/organizations/lhp', translate)).toEqual([
+      { label: 'Users' },
+      { label: 'admin.shell.screens.organizations', to: { name: 'admin-organizations' } },
+    ]);
     expect(navCrumbsOf('/admin', translate)).toEqual([]);
   });
 });

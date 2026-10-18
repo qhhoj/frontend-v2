@@ -8,7 +8,8 @@ import EmptyState from '@/components/EmptyState.vue';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import { useSessionStore } from '@/stores/session.store';
 import { INPUT } from '../../ui/controls';
-import { ADMIN_NAV, visibleNav } from '../admin-nav';
+import { canUseAdmin } from '../../admin-access';
+import { PALETTE_SCREENS } from '../admin-nav';
 import { MIN_RECORD_SEARCH, matchScreens, paletteOptionId, steppedKey } from './admin-search';
 import type { PaletteEntry } from './admin-search';
 import { useAdminRecordSearch } from './admin-search.queries';
@@ -30,7 +31,7 @@ const text = useDebouncedText(
   (committed) => (searchTerm.value = committed),
 );
 const records = useAdminRecordSearch(searchTerm);
-const screens = computed(() => visibleNav(ADMIN_NAV, session.user).flatMap((group) => group.items));
+const screens = computed(() => PALETTE_SCREENS.filter((item) => canUseAdmin(session.user, item)));
 const entries = computed<PaletteEntry[]>(() => [
   ...matchScreens(screens.value, text.value.trim(), (item) => t(item.labelKey)),
   ...records.entries.value,
