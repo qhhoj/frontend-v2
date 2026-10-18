@@ -188,7 +188,11 @@ const SAVE_FORM_ID = 'site-settings-save';
       :maxlength="100"
     />
     <p v-if="hits" role="status" class="m-0 text-meta text-muted">
-      {{ t('admin.settings.search.results', hits.size) }}
+      {{
+        hits.size
+          ? t('admin.settings.search.results', hits.size)
+          : t('admin.settings.search.noResults')
+      }}
     </p>
   </div>
   <Tabs

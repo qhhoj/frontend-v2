@@ -319,7 +319,8 @@
   "search": {
     "label": "Tìm cài đặt",
     "placeholder": "Tìm cài đặt… (vd. múi giờ, Polygon)",
-    "results": "Không có cài đặt nào khớp | {n} cài đặt khớp | {n} cài đặt khớp"
+    "results": "{n} cài đặt khớp",
+    "noResults": "Không có cài đặt nào khớp"
   },
   "info": {
     "label": "Chi tiết {key}",

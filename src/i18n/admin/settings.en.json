@@ -319,7 +319,8 @@
   "search": {
     "label": "Search settings",
     "placeholder": "Search settings… (e.g. time zone, Polygon)",
-    "results": "No setting matches | {n} setting matches | {n} settings match"
+    "results": "{n} setting matches | {n} settings match",
+    "noResults": "No setting matches"
   },
   "info": {
     "label": "Details of {key}",
