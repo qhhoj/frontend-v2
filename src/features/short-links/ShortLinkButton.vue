@@ -25,14 +25,8 @@ const labelKey = computed(() =>
     ? LABEL_KEYS[state.value]
     : 'shortLink.copy',
 );
-/** The idle name extends the visible "Sao chép" (WCAG 2.5.3); other states show their visible text as the name. */
-const accessibleName = computed(() =>
-  state.value === 'creating' || state.value === 'copied'
-    ? undefined
-    : translate('shortLink.copyAriaLabel'),
-);
-/** The compact button shows no text, so its name (and tooltip) is always the label of the state. */
-const compactName = computed(() => accessibleName.value ?? translate(labelKey.value));
+/** The compact button shows no text, so its name (and tooltip) is the label of the state; the full button is named by its text. */
+const compactName = computed(() => translate(labelKey.value));
 /** Notices stack under the full button; under the icon button they float, so the header row keeps its height. */
 const noticeClass = computed(() =>
   props.compact
@@ -65,7 +59,7 @@ const selectAll = (event: FocusEvent) => (event.target as HTMLInputElement).sele
             ? 'border-line bg-surface text-content hover:bg-surface-hover'
             : 'border-line-strong bg-surface-solid text-content hover:bg-surface-hover',
       ]"
-      :aria-label="compact ? compactName : accessibleName"
+      :aria-label="compact ? compactName : undefined"
       :title="compact ? compactName : undefined"
       :aria-disabled="state === 'limited' || undefined"
       @click="copy"

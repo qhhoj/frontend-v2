@@ -8,6 +8,7 @@ export function useLogout() {
   return async () => {
     await session.logout();
     const { meta } = router.currentRoute.value;
-    if (meta.requiresAuth || meta.adminArea) await router.push({ name: 'home' });
+    if (meta.requiresAuth || meta.adminArea || meta.notFoundWithout)
+      await router.push({ name: 'home' });
   };
 }

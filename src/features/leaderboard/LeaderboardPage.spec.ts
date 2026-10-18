@@ -105,6 +105,7 @@ describe('leaderboard page: opens a profile by username', () => {
       'GET /users/khoa.tran/activity': ok({ timezone: 'UTC', since: '2026-01-01', days: {} }),
       'GET /users/khoa.tran/solved': ok({ groups: [] }),
       'GET /users/khoa.tran/comments': page([], { pageSize: 10, nextBefore: null }),
+      'GET /submissions': page([]),
     });
     const { wrapper, router } = await mountApp('/users');
     await wrapper.get('input[name="username"]').setValue('  khoa.tran ');

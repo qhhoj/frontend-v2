@@ -7,7 +7,7 @@ import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
-import { formatNumericDate } from '@/lib/format';
+import { formatNumber, formatNumericDate } from '@/lib/format';
 import { hasPermission } from '@/lib/permissions';
 import { ratingTier, tierColor } from '@/lib/rating-tiers';
 import { TIER_TEXT_CLASSES } from '@/lib/tier-classes';
@@ -91,9 +91,24 @@ const joinedDate = computed(() => formatNumericDate(props.user.dateJoined, local
       </p>
     </div>
     <div data-testid="rating-box" :class="RATING_BOX_CLASSES">
-      <p class="text-sm text-muted">{{ $t('profile.rating') }}</p>
-      <p :class="tierClass" class="font-display text-4xl font-semibold">{{ user.rating ?? '—' }}</p>
-      <p v-if="user.ratingSummary" class="min-h-10 text-sm text-muted">
+      <!-- Q-03 B: without a rating the box leads with the problems solved, a number a new student can raise every day. -->
+      <template v-if="user.rating === null">
+        <p class="text-sm text-muted">{{ $t('profile.solvedLead') }}</p>
+        <p data-testid="rating-figure" class="font-display text-4xl font-semibold">
+          {{ formatNumber(user.problemCount, locale.locale) }}
+        </p>
+      </template>
+      <template v-else>
+        <p class="text-sm text-muted">{{ $t('profile.rating') }}</p>
+        <p
+          data-testid="rating-figure"
+          :class="tierClass"
+          class="font-display text-4xl font-semibold"
+        >
+          {{ user.rating }}
+        </p>
+      </template>
+      <p v-if="user.rating !== null && user.ratingSummary" class="min-h-10 text-sm text-muted">
         {{
           $t('profile.ratingSummary', {
             max: user.ratingSummary.max,
