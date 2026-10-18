@@ -12,6 +12,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import FactLine from '@/components/FactLine.vue';
 import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
+import ContestEditLink from './ContestEditLink.vue';
 import ContestOrganizationChips from './ContestOrganizationChips.vue';
 import { listCallToAction } from './contest-action';
 import {
@@ -25,7 +26,7 @@ import ViewerBadge from './ViewerBadge.vue';
 
 defineProps<{
   contests: ContestListItem[];
-  /** The list is one organization's: its name is not repeated on every row. */
+  /** The list is one organization's: its name is not repeated on every row, and editors get a pencil (P-32). */
   isOrganizationScoped?: boolean;
 }>();
 const locale = useLocaleStore();
@@ -118,7 +119,9 @@ const compactFacts = (contest: ContestListItem) => {
               class="font-semibold hover:text-accent-text"
               >{{ contest.name }}</RouterLink
             >
-            <span class="block font-mono text-caption text-muted">{{ contest.key }}</span>
+            <span class="flex items-center gap-1 font-mono text-caption text-muted"
+              >{{ contest.key }}<ContestEditLink v-if="isOrganizationScoped" :contest="contest"
+            /></span>
             <span
               v-if="!isOrganizationScoped && contest.organizations.length"
               class="mt-1 flex max-w-full flex-wrap gap-1.5"

@@ -11,6 +11,7 @@ import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
+import ContestEditLink from './ContestEditLink.vue';
 import { listCallToAction } from './contest-action';
 import { timelineLabels } from './contest-clock';
 import PhasePill from './PhasePill.vue';
@@ -18,7 +19,8 @@ import { useSpanText } from './use-span-text';
 import ViewerBadge from './ViewerBadge.vue';
 
 /** `wide`: the only running contest spans the column, with the time left and the button in a right-hand column (P-26). */
-const props = defineProps<{ contest: ContestListItem; wide?: boolean }>();
+/** `withEdit`: an organization's list, where its administrators get a pencil on the contests they edit (P-32). */
+const props = defineProps<{ contest: ContestListItem; wide?: boolean; withEdit?: boolean }>();
 const locale = useLocaleStore();
 const spanText = useSpanText();
 /** The button and the bar move slowly (the time left is CountdownTimer's own clock): a tick every 15 s is enough. */
@@ -54,7 +56,9 @@ const perParticipation = computed(() =>
             >{{ contest.name }}</RouterLink
           >
         </h3>
-        <p class="font-mono text-meta text-muted">{{ contest.key }}</p>
+        <p class="flex items-center gap-1 font-mono text-meta text-muted">
+          {{ contest.key }}<ContestEditLink v-if="withEdit" :contest="contest" />
+        </p>
         <p v-if="contest.summary" class="mt-1 text-muted">{{ contest.summary }}</p>
       </div>
       <!-- As the contest page's bar: the two ends under it, so dated labels never squeeze the bar on a phone. -->

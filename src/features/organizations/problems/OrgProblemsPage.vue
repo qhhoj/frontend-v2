@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Plus } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { OrganizationProblem } from '@/api/types/organization-problems';
@@ -37,6 +38,12 @@ const canRead = computed(() =>
   Boolean(organization.value?.viewer?.isMember || organization.value?.viewer?.canAdminister),
 );
 const isAdmin = computed(() => organization.value?.viewer?.canAdminister === true);
+/** "Tạo bài tập" for whoever may create problems for the organization (P-32 B), above the list and in its empty state. */
+const canCreate = computed(() => organization.value?.viewer?.canCreateProblem === true);
+const createTarget = computed(() => ({
+  name: 'admin-problemNew',
+  query: { organization: slug.value },
+}));
 const filters = computed(() => filtersFromQuery(route.query));
 const problems = useOrgProblemsQuery(slug, filters, canRead);
 const tags = useProblemTagsQuery(slug, canRead);
@@ -112,6 +119,12 @@ function saveTags(tagIds: string[]) {
         data-testid="org-problem-list"
         class="flex min-w-0 flex-col gap-4 rounded-panel p-5"
       >
+        <div v-if="canCreate && listState !== 'empty'" class="flex justify-end">
+          <AppButton data-testid="org-tab-create-problem" :to="createTarget">
+            <template #icon><Plus class="size-4" aria-hidden="true" /></template>
+            {{ $t('create.problem') }}
+          </AppButton>
+        </div>
         <OrgProblemFiltersBar
           :filters="filters"
           :tags="tagList"
@@ -129,8 +142,17 @@ function saveTags(tagIds: string[]) {
             v-if="listState === 'empty'"
             :kind="ORG_BITS.listEmpty"
             :title="$t('orgProblems.emptyTitle')"
-            :body="$t('orgProblems.emptyBody')"
+            :body="$t(canCreate ? 'orgProblems.emptyBodyCreator' : 'orgProblems.emptyBody')"
           >
+            <AppButton
+              v-if="canCreate"
+              tone="primary"
+              data-testid="org-tab-create-problem"
+              :to="createTarget"
+            >
+              <template #icon><Plus class="size-4" aria-hidden="true" /></template>
+              {{ $t('create.problem') }}
+            </AppButton>
             <AppButton
               v-if="filters.archived === 'false'"
               @click="applyFilters({ archived: 'true' })"

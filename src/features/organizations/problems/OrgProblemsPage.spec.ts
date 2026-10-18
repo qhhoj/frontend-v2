@@ -6,7 +6,7 @@ import { mountApp } from '@/test/mount';
 import { confirmDialog, openDialog } from '@/test/admin-routes';
 import { signedInViewer } from '@/test/problem-routes';
 import { ORG_PROBLEMS, TAGS, bulkResult, problemTag } from '@/test/f4-fixtures';
-import { MEMBER_STATE, STRANGER_STATE, orgProblemRoutes } from '@/test/f4-routes';
+import { ADMIN_STATE, MEMBER_STATE, STRANGER_STATE, orgProblemRoutes } from '@/test/f4-routes';
 
 type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 const LIST = '/organizations/lhp/problems';
@@ -274,5 +274,27 @@ describe('org bulk actions', () => {
     await router.push('/organizations/other/problems');
     await flushPromises();
     expect(wrapper.find('[data-testid="org-bulk-bar"]').exists()).toBe(false);
+  });
+
+  describe('creating from the tab (P-32 B)', () => {
+    const CREATOR_STATE = { ...ADMIN_STATE, canCreateProblem: true };
+
+    it('offers a problem creator "Tạo bài tập" for this organization above the list', async () => {
+      mockApi({ ...signedInViewer(), ...orgProblemRoutes(CREATOR_STATE) });
+      const { wrapper } = await mountTab();
+      const create = wrapper.get('[data-testid="org-tab-create-problem"]');
+      expect(create.attributes('href')).toBe('/admin/problems/new?organization=lhp');
+    });
+
+    it('turns an empty list into a first step for a creator, and only explains it to the others', async () => {
+      mockApi({ ...signedInViewer(), ...orgProblemRoutes(CREATOR_STATE, []) });
+      const { wrapper } = await mountTab();
+      expect(wrapper.text()).toContain('Tạo bài đầu tiên cho thành viên');
+      expect(wrapper.findAll('[data-testid="org-tab-create-problem"]')).toHaveLength(1);
+      mockApi({ ...signedInViewer(), ...orgProblemRoutes(MEMBER_STATE, []) });
+      const member = await mountTab();
+      expect(member.wrapper.text()).toContain('Liên hệ người quản lý bài');
+      expect(member.wrapper.find('[data-testid="org-tab-create-problem"]').exists()).toBe(false);
+    });
   });
 });

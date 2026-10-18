@@ -313,7 +313,8 @@
         "pastLastPage": "This page does not exist.",
         "backToFirstPage": "Back to page 1"
       },
-      "contestantCount": "{count} contestants"
+      "contestantCount": "{count} contestants",
+      "edit": "Edit contest {name}"
     },
     "print": {
       "toolbar": "Print options",
@@ -1700,6 +1701,7 @@
       "submissions": "Submissions"
     },
     "noContests": "This organization has no contests yet",
+    "noContestsCreator": "This organization has no contests yet. Create the first one for its members.",
     "noAbout": "No description yet.",
     "posts": "Organization posts",
     "noPosts": "No posts yet.",
@@ -2570,6 +2572,7 @@
     "forbiddenBody": "Join the organization to see this list.",
     "emptyTitle": "The organization has no problems yet",
     "emptyBody": "Problems linked to the organization appear here. Ask a problem manager to add some.",
+    "emptyBodyCreator": "Problems linked to the organization appear here. Create the first one for its members.",
     "filteredEmpty": "No problem matches the filter.",
     "filteredEmptyTag": "No problem in use has the tag “{tag}”.",
     "showArchived": "Show archived",

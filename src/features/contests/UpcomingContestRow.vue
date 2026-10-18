@@ -7,12 +7,14 @@ import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
+import ContestEditLink from './ContestEditLink.vue';
 import { listCallToAction } from './contest-action';
 import { endClockLabel } from './contest-clock';
 import { useSpanText } from './use-span-text';
 import ViewerBadge from './ViewerBadge.vue';
 
-const props = defineProps<{ contest: ContestListItem }>();
+/** `withEdit`: an organization's list, where its administrators get a pencil on the contests they edit (P-32). */
+const props = defineProps<{ contest: ContestListItem; withEdit?: boolean }>();
 const locale = useLocaleStore();
 const spanText = useSpanText();
 /** Relative start words move in minutes: a tick a minute is enough. */
@@ -45,7 +47,8 @@ const startsInText = computed(() =>
       <span class="font-display text-2xl leading-none font-bold">{{ dayChip.day }}</span>
       <span class="text-caption font-semibold">{{ dayChip.month }}</span>
     </span>
-    <div class="min-w-0 flex-1">
+    <!-- On a phone the name takes the rest of the day chip's line (basis 0 let the times share it, one word a line). -->
+    <div class="min-w-0 flex-1 basis-[calc(100%-5rem)] sm:basis-0">
       <h3 class="font-display text-lg font-semibold">
         <RouterLink
           :to="{ name: 'contest', params: { key: contest.key } }"
@@ -58,6 +61,7 @@ const startsInText = computed(() =>
         <ContestChips :contest="contest" with-tags with-code-needed />
         <ViewerBadge :badge-key="call.badgeKey" />
         <span class="font-mono text-caption text-muted">{{ contest.key }}</span>
+        <ContestEditLink v-if="withEdit" :contest="contest" />
       </div>
     </div>
     <div class="text-sm">
