@@ -954,7 +954,9 @@
     "external_judge_unauthorized": "Máy chấm ngoài từ chối token.",
     "external_judge_not_found": "Máy chấm ngoài không có OJ hoặc bài này.",
     "external_judge_rejected": "Máy chấm ngoài từ chối yêu cầu.",
-    "external_judge_unavailable": "Hiện chưa kết nối được máy chấm ngoài. Thử lại sau."
+    "external_judge_unavailable": "Hiện chưa kết nối được máy chấm ngoài. Thử lại sau.",
+    "ticket_claimed": "Người khác vừa nhận phiếu này; phiếu đã được tải lại.",
+    "ticket_closed": "Phiếu đã đóng. Mở lại phiếu trước khi nhận."
   },
   "common": {
     "scrollHint": "Vuốt ngang để xem thêm cột →",
@@ -2103,6 +2105,7 @@
     "liveOff": "Cập nhật trực tiếp đã dừng. Tải lại trang để xem tin mới.",
     "reply": "Trả lời",
     "replyPlaceholder": "Viết tin nhắn (tối đa 8192 ký tự; HTML được thoát)",
+    "replyFolded": "Trả lời…",
     "send": "Gửi tin nhắn",
     "messageCap": "Phiếu đã đạt giới hạn 500 tin nhắn.",
     "conflictReloaded": "Phiếu đã thay đổi sau khi trang được tải. Phiếu đã được tải lại; hãy xem nội dung mới nhất rồi thử lại.",

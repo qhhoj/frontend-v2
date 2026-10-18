@@ -6,7 +6,7 @@ import { signedInViewer } from '@/test/problem-routes';
 import { mountComponent } from '@/test/mount';
 import TicketStaffActions from './TicketStaffActions.vue';
 
-const ASSIGNER = { editNotes: false, markGood: false, assign: true, claim: false };
+const ASSIGNER = { editNotes: false, markGood: false, assign: true, claim: true };
 const LIMIT = 20;
 const usernames = (count: number) => Array.from({ length: count }, (_row, index) => `user${index}`);
 

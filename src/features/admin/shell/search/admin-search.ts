@@ -6,16 +6,19 @@ import {
   searchAdminUsers,
 } from '@/api/admin-search.api';
 import { fetchContests } from '@/api/contests.api';
+import { fetchTickets } from '@/api/tickets.api';
 import type { Locale } from '@/i18n';
 import type { AdminAccess } from '../../admin-access';
 import { ADMIN_SCREENS, adminRouteName } from '../../admin-screens';
 import { highlightParts } from '../../search/index-search';
+import { queueLocation } from '../../tickets/ticket-queue';
 import type { AdminNavItem } from '../admin-nav';
 
 /** Shorter text would match most of the site; the record lookups wait for this many characters. */
 export const MIN_RECORD_SEARCH = 2;
 
-export type PaletteGroupId = 'screens' | 'problems' | 'contests' | 'users' | 'organizations';
+export type PaletteGroupId =
+  'screens' | 'problems' | 'contests' | 'tickets' | 'users' | 'organizations';
 export interface PaletteEntry {
   /** Unique within the palette: the option's DOM id is built from it. */
   key: string;
@@ -85,6 +88,23 @@ export const RECORD_SOURCES: readonly RecordSource[] = [
         ({ key, name }) =>
           entry('contests', key, name, { name: adminRouteName('contestGeneral'), params: { key } }),
       ),
+  },
+  {
+    group: 'tickets',
+    permission: ADMIN_SCREENS.tickets.permission,
+    // Every ticket the viewer may read, open or closed, by title or creator; the hit opens beside the queue.
+    search: async (term) => {
+      const filters = { own: false, q: term, user: [], assignee: [], page: 1 };
+      const found = await fetchTickets(filters);
+      return found.items.slice(0, ADMIN_SEARCH_PAGE.pageSize).map((ticket) => ({
+        ...entry('tickets', ticket.id, ticket.title, {
+          name: adminRouteName('tickets'),
+          query: queueLocation(filters, ticket.id),
+        }),
+        // Ticket ids are time-ordered UUIDs, so a short id barely differs between tickets: the sender and subject do.
+        detail: `${ticket.creator.username} · ${ticket.link.title}`,
+      }));
+    },
   },
   {
     group: 'users',

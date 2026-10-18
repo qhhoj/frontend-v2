@@ -7,18 +7,21 @@
     "open": "Open",
     "closed": "Closed",
     "all": "All",
-    "own": "Only my tickets",
+    "own": "Tickets I sent or handle",
     "assignee": "Assignee",
     "peopleHint": "Separate several names with commas.",
     "awaiting": "Waiting for a staff reply",
-    "creatorSearch": "Creator (username)",
-    "assigneeChip": "Assignee: {names}"
+    "assigneeChip": "Assignee: {names}",
+    "mine": "My tickets",
+    "aboutMine": "About my problems",
+    "search": "Search title or sender",
+    "userChip": "Sender: {names}"
   },
   "table": {
     "caption": "Ticket list",
     "status": "Status",
     "ticket": "Ticket",
-    "assignees": "Assignees",
+    "assignees": "Handler",
     "messages": "Messages",
     "updated": "Latest",
     "open": "Open",
@@ -32,15 +35,25 @@
     "byline": "{creator} · opened {date}",
     "close": "Close ticket",
     "reopen": "Reopen ticket",
-    "closeAfterReply": "Close the ticket after sending"
+    "closeAfterReply": "Close the ticket after sending",
+    "claim": "Take ticket",
+    "release": "Hand back",
+    "handledBy": "Handled by {names}",
+    "markGoodHelp": "What is a good contribution?",
+    "markGoodHint": "Adds contribution points for the sender. You cannot mark your own ticket."
   },
-  "move": {
-    "heading": "Title and linked problem",
+  "handling": {
+    "heading": "Handling",
+    "assignees": "Handlers",
+    "assigneesHint": "Usernames separated by commas.",
+    "assigneesMax": "At most 20 handlers.",
+    "notes": "Internal notes",
+    "notesHint": "Readers of the ticket see the notes; handlers edit them.",
     "title": "Title",
-    "problem": "Problem code",
-    "problemHint": "Link the ticket to another problem; editors of that problem then see it. Leave as is to keep the link.",
-    "save": "Save title and link",
-    "saved": "Ticket updated."
+    "problem": "Linked problem code",
+    "problemHint": "Moves the ticket to another problem; leave it to keep the link.",
+    "save": "Save",
+    "saved": "Saved."
   },
   "total": "{count} ticket | {count} tickets"
 }

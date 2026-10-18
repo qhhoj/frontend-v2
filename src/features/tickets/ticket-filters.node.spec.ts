@@ -38,4 +38,21 @@ describe('ticket filters: URL round trip', () => {
       filters,
     );
   });
+  it('round-trips "about my problems" and the search, and leaves a blank search out', () => {
+    const filters = {
+      own: false,
+      open: true,
+      aboutMine: true,
+      q: 'sai test',
+      user: [],
+      assignee: [],
+      page: 1,
+    };
+    const query = routeQueryFromFilters(filters);
+    expect(query).toEqual({ scope: 'all', open: '1', about: 'mine', q: 'sai test' });
+    expect(ticketQueryFromRoute(query as Record<string, string>)).toEqual(filters);
+    expect(routeQueryFromFilters({ ...filters, q: '   ' })).not.toHaveProperty('q');
+    expect(ticketQueryFromRoute({ q: '  ', about: 'yes' })).not.toHaveProperty('q');
+    expect(ticketQueryFromRoute({ about: 'yes' })).not.toHaveProperty('aboutMine');
+  });
 });

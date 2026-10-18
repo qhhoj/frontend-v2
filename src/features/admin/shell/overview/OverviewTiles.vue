@@ -1,22 +1,24 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { usePermissions } from '@/stores/use-permissions';
-import { ADMIN_SCREENS, PROBLEM_EDIT } from '../../admin-screens';
+import { ADMIN_SCREENS, TICKET_STAFF } from '../../admin-screens';
 import { ORGANIZATION_QUEUE_PERMISSION } from '../../organizations/join-requests.queries';
+import { isMakerOf } from './admin-overview.queries';
 import OverviewTile from './OverviewTile.vue';
 import { JUDGING_STAFF, useOverviewTiles } from './use-overview-tiles';
 
 /** The dashboard's figures, the ones that need attention first, so the first row is what waits (P-33). */
-const { canAny } = usePermissions();
+const { can, canAny } = usePermissions();
 const tiles = useOverviewTiles();
-const hasTiles = computed(() =>
-  canAny([
-    ...JUDGING_STAFF,
-    ADMIN_SCREENS.tickets.permission,
-    ADMIN_SCREENS.commentReports.permission,
-    ORGANIZATION_QUEUE_PERMISSION,
-    PROBLEM_EDIT,
-  ]),
+const hasTiles = computed(
+  () =>
+    isMakerOf(can) ||
+    canAny([
+      ...JUDGING_STAFF,
+      TICKET_STAFF,
+      ADMIN_SCREENS.commentReports.permission,
+      ORGANIZATION_QUEUE_PERMISSION,
+    ]),
 );
 </script>
 

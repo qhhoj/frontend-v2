@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, useSlots, useTemplateRef, watch } from 'vue';
+import { computed, onBeforeUnmount, ref, useSlots, useTemplateRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Check } from 'lucide-vue-next';
 import { buttonClass } from '@/features/admin/ui/controls';
 import { SITE_TIME_ZONE } from '@/features/admin/ui/form/site-time';
+import { useBottomScrollPadding } from '@/lib/use-bottom-scroll-padding';
 import { SAVED_NOTE_MS } from './SaveBar.props';
 import type { SaveBarProps } from './SaveBar.props';
 
@@ -95,21 +96,13 @@ function useSavedNote(savedAt: () => Date | string | null, timeZone: () => strin
 }
 
 const bar = useTemplateRef<HTMLElement>('bar');
-const root = document.documentElement;
-const previousPadding = root.style.scrollPaddingBottom;
-let observer: ResizeObserver | undefined;
-onMounted(() => {
-  if (props.variant === 'footer') return;
-  const follow = () => {
-    root.style.scrollPaddingBottom = `${(bar.value?.offsetHeight ?? 0) + 16}px`;
+useBottomScrollPadding(
+  bar,
+  () => props.variant !== 'footer',
+  () => {
     if (props.hideIdleOnPhone) keepFocusAbove();
-  };
-  follow();
-  if (typeof ResizeObserver === 'function' && bar.value) {
-    observer = new ResizeObserver(follow);
-    observer.observe(bar.value);
-  }
-});
+  },
+);
 /** A bar that just appeared may sit on the field being typed into: scroll that field above it (the padding is set first). */
 function keepFocusAbove() {
   const focused = document.activeElement;
@@ -118,10 +111,6 @@ function keepFocusAbove() {
   if (bar.value.offsetHeight > 0 && focused.getBoundingClientRect().bottom > barTop)
     focused.scrollIntoView({ block: 'nearest' });
 }
-onBeforeUnmount(() => {
-  observer?.disconnect();
-  root.style.scrollPaddingBottom = previousPadding;
-});
 </script>
 
 <template>

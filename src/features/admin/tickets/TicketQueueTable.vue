@@ -5,18 +5,22 @@ import { Star } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
 import type { TicketListItem, TicketListQuery } from '@/api/types/tickets';
-import { formatDateTime, formatNumber } from '@/lib/format';
+import { formatAgoCompact, formatDateTime, formatNumber } from '@/lib/format';
+import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminBit from '../shell/AdminBit.vue';
 import AdminChip from '../ui/AdminChip.vue';
+import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import type { AdminColumn } from '../ui/table/table-columns';
 import { queueLocation } from './ticket-queue';
 
 /**
- * The rows as the server returned them: the status is the server's filter, so nothing is filtered here. With a ticket open
- * beside the list (`narrow`) the assignee and message columns step aside; the open ticket shows both.
+ * The rows as the server returned them: the status is the server's filter, so nothing is filtered here. "Xử lý" shows who
+ * handles each ticket (P-31). With a ticket open beside the list (`narrow`) it shrinks to avatars, the message count
+ * steps aside, "Gần nhất" turns relative (the full time in its title), and the status chip goes when the status filter
+ * already says it.
  */
 const props = defineProps<{
   items: TicketListItem[];
@@ -31,18 +35,26 @@ defineEmits<{ retry: [] }>();
 const router = useRouter();
 const locale = useLocaleStore();
 const { t } = useI18n();
+/** The relative "Gần nhất" moves on without a reload. */
+const RELATIVE_REFRESH_MS = 15_000;
+const now = useNow(RELATIVE_REFRESH_MS);
+const isStatusFixed = computed(() => props.narrow && props.filters.open !== undefined);
 const columns = computed<AdminColumn[]>(() => [
   { key: 'ticket', label: t('admin.tickets.table.ticket'), priority: 'primary' },
-  { key: 'status', label: t('admin.tickets.table.status'), priority: 'badge' },
+  ...(isStatusFixed.value
+    ? []
+    : [{ key: 'status', label: t('admin.tickets.table.status'), priority: 'badge' as const }]),
+  { key: 'assignees', label: t('admin.tickets.table.assignees') },
   ...(props.narrow
     ? []
-    : [
-        { key: 'assignees', label: t('admin.tickets.table.assignees') },
-        { key: 'messages', label: t('admin.tickets.table.messages'), align: 'end' as const },
-      ]),
+    : [{ key: 'messages', label: t('admin.tickets.table.messages'), align: 'end' as const }]),
   { key: 'updated', label: t('admin.tickets.table.updated'), cellClass: 'whitespace-nowrap' },
 ]);
 const selectTicket = (id: string) => router.replace({ query: queueLocation(props.filters, id) });
+/** Beside an open ticket the column has room for three avatars, then a "+n". */
+const AVATARS_SHOWN = 3;
+const handlerNames = (ticket: TicketListItem) =>
+  ticket.assignees.map((assignee) => assignee.username).join(', ');
 const byline = (ticket: TicketListItem) => `${ticket.creator.username} · ${ticket.link.title}`;
 const rowAttrs = (ticket: TicketListItem) => ({
   'data-ticket': ticket.id,
@@ -92,7 +104,30 @@ const rowAttrs = (ticket: TicketListItem) => ({
       </AdminChip>
     </template>
     <template #cell-assignees="{ row }">
-      <span v-if="row.assignees.length" class="flex max-w-full min-w-0 flex-wrap gap-x-2 gap-y-1">
+      <span
+        v-if="row.assignees.length && narrow"
+        class="flex -space-x-1.5"
+        :title="handlerNames(row)"
+      >
+        <UserAvatar
+          v-for="assignee in row.assignees.slice(0, AVATARS_SHOWN)"
+          :key="assignee.id"
+          :username="assignee.username"
+          :size="24"
+          class="ring-2 ring-surface-solid"
+        />
+        <span
+          v-if="row.assignees.length > AVATARS_SHOWN"
+          class="inline-flex size-6 items-center justify-center rounded-pill bg-surface-strong font-mono text-tiny tabular-nums"
+          aria-hidden="true"
+          >+{{ row.assignees.length - AVATARS_SHOWN }}</span
+        >
+        <span class="sr-only">{{ handlerNames(row) }}</span>
+      </span>
+      <span
+        v-else-if="row.assignees.length"
+        class="flex max-w-full min-w-0 flex-wrap gap-x-2 gap-y-1"
+      >
         <AdminUserLabel
           v-for="assignee in row.assignees"
           :key="assignee.id"
@@ -101,13 +136,23 @@ const rowAttrs = (ticket: TicketListItem) => ({
           class="max-w-full"
         />
       </span>
+      <span v-else-if="narrow" class="text-muted">
+        <span aria-hidden="true">—</span>
+        <span class="sr-only">{{ $t('admin.tickets.table.unassigned') }}</span>
+      </span>
       <span v-else class="text-muted">{{ $t('admin.tickets.table.unassigned') }}</span>
     </template>
     <template #cell-messages="{ row }">{{
       formatNumber(row.messageCount, locale.locale)
     }}</template>
-    <template #cell-updated="{ row }">{{
-      formatDateTime(row.lastMessageAt, locale.locale)
-    }}</template>
+    <template #cell-updated="{ row }">
+      <time
+        v-if="narrow"
+        :datetime="row.lastMessageAt"
+        :title="formatDateTime(row.lastMessageAt, locale.locale)"
+        >{{ formatAgoCompact(row.lastMessageAt, now, locale.locale) }}</time
+      >
+      <template v-else>{{ formatDateTime(row.lastMessageAt, locale.locale) }}</template>
+    </template>
   </AdminDataTable>
 </template>

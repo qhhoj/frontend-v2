@@ -142,7 +142,7 @@ describe('ticket page: drafts follow refetches unless edited', () => {
 
 describe('ticket page: drafts follow refetches unless edited', () => {
   it('shows the assignees the refetch brings when the viewer has not typed', async () => {
-    const staff = { editNotes: true, markGood: true, assign: true, claim: false };
+    const staff = { editNotes: true, markGood: true, assign: true, claim: true };
     mockApi({
       ...signedInViewer({ user: sessionUser({ isStaff: true }) }),
       [`GET /tickets/${id}`]: sequence(

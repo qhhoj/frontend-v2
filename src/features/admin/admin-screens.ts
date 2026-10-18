@@ -14,7 +14,11 @@ export interface AdminScreen {
 
 /** The backend's `canEdit` needs `edit_own_problem` for every edit; `edit_all_problem` only widens which problems. */
 export const PROBLEM_EDIT = 'judge.edit_own_problem';
+/** Ticket staff (backend `TICKET_STAFF_PERMISSION`): every ticket, assigning, canned replies. */
+export const TICKET_STAFF = 'judge.change_ticket';
 const CONTEST_EDIT = ['judge.edit_own_contest', 'judge.edit_all_contest'] as const;
+/** The backend's `canEdit` of a contest needs `edit_own_contest` for every edit, like problems. */
+export const CONTEST_EDIT_OWN = 'judge.edit_own_contest';
 /** Syncing a Polygon-linked problem and changing its link (backend `POLYGON_SYNC_PERMISSION`); importing needs only the rights of the change (create, or edit for an update). */
 export const SYNC_POLYGON = 'judge.sync_polygon_problem';
 const problemTab = (tab: string): AdminScreen => ({
@@ -105,8 +109,9 @@ export const ADMIN_SCREENS = {
   commentReports: { path: '/admin/comments/reports', permission: 'judge.change_comment' },
   comments: { path: '/admin/comments', permission: 'judge.change_comment' },
   commentLocks: { path: '/admin/comments/locks', permission: 'judge.change_comment' },
-  tickets: { path: '/admin/tickets', permission: 'judge.change_ticket' },
-  cannedReplies: { path: '/admin/tickets/canned', permission: 'judge.change_ticket' },
+  /** Problem setters and contest organisers handle the tickets about their problems and contests here too (P-31). */
+  tickets: { path: '/admin/tickets', permission: [TICKET_STAFF, PROBLEM_EDIT, CONTEST_EDIT_OWN] },
+  cannedReplies: { path: '/admin/tickets/canned', permission: TICKET_STAFF },
   activity: { path: '/admin/activity', permission: 'judge.can_see_user_activity' },
   // The site notice (misc config) lives in its "Văn bản công khai" tab, so either permission opens the page.
   settings: {

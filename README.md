@@ -91,6 +91,7 @@ Data flow: page -> `features/<area>/<area>.queries.ts` (vue-query) -> `api/<area
 | Official mode: pill, banner, locked controls                 | `src/features/official-mode/` (`useOfficialMode`, `useOfficialLock`, `OfficialLockNote`)                                                                                                 |
 | Ticket timeline rows and folding                             | `src/features/tickets/ticket-thread.ts`, `TicketMessages.vue`                                                                                                                            |
 | Canned replies: placeholders and picker                      | `src/features/tickets/canned/`                                                                                                                                                           |
+| Staff ticket queue: claim, "Xử lý" fold, filters             | `src/features/admin/tickets/` (`ticket-queue.ts` holds the URL format and the one-save patch)                                                                                            |
 | Bit in notifications, official mode and tickets              | `NOTIFICATION_BITS` (`notification-bits.ts`), `TICKET_BITS` (`ticket-bits.ts`)                                                                                                           |
 
 ## Auth screens

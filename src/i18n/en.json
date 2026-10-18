@@ -954,7 +954,9 @@
     "external_judge_unauthorized": "The external judge refused the token.",
     "external_judge_not_found": "The external judge has no such OJ or problem.",
     "external_judge_rejected": "The external judge rejected the request.",
-    "external_judge_unavailable": "The external judge cannot be reached right now. Try again later."
+    "external_judge_unavailable": "The external judge cannot be reached right now. Try again later.",
+    "ticket_claimed": "Someone else just took this ticket; it has been reloaded.",
+    "ticket_closed": "The ticket is closed. Reopen it before taking it."
   },
   "common": {
     "scrollHint": "Swipe sideways to see more columns →",
@@ -2103,6 +2105,7 @@
     "liveOff": "Live updates stopped. Reload to see new messages.",
     "reply": "Reply",
     "replyPlaceholder": "Write a message (up to 8192 characters; HTML is escaped)",
+    "replyFolded": "Reply…",
     "send": "Send message",
     "messageCap": "This ticket reached its 500-message limit.",
     "conflictReloaded": "The ticket changed after this page loaded. It has been reloaded; check the latest content and try again.",
