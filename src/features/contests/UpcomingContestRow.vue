@@ -47,7 +47,8 @@ const startsInText = computed(() =>
       <span class="font-display text-2xl leading-none font-bold">{{ dayChip.day }}</span>
       <span class="text-caption font-semibold">{{ dayChip.month }}</span>
     </span>
-    <div class="min-w-0 flex-1">
+    <!-- On a phone the name takes the rest of the day chip's line (basis 0 let the times share it, one word a line). -->
+    <div class="min-w-0 flex-1 basis-[calc(100%-5rem)] sm:basis-0">
       <h3 class="font-display text-lg font-semibold">
         <RouterLink
           :to="{ name: 'contest', params: { key: contest.key } }"
