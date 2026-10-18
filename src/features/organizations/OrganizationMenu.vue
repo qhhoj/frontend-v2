@@ -4,31 +4,49 @@ import Menu from 'primevue/menu';
 import type { MenuItem } from 'primevue/menuitem';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute, useRouter } from 'vue-router';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import IconButton from '@/components/ui/IconButton.vue';
 import { useAdminToast } from '@/features/admin/ui/feedback/use-admin-toast';
 import OfficialLockNote from '@/features/official-mode/OfficialLockNote.vue';
 import { useOfficialLock } from '@/features/official-mode/use-official-lock';
+import { useSessionStore } from '@/stores/session.store';
 import { membershipErrorCopy } from './membership-errors';
 import { useMembership } from './use-membership';
 
 /**
  * The member's ⋯ menu in the organization header: "Rời tổ chức", a rare and destructive step, behind a confirm dialog. A failure
  * stays in the dialog; leaving closes it and says so in a toast. An administrator may leave too while another one remains; the
- * dialog says the rights go with it, and the last one's refusal (`last_admin`) asks them to hand over first.
+ * dialog says the rights go with it, and the last one's refusal (`last_admin`) asks them to hand over first. An administrator who
+ * leaves from "Quản lý" lands on the about tab, since that tab is no longer theirs.
  */
 const props = defineProps<{ organization: OrganizationDetail }>();
 const { t } = useI18n();
+const route = useRoute();
+const router = useRouter();
+const session = useSessionStore();
 const toast = useAdminToast({ lazy: true });
 const isLeaveOpen = ref(false);
+/** One of this organization's administrators: site staff administer through a permission and keep it after leaving. */
+const isOwnAdmin = computed(() =>
+  props.organization.admins.some((admin) => admin.id === session.user?.id),
+);
+/** Read when leave is confirmed: the refreshed organization no longer lists the viewer. */
+let leftAsAdmin = false;
 const membership = useMembership(
   () => props.organization.slug,
   () => {
     isLeaveOpen.value = false;
     toast.show({ text: t('orgMembership.left', { name: props.organization.name }) });
+    if (leftAsAdmin && route.name === 'organization-manage')
+      void router.replace({ name: 'organization', params: { slug: props.organization.slug } });
   },
 );
+function leave() {
+  leftAsAdmin = isOwnAdmin.value;
+  membership.leave();
+}
 const lock = useOfficialLock();
 const menu = ref<InstanceType<typeof Menu>>();
 const isMenuOpen = ref(false);
@@ -50,9 +68,7 @@ const body = computed(() => {
   const rejoin = t(
     props.organization.isOpen ? 'orgMembership.leaveOpenBody' : 'orgMembership.privateLeave',
   );
-  return props.organization.viewer?.canAdminister
-    ? `${t('orgMembership.leaveAdminNote')} ${rejoin}`
-    : rejoin;
+  return isOwnAdmin.value ? `${t('orgMembership.leaveAdminNote')} ${rejoin}` : rejoin;
 });
 </script>
 
@@ -84,7 +100,7 @@ const body = computed(() => {
       :busy="membership.isPending.value"
       :can-confirm="!lock.isLocked.value"
       :return-focus-to="joinButton"
-      @confirm="membership.leave()"
+      @confirm="leave()"
     >
       <template #error>
         <OfficialLockNote v-if="lock.isLocked.value" :id="lock.noteId" />

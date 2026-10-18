@@ -1,9 +1,10 @@
 import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
-import { joinRequest, organizationDetail } from '@/test/community-fixtures';
+import { ADMIN_USER, joinRequest, organizationDetail } from '@/test/community-fixtures';
+import { sessionUser } from '@/test/fixtures';
 import { organizationRoutes } from '@/test/community-routes';
-import { fail, failWithCode, mockApi, ok, sequence } from '@/test/mock-api';
+import { fail, failWithCode, mockApi, ok, page, sequence } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import Modal from '@/components/ui/Modal.vue';
 import { signedInViewer } from '@/test/problem-routes';
@@ -154,15 +155,8 @@ describe('membership header: member and join', () => {
     await vi.waitFor(() => expect(document.body.textContent).toContain('Đã rời'));
   });
 
-  it('lets an administrator leave through ⋯, says the rights go, and asks the last one to hand over', async () => {
-    const lhp = organizationDetail({ viewer: { ...MEMBER, canAdminister: true } });
-    mockApi({
-      ...signedInViewer(),
-      ...organizationRoutes(lhp),
-      'POST /organizations/lhp/leave': failWithCode(409, 'user', 'last_admin'),
-    });
-    const { wrapper } = await mountApp('/organizations/lhp');
-    expect(wrapper.get('[data-testid="membership-chip"]').text()).toBe('Quản trị viên');
+  const SELF_ADMIN = { id: sessionUser().id, username: 'user_01', rating: null };
+  const openLeaveDialog = async (wrapper: Pick<VueWrapper, 'get'>) => {
     await wrapper.get('[data-testid="organization-menu"] button').trigger('click');
     await flushPromises();
     const leaveItem = [...document.body.querySelectorAll('[role="menuitem"]')].find((item) =>
@@ -170,13 +164,55 @@ describe('membership header: member and join', () => {
     ) as HTMLElement;
     (leaveItem.firstElementChild as HTMLElement).click();
     await flushPromises();
-    const dialog = document.body.querySelector('[role="dialog"]')!;
+    return document.body.querySelector('[role="dialog"]')!;
+  };
+
+  it('lets an administrator leave through ⋯, says the rights go, and asks the last one to hand over', async () => {
+    const lhp = organizationDetail({
+      admins: [SELF_ADMIN],
+      viewer: { ...MEMBER, canAdminister: true },
+    });
+    mockApi({
+      ...signedInViewer(),
+      ...organizationRoutes(lhp),
+      'POST /organizations/lhp/leave': failWithCode(409, 'user', 'last_admin'),
+    });
+    const { wrapper } = await mountApp('/organizations/lhp');
+    expect(wrapper.get('[data-testid="membership-chip"]').text()).toBe('Quản trị viên');
+    const dialog = await openLeaveDialog(wrapper);
     expect(dialog.textContent).toContain('Bạn cũng mất quyền quản trị.');
     dialog.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
     await flushPromises();
     expect(dialog.querySelector('[role="alert"]')!.textContent).toContain(
       'Bạn là quản trị viên duy nhất',
     );
+  });
+
+  it('keeps the rights note from staff who administer through a permission', async () => {
+    const lhp = organizationDetail({ viewer: { ...MEMBER, canAdminister: true } });
+    mockApi({ ...signedInViewer(), ...organizationRoutes(lhp) });
+    const { wrapper } = await mountApp('/organizations/lhp');
+    const dialog = await openLeaveDialog(wrapper);
+    expect(dialog.textContent).not.toContain('quyền quản trị');
+  });
+
+  it('sends an administrator who leaves from "Quản lý" to the about tab', async () => {
+    const lhp = organizationDetail({
+      admins: [SELF_ADMIN, ADMIN_USER],
+      viewer: { ...MEMBER, canAdminister: true },
+    });
+    mockApi({
+      ...signedInViewer(),
+      ...organizationRoutes(lhp),
+      'GET /organizations/lhp': sequence(ok(lhp), ok(organizationDetail({ viewer: OUTSIDER }))),
+      'POST /organizations/lhp/leave': { status: 204 },
+      'GET /organizations/lhp/revisions': page([]),
+    });
+    const { wrapper, router } = await mountApp('/organizations/lhp/manage');
+    const dialog = await openLeaveDialog(wrapper);
+    dialog.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    await flushPromises();
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('organization'));
   });
 
   it('turns a join into a chip and a toast, not a panel', async () => {
