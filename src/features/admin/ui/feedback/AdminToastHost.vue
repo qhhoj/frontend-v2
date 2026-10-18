@@ -42,7 +42,7 @@ function undo(toast: Toast) {
         v-for="toast in adminToasts"
         :key="toast.id"
         :role="toast.tone === 'error' ? 'alert' : undefined"
-        class="pointer-events-auto flex items-start gap-2.5 rounded-row border border-line-strong bg-surface-solid py-2 pr-2 pl-3 text-sm text-content"
+        class="pointer-events-auto flex items-start gap-2.5 rounded-row border border-line-strong bg-surface-solid py-2 pr-2 pl-3 text-sm text-content shadow-float"
         @mouseenter="pauseToast(toast.id)"
         @mouseleave="resumeToast(toast.id)"
         @focusin="pauseToast(toast.id)"

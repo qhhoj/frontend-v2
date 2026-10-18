@@ -11,6 +11,7 @@
   --qh-surface-solid: #24211e;
   --qh-line: #39342f;
   --qh-line-strong: #4a443d;
+  --qh-line-control: #8f877c;
   --qh-line-accent: #d97757;
   --qh-text: #f2eee8;
   --qh-text-muted: #c9c1b6;
@@ -24,6 +25,7 @@
   --qh-focus-ring: #f4a98b;
   --qh-gradient-accent: linear-gradient(90deg, #d97757, #d97757);
   --qh-glow: 0 0 0 0 rgba(0, 0, 0, 0);
+  --qh-shadow-float: 0 8px 24px rgba(0, 0, 0, 0.5);
   --qh-positive: #86efac;
   --qh-negative: #fca5a5;
   --qh-caution-strong: #f0b44c;

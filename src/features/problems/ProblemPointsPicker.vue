@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ChevronDown } from 'lucide-vue-next';
-import Popover from 'primevue/popover';
 import { computed, ref, watch } from 'vue';
 import { PROBLEM_LIMITS } from '@/features/admin/problems/general/problem-form';
 import { translate } from '@/i18n';
 import { toolbarControlClass } from '@/components/toolbar-classes';
+import Popover from '@/components/ui/Popover.vue';
 
 const props = defineProps<{ min: number | null; max: number | null }>();
 const emit = defineEmits<{
@@ -85,7 +85,7 @@ const commit = () => setRange(draftMin.value, draftMax.value);
   </button>
   <Popover
     ref="popover"
-    :pt="{ root: { 'aria-label': $t('problems.pointsFilter') } }"
+    :label="$t('problems.pointsFilter')"
     @show="open = true"
     @hide="open = false"
   >
@@ -95,7 +95,6 @@ const commit = () => setRange(draftMin.value, draftMax.value);
           {{ $t('problems.pointsMin') }}
           <input
             name="pointsMin"
-            autofocus
             type="number"
             inputmode="numeric"
             :min="SLIDER.min"

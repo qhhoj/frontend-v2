@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Ellipsis } from 'lucide-vue-next';
-import Popover from 'primevue/popover';
 import { computed, ref, useSlots } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import PageHeader from '@/components/ui/PageHeader.vue';
+import Popover from '@/components/ui/Popover.vue';
 import { navCrumbsOf } from '../shell/admin-nav';
 import type { AdminCrumb } from '../shell/admin-nav';
 
@@ -39,7 +39,7 @@ const backLink = computed(() => {
   };
 });
 
-const overflowMenu = ref<InstanceType<typeof Popover> | null>(null);
+const overflowMenu = ref<InstanceType<typeof Popover>>();
 const closeOverflow = () => overflowMenu.value?.hide();
 </script>
 
@@ -57,7 +57,7 @@ const closeOverflow = () => overflowMenu.value?.hide();
         >
           <Ellipsis aria-hidden="true" class="size-4" />{{ $t('admin.shell.more') }}
         </button>
-        <Popover ref="overflowMenu">
+        <Popover ref="overflowMenu" :label="$t('admin.shell.more')">
           <div class="flex min-w-48 flex-col gap-1">
             <slot name="overflow" :close="closeOverflow" />
           </div>

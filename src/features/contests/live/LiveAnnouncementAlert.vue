@@ -79,7 +79,7 @@ const announcementsTab = computed(() => ({
     <AnnouncementsPausedNotice
       v-if="!isOnThisContest"
       :contest-key="key"
-      class="max-md:page-gutter max-md:mt-3 md:mb-0 md:rounded-row md:border md:border-line md:bg-surface-solid md:p-3"
+      class="max-md:page-gutter max-md:mt-3 md:mb-0 md:rounded-row md:border md:border-line md:bg-surface-solid md:p-3 md:shadow-float"
     />
     <aside
       v-if="shown"
@@ -106,7 +106,7 @@ const announcementsTab = computed(() => ({
         </IconButton>
       </div>
       <div
-        class="flex items-start gap-3 rounded-row border border-accent bg-surface-solid p-4 max-md:hidden"
+        class="flex items-start gap-3 rounded-row border border-accent bg-surface-solid p-4 max-md:hidden md:shadow-float"
       >
         <InlineBit kind="envelope" />
         <div class="min-w-0 flex-1">

@@ -11,8 +11,8 @@ export type ChipTone = StatusTone | TagTone | VerdictCode;
 export type ChipSize = 'sm' | 'md';
 
 /**
- * A pill chip: optional dot or icon, then text on a tone's token pair, never wrapping. sm is 22 px with caption text, md 28 px
- * with meta text. The text carries the meaning; colour only repeats it. `interactive` makes it a button with a 44 px hit area
+ * A pill chip: optional dot or icon, then text on a tone's token pair, never wrapping. sm is 22 px with caption text and a 14 px
+ * icon, md 28 px with meta text and a 16 px icon; an icon in the `icon` slot without its own `size-*` class gets the same size. The text carries the meaning; colour only repeats it. `interactive` makes it a button with a 44 px hit area
  * on coarse pointers.
  */
 const props = withDefaults(
@@ -45,8 +45,14 @@ const STATUS_TONES: Record<StatusTone | TagTone, string> = {
   'tag-8': 'border-transparent bg-tag-8-bg text-tag-8',
 };
 const SIZES: Record<ChipSize, { box: string; icon: string }> = {
-  sm: { box: 'h-5.5 px-2 text-caption leading-4', icon: 'size-3.5' },
-  md: { box: 'h-7 px-2.5 text-meta leading-4.5', icon: 'size-4' },
+  sm: {
+    box: 'h-5.5 px-2 text-caption leading-4 [&_svg:not([class*=size-])]:size-3.5',
+    icon: 'size-3.5',
+  },
+  md: {
+    box: 'h-7 px-2.5 text-meta leading-4.5 [&_svg:not([class*=size-])]:size-4',
+    icon: 'size-4',
+  },
 };
 const INTERACTIVE =
   'relative cursor-pointer transition-colors hover:border-current focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus pointer-coarse:after:absolute pointer-coarse:after:inset-x-0 pointer-coarse:after:top-1/2 pointer-coarse:after:h-11 pointer-coarse:after:-translate-y-1/2';

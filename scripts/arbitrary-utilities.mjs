@@ -1,5 +1,5 @@
 // Arbitrary values that bypass the named tokens (docs/design-language.md): `text-[13px]`, `rounded-[3px]`, `z-[1200]`.
-// Use the steps instead: text-tiny|caption|meta|sm|base|title|page|stat|hero, rounded-cell|row|card|pill|control, z-sticky|savebar|header|bit|overlay|toast.
+// Use the steps instead: text-tiny|caption|meta|sm|base|title|subtitle|section|display|page|stat|hero, rounded-cell|row|card|pill|control, z-sticky|savebar|header|bit|overlay|toast.
 const ARBITRARY =
   /^(?:text-\[[\d.]+(?:px|r?em)\](?:\/\S+)?|rounded(?:-[a-z]{1,2})?-\[[^\]]+\]|z-\[[^\]]+\])$/;
 const COMMENT_LINE = /^\s*(?:\/\/|\/\*|\*)/;

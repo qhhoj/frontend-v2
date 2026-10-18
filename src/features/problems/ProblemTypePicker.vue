@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { problemTypeLabel } from './problem-type-label';
 import { ChevronDown } from 'lucide-vue-next';
-import Popover from 'primevue/popover';
 import { computed, ref } from 'vue';
 import type { CatalogItem } from '@/api/types/problems';
 import { toolbarControlClass } from '@/components/toolbar-classes';
+import Popover from '@/components/ui/Popover.vue';
 
 const props = defineProps<{ types: CatalogItem[]; selected: string[] }>();
 const emit = defineEmits<{ change: [typeIds: string[]] }>();
@@ -40,18 +40,12 @@ const toggle = (id: string) =>
     }}
     <ChevronDown class="size-4" aria-hidden="true" />
   </button>
-  <Popover
-    ref="popover"
-    :pt="{ root: { 'aria-label': $t('problems.types') } }"
-    @show="open = true"
-    @hide="open = false"
-  >
+  <Popover ref="popover" :label="$t('problems.types')" @show="open = true" @hide="open = false">
     <div class="flex w-64 flex-col gap-2">
       <input
         v-model="query"
         type="search"
         name="typeSearch"
-        autofocus
         :aria-label="$t('problems.typeSearch')"
         :placeholder="$t('problems.typeSearch')"
         class="h-10 rounded-row border border-line bg-surface-strong px-3 text-content"

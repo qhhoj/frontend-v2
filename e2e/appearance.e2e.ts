@@ -50,6 +50,25 @@ test('an anonymous visitor picks a look in the panel; it survives a reload and n
   expect(api.requestsTo('PATCH /profile')).toEqual([]);
 });
 
+test('the panel takes focus without moving the page, keeps Tab inside, and Escape gives focus back to its button', async ({
+  page,
+  api,
+}) => {
+  void api;
+  await page.goto('/blog');
+  const panel = await openPanel(page);
+  await expect(panel.getByRole('button').first()).toBeFocused();
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  // More presses than the panel has controls, so Tab wraps at least once.
+  for (let press = 0; press < 40; press += 1) {
+    await page.keyboard.press('Tab');
+    expect(await panel.evaluate((element) => element.contains(document.activeElement))).toBe(true);
+  }
+  await page.keyboard.press('Escape');
+  await expect(panel).toBeHidden();
+  await expect(page.getByRole('button', TRIGGER)).toBeFocused();
+});
+
 test('the panel and the settings page show the same look, and the page takes focus', async ({
   page,
   api,

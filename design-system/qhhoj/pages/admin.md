@@ -78,7 +78,7 @@ These are defined in `src/features/admin/ui/admin-density.css` under `@media (po
 
 ### Data tables: `AdminDataTable` (new, `ui/table/`)
 - Props: columns (key, label, sortable, align, `priority: 'primary' | 'secondary' | 'meta'`), rows, `rowKey`, selection, `sort` (v-model bound to the `?sort=` query string; the existing values such as `newest` keep working), `loading`, `error`.
-- **Header**: sticky inside the card (`top: 0` of the scroll region), 12/600 caps muted. Sortable headers are buttons with `aria-sort` and a 14 px chevron.
+- **Header**: sticky inside the card (`top: 0` of the scroll region), 13/600 muted, sentence case (`text-meta text-muted`, as in every `DataTable`). Sortable headers are buttons with `aria-sort` and a 14 px chevron.
 - **Rows**: 40 px. Hover uses `surface-hover`. The primary column is a link (name 14/600 + mono code 12 muted underneath). Status columns use chips. Numbers are right-aligned and mono.
 - **Row actions**: at most one visible text or icon action (e.g. "Sửa"), plus a `⋯` menu (`AdminRowMenu`). Destructive items go last, in red, separated, and always confirm. Icon-only buttons have an `aria-label` and a tooltip.
 - **Selection and bulk bar**: the checkbox column shows only when bulk actions exist. The bulk bar (`AdminBulkBar`) replaces the toolbar while a selection exists. It shows "3 đã chọn · Bỏ chọn" and the actions, has no shadow, and uses a `surface-strong` fill.

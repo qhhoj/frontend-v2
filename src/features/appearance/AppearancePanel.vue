@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { Palette } from 'lucide-vue-next';
-import FocusTrap from 'primevue/focustrap';
-import Popover from 'primevue/popover';
 import { computed, ref } from 'vue';
 import BitMascot from '@/components/BitMascot.vue';
+import Popover from '@/components/ui/Popover.vue';
 import { translate } from '@/i18n';
 import { useMediaQuery } from '@/lib/use-media-query';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
@@ -16,7 +15,6 @@ import ModeChoice from './ModeChoice.vue';
 import SegmentedChoice from './SegmentedChoice.vue';
 import { useAppearanceChoice } from './use-appearance-choice';
 
-const vFocustrap = FocusTrap;
 const TITLE_ID = 'appearance-panel-title';
 const theme = useThemeStore();
 const { shown, update, reset } = useAppearanceChoice();
@@ -47,17 +45,8 @@ const lowPowerOptions = computed(() =>
   >
     <Palette class="size-5" aria-hidden="true" />
   </button>
-  <Popover
-    ref="popover"
-    :pt="{ root: { 'aria-labelledby': TITLE_ID } }"
-    @show="isOpen = true"
-    @hide="isOpen = false"
-  >
-    <!-- v-focustrap keeps Tab inside while the panel is open; autoFocus moves focus to the first button on open; the popover returns focus to the button on Escape. -->
-    <div
-      v-focustrap="{ autoFocus: true }"
-      class="flex w-[min(20rem,calc(100vw-4rem))] flex-col gap-4"
-    >
+  <Popover ref="popover" :labelledby="TITLE_ID" @show="isOpen = true" @hide="isOpen = false">
+    <div class="flex w-[min(20rem,calc(100vw-4rem))] flex-col gap-4">
       <div class="flex items-center justify-between gap-3">
         <p :id="TITLE_ID" class="font-display text-lg font-bold">{{ $t('appearance.title') }}</p>
         <BitMascot :look="PLACEMENT_LOOKS.hero" blinks class="[--bit-px:2px]" />

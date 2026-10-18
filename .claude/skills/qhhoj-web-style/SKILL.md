@@ -25,6 +25,9 @@ Type scale (font size only; leading comes from the primitive or a `leading-*` cl
 | `text-sm`                          | 14  | UI, controls, table cells (Tailwind's, leading 20) |
 | `text-base`                        | 16  | prose and every input (Tailwind's, leading 24)     |
 | `text-title`                       | 17  | card titles (with `font-semibold`/`font-bold`)     |
+| `text-subtitle`                    | 18  | lead lines, dialog titles (add a `leading-*`)      |
+| `text-section`                     | 20  | section titles outside cards (add a `leading-*`)   |
+| `text-display`                     | 24  | display headings, big numbers (add a `leading-*`)  |
 | `page-title` utility / `text-page` | 26  | the one h1 per page                                |
 | `text-stat`                        | 26  | stat values, always with `font-mono tabular-nums`  |
 | `text-hero`                        | 40  | countdowns                                         |
@@ -36,10 +39,14 @@ Other tokens:
 - Spacing: page blocks 24 · card padding 16/20/24, up to 32 · form fields 20 apart · label to input 6 · button groups 8.
 - Z: `z-sticky` 10 · `z-savebar` 20 · `z-header` 30 · `z-bit` 40 · `z-overlay` 50 · `z-toast` 1200.
 - Colour roles: `content`, `muted`, `line`, `accent*`, `positive`, `negative`, `warning`/`warning-bg`, `info`/`info-bg`, `tag-1..8`, `verdict-*` (verdicts only), `tier-*`.
+- Control border: `border-line-control` on inputs, selects, textareas and secondary buttons (3:1 on their ground, WCAG 1.4.11); `border-line` stays the hairline of cards and dividers, `border-line-strong` the edge of menus and popovers.
+- Elevation: `shadow-float` on floating surfaces only (Modal, menus, popovers, toasts get it from the kit); everything else is flat.
+- Icons (Lucide): 14 dense admin chrome and small chips · 16 default · 20 hero and empty states. `IconButton` and `Chip` size an icon with no `size-*` class themselves.
+- Placeholder: muted text, never the content colour at 50 %.
 - Motion: `--qh-duration-fast` 150 ms, `--qh-duration` 200 ms, on colour, border and opacity only.
 - Admin density: `--qa-row`, `--qa-control`, `--qa-gap`, `--qa-gutter` (`src/features/admin/ui/admin-density.css`).
 
-`npm run lint:tokens` fails on: raw colours outside `src/theme/themes/`, stock `rounded`/`rounded-lg`/`shadow-*` (the theme resets them, they render nothing), `text-[<n>px]`, `rounded-[…]`, `z-[…]`. The only exceptions are listed per file in `ALLOWED` in `scripts/arbitrary-utilities.mjs`; do not add to it without a reason line in the PR.
+`npm run lint:tokens` fails on: raw colours outside `src/theme/themes/`, stock `rounded`/`rounded-lg`/`shadow-*` (the theme resets them, they render nothing; `shadow-float` and `shadow-glow` are ours), `text-[<n>px]`, `rounded-[…]`, `z-[…]`. The only exceptions are listed per file in `ALLOWED` in `scripts/arbitrary-utilities.mjs`; do not add to it without a reason line in the PR.
 
 ## 3. Primitives
 
@@ -62,12 +69,13 @@ The kit lives in `src/components/ui/`; new code imports from there. Key props on
 | Table / list                         | `DataTable` (+ `DataTableColumns.ts`)              | `columns`, `rows`, `rowKey`, `density`, `stack` card/scroll, `stackBelow`, `stickyColumns`, `pager`, sort/selected models                                                                     |
 | Search + filters                     | `FilterBar`                                        | `searchLabel`, `chips`, v-model search                                                                                                                                                        |
 | Dialog                               | `Modal` (`ConfirmDialog` for confirms)             | `title`, `size` sm/md/lg (full screen < 640)                                                                                                                                                  |
+| Popover, small menu panel            | `Popover`                                          | `label` or `labelledby`; `toggle($event)` / `hide()`; focus goes in, Tab stays inside, Escape and `hide()` return focus to the opener                                                         |
 | Facts or stats                       | `StatGrid`                                         | `items` {label, value (string), tone, hint}, `cols`, `mode` fact/stat                                                                                                                         |
 | Meter                                | `ProgressBar`                                      | `value`, `max`, `tone`, `label`                                                                                                                                                               |
 
 Also in `src/components/`: `QueryState` (+ `#skeleton`), `SkeletonBlock`, `StatePanel`, `EmptyState`, `NumberedPager`, `ToolbarSearch`, `ToolbarSelect`. Admin-only (`src/features/admin/ui/`): `AdminRowMenu`, `AdminLeaveGuard`, toasts via `use-admin-toast`.
 
-Thin wrappers kept for old call sites: `GlassCard`, `PillTabs`, `AdminPageHeader`, `AdminField`, `AdminChip`, `AdminTabs`, `AdminFilterTabs`, `AdminDataTable`, `AdminFilterBar`, `AdminSaveBar`, `AdminNotice`, `AdminSwitch` (adds `lockedBy`), `SettingsNotice`, `SettingsCard`, `AuthField`, `controls.ts` and `settings/buttons.ts` classes. Use the `ui/` part in new code.
+Thin wrappers kept for old call sites (ESLint rejects a new import of `AdminField`, `AdminChip`, `AdminPageHeader`, `AdminDataTable`, `AdminNotice`, `GlassCard` and the `controls.ts` classes; ledger in `docs/wrapper-migration.md`): `GlassCard`, `PillTabs`, `AdminPageHeader`, `AdminField`, `AdminChip`, `AdminTabs`, `AdminFilterTabs`, `AdminDataTable`, `AdminFilterBar`, `AdminSaveBar`, `AdminNotice`, `AdminSwitch` (adds `lockedBy`), `SettingsNotice`, `SettingsCard`, `AuthField`, `controls.ts` and `settings/buttons.ts` classes. Use the `ui/` part in new code.
 
 Known gaps: `Notice` has no icon override, `Chip` has no `to`, `StatGrid` values are plain strings, there is no toggle button (single `aria-pressed`) primitive. Not built: `MarkdownEditor`, `ListRow`, `SidebarLayout`. Until a part exists, reuse the closest one and never hand-roll a new recipe.
 
@@ -82,7 +90,7 @@ Known gaps: `Notice` has no icon override, `Chip` has no `to`, `StatGrid` values
 - Public lists with more than 4 columns stack to cards under 640 px; others may scroll inside their card.
 - Ranking boards on phones: sticky rank + name columns, sideways scroll.
 - No horizontal page scroll from 320 to 1440 px (`e2e/topbar-fit.e2e.ts`, `e2e/containment.e2e.ts`).
-- Empty states always offer one next step. Skeletons are shaped from the real component, never fixed pixel heights.
+- Empty states always offer one next step (`EmptyState`'s `#action` slot). Skeletons are shaped from the real component, never fixed pixel heights.
 - Active tab = `bg-accent-soft` + `text-accent-soft-text` + accent border.
 - Copy: Vietnamese first, through i18n (vi and en both), short and plain. Lucide icons only, no emoji.
 - Person names in mock-ups, placeholders, examples and fixtures shown on screen: only `bitcoder` (a handle, not a real-looking personal name). Never invent other names.
