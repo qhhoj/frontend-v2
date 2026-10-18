@@ -139,7 +139,7 @@ describe('LoadingBit', () => {
     header.remove();
   });
 
-  it('walks along the bottom of the viewport where the gutters are narrower than a Bit', () => {
+  it('walks along the bottom of the viewport where the gutters are too narrow to walk in', () => {
     setViewport(390, 844);
     const wrapper = mountBits('walking');
     for (let frame = 1; frame <= 300; frame++) {

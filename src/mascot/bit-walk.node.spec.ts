@@ -184,8 +184,8 @@ describe('loadingLanes', () => {
   });
 
   it.each([
-    ['a gutter narrower than a Bit', { left: SIZE - 1, right: 1328 }],
-    ['the other gutter narrower than a Bit', { left: 112, right: WIDE.width - SIZE + 1 }],
+    ['a gutter with no room to walk beside a Bit', { left: SIZE * 1.5 - 1, right: 1328 }],
+    ['the other gutter too narrow', { left: 112, right: WIDE.width - SIZE * 1.5 + 1 }],
     ['no column at all', null],
   ])('falls back to one band along the bottom with %s', (_name, column) => {
     const lanes = loadingLanes(WIDE, SIZE, column);

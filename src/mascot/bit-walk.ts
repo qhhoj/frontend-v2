@@ -92,13 +92,17 @@ export interface Column {
   right: number;
 }
 
+/** A gutter takes a lane when a Bit fits with half a body of room to walk sideways (1440 px yes, 1366 px no). */
+const LANE_WIDTH_IN_BITS = 1.5;
+
 /**
- * Where the loading Bits walk, one lane per Bit in turn: the two gutters beside the content column when each fits a Bit,
- * else a band along the bottom of the viewport (the footer's place), so they never cross the header or the content.
+ * Where the loading Bits walk, one lane per Bit in turn: the two gutters beside the content column when each is wide
+ * enough, else a band along the bottom of the viewport (the footer's place), so they never cross the header or the content.
  */
 export const loadingLanes = (viewport: Viewport, size: number, column: Column | null): Bounds[] => {
   const whole = walkBounds(viewport, size);
-  if (column && column.left >= size && viewport.width - column.right >= size)
+  const minGutter = size * LANE_WIDTH_IN_BITS;
+  if (column && column.left >= minGutter && viewport.width - column.right >= minGutter)
     return [
       { ...whole, maxX: column.left - size },
       { ...whole, minX: column.right },
