@@ -1,6 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import { sessionUser } from '@/test/fixtures';
+import { sessionUser, userPage } from '@/test/fixtures';
 import { ppEntry, recentComment } from '@/test/community-fixtures';
 import { profileRoutes, profileTabRoutes } from '@/test/community-routes';
 import { fail, mockApi, ok, page, sequence } from '@/test/mock-api';
@@ -68,7 +68,11 @@ describe('profile tabs', () => {
     expect(calls.some((call) => call.path.endsWith('/comments'))).toBe(false);
   });
   it('links "Bài nộp" to the site list filtered to the user, with their count', async () => {
-    const calls = mockApi({ ...anonymousViewer, ...base });
+    const calls = mockApi({
+      ...anonymousViewer,
+      ...base,
+      ...profileRoutes(userPage({ submissionCount: 38 })),
+    });
     const { wrapper } = await mountApp('/users/user_01');
     await flushPromises();
     const tab = wrapper.get('a[href="/submissions?user=user_01"]');

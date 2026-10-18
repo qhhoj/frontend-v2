@@ -113,7 +113,6 @@ export const editableContest = (overrides: Partial<EditableContest> = {}): Edita
   ],
   viewer: {
     boardFrozenAt: null,
-    ratingChange: null,
     canSeeFullScoreboard: true,
     canEdit: true,
     isEditor: true,

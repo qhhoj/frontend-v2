@@ -164,7 +164,6 @@ export const userPage = (overrides: Partial<UserPage> = {}): UserPage => ({
   points: 1200,
   performancePoints: 386.4,
   problemCount: 412,
-  submissionCount: 38,
   rating: 2104,
   rank: 27,
   ratingRank: 30,
@@ -360,7 +359,6 @@ export const listViewer = (overrides: Partial<ContestListViewer> = {}): ContestL
 export const contestViewer = (overrides: Partial<ContestViewer> = {}): ContestViewer => ({
   ...listViewer(),
   boardFrozenAt: null,
-  ratingChange: null,
   canSeeFullScoreboard: false,
   canEdit: false,
   isEditor: false,
