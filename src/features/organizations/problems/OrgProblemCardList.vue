@@ -26,14 +26,15 @@ const emit = defineEmits<{
 
 <template>
   <div class="flex flex-col">
-    <div v-if="isAdmin" class="flex items-center gap-1 text-sm text-muted">
-      <OrgSelectBox
-        :checked="isAllSelected"
-        :label="$t('orgProblems.selectAll')"
-        @change="emit('toggle-all')"
-      />
+    <OrgSelectBox
+      v-if="isAdmin"
+      class="self-start text-sm text-muted"
+      :checked="isAllSelected"
+      :label="$t('orgProblems.selectAll')"
+      @change="emit('toggle-all')"
+    >
       {{ $t('orgProblems.selectAll') }}
-    </div>
+    </OrgSelectBox>
     <ul class="m-0 flex list-none flex-col p-0" :aria-label="$t('orgProblems.tableCaption')">
       <li
         v-for="row in rows"

@@ -345,7 +345,9 @@ describe('OrgProblemsPage on a phone', () => {
     const { wrapper } = await mountTab();
     await tick(wrapper, 'lhp_lis');
     expect(wrapper.get('[data-testid="org-bulk-bar"]').text()).toContain('Đã chọn 1 bài');
-    await wrapper.get('input[aria-label="Chọn tất cả bài trên trang"]').setValue(true);
+    const selectAll = wrapper.get('input[aria-label="Chọn tất cả bài trên trang"]');
+    expect(selectAll.element.closest('label')!.textContent).toContain('Chọn tất cả bài trên trang');
+    await selectAll.setValue(true);
     await flushPromises();
     expect(wrapper.get('[data-testid="org-bulk-bar"]').text()).toContain('Đã chọn 4 bài');
   });
