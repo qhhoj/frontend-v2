@@ -36,7 +36,7 @@ const chipClasses = (code: ResultCode, value: number) =>
 
 <template>
   <section class="flex flex-col gap-2">
-    <h2 class="font-display text-section leading-7 font-bold">
+    <h2 class="section-title">
       {{ $t('contests.stats.problemTitle') }}
     </h2>
     <Card

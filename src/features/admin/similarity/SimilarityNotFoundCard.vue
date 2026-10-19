@@ -11,7 +11,7 @@ const backToList = () => router.push({ name: 'admin-similarity' });
 <template>
   <section class="flex flex-col items-center gap-3 px-6 py-8 text-center">
     <AdminBit placement="refused" />
-    <h2 class="font-display text-section leading-7 font-bold">
+    <h2 class="section-title">
       {{ $t('admin.similarity.notFound.title') }}
     </h2>
     <p class="max-w-prose text-sm text-muted">{{ $t('admin.similarity.notFound.body') }}</p>

@@ -33,7 +33,7 @@ const isLive = computed(
 <template>
   <Card class="p-5">
     <div class="mb-1 flex items-center justify-between gap-3">
-      <h2 class="font-display text-base font-bold">{{ $t('contests.tabs.announcements') }}</h2>
+      <h2 class="section-title">{{ $t('contests.tabs.announcements') }}</h2>
       <Chip v-if="isLive" tone="success">{{ $t('contests.announcements.live') }}</Chip>
     </div>
     <div v-if="isPending" data-skeleton-region="announcement-rail" class="flex flex-col gap-2 py-3">

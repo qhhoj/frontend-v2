@@ -182,6 +182,13 @@
   font-weight: 700;
   line-height: 1.25;
 }
+/* Section title: the h2 of a page section, one step under the page title (--text-section, 20 px). */
+@utility section-title {
+  font-family: var(--qh-font-display);
+  font-size: var(--text-section);
+  font-weight: 700;
+  line-height: 1.75rem;
+}
 @utility glass {
   background-color: var(--qh-surface-live);
   border: 1px solid var(--qh-line);

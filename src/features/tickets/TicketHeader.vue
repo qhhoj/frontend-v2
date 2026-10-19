@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed } from 'vue';
 import type { TicketDetail } from '@/api/types/tickets';
 import GlassCard from '@/components/GlassCard.vue';
@@ -48,39 +49,44 @@ const LINK_CLASS = 'inline-flex flex-wrap items-center gap-2 text-sm hover:under
       <span aria-hidden="true"> / </span>
       <span>{{ shortTicketId(ticket.id) }}</span>
     </nav>
-    <div class="flex flex-wrap items-center gap-2">
-      <TicketStatusPill :is-open="ticket.isOpen" :is-contributive="ticket.isContributive" />
-      <RouterLink
-        v-if="ticket.link.type === 'problem' && ticket.link.url"
-        :to="ticket.link.url"
-        :class="LINK_CLASS"
-      >
-        <TicketLinkChip :link="ticket.link" />
-        <span>{{ ticket.link.title }}</span>
-      </RouterLink>
-      <a
-        v-else-if="ticket.link.type === 'general' && isWebUrl(ticket.link.url)"
-        :href="ticket.link.url"
-        target="_blank"
-        rel="noopener noreferrer"
-        :class="LINK_CLASS"
-      >
-        <TicketLinkChip :link="ticket.link" />
-        <span class="break-all">{{ ticket.link.title }}</span>
-      </a>
-      <span v-else :class="LINK_CLASS">
-        <TicketLinkChip :link="ticket.link" />
-        <span class="break-all">{{ ticket.link.title }}</span>
-      </span>
-    </div>
-    <h1 class="page-title">{{ ticket.title }}</h1>
-    <p v-if="isCreator" class="text-sm font-semibold text-accent-soft-text">
-      {{ $t('ticket.yours') }}
-    </p>
-    <p v-else-if="isStaffView" class="flex items-center gap-2 text-sm font-semibold">
-      <StateBit variant="staff" size="inline" />
-      <span>{{ $t('ticket.staffView') }}</span>
-    </p>
-    <p class="text-meta text-muted">{{ $t('ticket.meta', meta) }}</p>
+    <PageHeader :title="ticket.title">
+      <template #above>
+        <div class="flex flex-wrap items-center gap-2">
+          <TicketStatusPill :is-open="ticket.isOpen" :is-contributive="ticket.isContributive" />
+          <RouterLink
+            v-if="ticket.link.type === 'problem' && ticket.link.url"
+            :to="ticket.link.url"
+            :class="LINK_CLASS"
+          >
+            <TicketLinkChip :link="ticket.link" />
+            <span>{{ ticket.link.title }}</span>
+          </RouterLink>
+          <a
+            v-else-if="ticket.link.type === 'general' && isWebUrl(ticket.link.url)"
+            :href="ticket.link.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            :class="LINK_CLASS"
+          >
+            <TicketLinkChip :link="ticket.link" />
+            <span class="break-all">{{ ticket.link.title }}</span>
+          </a>
+          <span v-else :class="LINK_CLASS">
+            <TicketLinkChip :link="ticket.link" />
+            <span class="break-all">{{ ticket.link.title }}</span>
+          </span>
+        </div>
+      </template>
+      <template #lead>
+        <p v-if="isCreator" class="text-sm font-semibold text-accent-soft-text">
+          {{ $t('ticket.yours') }}
+        </p>
+        <p v-else-if="isStaffView" class="flex items-center gap-2 text-sm font-semibold">
+          <StateBit variant="staff" size="inline" />
+          <span>{{ $t('ticket.staffView') }}</span>
+        </p>
+        <p class="text-meta text-muted">{{ $t('ticket.meta', meta) }}</p>
+      </template>
+    </PageHeader>
   </GlassCard>
 </template>

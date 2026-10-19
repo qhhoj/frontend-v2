@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
@@ -50,15 +51,13 @@ usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : page.value?
       </div>
     </template>
     <article v-if="page" class="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-6 sm:px-8">
-      <nav :aria-label="$t('flatpage.breadcrumb')" class="text-sm text-muted">
-        <RouterLink to="/" class="hover:underline">{{ $t('flatpage.home') }}</RouterLink>
-        <span aria-hidden="true"> / </span>
-        <span>{{ page.title }}</span>
-      </nav>
-      <div class="flex items-start gap-3">
-        <h1 class="page-title min-w-0 flex-1">{{ page.title }}</h1>
-        <AdminEditLink :to="flatpageEditTarget(session.user)" />
-      </div>
+      <PageHeader
+        :title="page.title"
+        :crumbs="[{ label: $t('flatpage.home'), to: '/' }, { label: page.title }]"
+        :back="{ to: '/', label: $t('flatpage.home') }"
+      >
+        <template #actions><AdminEditLink :to="flatpageEditTarget(session.user)" /></template>
+      </PageHeader>
       <UserContent :html="page.contentHtml" class="overflow-x-auto" />
     </article>
   </QueryState>

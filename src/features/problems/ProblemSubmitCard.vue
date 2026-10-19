@@ -29,7 +29,7 @@ async function openDock() {
 <template>
   <Card class="flex flex-col gap-3 rounded-card p-4" data-testid="rail-submit">
     <div class="flex items-center justify-between gap-2">
-      <h2 class="font-display text-title font-bold">{{ $t('problem.rail.submit.title') }}</h2>
+      <h2 class="section-title">{{ $t('problem.rail.submit.title') }}</h2>
       <InlineBit kind="writing" />
     </div>
     <slot name="context" />

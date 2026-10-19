@@ -11,7 +11,7 @@ const NUMBER_COLUMN_COUNT = 3;
 <template>
   <Card as="div" data-testid="cases-card" class="overflow-hidden rounded-card">
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 pt-5 pb-3 sm:px-6">
-      <h2 class="font-display text-title font-bold"><SkeletonBlock text class="w-40" /></h2>
+      <h2 class="section-title"><SkeletonBlock text class="w-40" /></h2>
     </div>
     <div class="overflow-x-auto">
       <table aria-hidden="true" class="w-full border-collapse sm:min-w-[560px] text-sm">

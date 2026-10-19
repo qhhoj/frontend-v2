@@ -38,7 +38,7 @@ const applyPreset = (preset: ResultPreset) => {
 
 <template>
   <section :class="[CARD, 'flex flex-col gap-5 p-5 sm:p-6']" aria-labelledby="rejudge-filter-title">
-    <h2 id="rejudge-filter-title" class="font-display text-section leading-7 font-semibold">
+    <h2 id="rejudge-filter-title" class="section-title">
       {{ $t('admin.rejudge.filter.title') }}
     </h2>
 

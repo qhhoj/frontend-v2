@@ -130,7 +130,7 @@ const CHIP =
               <p class="text-xs tracking-widest text-muted uppercase">
                 {{ $t('contests.print.kicker', { count: problems.length }, problems.length) }}
               </p>
-              <h1 class="mt-1 font-display text-section leading-7 font-bold md:text-page">
+              <h1 class="mt-1 page-title">
                 {{ contest.name }}
               </h1>
               <p class="mt-1 text-meta text-muted">{{ whenText }}</p>

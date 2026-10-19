@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { LocateFixed, Search } from 'lucide-vue-next';
 import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -175,14 +176,11 @@ async function goToMyRow() {
       </template>
       <template v-if="contest">
         <ContestTabs :contest-key="key" :phase="contest.phase" />
-        <div class="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p class="text-muted">{{ summary }}</p>
-            <h1 class="mt-1 page-title">
-              {{ contest.name }}
-            </h1>
-          </div>
-          <div class="flex flex-wrap items-center gap-2.5">
+        <PageHeader :title="contest.name">
+          <template #above
+            ><p class="text-muted">{{ summary }}</p></template
+          >
+          <template #actions>
             <p
               v-if="running"
               class="glass flex h-(--qh-control) items-center gap-2.5 rounded-pill px-4.5"
@@ -223,8 +221,8 @@ async function goToMyRow() {
                 class="pl-9"
               />
             </label>
-          </div>
-        </div>
+          </template>
+        </PageHeader>
         <RankingFreezeNotice :contest="contest" :is-board-frozen="ranking?.frozen ?? false" />
       </template>
     </QueryState>

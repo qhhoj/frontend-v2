@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { NOTIFICATION_STATES } from '@/api/types/notifications';
@@ -70,20 +71,14 @@ const FILTER_CLASS =
 
 <template>
   <div class="mx-auto flex max-w-5xl flex-col gap-5 px-4 py-6 sm:px-8">
-    <header class="flex flex-wrap items-end justify-between gap-4 pt-3 pb-1">
-      <div class="flex items-center gap-3">
-        <InlineBit :kind="NOTIFICATION_BITS.header" />
-        <div>
-          <h1 class="page-title">
-            {{ $t('notifications.title') }}
-          </h1>
-          <p class="mt-2 text-muted">{{ $t('notifications.lead') }}</p>
-        </div>
-      </div>
-      <AppButton v-if="canReadAll" :loading="markAll.isPending.value" @click="readAll">
-        {{ $t('notifications.readAllLong') }}
-      </AppButton>
-    </header>
+    <PageHeader :title="$t('notifications.title')" :lead="$t('notifications.lead')">
+      <template #start><InlineBit :kind="NOTIFICATION_BITS.header" /></template>
+      <template v-if="canReadAll" #actions>
+        <AppButton :loading="markAll.isPending.value" @click="readAll">
+          {{ $t('notifications.readAllLong') }}
+        </AppButton>
+      </template>
+    </PageHeader>
     <SettingsNotice
       v-if="!opener.canMarkRead.value"
       tone="info"

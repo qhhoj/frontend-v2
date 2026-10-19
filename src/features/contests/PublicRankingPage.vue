@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import EmptyState from '@/components/EmptyState.vue';
@@ -39,10 +40,11 @@ const context = computed<RankingContext | null>(() => {
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><RankingSkeleton :problem-count="4" :has-time-column="false" /></template>
       <template v-if="data && context">
-        <div>
-          <p class="text-muted">{{ $t('ranking.public.subtitle') }}</p>
-          <h1 class="mt-1 page-title">{{ data.contest.name }}</h1>
-        </div>
+        <PageHeader :title="data.contest.name">
+          <template #above>
+            <p class="text-muted">{{ $t('ranking.public.subtitle') }}</p>
+          </template>
+        </PageHeader>
         <Card v-if="!data.ranking.rows.length" as="div">
           <EmptyState>{{ $t('ranking.empty') }}</EmptyState>
         </Card>

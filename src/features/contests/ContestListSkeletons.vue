@@ -17,7 +17,7 @@ defineProps<{ kind: ContestPhase }>();
       class="flex flex-col gap-3 p-5"
     >
       <SkeletonBlock pill class="h-7 w-40" />
-      <div class="font-display text-section leading-7 font-semibold">
+      <div class="section-title">
         <SkeletonBlock text class="w-3/4" />
       </div>
       <p class="font-mono text-meta"><SkeletonBlock text class="w-24" /></p>

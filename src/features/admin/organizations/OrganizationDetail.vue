@@ -68,7 +68,7 @@ const tabs = computed<AdminTab[]>(() =>
       </button>
       <div class="flex w-full items-start gap-3">
         <div class="flex min-w-0 flex-1 flex-col gap-1">
-          <h2 class="font-display text-section leading-tight font-semibold break-words">
+          <h2 class="section-title break-words">
             {{
               organization?.name ??
               (slug === null ? $t('admin.organizations.editor.createTitle') : slug)

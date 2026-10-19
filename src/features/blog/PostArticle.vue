@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import UserContent from '@/components/UserContent.vue';
@@ -30,34 +31,32 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
 
 <template>
   <article class="flex min-w-0 flex-col gap-5">
-    <header data-testid="post-header" class="flex flex-col gap-3">
-      <div v-if="post.organization || post.sticky" class="flex flex-wrap items-center gap-2">
-        <RouterLink
-          v-if="post.organization"
-          :to="{ name: 'organization', params: { slug: post.organization.slug } }"
-          class="rounded-pill hover:underline"
-        >
-          <Chip>{{ post.organization.shortName }}</Chip>
-        </RouterLink>
-        <Chip v-if="post.sticky" tone="accent">{{ $t('blogPost.pinned') }}</Chip>
-      </div>
-      <h1 class="page-title [overflow-wrap:anywhere]">
-        {{ post.title }}
-      </h1>
-      <div
-        data-testid="post-byline"
-        class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted"
-      >
-        <UserLink
-          v-for="author in post.authors"
-          :key="author.id"
-          :username="author.username"
-          :rating="author.rating"
-          size="sm"
-        />
-        <time :datetime="post.publishOn">{{ publishedOn }}</time>
-      </div>
-    </header>
+    <PageHeader data-testid="post-header" :title="post.title">
+      <template v-if="post.organization || post.sticky" #above>
+        <div class="flex flex-wrap items-center gap-2">
+          <RouterLink
+            v-if="post.organization"
+            :to="{ name: 'organization', params: { slug: post.organization.slug } }"
+            class="rounded-pill hover:underline"
+          >
+            <Chip>{{ post.organization.shortName }}</Chip>
+          </RouterLink>
+          <Chip v-if="post.sticky" tone="accent">{{ $t('blogPost.pinned') }}</Chip>
+        </div>
+      </template>
+      <template #meta>
+        <div data-testid="post-byline" class="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <UserLink
+            v-for="author in post.authors"
+            :key="author.id"
+            :username="author.username"
+            :rating="author.rating"
+            size="sm"
+          />
+          <time :datetime="post.publishOn">{{ publishedOn }}</time>
+        </div>
+      </template>
+    </PageHeader>
     <UserContent :html="post.contentHtml" />
     <footer
       data-testid="post-actions"

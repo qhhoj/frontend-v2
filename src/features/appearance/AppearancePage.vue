@@ -44,7 +44,7 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
 <template>
   <SettingsLayout>
     <div class="flex items-center justify-between gap-4">
-      <h2 class="page-title">{{ $t('appearance.title') }}</h2>
+      <h2 class="section-title">{{ $t('appearance.title') }}</h2>
       <BitMascot
         data-testid="appearance-bit"
         :look="PLACEMENT_LOOKS.hero"
@@ -119,7 +119,7 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
       </Card>
 
       <section class="flex min-w-0 flex-[1_1_420px] flex-col gap-3.5">
-        <h2 class="text-meta font-semibold tracking-wider text-muted uppercase">
+        <h2 class="section-title">
           {{ $t('appearance.preview') }}
         </h2>
         <AppearancePreview />

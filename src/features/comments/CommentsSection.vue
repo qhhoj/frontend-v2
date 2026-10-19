@@ -264,19 +264,14 @@ useCommentJump({
         class="flex min-h-11 w-full items-center gap-2 rounded-card border border-line bg-surface-solid px-5 py-3 text-left hover:bg-surface-hover"
         @click="unfold"
       >
-        <span class="font-display text-base font-semibold">{{ $t('comments.title') }}</span>
+        <span class="section-title">{{ $t('comments.title') }}</span>
         <span class="font-mono text-sm text-muted">(0)</span>
         <ChevronDown aria-hidden="true" class="ml-auto size-5 text-muted" />
       </button>
     </h2>
     <template v-else>
       <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h2
-          id="comments-heading"
-          ref="heading"
-          tabindex="-1"
-          class="font-display text-section leading-7 font-semibold outline-none sm:text-display sm:leading-8"
-        >
+        <h2 id="comments-heading" ref="heading" tabindex="-1" class="section-title outline-none">
           {{ $t('comments.title') }}
         </h2>
         <span v-if="data && !isContestHidden && entries.length" class="text-sm text-muted">

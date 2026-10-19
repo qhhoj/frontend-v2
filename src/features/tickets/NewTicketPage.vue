@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed, ref } from 'vue';
 import GlassCard from '@/components/GlassCard.vue';
 import StateBit from '@/components/StateBit.vue';
@@ -38,12 +39,9 @@ const trimmedCode = computed(() => draft.problemCode.trim());
     </p>
     <div class="grid gap-6 lg:grid-cols-[1fr_300px]">
       <GlassCard as="section" class="p-6 sm:p-8">
-        <div class="flex items-center gap-4">
-          <StateBit variant="writing" size="inline" />
-          <h1 class="page-title">
-            {{ $t('tickets.newTicket') }}
-          </h1>
-        </div>
+        <PageHeader :title="$t('tickets.newTicket')">
+          <template #start><StateBit variant="writing" size="inline" /></template>
+        </PageHeader>
         <form ref="form" novalidate class="mt-6 flex flex-col gap-5" @submit.prevent="submit">
           <fieldset class="flex flex-col gap-3">
             <legend class="mb-2 text-sm font-semibold">{{ $t('tickets.new.about') }}</legend>

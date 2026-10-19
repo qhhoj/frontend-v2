@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed } from 'vue';
 import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
 import { judgesEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
@@ -24,13 +25,9 @@ const totals = computed(() => runtimeTotals(data.value?.judges ?? []));
 
 <template>
   <div class="page-column">
-    <header class="flex items-start gap-3">
-      <div class="min-w-0 flex-1">
-        <h1 class="page-title">{{ $t('runtimes.title') }}</h1>
-        <p class="text-muted">{{ $t('runtimes.lead') }}</p>
-      </div>
-      <AdminEditLink :to="judgesEditTarget(session.user)" />
-    </header>
+    <PageHeader :title="$t('runtimes.title')" :lead="$t('runtimes.lead')">
+      <template #actions><AdminEditLink :to="judgesEditTarget(session.user)" /></template>
+    </PageHeader>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <SkeletonBlock class="h-20 w-full" />
