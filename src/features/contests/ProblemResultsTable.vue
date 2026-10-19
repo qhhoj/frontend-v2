@@ -36,7 +36,9 @@ const chipClasses = (code: ResultCode, value: number) =>
 
 <template>
   <section class="flex flex-col gap-2">
-    <h2 class="font-display text-xl font-bold">{{ $t('contests.stats.problemTitle') }}</h2>
+    <h2 class="font-display text-section leading-7 font-bold">
+      {{ $t('contests.stats.problemTitle') }}
+    </h2>
     <Card
       as="div"
       tabindex="0"
@@ -69,7 +71,10 @@ const chipClasses = (code: ResultCode, value: number) =>
         </thead>
         <tbody>
           <tr v-for="problem in problems" :key="problem.problemId" class="border-t border-line">
-            <th scope="row" class="px-4 py-3 text-left font-display text-lg font-bold">
+            <th
+              scope="row"
+              class="px-4 py-3 text-left font-display text-subtitle leading-7 font-bold"
+            >
               {{ problem.label }}
             </th>
             <td class="px-4 py-3">

@@ -1,9 +1,9 @@
 // Arbitrary values that bypass the named tokens (docs/design-language.md): `text-[13px]`, `rounded-[3px]`, `z-[1200]`.
 // Use the steps instead: text-tiny|caption|meta|sm|base|title|subtitle|section|display|page|stat|hero, rounded-cell|row|card|pill|control, z-sticky|savebar|header|bit|overlay|toast.
+import { classTokens, utilityOf } from './class-tokens.mjs';
+
 const ARBITRARY =
   /^(?:text-\[[\d.]+(?:px|r?em)\](?:\/\S+)?|rounded(?:-[a-z]{1,2})?-\[[^\]]+\]|z-\[[^\]]+\])$/;
-const COMMENT_LINE = /^\s*(?:\/\/|\/\*|\*)/;
-const QUOTED = /(['"`])((?:(?!\1).)*)\1/g;
 
 /**
  * Known exceptions, by file (path under src/) and class. Display sizes off the scale wait for the PageHeader and
@@ -11,7 +11,6 @@ const QUOTED = /(['"`])((?:(?!\1).)*)\1/g;
  */
 export const ALLOWED = {
   'features/home/LiveContestCard.vue': ['text-[32px]'],
-  'features/contests/replay/ContestReplayPage.vue': ['sm:text-[40px]'],
   'features/contests/ContestProblemsTable.vue': ['text-[22px]'],
   'features/auth/LoginBrandPanel.vue': ['text-[34px]'],
   'features/appearance/AppearancePreview.vue': ['text-[22px]'],
@@ -25,12 +24,6 @@ export const ALLOWED = {
   'components/ui/SegmentedControl.vue': ['rounded-[1.125rem]'],
 };
 
-/** The arbitrary size, radius and z-index classes in the string literals of one source line; comment lines are ignored. */
+/** The arbitrary size, radius and z-index classes in the string literals of one source line, as written; comment lines are ignored. */
 export const arbitraryUtilities = (line) =>
-  COMMENT_LINE.test(line)
-    ? []
-    : [...line.matchAll(QUOTED)]
-        .flatMap(([, , text]) => text.split(/\s+/))
-        .filter((token) =>
-          ARBITRARY.test(token.replace(/^.*:/, '').replace(/^[!-]/, '').replace(/!$/, '')),
-        );
+  classTokens(line).filter((token) => ARBITRARY.test(utilityOf(token)));

@@ -30,7 +30,8 @@ Type scale (font size only; leading comes from the primitive or a `leading-*` cl
 | `text-display`                     | 24  | display headings, big numbers (add a `leading-*`)  |
 | `page-title` utility / `text-page` | 26  | the one h1 per page                                |
 | `text-stat`                        | 26  | stat values, always with `font-mono tabular-nums`  |
-| `text-hero`                        | 40  | countdowns                                         |
+| `text-hero`                        | 40  | countdowns only                                    |
+| `text-score`                       | 56  | the submission score, the home rating figure       |
 
 Other tokens:
 
@@ -46,7 +47,7 @@ Other tokens:
 - Motion: `--qh-duration-fast` 150 ms, `--qh-duration` 200 ms, on colour, border and opacity only.
 - Admin density: `--qa-row`, `--qa-control`, `--qa-gap`, `--qa-gutter` (`src/features/admin/ui/admin-density.css`).
 
-`npm run lint:tokens` fails on: raw colours outside `src/theme/themes/`, stock `rounded`/`rounded-lg`/`shadow-*` (the theme resets them, they render nothing; `shadow-float` and `shadow-glow` are ours), `text-[<n>px]`, `rounded-[…]`, `z-[…]`. The only exceptions are listed per file in `ALLOWED` in `scripts/arbitrary-utilities.mjs`; do not add to it without a reason line in the PR.
+`npm run lint:tokens` fails on: raw colours outside `src/theme/themes/`, stock `rounded`/`rounded-lg`/`shadow-*` (the theme resets them, they render nothing; `shadow-float` and `shadow-glow` are ours), stock `text-lg` … `text-9xl` (use the steps above; a swapped `text-xl` keeps its line with `leading-7`), `text-[<n>px]`, `rounded-[…]`, `z-[…]`. The only exceptions are listed per file in `ALLOWED` in `scripts/arbitrary-utilities.mjs`; do not add to it without a reason line in the PR.
 
 ## 3. Primitives
 

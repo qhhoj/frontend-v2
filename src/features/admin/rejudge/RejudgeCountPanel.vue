@@ -61,7 +61,7 @@ const view = computed<CountView | null>(() => {
     class="flex flex-col gap-2 rounded-row bg-surface-hover p-4"
   >
     <div class="flex flex-wrap items-center gap-3">
-      <span class="font-mono text-3xl font-bold">{{ view.figure }}</span>
+      <span class="font-mono text-stat leading-9 font-bold">{{ view.figure }}</span>
       <AdminChip :tone="view.tone">{{ view.chip }}</AdminChip>
     </div>
     <p class="text-sm">{{ view.sentence }}</p>

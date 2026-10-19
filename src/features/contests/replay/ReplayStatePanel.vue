@@ -43,7 +43,7 @@ const hasRankingLink = computed(() => RANKING_LINK_STATES.includes(props.state))
       :label="$t(bit.labelKey)"
       :size="isCompact ? 'inline' : 'panel'"
     />
-    <h2 class="font-display text-xl font-semibold text-content">
+    <h2 class="font-display text-section leading-7 font-semibold text-content">
       {{ $t(`replay.states.${state}.title`) }}
     </h2>
     <p class="max-w-md text-muted">{{ $t(`replay.states.${state}.body`) }}</p>

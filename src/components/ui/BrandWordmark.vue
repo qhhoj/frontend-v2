@@ -8,7 +8,7 @@ withDefaults(defineProps<{ to?: RouteLocationRaw; size?: 'sm' | 'md' | 'lg' }>()
   to: '/',
   size: 'md',
 });
-const SIZES = { sm: 'text-lg', md: 'text-xl', lg: 'text-2xl lg:text-3xl' } as const;
+const SIZES = { sm: 'text-subtitle', md: 'text-section', lg: 'text-display lg:text-page' } as const;
 const LOOK: BitLook = { headgear: 'none', palette: 'terracotta' };
 /** The visible part of the 16x16 sprite: 13 columns from column 1, 9 rows from row 5 (outline, body, legs). */
 const COLUMNS = 13;

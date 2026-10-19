@@ -75,7 +75,7 @@ const views = computed(
       @click="openRow($event, row.id)"
       @auxclick="openRowInTab($event, row.id)"
     >
-      <span aria-hidden="true" class="font-display text-lg font-bold">{{
+      <span aria-hidden="true" class="font-display text-subtitle leading-7 font-bold">{{
         row.problem ? (problemLabels[row.problem.code] ?? '') : ''
       }}</span>
       <div class="min-w-0">

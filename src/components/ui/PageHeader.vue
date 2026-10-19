@@ -32,7 +32,7 @@ const slots = useSlots();
 
 const TITLE = {
   page: 'page-title',
-  compact: 'font-display text-xl leading-tight font-semibold md:text-2xl',
+  compact: 'font-display text-section leading-tight font-semibold md:text-display',
 };
 </script>
 

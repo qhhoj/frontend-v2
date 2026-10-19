@@ -26,7 +26,7 @@ const STATIC_TILE = `${CARD} px-4 py-3`;
       :aria-pressed="status === 'online'"
       @click="toggle('online')"
     >
-      <span class="font-display text-2xl font-semibold"
+      <span class="font-display text-display leading-8 font-semibold"
         >{{ stats.online }} / {{ stats.total }}</span
       >
       <span class="flex items-center gap-1.5 text-sm text-muted">
@@ -35,7 +35,7 @@ const STATIC_TILE = `${CARD} px-4 py-3`;
       </span>
     </button>
     <div :class="STATIC_TILE">
-      <p class="font-display text-2xl font-semibold">
+      <p class="font-display text-display leading-8 font-semibold">
         {{ meanLoadText ?? $t('admin.judges.stats.noLoad') }}
       </p>
       <p class="text-sm text-muted">{{ $t('admin.judges.stats.load') }}</p>
@@ -48,7 +48,7 @@ const STATIC_TILE = `${CARD} px-4 py-3`;
       :aria-pressed="status === key"
       @click="toggle(key)"
     >
-      <span class="font-display text-2xl font-semibold">{{ stats[key] }}</span>
+      <span class="font-display text-display leading-8 font-semibold">{{ stats[key] }}</span>
       <span class="text-sm text-muted">{{ $t(`admin.judges.stats.${key}`) }}</span>
     </button>
   </section>

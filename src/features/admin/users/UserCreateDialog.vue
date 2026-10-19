@@ -75,7 +75,7 @@ const titleId = useId();
     :pt="{ root: { 'aria-labelledby': titleId } }"
   >
     <template #header>
-      <h2 :id="titleId" class="font-display text-lg font-semibold">
+      <h2 :id="titleId" class="font-display text-subtitle leading-7 font-semibold">
         {{ $t('admin.users.create.title') }}
       </h2>
     </template>

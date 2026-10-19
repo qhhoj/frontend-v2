@@ -87,7 +87,7 @@ const goToMyRow = () => myRowId.value && table.value?.focusRow(myRowId.value);
         <SkeletonBlock data-skeleton-region="nav" pill class="h-[52px] w-72 max-w-full" />
         <div data-skeleton-region="title">
           <p class="text-muted"><SkeletonBlock text class="w-56" /></p>
-          <div class="mt-1 font-display text-4xl font-bold tracking-tight sm:text-[40px]">
+          <div class="mt-1 page-title">
             <SkeletonBlock text class="w-80 max-w-full" />
           </div>
         </div>
@@ -154,7 +154,9 @@ const goToMyRow = () => myRowId.value && table.value?.focusRow(myRowId.value);
                 data-replay-part="feed"
                 class="flex flex-col gap-3 p-5"
               >
-                <div class="font-display text-lg"><SkeletonBlock text class="w-28" /></div>
+                <div class="font-display text-subtitle leading-7">
+                  <SkeletonBlock text class="w-28" />
+                </div>
                 <SkeletonBlock text class="w-full" />
                 <SkeletonBlock text class="w-3/4" />
               </Card>

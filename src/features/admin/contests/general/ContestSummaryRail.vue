@@ -56,7 +56,9 @@ const LINK =
       />
       <div v-for="stat in stats" :key="stat.key" class="flex flex-col px-4 py-3">
         <span class="text-xs text-muted">{{ $t(`admin.contests.general.rail.${stat.key}`) }}</span>
-        <span class="font-display text-xl font-semibold tabular-nums">{{ stat.value }}</span>
+        <span class="font-display text-section leading-7 font-semibold tabular-nums">{{
+          stat.value
+        }}</span>
         <span v-if="stat.note" class="text-xs text-muted">
           {{ $t(`admin.contests.general.rail.${stat.note.key}`, { count: stat.note.count }) }}
         </span>

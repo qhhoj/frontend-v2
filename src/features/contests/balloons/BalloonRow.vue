@@ -18,7 +18,7 @@ const emit = defineEmits<{ toggle: [] }>();
     <span
       :data-swatch="balloon.problemLabel"
       :class="[
-        'inline-flex size-11 items-center justify-center rounded-full border font-display text-lg font-bold',
+        'inline-flex size-11 items-center justify-center rounded-full border font-display text-subtitle leading-7 font-bold',
         swatchClassOf(balloon.problemLabel),
       ]"
       >{{ balloon.problemLabel }}</span

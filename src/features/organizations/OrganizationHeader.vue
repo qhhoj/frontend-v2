@@ -62,7 +62,7 @@ const phoneLines = computed(() => [
       <div class="flex min-w-0 flex-1 flex-col gap-1">
         <div class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
           <h1
-            class="min-w-0 font-display text-2xl leading-tight font-bold [overflow-wrap:anywhere]"
+            class="min-w-0 font-display text-display leading-tight font-bold [overflow-wrap:anywhere]"
           >
             {{ organization.name }}
           </h1>

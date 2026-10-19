@@ -44,7 +44,7 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
 <template>
   <SettingsLayout>
     <div class="flex items-center justify-between gap-4">
-      <h2 class="font-display text-3xl font-bold">{{ $t('appearance.title') }}</h2>
+      <h2 class="page-title">{{ $t('appearance.title') }}</h2>
       <BitMascot
         data-testid="appearance-bit"
         :look="PLACEMENT_LOOKS.hero"

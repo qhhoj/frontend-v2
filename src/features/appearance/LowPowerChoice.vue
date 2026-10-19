@@ -22,7 +22,7 @@ function choose(preference: LowPowerPreference) {
 <template>
   <Card id="low-power" data-testid="low-power-section" class="flex scroll-mt-24 flex-col gap-5 p-6">
     <div>
-      <h2 class="font-display text-xl font-semibold">{{ $t('lowPower.title') }}</h2>
+      <h2 class="font-display text-section leading-7 font-semibold">{{ $t('lowPower.title') }}</h2>
       <p class="mt-1 text-meta text-muted">{{ $t('lowPower.lead') }}</p>
     </div>
     <fieldset class="grid gap-3 md:grid-cols-3">

@@ -32,7 +32,7 @@ const actions = computed(() =>
     <header class="flex flex-wrap items-center gap-x-4 gap-y-3">
       <AdminBit placement="greeting" />
       <div class="min-w-0 flex-1 basis-60">
-        <h1 class="font-display text-xl font-semibold md:text-2xl">
+        <h1 class="font-display text-section leading-7 font-semibold md:text-display md:leading-8">
           {{ $t('admin.shell.dashboard.hello', { name: session.user?.username }) }}
         </h1>
         <p class="text-sm text-muted">{{ $t('admin.shell.dashboard.lead') }}</p>

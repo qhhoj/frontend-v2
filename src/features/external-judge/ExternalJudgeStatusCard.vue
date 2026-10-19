@@ -13,7 +13,9 @@ const locale = useLocaleStore();
 
 <template>
   <GlassCard class="rounded-panel p-5" data-testid="external-judge-status">
-    <h2 class="font-display text-lg font-bold">{{ $t('externalJudge.status.title') }}</h2>
+    <h2 class="font-display text-subtitle leading-7 font-bold">
+      {{ $t('externalJudge.status.title') }}
+    </h2>
     <QueryState
       :loading="query.isPending.value"
       :error="query.error.value"

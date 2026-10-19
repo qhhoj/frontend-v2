@@ -70,7 +70,7 @@ export const primeVuePreset: PrimeVuePTOptions = {
         'flex max-h-[calc(100dvh-2rem)] w-[min(28rem,calc(100vw-2rem))] flex-col rounded-panel border border-line-strong bg-surface-solid text-content shadow-float',
     },
     header: { class: 'flex shrink-0 items-start justify-between gap-3 px-6 pt-5' },
-    title: { class: 'font-display text-xl font-semibold' },
+    title: { class: 'font-display text-section leading-7 font-semibold' },
     pcCloseButton: {
       root: {
         class:

@@ -17,7 +17,9 @@ defineProps<{ kind: ContestPhase }>();
       class="flex flex-col gap-3 p-5"
     >
       <SkeletonBlock pill class="h-7 w-40" />
-      <div class="font-display text-xl font-semibold"><SkeletonBlock text class="w-3/4" /></div>
+      <div class="font-display text-section leading-7 font-semibold">
+        <SkeletonBlock text class="w-3/4" />
+      </div>
       <p class="font-mono text-meta"><SkeletonBlock text class="w-24" /></p>
       <SkeletonBlock class="h-2 w-full" />
       <p class="font-semibold"><SkeletonBlock text class="w-40" /></p>
@@ -36,7 +38,9 @@ defineProps<{ kind: ContestPhase }>();
     >
       <SkeletonBlock class="size-16 shrink-0 rounded-tile" />
       <div class="flex min-w-0 flex-1 flex-col gap-1.5">
-        <div class="font-display text-lg font-semibold"><SkeletonBlock text class="w-2/3" /></div>
+        <div class="font-display text-subtitle leading-7 font-semibold">
+          <SkeletonBlock text class="w-2/3" />
+        </div>
         <p class="text-sm"><SkeletonBlock text class="w-1/2" /></p>
         <div class="flex items-center gap-1.5">
           <SkeletonBlock pill class="h-6.5 w-24" />

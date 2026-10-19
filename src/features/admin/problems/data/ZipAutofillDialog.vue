@@ -67,7 +67,7 @@ const CELL = 'border-b border-line px-2 py-1.5';
     :pt="{ root: { 'aria-labelledby': titleId } }"
   >
     <template #header>
-      <h2 :id="titleId" class="font-display text-lg font-semibold">
+      <h2 :id="titleId" class="font-display text-subtitle leading-7 font-semibold">
         {{ $t('admin.problems.data.autofill.title') }}
       </h2>
     </template>

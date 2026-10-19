@@ -10,7 +10,9 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
     <div class="flex min-w-0 flex-1 items-center gap-3">
       <SkeletonBlock class="size-12 shrink-0" />
       <div class="flex min-w-0 flex-1 flex-col gap-1">
-        <div class="font-display text-2xl leading-tight"><SkeletonBlock text class="w-3/5" /></div>
+        <div class="font-display text-display leading-tight">
+          <SkeletonBlock text class="w-3/5" />
+        </div>
         <p class="min-h-5 text-sm"><SkeletonBlock text class="w-3/4" /></p>
       </div>
     </div>

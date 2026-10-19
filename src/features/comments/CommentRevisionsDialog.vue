@@ -65,7 +65,9 @@ const SIGN = { same: ' ', removed: '−', added: '+' };
   <Modal v-model:visible="visible" size="lg">
     <template #header>
       <div class="flex flex-wrap items-baseline gap-2">
-        <h2 class="font-display text-lg font-semibold">{{ $t('comments.revisions.title') }}</h2>
+        <h2 class="font-display text-subtitle leading-7 font-semibold">
+          {{ $t('comments.revisions.title') }}
+        </h2>
         <span v-if="versions.length" class="text-sm text-muted">
           · {{ $t('comments.revisions.count', { count: versions.length - 1 }) }}
         </span>

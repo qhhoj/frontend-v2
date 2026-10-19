@@ -41,7 +41,7 @@ const hint = computed(() =>
         :is="canUpload ? 'label' : 'span'"
         :for="canUpload ? fileId : undefined"
         data-testid="logo-tile"
-        class="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-pill border border-line font-display text-xl font-bold"
+        class="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-pill border border-line font-display text-section leading-7 font-bold"
         :class="[tileClass(slug), canUpload && 'cursor-pointer hover:border-accent']"
       >
         <img

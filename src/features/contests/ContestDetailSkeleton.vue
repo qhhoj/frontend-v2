@@ -24,7 +24,7 @@ const hasActionRow = computed(() => session.status === 'authenticated');
         <SkeletonBlock pill class="h-6 w-28 sm:hidden" />
       </div>
       <div>
-        <div class="font-display text-2xl leading-tight font-bold md:text-4xl">
+        <div class="page-title">
           <SkeletonBlock text class="w-3/4" />
         </div>
         <p class="mt-1 hidden items-center gap-1.5 text-sm md:flex">
@@ -45,7 +45,7 @@ const hasActionRow = computed(() => session.status === 'authenticated');
         <SkeletonBlock round class="size-24 shrink-0 md:size-[98px]" />
         <div class="flex min-w-0 flex-1 flex-col">
           <p class="text-caption"><SkeletonBlock text class="w-20" /></p>
-          <p class="font-mono text-3xl leading-tight md:text-5xl">
+          <p class="font-mono text-stat leading-tight md:text-hero">
             <SkeletonBlock text class="w-48" />
           </p>
         </div>

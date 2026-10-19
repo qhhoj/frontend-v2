@@ -121,7 +121,7 @@ const tiles = computed(() =>
             <div data-testid="rating-row" class="mt-2 flex flex-wrap items-end gap-4">
               <span
                 data-testid="hero-figure"
-                class="font-mono text-6xl font-semibold tracking-tight tabular-nums"
+                class="font-mono text-score leading-none font-semibold tracking-tight tabular-nums"
                 >{{ headline }}</span
               >
               <!-- The delta pill and the rank-up Bit wrap as one group, so the Bit always sits beside its delta. -->

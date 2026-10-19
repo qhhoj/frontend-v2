@@ -64,7 +64,7 @@ const tiles = computed<StatTile[]>(() => [
         :class="tile.phoneHidden && 'max-md:hidden'"
       >
         <dt class="text-sm text-muted">{{ tile.label }}</dt>
-        <dd class="font-display text-2xl font-semibold">{{ tile.value }}</dd>
+        <dd class="font-display text-display leading-8 font-semibold">{{ tile.value }}</dd>
         <dd v-if="tile.hint" class="text-xs text-muted">{{ tile.hint }}</dd>
       </div>
     </dl>

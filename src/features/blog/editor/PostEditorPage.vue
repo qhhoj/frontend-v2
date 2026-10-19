@@ -123,7 +123,7 @@ const fixedAuthor = computed(() =>
                 :id="id"
                 v-model="form.title"
                 :maxlength="POST_LIMITS.title"
-                class="min-h-13 w-full rounded-row border border-line-strong bg-surface-solid px-4 font-display text-xl font-bold text-content"
+                class="min-h-13 w-full rounded-row border border-line-strong bg-surface-solid px-4 font-display text-section leading-7 font-bold text-content"
                 :aria-describedby="describedBy"
                 :aria-invalid="invalid ? 'true' : undefined"
               />

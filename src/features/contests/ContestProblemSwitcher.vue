@@ -34,7 +34,7 @@ const LINK =
           :aria-current="entry.isCurrent ? 'page' : undefined"
           :class="LINK"
         >
-          <span class="font-display text-lg font-bold">{{ entry.label }}</span>
+          <span class="font-display text-subtitle leading-7 font-bold">{{ entry.label }}</span>
           <span class="flex min-w-0 flex-col">
             <span class="max-w-40 truncate font-semibold lg:max-w-none lg:whitespace-normal">{{
               entry.name

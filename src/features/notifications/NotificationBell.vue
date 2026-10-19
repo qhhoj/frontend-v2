@@ -64,7 +64,7 @@ const drawerPt = computed(() => ({
     'aria-label': translate('notifications.drawerTitle'),
   },
   header: { class: 'flex items-center justify-between gap-3 px-5 pt-5' },
-  title: { class: 'font-display text-xl font-semibold' },
+  title: { class: 'font-display text-section leading-7 font-semibold' },
   pcCloseButton: {
     root: {
       class: 'inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-hover',

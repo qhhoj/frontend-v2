@@ -91,7 +91,7 @@ const tops = computed(() =>
       >
         <template #skeleton><SkeletonBlock class="h-72 w-full" /></template>
         <template v-if="data">
-          <p class="m-0 text-lg font-semibold tabular-nums">
+          <p class="m-0 text-subtitle leading-7 font-semibold tabular-nums">
             {{ $t('admin.activity.summary.total', { total: numberOf(data.total) }) }}
           </p>
           <DailyBars :daily="data.daily" />

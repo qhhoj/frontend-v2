@@ -56,7 +56,7 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 ## Typography
 
 - Display/headings: **Space Grotesk** 500-700. Body/UI: `--qh-font-body` (Verdana, then DejaVu Sans and the system sans). Numbers and code: **JetBrains Mono** (400, 600) with `tabular-nums`.
-- Type scale (font size only; leading comes from the primitives): `text-tiny` 11, `text-caption` 12, `text-meta` 13, `text-sm` 14 (UI, tables), `text-base` 16 (prose, every input), `text-title` 17, `text-subtitle` 18, `text-section` 20, `text-display` 24, `text-page` 26 (the `page-title` h1 utility), `text-stat` 26 with `font-mono`, `text-hero` 40. No arbitrary `text-[Npx]` (`lint:tokens`). Hero rating number 60 px (`text-6xl`).
+- Type scale (font size only; leading comes from the primitives): `text-tiny` 11, `text-caption` 12, `text-meta` 13, `text-sm` 14 (UI, tables), `text-base` 16 (prose, every input), `text-title` 17, `text-subtitle` 18, `text-section` 20, `text-display` 24, `text-page` 26 (the `page-title` h1 utility), `text-stat` 26 with `font-mono`, `text-hero` 40. No arbitrary `text-[Npx]` (`lint:tokens`). Hero rating number 56 px (`text-score`).
 - Self-hosted via `@fontsource` (no Google Fonts request).
 
 ## Shape, depth, motion

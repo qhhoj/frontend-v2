@@ -38,7 +38,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
     class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-4 py-4 sm:px-5 sm:py-5"
   >
     <div class="flex min-w-0 flex-col gap-2">
-      <h2 class="line-clamp-2 text-lg leading-snug font-semibold [overflow-wrap:anywhere]">
+      <h2 class="line-clamp-2 text-subtitle leading-snug font-semibold [overflow-wrap:anywhere]">
         <Chip v-if="post.sticky" tone="accent" class="mr-2 align-middle">{{
           $t('blog.pinned')
         }}</Chip>

@@ -51,7 +51,7 @@ const numberOf = (value: number) => formatNumber(value, locale.locale);
             class="rounded-cell border border-line bg-surface-solid px-3 py-2"
           >
             <dt class="text-xs text-muted">{{ $t(`admin.activity.live.${tile.key}`) }}</dt>
-            <dd class="m-0 font-mono text-lg font-semibold tabular-nums">
+            <dd class="m-0 font-mono text-subtitle leading-7 font-semibold tabular-nums">
               {{ numberOf(tile.value) }}
             </dd>
           </div>

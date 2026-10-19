@@ -89,7 +89,9 @@ async function submit() {
     </template>
     <InboxNotice :resend="() => resendActivation(form.email)">
       <p>{{ $t('auth.registeredSentTo') }}</p>
-      <p class="font-mono text-lg font-semibold text-content">{{ maskEmail(form.email) }}</p>
+      <p class="font-mono text-subtitle leading-7 font-semibold text-content">
+        {{ maskEmail(form.email) }}
+      </p>
       <p>{{ $t('auth.registeredOpenMail') }}</p>
     </InboxNotice>
     <div class="flex flex-col gap-3 text-center text-sm text-muted">

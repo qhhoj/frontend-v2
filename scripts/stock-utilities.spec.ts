@@ -14,8 +14,16 @@ describe('stockUtilities', () => {
     `'hover:rounded-sm'`,
     `\`x \${y} rounded-xs\``,
     `class="shadow"`,
+    `class="font-display text-lg font-bold"`,
+    `'md:text-2xl leading-tight'`,
+    `\`\${size} text-9xl\``,
+    `'text-xl/7'`,
   ])('flags a stock class in %s', (line) => {
     expect(found(line)).toHaveLength(1);
+  });
+
+  it('flags each stock size of a responsive pair', () => {
+    expect(found(`'text-3xl md:text-5xl'`)).toEqual(['text-3xl', 'text-5xl']);
   });
 
   it.each([
@@ -25,6 +33,10 @@ describe('stockUtilities', () => {
     `// rounded-lg is reset by the theme`,
     ` * 'rounded-lg' in a doc comment`,
     `const rounded = 1;`,
+    `class="text-tiny text-caption text-meta text-sm text-base text-title text-xs"`,
+    `class="text-subtitle text-section text-display text-page text-stat text-hero text-score"`,
+    `class="text-muted text-content text-xlarge"`,
+    `// text-lg is a stock step`,
   ])('accepts %s', (line) => {
     expect(found(line)).toEqual([]);
   });

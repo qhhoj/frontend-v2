@@ -21,11 +21,11 @@ Root problem it fixes: the same control was built four ways (admin `controls.ts`
 | Spacing | page blocks 24 · card padding 16/20/24 → 32 · form fields 20 · inside a field 6 · button groups 8 |
 | Motion | 150/200 ms on colour, border, opacity only; 0 under reduced motion |
 
-`sm` and `base` are Tailwind's own steps and carry their leading; the new steps set font size only, so replacing an exact `text-[Npx]` is pixel-identical. `subtitle`, `section` and `display` (18, 20, 24) name the sizes pages already use. The stock `text-lg` … `text-5xl` still render until the sweep that moves their call sites onto these names; the lint ban lands with that sweep.
+`sm` and `base` are Tailwind's own steps and carry their leading; the new steps set font size only, so replacing an exact `text-[Npx]` is pixel-identical. `subtitle`, `section` and `display` (18, 20, 24) name the sizes pages already use. The stock `text-lg` … `text-9xl` are lint-banned (D-03): a site that had one took the step of its size (`text-lg` → `subtitle`, `text-xl` → `section`, `text-2xl` → `display`) and keeps the stock line height with `leading-7` (subtitle, section) or `leading-8` (display) unless it sets its own `leading-*`; the larger ones moved by role (`text-stat` for figures, `text-page` for titles, `text-hero` for countdowns only, `text-score` for the home rating figure).
 
 Admin scope: `AdminShell` puts `qh-admin` on `<html>` while mounted (teleported dialogs included). It sets `--qh-radius-control` to 12 px and `--qh-control` to `--qh-control-sm`.
 
-Lint (`npm run lint:tokens`, `scripts/check-tokens.mjs`) errors on raw colours, stock `rounded-*`/`shadow-*`, `text-[<n>px|rem]`, `rounded-[…]` and `z-[…]`. Exceptions are listed by file in `scripts/arbitrary-utilities.mjs` (`ALLOWED`): off-scale display sizes waiting for PageHeader/StatGrid, and radii under 5 px on tiny marks.
+Lint (`npm run lint:tokens`, `scripts/check-tokens.mjs`) errors on raw colours, stock `rounded-*`/`shadow-*`, stock `text-lg` … `text-9xl`, `text-[<n>px|rem]`, `rounded-[…]` and `z-[…]`. Exceptions are listed by file in `scripts/arbitrary-utilities.mjs` (`ALLOWED`): off-scale display sizes waiting for PageHeader/StatGrid, and radii under 5 px on tiny marks.
 
 ## Primitives (`src/components/ui/`)
 
