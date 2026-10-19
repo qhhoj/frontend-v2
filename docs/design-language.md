@@ -25,7 +25,7 @@ Root problem it fixes: the same control was built four ways (admin `controls.ts`
 
 Admin scope: `AdminShell` puts `qh-admin` on `<html>` while mounted (teleported dialogs included). It sets `--qh-radius-control` to 12 px and `--qh-control` to `--qh-control-sm`.
 
-Lint (`npm run lint:tokens`, `scripts/check-tokens.mjs`) errors on raw colours, stock `rounded-*`/`shadow-*`, stock `text-lg` … `text-9xl`, `rounded-tile`/`rounded-panel`, bare `transition`/`transition-all`/`transition-transform`, `text-[<n>px|rem]`, `rounded-[…]` and `z-[…]`. Exceptions are listed by file in `scripts/arbitrary-utilities.mjs` (`ALLOWED`): off-scale display sizes waiting for PageHeader/StatGrid, and radii under 5 px on tiny marks.
+Lint (`npm run lint:tokens`, `scripts/check-tokens.mjs`) errors on raw colours, stock `rounded-*`/`shadow-*`, stock `text-lg` … `text-9xl`, `rounded-tile`/`rounded-panel`, bare `transition`/`transition-all`/`transition-transform`, `uppercase` on a table header, `text-[<n>px|rem]`, `rounded-[…]` and `z-[…]`. Exceptions are listed by file in `scripts/arbitrary-utilities.mjs` (`ALLOWED`): off-scale display sizes waiting for PageHeader/StatGrid, and radii under 5 px on tiny marks.
 
 ## Primitives (`src/components/ui/`)
 
@@ -41,7 +41,7 @@ Not built: MarkdownEditor, ListRow, SidebarLayout. Gaps: Notice icon override, C
 - Inputs 16 px, 44 px tall, 12 px corners. Targets ≥ 44 px on coarse pointers.
 - Hint ≤ one line (~60 chars); an error replaces it. Optional fields say "(tùy chọn)".
 - Feedback: standing state or refusal → inline Notice by its cause; form save → SaveBar text; row/bulk/background → toast. A failure is never toast-only.
-- Tables: th 13 muted in sentence case (`text-meta text-muted`, comfortable and compact alike), td 14; numbers right-aligned, mono, tabular, nowrap.
+- Tables: th 13 muted in sentence case (`text-meta text-muted`, comfortable and compact alike; `lint:tokens` rejects `uppercase` on a header cell or header recipe), td 14; numbers right-aligned, mono, tabular, nowrap.
 - Empty states offer one next step. Skeletons are shaped from the component.
 
 ## Answers (2026-10-12)

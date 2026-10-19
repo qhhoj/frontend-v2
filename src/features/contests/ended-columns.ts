@@ -4,8 +4,7 @@
  */
 export const ENDED_TABLE_CLASS =
   'w-full min-w-[800px] table-fixed border-collapse text-sm lg:min-w-[980px]';
-export const ENDED_HEAD_ROW_CLASS =
-  'text-left text-caption tracking-wider whitespace-nowrap text-muted uppercase';
+export const ENDED_HEAD_ROW_CLASS = 'text-left text-meta whitespace-nowrap text-muted';
 export const ENDED_ROW_CLASS = 'border-t border-line';
 export const ENDED_CELL = {
   name: 'px-5 py-3',

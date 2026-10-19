@@ -20,8 +20,8 @@ Type scale (font size only; leading comes from the primitive or a `leading-*` cl
 | Class                              | px  | Use                                                |
 | ---------------------------------- | --- | -------------------------------------------------- |
 | `text-tiny`                        | 11  | counts, badges                                     |
-| `text-caption`                     | 12  | chips, table headers                               |
-| `text-meta`                        | 13  | hints, meta lines, errors, breadcrumbs             |
+| `text-caption`                     | 12  | chips, small labels                                |
+| `text-meta`                        | 13  | table headers, hints, meta lines, errors           |
 | `text-sm`                          | 14  | UI, controls, table cells (Tailwind's, leading 20) |
 | `text-base`                        | 16  | prose and every input (Tailwind's, leading 24)     |
 | `text-title`                       | 17  | card titles (with `font-semibold`/`font-bold`)     |
@@ -47,7 +47,7 @@ Other tokens:
 - Motion: `--qh-duration-fast` 150 ms, `--qh-duration` 200 ms, on colour, border and opacity only: `transition-colors`, never bare `transition`/`transition-all`/`transition-transform` (real motion such as a chevron turning is allowlisted with a reason in `scripts/transition-utilities.mjs`).
 - Admin density: `--qa-row`, `--qa-control`, `--qa-gap`, `--qa-gutter` (`src/features/admin/ui/admin-density.css`).
 
-`npm run lint:tokens` fails on: raw colours outside `src/theme/themes/`, stock `rounded`/`rounded-lg`/`shadow-*` (the theme resets them, they render nothing; `shadow-float` and `shadow-glow` are ours), stock `text-lg` … `text-9xl` (use the steps above; a swapped `text-xl` keeps its line with `leading-7`), `rounded-tile`/`rounded-panel`, bare `transition`/`transition-all`/`transition-transform`, `text-[<n>px]`, `rounded-[…]`, `z-[…]`. The only exceptions are listed per file in `ALLOWED` in `scripts/arbitrary-utilities.mjs`; do not add to it without a reason line in the PR.
+`npm run lint:tokens` fails on: raw colours outside `src/theme/themes/`, stock `rounded`/`rounded-lg`/`shadow-*` (the theme resets them, they render nothing; `shadow-float` and `shadow-glow` are ours), stock `text-lg` … `text-9xl` (use the steps above; a swapped `text-xl` keeps its line with `leading-7`), `rounded-tile`/`rounded-panel`, bare `transition`/`transition-all`/`transition-transform`, `uppercase` on a table header, `text-[<n>px]`, `rounded-[…]`, `z-[…]`. The only exceptions are listed per file in `ALLOWED` in `scripts/arbitrary-utilities.mjs`; do not add to it without a reason line in the PR.
 
 ## 3. Primitives
 

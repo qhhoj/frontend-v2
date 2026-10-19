@@ -97,7 +97,7 @@ const phoneFacts = (problem: ContestProblem) =>
           }}
         </caption>
         <thead>
-          <tr class="text-left text-caption tracking-wider text-muted uppercase">
+          <tr class="text-left text-meta text-muted">
             <th scope="col" class="px-5 py-3 font-semibold">
               {{ $t('contests.problems.columns.label') }}
             </th>
