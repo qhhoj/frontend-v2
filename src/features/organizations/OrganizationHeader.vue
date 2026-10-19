@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed } from 'vue';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
@@ -53,45 +54,37 @@ const phoneLines = computed(() => [
 </script>
 
 <template>
-  <section
-    data-testid="organization-header"
-    class="flex min-w-0 flex-col gap-3 md:flex-row md:items-center md:gap-4"
-  >
-    <div class="flex min-w-0 flex-1 items-start gap-3">
-      <OrganizationLogo :organization="organization" />
-      <div class="flex min-w-0 flex-1 flex-col gap-1">
-        <div class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-          <h1
-            class="min-w-0 font-display text-display leading-tight font-bold [overflow-wrap:anywhere]"
-          >
-            {{ organization.name }}
-          </h1>
-          <MembershipChip :state="state" />
-          <AdminEditLink :to="editTarget" />
-          <ShortLinkButton
-            compact
-            :path="shortLinkPath({ kind: 'organization', slug: organization.slug })"
-          />
-          <OrganizationMenu v-if="isMember" :organization="organization" class="ml-auto shrink-0" />
-        </div>
-        <!-- Phone: two lines at most, each cut with an ellipsis; from md every fact on one wrapping line. -->
-        <div data-testid="organization-facts" class="min-w-0 text-sm text-muted tabular-nums">
-          <p class="truncate md:hidden">{{ phoneLines[0] }}</p>
-          <p class="truncate md:hidden">{{ phoneLines[1] }}</p>
-          <p class="flex flex-wrap gap-x-3 max-md:hidden">
-            <span class="font-mono">{{ organization.shortName }}</span>
-            <span v-if="rank !== null">
-              {{ $t('orgs.rankLabel') }} <b :class="medalClass(rank)">#{{ rank }}</b>
-            </span>
-            <span>{{ $t('orgs.membersMeta', { count: memberCount }) }}</span>
-            <span class="text-positive">{{ $t('orgs.ppMeta', { pp: performancePoints }) }}</span>
-            <span>{{ $t(joinModeKey(organization.isOpen)) }}</span>
-            <span>{{ $t(places.key, places.params ?? {}) }}</span>
-            <span>{{ $t('orgs.founded', { date: founded }) }}</span>
-          </p>
-        </div>
+  <PageHeader data-testid="organization-header" :title="organization.name">
+    <template #start><OrganizationLogo :organization="organization" /></template>
+    <template #meta>
+      <MembershipChip :state="state" />
+      <AdminEditLink :to="editTarget" />
+      <ShortLinkButton
+        compact
+        :path="shortLinkPath({ kind: 'organization', slug: organization.slug })"
+      />
+    </template>
+    <template #lead>
+      <!-- Phone: two lines at most, each cut with an ellipsis; from md every fact on one wrapping line. -->
+      <div data-testid="organization-facts" class="min-w-0 tabular-nums">
+        <p class="truncate md:hidden">{{ phoneLines[0] }}</p>
+        <p class="truncate md:hidden">{{ phoneLines[1] }}</p>
+        <p class="flex flex-wrap gap-x-3 max-md:hidden">
+          <span class="font-mono">{{ organization.shortName }}</span>
+          <span v-if="rank !== null">
+            {{ $t('orgs.rankLabel') }} <b :class="medalClass(rank)">#{{ rank }}</b>
+          </span>
+          <span>{{ $t('orgs.membersMeta', { count: memberCount }) }}</span>
+          <span class="text-positive">{{ $t('orgs.ppMeta', { pp: performancePoints }) }}</span>
+          <span>{{ $t(joinModeKey(organization.isOpen)) }}</span>
+          <span>{{ $t(places.key, places.params ?? {}) }}</span>
+          <span>{{ $t('orgs.founded', { date: founded }) }}</span>
+        </p>
       </div>
-    </div>
-    <MembershipPanel :organization="organization" :state="state" />
-  </section>
+    </template>
+    <template #actions>
+      <OrganizationMenu v-if="isMember" :organization="organization" />
+      <MembershipPanel :organization="organization" :state="state" />
+    </template>
+  </PageHeader>
 </template>

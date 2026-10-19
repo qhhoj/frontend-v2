@@ -101,7 +101,7 @@ const clearTagTarget = computed(() => ({
   <section :aria-labelledby="headingId" :aria-describedby="countId" class="flex flex-col gap-4">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-baseline gap-2.5">
-        <h2 :id="headingId" class="font-display text-display leading-8 font-semibold">
+        <h2 :id="headingId" class="section-title">
           {{ $t(`contests.phase.${phase}`) }}
         </h2>
         <Chip :id="countId" size="md">{{ countText }}</Chip>

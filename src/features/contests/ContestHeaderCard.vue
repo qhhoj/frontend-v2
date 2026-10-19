@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed } from 'vue';
 import type { ContestDetail, ParticipationSummary } from '@/api/types/contests';
 import Card from '@/components/ui/Card.vue';
@@ -56,20 +57,22 @@ const oneDay = computed(() =>
     class="grid gap-5 p-5 md:grid-cols-[minmax(0,1fr)_minmax(260px,320px)] md:p-6"
   >
     <div class="flex min-w-0 flex-col gap-3">
-      <div class="flex flex-wrap items-center gap-1.5">
-        <PhasePill :phase="phase" />
-        <ContestChips :contest="contest" with-tags />
-      </div>
       <div>
-        <h1 class="flex items-center gap-3 page-title tracking-tight">
-          <img
-            v-if="contest.logoOverrideImage"
-            :src="contest.logoOverrideImage"
-            alt=""
-            class="size-10 shrink-0 rounded-cell object-contain md:size-14"
-          />
-          {{ contest.name }}
-        </h1>
+        <PageHeader :title="contest.name">
+          <template #above>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <PhasePill :phase="phase" />
+              <ContestChips :contest="contest" with-tags />
+            </div>
+          </template>
+          <template v-if="contest.logoOverrideImage" #start>
+            <img
+              :src="contest.logoOverrideImage"
+              alt=""
+              class="size-10 shrink-0 rounded-cell object-contain md:size-14"
+            />
+          </template>
+        </PageHeader>
         <p v-if="contest.summary" class="mt-1 hidden text-muted md:block">
           {{ contest.summary }}
         </p>

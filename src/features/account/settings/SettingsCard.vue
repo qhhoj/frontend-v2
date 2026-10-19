@@ -19,7 +19,7 @@ defineExpose({ focusHeading });
           :id="headingId"
           ref="headingElement"
           tabindex="-1"
-          class="font-display text-section leading-tight font-bold focus-visible:outline-none"
+          class="section-title focus-visible:outline-none"
         >
           {{ title }}
         </h2>

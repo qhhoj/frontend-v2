@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { LocateFixed } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
@@ -94,12 +95,11 @@ const goToMyRow = () => myRowId.value && table.value?.focusRow(myRowId.value);
       </template>
       <template v-if="contest">
         <ContestTabs :contest-key="key" :phase="contest.phase" />
-        <div>
-          <p class="text-muted">{{ summary }}</p>
-          <h1 class="mt-1 page-title">
-            {{ contest.name }}
-          </h1>
-        </div>
+        <PageHeader :title="contest.name">
+          <template #above>
+            <p class="text-muted">{{ summary }}</p>
+          </template>
+        </PageHeader>
       </template>
     </QueryState>
     <p role="status" data-testid="replay-announcement" class="sr-only">{{ announcement }}</p>

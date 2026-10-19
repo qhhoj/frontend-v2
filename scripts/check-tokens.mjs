@@ -5,6 +5,7 @@
 // The retired radius roles rounded-tile and rounded-panel are rejected as well (scripts/retired-utilities.mjs).
 // So are the bare transitions that also animate transform (scripts/transition-utilities.mjs).
 // So is `uppercase` on a table header cell or header recipe (scripts/table-header-case.mjs).
+// So is a raw `<h1` outside PageHeader (scripts/page-headings.mjs).
 // So is a hairline border (`border-line`, `border-line-strong`) on a form control (scripts/control-borders.mjs).
 // So are arbitrary sizes, radii and z-indexes (`text-[13px]`, `rounded-[3px]`, `z-[5]`): use the named steps (scripts/arbitrary-utilities.mjs).
 // The exemptions are Bit's sprite palettes (src/mascot/bit-sprite.ts) and the avatar's sprite data (src/mascot/avatar/avatar-sprites.ts):
@@ -12,6 +13,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { hairlineControlBorders } from './control-borders.mjs';
+import { rawHeadings } from './page-headings.mjs';
 import { retiredUtilities } from './retired-utilities.mjs';
 import { stockUtilities } from './stock-utilities.mjs';
 import { tableHeaderUppercase } from './table-header-case.mjs';
@@ -72,6 +74,10 @@ const CHECKS = [
   {
     message: `Hairline border on a form control (an input, select or textarea, or a wrapper that shows its focus or checked state, takes border-line-control: 3:1 on its ground, WCAG 1.4.11; docs/design-language.md):`,
     find: hairlineControlBorders,
+  },
+  {
+    message: `Raw <h1> (a page title is the kit PageHeader, one size; a page that cannot use it goes in ALLOWED in scripts/page-headings.mjs with its reason and still takes page-title; docs/design-language.md):`,
+    find: rawHeadings,
   },
   {
     message: `Colour literals outside src/theme/themes/ (use a --qh- token):`,

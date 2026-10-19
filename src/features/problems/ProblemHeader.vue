@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
 import { problemEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import type { ProblemSection } from '@/features/admin/edit-link/admin-edit-targets';
@@ -19,8 +20,8 @@ const session = useSessionStore();
 
 <template>
   <div data-testid="problem-header">
-    <div class="flex items-start gap-3">
-      <div class="min-w-0 flex-1">
+    <PageHeader :title="problem.name">
+      <template #above>
         <p class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm">
           <span class="font-mono text-muted [overflow-wrap:anywhere]">{{ problem.code }}</span>
           <Chip v-if="problem.group" data-testid="problem-group-chip" tone="accent">{{
@@ -30,12 +31,11 @@ const session = useSessionStore();
             $t('problem.externalJudge', { oj: problem.externalJudge.oj })
           }}</Chip>
         </p>
-        <h1 class="mt-1 page-title [overflow-wrap:anywhere]">
-          {{ problem.name }}
-        </h1>
-      </div>
-      <AdminEditLink :to="problemEditTarget(session.user, props.problem, props.section)" />
-    </div>
+      </template>
+      <template #actions>
+        <AdminEditLink :to="problemEditTarget(session.user, props.problem, props.section)" />
+      </template>
+    </PageHeader>
     <slot name="strip" />
     <hr class="-mx-6 mt-4 border-line sm:-mx-8" />
     <div v-if="$slots.default" class="mt-4"><slot /></div>

@@ -21,7 +21,7 @@ const count = (value: number) => formatNumber(value, locale.locale);
 
 <template>
   <section class="flex flex-col gap-2">
-    <h2 class="font-display text-section leading-7 font-bold">
+    <h2 class="section-title">
       {{ $t('contests.stats.languageTitle') }}
     </h2>
     <Card

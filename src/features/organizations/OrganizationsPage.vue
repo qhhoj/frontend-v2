@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { Plus } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -66,15 +67,9 @@ const isCreateOpen = ref(false);
 
 <template>
   <div class="page-column">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-      <header class="flex items-center gap-3">
-        <StateBit variant="community" size="inline" class="shrink-0" />
-        <div class="flex min-w-0 flex-col gap-1">
-          <h1 class="page-title">{{ $t('orgs.title') }}</h1>
-          <p class="text-muted">{{ $t('orgs.lead') }}</p>
-        </div>
-      </header>
-      <div class="flex flex-wrap items-center gap-3">
+    <PageHeader :title="$t('orgs.title')" :lead="$t('orgs.lead')">
+      <template #start><StateBit variant="community" size="inline" /></template>
+      <template #actions>
         <SegmentedControl
           v-if="!isListEmpty"
           v-model="filter"
@@ -92,8 +87,8 @@ const isCreateOpen = ref(false);
           <span class="max-sm:hidden">{{ $t('orgAdmin.create.open') }}</span>
           <span class="sm:hidden">{{ $t('orgAdmin.create.openShort') }}</span>
         </AppButton>
-      </div>
-    </div>
+      </template>
+    </PageHeader>
     <CreateOrganizationDialog v-if="canCreate" v-model:visible="isCreateOpen" />
 
     <QueryState :loading="list.isPending.value" :error="list.error.value" @retry="list.refetch()">

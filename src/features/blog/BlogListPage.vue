@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { ChevronRight, FilePen, Pencil, Rss } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -53,15 +54,9 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
 
 <template>
   <div class="page-column">
-    <header class="flex items-center justify-between gap-3">
-      <div class="flex min-w-0 flex-col gap-2">
-        <h1 class="page-title">
-          {{ $t('blog.title') }}
-        </h1>
-        <p class="text-muted">{{ $t('blog.lead') }}</p>
-      </div>
-      <StateBit variant="writing" size="inline" class="shrink-0" />
-    </header>
+    <PageHeader :title="$t('blog.title')" :lead="$t('blog.lead')">
+      <template #start><StateBit variant="writing" size="inline" /></template>
+    </PageHeader>
     <div class="flex flex-wrap items-center justify-between gap-3">
       <Tabs
         :model-value="feed"

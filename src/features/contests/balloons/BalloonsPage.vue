@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { computed, nextTick, ref } from 'vue';
@@ -114,22 +115,21 @@ const go = (patch: Record<string, string | undefined>) =>
       :body="$t('balloons.forbiddenBody')"
     />
     <template v-else>
-      <header class="flex flex-wrap items-end justify-between gap-4">
-        <div class="flex min-w-0 items-center gap-3">
-          <InlineBit :kind="EXTRAS_BITS.balloonsHeading" />
-          <div class="min-w-0">
-            <h1 class="page-title">{{ $t('balloons.title') }}</h1>
-            <RouterLink
-              :to="{ name: 'contest', params: { key } }"
-              class="text-sm text-accent-text underline"
-              >{{ contest?.name ?? key }}</RouterLink
-            >
-          </div>
-        </div>
-        <AppButton :to="{ name: 'contest-balloons-print', params: { key } }">{{
-          $t('balloons.printLink')
-        }}</AppButton>
-      </header>
+      <PageHeader :title="$t('balloons.title')">
+        <template #start><InlineBit :kind="EXTRAS_BITS.balloonsHeading" /></template>
+        <template #lead>
+          <RouterLink
+            :to="{ name: 'contest', params: { key } }"
+            class="text-accent-text underline"
+            >{{ contest?.name ?? key }}</RouterLink
+          >
+        </template>
+        <template #actions>
+          <AppButton :to="{ name: 'contest-balloons-print', params: { key } }">{{
+            $t('balloons.printLink')
+          }}</AppButton>
+        </template>
+      </PageHeader>
       <p role="status" class="sr-only">{{ pendingAnnouncement }}</p>
       <SegmentedControl
         :label="$t('balloons.title')"

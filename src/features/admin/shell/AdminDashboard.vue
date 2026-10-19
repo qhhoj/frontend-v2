@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed } from 'vue';
 import { CloudDownload, Plus, Trophy } from 'lucide-vue-next';
 import { useSessionStore } from '@/stores/session.store';
@@ -29,15 +30,12 @@ const actions = computed(() =>
 
 <template>
   <div data-testid="admin-dashboard" class="flex flex-col gap-6">
-    <header class="flex flex-wrap items-center gap-x-4 gap-y-3">
-      <AdminBit placement="greeting" />
-      <div class="min-w-0 flex-1 basis-60">
-        <h1 class="font-display text-section leading-7 font-semibold md:text-display md:leading-8">
-          {{ $t('admin.shell.dashboard.hello', { name: session.user?.username }) }}
-        </h1>
-        <p class="text-sm text-muted">{{ $t('admin.shell.dashboard.lead') }}</p>
-      </div>
-      <div v-if="actions.length" class="flex flex-wrap gap-2">
+    <PageHeader
+      :title="$t('admin.shell.dashboard.hello', { name: session.user?.username })"
+      :lead="$t('admin.shell.dashboard.lead')"
+    >
+      <template #start><AdminBit placement="greeting" /></template>
+      <template v-if="actions.length" #actions>
         <RouterLink
           v-for="(id, index) in actions"
           :key="id"
@@ -52,8 +50,8 @@ const actions = computed(() =>
           />
           {{ $t(`admin.shell.dashboard.actions.${id}`) }}
         </RouterLink>
-      </div>
-    </header>
+      </template>
+    </PageHeader>
     <OverviewTiles />
     <RecentScreens />
     <RecentChangesCard class="max-w-4xl" />

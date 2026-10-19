@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed, ref, watch } from 'vue';
 import { useLeaderboardQuery } from '@/features/users/users.queries';
 import { formatNumber } from '@/lib/format';
@@ -21,16 +22,13 @@ const total = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.lo
 
 <template>
   <div class="page-column">
-    <header class="flex flex-wrap items-center justify-between gap-4">
-      <div>
-        <h1 class="page-title">{{ $t('leaderboard.title') }}</h1>
-        <p class="text-muted">
-          {{ $t('leaderboard.lead', { total }) }}
-          <MyRankLine v-if="session.user" :sort="sort" />
-        </p>
-      </div>
-      <UsernameJump />
-    </header>
+    <PageHeader :title="$t('leaderboard.title')">
+      <template #lead>
+        {{ $t('leaderboard.lead', { total }) }}
+        <MyRankLine v-if="session.user" :sort="sort" />
+      </template>
+      <template #actions><UsernameJump /></template>
+    </PageHeader>
     <div ref="listTop" class="min-w-0">
       <LeaderboardTable
         :entries="entries"

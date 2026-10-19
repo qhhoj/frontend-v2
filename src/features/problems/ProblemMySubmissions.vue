@@ -75,7 +75,7 @@ const rows = computed(() =>
 <template>
   <Card class="flex flex-col gap-2 p-4" data-testid="rail-my-submissions">
     <div class="flex items-center justify-between gap-2">
-      <h2 class="flex items-center gap-2 font-display text-title font-bold">
+      <h2 class="flex items-center gap-2 section-title">
         {{ $t('problem.rail.mine.title') }}
         <StateBit v-if="isJudging" variant="judging" size="tiny" />
       </h2>

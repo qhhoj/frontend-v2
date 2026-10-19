@@ -92,7 +92,7 @@ function onAfterHide() {
             :id="titleId"
             ref="heading"
             tabindex="-1"
-            class="m-0 truncate font-display text-section leading-7 font-semibold focus-visible:outline-none"
+            class="m-0 truncate section-title focus-visible:outline-none"
           >
             {{ title }}
           </h2>

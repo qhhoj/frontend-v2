@@ -9,7 +9,7 @@ import { navCrumbsOf } from '../shell/admin-nav';
 import type { AdminCrumb } from '../shell/admin-nav';
 
 /**
- * Every admin page's header: `PageHeader` at the compact title size, its breadcrumb led by the nav's crumbs. One primary
+ * Every admin page's header: `PageHeader` (the same title step as the public pages), its breadcrumb led by the nav's crumbs. One primary
  * action per page goes in `#actions` with the secondary ones; a third action or more goes in `#overflow`, behind a
  * "⋯ Thêm" button. Below `md` the breadcrumb becomes one back link: `back`, else the nearest crumb that links somewhere.
  * `#meta` sits under the title (chips, a code, a status line).
@@ -44,7 +44,7 @@ const closeOverflow = () => overflowMenu.value?.hide();
 </script>
 
 <template>
-  <PageHeader :title="title" :lead="lead" :crumbs="crumbs" :back="backLink" size="compact">
+  <PageHeader :title="title" :lead="lead" :crumbs="crumbs" :back="backLink">
     <template v-if="slots.meta" #meta><slot name="meta" /></template>
     <template v-if="slots.actions || slots.overflow" #actions>
       <slot name="actions" />

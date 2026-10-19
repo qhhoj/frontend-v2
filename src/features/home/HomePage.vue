@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { useSessionStore } from '@/stores/session.store';
 import AnonymousHome from './AnonymousHome.vue';
 import HomePostsCard from './HomePostsCard.vue';
@@ -13,7 +14,7 @@ const session = useSessionStore();
 <template>
   <AnonymousHome v-if="!session.user" />
   <div v-else class="page-column">
-    <h1 class="sr-only">{{ $t('nav.home') }}</h1>
+    <PageHeader :title="$t('nav.home')" class="sr-only" />
     <section class="flex flex-wrap items-stretch gap-6">
       <RatingHeroCard :username="session.user.username" class="min-w-0 flex-1" />
     </section>

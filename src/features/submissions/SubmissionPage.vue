@@ -4,6 +4,8 @@ import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
+import PageHeader from '@/components/ui/PageHeader.vue';
+import type { PageCrumb } from '@/components/ui/PageHeader.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
@@ -74,6 +76,25 @@ const problemName = computed(
 const inContest = useSubmissionContest(row, isOwn);
 useNavSection(() => (inContest.value ? '/contests' : null));
 const contestScore = useContestScore(row, inContest);
+/** The page title is the problem (with its contest label); the crumbs lead to the list the submission belongs to, the contest or all submissions. */
+const heading = computed(() => {
+  const label = inContest.value ? `${inContest.value.problem.label}. ` : '';
+  const parent: PageCrumb[] = inContest.value
+    ? [
+        { label: translate('contests.title'), to: { name: 'contests' } },
+        {
+          label: inContest.value.contest.name,
+          to: { name: 'contest', params: { key: inContest.value.contest.key } },
+        },
+      ]
+    : [{ label: translate('pages.submissions'), to: { name: 'submissions' } }];
+  const nearest = parent[parent.length - 1]!;
+  return {
+    title: `${label}${problemName.value ?? shortId.value}`,
+    crumbs: parent,
+    back: { to: nearest.to!, label: nearest.label },
+  };
+});
 const canResubmit = computed(
   () => isOwn.value && problemCode.value !== null && !isDeletedProblem.value,
 );
@@ -97,31 +118,12 @@ const verdict = computed(() => {
 <template>
   <NotFoundPage v-if="isNotFound" />
   <div v-else class="page-column">
-    <nav
-      :aria-label="$t('common.breadcrumb')"
-      class="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1 text-sm"
-    >
-      <template v-if="inContest">
-        <RouterLink :to="{ name: 'contests' }" class="text-muted hover:underline">{{
-          $t('contests.title')
-        }}</RouterLink>
-        <span aria-hidden="true" class="text-muted">/</span>
-        <RouterLink
-          :to="{ name: 'contest', params: { key: inContest.contest.key } }"
-          class="font-semibold text-accent-text underline underline-offset-2 hover:no-underline"
-          >{{ inContest.contest.name }}</RouterLink
-        >
-      </template>
-      <RouterLink v-else :to="{ name: 'submissions' }" class="text-muted hover:underline">{{
-        $t('pages.submissions')
-      }}</RouterLink>
-      <span aria-hidden="true" class="text-muted">/</span>
-      <h1 class="min-w-0 font-semibold [overflow-wrap:anywhere]">
-        <template v-if="inContest">{{ inContest.problem.label }}. </template
-        >{{ problemName ?? shortId }}
-      </h1>
-      <span v-if="problemName" class="font-mono text-meta text-muted">{{ shortId }}</span>
-    </nav>
+    <PageHeader
+      :title="heading.title"
+      :crumbs="heading.crumbs"
+      :back="heading.back"
+      :meta="problemName ? [shortId] : []"
+    />
     <p role="status" aria-live="polite" class="sr-only">
       {{ verdict ? $t(verdict.labelKey) : '' }}
     </p>

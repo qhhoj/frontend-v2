@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
@@ -46,19 +47,18 @@ const printSheet = () => window.print();
       :body="$t('balloons.forbiddenBody')"
     />
     <template v-else>
-      <header class="flex flex-wrap items-center justify-between gap-3">
-        <h1 class="page-title">
-          {{ $t('balloons.printTitle', { contest: contest?.name ?? key }) }}
-        </h1>
-        <div class="flex gap-2 print:hidden">
-          <AppButton :to="{ name: 'contest-balloons', params: { key } }">{{
-            $t('balloons.back')
-          }}</AppButton>
-          <AppButton tone="primary" @click="printSheet">
-            {{ $t('balloons.print') }}
-          </AppButton>
-        </div>
-      </header>
+      <PageHeader :title="$t('balloons.printTitle', { contest: contest?.name ?? key })">
+        <template #actions>
+          <div class="flex gap-2 print:hidden">
+            <AppButton :to="{ name: 'contest-balloons', params: { key } }">{{
+              $t('balloons.back')
+            }}</AppButton>
+            <AppButton tone="primary" @click="printSheet">
+              {{ $t('balloons.print') }}
+            </AppButton>
+          </div>
+        </template>
+      </PageHeader>
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
           <div class="flex flex-col gap-2">
