@@ -41,7 +41,7 @@ describe('FormField', () => {
     const required = mountComponent(fieldWith(TextInput, { label: 'Tên', required: true }));
     expect(required.get('label').text()).toBe('Tên*bắt buộc');
     const optional = mountComponent(fieldWith(TextInput, { label: 'Trường', optional: true }));
-    expect(optional.get('label').text()).toBe('Trường (tuỳ chọn)');
+    expect(optional.get('label').text()).toBe('Trường (tùy chọn)');
   });
 
   it('hands slot props to a control that binds them itself', () => {

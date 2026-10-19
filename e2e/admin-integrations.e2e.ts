@@ -17,17 +17,17 @@ test('creates a client, reveals its key once, and revokes it after confirming', 
   await page.getByRole('checkbox', { name: /contests:write/ }).check();
   await page.getByLabel('Địa chỉ được gọi (CIDR)').fill('10.0.0.0/8');
   await page.getByLabel('Hành động dưới tên').fill('syncauthor');
-  await page.getByRole('button', { name: 'Tạo khoá' }).click();
-  await expect(page.getByRole('dialog', { name: 'Khoá của Hệ thống thi tỉnh' })).toContainText(
+  await page.getByRole('button', { name: 'Tạo khóa' }).click();
+  await expect(page.getByRole('dialog', { name: 'Khóa của Hệ thống thi tỉnh' })).toContainText(
     INTEGRATION_KEY,
   );
   await expect(page.locator('#key-saved')).toBeFocused();
   await page.locator('#key-saved').check();
   await page.getByTestId('key-close').click();
   await expect(page.getByText(INTEGRATION_KEY)).toHaveCount(0);
-  await page.getByRole('button', { name: 'Thu hồi khoá của Hệ thống thi tỉnh' }).click();
-  await confirmInDialog(page, 'Thu hồi khoá');
-  await expect(page.getByText('Đã thu hồi khoá của Hệ thống thi tỉnh')).toBeVisible();
+  await page.getByRole('button', { name: 'Thu hồi khóa của Hệ thống thi tỉnh' }).click();
+  await confirmInDialog(page, 'Thu hồi khóa');
+  await expect(page.getByText('Đã thu hồi khóa của Hệ thống thi tỉnh')).toBeVisible();
   expect(api.requestsTo(`DELETE /integration-clients/${integrationClient().id}`)).toHaveLength(1);
 });
 
@@ -64,8 +64,8 @@ test('the key dialog is accessible', async ({ page, api }) => {
   await page.getByRole('checkbox', { name: /contests:read/ }).check();
   await page.getByLabel('Địa chỉ được gọi (CIDR)').fill('10.0.0.0/8');
   await page.getByLabel('Hành động dưới tên').fill('syncauthor');
-  await page.getByRole('button', { name: 'Tạo khoá' }).click();
-  await expect(page.getByRole('dialog', { name: 'Khoá của Hệ thống thi tỉnh' })).toBeVisible();
+  await page.getByRole('button', { name: 'Tạo khóa' }).click();
+  await expect(page.getByRole('dialog', { name: 'Khóa của Hệ thống thi tỉnh' })).toBeVisible();
   await expect(page.getByRole('dialog')).toHaveCount(1);
   expect(await axeViolationsIn(page)).toEqual([]);
 });

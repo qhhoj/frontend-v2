@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-vue-next';
 import { computed, useId } from 'vue';
 import FormField from '@/components/ui/FormField.vue';
 
-/** A native select in the `AuthField` frame (the language picker on the signup and social completion pages, and the profile defaults). `optional` adds "(tuỳ chọn)" to the label. `placeholder` is the empty option; leave it out when the field always has a value. Extra attributes go to the select. */
+/** A native select in the `AuthField` frame (the language picker on the signup and social completion pages, and the profile defaults). `optional` adds "(tùy chọn)" to the label. `placeholder` is the empty option; leave it out when the field always has a value. Extra attributes go to the select. */
 defineOptions({ inheritAttrs: false });
 const props = withDefaults(
   defineProps<{

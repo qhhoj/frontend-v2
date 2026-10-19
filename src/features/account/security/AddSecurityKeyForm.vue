@@ -12,7 +12,7 @@ import SettingsNotice from '../settings/SettingsNotice.vue';
 import { addSecurityKey } from './security-key';
 import { SECURITY_KEYS_KEY } from './security.queries';
 
-/** Board SetSecurityC "Thêm khoá bảo mật": name, password, then the browser's prompt. A cancelled prompt leaves the form as it was. */
+/** Board SetSecurityC "Thêm khóa bảo mật": name, password, then the browser's prompt. A cancelled prompt leaves the form as it was. */
 const emit = defineEmits<{ added: [key: SecurityKey]; close: [] }>();
 const KEY_NAME_MAX_LENGTH = 100; // backend WebauthnRegisterDto.name
 const session = useSessionStore();

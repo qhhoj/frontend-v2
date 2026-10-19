@@ -14,7 +14,5 @@ const TONES: Record<PolygonPackageState, ChipTone> = {
 </script>
 
 <template>
-  <AdminChip :tone="TONES[state]" class="font-mono">{{
-    $t(`admin.polygonLink.packageState.${state}`)
-  }}</AdminChip>
+  <AdminChip :tone="TONES[state]">{{ $t(`admin.polygonLink.packageState.${state}`) }}</AdminChip>
 </template>

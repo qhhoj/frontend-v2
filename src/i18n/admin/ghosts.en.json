@@ -60,7 +60,6 @@
     "delete": "Delete the ghost set",
     "deleteTitle": "Delete {count} ghosts?",
     "deleteBody": "Ghosts leave the replay once it is rebuilt. Download the CSV first to keep it.",
-    "deleteConfirm": "Delete",
     "deleted": "The ghost set was deleted."
   },
   "title": "Ghosts"

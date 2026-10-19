@@ -53,6 +53,20 @@ describe('ConfirmDialog', () => {
     await flushPromises();
     expect(wrapper.emitted('update:visible')).toBeUndefined();
   });
+
+  it.each([
+    ['danger', 'Xóa'],
+    ['neutral', 'Xác nhận'],
+  ])('says "Hủy" and the %s tone\'s own word when no label is given', async (tone, word) => {
+    const wrapper = mountComponent(ConfirmDialog, {
+      props: { title: 'Bạn chắc chứ?', visible: true, tone },
+    });
+    await flushPromises();
+    buttonNamed(word).click();
+    await flushPromises();
+    expect(buttonNamed('Hủy')).toBeDefined();
+    expect(wrapper.emitted('confirm')).toHaveLength(1);
+  });
 });
 
 describe('ConfirmDialog with an input in its body', () => {

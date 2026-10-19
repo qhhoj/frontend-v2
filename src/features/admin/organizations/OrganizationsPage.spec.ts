@@ -141,17 +141,17 @@ describe('OrganizationsPage', () => {
     );
     const { wrapper, router } = await mountWithButton(
       '/admin/organizations?org=lhp',
-      'Xoá tổ chức',
+      'Xóa tổ chức',
     );
     await wrapper.get('[data-testid="delete-organization"]').trigger('click');
     await flushPromises();
-    await confirmDialog('Xoá');
+    await confirmDialog('Xóa');
     expect(calls.some((call) => call.method === 'DELETE')).toBe(false);
     const input = openDialog().querySelector<HTMLInputElement>('#org-delete-slug')!;
     input.value = 'lhp';
     input.dispatchEvent(new Event('input'));
     await flushPromises();
-    await confirmDialog('Xoá');
+    await confirmDialog('Xóa');
     expect(calls.filter((call) => call.method === 'DELETE').map((call) => call.path)).toEqual([
       '/organizations/lhp',
     ]);

@@ -121,7 +121,7 @@ describe('ProblemStatementsTab', () => {
     await save.trigger('click');
     await flushPromises();
     expect(calls.some((call) => call.method === 'PUT')).toBe(false);
-    await buttonLabelled(wrapper, 'Huỷ thay đổi').trigger('click');
+    await buttonLabelled(wrapper, 'Hủy thay đổi').trigger('click');
     await wrapper.get('#statement-name').setValue('Tên mới');
     await buttonLabelled(wrapper, 'Lưu bản dịch tiếng Việt').trigger('click');
     await flushPromises();

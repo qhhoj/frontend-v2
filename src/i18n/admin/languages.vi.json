@@ -65,7 +65,7 @@
     "required": "Trường có dấu * là bắt buộc. Mã ngôn ngữ không đổi được sau khi tạo.",
     "create": "Tạo ngôn ngữ",
     "save": "Lưu thay đổi",
-    "cancel": "Huỷ",
+    "cancel": "Hủy",
     "saved": "Đã lưu.",
     "savedToast": "Đã lưu ngôn ngữ {key}.",
     "createdToast": "Đã tạo ngôn ngữ {key}.",

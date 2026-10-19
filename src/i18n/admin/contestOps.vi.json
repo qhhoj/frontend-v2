@@ -118,8 +118,8 @@
     "recomputeQueuedFor": "Đã xếp hàng tính lại điểm của {username}.",
     "disqualified": "Đã loại {username} khỏi bảng.",
     "startMoved": "Đã đổi giờ bắt đầu của {username}.",
-    "deleted": "Đã xoá lượt tham gia của {username}.",
-    "deleteConfirm": "Xoá lượt tham gia",
+    "deleted": "Đã xóa lượt tham gia của {username}.",
+    "deleteConfirm": "Xóa lượt tham gia",
     "more": "Thao tác khác với lượt tham gia của {username}",
     "chips": {
       "kind": "Loại: {value}",
@@ -135,7 +135,7 @@
     "previewLabel": "Xem trước",
     "previewEmpty": "Chưa có gì để xem trước.",
     "more": "Thao tác khác với thông báo “{title}”",
-    "deleted": "Đã xoá thông báo “{title}”.",
+    "deleted": "Đã xóa thông báo “{title}”.",
     "saved": "Đã lưu thông báo."
   }
 }

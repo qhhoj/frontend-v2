@@ -14,7 +14,7 @@ const props = defineProps<{
   previewStyle: PreviewSource;
   hint?: string;
   error?: string;
-  /** Heading of the preview column; defaults to the style name. */
+  /** Heading of the preview column; defaults to "Xem trước". */
   previewLabel?: string;
   /**
    * `split` (default): write and preview side by side from 1024 px. `tabs`: one editor with Viết / Xem trước tabs at every width,
@@ -28,9 +28,7 @@ const preview = useRenderPreview(
   () => props.previewStyle,
 );
 const { t } = useI18n();
-const previewHeading = computed(
-  () => props.previewLabel ?? t('admin.ui.preview', { style: props.previewStyle }),
-);
+const previewHeading = computed(() => props.previewLabel ?? t('admin.ui.preview'));
 /** Below 1024 px one pane shows at a time ("Soạn" / "Xem trước"); from 1024 px both sit side by side. */
 const pane = ref<'write' | 'preview'>('write');
 const tab = ref<'write' | 'preview'>('write');

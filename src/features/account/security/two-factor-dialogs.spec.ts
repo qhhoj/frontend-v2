@@ -61,7 +61,7 @@ describe('Settings › Security › turning the app off', () => {
     expect(sent(calls, '/auth/2fa/totp/disable')).toEqual([{ code: '123456' }]);
     await vi.waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeNull());
     expect(wrapper.get('#main [role="status"]').text()).toBe(
-      'Đã tắt ứng dụng xác thực. Các mã dự phòng cũ đã bị xoá.',
+      'Đã tắt ứng dụng xác thực. Các mã dự phòng cũ đã bị xóa.',
     );
     expect(pageButton(wrapper, 'Bật')).toBeDefined();
   });

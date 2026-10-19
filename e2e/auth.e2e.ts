@@ -127,7 +127,7 @@ test.describe('second factor', () => {
       },
     });
     await page.goto(`http://localhost:${port}/login/2fa`);
-    await page.getByRole('button', { name: 'Dùng khoá bảo mật' }).click();
+    await page.getByRole('button', { name: 'Dùng khóa bảo mật' }).click();
     await expect(page).toHaveURL(/\/$/);
     expect(requestsOf(auth, 'webauthn-verify')).toMatchObject([
       {
@@ -162,7 +162,7 @@ test.describe('registration, activation and resend', () => {
       'aria-valuenow',
       '4',
     );
-    await page.getByRole('combobox', { name: 'Trường (tuỳ chọn)' }).click();
+    await page.getByRole('combobox', { name: 'Trường (tùy chọn)' }).click();
     await page.getByPlaceholder('Gõ để tìm trường').fill('THPT A');
     await page.getByRole('option', { name: organizationItem().name }).click();
     await page.getByRole('button', { name: 'Tạo tài khoản', exact: true }).click();
@@ -244,7 +244,7 @@ test.describe('registration, activation and resend', () => {
     await languagesLoaded;
     await page.getByLabel('Tên đăng nhập').fill('social_user');
     await page.getByLabel('Mật khẩu', PASSWORD).fill('correct horse battery');
-    await page.getByRole('combobox', { name: 'Trường (tuỳ chọn)' }).click();
+    await page.getByRole('combobox', { name: 'Trường (tùy chọn)' }).click();
     await page.getByRole('option', { name: organizationItem().name }).click();
     await page.getByRole('button', { name: 'Tạo tài khoản' }).click();
     await expect(page).toHaveURL(/\/$/);

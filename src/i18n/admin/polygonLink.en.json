@@ -1,8 +1,8 @@
 {
   "packageState": {
-    "READY": "READY",
-    "RUNNING": "RUNNING",
-    "FAILED": "FAILED",
+    "READY": "Ready",
+    "RUNNING": "Running",
+    "FAILED": "Failed",
     "NONE": "No package"
   },
   "packageType": {
@@ -68,11 +68,11 @@
     },
     "noPackage": {
       "title": "Build a package first",
-      "body": "QHHOJ checks the link against the newest package, so the problem needs at least one READY package. Build a full package on Polygon, then check again."
+      "body": "QHHOJ checks the link against the newest package, so the problem needs at least one ready package. Build a full package on Polygon, then check again."
     },
     "notReady": {
-      "title": "No READY package to import",
-      "body": "The newest package is not READY: it is still building or it failed. On Polygon, open Packages and build a full or standard package; if one is RUNNING, wait until it finishes."
+      "title": "No ready package to import",
+      "body": "The newest package is not ready: it is still building or it failed. On Polygon, open Packages and build a full or standard package; if one is running, wait until it finishes."
     },
     "linked": {
       "title": "Already on QHHOJ",
@@ -108,7 +108,7 @@
     "lead": "The same as a .zip import. Statements, tests and the checker come from the Polygon package; the rest are QHHOJ settings.",
     "board": "Problem on QHHOJ",
     "autoSync": "Sync automatically on a new package",
-    "autoSyncHint": "When the owner builds a READY package newer than r{revision}, QHHOJ imports the statements, tests and checker again (checked every 10 minutes, deferred while a contest using the problem runs).",
+    "autoSyncHint": "When the owner builds a ready package newer than r{revision}, QHHOJ imports the statements, tests and checker again (checked every 10 minutes, deferred while a contest using the problem runs).",
     "back": "Back"
   },
   "progress": {
@@ -138,18 +138,18 @@
     "inUse": "In use",
     "latest": "Newest",
     "revisionText": {
-      "newer": "Package #{id} of r{revision} is built (READY). Sync to take the new version.",
-      "upToDate": "Using the newest READY package (package #{package}).",
-      "syncFailed": "Newest package on Polygon: r{revision}, {state}. The last sync failed; the problem keeps the old version.",
-      "notReady": "The newest package on Polygon is {state}; it cannot be synced yet.",
+      "newer": "Package #{id} of r{revision} is built. Sync to take the new version.",
+      "upToDate": "Using the newest ready package (package #{package}).",
+      "syncFailed": "Newest package on Polygon: r{revision} ({state}). The last sync failed; the problem keeps the old version.",
+      "notReady": "The newest package on Polygon is not ready ({state}); it cannot be synced yet.",
       "unknown": "Polygon cannot be asked right now: not connected, unreachable, or the account lost read access."
     },
     "syncFailed": "The sync at {date} failed: {reason} The problem was not changed.",
     "syncNow": "Sync now",
     "syncNowRevision": "Sync now (r{revision})",
-    "syncBlocked": "Syncing needs a READY package on Polygon.",
-    "autoSyncOn": "A newer READY package re-imports the statements, tests and checker. On.",
-    "autoSyncOff": "A newer READY package re-imports the statements, tests and checker. Off.",
+    "syncBlocked": "Syncing needs a ready package on Polygon.",
+    "autoSyncOn": "A newer ready package re-imports the statements, tests and checker. On.",
+    "autoSyncOff": "A newer ready package re-imports the statements, tests and checker. Off.",
     "unlink": "Unlink",
     "readOnly": "{needs} to sync, switch auto-sync or unlink.",
     "autoSyncState": "Auto-sync: {state}",

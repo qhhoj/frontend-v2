@@ -9,11 +9,11 @@
   "details": "Chi tiết",
   "empty": "Chưa có gì ở đây.",
   "emptyFiltered": "Không có kết quả cho bộ lọc này.",
-  "clearFilters": "Xoá bộ lọc",
+  "clearFilters": "Xóa bộ lọc",
   "filters": "Bộ lọc",
   "filtersCount": "Bộ lọc ({count})",
   "removeFilter": "Bỏ lọc {label}",
-  "clearAll": "Xoá tất cả",
+  "clearAll": "Xóa tất cả",
   "openExact": "Mở {code}",
   "range": "{from}–{to} / {total}"
 }

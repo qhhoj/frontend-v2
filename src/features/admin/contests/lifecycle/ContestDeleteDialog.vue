@@ -11,7 +11,7 @@ import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { CONTEST_INDEX_KEY } from '../contest-editing.queries';
 
 /**
- * "Xoá kỳ thi…" from the row menu, the editor header and the Actions tab: deletes once the key is typed again. Callers
+ * "Xóa kỳ thi…" from the row menu, the editor header and the Actions tab: deletes once the key is typed again. Callers
  * offer it only for a hidden contest; the rated and still-judging refusals come back from the server, inside the dialog.
  */
 const props = defineProps<{ contestKey: string }>();

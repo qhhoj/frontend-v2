@@ -104,7 +104,7 @@ describe('ProblemSearchList', () => {
       'Xem trang công khai',
       'Nhân bản…',
       'Dữ liệu chấm',
-      'Xoá…',
+      'Xóa…',
     ]);
     (items[1]!.querySelector('a') as HTMLElement).click();
     await flushPromises();

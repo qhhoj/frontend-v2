@@ -50,7 +50,7 @@ const props = withDefaults(
     loading?: boolean;
     error?: unknown;
     skeletonRows?: number;
-    /** The list is empty because of a filter: offer "Xoá bộ lọc" (emits `clear-filters`). */
+    /** The list is empty because of a filter: offer "Xóa bộ lọc" (emits `clear-filters`). */
     filtered?: boolean;
     emptyText?: string;
     /** Caps the card's height so the header sticks while the rows scroll (a CSS length). */

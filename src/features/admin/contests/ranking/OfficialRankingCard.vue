@@ -164,7 +164,6 @@ const submitUrl = () => upload.run({ url: urlText.value.trim() });
       v-model:visible="isRemoveOpen"
       :title="$t('admin.contests.ranking.official.removeTitle')"
       :body="$t('admin.contests.ranking.official.removeBody')"
-      :confirm-label="$t('admin.contests.ranking.official.removeConfirm')"
       tone="danger"
       :busy="remove.isPending.value"
       @confirm="remove.run(undefined)"

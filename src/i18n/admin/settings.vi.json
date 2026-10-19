@@ -60,7 +60,7 @@
     },
     "polygon": {
       "title": "Tài khoản Polygon của QHHOJ",
-      "help": "QHHOJ đọc bài trên Polygon bằng tài khoản này. Người ra đề chia sẻ bài với tài khoản, rồi nhập ở mục Nhập từ Polygon. Thiếu khoá hoặc bí mật là chưa kết nối."
+      "help": "QHHOJ đọc bài trên Polygon bằng tài khoản này. Người ra đề chia sẻ bài với tài khoản, rồi nhập ở mục Nhập từ Polygon. Thiếu khóa hoặc bí mật là chưa kết nối."
     },
     "externalJudge": {
       "title": "Máy chấm ngoài (PCD VJudge)",
@@ -114,7 +114,7 @@
     },
     "polygon": {
       "accountName": "Tên tài khoản",
-      "apiKey": "Khoá API",
+      "apiKey": "Khóa API",
       "apiSecret": "Bí mật API"
     },
     "externalJudge": {
@@ -137,7 +137,7 @@
     },
     "mail": {
       "from": "Địa chỉ hoặc “Tên <địa chỉ>”, không xuống dòng.",
-      "smtpUrl": "smtp:// hoặc smtps://, thông tin đăng nhập mã hoá phần trăm. Không bao giờ hiện lại."
+      "smtpUrl": "smtp:// hoặc smtps://, thông tin đăng nhập mã hóa phần trăm. Không bao giờ hiện lại."
     },
     "auth": {
       "pwnedApiUrl": "Để trống hoặc https. Máy chủ thật không nhận địa chỉ nội bộ."
@@ -164,9 +164,9 @@
       "deleteGraceDays": "Số nguyên từ 1 đến 365."
     },
     "polygon": {
-      "accountName": "Tài khoản Polygon sở hữu khoá API; hiện trong hướng dẫn cho người ra đề.",
-      "apiKey": "Lấy ở Polygon: Settings, API keys. Mã hoá khi lưu, không hiện lại.",
-      "apiSecret": "Mã hoá khi lưu, không hiện lại. Thay bí mật thì kiểm tra kết nối lại."
+      "accountName": "Tài khoản Polygon sở hữu khóa API; hiện trong hướng dẫn cho người ra đề.",
+      "apiKey": "Lấy ở Polygon: Settings, API keys. Mã hóa khi lưu, không hiện lại.",
+      "apiSecret": "Mã hóa khi lưu, không hiện lại. Thay bí mật thì kiểm tra kết nối lại."
     },
     "externalJudge": {
       "baseUrl": "http:// hoặc https://. Để trống: chưa kết nối.",
@@ -185,17 +185,17 @@
   "secret": {
     "replace": "Thay thế",
     "set": "Đặt giá trị",
-    "cancelReplace": "Huỷ thay thế",
+    "cancelReplace": "Hủy thay thế",
     "masked": "••••••••",
     "neverShown": "Không bao giờ hiện lại.",
-    "emptyKeeps": "Ô trống khi lưu nghĩa là giữ bí mật đang lưu. Muốn bỏ hẳn, dùng “Xoá bí mật”, không phải ô trống."
+    "emptyKeeps": "Ô trống khi lưu nghĩa là giữ bí mật đang lưu. Muốn bỏ hẳn, dùng “Xóa bí mật”, không phải ô trống."
   },
   "oauth": {
     "enable": "Bật {provider}",
     "clientId": "Mã khách OAuth",
     "clientSecret": "Bí mật máy khách",
     "needsClientId": "Cần mã khách khi đã bật.",
-    "secretHint": "Giá trị được mã hoá khi lưu và không bao giờ hiện lại. Để trống để giữ nguyên."
+    "secretHint": "Giá trị được mã hóa khi lưu và không bao giờ hiện lại. Để trống để giữ nguyên."
   },
   "webhooks": {
     "note": "Mỗi sự kiện gửi tới địa chỉ riêng, nếu không có thì tới Mặc định. Địa chỉ là bí mật: chỉ hiện tên miền và 4 ký tự cuối.",
@@ -264,12 +264,12 @@
     "empty": "(trống)"
   },
   "clear": {
-    "button": "Xoá bí mật",
-    "title": "Xoá {name}?",
-    "lead": "Xoá bí mật {key} đang lưu?",
-    "confirm": "Xoá {name}",
-    "clearing": "Đang xoá",
-    "done": "Đã xoá {name}.",
+    "button": "Xóa bí mật",
+    "title": "Xóa {name}?",
+    "lead": "Xóa bí mật {key} đang lưu?",
+    "confirm": "Xóa {name}",
+    "clearing": "Đang xóa",
+    "done": "Đã xóa {name}.",
     "names": {
       "mail": {
         "smtpUrl": "URL SMTP"
@@ -283,7 +283,7 @@
         "facebook": "bí mật máy khách Facebook"
       },
       "polygon": {
-        "apiKey": "khoá API Polygon",
+        "apiKey": "khóa API Polygon",
         "apiSecret": "bí mật API Polygon"
       },
       "externalJudge": {
@@ -302,10 +302,10 @@
   },
   "log": {
     "title": "Nhật ký thay đổi",
-    "keyLabel": "Khoá cài đặt",
+    "keyLabel": "Khóa cài đặt",
     "secrets": {
       "title": "Bí mật không bao giờ trong nhật ký",
-      "body": "Bản sửa của khoá có bí mật chỉ ghi “đã đặt / chưa đặt”, nên không khôi phục được giá trị bí mật."
+      "body": "Bản sửa của khóa có bí mật chỉ ghi “đã đặt / chưa đặt”, nên không khôi phục được giá trị bí mật."
     }
   },
   "options": {

@@ -88,7 +88,7 @@ test.describe('J9 admin users', () => {
     await expect(leave).toBeVisible();
     await leave.getByRole('button', { name: 'Ở lại' }).click();
     await expect(drawer.getByLabel('Ghi chú nội bộ')).toHaveValue('nháp');
-    await drawer.getByRole('button', { name: 'Huỷ thay đổi' }).click();
+    await drawer.getByRole('button', { name: 'Hủy thay đổi' }).click();
     await expect(drawer.getByLabel('Ghi chú nội bộ')).toHaveValue('');
     await drawer.getByRole('button', { name: 'Đóng' }).click();
     await expect(drawer).toBeHidden();
@@ -144,18 +144,18 @@ test.describe('J9 admin users', () => {
     await expect(page).toHaveURL(new RegExp(`user=${renamed}`));
     drawer = page.getByRole('dialog', { name: renamed });
 
-    const confirm = page.getByRole('dialog', { name: `Vô hiệu hoá ${renamed}?` });
+    const confirm = page.getByRole('dialog', { name: `Vô hiệu hóa ${renamed}?` });
     // Escape closes only the confirm on top, never the drawer under it.
-    await drawer.getByRole('button', { name: 'Vô hiệu hoá tài khoản' }).click();
+    await drawer.getByRole('button', { name: 'Vô hiệu hóa tài khoản' }).click();
     await expect(confirm).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(confirm).toBeHidden();
     await expect(drawer).toBeVisible();
-    await drawer.getByRole('button', { name: 'Vô hiệu hoá tài khoản' }).click();
-    await confirm.getByRole('button', { name: 'Vô hiệu hoá tài khoản' }).click();
+    await drawer.getByRole('button', { name: 'Vô hiệu hóa tài khoản' }).click();
+    await confirm.getByRole('button', { name: 'Vô hiệu hóa tài khoản' }).click();
     await expect(drawer.getByText('Chưa kích hoạt').first()).toBeVisible();
     await drawer.getByRole('button', { name: 'Kích hoạt tài khoản' }).click();
-    await expect(drawer.getByRole('button', { name: 'Vô hiệu hoá tài khoản' })).toBeVisible();
+    await expect(drawer.getByRole('button', { name: 'Vô hiệu hóa tài khoản' })).toBeVisible();
 
     await drawer.getByLabel('Lý do (bắt buộc, hiện cho người bị cấm)').fill('U1 kiểm thử');
     await drawer.getByRole('button', { name: 'Cấm người dùng' }).click();
@@ -232,7 +232,7 @@ test.describe('J9 admin users', () => {
     await submitLoginForm(page, STAFF, STAFF_PASSWORD);
     await expect(page.getByRole('button', { name: `Tài khoản của ${STAFF}` })).toBeVisible();
     await page.goto('/admin/users');
-    await expect(rowOf(page, 'e2e_admin')).toContainText('Khoá');
+    await expect(rowOf(page, 'e2e_admin')).toContainText('Khóa');
     await expect(rowOf(page, 'e2e_admin').getByTestId('user-edit-open')).toHaveCount(0);
     await page.goto(`/admin/users?user=${SUPER}`);
     await expect(page.getByTestId('user-edit-locked')).toContainText('Chỉ siêu quản trị');

@@ -82,7 +82,6 @@ const remove = useAdminMutation({
       v-model:visible="isConfirmShown"
       :title="$t('admin.problems.uploads.sources.removeTitle', { name: storedName ?? '' })"
       :body="$t('admin.problems.uploads.sources.removeBody')"
-      :confirm-label="$t('admin.problems.uploads.sources.removeConfirm')"
       tone="danger"
       :busy="remove.isPending.value"
       @confirm="remove.run(kind)"

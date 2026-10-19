@@ -154,7 +154,6 @@ const tops = computed(() =>
       v-model:visible="isConfirmOpen"
       :title="$t('admin.activity.confirm.userTitle', { username })"
       :body="$t('admin.activity.confirm.userBody')"
-      :confirm-label="$t('admin.activity.confirm.delete')"
       tone="danger"
       :busy="removal.isPending.value"
       @confirm="removal.run()"

@@ -63,7 +63,6 @@ const removing = useAdminMutation({
       v-model:visible="isDeleteOpen"
       :title="$t('admin.ghosts.current.deleteTitle', { count: ghosts.length })"
       :body="$t('admin.ghosts.current.deleteBody')"
-      :confirm-label="$t('admin.ghosts.current.deleteConfirm')"
       tone="danger"
       :busy="removing.isPending.value"
       @confirm="removing.run(undefined)"

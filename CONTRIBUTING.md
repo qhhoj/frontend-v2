@@ -92,6 +92,7 @@ Change a palette: edit the values in the theme file and run `npm test`.
 - Every string in `src/i18n/vi.json` and `src/i18n/en.json`, same keys and placeholders (`messages.node.spec.ts`)
 - Pluralised keys take the count as the third `t()` argument
 - Vietnamese is the default; statement `lang` params follow the UI locale
+- Vietnamese spelling: the tone mark of an open oa/oe/uy syllable goes on the main vowel (hóa, hòa, xóa, khỏe, hủy, tùy, thủy; hoàn, thuyền and qu- syllables such as quý keep theirs) and quotations use “ ”; `npm run lint:copy` fails on the other forms in every `vi.json`. `ConfirmDialog` already says "Hủy" and "Xóa": do not pass a label that only restates them
 
 ## Testing
 

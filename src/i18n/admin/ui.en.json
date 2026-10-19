@@ -22,7 +22,7 @@
     "hoursMinutes": "{hours} h {minutes} min"
   },
   "tooLarge": "File too large (max {max}).",
-  "preview": "Preview ({style})",
+  "preview": "Preview",
   "previewHint": "Updates 0.5 s after you stop typing; the result is sanitised.",
   "previewRateLimited": "Preview paused: over 60 a minute. The last preview is kept.",
   "issues": {

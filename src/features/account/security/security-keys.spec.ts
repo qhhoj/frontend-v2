@@ -33,7 +33,7 @@ async function openSecurity(routes: Record<string, MockHandler>) {
   return { wrapper, calls };
 }
 async function addKey(wrapper: VueWrapper) {
-  await pageButton(wrapper, 'Thêm khoá')!.trigger('click');
+  await pageButton(wrapper, 'Thêm khóa')!.trigger('click');
   await flushPromises();
   await wrapper.get('input[name="keyName"]').setValue('YubiKey 5C (cắm máy tính)');
   await wrapper.get('input[name="keyPassword"]').setValue('mật khẩu');
@@ -50,7 +50,7 @@ describe('Settings › Security › security keys', () => {
       'POST /auth/2fa/webauthn/register/verify': ok(YUBIKEY),
     });
     await addKey(wrapper);
-    expect(wrapper.get('#main [role="status"]').text()).toBe(`Đã thêm khoá ${YUBIKEY.name}.`);
+    expect(wrapper.get('#main [role="status"]').text()).toBe(`Đã thêm khóa ${YUBIKEY.name}.`);
     expect(wrapper.findAll('[data-security-key] strong').map((name) => name.text())).toEqual([
       YUBIKEY.name,
     ]);
@@ -60,8 +60,8 @@ describe('Settings › Security › security keys', () => {
   it('a browser without WebAuthn gets an explanation instead of the add button', async () => {
     vi.stubGlobal('PublicKeyCredential', undefined);
     const { wrapper } = await openSecurity({ 'GET /auth/2fa/webauthn/credentials': ok([]) });
-    expect(pageButton(wrapper, 'Thêm khoá')).toBeUndefined();
-    expect(wrapper.text()).toContain('Trình duyệt này chưa hỗ trợ khoá bảo mật.');
+    expect(pageButton(wrapper, 'Thêm khóa')).toBeUndefined();
+    expect(wrapper.text()).toContain('Trình duyệt này chưa hỗ trợ khóa bảo mật.');
   });
 
   it('removes a key after the current password, and marks a wrong password on its field', async () => {
@@ -75,7 +75,7 @@ describe('Settings › Security › security keys', () => {
         noContent(),
       ),
     });
-    await wrapper.get(`button[aria-label="Xoá ${PIXEL.name}"]`).trigger('click');
+    await wrapper.get(`button[aria-label="Xóa ${PIXEL.name}"]`).trigger('click');
     await flushPromises();
     const password = document.body.querySelector<HTMLInputElement>(
       '[role="dialog"] input[name="removeKeyPassword"]',
@@ -83,13 +83,13 @@ describe('Settings › Security › security keys', () => {
     password.value = 'sai';
     password.dispatchEvent(new Event('input'));
     await flushPromises();
-    dialogButton('Xoá khoá').click();
+    dialogButton('Xóa khóa').click();
     await flushPromises();
     expect(password.getAttribute('aria-invalid')).toBe('true');
     password.value = 'đúng';
     password.dispatchEvent(new Event('input'));
     await flushPromises();
-    dialogButton('Xoá khoá').click();
+    dialogButton('Xóa khóa').click();
     await flushPromises();
     expect(calls.filter((call) => call.method === 'DELETE').map((call) => call.body)).toEqual([
       { currentPassword: 'sai' },
@@ -108,7 +108,7 @@ describe('Settings › Security › rate-limited password confirms', () => {
       'GET /auth/2fa/webauthn/credentials': sequence(ok([YUBIKEY, PIXEL]), ok([YUBIKEY])),
       'DELETE /auth/2fa/webauthn/credentials/key-2': fail(404, 'not_found'),
     });
-    await wrapper.get(`button[aria-label="Xoá ${PIXEL.name}"]`).trigger('click');
+    await wrapper.get(`button[aria-label="Xóa ${PIXEL.name}"]`).trigger('click');
     await flushPromises();
     const password = document.body.querySelector<HTMLInputElement>(
       '[role="dialog"] input[name="removeKeyPassword"]',
@@ -116,7 +116,7 @@ describe('Settings › Security › rate-limited password confirms', () => {
     password.value = 'mật khẩu';
     password.dispatchEvent(new Event('input'));
     await flushPromises();
-    dialogButton('Xoá khoá').click();
+    dialogButton('Xóa khóa').click();
     await flushPromises();
     expect(
       calls.filter(

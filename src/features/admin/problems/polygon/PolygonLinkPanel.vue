@@ -207,7 +207,9 @@ const onHistoryToggle = (event: Event) =>
           $t(`admin.polygonLink.panel.revisionText.${status}`, {
             id: state.latestPackage?.id ?? '-',
             revision: state.latestPackage?.revision ?? '-',
-            state: state.latestPackage?.state ?? '-',
+            state: state.latestPackage
+              ? $t(`admin.polygonLink.packageState.${state.latestPackage.state}`)
+              : '-',
             package: state.link.packageId,
           })
         }}

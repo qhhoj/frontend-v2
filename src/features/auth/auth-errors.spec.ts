@@ -39,7 +39,7 @@ describe('banReason', () => {
 describe('authErrorText', () => {
   it('shows the ban reason in the interface language', () => {
     const error = banned({ banReason: 'cheating' });
-    expect(authErrorText(error)).toBe('Tài khoản đã bị khoá. Lý do: cheating');
+    expect(authErrorText(error)).toBe('Tài khoản đã bị khóa. Lý do: cheating');
     i18n.global.locale.value = 'en';
     expect(authErrorText(error)).toBe('This account is banned. Reason: cheating');
   });
@@ -55,7 +55,7 @@ describe('authErrorText', () => {
     'explains a failed browser security-key prompt (%s)',
     (name) => {
       expect(authErrorText(new DOMException('blocked', name))).toBe(
-        'Xác minh khoá bảo mật không thành công.',
+        'Xác minh khóa bảo mật không thành công.',
       );
     },
   );

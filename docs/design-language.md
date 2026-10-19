@@ -39,7 +39,7 @@ Not built: MarkdownEditor, ListRow, SidebarLayout. Gaps: Notice icon override, C
 
 - One primary action per view. Disabled = `aria-disabled` + token pair, never opacity. Busy = spinner (`AppButton loading`, label kept unless the caller changes it).
 - Inputs 16 px, 44 px tall, 12 px corners. Targets ≥ 44 px on coarse pointers.
-- Hint ≤ one line (~60 chars); an error replaces it. Optional fields say "(tuỳ chọn)".
+- Hint ≤ one line (~60 chars); an error replaces it. Optional fields say "(tùy chọn)".
 - Feedback: standing state or refusal → inline Notice by its cause; form save → SaveBar text; row/bulk/background → toast. A failure is never toast-only.
 - Tables: th 13 muted in sentence case (`text-meta text-muted`, comfortable and compact alike), td 14; numbers right-aligned, mono, tabular, nowrap.
 - Empty states offer one next step. Skeletons are shaped from the component.

@@ -76,7 +76,7 @@ describe('UsernameChips', () => {
     await wrapper.get('input').setValue('nobody');
     await wrapper.get('input').trigger('keydown', { key: 'Enter' });
     await flushPromises();
-    expect(wrapper.text()).toContain('Không có tài khoản "nobody".');
+    expect(wrapper.text()).toContain('Không có tài khoản “nobody”.');
     expect(wrapper.get('input').attributes('aria-invalid')).toBe('true');
   });
 

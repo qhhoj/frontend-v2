@@ -14,12 +14,12 @@ Applies to every route under `/admin`. Audit and redesign done 2026-10-11 with U
 
 | # | Defect | Rule | Where |
 |---|---|---|---|
-| 1 | The user edit dialog is taller than the viewport and opens scrolled to the middle, so its title and close button are off screen. It stacks 5 independent forms (profile, account, password, reset link, access), each with its own save button, separated by `<hr>`. "Vô hiệu hoá tài khoản" sits among routine fields. | escape-routes, focus-management, progressive-disclosure, confirmation-dialogs | `users/UserEditDialog.vue`; the dialog preset in `src/theme/primevue-preset.ts` has no max-height or scrolling body |
+| 1 | The user edit dialog is taller than the viewport and opens scrolled to the middle, so its title and close button are off screen. It stacks 5 independent forms (profile, account, password, reset link, access), each with its own save button, separated by `<hr>`. "Vô hiệu hóa tài khoản" sits among routine fields. | escape-routes, focus-management, progressive-disclosure, confirmation-dialogs | `users/UserEditDialog.vue`; the dialog preset in `src/theme/primevue-preset.ts` has no max-height or scrolling body |
 | 2 | The sticky save bars have no z-index, no dirty count and no discard. The disabled pill looks like an enabled button. On phone they cover field labels (Language new, Problem general). There are four separate implementations, each placed differently: right for problems, left for contests, split for languages. | focus-not-obscured, consistency, submit-feedback | `problems/general/ProblemGeneralTab.vue`, `problems/data/ProblemDataTab.vue`, `contests/general/ContestGeneralTab.vue`, `languages/LanguageSaveBar.vue` |
 | 3 | **Horizontal page scroll** on `/admin/config` at 390: the page is 576 px wide. | horizontal-scroll | `site/MiscConfigPage.vue` (config table) |
 | 4 | **Tables are not responsive.** There are 34 hand-made `<table>` files. At 390 the contests list wraps dates one word per line (~12 lines per row). Users, submissions and activity rely on a "Vuốt ngang để xem thêm cột" hint with clipped columns. Deleted-problems row buttons wrap to 3 lines. There is no card fallback anywhere. | Table Handling, content-priority, truncation-strategy | `contests/ContestsIndexPage.vue`, `search/ProblemSearchList.vue`, `users/UsersTable.vue`, `submissions/*`, `activity/*`, `problems/lifecycle/DeletedProblemsPage.vue` |
 | 5 | **List pages are filter walls.** Problems, contests and users stack a "lookup by exact code" card above a separate search card, plus a segmented filter, then 3–4 selects. On phone the first result appears at about y=950. Sorting is a `<select>`, never a column header. The segmented filter is clipped at 390 ("Đề xuất" is cut off). | content-priority, progressive-disclosure, primary-action | `ProblemsIndexPage.vue`, `ContestsIndexPage.vue`, `users/UserLookupCard.vue` + `UsersFilters.vue`, `ui/AdminFilterTabs.vue` |
-| 6 | **Row actions pile up**, and destructive red outlines are used for non-destructive actions. Judges have 4–5 pill buttons per card (Tắt, Chặn, Khoá, Ngắt, Xóa, Chi tiết). Posts have 4 buttons per row. Contest actions show "Tính lại điểm" (recompute) with a red danger outline. Bulk bars are always visible, even with 0 selected. | primary-action, state-clarity, color-not-decorative-only | `judges/*`, `posts/PostsTable.vue`, `contests/actions/*`, `comments/CommentsAdminPage.vue` |
+| 6 | **Row actions pile up**, and destructive red outlines are used for non-destructive actions. Judges have 4–5 pill buttons per card (Tắt, Chặn, Khóa, Ngắt, Xóa, Chi tiết). Posts have 4 buttons per row. Contest actions show "Tính lại điểm" (recompute) with a red danger outline. Bulk bars are always visible, even with 0 selected. | primary-action, state-clarity, color-not-decorative-only | `judges/*`, `posts/PostsTable.vue`, `contests/actions/*`, `comments/CommentsAdminPage.vue` |
 | 7 | **No feedback system.** There is no toast primitive anywhere in `src`. Success is a small inline "Đã lưu" next to the button. Dirty-leave guards exist only for drafts, judges and integrations. They are missing on the problem/contest general forms, language, settings and the user dialog. | success-feedback, sheet-dismiss-confirm, undo-support | `ui/use-admin-mutation.ts`, `problems/drafts/use-draft-leave-guard.ts` (only 3 users) |
 | 8 | **Developer text leaks into the UI**: raw permission codenames as chips ("Quyền: judge.import_polygon_package", "Cần quyền judge.moss_contest", dashboard tile footers with codename + path); API routes ("lưu riêng bằng PUT /translations/:lang", "Ảnh tải lên qua /problems/uploads/image"); long implementation paragraphs on `/admin/log` and `/admin/config`. | error-clarity, visual-hierarchy | 12 `needsPermission` sites; `i18n/admin/{polygon,similarity,rejudge,shell,settings,site,problems}.vi.json` |
 | 9 | **Navigation is overloaded.** The sidebar has 30 always-expanded items in 5 groups; its chevrons collapse nothing useful and it is not sticky, so long editors lose it. The phone nav is a `<details>` summary whose title truncates ("Sửa kỳ thi: bài trong kỳ …"). Editor tabs (8 for contests) scroll off the right edge at 390 with no affordance. Admin Bits overlap the sidebar (contest Data/Ranking, users edit). | nav-hierarchy, overloaded nav, z-index-management | `shell/AdminShell.vue`, `shell/AdminNav.vue`, `ui/AdminTabs.vue`, `shell/AdminBit.vue` placements |
@@ -82,7 +82,7 @@ These are defined in `src/features/admin/ui/admin-density.css` under `@media (po
 - **Rows**: 40 px. Hover uses `surface-hover`. The primary column is a link (name 14/600 + mono code 12 muted underneath). Status columns use chips. Numbers are right-aligned and mono.
 - **Row actions**: at most one visible text or icon action (e.g. "Sửa"), plus a `⋯` menu (`AdminRowMenu`). Destructive items go last, in red, separated, and always confirm. Icon-only buttons have an `aria-label` and a tooltip.
 - **Selection and bulk bar**: the checkbox column shows only when bulk actions exist; each box is 16 px with a 44 px hit area on coarse pointers (`DataTableCheckbox`). The bulk bar (`AdminBulkBar`) replaces the toolbar while a selection exists. It shows "3 đã chọn · Bỏ chọn" and the actions, has no shadow, and uses a `surface-strong` fill.
-- **States** (via `QueryState`): skeleton rows matching the real row count; empty (EmptyState: one nightcap Bit, one line, one action); filtered-empty ("Không có kết quả cho bộ lọc này · Xoá bộ lọc"); error with retry inside the card.
+- **States** (via `QueryState`): skeleton rows matching the real row count; empty (EmptyState: one nightcap Bit, one line, one action); filtered-empty ("Không có kết quả cho bộ lọc này · Xóa bộ lọc"); error with retry inside the card.
 - **Pager**: `NumberedPager` plus "1–50 / 312". Hidden when there is only one page.
 - **Mobile (< 768)**: card list, one card per row. Line 1: primary column + status chip. Line 2: the secondary columns as "Label value" facts at most two lines, separated by a gap, never by "·" (a wrapped dot orphans); a fact is never split, and a `stacked` column is a fact without its label. Line 3: the "Chi tiết" button (`AppButton` sm, 44 on coarse pointers) for the columns with `priority: 'meta'`, and the actions. Badges sit beside the title, or under it when they would squeeze it. The page never scrolls horizontally. A table that must keep its grid (test lists) scrolls inside `ScrollRegion` with a fade edge, not a text hint.
 
@@ -91,7 +91,7 @@ One row:
 1. Search field, debounced 250 ms, auto-applied. If the query matches an exact code or username, a "Mở hcmus41c ↵" row appears at the top and Enter opens it. This replaces the separate lookup cards.
 2. Segmented view filter (`AdminFilterTabs`).
 3. A "Bộ lọc (2)" button that opens a popover (phone: bottom sheet) holding the selects.
-4. Active filters as removable chips under the bar, with "Xoá tất cả".
+4. Active filters as removable chips under the bar, with "Xóa tất cả".
 
 Everything syncs to the query string. No "Lọc" or "Tìm" buttons. Results count sits at the right ("312 bài").
 
@@ -103,7 +103,7 @@ Everything syncs to the query string. No "Lọc" or "Tìm" buttons. Results coun
 - **Save bar**: one `AdminSaveBar`.
   - Sticky to the bottom of the content column, `z-index` 30, `surface-solid` with a top hairline. `scroll-padding-bottom` on the page equals the bar's height, so focus is never covered.
   - Left side: "3 thay đổi chưa lưu" (polite live region), or "Đã lưu lúc 14:02".
-  - Right side: "Huỷ thay đổi" (ghost) and "Lưu" (primary). Disabled when there are no changes, with `aria-disabled` and the reason as text.
+  - Right side: "Hủy thay đổi" (ghost) and "Lưu" (primary). Disabled when there are no changes, with `aria-disabled` and the reason as text.
   - It replaces the 4 current bars.
 - **Dirty guard**: `useDirtyGuard(isDirty)` handles `onBeforeRouteLeave` and `beforeunload` with a ConfirmDialog ("Rời trang? 3 thay đổi chưa lưu sẽ mất"). It generalises `use-draft-leave-guard`.
 - **Danger zone**: the last section, with a red hairline. Each action is a row with a title, one line of consequence and a danger button. Each one confirms, and a type-to-confirm is required for irreversible deletes.
@@ -111,7 +111,7 @@ Everything syncs to the query string. No "Lọc" or "Tìm" buttons. Results coun
 ### Dialogs, drawers and confirmations
 - Dialog preset (in `src/theme/primevue-preset.ts`, shared): `max-height: calc(100dvh - 2rem)`. The header is fixed, the content scrolls (`overflow:auto`), and the footer is fixed with actions on the right. Focus starts on the first field or the title, never mid-body.
 - `AdminDrawer` (new): right side, 560 px, full screen under 768. It has a header (title, meta chips, close), optional tabs, a scrolling body and a footer save bar. It is used for user edit, judge details, ticket preview and flat-page edit.
-- `ConfirmDialog`: kept. Destructive confirms use the danger tone, and the confirm label names the action ("Xoá bài hcmus41c", not "OK").
+- `ConfirmDialog`: kept. Destructive confirms use the danger tone, and the confirm label names the action ("Xóa bài hcmus41c", not "OK").
 
 ### Feedback
 - `AdminToast` (new, `ui/feedback/`): bottom-right (phone: bottom centre above the safe area), max 3 stacked, `role="status"`, auto-dismiss after 4 s (errors stay until closed). Optional "Hoàn tác" for reversible bulk actions. Wire it once in `use-admin-mutation.ts` (success text param).
@@ -188,11 +188,11 @@ Colour and opacity transitions use `--qh-duration-fast` (150 ms). Drawers and sh
 ### List pages (one pattern: header → tabs? → AdminFilterBar → AdminDataTable)
 - **Problems** (`/admin/problems`, `/admin/problems/deleted`):
   - Header actions: "Tạo bài tập" (primary) and a split "Nhập ▾" (Polygon, .zip).
-  - Tabs: Tất cả / Đã xoá.
+  - Tabs: Tất cả / Đã xóa.
   - Filter bar: search, segmented Tất cả · Công khai · Riêng tư · Đề xuất, and a popover with Nhóm, Loại, Tác giả.
-  - Columns: ☐, Bài (name + code), Trạng thái chip, Nhóm, Tác giả (avatar + name), Điểm (right), Cập nhật (relative), and the row actions "Sửa" + ⋯ (Xem bài, Nhân bản, Xoá).
-  - Bulk: Công khai, Ẩn, Đổi nhóm, Xoá.
-  - Deleted tab: columns Bài, Xoá lúc, Người xoá, "Còn 20 ngày" chip (caution under 7), and actions Khôi phục + ⋯ Xoá hẳn.
+  - Columns: ☐, Bài (name + code), Trạng thái chip, Nhóm, Tác giả (avatar + name), Điểm (right), Cập nhật (relative), and the row actions "Sửa" + ⋯ (Xem bài, Nhân bản, Xóa).
+  - Bulk: Công khai, Ẩn, Đổi nhóm, Xóa.
+  - Deleted tab: columns Bài, Xóa lúc, Người xóa, "Còn 20 ngày" chip (caution under 7), and actions Khôi phục + ⋯ Xóa hẳn.
 - **Contests**:
   - Same pattern. Filter: Tất cả · Đang diễn ra · Sắp diễn ra · Đã kết thúc; popover with Thẻ, Tổ chức, Rating.
   - Columns: Kỳ thi (name + key), Giai đoạn chip, Thời gian as one line "08/10 15:00 → 18:24 (3 giờ 24 phút)" (mono), Thí sinh (right), and chips Rating / Riêng tư.
@@ -211,7 +211,7 @@ Colour and opacity transitions use `--qh-duration-fast` (150 ms). Drawers and sh
 - **Judges**:
   - A KPI strip (queue, online 3/5, average load, blocked) as one row of 4 stat tiles.
   - Judges as a table: name + room, status chip (Trực tuyến/Đã tắt/Bị chặn), Tải, Ping, Đang chấm, Bản dựng, Ngôn ngữ, IP.
-  - Row actions: Tắt/Bật (toggle), and ⋯ (Chặn, Cấp khoá mới, Ngắt, Xoá).
+  - Row actions: Tắt/Bật (toggle), and ⋯ (Chặn, Cấp khóa mới, Ngắt, Xóa).
   - Details open in the drawer.
 - **Languages**:
   - One `LanguageCoverageNotice` (kit `Notice`, compact) replaces the summary strip and the per-language warnings. Title "N ngôn ngữ cần thêm máy chấm", then one line of keys per kind: those no online judge runs (the notice turns danger) and those only one judge runs (warning). The language and online-judge counts are the table footer.
@@ -232,7 +232,7 @@ Colour and opacity transitions use `--qh-duration-fast` (150 ms). Drawers and sh
 - **Activity, log**:
   - The filter bar holds User, IP, Đường dẫn and the range segmented control (7 / 30 / 90 ngày).
   - Table plus a "Đang truy cập" side card at ≥ 1280.
-  - The long warnings become `AdminNotice`s. "Xoá nhật ký khách" moves to the header ⋯ as a destructive item.
+  - The long warnings become `AdminNotice`s. "Xóa nhật ký khách" moves to the header ⋯ as a destructive item.
 - **Similarity** (runs, pairs, pair): runs and pairs become AdminDataTable (similarity % as a right-aligned mono number with a meter). The pair page keeps its side-by-side diff (it scores well) and just adopts the editor header.
 
 ### Problem editor (`/admin/problems/:code/{general,statements,editorial,data,files}`)
@@ -246,9 +246,9 @@ Colour and opacity transitions use `--qh-duration-fast` (150 ms). Drawers and sh
 - **Statements**: language segmented control (Tiếng Việt · English (chưa có) · Mô tả gốc). Editor and preview side by side at ≥ 1024, and an Editor/Preview toggle on phone. A per-language save sits in the save bar ("Lưu bản dịch Tiếng Việt").
 - **Editorial**: same two-pane layout. The public toggle and the release date share one row.
 - **Data**:
-  - Sections: Gói dữ liệu (archive, file list as chips, Xem init.yml, Tải zip mới) · Tệp nguồn kèm theo (generator, checker, grader, header as a table with Tải lên/Tải lại/Xoá in ⋯) · Checker và grader · Danh sách test.
+  - Sections: Gói dữ liệu (archive, file list as chips, Xem init.yml, Tải zip mới) · Tệp nguồn kèm theo (generator, checker, grader, header as a table with Tải lên/Tải lại/Xóa in ⋯) · Checker và grader · Danh sách test.
   - The test list stays a grid inside ScrollRegion, with sticky first column, row drag handle + up/down buttons (keyboard alternative), and bulk "Đặt điểm" / "Pretest".
-- **Files**: three upload tiles (Ảnh trong đề, Đề PDF, Tài liệu kèm). Each shows the current file name/size, a Thay, Xoá or Sao chép URL button, and drag-and-drop.
+- **Files**: three upload tiles (Ảnh trong đề, Đề PDF, Tài liệu kèm). Each shows the current file name/size, a Thay, Xóa or Sao chép URL button, and drag-and-drop.
 - **New, import, polygon**:
   - New is the same form as General, without the moved-out parts.
   - Polygon is a 3-step stepper with the guide in an `AdminNotice` (collapsed after first use) and the history table below.
@@ -259,7 +259,7 @@ Colour and opacity transitions use `--qh-duration-fast` (150 ms). Drawers and sh
 - **Tabs**: Thông tin chung · Bài · Thí sinh · Thông báo · Bảng xếp hạng · Thao tác · Ghost · Dữ liệu, with the overflow ⋯ on phone.
 - **General**:
   - Sections Thông tin · Người phụ trách · Thời gian · Thể thức và chấm · Quyền xem và xếp hạng.
-  - Thời gian shows a small timeline bar (đăng ký → bắt đầu → đóng băng → kết thúc → khoá chấm) above the date fields, using `AdminDateTimeField`.
+  - Thời gian shows a small timeline bar (đăng ký → bắt đầu → đóng băng → kết thúc → khóa chấm) above the date fields, using `AdminDateTimeField`.
   - Thể thức groups its 6 switches as checkboxes in two columns.
   - A right-hand summary rail at ≥ 1280 shows status, counts and quick links.
   - AdminSaveBar at the bottom.
@@ -280,7 +280,7 @@ Colour and opacity transitions use `--qh-duration-fast` (150 ms). Drawers and sh
 - The list is described above.
 - The **drawer** has:
   - A header with avatar, `tuan_k`, display name, the chips Hoạt động / 2FA / Đang thi, and a close button.
-  - Tabs **Hồ sơ** (name, email, about, internal note, organizations, flags), **Bảo mật** (đặt mật khẩu mới, liên kết đặt lại, đặt lại 2FA), **Quyền** (roles, permissions) and **Tài khoản** (đổi tên, then the danger zone with Vô hiệu hoá, Cấm and Mạo danh).
+  - Tabs **Hồ sơ** (name, email, about, internal note, organizations, flags), **Bảo mật** (đặt mật khẩu mới, liên kết đặt lại, đặt lại 2FA), **Quyền** (roles, permissions) and **Tài khoản** (đổi tên, then the danger zone with Vô hiệu hóa, Cấm and Mạo danh).
   - The footer save bar applies to the current tab only.
 - Keep `data-testid="user-edit-open"`, `user-edit`, `role="dialog"` and the existing field labels (the e2e tests use `getByLabel('Họ và tên')`).
 

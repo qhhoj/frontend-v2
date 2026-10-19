@@ -55,7 +55,7 @@ describe('login page', () => {
     const { wrapper } = await mountApp('/login');
     await signIn(wrapper);
     expect(wrapper.get('#main [role="alert"]').text()).toBe(
-      'Tài khoản đã bị khoá. Lý do: <b>x</b>',
+      'Tài khoản đã bị khóa. Lý do: <b>x</b>',
     );
     expect(wrapper.find('#main [role="alert"] b').exists()).toBe(false);
   });

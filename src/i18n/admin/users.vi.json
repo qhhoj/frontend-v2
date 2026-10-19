@@ -41,11 +41,11 @@
     "openExact": "Mở tài khoản “{username}”",
     "locked": {
       "self": "Bạn",
-      "superuser": "Khoá"
+      "superuser": "Khóa"
     }
   },
   "card": {
-    "notFound": "Không có tài khoản \"{name}\".",
+    "notFound": "Không có tài khoản “{name}”.",
     "copyId": "Sao chép ID",
     "none": "Chưa có",
     "facts": {
@@ -69,7 +69,7 @@
     "notBanned": "Tài khoản không bị cấm.",
     "banDialog": {
       "title": "Cấm {username}?",
-      "body": "Tài khoản bị khoá, mọi phiên đăng nhập bị thu hồi và tài khoản bị ẩn khỏi bảng xếp hạng.",
+      "body": "Tài khoản bị khóa, mọi phiên đăng nhập bị thu hồi và tài khoản bị ẩn khỏi bảng xếp hạng.",
       "confirm": "Cấm"
     },
     "banned": {
@@ -82,9 +82,9 @@
   },
   "impersonate": {
     "title": "Đóng vai",
-    "note": "Chỉ siêu quản trị. Không đóng vai được siêu quản trị khác hoặc tài khoản đã khoá.",
+    "note": "Chỉ siêu quản trị. Không đóng vai được siêu quản trị khác hoặc tài khoản đã khóa.",
     "open": "Đóng vai {username}",
-    "refused": "Không đóng vai được siêu quản trị khác hoặc tài khoản đã khoá.",
+    "refused": "Không đóng vai được siêu quản trị khác hoặc tài khoản đã khóa.",
     "dialog": {
       "title": "Đóng vai {username}?",
       "body": "Phiên của bạn sẽ được thay bằng phiên của {username}. Bạn thấy và làm được mọi thứ như người này, kể cả nộp bài và bình luận.",
@@ -148,27 +148,27 @@
     },
     "account": {
       "active": "Tài khoản đang hoạt động.",
-      "inactive": "Tài khoản đang bị vô hiệu hoá: người dùng không thể đăng nhập.",
+      "inactive": "Tài khoản đang bị vô hiệu hóa: người dùng không thể đăng nhập.",
       "banned": "Tài khoản đang bị cấm; bỏ cấm để kích hoạt lại.",
-      "deactivate": "Vô hiệu hoá tài khoản",
+      "deactivate": "Vô hiệu hóa tài khoản",
       "activate": "Kích hoạt tài khoản",
       "deactivateDialog": {
-        "title": "Vô hiệu hoá {username}?",
+        "title": "Vô hiệu hóa {username}?",
         "body": "Người dùng bị đăng xuất khỏi mọi phiên, API token bị thu hồi và không thể đăng nhập cho tới khi tài khoản được kích hoạt lại."
       },
       "rename": "Tên đăng nhập",
       "renameHint": "Chữ, số và dấu gạch dưới, tối đa 30 ký tự. Tên cũ vẫn mở được trang hồ sơ.",
       "renameSubmit": "Đổi tên",
       "twoFactor": "Đặt lại xác thực hai bước",
-      "twoFactorNote": "Dành cho người dùng mất ứng dụng xác thực hoặc khoá bảo mật.",
+      "twoFactorNote": "Dành cho người dùng mất ứng dụng xác thực hoặc khóa bảo mật.",
       "twoFactorDialog": {
         "title": "Đặt lại xác thực hai bước cho {username}?",
-        "body": "Gỡ ứng dụng xác thực và mọi khoá bảo mật, đồng thời đăng xuất người dùng khỏi mọi phiên."
+        "body": "Gỡ ứng dụng xác thực và mọi khóa bảo mật, đồng thời đăng xuất người dùng khỏi mọi phiên."
       },
       "twoFactorDone": "Đã đặt lại xác thực hai bước.",
       "renamed": "Đã đổi tên thành {username}.",
       "activated": "Đã kích hoạt {username}.",
-      "deactivated": "Đã vô hiệu hoá {username}."
+      "deactivated": "Đã vô hiệu hóa {username}."
     },
     "sections": {
       "profile": "Hồ sơ",

@@ -128,13 +128,13 @@ describe('FlatpagesPage', () => {
   it('deletes after confirming, and hides delete without its permission', async () => {
     const calls = mockApi(routes({ 'DELETE /admin/site/pages/fp-1': { status: 204 } }));
     const { wrapper } = await mountPages('/admin/pages?page=fp-1');
-    await click(wrapper, 'Xoá trang');
+    await click(wrapper, 'Xóa trang');
     expect(calls.some((call) => call.method === 'DELETE')).toBe(false);
-    await confirmDialog('Xoá trang');
+    await confirmDialog('Xóa trang');
     expect(calls.some((call) => call.method === 'DELETE')).toBe(true);
     mockApi({ ...routes(), ...staffViewer(['flatpages.change_flatpage']) });
     const second = await mountPages('/admin/pages?page=fp-1');
-    expect(second.wrapper.text()).not.toContain('Xoá trang');
+    expect(second.wrapper.text()).not.toContain('Xóa trang');
   });
 });
 
@@ -194,8 +194,8 @@ describe('history', () => {
     expect(invalidatedKeys(queryClient, publicKey)).toEqual(publicKey);
     queryClient.setQueryData(['flatpages', '/about', 'probe'], { seeded: true });
     seedCache(queryClient, [['admin', 'flatpage-revisions', 'fp-1', 'probe']]);
-    await click(wrapper, 'Xoá trang');
-    await confirmDialog('Xoá trang');
+    await click(wrapper, 'Xóa trang');
+    await confirmDialog('Xóa trang');
     expect(invalidatedKeys(queryClient, publicKey)).toEqual(publicKey);
     expect(
       queryClient.getQueryState(['admin', 'flatpage-revisions', 'fp-1', 'probe']),

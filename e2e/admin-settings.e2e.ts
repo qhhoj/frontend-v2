@@ -92,15 +92,15 @@ for (const viewport of AUDIT_VIEWPORTS)
     );
     await page.goto('/admin/settings?tab=accounts');
     const mailBlock = page.locator('[data-block="mail"]');
-    await mailBlock.getByRole('button', { name: 'Xoá bí mật', exact: true }).focus();
+    await mailBlock.getByRole('button', { name: 'Xóa bí mật', exact: true }).focus();
     await page.keyboard.press('Enter');
-    await expect(dialogOf(page)).toContainText('Xoá URL SMTP?');
+    await expect(dialogOf(page)).toContainText('Xóa URL SMTP?');
     expect(await axeViolationsIn(page)).toEqual([]);
     expect(api.requestsTo('PATCH /admin/settings/mail.smtpUrl')).toHaveLength(0);
 
-    await dialogOf(page).getByRole('button', { name: 'Xoá URL SMTP', exact: true }).focus();
+    await dialogOf(page).getByRole('button', { name: 'Xóa URL SMTP', exact: true }).focus();
     await page.keyboard.press('Enter');
-    await expect(mailBlock).toContainText('Đã xoá URL SMTP.');
+    await expect(mailBlock).toContainText('Đã xóa URL SMTP.');
     await expect(dialogOf(page)).toBeHidden();
     const sent = api.requestsTo('PATCH /admin/settings/mail.smtpUrl');
     expect(sent).toHaveLength(1);

@@ -40,7 +40,7 @@ describe('judge key reveal', () => {
     await wrapper.get('#judge-name').setValue('qhh-judge-06');
     await wrapper
       .findAll('button')
-      .find((button) => button.text() === 'Tạo và lấy khoá')!
+      .find((button) => button.text() === 'Tạo và lấy khóa')!
       .trigger('click');
     await flushPromises();
     expect(openDialog().textContent).toContain(KEY);
@@ -90,14 +90,14 @@ describe('judge key reveal', () => {
     await wrapper.get('#judge-name').setValue('bad name');
     await wrapper
       .findAll('button')
-      .find((button) => button.text() === 'Tạo và lấy khoá')!
+      .find((button) => button.text() === 'Tạo và lấy khóa')!
       .trigger('click');
     await flushPromises();
     expect(calls.some((call) => call.method === 'POST')).toBe(false);
     await wrapper.get('#judge-name').setValue('qhh-judge-01');
     await wrapper
       .findAll('button')
-      .find((button) => button.text() === 'Tạo và lấy khoá')!
+      .find((button) => button.text() === 'Tạo và lấy khóa')!
       .trigger('click');
     await flushPromises();
     expect(wrapper.get('#judge-name').attributes('aria-invalid')).toBe('true');

@@ -54,12 +54,12 @@ describe('JudgesPage', () => {
       routes({ 'POST /judges/qhh-judge-02/key': ok({ authKey: 'rotated-key-value' }) }),
     );
     const { wrapper } = await mountJudges();
-    await pick(wrapper, 'qhh-judge-02', 'Cấp khoá mới');
+    await pick(wrapper, 'qhh-judge-02', 'Cấp khóa mới');
     expect(document.body.querySelector('[role="dialog"]')?.textContent).toContain(
       'Máy chấm bị ngắt ngay',
     );
     expect(calls.some((call) => call.path.endsWith('/key'))).toBe(false);
-    await confirmDialog('Cấp khoá mới');
+    await confirmDialog('Cấp khóa mới');
     expect(document.body.textContent).toContain('rotated-key-value');
   });
 
@@ -83,8 +83,8 @@ describe('JudgesPage', () => {
       }),
     );
     const { wrapper, queryClient } = await mountJudges();
-    await pick(wrapper, 'qhh-judge-02', 'Cấp khoá mới');
-    await confirmDialog('Cấp khoá mới');
+    await pick(wrapper, 'qhh-judge-02', 'Cấp khóa mới');
+    await confirmDialog('Cấp khóa mới');
     await queryClient.invalidateQueries({ queryKey: ['admin', 'judges'] });
     await flushPromises();
     expect(wrapper.find('[role="alert"]').exists()).toBe(true);

@@ -89,12 +89,12 @@ describe('AppButton', () => {
 describe('IconButton', () => {
   it('names itself with its label, for assistive tech and as a tooltip', async () => {
     const wrapper = mountComponent(IconButton, {
-      props: { label: 'Xoá' },
+      props: { label: 'Xóa' },
       slots: { default: '<i data-testid="icon"></i>' },
     });
     const button = wrapper.get('button');
-    expect(button.attributes('aria-label')).toBe('Xoá');
-    expect(button.attributes('title')).toBe('Xoá');
+    expect(button.attributes('aria-label')).toBe('Xóa');
+    expect(button.attributes('title')).toBe('Xóa');
     expect(button.find('[data-testid="icon"]').exists()).toBe(true);
     await button.trigger('click');
     expect(wrapper.emitted('click')).toHaveLength(1);

@@ -81,7 +81,6 @@ function open() {
     <ConfirmDialog
       v-model:visible="isConfirmOpen"
       :title="$t('admin.organizations.delete.dialogTitle', { name: detail.data.value.name })"
-      :confirm-label="$t('admin.organizations.delete.confirm')"
       tone="danger"
       :busy="remove.isPending.value"
       :can-confirm="isSlugTyped"
