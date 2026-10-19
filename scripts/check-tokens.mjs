@@ -3,6 +3,7 @@
 // Stock radius/shadow class names are rejected too: `@theme` resets them, so they render nothing. So are the stock type sizes `text-lg` ... `text-9xl`,
 // which skip the named scale (scripts/stock-utilities.mjs).
 // The retired radius roles rounded-tile and rounded-panel are rejected as well (scripts/retired-utilities.mjs).
+// So are the bare transitions that also animate transform (scripts/transition-utilities.mjs).
 // So are arbitrary sizes, radii and z-indexes (`text-[13px]`, `rounded-[3px]`, `z-[5]`): use the named steps (scripts/arbitrary-utilities.mjs).
 // The exemptions are Bit's sprite palettes (src/mascot/bit-sprite.ts) and the avatar's sprite data (src/mascot/avatar/avatar-sprites.ts):
 // image-like data that Bit keeps in every theme.
@@ -10,6 +11,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { retiredUtilities } from './retired-utilities.mjs';
 import { stockUtilities } from './stock-utilities.mjs';
+import { ALLOWED as MOTION, bareTransitions } from './transition-utilities.mjs';
 import { ALLOWED, arbitraryUtilities } from './arbitrary-utilities.mjs';
 
 const root = new URL('../src/', import.meta.url).pathname;
@@ -54,6 +56,10 @@ const CHECKS = [
   {
     message: `Retired radius roles rounded-tile (20 px) and rounded-panel (28 px): use rounded-row for an inset tile, a notice or a menu, rounded-cell for code and fields, rounded-card for a card or a dialog (docs/design-language.md):`,
     find: perLine(retiredUtilities),
+  },
+  {
+    message: `Bare transition, transition-all and transition-transform also animate transform and layout (use transition-colors or transition-opacity; real motion goes in ALLOWED in scripts/transition-utilities.mjs with its reason):`,
+    find: perLine((line, rel) => bareTransitions(line).filter((name) => !MOTION[rel]?.[name])),
   },
   {
     message: `Colour literals outside src/theme/themes/ (use a --qh- token):`,
