@@ -151,7 +151,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div
-    class="code-editor rounded-cell border border-line bg-surface-strong"
+    class="code-editor rounded-cell border border-line-control bg-surface-strong"
     :style="{ '--min-lines': minLines }"
   >
     <div v-show="isEditorReady" ref="host" class="code-editor-host"></div>

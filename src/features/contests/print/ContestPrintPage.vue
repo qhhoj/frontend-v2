@@ -77,7 +77,7 @@ const CHIP =
         <template v-else>
           <div
             :aria-label="$t('contests.print.toolbar')"
-            class="glass sticky top-[calc(var(--contest-bar-height,0px)+0.5rem)] z-10 flex flex-wrap items-center gap-3 rounded-card px-3.5 py-2.5 print:hidden"
+            class="glass sticky top-[calc(var(--contest-bar-height,0px)+0.5rem)] z-10 flex flex-wrap items-center gap-3 rounded-row px-3.5 py-2.5 print:hidden"
           >
             <AppButton :to="{ name: 'contest', params: { key } }">
               <template #icon><ArrowLeft class="size-4" aria-hidden="true" /></template>

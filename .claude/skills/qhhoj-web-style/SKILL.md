@@ -17,21 +17,21 @@ Follow this for every change that affects what the site looks like. Long form: `
 
 Type scale (font size only; leading comes from the primitive or a `leading-*` class):
 
-| Class                              | px  | Use                                                |
-| ---------------------------------- | --- | -------------------------------------------------- |
-| `text-tiny`                        | 11  | counts, badges                                     |
-| `text-caption`                     | 12  | chips, small labels                                |
-| `text-meta`                        | 13  | table headers, hints, meta lines, errors           |
-| `text-sm`                          | 14  | UI, controls, table cells (Tailwind's, leading 20) |
-| `text-base`                        | 16  | prose and every input (Tailwind's, leading 24)     |
-| `text-title`                       | 17  | card titles (with `font-semibold`/`font-bold`)     |
-| `text-subtitle`                    | 18  | lead lines, dialog titles (add a `leading-*`)      |
-| `text-section`                     | 20  | section titles outside cards (add a `leading-*`)   |
-| `text-display`                     | 24  | display headings, big numbers (add a `leading-*`)  |
-| `page-title` utility / `text-page` | 26  | the one h1 per page                                |
-| `text-stat`                        | 26  | stat values, always with `font-mono tabular-nums`  |
-| `text-hero`                        | 40  | countdowns only                                    |
-| `text-score`                       | 56  | the submission score, the home rating figure       |
+| Class                              | px  | Use                                                                                         |
+| ---------------------------------- | --- | ------------------------------------------------------------------------------------------- |
+| `text-tiny`                        | 11  | counts, badges                                                                              |
+| `text-caption`                     | 12  | chips, small labels                                                                         |
+| `text-meta`                        | 13  | table headers, hints, meta lines, errors                                                    |
+| `text-sm`                          | 14  | UI, controls, table cells (Tailwind's, leading 20)                                          |
+| `text-base`                        | 16  | prose and every input (Tailwind's, leading 24)                                              |
+| `text-title`                       | 17  | card titles (with `font-semibold`/`font-bold`)                                              |
+| `text-subtitle`                    | 18  | lead lines, dialog titles (add a `leading-*`)                                               |
+| `text-section`                     | 20  | section titles outside cards (add a `leading-*`)                                            |
+| `text-display`                     | 24  | display headings, big numbers (add a `leading-*`)                                           |
+| `page-title` utility / `text-page` | 26  | the one h1 per page                                                                         |
+| `text-stat`                        | 26  | stat values: `font-mono tabular-nums`; profile rating and overview tiles use `font-display` |
+| `text-hero`                        | 40  | countdowns only                                                                             |
+| `text-score`                       | 56  | the submission score, the home rating figure                                                |
 
 Other tokens:
 

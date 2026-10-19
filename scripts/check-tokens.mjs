@@ -48,7 +48,7 @@ const perLine = (find) => (source, rel) =>
 /** Each check reads a whole file and answers `{ line, text }` offences; the first group that has any is reported. */
 const CHECKS = [
   {
-    message: `Arbitrary size/radius/z-index classes (use text-tiny|caption|meta|sm|base|title|subtitle|section|display|page|stat|hero, rounded-<role>, z-<layer>; docs/design-language.md):`,
+    message: `Arbitrary size/radius/z-index classes (use text-tiny|caption|meta|sm|base|title|subtitle|section|display|page|stat|hero|score, rounded-<role>, z-<layer>; docs/design-language.md):`,
     find: perLine((line, rel) =>
       arbitraryUtilities(line).filter((name) => !(ALLOWED[rel] ?? []).includes(name)),
     ),

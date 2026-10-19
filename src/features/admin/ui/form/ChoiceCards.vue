@@ -20,7 +20,9 @@ defineProps<{
         :key="option.value"
         :data-testid="`${name}-${option.value}`"
         class="flex min-h-11 cursor-pointer items-start gap-3 rounded-cell border px-3 py-2.5 transition-colors has-[:checked]:border-accent has-[:checked]:bg-surface-hover has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-accent"
-        :class="model === option.value ? 'border-accent' : 'border-line hover:bg-surface-hover'"
+        :class="
+          model === option.value ? 'border-accent' : 'border-line-control hover:bg-surface-hover'
+        "
       >
         <input
           v-model="model"

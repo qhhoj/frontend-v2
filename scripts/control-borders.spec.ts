@@ -35,6 +35,15 @@ describe('hairlineControlBorders', () => {
     expect(found(`<label class="border border-line has-[:checked]:border-accent">`)).toEqual([
       '1:border-line',
     ]);
+    expect(found(`<label class="border border-line has-checked:border-accent">`)).toEqual([
+      '1:border-line',
+    ]);
+    expect(found(`<label class="border border-line has-focus-visible:outline-2">`)).toEqual([
+      '1:border-line',
+    ]);
+    expect(found(`<label class="border border-line md:focus-within:ring-2">`)).toEqual([
+      '1:border-line',
+    ]);
   });
 
   it.each([

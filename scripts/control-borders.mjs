@@ -1,12 +1,13 @@
 // A form control's border must reach 3:1 against its ground (WCAG 1.4.11, docs/design-language.md, Control border): `border-line-control`.
 // The hairline tokens `border-line` and `border-line-strong` are 1.3-1.8:1 and belong to cards, dividers and menus, never to a field.
 // A control is an `<input>`, `<select>` or `<textarea>`, or a string that styles one: a placeholder, a wrapper that shows focus-within
-// or a focused or checked child (`placeholder:`, `focus-within:`, `has-[:focus-visible]:`, `has-[:checked]:`).
+// or a focused or checked child (`placeholder:`, `focus-within:`, `has-checked:`, `has-focus-visible:`, `has-[:focus-visible]:`, `has-[:checked]:`, with or without a breakpoint prefix).
 import { classLiterals, classTokens } from './class-tokens.mjs';
 
 /** An opening control tag, over lines; a `>` inside a quoted attribute value does not end it. */
 const CONTROL_TAG = /<(?:input|select|textarea)\b(?:"[^"]*"|'[^']*'|[^>"'])*>/g;
-const FIELD_VARIANT = /^(?:placeholder|focus-within|has-\[:(?:focus-visible|checked)\]):/;
+const FIELD_VARIANT =
+  /^(?:[a-z0-9-]+:)*(?:placeholder|focus-within|has-checked|has-focus-visible|has-\[:(?:focus-visible|checked)\]):/;
 const HAIRLINE = /^border-line(?:-strong)?$/;
 
 const lineOf = (source, index) => source.slice(0, index).split('\n').length;
