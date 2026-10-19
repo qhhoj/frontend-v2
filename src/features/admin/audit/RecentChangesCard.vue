@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import Card from '@/components/ui/Card.vue';
-import { formatAgo, formatDateTime } from '@/lib/format';
+import { formatAgo, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
@@ -98,7 +98,7 @@ const rows = computed(() =>
           </i18n-t>
           <time
             :datetime="entry.at"
-            :title="formatDateTime(entry.at, locale.locale)"
+            :title="formatDate(entry.at, 'datetime', locale.locale)"
             class="shrink-0 text-meta text-muted tabular-nums"
           >
             {{ formatAgo(entry.at, now, locale.locale) }}

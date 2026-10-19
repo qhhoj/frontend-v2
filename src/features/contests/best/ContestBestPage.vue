@@ -15,7 +15,7 @@ import SubmissionTable from '@/features/submissions/SubmissionTable.vue';
 import SubmissionTableSkeleton from '@/features/submissions/SubmissionTableSkeleton.vue';
 import { SUBMISSION_PAGE_SIZE } from '@/features/submissions/list/submission-scope';
 import { useContestBestSubmissionsQuery } from '@/features/submissions/submissions.queries';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { pageFromQuery } from '@/lib/paging';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { usePageTitle } from '@/router/page-title';
@@ -109,7 +109,7 @@ const CHIP =
             class="flex items-center gap-2.5 bg-tag-4-bg px-5 py-3 text-meta font-semibold text-tag-4"
           >
             <TriangleAlert class="size-4 shrink-0" aria-hidden="true" />{{
-              $t('contests.best.frozen', { time: formatDateTime(frozenAt, locale.locale) })
+              $t('contests.best.frozen', { time: formatDate(frozenAt, 'datetime', locale.locale) })
             }}
           </p>
           <EmptyState v-if="!list?.items.length">{{ $t('submissions.best.empty') }}</EmptyState>

@@ -10,10 +10,9 @@ import Chip from '@/components/ui/Chip.vue';
 import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
 import { spanMessage } from '@/lib/contest-time';
-import { formatClock } from '@/lib/format';
+import { formatClock } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { safeRedirect } from '@/router/safe-redirect';
-import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import AccessCodeDialog from './AccessCodeDialog.vue';
 import { actionFactsOf, commandOf, contestAction, signInLabelKey } from './contest-action';
@@ -57,7 +56,6 @@ const LOCKED_KINDS: readonly ContestActionKind[] = ['opensLater', 'registered'];
 const props = defineProps<{ contest: ContestDetail; current: CurrentParticipation | null }>();
 const route = useRoute();
 const session = useSessionStore();
-const locale = useLocaleStore();
 const now = useNow();
 const facts = computed(() => actionFactsOf(props.contest, session.user !== null, now.value));
 const chosen = computed(() => contestAction(facts.value));
@@ -87,7 +85,7 @@ const { run, isPending, error, reset } = useParticipation(computed(() => props.c
 const root = ref<HTMLElement | null>(null);
 const isDialogOpen = ref(false);
 const participationStatus = ref('');
-const startClock = computed(() => formatClock(props.contest.startTime, locale.locale));
+const startClock = computed(() => formatClock(props.contest.startTime));
 const virtualLength = computed(() =>
   spanMessage((Date.parse(props.contest.endTime) - Date.parse(props.contest.startTime)) / 1000),
 );

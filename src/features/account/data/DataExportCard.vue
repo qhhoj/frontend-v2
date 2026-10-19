@@ -8,7 +8,8 @@ import InlineBit from '@/components/InlineBit.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import { translate } from '@/i18n';
-import { formatDateTime, formatFileSize } from '@/lib/format';
+import { formatFileSize } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import SettingsCard from '../settings/SettingsCard.vue';
@@ -32,7 +33,7 @@ const { pending, error, summary, run } = useAuthAction();
 const file = computed(() => exportFileOf(props.status));
 const rule = computed(() => requestRuleOf(props.status));
 const canRequest = computed(() => rule.value.kind === 'allowed' && !pending.value);
-const when = (date: string) => formatDateTime(date, locale.locale);
+const when = (date: string) => formatDate(date, 'datetime', locale.locale);
 
 const fileText = computed(() => {
   if (file.value.kind === 'preparing')

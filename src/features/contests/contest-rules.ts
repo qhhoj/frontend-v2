@@ -2,7 +2,7 @@ import type { ContestDetail, ContestFormatName } from '@/api/types/contests';
 import { formatLabel } from '@/lib/contest-format';
 import type { Locale } from '@/i18n';
 import { freezeStart, spanMessage } from '@/lib/contest-time';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 
 /** One line of the rules card: `termKey` names the left column, `valueKey` the right one. */
 export interface RuleRow {
@@ -53,7 +53,7 @@ function scoreboardRule(contest: ContestDetail): RuleRow {
 
 function registrationRule(contest: ContestDetail, locale: Locale): RuleRow[] {
   const { registrationStart: start, registrationEnd: end } = contest;
-  const at = (instant: string) => formatDateTime(instant, locale);
+  const at = (instant: string) => formatDate(instant, 'datetime', locale);
   if (start !== null && end !== null) {
     return [
       row('registration', 'contests.rules.registrationBetween', { start: at(start), end: at(end) }),

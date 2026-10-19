@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { Check } from 'lucide-vue-next';
 import { buttonClass } from '@/features/admin/ui/controls';
 import { SITE_TIME_ZONE } from '@/features/admin/ui/form/site-time';
+import { formatClock } from '@/lib/format-date';
 import { useBottomScrollPadding } from '@/lib/use-bottom-scroll-padding';
 import { SAVED_NOTE_MS } from './SaveBar.props';
 import type { SaveBarProps } from './SaveBar.props';
@@ -67,19 +68,12 @@ function discard() {
 function useSavedNote(savedAt: () => Date | string | null, timeZone: () => string) {
   const shown = ref<string | null>(null);
   let timer: ReturnType<typeof setTimeout> | undefined;
-  const formatIn = (at: Date | string, zone: string) =>
-    new Intl.DateTimeFormat('vi-VN', {
-      timeZone: zone,
-      hour: '2-digit',
-      minute: '2-digit',
-      hourCycle: 'h23',
-    }).format(new Date(at));
   /** A zone the browser does not know (an old profile value) falls back to the site's. */
   const format = (at: Date | string) => {
     try {
-      return formatIn(at, timeZone());
+      return formatClock(at, { timeZone: timeZone() });
     } catch {
-      return formatIn(at, SITE_TIME_ZONE);
+      return formatClock(at, { timeZone: SITE_TIME_ZONE });
     }
   };
   watch(

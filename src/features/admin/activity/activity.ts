@@ -75,21 +75,3 @@ export function shortIp(ip: string): string {
     ? ip
     : `${groups.slice(0, IPV6_SHOWN_GROUPS).join(':')}:…`;
 }
-
-/**
- * The ids of the rows that open a new calendar day among `rows` (in list order), so the table prints the date only there
- * and the bare time elsewhere. `dayOf` names the day of a row's instant in the viewer's zone.
- */
-export function dayStartIds(
-  rows: readonly { id: string; at: string }[],
-  dayOf: (at: string) => string,
-): Set<string> {
-  const starts = new Set<string>();
-  let previous: string | undefined;
-  for (const row of rows) {
-    const day = dayOf(row.at);
-    if (day !== previous) starts.add(row.id);
-    previous = day;
-  }
-  return starts;
-}

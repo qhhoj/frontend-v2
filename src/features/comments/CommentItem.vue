@@ -9,7 +9,8 @@ import type { VoteScore } from '@/api/types/votes';
 import UserContent from '@/components/UserContent.vue';
 import UserLink from '@/components/UserLink.vue';
 import VoteControl from '@/components/VoteControl.vue';
-import { formatAgo, formatNumericDateTime, signedScore } from '@/lib/format';
+import { signedScore } from '@/lib/format';
+import { formatAgo, formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import type { NumberedComment } from './comment-order';
 import { commentAnchor } from './comment-quote';
@@ -163,7 +164,7 @@ const TEXT_BUTTON =
           <span v-else class="font-semibold text-muted">{{ $t('comments.deletedAccount') }}</span>
           <time
             :datetime="comment.createdAt"
-            :title="formatNumericDateTime(comment.createdAt, locale.locale)"
+            :title="formatDate(comment.createdAt, 'datetime', locale.locale)"
             class="text-sm text-muted"
           >
             {{ formatAgo(comment.createdAt, now, locale.locale) }}

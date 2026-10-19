@@ -5,7 +5,8 @@ import { Star } from 'lucide-vue-next';
 import { useRouter } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
 import type { TicketListItem, TicketListQuery } from '@/api/types/tickets';
-import { formatAgoCompact, formatDateTime, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatAgoCompact, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminBit from '../shell/AdminBit.vue';
@@ -149,10 +150,10 @@ const rowAttrs = (ticket: TicketListItem) => ({
       <time
         v-if="narrow"
         :datetime="row.lastMessageAt"
-        :title="formatDateTime(row.lastMessageAt, locale.locale)"
+        :title="formatDate(row.lastMessageAt, 'datetime', locale.locale)"
         >{{ formatAgoCompact(row.lastMessageAt, now, locale.locale) }}</time
       >
-      <template v-else>{{ formatDateTime(row.lastMessageAt, locale.locale) }}</template>
+      <template v-else>{{ formatDate(row.lastMessageAt, 'datetime', locale.locale) }}</template>
     </template>
   </AdminDataTable>
 </template>

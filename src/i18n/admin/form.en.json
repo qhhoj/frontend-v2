@@ -9,9 +9,11 @@
   },
   "dateTime": {
     "placeholder": "dd/mm/yyyy hh:mm",
+    "placeholderDate": "dd/mm/yyyy",
     "now": "Now",
     "nowLabel": "Set {label} to now",
     "invalid": "Use dd/mm/yyyy hh:mm, for example 08/10/2026 13:00.",
+    "invalidDate": "Use dd/mm/yyyy, for example 08/10/2026.",
     "zoneHint": "{zone} time"
   },
   "section": {

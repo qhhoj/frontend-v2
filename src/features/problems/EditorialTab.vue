@@ -5,7 +5,7 @@ import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
 import QueryState from '@/components/QueryState.vue';
 import UserName from '@/components/UserName.vue';
-import { formatDate } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import StatementBody from './StatementBody.vue';
 import StatementSkeleton from './StatementSkeleton.vue';
@@ -48,7 +48,7 @@ watch(
             ><UserName :username="author.username" :rating="author.rating"
           /></template>
         </span>
-        <span>{{ formatDate(editorial.publishOn, locale.locale) }}</span>
+        <span>{{ formatDate(editorial.publishOn, 'date', locale.locale) }}</span>
         <Chip v-if="!editorial.isPublic" tone="accent" size="md">{{
           $t('problem.editorial.editorsOnly')
         }}</Chip>

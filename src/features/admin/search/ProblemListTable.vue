@@ -4,7 +4,8 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { NumberedPageMeta } from '@/api/client';
 import type { ProblemListItem } from '@/api/types/problems';
-import { formatDate, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminChip from '../ui/AdminChip.vue';
@@ -150,7 +151,7 @@ const menuItems = (code: string) =>
     </template>
     <template #cell-points="{ row }">{{ formatNumber(row.points, locale.locale) }}</template>
     <template #cell-date="{ row }">
-      {{ row.date ? formatDate(row.date, locale.locale) : '—' }}
+      {{ row.date ? formatDate(row.date, 'date', locale.locale) : '—' }}
     </template>
     <template #actions="{ row }">
       <AdminRowMenu

@@ -30,7 +30,7 @@ API_ORIGIN=http://localhost:3001 npm run dev
 | `npm test`             | Vitest: `*.node.spec.ts` in Node, the other specs in jsdom                                                                                               |
 | `npm run test:scripts` | Vitest: the specs of `scripts/` (api-gen, build helpers)                                                                                                 |
 | `npm run e2e`          | Playwright on :4310 (`E2E_PORT` for parallel runs): builds `dist/`, previews it and answers the API with a fake (`npx playwright install chromium` once) |
-| `npm run lint`         | ESLint, `prettier --check`, `lint:tokens` (no colour literals outside themes), `lint:copy` (Vietnamese spelling and quotes in `vi.json`)                 |
+| `npm run lint`         | ESLint, `prettier --check`, `lint:tokens` (no colour literals outside themes), `lint:copy` (vi spelling, quotes), `lint:dates` (`formatDate` only)       |
 | `npm run typecheck`    | `vue-tsc --build`                                                                                                                                        |
 | `npm run check`        | lint, typecheck, test                                                                                                                                    |
 
@@ -44,7 +44,7 @@ src/
   stores/                   Pinia: session, locale (the theme store lives in theme/)
   theme/                    tokens, one CSS file per theme, registry, theme store, PrimeVue preset
   i18n/                     vi.json (default), en.json
-  lib/                      pure helpers (verdicts, rating tiers, formats, ranking cells)
+  lib/                      pure helpers (verdicts, rating tiers, formats, dates, ranking cells)
   components/               shared UI
   features/<area>/          pages, their parts, <area>.queries.ts
   features/shell/           app shell, theme menu, account sync
@@ -52,6 +52,7 @@ src/
 e2e/                        Playwright specs and the fake API (e2e/fixtures/api.ts)
 scripts/check-tokens.mjs    lint:tokens
 scripts/check-vi-copy.mjs   lint:copy
+scripts/check-date-format.mjs  lint:dates (the rule and its allow-list: date-format-calls.mjs)
 design-system/qhhoj/        design notes (Clay & ivory default, Glass optional)
 ```
 
@@ -68,6 +69,8 @@ Data flow: page -> `features/<area>/<area>.queries.ts` (vue-query) -> `api/<area
 | A route or who may open it                                   | `src/router/routes.ts`, `src/router/guards.ts`                                                                                                                                           |
 | A backend call or DTO type                                   | `src/api/<area>.api.ts` (typed by route through `src/api/typed.ts`); `src/api/types/<area>.ts` are aliases of `src/api/generated/schema.d.ts`; after a backend change: `npm run api:gen` |
 | A text                                                       | `src/i18n/vi.json` and `src/i18n/en.json`                                                                                                                                                |
+| How a date or time reads (preset, locale order, zone)        | `src/lib/format-date.ts` (`formatDate` presets, `formatClock`); which preset a call site takes: its header, decisions.md "One `formatDate`"                                              |
+| What `lint:dates` bans, or an exempt file                    | `scripts/date-format-calls.mjs` (`BANNED`, `ALLOWED` with a reason), run by `scripts/check-date-format.mjs`                                                                              |
 | Verdict colours and labels, rating tiers                     | `src/lib/verdicts.ts`, `src/lib/rating-tiers.ts`                                                                                                                                         |
 | Ranking cell rules                                           | `src/lib/ranking-cells.ts`                                                                                                                                                               |
 | Replay board rules (order, ties, ghosts, first solves, feed) | `src/features/contests/replay/replay-board.ts`, `replay-timeline.ts`                                                                                                                     |

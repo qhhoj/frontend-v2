@@ -7,7 +7,7 @@ import { syncPolygonLink, unlinkPolygon, updatePolygonLink } from '@/api/polygon
 import type { PolygonLink } from '@/api/types/polygon';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
-import { formatNumericDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
 import { useViewerId } from '@/stores/use-viewer-id';
@@ -54,7 +54,7 @@ const STATUS_TONE: Record<LinkStatus, ChipTone> = {
   notReady: 'neutral',
   unknown: 'neutral',
 };
-const dateText = (date: string | null) => (date ? formatNumericDateTime(date, locale.locale) : '');
+const dateText = (date: string | null) => (date ? formatDate(date, 'datetime', locale.locale) : '');
 const putLink = (link: PolygonLink) =>
   queryClient.setQueryData(linkKey(), state.value ? { ...state.value, link } : undefined);
 

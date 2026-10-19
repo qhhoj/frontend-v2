@@ -2,7 +2,8 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { SubmissionBatchLog } from '@/api/types/submission-actions';
-import { formatNumber, formatNumericDateTime } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import type { AdminColumn } from '../ui/table/table-columns';
@@ -59,7 +60,7 @@ function filterText(entry: SubmissionBatchLog): string {
       </template>
       <template #cell-createdAt="{ row }">
         <span class="whitespace-nowrap text-muted">{{
-          formatNumericDateTime(row.createdAt, locale.locale)
+          formatDate(row.createdAt, 'datetime', locale.locale)
         }}</span>
       </template>
     </AdminDataTable>

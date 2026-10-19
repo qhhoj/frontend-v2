@@ -12,7 +12,7 @@ import { BUTTON } from '@/features/admin/ui/controls';
 import { failureTextOf, hasIssueCode } from '@/features/admin/ui/admin-errors';
 import { useAdminMutation } from '@/features/admin/ui/use-admin-mutation';
 import { hasPermission } from '@/lib/permissions';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -168,7 +168,7 @@ async function confirmAction() {
     <p v-if="lockLine" class="text-sm text-muted">
       {{
         $t(`admin.staff.lock.${lockLine.key}`, {
-          time: formatDateTime(lockLine.time, locale.locale),
+          time: formatDate(lockLine.time, 'datetime', locale.locale),
         })
       }}
     </p>

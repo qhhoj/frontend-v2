@@ -5,12 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { fetchActivityLogs } from '@/api/activity-admin.api';
 import type { ActivityLog } from '@/api/types/activity-admin';
-import {
-  formatClockSeconds,
-  formatNumericDate,
-  formatNumericDateTimeSeconds,
-  formatShortDate,
-} from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AdminChip from '../ui/AdminChip.vue';
@@ -20,7 +15,7 @@ import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import type { AdminColumn } from '../ui/table/table-columns';
 import ActivityIp from './ActivityIp.vue';
-import { dayStartIds, isFilteredActivity, toActivityRequest } from './activity';
+import { isFilteredActivity, toActivityRequest } from './activity';
 import type { ActivityFilter } from './activity';
 
 const props = defineProps<{ filter: ActivityFilter }>();
@@ -62,10 +57,6 @@ const columns = computed<AdminColumn[]>(() => [
   { key: 'request', label: t('admin.activity.table.request'), grow: true },
   { key: 'status', label: t('admin.activity.table.status'), priority: 'badge' },
 ]);
-/** A time alone says little across a page of days: the first row of each day also carries the date. */
-const dayStarts = computed(() =>
-  dayStartIds(rows.value, (at) => formatNumericDate(at, locale.locale)),
-);
 
 /** A name opens that user's summary beside the table; the rest of the URL (the filter) stays. */
 function openSummary(username: string) {
@@ -108,12 +99,8 @@ const goTo = (next: number) => (page.value = next);
         <time
           :datetime="row.at"
           class="font-mono text-xs whitespace-nowrap text-muted tabular-nums"
-          :title="formatNumericDateTimeSeconds(row.at, locale.locale)"
         >
-          <template v-if="dayStarts.has(row.id)"
-            >{{ formatShortDate(row.at, locale.locale) }} ·
-          </template>
-          {{ formatClockSeconds(row.at, locale.locale) }}
+          {{ formatDate(row.at, 'datetimeSeconds', locale.locale) }}
         </time>
       </div>
     </template>

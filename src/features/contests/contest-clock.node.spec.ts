@@ -10,14 +10,14 @@ describe('contest clock labels', () => {
     expect(timelineLabels(times, 'vi')).toEqual({ start: '08:00', end: '11:00' });
   });
 
-  it('puts the date before both clocks once the days differ', () => {
-    const times = { startTime: '2026-10-15T04:27:00Z', endTime: '2026-11-15T04:27:00Z' };
-    expect(timelineLabels(times, 'vi')).toEqual({ start: '15/10 11:27', end: '15/11 11:27' });
-  });
-
-  it('adds the year once the years differ', () => {
-    const times = { startTime: '2026-10-15T04:27:00Z', endTime: '2027-10-15T04:27:00Z' };
-    expect(timelineLabels(times, 'vi')).toEqual({
+  it('shows the full datetime of both ends once the days differ, in any year', () => {
+    const sameYear = { startTime: '2026-10-15T04:27:00Z', endTime: '2026-11-15T04:27:00Z' };
+    expect(timelineLabels(sameYear, 'vi')).toEqual({
+      start: '15/10/2026 11:27',
+      end: '15/11/2026 11:27',
+    });
+    const nextYear = { startTime: '2026-10-15T04:27:00Z', endTime: '2027-10-15T04:27:00Z' };
+    expect(timelineLabels(nextYear, 'vi')).toEqual({
       start: '15/10/2026 11:27',
       end: '15/10/2027 11:27',
     });
@@ -25,6 +25,6 @@ describe('contest clock labels', () => {
 
   it('counts the day offset of the end clock', () => {
     const times = { startTime: '2026-10-15T15:00:00Z', endTime: '2026-10-15T18:00:00Z' };
-    expect(endClockLabel(times, 'vi')).toBe('01:00 (+1)');
+    expect(endClockLabel(times)).toBe('01:00 (+1)');
   });
 });

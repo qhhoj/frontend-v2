@@ -8,7 +8,7 @@ import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestNotFound from '../ContestNotFound.vue';
@@ -46,7 +46,7 @@ usePrintPageRules(() =>
 );
 const whenText = computed(() =>
   contest.value
-    ? `${formatDateTime(contest.value.startTime, locale.locale)} – ${formatDateTime(contest.value.endTime, locale.locale)}`
+    ? `${formatDate(contest.value.startTime, 'datetime', locale.locale)} – ${formatDate(contest.value.endTime, 'datetime', locale.locale)}`
     : '',
 );
 const printSheet = () => window.print();

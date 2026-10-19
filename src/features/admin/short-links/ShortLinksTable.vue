@@ -4,7 +4,8 @@ import { useI18n } from 'vue-i18n';
 import { ExternalLink, Trash2 } from 'lucide-vue-next';
 import type { NumberedPageMeta } from '@/api/client';
 import type { ShortLink } from '@/api/types/short-links';
-import { formatDateTime, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
@@ -32,7 +33,8 @@ const columns = computed<AdminColumn[]>(() => [
 ]);
 const isExpired = (link: ShortLink) =>
   link.expiresAt !== null && new Date(link.expiresAt).getTime() < Date.now();
-const dateOrDash = (value: string | null) => (value ? formatDateTime(value, locale.locale) : '—');
+const dateOrDash = (value: string | null) =>
+  value ? formatDate(value, 'datetime', locale.locale) : '—';
 const menuItems = (link: ShortLink) => [
   { label: t('admin.shortlinks.table.open'), icon: ExternalLink, to: link.path },
   {

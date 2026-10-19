@@ -11,7 +11,8 @@ import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
 import { usePpQuery } from '@/features/users/users.queries';
-import { formatDate, formatFixed, formatNumber } from '@/lib/format';
+import { formatFixed, formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { pageFromQuery } from '@/lib/paging';
 import { VERDICT_TONES, verdictOf } from '@/lib/verdicts';
 import type { Verdict } from '@/lib/verdicts';
@@ -135,7 +136,7 @@ const verdictFor = (result: string | null): Verdict =>
                       </span>
                       <span class="text-xs whitespace-nowrap text-muted">
                         {{ entry.submission.language }} ·
-                        {{ formatDate(entry.submission.date, locale.locale) }}
+                        {{ formatDate(entry.submission.date, 'date', locale.locale) }}
                       </span>
                     </RouterLink>
                   </td>

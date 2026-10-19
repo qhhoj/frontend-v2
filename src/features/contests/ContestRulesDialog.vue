@@ -6,7 +6,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import UserContent from '@/components/UserContent.vue';
 import { ApiError } from '@/api/client';
 import { errorMessageKey } from '@/i18n/error-message';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { EXTRAS_BITS } from './contest-extras-bits';
 
@@ -70,7 +70,7 @@ function accept() {
         {{
           $t('joinRules.previous', {
             revision: previousAcceptance.revision,
-            time: formatDateTime(previousAcceptance.at, locale.locale),
+            time: formatDate(previousAcceptance.at, 'datetime', locale.locale),
           })
         }}
       </template>

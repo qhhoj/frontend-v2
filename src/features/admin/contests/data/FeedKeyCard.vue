@@ -5,7 +5,7 @@ import type { FeedKeyMode } from '@/api/types/contest-ops';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
@@ -63,7 +63,7 @@ async function confirm() {
   else await MUTATIONS[action].run(undefined);
   if (!MUTATIONS[action].failure.value) pending.value = null;
 }
-const at = (date: string | null) => (date ? formatDateTime(date, locale.locale) : '—');
+const at = (date: string | null) => (date ? formatDate(date, 'datetime', locale.locale) : '—');
 </script>
 
 <template>

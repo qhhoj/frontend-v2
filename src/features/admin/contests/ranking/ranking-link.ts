@@ -1,6 +1,7 @@
 import type { RankingLinkPatch } from '@/api/types/contest-editing';
 import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
+import { formatClock, formatDate } from '@/lib/format-date';
 
 export const OFFICIAL_CSV_MAX_BYTES = 1024 * 1024;
 /** Backend `RankingLinkDto.expiryAmount` `@Max`. */
@@ -34,21 +35,19 @@ export function toLinkPatch(form: LinkForm): RankingLinkPatch | { error: string 
     : { error: translate('admin.contests.ranking.link.needsAmount') };
 }
 
-const pad = (value: number) => String(value).padStart(2, '0');
-/** The viewer's own calendar day and clock time: the zone the expiry was typed in and is shown in everywhere else. */
-const localDay = (instant: Date) =>
-  `${pad(instant.getDate())}/${pad(instant.getMonth() + 1)}/${instant.getFullYear()}`;
-const localClock = (instant: Date) => `${pad(instant.getHours())}:${pad(instant.getMinutes())}`;
-
 const MINUTE_MS = 60_000;
 const DAY_MS = 86_400_000;
 
-/** What the link will expire at, counted from the link's last regeneration (as the backend does), in words; null for the modes without an amount. */
+/** What the link will expire at, counted from the link's last regeneration (as the backend does), in words and the viewer's zone and locale; null for the modes without an amount. */
 export function expiryPreview(form: LinkForm, regeneratedAt: Date, locale: Locale): string | null {
   if ((form.expiryMode !== 'M' && form.expiryMode !== 'D') || !isWholeAmount(form.expiryAmount))
     return null;
   const step = form.expiryMode === 'M' ? MINUTE_MS : DAY_MS;
   const until = new Date(regeneratedAt.getTime() + form.expiryAmount * step);
-  const when = { amount: form.expiryAmount, date: localDay(until), time: localClock(until) };
+  const when = {
+    amount: form.expiryAmount,
+    date: formatDate(until, 'date', locale),
+    time: formatClock(until),
+  };
   return translate(`admin.contests.ranking.link.preview.${form.expiryMode}`, when, { locale });
 }

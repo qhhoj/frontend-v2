@@ -6,7 +6,8 @@ import UserName from '@/components/UserName.vue';
 import CommunityCard from '@/features/community/CommunityCard.vue';
 import { usePostsQuery } from '@/features/blog/blog.queries';
 import { summaryExcerpt } from '@/features/blog/post-summary';
-import { formatNumber, formatShortDate } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 
 const POST_COUNT = 5;
@@ -49,7 +50,7 @@ const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
             ><template v-if="index">, </template
             ><UserName :username="author.username" :rating="author.rating"
           /></template>
-          · {{ formatShortDate(post.publishOn, locale.locale) }} ·
+          · {{ formatDate(post.publishOn, 'short', locale.locale) }} ·
           {{ $t('blog.comments', { count: formatNumber(post.commentCount, locale.locale) }) }}
         </p>
       </li>

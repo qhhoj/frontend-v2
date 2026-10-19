@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { AuditEntry } from '@/api/types/audit-admin';
-import { formatNumericDateTimeSeconds } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { shortId } from '../ui/short-id';
@@ -33,7 +33,7 @@ const objectName = computed(() => props.entry.object.label ?? shortId(props.entr
     class="grid gap-x-4 gap-y-1 px-4 py-3 sm:grid-cols-[11rem_minmax(0,12rem)_minmax(0,1fr)]"
   >
     <time :datetime="entry.at" class="text-sm text-muted tabular-nums">
-      {{ formatNumericDateTimeSeconds(entry.at, locale.locale) }}
+      {{ formatDate(entry.at, 'datetimeSeconds', locale.locale) }}
     </time>
     <span class="min-w-0 text-sm">
       <AdminUserLabel v-if="entry.actor?.username" :username="entry.actor.username" :link="false" />

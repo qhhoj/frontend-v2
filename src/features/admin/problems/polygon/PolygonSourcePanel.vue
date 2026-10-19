@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PolygonProblem } from '@/api/types/polygon';
-import { formatNumericDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import PackageStatePill from './PackageStatePill.vue';
 import PackageTypePill from './PackageTypePill.vue';
@@ -43,7 +43,7 @@ const locale = useLocaleStore();
         <dt class="text-muted">{{ $t('admin.polygonLink.source.built') }}</dt>
         <dd>
           <time :datetime="problem.latestPackage.createdAt">{{
-            formatNumericDateTime(problem.latestPackage.createdAt, locale.locale)
+            formatDate(problem.latestPackage.createdAt, 'datetime', locale.locale)
           }}</time>
         </dd>
       </template>

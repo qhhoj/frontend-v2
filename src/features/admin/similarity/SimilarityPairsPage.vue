@@ -5,7 +5,8 @@ import type { RouteLocationRaw } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
-import { formatDateTime, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import { buttonClass } from '../ui/controls';
@@ -57,7 +58,7 @@ const lead = computed(() => {
   return finishedAt
     ? translate('admin.similarity.pairs.lead', {
         id: shortId(runId.value),
-        finishedAt: formatDateTime(finishedAt, locale.locale),
+        finishedAt: formatDate(finishedAt, 'datetime', locale.locale),
       })
     : shortId(runId.value);
 });

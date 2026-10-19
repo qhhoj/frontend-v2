@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import type { PolygonSyncRun } from '@/api/types/polygon';
 import NumberedPager from '@/components/NumberedPager.vue';
-import { formatNumericDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../../ui/AdminChip.vue';
@@ -37,7 +37,7 @@ const columns = computed<AdminColumn[]>(() => [
   { key: 'how', label: t('admin.polygonLink.history.columns.how') },
   { key: 'by', label: t('admin.polygonLink.history.columns.by'), priority: 'meta' },
 ]);
-const dateText = (date: string) => formatNumericDateTime(date, locale.locale);
+const dateText = (date: string) => formatDate(date, 'datetime', locale.locale);
 const isFailed = (run: PolygonSyncRun) => run.result === 'failed';
 </script>
 

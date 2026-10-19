@@ -5,7 +5,7 @@ import { translate } from '@/i18n';
 import GlassCard from '@/components/GlassCard.vue';
 import UserName from '@/components/UserName.vue';
 import AppButton from '@/components/ui/AppButton.vue';
-import { formatAgo } from '@/lib/format';
+import { formatAgo } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { useTicketPatch } from './use-ticket-patch';

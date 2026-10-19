@@ -1,7 +1,9 @@
 import type { LocationQuery, LocationQueryRaw, RouteLocationRaw } from 'vue-router';
 import type { AuditRequest } from '@/api/audit-admin.api';
 import type { AuditEntry } from '@/api/types/audit-admin';
+import { formatDayKey } from '@/lib/format-date';
 import { adminRouteName } from '../admin-screens';
+import { parseInZone } from '../ui/form/site-time';
 
 /** Every kind the backend can filter by (`AUDIT_TYPES`), in the order the filter lists them. */
 export const AUDIT_TYPES = [
@@ -53,6 +55,18 @@ export function auditFilterFromQuery(query: LocationQuery): AuditFilter {
 export function auditFilterQuery(filter: AuditFilter): LocationQueryRaw {
   return Object.fromEntries(Object.entries(filter).filter(([, value]) => value !== ''));
 }
+
+/** The instant a `YYYY-MM-DD` day starts in `zone` (the date field's model); null for no day. */
+export function dayStartInstant(day: string, zone: string): string | null {
+  if (!day) return null;
+  const [year, month, date] = day.split('-');
+  const start = parseInZone(`${date}/${month}/${year}`, zone, true);
+  return start.ok ? start.iso : null;
+}
+
+/** The `YYYY-MM-DD` calendar day an instant falls on in `zone`; empty for no instant. */
+export const dayOfInstant = (instant: string | null, zone: string): string =>
+  instant ? formatDayKey(instant, zone) : '';
 
 /** Local midnight of a `YYYY-MM-DD` day, plus `days`. */
 function localDayStart(value: string, days = 0): string {

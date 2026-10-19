@@ -3,8 +3,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UserContent from '@/components/UserContent.vue';
 import Notice from '@/components/ui/Notice.vue';
-import { INTL_LOCALES } from '@/lib/format';
-import { useLocaleStore } from '@/stores/locale.store';
+import { formatClock } from '@/lib/format-date';
 import { failureTextOf } from '../ui/admin-errors';
 import { useRenderPreview } from '../ui/use-render-preview';
 import { previewStatusOf } from './preview-status';
@@ -13,7 +12,6 @@ import AdminChip from '../ui/AdminChip.vue';
 /** `savedContent` is null for a page not saved yet: then no text is "the saved text". */
 const props = defineProps<{ content: string; savedContent: string | null; savedHtml: string }>();
 const { t } = useI18n();
-const localeStore = useLocaleStore();
 const isUntouched = computed(
   () => props.savedContent !== null && props.content === props.savedContent,
 );
@@ -31,14 +29,7 @@ const status = computed(() =>
 );
 const html = computed(() => (isUntouched.value ? props.savedHtml : preview.html.value));
 const clock = computed(() =>
-  preview.updatedAt.value
-    ? new Intl.DateTimeFormat(INTL_LOCALES[localeStore.locale], {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hourCycle: 'h23',
-      }).format(preview.updatedAt.value)
-    : '',
+  preview.updatedAt.value ? formatClock(preview.updatedAt.value, { seconds: true }) : '',
 );
 /** "Đã cập nhật hh:mm:ss"; before any answer (an emptied box) there is no time to show. */
 const chipText = computed(() =>

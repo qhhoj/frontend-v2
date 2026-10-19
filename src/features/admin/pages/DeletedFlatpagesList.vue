@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { positivePageOf } from './flatpage-route';
 import { useDeletedFlatpagesQuery } from './flatpages.queries';
@@ -52,7 +52,7 @@ const items = computed(() => query.data.value?.items ?? []);
             <span class="text-xs text-muted">
               {{
                 $t('admin.pages.deleted.at', {
-                  time: formatDateTime(item.deletedAt, locale.locale),
+                  time: formatDate(item.deletedAt, 'datetime', locale.locale),
                 })
               }}
             </span>

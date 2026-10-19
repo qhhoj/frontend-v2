@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminField from '../ui/AdminField.vue';
 import { INPUT, buttonClass } from '../ui/controls';
@@ -29,7 +29,7 @@ function save() {
     <p v-if="judge.startTime" class="text-sm text-muted">
       {{
         $t('admin.judges.row.started', {
-          time: formatDateTime(judge.startTime, locale.locale),
+          time: formatDate(judge.startTime, 'datetime', locale.locale),
         })
       }}
     </p>

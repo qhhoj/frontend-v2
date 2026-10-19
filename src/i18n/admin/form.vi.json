@@ -9,9 +9,11 @@
   },
   "dateTime": {
     "placeholder": "dd/mm/yyyy hh:mm",
+    "placeholderDate": "dd/mm/yyyy",
     "now": "Bây giờ",
     "nowLabel": "Đặt {label} là bây giờ",
     "invalid": "Nhập theo dạng dd/mm/yyyy hh:mm, ví dụ 08/10/2026 13:00.",
+    "invalidDate": "Nhập theo dạng dd/mm/yyyy, ví dụ 08/10/2026.",
     "zoneHint": "Giờ {zone}"
   },
   "section": {

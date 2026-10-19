@@ -2,7 +2,7 @@
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
-import { formatDate } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useUserPageQuery } from '@/features/users/users.queries';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminDrawer from '../ui/AdminDrawer.vue';
@@ -86,7 +86,7 @@ function afterHide() {
 const subtitle = computed(() => {
   const loaded = page.value;
   if (!loaded) return undefined;
-  const joined = formatDate(loaded.dateJoined, locale.locale);
+  const joined = formatDate(loaded.dateJoined, 'date', locale.locale);
   return loaded.displayName === loaded.username ? joined : `${loaded.displayName} · ${joined}`;
 });
 const retry = () => Promise.all([pageQuery.refetch(), editQuery.refetch()]);

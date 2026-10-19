@@ -6,7 +6,7 @@ import { useI18n } from 'vue-i18n';
 import type { NumberedPageMeta } from '@/api/client';
 import { decideJoinRequest } from '@/api/organizations.api';
 import type { JoinRequest, JoinRequestState } from '@/api/types/organizations';
-import { formatNumericDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
@@ -98,7 +98,7 @@ const columns = computed<AdminColumn[]>(() => [
         },
       ]),
 ]);
-const timeOf = (value: string) => formatNumericDateTime(value, locale.locale);
+const timeOf = (value: string) => formatDate(value, 'datetime', locale.locale);
 const menuItems = (request: JoinRequest) => [
   { label: t('admin.organizations.queue.reject'), icon: X, run: () => void decide(request, 'R') },
 ];

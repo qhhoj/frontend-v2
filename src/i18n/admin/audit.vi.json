@@ -13,6 +13,7 @@
     "anyType": "Mọi loại",
     "from": "Từ ngày",
     "to": "Đến ngày",
+    "rangeInverted": "Ngày bắt đầu sau ngày kết thúc.",
     "clear": "Bỏ lọc"
   },
   "listLabel": "Các thay đổi, mới nhất trước",

@@ -4,7 +4,8 @@ import type { TicketDetail } from '@/api/types/tickets';
 import GlassCard from '@/components/GlassCard.vue';
 import { translate } from '@/i18n';
 import StateBit from '@/components/StateBit.vue';
-import { formatNumber, formatNumericDateTime } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import TicketLinkChip from './TicketLinkChip.vue';
@@ -20,7 +21,7 @@ const isStaffView = computed(() => props.ticket.can.assign && !isCreator.value);
 /** The line under the title: creator, opening date, message count and assignees (the board's wording). */
 const meta = computed(() => ({
   creator: props.ticket.creator.username,
-  date: formatNumericDateTime(props.ticket.createdAt, locale.locale),
+  date: formatDate(props.ticket.createdAt, 'datetime', locale.locale),
   count: formatNumber(props.ticket.messageCount, locale.locale),
   assignees:
     props.ticket.assignees.map((assignee) => assignee.username).join(', ') ||

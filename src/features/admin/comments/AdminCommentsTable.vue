@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { Eye, EyeOff, Pencil } from 'lucide-vue-next';
 import type { NumberedPageMeta } from '@/api/client';
 import type { AdminCommentItem } from '@/api/types/comments';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
@@ -93,7 +93,9 @@ const menuItems = (item: AdminCommentItem) => [
     </template>
     <template #cell-page="{ row }"><CommentPlace :item="row" /></template>
     <template #cell-createdAt="{ row }">
-      <span class="whitespace-nowrap">{{ formatDateTime(row.createdAt, locale.locale) }}</span>
+      <span class="whitespace-nowrap">{{
+        formatDate(row.createdAt, 'datetime', locale.locale)
+      }}</span>
     </template>
     <template #actions="{ row }">
       <template v-if="!row.comment.deleted">

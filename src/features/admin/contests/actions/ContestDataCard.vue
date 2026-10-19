@@ -3,7 +3,8 @@ import { computed, ref } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
 import { contestDataDownloadUrl, fetchContestData } from '@/api/contest-editing.api';
 import QueryState from '@/components/QueryState.vue';
-import { formatDateTime, formatFileSize } from '@/lib/format';
+import { formatFileSize } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminBit from '../../shell/AdminBit.vue';
@@ -67,9 +68,9 @@ const isReady = computed(() => status.value?.state === 'ready');
         <p v-if="isReady && status.readyAt" class="text-sm text-muted">
           {{
             $t('admin.contests.actions.data.readyDetail', {
-              readyAt: formatDateTime(status.readyAt, locale.locale),
+              readyAt: formatDate(status.readyAt, 'datetime', locale.locale),
               nextPrepareAt: status.nextPrepareAt
-                ? formatDateTime(status.nextPrepareAt, locale.locale)
+                ? formatDate(status.nextPrepareAt, 'datetime', locale.locale)
                 : '',
             })
           }}
@@ -97,7 +98,7 @@ const isReady = computed(() => status.value?.state === 'ready');
         >
           {{
             $t('admin.contests.actions.data.waitUntil', {
-              time: formatDateTime(status.nextPrepareAt, locale.locale),
+              time: formatDate(status.nextPrepareAt, 'datetime', locale.locale),
             })
           }}
         </p>

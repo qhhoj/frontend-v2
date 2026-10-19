@@ -6,7 +6,8 @@ import { organizationEditTarget } from '@/features/admin/edit-link/admin-edit-ta
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { translate } from '@/i18n';
-import { formatNumber, formatNumericDate } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { medalClass } from '@/lib/medal';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
@@ -30,7 +31,7 @@ const state = computed(() => membershipState(props.organization, session.user !=
 /** Members leave through ⋯, administrators too (the chip shows them as administrators, not members). */
 const isMember = computed(() => session.user !== null && !!props.organization.viewer?.isMember);
 const places = computed(() => slotsLine(props.organization));
-const founded = computed(() => formatNumericDate(props.organization.createdAt, locale.locale));
+const founded = computed(() => formatDate(props.organization.createdAt, 'date', locale.locale));
 const memberCount = computed(() => formatNumber(props.organization.memberCount, locale.locale));
 const performancePoints = computed(() =>
   formatNumber(props.organization.performancePoints, locale.locale),

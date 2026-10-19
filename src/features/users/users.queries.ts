@@ -2,6 +2,7 @@ import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/vue-quer
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
 import { LEADERBOARD_PAGE_SIZE } from '@/api/types/users';
+import { viewerTimeZone } from '@/lib/format-date';
 import type { LeaderboardSort, RankField } from '@/api/types/users';
 import {
   fetchActivity,
@@ -78,10 +79,8 @@ export const usePpQuery = (username: MaybeRefOrGetter<string>, page: MaybeRefOrG
     placeholderData: keepPreviousData,
   });
 
-/** The browser's own zone, so the heatmap's days are the viewer's days. */
-export const viewerTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
 export const useActivityQuery = (username: MaybeRefOrGetter<string>) => {
-  const timezone = viewerTimeZone();
+  const timezone = viewerTimeZone(); // the heatmap's days are the viewer's days
   return useQuery({
     queryKey: computed(() => ['users', 'activity', toValue(username), timezone]),
     queryFn: () => fetchActivity(toValue(username), timezone),

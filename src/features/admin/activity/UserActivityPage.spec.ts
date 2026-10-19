@@ -49,6 +49,15 @@ describe('UserActivityPage', () => {
     expect(wrapper.text()).toContain('chưa biết tổng số');
   });
 
+  it('dates each log row to the second and the live visitors to the minute', async () => {
+    mockApi(routes());
+    const { wrapper } = await mountScreen('/admin/activity', (view) =>
+      view.find('a[download]').exists(),
+    );
+    expect(wrapper.text()).toContain('08/10/2026 08:41:08');
+    expect(wrapper.text()).toContain('08/10/2026 08:40');
+    expect(wrapper.text()).not.toContain('08/10/2026 08:40:55');
+  });
   it('offers no next page past the last one the backend accepts (page 200)', async () => {
     const calls = mockApi(
       routes({

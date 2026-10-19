@@ -4,8 +4,7 @@ import { Activity } from 'lucide-vue-next';
 import { testExternalJudgeConnection } from '@/api/external-judge.api';
 import type { ExternalJudgeTestResult } from '@/api/types/external-judge';
 import type { Setting } from '@/api/types/settings-admin';
-import { formatClock } from '@/lib/format';
-import { useLocaleStore } from '@/stores/locale.store';
+import { formatClock } from '@/lib/format-date';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { BUTTON } from '../ui/controls';
@@ -13,7 +12,6 @@ import { useAdminMutation } from '../ui/use-admin-mutation';
 
 /** Under the External judge block: lists the OJs the saved connection serves, and warns about a plain-http address. */
 const props = defineProps<{ settings: Setting[] }>();
-const locale = useLocaleStore();
 const isPlainHttp = computed(() => {
   const value = props.settings.find((entry) => entry.key === 'externalJudge.baseUrl')?.value;
   return typeof value === 'string' && value.startsWith('http://');
@@ -29,7 +27,7 @@ const check = useAdminMutation({
 });
 
 function run() {
-  checkedAt.value = formatClock(new Date().toISOString(), locale.locale);
+  checkedAt.value = formatClock(new Date().toISOString());
   void check.run(undefined);
 }
 </script>

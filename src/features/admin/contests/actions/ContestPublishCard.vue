@@ -6,7 +6,7 @@ import type { ContestActions, EditableContest } from '@/api/types/contest-editin
 import type { PublishOptions, PublishProblemsResult } from '@/api/types/contest-ops';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { translate } from '@/i18n';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AdminStatus from '../../ui/AdminStatus.vue';
@@ -67,7 +67,7 @@ const autoOutcome = computed(() => props.actions?.autoPublish ?? null);
 const autoText = computed(() => {
   const outcome = autoOutcome.value;
   if (!outcome) return null;
-  const at = formatDateTime(outcome.at, locale.locale);
+  const at = formatDate(outcome.at, 'datetime', locale.locale);
   if (outcome.status === 'published') {
     return translate('admin.contestPublish.auto.published', { ...outcome, at });
   }

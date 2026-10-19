@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import type { RouteLocationNormalized } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import QueryState from '@/components/QueryState.vue';
-import { formatDateTime } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
 import type { FlatpageRevision } from '@/api/types/flatpages-admin';
@@ -52,7 +52,9 @@ const registrationRequired = computed({
 const loadedAt = ref<string | null>(null);
 const loadedNote = computed(() =>
   loadedAt.value
-    ? t('admin.pages.history.loaded', { time: formatDateTime(loadedAt.value, localeStore.locale) })
+    ? t('admin.pages.history.loaded', {
+        time: formatDate(loadedAt.value, 'datetime', localeStore.locale),
+      })
     : '',
 );
 /** "Đã lưu lúc 14:02" in the save bar, for the page on screen (kept when a new page opens at its id after its create). */

@@ -39,7 +39,9 @@ const detail = computed(() => {
   if (props.usage.unlimited) return translate('orgQuota.unlimitedNotice');
   if (kind !== 'blocked') return modeText.value;
   if (meter === 'storage') return translate('orgQuota.blockedStorage');
-  return translate('orgQuota.blockedCredits', { date: nextMonthStart(props.usage.month) });
+  return translate('orgQuota.blockedCredits', {
+    date: nextMonthStart(props.usage.month, locale.locale),
+  });
 });
 </script>
 

@@ -4,8 +4,7 @@ import { computed, ref, watch } from 'vue';
 import type { ContestDetail } from '@/api/types/contests';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AppButton from '@/components/ui/AppButton.vue';
-import { formatClock } from '@/lib/format';
-import { useLocaleStore } from '@/stores/locale.store';
+import { formatClock } from '@/lib/format-date';
 import type { ParticipationKind } from './bar/current-contest';
 
 /**
@@ -23,7 +22,6 @@ const props = defineProps<{
   returnFocusTo?: () => HTMLElement | null;
 }>();
 const emit = defineEmits<{ leave: [] }>();
-const locale = useLocaleStore();
 const keys = computed(() => `contests.leave.${props.kind}`);
 const isConfirmOpen = ref(false);
 /** The dialog stays open, busy, while the request runs; it closes once the answer is in (an error shows below). */
@@ -59,7 +57,7 @@ const LINK =
         $t(kind === 'spectate' ? 'contests.actions.spectating' : 'contests.actions.inContest')
       }}</strong>
       <span v-if="since && kind === 'live'" class="text-muted">
-        {{ $t('contests.actions.since', { time: formatClock(since, locale.locale) }) }}
+        {{ $t('contests.actions.since', { time: formatClock(since) }) }}
       </span>
       <span aria-hidden="true" class="text-muted">·</span>
       <button type="button" :class="LINK" @click="isConfirmOpen = true">

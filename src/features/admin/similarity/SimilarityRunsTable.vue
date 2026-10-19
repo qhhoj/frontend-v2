@@ -2,7 +2,8 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RunStatus, SimilarityRun, SimilarityScope } from '@/api/types/similarity';
-import { formatDateTime, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../ui/AdminChip.vue';
 import type { ChipTone } from '../ui/AdminChip.vue';
@@ -67,7 +68,9 @@ const detailTo = (run: SimilarityRun) => ({
         <AdminChip :tone="TONES[row.status]">{{ runStatusText(row) }}</AdminChip>
       </template>
       <template #cell-createdAt="{ row }">
-        <span class="whitespace-nowrap">{{ formatDateTime(row.createdAt, locale.locale) }}</span>
+        <span class="whitespace-nowrap">{{
+          formatDate(row.createdAt, 'datetime', locale.locale)
+        }}</span>
       </template>
       <template #cell-duration="{ row }">{{ runDurationText(row) }}</template>
       <template #cell-groups="{ row }">{{ row.groups.length }}</template>

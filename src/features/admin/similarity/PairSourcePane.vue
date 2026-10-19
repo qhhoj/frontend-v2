@@ -4,7 +4,8 @@ import { useI18n } from 'vue-i18n';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { shortId } from '../ui/short-id';
 import VerdictBadge from '@/components/VerdictBadge.vue';
-import { formatDateTime, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import type { PairDetailSide } from '@/api/types/similarity';
 import { isDeletedSide, lineIdOf, sourceLines, verdictOfResult } from './similarity-pairs';
@@ -31,7 +32,8 @@ const factsText = computed(() => {
       }),
     );
   }
-  if (props.source.date !== null) parts.push(formatDateTime(props.source.date, locale.locale));
+  if (props.source.date !== null)
+    parts.push(formatDate(props.source.date, 'datetime', locale.locale));
   return parts.join(' · ');
 });
 /** Fragments alternate between two background tokens, so neighbours read apart without colour alone. */
