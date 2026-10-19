@@ -44,7 +44,7 @@ const extraDescribedBy = computed(() => (props.hint ? hintId : undefined));
           :aria-invalid="control.invalid"
           :aria-describedby="control.describedBy"
           class="h-12 w-full min-w-0 appearance-none rounded-row border bg-surface-solid pr-10 pl-3.5 text-base text-content"
-          :class="error ? 'border-negative' : 'border-line-strong'"
+          :class="error ? 'border-negative' : 'border-line-control'"
         >
           <option v-if="placeholder !== undefined" value="">{{ placeholder }}</option>
           <slot />

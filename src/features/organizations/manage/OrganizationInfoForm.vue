@@ -117,7 +117,7 @@ function reset() {
             >
               <template #default="{ id, describedBy, invalid }">
                 <div
-                  class="flex min-w-0 flex-col items-stretch rounded-cell sm:flex-row border border-line-strong bg-surface-solid focus-within:ring-2 focus-within:ring-accent has-[[aria-invalid=true]]:border-negative"
+                  class="flex min-w-0 flex-col items-stretch rounded-cell sm:flex-row border border-line-control bg-surface-solid focus-within:ring-2 focus-within:ring-accent has-[[aria-invalid=true]]:border-negative"
                 >
                   <span
                     aria-hidden="true"

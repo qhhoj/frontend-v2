@@ -90,7 +90,7 @@ const LABEL = 'text-xs font-bold tracking-wide text-muted uppercase';
       <label
         v-for="value in MODES"
         :key="value"
-        class="flex cursor-pointer items-start gap-3 rounded-row border border-line px-3 py-2.5 has-[:checked]:border-accent has-[:checked]:bg-accent-soft"
+        class="flex cursor-pointer items-start gap-3 rounded-row border border-line-control px-3 py-2.5 has-[:checked]:border-accent has-[:checked]:bg-accent-soft"
       >
         <input v-model="mode" type="radio" :value="value" class="mt-1 accent-accent" />
         <span class="flex flex-col">

@@ -89,7 +89,7 @@ const CHIP =
           type="search"
           maxlength="50"
           :placeholder="$t('orgProblems.searchPlaceholder')"
-          class="min-h-11 min-w-0 flex-1 rounded-row border border-line-strong bg-surface-solid px-3 text-content"
+          class="min-h-11 min-w-0 flex-1 rounded-row border border-line-control bg-surface-solid px-3 text-content"
         />
         <AppButton type="submit">{{ $t('orgProblems.searchSubmit') }}</AppButton>
       </form>

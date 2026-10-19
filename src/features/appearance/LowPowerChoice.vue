@@ -32,7 +32,7 @@ function choose(preference: LowPowerPreference) {
         :key="option"
         :data-testid="`low-power-${option}`"
         class="flex cursor-pointer flex-col gap-2 rounded-row border-2 bg-surface-strong p-4"
-        :class="lowPower.preference === option ? 'border-accent' : 'border-line'"
+        :class="lowPower.preference === option ? 'border-accent' : 'border-line-control'"
       >
         <span class="flex min-h-11 items-center gap-3 font-semibold">
           <input

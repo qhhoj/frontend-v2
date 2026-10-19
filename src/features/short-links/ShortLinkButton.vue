@@ -93,7 +93,7 @@ const selectAll = (event: FocusEvent) => (event.target as HTMLInputElement).sele
         readonly
         :value="url"
         :aria-label="$t('shortLink.manualLabel')"
-        class="min-h-11 rounded-row border border-line-strong bg-surface-solid px-3 font-mono text-content"
+        class="min-h-11 rounded-row border border-line-control bg-surface-solid px-3 font-mono text-content"
         @focus="selectAll"
       />
     </div>

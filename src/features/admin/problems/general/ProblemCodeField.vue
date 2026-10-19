@@ -42,7 +42,7 @@ watch(
     required
   >
     <div
-      class="flex min-w-0 overflow-hidden rounded-cell border border-line-strong bg-surface-solid focus-within:outline-2 focus-within:outline-focus"
+      class="flex min-w-0 overflow-hidden rounded-cell border border-line-control bg-surface-solid focus-within:outline-2 focus-within:outline-focus"
       :class="error ? 'border-negative' : ''"
     >
       <span

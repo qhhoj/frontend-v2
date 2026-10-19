@@ -36,7 +36,7 @@ const toggle = (key: string) => (openKey.value = openKey.value === key ? null : 
           type="search"
           :aria-label="$t('runtimes.search')"
           :placeholder="$t('runtimes.search')"
-          class="min-h-11 rounded-pill border border-line-strong bg-surface-solid pr-4 pl-9 text-sm"
+          class="min-h-11 rounded-pill border border-line-control bg-surface-solid pr-4 pl-9 text-sm"
         />
       </label>
     </header>

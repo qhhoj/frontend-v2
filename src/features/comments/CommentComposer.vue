@@ -136,7 +136,7 @@ function submit() {
           :placeholder="$t(placeholderKey)"
           :aria-invalid="isTooLong || undefined"
           :aria-describedby="`${id}-help ${id}-count`"
-          class="block w-full resize-y rounded-row border border-line-strong bg-surface-solid px-3 py-2.5 font-mono text-meta leading-relaxed text-content"
+          class="block w-full resize-y rounded-row border border-line-control bg-surface-solid px-3 py-2.5 font-mono text-meta leading-relaxed text-content"
           @keydown.ctrl.enter.prevent="submit"
           @keydown.meta.enter.prevent="submit"
         />

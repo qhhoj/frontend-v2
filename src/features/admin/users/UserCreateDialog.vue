@@ -85,7 +85,7 @@ const titleId = useId();
         <label
           v-for="option in ['single', 'csv'] as const"
           :key="option"
-          class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-pill border border-line-strong px-4 text-sm font-semibold has-[:checked]:bg-accent-soft has-[:checked]:text-accent-soft-text has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus"
+          class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-pill border border-line-control px-4 text-sm font-semibold has-[:checked]:bg-accent-soft has-[:checked]:text-accent-soft-text has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus"
         >
           <input v-model="mode" type="radio" :value="option" class="sr-only" />
           {{ $t(`admin.users.create.modes.${option}`) }}
@@ -107,7 +107,7 @@ const titleId = useId();
           v-model="csvText"
           rows="6"
           spellcheck="false"
-          class="w-full rounded-row border border-line-strong bg-surface-solid px-3 py-2 font-mono text-sm text-content"
+          class="w-full rounded-row border border-line-control bg-surface-solid px-3 py-2 font-mono text-sm text-content"
           placeholder="username,fullname,email,password,invite"
         />
         <p class="text-sm" :class="parsed.problem ? 'text-negative' : 'text-muted'">

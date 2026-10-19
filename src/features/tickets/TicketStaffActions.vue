@@ -57,7 +57,7 @@ const markGood = () => patch({ isContributive: !props.ticket.isContributive });
           name="assignees"
           type="text"
           autocomplete="off"
-          class="min-h-11 rounded-cell border border-line bg-surface px-3.5 text-base text-content"
+          class="min-h-11 rounded-cell border border-line-control bg-surface px-3.5 text-base text-content"
           @input="isEdited = true"
         />
       </label>

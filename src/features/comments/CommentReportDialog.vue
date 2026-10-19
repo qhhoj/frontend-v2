@@ -76,7 +76,7 @@ async function send() {
         rows="3"
         :aria-invalid="isNoteTooLong || undefined"
         :aria-describedby="`${id}-note-count`"
-        class="block w-full resize-y rounded-row border border-line-strong bg-surface-solid px-3 py-2 text-sm text-content"
+        class="block w-full resize-y rounded-row border border-line-control bg-surface-solid px-3 py-2 text-sm text-content"
       />
       <span
         :id="`${id}-note-count`"

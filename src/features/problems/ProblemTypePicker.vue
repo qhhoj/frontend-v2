@@ -48,7 +48,7 @@ const toggle = (id: string) =>
         name="typeSearch"
         :aria-label="$t('problems.typeSearch')"
         :placeholder="$t('problems.typeSearch')"
-        class="h-10 rounded-row border border-line bg-surface-strong px-3 text-content"
+        class="h-10 rounded-row border border-line-control bg-surface-strong px-3 text-content"
       />
       <ul class="max-h-64 overflow-y-auto">
         <li v-for="type in shown" :key="type.id">

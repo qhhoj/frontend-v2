@@ -53,7 +53,9 @@ const trimmedCode = computed(() => draft.problemCode.trim());
                 :key="option.value"
                 class="flex cursor-pointer flex-col gap-1 rounded-row border p-4"
                 :class="
-                  draft.kind === option.value ? 'border-accent bg-accent-soft' : 'border-line'
+                  draft.kind === option.value
+                    ? 'border-accent bg-accent-soft'
+                    : 'border-line-control'
                 "
               >
                 <span class="flex items-center gap-2 font-semibold">

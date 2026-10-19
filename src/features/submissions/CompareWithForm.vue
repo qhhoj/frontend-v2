@@ -69,7 +69,7 @@ function submit() {
           spellcheck="false"
           :aria-invalid="errorKey ? 'true' : undefined"
           :aria-describedby="errorKey ? errorId : undefined"
-          class="min-h-11 min-w-0 flex-1 rounded-cell border border-line-strong bg-surface-solid px-3 font-mono text-base"
+          class="min-h-11 min-w-0 flex-1 rounded-cell border border-line-control bg-surface-solid px-3 font-mono text-base"
         />
         <AppButton type="submit">
           {{ $t('sourceDiff.compare.submit') }}
