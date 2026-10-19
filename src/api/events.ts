@@ -55,6 +55,22 @@ export const reconnectLiveStream = (target: LiveTarget<StreamPath>): void =>
 
 type RawHandlers = Record<string, (data: object) => void>;
 
+const SUBMISSION_FRAME_ID = 'submissionId';
+/** The id field a frame's handlers rely on, per frame name; a frame without it as a string is dropped. Frames not listed need none. */
+const REQUIRED_ID: Record<string, string> = {
+  queued: SUBMISSION_FRAME_ID,
+  processing: SUBMISSION_FRAME_ID,
+  'grading-begin': SUBMISSION_FRAME_ID,
+  done: SUBMISSION_FRAME_ID,
+  'test-case': SUBMISSION_FRAME_ID,
+  announcement: 'announcementId',
+};
+
+const hasRequiredId = (name: string, data: object): boolean => {
+  const field = REQUIRED_ID[name];
+  return !field || typeof (data as Record<string, unknown>)[field] === 'string';
+};
+
 const parseFrame = (event: Event): object | null => {
   try {
     const data: unknown = JSON.parse((event as MessageEvent<string>).data);
@@ -65,7 +81,7 @@ const parseFrame = (event: Event): object | null => {
 };
 
 /**
- * One EventSource on `/api/internal<path>`: each named event goes to its handler as parsed JSON, and nothing after `close`.
+ * One EventSource on `/api/internal<path>`: each named event goes to its handler as parsed JSON (a malformed frame is dropped), and nothing after `close`.
  * While the connection drops the browser reconnects by itself, waiting the server's `retry: 3000`; `onGiveUp` fires once it stops for good.
  */
 function connect(path: string, handlers: RawHandlers, onGiveUp: () => void) {
@@ -74,7 +90,7 @@ function connect(path: string, handlers: RawHandlers, onGiveUp: () => void) {
   for (const [name, handle] of Object.entries(handlers))
     source.addEventListener(name, (event) => {
       const data = parseFrame(event);
-      if (data && !isClosed) handle(data);
+      if (data && hasRequiredId(name, data) && !isClosed) handle(data);
     });
   source.addEventListener('error', () => {
     if (!isClosed && source.readyState === EventSource.CLOSED) onGiveUp();

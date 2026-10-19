@@ -59,6 +59,30 @@ describe('useLiveStream: connecting and frames', () => {
   });
 });
 
+describe('useLiveStream: malformed frames', () => {
+  it('drops a frame missing the id its handler relies on, and delivers a valid one', () => {
+    const onDone = vi.fn();
+    const onAnnouncement = vi.fn();
+    const target = ref<LiveTarget<TicketRoute> | null>(ticket('t1'));
+    hold(target, {
+      frames: {
+        done: onDone,
+        announcement: onAnnouncement,
+      } as unknown as LiveStreamOptions<TicketRoute>['frames'],
+    });
+    const source = latestEventSource();
+    source.emit('done', { type: 'done' });
+    source.emit('done', { submissionId: 7 });
+    source.emit('announcement', { text: 'x' });
+    expect(onDone).not.toHaveBeenCalled();
+    expect(onAnnouncement).not.toHaveBeenCalled();
+    source.emit('done', { submissionId: 's1' });
+    source.emit('announcement', { announcementId: 'a1' });
+    expect(onDone).toHaveBeenCalledExactlyOnceWith({ submissionId: 's1' });
+    expect(onAnnouncement).toHaveBeenCalledExactlyOnceWith({ announcementId: 'a1' });
+  });
+});
+
 describe('useLiveStream: lifecycle', () => {
   it('reopens when the path or the viewer changes, not when the same target is rebuilt', async () => {
     const target = ref<LiveTarget<TicketRoute> | null>(ticket('t1', 'u1'));
