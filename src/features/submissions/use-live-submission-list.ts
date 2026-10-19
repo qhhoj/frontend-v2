@@ -1,7 +1,10 @@
 import { ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
-import { createFrameSummary, createSettler, useFeedStream } from './live-feed';
+import { useLiveStream } from '@/api/events';
+import type { SubmissionFeedEvent } from '@/api/types/submissions';
+import { createSettleWindow } from '@/lib/settle-window';
+import { createFrameSummary } from './frame-summary';
 import { useAnnouncer, useListFilterKey, useNewRowBaseline } from './live-list-state';
 import { createListPasses } from './live-passes';
 import type { SubmissionScope } from './list/submission-scope';
@@ -24,6 +27,31 @@ interface LiveSubmissionListOptions {
   goToFirstPage: () => void;
 }
 
+type FrameSummaryTally = ReturnType<typeof createFrameSummary>;
+
+/**
+ * The public feed while `enabled`: a frame that matters starts or joins a settle window, whose end runs `pass` once.
+ * `forgetPendingWork` drops the tally and the window; a closed stream does it too.
+ */
+function useSettledFeed(
+  enabled: Ref<boolean>,
+  frames: FrameSummaryTally,
+  hooks: { pass: () => Promise<void>; onForget: () => void },
+) {
+  const settler = createSettleWindow(LIVE_SETTLE_MS, hooks.pass, 'fixed');
+  const forgetPendingWork = () => {
+    hooks.onForget();
+    frames.clear();
+    settler.cancel();
+  };
+  const onFrame = (frame: SubmissionFeedEvent) => frames.add(frame) && settler.add();
+  const feed = useLiveStream(() => (enabled.value ? { route: '/events/submissions' } : null), {
+    frames: { queued: onFrame, processing: onFrame, 'grading-begin': onFrame, done: onFrame },
+    onClose: forgetPendingWork,
+  });
+  return { feed, forgetPendingWork };
+}
+
 /**
  * Keeps the submission list current from the public feed (it only says ids and status, so a pass reads the list).
  * Page 1 takes new rows in place; a later page only learns how many rows arrived above it (`newCount`).
@@ -32,7 +60,6 @@ export function useLiveSubmissionList(options: LiveSubmissionListOptions) {
   const { filters, rows } = options;
   const announcer = useAnnouncer();
   const baseline = useNewRowBaseline(filters, options.total);
-  const { newCount } = baseline;
   const addedIds = ref<ReadonlySet<string>>(new Set());
   const shownIds = () => new Set(rows.value.map((row) => row.id));
   const frames = createFrameSummary((id) => shownIds().has(id));
@@ -41,22 +68,15 @@ export function useLiveSubmissionList(options: LiveSubmissionListOptions) {
     ...options,
     shownIds,
     addedIds,
-    newCount,
+    newCount: baseline.newCount,
     announce: (message) => void announcer.announce(message),
     rowsAbove: (firstPageTotal, queuedFrames) => baseline.rowsAbove(firstPageTotal, queuedFrames),
     currentGeneration: () => generation,
   });
 
-  const settler = createSettler(LIVE_SETTLE_MS, () => passes.run(frames.take()));
-  const forgetPendingWork = () => {
-    generation += 1;
-    frames.clear();
-    settler.cancel();
-  };
-  const feed = useFeedStream({
-    enabled: options.enabled,
-    onFrame: (frame) => frames.add(frame) && settler.poke(),
-    onStop: forgetPendingWork,
+  const { feed, forgetPendingWork } = useSettledFeed(options.enabled, frames, {
+    pass: () => passes.run(frames.take()),
+    onForget: () => (generation += 1),
   });
   /** A new filter is a new list: what was counted for the old one means nothing. */
   watch(useListFilterKey(filters), () => {
@@ -65,7 +85,7 @@ export function useLiveSubmissionList(options: LiveSubmissionListOptions) {
   });
 
   return {
-    newCount,
+    newCount: baseline.newCount,
     announcement: announcer.text,
     addedIds,
     paused: feed.paused,

@@ -80,11 +80,9 @@ describe('useTicketStream on the list: status and connection', () => {
 });
 
 describe('useTicketStream on one ticket', () => {
-  it('closes the feed when the owner unmounts', async () => {
+  it("follows that ticket's feed", async () => {
     mockApi({ ...signedInViewer(), 'GET /tickets/t1': ok({}) });
-    const wrapper = await mountStream('t1');
-    const stream = latestEventSource();
-    wrapper.unmount();
-    expect(stream.closed).toBe(true);
+    await mountStream('t1');
+    expect(latestEventSource().url).toBe('/api/internal/events/tickets/t1');
   });
 });

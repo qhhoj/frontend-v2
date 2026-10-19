@@ -190,6 +190,10 @@ export type StreamEventName<Path extends ApiPath> =
       ? Name
       : never
     : never;
+/** The routes that answer with an event stream (`'/events/user'`, `'/events/tickets/{id}'`, ...). */
+export type StreamPath = {
+  [Path in ApiPath]: [StreamEventName<Path>] extends [never] ? never : Path;
+}[ApiPath];
 /** The JSON payload of the frames named `Name` on a stream route. */
 export type StreamData<Path extends ApiPath, Name extends StreamEventName<Path>> =
   StreamFrame<Path> extends infer Frame
