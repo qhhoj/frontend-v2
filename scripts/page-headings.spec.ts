@@ -15,6 +15,24 @@ describe('rawHeadings', () => {
     expect(lines(`<div>\n<h1\n  :class="a > b ? 'x' : 'y'"\n>A</h1>`)).toEqual([2]);
   });
 
+  it('flags a dynamic component that can render an h1', () => {
+    expect(lines(`<div>\n<component :is="big ? 'h1' : 'h2'" class="x">A</component>`)).toEqual([2]);
+    expect(lines(`<component\n  :is='"h1"'\n>A</component>`)).toEqual([1]);
+    expect(lines(`<component v-bind:is="\`h1\`">A</component>`)).toEqual([1]);
+    expect(lines(`<component is="h1">A</component>`)).toEqual([1]);
+  });
+
+  it('leaves a dynamic component that is not an h1 alone', () => {
+    expect(lines(`<component :is="icon" /><component :is="big ? 'h2' : 'h3'" />`)).toEqual([]);
+  });
+
+  it('lists StatePanel for its dynamic h1 and still wants page-title there', () => {
+    expect(ALLOWED).toHaveProperty(['components/StatePanel.vue']);
+    const tag = (cls: string) => `<component :is="a ? 'h1' : 'h2'" :class="a ? '${cls}' : 's'">`;
+    expect(lines(tag('page-title'), 'components/StatePanel.vue')).toEqual([]);
+    expect(lines(tag('text-lg'), 'components/StatePanel.vue')).toEqual([1]);
+  });
+
   it('accepts PageHeader itself and any non-vue file', () => {
     expect(
       lines(`<h1 class="page-title">{{ title }}</h1>`, 'components/ui/PageHeader.vue'),

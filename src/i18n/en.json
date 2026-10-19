@@ -2097,7 +2097,6 @@
   },
   "ticket": {
     "title": "Ticket",
-    "breadcrumb": "Breadcrumb",
     "list": "Support tickets",
     "yours": "Your ticket",
     "staffView": "Staff view",

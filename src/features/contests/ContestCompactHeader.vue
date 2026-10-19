@@ -13,6 +13,7 @@ defineProps<{ contest: ContestSummary }>();
       { label: $t('contests.title'), to: { name: 'contests' } },
       { label: contest.key, mono: true },
     ]"
+    :back="{ to: { name: 'contests' }, label: $t('contests.title') }"
   >
     <template #above><PhasePill :phase="contest.phase" /></template>
   </PageHeader>
