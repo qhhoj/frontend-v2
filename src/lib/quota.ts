@@ -1,6 +1,6 @@
 import type { Locale } from '@/i18n';
 import { formatNumber } from './format';
-import { formatMonthName } from './format-date';
+import { formatDate, formatMonthName } from './format-date';
 
 export const MEBIBYTE = 1024 * 1024;
 const FULL_PERCENT = 100;
@@ -22,14 +22,23 @@ export function meterPercent(meter: { used: number; limit: number }): {
   return { percent, barPercent: Math.min(FULL_PERCENT, percent) };
 }
 
-/** The usage month `YYYY-MM` (site time zone, from the server) as a month name without the year ("tháng 10", board M7A); no zone shifts it. */
-export function monthLabel(month: string, locale: Locale): string {
+/** The year and month number of a usage month `YYYY-MM`. */
+const parseUsageMonth = (month: string): [year: number, monthNumber: number] => {
   const [year, monthNumber] = month.split('-').map(Number);
-  return formatMonthName(year ?? 1970, monthNumber ?? 1, locale);
+  return [year ?? 1970, monthNumber ?? 1];
+};
+
+/** The usage month `YYYY-MM` (site time zone, from the server) as a month name without the year ("tháng 10", board M7A); the one place besides the contest day tile that spells a month, and no zone shifts it. */
+export function monthLabel(month: string, locale: Locale): string {
+  const [year, monthNumber] = parseUsageMonth(month);
+  return formatMonthName(year, monthNumber, locale);
 }
 
-/** `dd/MM` of the day the quota resets: the first of the month after `month` (`YYYY-MM`), as board M7A's "cho đến 01/11". */
-export function nextMonthStart(month: string): string {
-  const monthNumber = Number(month.split('-')[1] ?? 1);
-  return `01/${String((monthNumber % 12) + 1).padStart(2, '0')}`;
+/**
+ * The day the quota resets, the first of the month after `month`, as a `short` date ("01/11", "11/01" in English; December's
+ * reset reads "01/01/2027" once the year is not the current one), built in UTC so no zone shifts it (board M7A's "cho đến 01/11").
+ */
+export function nextMonthStart(month: string, locale: Locale): string {
+  const [year, monthNumber] = parseUsageMonth(month);
+  return formatDate(Date.UTC(year, monthNumber, 1), 'short', locale, { timeZone: 'UTC' });
 }

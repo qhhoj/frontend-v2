@@ -27,9 +27,11 @@ const { openRow, openRowInTab } = useRowOpen();
 const now = useNow(60_000);
 const isToday = (date: string) =>
   new Date(date).toDateString() === new Date(now.value).toDateString();
-/** The clock for today's rows, the short date otherwise (the hover title carries the whole datetime). */
+/** The clock alone for today's rows, the short date and the clock before that (the hover title carries the whole datetime). */
 const whenOf = (date: string) =>
-  isToday(date) ? formatClock(date) : formatDate(date, 'short', locale.locale, { now: now.value });
+  isToday(date)
+    ? formatClock(date)
+    : `${formatDate(date, 'short', locale.locale, { now: now.value })} ${formatClock(date)}`;
 /** "0/2 test đúng" once judged, "đang chấm" before; null when the tests are hidden from this viewer. */
 function progressOf(row: SubmissionListItem): string | null {
   if (!isFinished(row)) return translate('submissions.strip.grading');

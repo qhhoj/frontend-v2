@@ -5,7 +5,7 @@ import {
   formatClock,
   formatDate,
   formatDayKey,
-  formatDayMonth,
+  formatDayTile,
   formatMonthName,
   formatMonthYear,
   formatRelative,
@@ -14,7 +14,10 @@ import {
 } from './format-date';
 
 const inVietnam = () => vi.stubEnv('TZ', 'Asia/Ho_Chi_Minh');
-afterEach(() => vi.unstubAllEnvs());
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.useRealTimers();
+});
 
 /** 2025-12-31 17:30 UTC is already 01/01/2026 00:30 in Vietnam: the day, the month and the year all roll over. */
 const NEW_YEAR_VIETNAM = '2025-12-31T17:30:00Z';
@@ -32,8 +35,10 @@ describe('formatDate presets', () => {
     inVietnam();
     expect(formatDate(NEW_YEAR_VIETNAM, 'date', 'vi')).toBe('01/01/2026');
     expect(formatDate(NEW_YEAR_VIETNAM, 'datetime', 'vi')).toBe('01/01/2026 00:30');
+    expect(formatDate(NEW_YEAR_VIETNAM, 'datetimeSeconds', 'vi')).toBe('01/01/2026 00:30:00');
     vi.stubEnv('TZ', 'UTC');
     expect(formatDate(NEW_YEAR_VIETNAM, 'datetime', 'vi')).toBe('31/12/2025 17:30');
+    expect(formatDate(NEW_YEAR_VIETNAM, 'datetimeSeconds', 'vi')).toBe('31/12/2025 17:30:00');
     vi.stubEnv('TZ', 'America/Los_Angeles');
     expect(formatDate(NEW_YEAR_VIETNAM, 'datetime', 'vi')).toBe('31/12/2025 09:30');
   });
@@ -90,7 +95,6 @@ describe('formatDate short', () => {
     vi.useFakeTimers({ now: MID_2026 });
     expect(formatDate('2026-03-02T00:00:00Z', 'short', 'vi')).toBe('02/03');
     expect(formatDate('2025-03-02T00:00:00Z', 'short', 'vi')).toBe('02/03/2025');
-    vi.useRealTimers();
   });
 });
 
@@ -111,11 +115,44 @@ describe('formatClock', () => {
     // 18:00Z on Oct 10 is 01:00 on Oct 11 in Vietnam.
     inVietnam();
     expect(formatClock('2026-10-10T18:00:00Z')).toBe('01:00');
-    expect(formatDayMonth('2026-10-10T18:00:00Z', 'vi')).toEqual({ day: '11', month: 'thg 10' });
-    expect(formatDayMonth('2026-10-10T18:00:00Z', 'en')).toEqual({ day: '11', month: 'Oct' });
     vi.stubEnv('TZ', 'UTC');
     expect(formatClock('2026-10-10T18:00:00Z')).toBe('18:00');
-    expect(formatDayMonth('2026-10-10T18:00:00Z', 'vi').day).toBe('10');
+  });
+});
+
+describe('formatDayTile', () => {
+  const OCTOBER_2026 = Date.parse('2026-10-08T09:37:07Z');
+
+  it('splits the viewer day into the day number and the short month, without the current year', () => {
+    inVietnam();
+    // 18:00Z on Oct 10 is 01:00 on Oct 11 in Vietnam.
+    const start = '2026-10-10T18:00:00Z';
+    expect(formatDayTile(start, 'vi', OCTOBER_2026)).toEqual({
+      day: '11',
+      month: 'thg 10',
+      year: null,
+    });
+    expect(formatDayTile(start, 'en', OCTOBER_2026)).toEqual({
+      day: '11',
+      month: 'Oct',
+      year: null,
+    });
+    vi.stubEnv('TZ', 'UTC');
+    expect(formatDayTile(start, 'vi', OCTOBER_2026).day).toBe('10');
+  });
+
+  it('adds the year once the day is not in the current year, as the short date does', () => {
+    inVietnam();
+    expect(formatDayTile('2027-01-05T03:00:00Z', 'vi', OCTOBER_2026)).toEqual({
+      day: '5',
+      month: 'thg 1',
+      year: '2027',
+    });
+    // 17:30Z on 31/12 is already 01/01 in Vietnam: the tile is 2026, so it shows the year until the viewer's own midnight.
+    const beforeNewYear = Date.parse('2025-12-31T16:00:00Z');
+    const afterNewYear = Date.parse('2025-12-31T18:00:00Z');
+    expect(formatDayTile(NEW_YEAR_VIETNAM, 'vi', beforeNewYear).year).toBe('2026');
+    expect(formatDayTile(NEW_YEAR_VIETNAM, 'vi', afterNewYear).year).toBeNull();
   });
 });
 

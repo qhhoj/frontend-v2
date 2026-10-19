@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { ContestListItem } from '@/api/types/contests';
 import { spanMessage } from '@/lib/contest-time';
 import { formatNumber } from '@/lib/format';
-import { formatClock, formatDayMonth, formatRelative } from '@/lib/format-date';
+import { formatClock, formatDayTile, formatRelative } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestCallLink from './ContestCallLink.vue';
@@ -21,7 +21,7 @@ const spanText = useSpanText();
 /** Relative start words move in minutes: a tick a minute is enough. */
 const now = useNow(60_000);
 const call = computed(() => listCallToAction(props.contest, now.value));
-const dayChip = computed(() => formatDayMonth(props.contest.startTime, locale.locale));
+const dayTile = computed(() => formatDayTile(props.contest.startTime, locale.locale, now.value));
 const timeRange = computed(
   () => `${formatClock(props.contest.startTime)}–${endClockLabel(props.contest)}`,
 );
@@ -44,8 +44,9 @@ const startsInText = computed(() =>
       data-testid="day-chip"
       class="flex size-16 shrink-0 flex-col items-center justify-center rounded-tile bg-accent-soft text-accent-soft-text"
     >
-      <span class="font-display text-2xl leading-none font-bold">{{ dayChip.day }}</span>
-      <span class="text-caption font-semibold">{{ dayChip.month }}</span>
+      <span class="font-display text-2xl leading-none font-bold">{{ dayTile.day }}</span>
+      <span class="text-caption font-semibold">{{ dayTile.month }}</span>
+      <span v-if="dayTile.year" class="text-tiny leading-none">{{ dayTile.year }}</span>
     </span>
     <!-- On a phone the name takes the rest of the day chip's line (basis 0 let the times share it, one word a line). -->
     <div class="min-w-0 flex-1 basis-[calc(100%-5rem)] sm:basis-0">

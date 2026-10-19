@@ -9,7 +9,9 @@ import { INTL_LOCALES } from '@/lib/format';
  *   datetime         08/10/2026 20:12     an event: logs, tickets, queues, contest schedules, dashboards
  *   datetimeSeconds  08/10/2026 20:12:09  audit and activity logs only, where the order inside a minute matters
  * The day and month follow the locale (vi day first, en month first); the clock is 24-hour in both. Everything shows in the
- * viewer's own time zone unless `options.timeZone` names another (the admin site zone). Relative times are `formatAgo*` below.
+ * viewer's own time zone unless `options.timeZone` names another (the admin site zone). Kept apart from the presets, each below:
+ * relative times (`formatRelative`, `formatAgo*`), the contest list's day tile (`formatDayTile`), a month's name (`formatMonthName`), the hero's
+ * weekday line (`formatWeekdayDate`) and the rating chart's `mm/yy` ticks (`formatMonthYear`).
  */
 export type DatePreset = 'short' | 'date' | 'datetime' | 'datetimeSeconds';
 export type DateInput = string | number | Date;
@@ -73,6 +75,9 @@ const dayMonth = (clock: WallClock, locale: Locale) =>
 const numericDate = (clock: WallClock, locale: Locale) =>
   `${dayMonth(clock, locale)}/${clock.year}`;
 const minuteClock = (clock: WallClock) => `${pad(clock.hour)}:${pad(clock.minute)}`;
+/** Whether `year` is the calendar year of `now` (the current instant by default) in the zone. */
+const isCurrentYear = (year: number, now: number | undefined, timeZone?: string) =>
+  year === wallClockIn(now ?? Date.now(), timeZone).year;
 
 /** Formats `date` as one of the presets, in the locale's order of day and month. */
 export function formatDate(
@@ -84,7 +89,7 @@ export function formatDate(
   const clock = wallClockIn(date, options.timeZone);
   switch (preset) {
     case 'short':
-      return clock.year === wallClockIn(options.now ?? Date.now(), options.timeZone).year
+      return isCurrentYear(clock.year, options.now, options.timeZone)
         ? dayMonth(clock, locale)
         : numericDate(clock, locale);
     case 'date':
@@ -105,15 +110,27 @@ export function formatClock(
   return options.seconds ? `${minuteClock(clock)}:${pad(clock.second)}` : minuteClock(clock);
 }
 
-/** The list's date chip: day number and short month (`11` / `thg 10`). */
-export function formatDayMonth(date: string, locale: Locale): { day: string; month: string } {
-  // One formatter for both parts: the combined pattern gives the short month its chip form (`thg 10`).
+/** The text of the contest list's day tile: the day number, the short month (`thg 10`) and the year once it is not the current one. */
+export interface DayTile {
+  day: string;
+  month: string;
+  year: string | null;
+}
+
+/** The day tile of an instant, in the viewer's zone; `now` is the current instant, default `Date.now()`. */
+export function formatDayTile(date: string, locale: Locale, now?: number): DayTile {
+  // One formatter for both parts: the combined pattern gives the short month its tile form (`thg 10`).
   const parts = new Intl.DateTimeFormat(INTL_LOCALES[locale], {
     day: 'numeric',
     month: 'short',
   }).formatToParts(new Date(date));
   const valueOf = (type: 'day' | 'month') => parts.find((part) => part.type === type)?.value ?? '';
-  return { day: valueOf('day'), month: valueOf('month') };
+  const { year } = wallClockIn(date);
+  return {
+    day: valueOf('day'),
+    month: valueOf('month'),
+    year: isCurrentYear(year, now) ? null : String(year),
+  };
 }
 
 /**
