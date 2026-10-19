@@ -177,15 +177,6 @@ describe('useSubmissionStatus', () => {
     expect(latestEventSource().closed).toBe(false);
   });
 
-  it('leaves a retrying connection alone', async () => {
-    const calls = mockApi({});
-    follow(ref('abc'));
-    latestEventSource().fail(true);
-    await flushPromises();
-    expect(calls).toHaveLength(0);
-    expect(latestEventSource().closed).toBe(false);
-  });
-
   it('follows a new id and closes the old stream; null stops following', async () => {
     const id = ref<string | null>('abc');
     follow(id);
@@ -196,12 +187,6 @@ describe('useSubmissionStatus', () => {
     expect(latestEventSource().url).toBe('/api/internal/events/submissions/def');
     id.value = null;
     await flushPromises();
-    expect(latestEventSource().closed).toBe(true);
-  });
-
-  it('closes the stream when the component unmounts', () => {
-    const { wrapper } = follow(ref('abc'));
-    wrapper.unmount();
     expect(latestEventSource().closed).toBe(true);
   });
 });

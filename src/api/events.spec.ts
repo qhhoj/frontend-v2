@@ -1,46 +1,186 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  FakeEventSource,
-  installFakeEventSource,
-  latestEventSource,
-} from '@/test/fake-event-source';
-import { openEventStream } from './events';
+import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
+import { flushPromises, mount } from '@vue/test-utils';
+import { describe, expect, it, vi } from 'vitest';
+import { defineComponent, nextTick, ref } from 'vue';
+import type { Ref } from 'vue';
+import { FakeEventSource, latestEventSource } from '@/test/fake-event-source';
+import { isLiveStreamPaused, reconnectLiveStream, useLiveStream } from './events';
+import type { LiveStream, LiveStreamOptions, LiveTarget } from './events';
 
-describe('openEventStream', () => {
-  beforeEach(installFakeEventSource);
-  afterEach(() => FakeEventSource.instances.forEach((source) => source.close()));
+type TicketRoute = '/events/tickets/{id}';
+const ticket = (id: string, viewer?: string): LiveTarget<TicketRoute> => ({
+  route: '/events/tickets/{id}',
+  params: { id },
+  viewer,
+});
+const frame = { type: 'ticket-message', ticketId: 't1', messageId: 'm1', open: null };
 
-  it('opens the internal API path and hands parsed data to the named handler', () => {
-    const onState = vi.fn();
-    const onDone = vi.fn();
-    openEventStream('/events/submissions/abc', { state: onState, done: onDone });
-    expect(latestEventSource().url).toBe('/api/internal/events/submissions/abc');
-    latestEventSource().emit('state', { status: 'QU' });
-    expect(onState).toHaveBeenCalledWith({ status: 'QU' });
-    expect(onDone).not.toHaveBeenCalled();
+/** Holds a stream in a mounted probe; `client` is the probe's query client, its invalidations are counted. */
+function hold(
+  target: Ref<LiveTarget<TicketRoute> | null>,
+  options: Partial<LiveStreamOptions<TicketRoute>> = {},
+) {
+  const client = new QueryClient();
+  const invalidate = vi.spyOn(client, 'invalidateQueries');
+  let live!: LiveStream;
+  const wrapper = mount(
+    defineComponent({
+      setup() {
+        live = useLiveStream(target, { frames: {}, ...options });
+        return () => null;
+      },
+    }),
+    { global: { plugins: [[VueQueryPlugin, { queryClient: client }]] } },
+  );
+  return { live, wrapper, invalidate };
+}
+
+describe('useLiveStream: connecting and frames', () => {
+  it('opens the internal API path with encoded parameters', () => {
+    hold(ref(ticket('a b')));
+    expect(latestEventSource().url).toBe('/api/internal/events/tickets/a%20b');
   });
 
-  it('skips a frame that is not JSON', () => {
-    const onState = vi.fn();
-    openEventStream('/events/submissions/abc', { state: onState });
-    latestEventSource().emit('state', '{broken', true);
-    expect(onState).not.toHaveBeenCalled();
+  it('hands each named frame to its own handler as parsed JSON', () => {
+    const onMessage = vi.fn();
+    const onStatus = vi.fn();
+    hold(ref(ticket('t1')), { frames: { 'ticket-message': onMessage, 'ticket-status': onStatus } });
+    latestEventSource().emit('ticket-message', frame);
+    expect(onMessage).toHaveBeenCalledWith(frame);
+    expect(onStatus).not.toHaveBeenCalled();
   });
 
-  it('skips a frame whose JSON is not an object', () => {
-    const onState = vi.fn();
-    openEventStream('/events/submissions/abc', { state: onState });
-    latestEventSource().emit('state', 'null', true);
-    latestEventSource().emit('state', '"text"', true);
-    expect(onState).not.toHaveBeenCalled();
+  it('skips a frame that is not a JSON object', () => {
+    const onMessage = vi.fn();
+    hold(ref(ticket('t1')), { frames: { 'ticket-message': onMessage } });
+    for (const raw of ['{broken', 'null', '"text"'])
+      latestEventSource().emit('ticket-message', raw, true);
+    expect(onMessage).not.toHaveBeenCalled();
+  });
+});
+
+describe('useLiveStream: lifecycle', () => {
+  it('reopens when the path or the viewer changes, not when the same target is rebuilt', async () => {
+    const target = ref<LiveTarget<TicketRoute> | null>(ticket('t1', 'u1'));
+    hold(target);
+    const first = latestEventSource();
+    target.value = ticket('t1', 'u1');
+    await nextTick();
+    expect(latestEventSource()).toBe(first);
+    target.value = ticket('t1', 'u2');
+    await nextTick();
+    expect(first.closed).toBe(true);
+    target.value = ticket('t2', 'u2');
+    await nextTick();
+    expect(FakeEventSource.instances.map((source) => source.url.split('/').at(-1))).toEqual([
+      't1',
+      't1',
+      't2',
+    ]);
   });
 
-  it('reports a connection the browser gave up on, but not one it is retrying', () => {
-    const onClosed = vi.fn();
-    openEventStream('/events/submissions/abc', {}, onClosed);
+  it('stops delivering once the target is cleared, and says so once', async () => {
+    const onMessage = vi.fn();
+    const onClose = vi.fn();
+    const target = ref<LiveTarget<TicketRoute> | null>(ticket('t1'));
+    hold(target, { frames: { 'ticket-message': onMessage }, onClose });
+    const source = latestEventSource();
+    target.value = null;
+    await nextTick();
+    source.emit('ticket-message', frame);
+    expect(source.closed).toBe(true);
+    expect(onMessage).not.toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it('stays closed after close() until reconnect, and closes on unmount', async () => {
+    const { live, wrapper } = hold(ref(ticket('t1')));
+    live.close();
+    await nextTick();
+    expect(FakeEventSource.instances.map((source) => source.closed)).toEqual([true]);
+    live.reconnect();
+    await nextTick();
+    wrapper.unmount();
+    expect(FakeEventSource.instances.map((source) => source.closed)).toEqual([true, true]);
+  });
+});
+
+describe('useLiveStream: dropped connections', () => {
+  it('waits while the browser retries, and pauses once it gives up', () => {
+    const onGiveUp = vi.fn();
+    const { live } = hold(ref(ticket('t1')), { onGiveUp });
     latestEventSource().fail(true);
-    expect(onClosed).not.toHaveBeenCalled();
+    expect(live.paused.value).toBe(false);
     latestEventSource().fail();
-    expect(onClosed).toHaveBeenCalledOnce();
+    expect(live.paused.value).toBe(true);
+    expect(onGiveUp).toHaveBeenCalledOnce();
+  });
+
+  it('reconnects with a new connection, clears the pause and refreshes the cached reads', async () => {
+    const onMessage = vi.fn();
+    const { live, invalidate } = hold(ref(ticket('t1')), {
+      frames: { 'ticket-message': onMessage },
+      cacheKey: () => ['tickets'],
+    });
+    const dropped = latestEventSource();
+    dropped.fail();
+    live.reconnect();
+    await nextTick();
+    expect(live.paused.value).toBe(false);
+    expect(latestEventSource()).not.toBe(dropped);
+    expect(invalidate.mock.calls).toEqual([[{ queryKey: ['tickets'] }]]);
+    latestEventSource().emit('ticket-message', frame);
+    expect(onMessage).toHaveBeenCalledOnce();
+  });
+
+  it('lets a page that does not own the stream read its pause and reconnect it', async () => {
+    const { invalidate } = hold(ref(ticket('t1')), { cacheKey: () => ['tickets'] });
+    expect(isLiveStreamPaused(ticket('t1'))).toBe(false);
+    latestEventSource().fail();
+    expect(isLiveStreamPaused(ticket('t1'))).toBe(true);
+    const dropped = latestEventSource();
+    reconnectLiveStream(ticket('t1'));
+    await nextTick();
+    expect(latestEventSource()).not.toBe(dropped);
+    expect(isLiveStreamPaused(ticket('t1'))).toBe(false);
+    expect(invalidate).toHaveBeenCalledOnce();
+  });
+
+  it('forgets a closed stream: its path reads as not paused', async () => {
+    const target = ref<LiveTarget<TicketRoute> | null>(ticket('t1'));
+    hold(target);
+    latestEventSource().fail();
+    target.value = null;
+    await nextTick();
+    expect(isLiveStreamPaused(ticket('t1'))).toBe(false);
+  });
+});
+
+describe('useLiveStream: cached reads', () => {
+  it('invalidates the cached reads on a resync frame', async () => {
+    const { invalidate } = hold(ref(ticket('t1')), { cacheKey: () => ['tickets', 't1'] });
+    latestEventSource().emit('resync', {});
+    await flushPromises();
+    expect(invalidate.mock.calls).toEqual([[{ queryKey: ['tickets', 't1'] }]]);
+  });
+
+  it('leaves a resync to the caller that handles it', async () => {
+    const onResync = vi.fn();
+    const { invalidate } = hold(ref(ticket('t1')), {
+      frames: { resync: onResync },
+      cacheKey: () => ['tickets'],
+    });
+    latestEventSource().emit('resync', {});
+    await flushPromises();
+    expect(onResync).toHaveBeenCalledOnce();
+    expect(invalidate).not.toHaveBeenCalled();
+  });
+
+  it('refresh invalidates the current key', async () => {
+    const id = ref('t1');
+    const { live, invalidate } = hold(ref(ticket('t1')), { cacheKey: () => ['tickets', id.value] });
+    id.value = 't2';
+    await live.refresh();
+    expect(invalidate.mock.calls).toEqual([[{ queryKey: ['tickets', 't2'] }]]);
   });
 });

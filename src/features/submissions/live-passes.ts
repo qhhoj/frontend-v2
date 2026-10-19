@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/vue-query';
 import type { Ref } from 'vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import { translate } from '@/i18n';
-import type { FrameSummary } from './live-feed';
+import type { FrameSummary } from './frame-summary';
 import { fetchScopePage, scopeApiQuery } from './list/submission-scope';
 import type { SubmissionScope } from './list/submission-scope';
 import type { SubmissionFilters } from './use-submission-filters';
