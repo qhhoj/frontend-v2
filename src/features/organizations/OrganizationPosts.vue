@@ -29,7 +29,7 @@ const writeTo = computed(() => ({ name: 'post-new', query: { organization: slug.
 <template>
   <div class="flex flex-col gap-4">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <h2 class="text-lg font-semibold">{{ $t('orgMembership.postsTitle') }}</h2>
+      <h2 class="text-subtitle leading-7 font-semibold">{{ $t('orgMembership.postsTitle') }}</h2>
       <AppButton v-if="canWrite" tone="primary" :to="writeTo">
         <template #icon><Pencil aria-hidden="true" class="size-4" /></template>
         {{ $t('orgMembership.writePost') }}

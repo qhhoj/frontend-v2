@@ -25,7 +25,7 @@ const isAlert = computed(() => ALERT_KINDS.includes(props.kind));
     <StateBit :variant="bit.variant" :label="$t(bit.labelKey)" />
     <component
       :is="isPageHeading ? 'h1' : 'h2'"
-      class="font-display text-xl font-semibold text-content"
+      class="font-display text-section leading-7 font-semibold text-content"
     >
       {{ title }}
     </component>

@@ -46,7 +46,7 @@ const lineClass = (line: number): string => {
 </script>
 
 <template>
-  <section class="flex min-w-0 flex-col gap-3 rounded-panel border border-line p-3">
+  <section class="flex min-w-0 flex-col gap-3 rounded-card border border-line p-3">
     <header class="flex flex-wrap items-center gap-2">
       <AdminUserLabel :username="source.username" :size="28" />
       <VerdictBadge v-if="verdict" :verdict="verdict" size="sm" />

@@ -42,15 +42,15 @@ const startsInText = computed(() =>
   >
     <span
       data-testid="day-chip"
-      class="flex size-16 shrink-0 flex-col items-center justify-center rounded-tile bg-accent-soft text-accent-soft-text"
+      class="flex size-16 shrink-0 flex-col items-center justify-center rounded-row bg-accent-soft text-accent-soft-text"
     >
-      <span class="font-display text-2xl leading-none font-bold">{{ dayTile.day }}</span>
+      <span class="font-display text-display leading-none font-bold">{{ dayTile.day }}</span>
       <span class="text-caption font-semibold">{{ dayTile.month }}</span>
       <span v-if="dayTile.year" class="text-tiny leading-none">{{ dayTile.year }}</span>
     </span>
     <!-- On a phone the name takes the rest of the day chip's line (basis 0 let the times share it, one word a line). -->
     <div class="min-w-0 flex-1 basis-[calc(100%-5rem)] sm:basis-0">
-      <h3 class="font-display text-lg font-semibold">
+      <h3 class="font-display text-subtitle leading-7 font-semibold">
         <RouterLink
           :to="{ name: 'contest', params: { key: contest.key } }"
           class="hover:text-accent-text"

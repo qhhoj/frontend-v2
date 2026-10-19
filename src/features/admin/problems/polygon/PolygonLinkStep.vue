@@ -153,7 +153,7 @@ const builtAt = computed(() =>
         class="flex flex-col gap-2 rounded-row border border-line bg-surface-strong p-4"
       >
         <div class="flex flex-wrap items-start justify-between gap-2">
-          <h2 class="font-display text-lg font-bold break-words">
+          <h2 class="font-display text-subtitle leading-7 font-bold break-words">
             {{ preview.title ?? preview.name }}
             <span class="font-mono text-sm font-normal text-muted"
               >{{ preview.name }} · #{{ preview.id }}</span

@@ -46,7 +46,7 @@ function submit() {
       autocomplete="new-password"
       maxlength="255"
       aria-describedby="contest-access-code-hint"
-      class="min-h-11 rounded-pill border border-line-strong bg-surface-strong px-4"
+      class="min-h-11 rounded-pill border border-line-control bg-surface-strong px-4"
     />
     <p id="contest-access-code-hint" class="text-sm text-muted">
       {{ $t('contests.actions.codeHint') }}

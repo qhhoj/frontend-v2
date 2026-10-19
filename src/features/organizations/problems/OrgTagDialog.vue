@@ -64,7 +64,7 @@ function submit() {
         <label
           v-for="(color, index) in ORGANIZATION_TAG_COLORS"
           :key="color"
-          class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-pill border border-line px-2 has-checked:border-accent"
+          class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-pill border border-line-control px-2 has-checked:border-accent"
         >
           <input
             v-model="form.color"

@@ -1,12 +1,21 @@
 // `src/api/generated/` is machine-written from the backend contract and skipped.
 // Colours live only in src/theme/themes/*.css; everything else uses semantic tokens. Specs are skipped (contrast tests use literal colours).
-// Stock radius/shadow class names are rejected too: `@theme` resets them, so they render nothing (scripts/stock-utilities.mjs).
+// Stock radius/shadow class names are rejected too: `@theme` resets them, so they render nothing. So are the stock type sizes `text-lg` ... `text-9xl`,
+// which skip the named scale (scripts/stock-utilities.mjs).
+// The retired radius roles rounded-tile and rounded-panel are rejected as well (scripts/retired-utilities.mjs).
+// So are the bare transitions that also animate transform (scripts/transition-utilities.mjs).
+// So is `uppercase` on a table header cell or header recipe (scripts/table-header-case.mjs).
+// So is a hairline border (`border-line`, `border-line-strong`) on a form control (scripts/control-borders.mjs).
 // So are arbitrary sizes, radii and z-indexes (`text-[13px]`, `rounded-[3px]`, `z-[5]`): use the named steps (scripts/arbitrary-utilities.mjs).
 // The exemptions are Bit's sprite palettes (src/mascot/bit-sprite.ts) and the avatar's sprite data (src/mascot/avatar/avatar-sprites.ts):
 // image-like data that Bit keeps in every theme.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { hairlineControlBorders } from './control-borders.mjs';
+import { retiredUtilities } from './retired-utilities.mjs';
 import { stockUtilities } from './stock-utilities.mjs';
+import { tableHeaderUppercase } from './table-header-case.mjs';
+import { ALLOWED as MOTION, bareTransitions } from './transition-utilities.mjs';
 import { ALLOWED, arbitraryUtilities } from './arbitrary-utilities.mjs';
 
 const root = new URL('../src/', import.meta.url).pathname;
@@ -29,51 +38,58 @@ const files = (dir) =>
       : [];
   });
 
-const offences = files(root).flatMap((path) =>
-  readFileSync(path, 'utf8')
-    .split('\n')
-    .flatMap((line, index) =>
-      colourLiteral.test(line) ? [`src/${relative(root, path)}:${index + 1}: ${line.trim()}`] : [],
+/** A finder that reads one line (and the file's path under src/) and answers the offending words. */
+const perLine = (find) => (source, rel) =>
+  source.split('\n').flatMap((text, index) => {
+    const found = find(text, rel);
+    return found.length ? [{ line: index + 1, text: found.join(' ') }] : [];
+  });
+
+/** Each check reads a whole file and answers `{ line, text }` offences; the first group that has any is reported. */
+const CHECKS = [
+  {
+    message: `Arbitrary size/radius/z-index classes (use text-tiny|caption|meta|sm|base|title|subtitle|section|display|page|stat|hero|score, rounded-<role>, z-<layer>; docs/design-language.md):`,
+    find: perLine((line, rel) =>
+      arbitraryUtilities(line).filter((name) => !(ALLOWED[rel] ?? []).includes(name)),
     ),
-);
+  },
+  {
+    message: `Stock classes that skip the named scales: the theme resets rounded-lg and shadow-md (they render nothing), and text-lg...text-9xl bypass the type scale (use rounded-cell|row|card|pill|skeleton|control, shadow-glow|float, text-subtitle|section|display|page|stat|hero|score):`,
+    find: perLine(stockUtilities),
+  },
+  {
+    message: `Retired radius roles rounded-tile (20 px) and rounded-panel (28 px): use rounded-row for an inset tile, a notice or a menu, rounded-cell for code and fields, rounded-card for a card or a dialog (docs/design-language.md):`,
+    find: perLine(retiredUtilities),
+  },
+  {
+    message: `Bare transition, transition-all and transition-transform also animate transform and layout (use transition-colors or transition-opacity; real motion goes in ALLOWED in scripts/transition-utilities.mjs with its reason):`,
+    find: perLine((line, rel) => bareTransitions(line).filter((name) => !MOTION[rel]?.[name])),
+  },
+  {
+    message: `Uppercase table header (a header is sentence case, muted, 13 px: text-meta text-muted, the DataTable recipe; docs/design-language.md):`,
+    find: tableHeaderUppercase,
+  },
+  {
+    message: `Hairline border on a form control (an input, select or textarea, or a wrapper that shows its focus or checked state, takes border-line-control: 3:1 on its ground, WCAG 1.4.11; docs/design-language.md):`,
+    find: hairlineControlBorders,
+  },
+  {
+    message: `Colour literals outside src/theme/themes/ (use a --qh- token):`,
+    find: perLine((line) => (colourLiteral.test(line) ? [line.trim()] : [])),
+  },
+];
 
-const stockOffences = files(root).flatMap((path) =>
-  readFileSync(path, 'utf8')
-    .split('\n')
-    .flatMap((line, index) =>
-      stockUtilities(line).length
-        ? [`src/${relative(root, path)}:${index + 1}: ${stockUtilities(line).join(' ')}`]
-        : [],
-    ),
-);
+const sources = files(root).map((path) => ({
+  rel: relative(root, path),
+  source: readFileSync(path, 'utf8'),
+}));
 
-const arbitraryOffences = files(root).flatMap((path) =>
-  readFileSync(path, 'utf8')
-    .split('\n')
-    .flatMap((line, index) => {
-      const allowed = ALLOWED[relative(root, path)] ?? [];
-      const found = arbitraryUtilities(line).filter((name) => !allowed.includes(name));
-      return found.length ? [`src/${relative(root, path)}:${index + 1}: ${found.join(' ')}`] : [];
-    }),
-);
-
-if (arbitraryOffences.length) {
-  console.error(
-    `Arbitrary size/radius/z-index classes (use text-tiny|caption|meta|sm|base|title|subtitle|section|display|page|stat|hero, rounded-<role>, z-<layer>; docs/design-language.md):\n${arbitraryOffences.join('\n')}`,
+for (const { message, find } of CHECKS) {
+  const offences = sources.flatMap(({ rel, source }) =>
+    find(source, rel).map(({ line, text }) => `src/${rel}:${line}: ${text}`),
   );
-  process.exit(1);
-}
-
-if (stockOffences.length) {
-  console.error(
-    `Stock radius/shadow classes the theme resets (use rounded-cell|row|tile|card|panel|pill|skeleton or shadow-glow):\n${stockOffences.join('\n')}`,
-  );
-  process.exit(1);
-}
-
-if (offences.length) {
-  console.error(
-    `Colour literals outside src/theme/themes/ (use a --qh- token):\n${offences.join('\n')}`,
-  );
-  process.exit(1);
+  if (offences.length) {
+    console.error(`${message}\n${offences.join('\n')}`);
+    process.exit(1);
+  }
 }

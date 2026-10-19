@@ -49,10 +49,7 @@ function goToPage(target: number) {
       <p v-if="items.length === 0" class="flex items-center gap-3 text-muted">
         <AdminBit placement="empty" />{{ t('admin.pages.history.empty') }}
       </p>
-      <div
-        v-else
-        class="relative overflow-x-auto rounded-panel border border-line bg-surface-solid"
-      >
+      <div v-else class="relative overflow-x-auto rounded-card border border-line bg-surface-solid">
         <table class="w-full min-w-[640px] text-sm">
           <thead class="text-left text-xs text-muted">
             <tr>

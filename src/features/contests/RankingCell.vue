@@ -30,7 +30,7 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
         CELL_BOX_CLASS,
         KIND_CLASSES[view.kind],
         view.partialStep && PARTIAL_CLASSES[view.partialStep],
-        to && 'cursor-pointer transition hover:ring-2 hover:ring-line-strong',
+        to && 'cursor-pointer transition-shadow hover:ring-2 hover:ring-line-strong',
       ]"
     >
       <!-- The star is out of the flow so the text stays centred identically in every row. -->

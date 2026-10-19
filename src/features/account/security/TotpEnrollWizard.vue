@@ -72,7 +72,7 @@ function onConfirmed(value: string[]) {
     <h3
       ref="heading"
       tabindex="-1"
-      class="font-display text-lg font-bold focus-visible:outline-none"
+      class="font-display text-subtitle leading-7 font-bold focus-visible:outline-none"
     >
       {{ stepTitle }}
     </h3>

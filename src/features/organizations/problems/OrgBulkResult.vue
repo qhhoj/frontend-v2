@@ -15,7 +15,7 @@ const isFull = computed(() => isFullSuccess(props.result));
   <section
     data-testid="org-bulk-result"
     aria-labelledby="org-bulk-result-title"
-    class="glass flex flex-col gap-3 rounded-panel p-5"
+    class="glass flex flex-col gap-3 rounded-card p-5"
   >
     <h2 id="org-bulk-result-title" class="font-display text-base font-bold">
       {{

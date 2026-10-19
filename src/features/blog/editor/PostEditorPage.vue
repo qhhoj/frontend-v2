@@ -123,7 +123,7 @@ const fixedAuthor = computed(() =>
                 :id="id"
                 v-model="form.title"
                 :maxlength="POST_LIMITS.title"
-                class="min-h-13 w-full rounded-row border border-line-strong bg-surface-solid px-4 font-display text-xl font-bold text-content"
+                class="min-h-13 w-full rounded-row border border-line-control bg-surface-solid px-4 font-display text-section leading-7 font-bold text-content"
                 :aria-describedby="describedBy"
                 :aria-invalid="invalid ? 'true' : undefined"
               />
@@ -139,7 +139,7 @@ const fixedAuthor = computed(() =>
             <button
               v-if="isPhone"
               type="button"
-              class="flex min-h-12 items-center justify-between rounded-panel border border-line bg-surface-strong px-4 font-semibold"
+              class="flex min-h-12 items-center justify-between rounded-row border border-line bg-surface-strong px-4 font-semibold"
               :aria-expanded="isSettingsOpen"
               aria-controls="post-settings-column"
               @click="isSettingsOpen = !isSettingsOpen"

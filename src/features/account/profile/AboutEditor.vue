@@ -70,7 +70,7 @@ watch(
         :aria-invalid="error ? 'true' : undefined"
         :aria-describedby="describedBy"
         class="scroll-mb-28 block min-h-24 max-h-96 not-supports-[field-sizing:content]:min-h-40 w-full resize-y rounded-row border field-sizing-content bg-surface-solid px-3.5 py-3 font-mono text-meta leading-relaxed text-content"
-        :class="error ? 'border-negative' : 'border-line-strong'"
+        :class="error ? 'border-negative' : 'border-line-control'"
       />
     </div>
     <div

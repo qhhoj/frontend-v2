@@ -57,7 +57,7 @@ const timeLeftOf = (contest: ContestListItem) =>
             <PhasePill phase="running" />
             <ContestChips :contest="contest" />
           </div>
-          <h3 class="font-display text-lg font-semibold">
+          <h3 class="font-display text-subtitle leading-7 font-semibold">
             <RouterLink
               :to="{ name: 'contest', params: { key: contest.key } }"
               class="hover:text-accent-text"

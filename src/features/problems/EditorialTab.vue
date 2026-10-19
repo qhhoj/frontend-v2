@@ -36,7 +36,7 @@ watch(
 <template>
   <QueryState :loading="isPending" :error="isGone ? null : error" @retry="refetch()">
     <template #skeleton><StatementSkeleton /></template>
-    <Card v-if="editorial" as="div" class="rounded-panel p-6 text-base sm:p-8">
+    <Card v-if="editorial" as="div" class="p-6 text-base sm:p-8">
       <p
         data-testid="editorial-meta"
         class="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted"

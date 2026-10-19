@@ -107,7 +107,7 @@ const tiles = computed(() =>
             v-for="tile in 3"
             :key="tile"
             data-skeleton-region="tile"
-            class="min-w-0 rounded-tile bg-surface-strong p-4"
+            class="min-w-0 rounded-row bg-surface-strong p-4"
           >
             <p class="text-meta"><SkeletonBlock text class="w-14" /></p>
             <p class="font-mono text-stat"><SkeletonBlock text class="w-20" /></p>
@@ -121,7 +121,7 @@ const tiles = computed(() =>
             <div data-testid="rating-row" class="mt-2 flex flex-wrap items-end gap-4">
               <span
                 data-testid="hero-figure"
-                class="font-mono text-6xl font-semibold tracking-tight tabular-nums"
+                class="font-mono text-score leading-none font-semibold tracking-tight tabular-nums"
                 >{{ headline }}</span
               >
               <!-- The delta pill and the rank-up Bit wrap as one group, so the Bit always sits beside its delta. -->
@@ -217,7 +217,7 @@ const tiles = computed(() =>
           <div
             v-for="tile in tiles"
             :key="tile.labelKey"
-            class="min-w-0 rounded-tile bg-surface-strong p-4"
+            class="min-w-0 rounded-row bg-surface-strong p-4"
           >
             <dt class="text-meta text-muted">{{ $t(tile.labelKey) }}</dt>
             <dd class="m-0 font-mono text-stat font-semibold tabular-nums">{{ tile.value }}</dd>

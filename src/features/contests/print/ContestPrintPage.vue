@@ -77,7 +77,7 @@ const CHIP =
         <template v-else>
           <div
             :aria-label="$t('contests.print.toolbar')"
-            class="glass sticky top-[calc(var(--contest-bar-height,0px)+0.5rem)] z-10 flex flex-wrap items-center gap-3 rounded-panel px-3.5 py-2.5 print:hidden"
+            class="glass sticky top-[calc(var(--contest-bar-height,0px)+0.5rem)] z-10 flex flex-wrap items-center gap-3 rounded-row px-3.5 py-2.5 print:hidden"
           >
             <AppButton :to="{ name: 'contest', params: { key } }">
               <template #icon><ArrowLeft class="size-4" aria-hidden="true" /></template>
@@ -122,7 +122,7 @@ const CHIP =
             </AppButton>
           </div>
           <article
-            class="print-doc mx-auto w-full max-w-[900px] rounded-panel border border-line bg-surface p-5 md:px-14 md:py-9"
+            class="print-doc mx-auto w-full max-w-[900px] rounded-card border border-line bg-surface p-5 md:px-14 md:py-9"
             :class="{ 'hide-samples': !showSamples, 'one-per-page': onePerPage }"
             data-testid="print-doc"
           >
@@ -130,7 +130,9 @@ const CHIP =
               <p class="text-xs tracking-widest text-muted uppercase">
                 {{ $t('contests.print.kicker', { count: problems.length }, problems.length) }}
               </p>
-              <h1 class="mt-1 font-display text-xl font-bold md:text-page">{{ contest.name }}</h1>
+              <h1 class="mt-1 font-display text-section leading-7 font-bold md:text-page">
+                {{ contest.name }}
+              </h1>
               <p class="mt-1 text-meta text-muted">{{ whenText }}</p>
             </header>
             <template v-for="(problem, index) in problems" :key="problem.problemId">

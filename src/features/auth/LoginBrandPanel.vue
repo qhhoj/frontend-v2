@@ -20,7 +20,7 @@ const show = (value: number) => formatNumber(value, locale.locale);
     class="grid grid-cols-[auto_1fr] items-center gap-x-3.5 bg-accent-soft px-4 py-4 sm:px-8 xl:flex xl:flex-col xl:items-start xl:justify-between xl:p-12"
   >
     <BitLoop data-testid="login-bit" kind="welcome" class="row-span-2 [--bit-px:5px] xl:hidden" />
-    <p class="font-display text-lg leading-snug font-bold xl:hidden">
+    <p class="font-display text-subtitle leading-snug font-bold xl:hidden">
       {{ $t('auth.brand.headline') }}
     </p>
     <!-- Keeps the counts at the panel's foot from xl. -->

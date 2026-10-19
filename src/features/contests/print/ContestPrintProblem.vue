@@ -28,7 +28,7 @@ const pointsText = computed(() =>
 
 <template>
   <section class="print-problem" :aria-labelledby="`print-problem-${problem.code}`">
-    <h2 :id="`print-problem-${problem.code}`" class="font-display text-2xl font-bold">
+    <h2 :id="`print-problem-${problem.code}`" class="font-display text-display leading-8 font-bold">
       {{ problem.label }}. {{ problem.name }}
     </h2>
     <p v-if="showLimits" class="print-limits mt-2 flex flex-wrap gap-2 text-sm text-muted">

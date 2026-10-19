@@ -66,7 +66,7 @@ function confirm() {
       required
       :maxlength="BAN_REASON_MAX_LENGTH"
       rows="4"
-      class="rounded-tile border border-line bg-surface-solid p-3 text-content"
+      class="rounded-cell border border-line-control bg-surface-solid p-3 text-content"
     />
     <template #error>
       <p v-if="ban.isError.value" role="alert" class="text-negative">

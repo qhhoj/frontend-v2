@@ -26,7 +26,7 @@ const init = useInitYamlQuery(
       @retry="() => void init.refetch()"
     >
       <pre
-        class="max-h-[60vh] overflow-auto rounded-tile bg-surface-strong p-3 font-mono text-sm"
+        class="max-h-[60vh] overflow-auto rounded-cell bg-surface-strong p-3 font-mono text-sm"
         >{{ init.data.value }}</pre>
     </QueryState>
   </Dialog>

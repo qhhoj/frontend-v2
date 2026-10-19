@@ -72,7 +72,7 @@ const toggleGood = () => {
             <TicketStatusPill :is-open="ticket.isOpen" :is-contributive="ticket.isContributive" />
             <TicketLinkChip :link="ticket.link" />
           </div>
-          <h2 class="font-display text-xl font-semibold">{{ ticket.title }}</h2>
+          <h2 class="font-display text-section leading-7 font-semibold">{{ ticket.title }}</h2>
           <p class="text-meta text-muted">
             {{
               $t('admin.tickets.detail.byline', {

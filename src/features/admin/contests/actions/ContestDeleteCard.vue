@@ -16,7 +16,7 @@ const blockedBy = computed(() => deleteBlockedBy(props.contest.settings?.isVisib
 <template>
   <section
     data-testid="action-delete"
-    class="flex flex-col gap-3 rounded-panel border border-negative bg-surface-solid p-5"
+    class="flex flex-col gap-3 rounded-card border border-negative bg-surface-solid p-5"
   >
     <h3 class="m-0 text-base font-semibold text-negative">
       {{ $t('admin.contestOps.delete.title') }}

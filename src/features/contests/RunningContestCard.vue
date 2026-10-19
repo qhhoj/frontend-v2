@@ -49,7 +49,7 @@ const perParticipation = computed(() =>
         <ViewerBadge :badge-key="call.badgeKey" />
       </div>
       <div>
-        <h3 class="font-display text-xl font-semibold">
+        <h3 class="font-display text-section leading-7 font-semibold">
           <RouterLink
             :to="{ name: 'contest', params: { key: contest.key } }"
             class="hover:text-accent-text"

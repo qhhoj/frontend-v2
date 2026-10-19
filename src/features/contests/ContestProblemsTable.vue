@@ -81,7 +81,7 @@ const phoneFacts = (problem: ContestProblem) =>
     </p>
     <template v-else>
       <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
-        <h2 class="min-w-0 font-display text-lg font-bold whitespace-nowrap">
+        <h2 class="min-w-0 font-display text-subtitle leading-7 font-bold whitespace-nowrap">
           {{ $t('contests.problems.heading') }}
           <span class="text-sm font-normal text-muted">({{ problems.length }})</span>
         </h2>
@@ -97,7 +97,7 @@ const phoneFacts = (problem: ContestProblem) =>
           }}
         </caption>
         <thead>
-          <tr class="text-left text-caption tracking-wider text-muted uppercase">
+          <tr class="text-left text-meta text-muted">
             <th scope="col" class="px-5 py-3 font-semibold">
               {{ $t('contests.problems.columns.label') }}
             </th>
@@ -124,7 +124,10 @@ const phoneFacts = (problem: ContestProblem) =>
             :key="problem.problemId"
             class="border-t border-line"
           >
-            <th scope="row" class="px-5 py-3 text-left font-display text-xl font-bold">
+            <th
+              scope="row"
+              class="px-5 py-3 text-left font-display text-section leading-7 font-bold"
+            >
               {{ problem.label }}
             </th>
             <td class="w-full max-w-0 min-w-28 px-3 py-3">

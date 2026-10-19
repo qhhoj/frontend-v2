@@ -56,7 +56,7 @@ function stateOf(option: SegmentOption<Value>) {
 
 const FRAME = {
   md: 'flex gap-1 rounded-pill bg-surface-strong p-1',
-  sm: 'flex max-w-full flex-wrap gap-0.5 self-start overflow-x-auto rounded-[1.125rem] border border-line-strong bg-surface-solid p-0.5',
+  sm: 'flex max-w-full flex-wrap gap-0.5 self-start overflow-x-auto rounded-row border border-line-strong bg-surface-solid p-0.5',
 };
 const SEGMENT = {
   md: 'min-h-11 flex-1 px-2 leading-tight',

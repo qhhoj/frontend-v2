@@ -65,7 +65,7 @@ const largest = computed(() =>
       <dl class="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div v-for="tile in tiles" :key="tile.key">
           <dt class="text-sm text-muted">{{ $t(`admin.judges.queue.${tile.key}`) }}</dt>
-          <dd class="font-display text-2xl font-semibold">{{ tile.value }}</dd>
+          <dd class="font-display text-display leading-8 font-semibold">{{ tile.value }}</dd>
         </div>
       </dl>
       <ul v-if="alerts.length" role="alert" class="flex flex-col gap-2">

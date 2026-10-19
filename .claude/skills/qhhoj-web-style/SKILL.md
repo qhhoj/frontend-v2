@@ -17,25 +17,26 @@ Follow this for every change that affects what the site looks like. Long form: `
 
 Type scale (font size only; leading comes from the primitive or a `leading-*` class):
 
-| Class                              | px  | Use                                                |
-| ---------------------------------- | --- | -------------------------------------------------- |
-| `text-tiny`                        | 11  | counts, badges                                     |
-| `text-caption`                     | 12  | chips, table headers                               |
-| `text-meta`                        | 13  | hints, meta lines, errors, breadcrumbs             |
-| `text-sm`                          | 14  | UI, controls, table cells (Tailwind's, leading 20) |
-| `text-base`                        | 16  | prose and every input (Tailwind's, leading 24)     |
-| `text-title`                       | 17  | card titles (with `font-semibold`/`font-bold`)     |
-| `text-subtitle`                    | 18  | lead lines, dialog titles (add a `leading-*`)      |
-| `text-section`                     | 20  | section titles outside cards (add a `leading-*`)   |
-| `text-display`                     | 24  | display headings, big numbers (add a `leading-*`)  |
-| `page-title` utility / `text-page` | 26  | the one h1 per page                                |
-| `text-stat`                        | 26  | stat values, always with `font-mono tabular-nums`  |
-| `text-hero`                        | 40  | countdowns                                         |
+| Class                              | px  | Use                                                                                         |
+| ---------------------------------- | --- | ------------------------------------------------------------------------------------------- |
+| `text-tiny`                        | 11  | counts, badges                                                                              |
+| `text-caption`                     | 12  | chips, small labels                                                                         |
+| `text-meta`                        | 13  | table headers, hints, meta lines, errors                                                    |
+| `text-sm`                          | 14  | UI, controls, table cells (Tailwind's, leading 20)                                          |
+| `text-base`                        | 16  | prose and every input (Tailwind's, leading 24)                                              |
+| `text-title`                       | 17  | card titles (with `font-semibold`/`font-bold`)                                              |
+| `text-subtitle`                    | 18  | lead lines, dialog titles (add a `leading-*`)                                               |
+| `text-section`                     | 20  | section titles outside cards (add a `leading-*`)                                            |
+| `text-display`                     | 24  | display headings, big numbers (add a `leading-*`)                                           |
+| `page-title` utility / `text-page` | 26  | the one h1 per page                                                                         |
+| `text-stat`                        | 26  | stat values: `font-mono tabular-nums`; profile rating and overview tiles use `font-display` |
+| `text-hero`                        | 40  | countdowns only                                                                             |
+| `text-score`                       | 56  | the submission score, the home rating figure                                                |
 
 Other tokens:
 
 - Control height: `--qh-control` 44 px (default) · `--qh-control-sm` 36 px, 44 on coarse pointers (toolbars, row actions, admin) · `--qh-control-lg` 56 px (submit swap card only). Use as `h-(--qh-control)`.
-- Radius by role: controls `rounded-control` (pill on public pages; 12 px under `.qh-admin`) · inputs and code `rounded-cell` 12 · inset tiles and notices `rounded-row` 16 · cards and dialogs `rounded-card` 24 · chips, tabs, segmented `rounded-pill`. No new `rounded-tile` or `rounded-panel`.
+- Radius by role: controls `rounded-control` (pill on public pages; 12 px under `.qh-admin`) · inputs and code `rounded-cell` 12 · inset tiles and notices `rounded-row` 16 · cards and dialogs `rounded-card` 24 · chips, tabs, segmented `rounded-pill`. `rounded-tile` and `rounded-panel` no longer exist (lint-banned); a menu or popover is `rounded-row`.
 - Spacing: page blocks 24 · card padding 16/20/24, up to 32 · form fields 20 apart · label to input 6 · button groups 8.
 - Z: `z-sticky` 10 · `z-savebar` 20 · `z-header` 30 · `z-bit` 40 · `z-overlay` 50 · `z-toast` 1200.
 - Colour roles: `content`, `muted`, `line`, `accent*`, `positive`, `negative`, `warning`/`warning-bg`, `info`/`info-bg`, `tag-1..8`, `verdict-*` (verdicts only), `tier-*`.
@@ -43,10 +44,10 @@ Other tokens:
 - Elevation: `shadow-float` on floating surfaces only (Modal, menus, popovers, toasts get it from the kit); everything else is flat.
 - Icons (Lucide): 14 dense admin chrome and small chips · 16 default · 20 hero and empty states. `IconButton` and `Chip` size an icon with no `size-*` class themselves.
 - Placeholder: muted text, never the content colour at 50 %.
-- Motion: `--qh-duration-fast` 150 ms, `--qh-duration` 200 ms, on colour, border and opacity only.
+- Motion: `--qh-duration-fast` 150 ms, `--qh-duration` 200 ms, on colour, border and opacity only: `transition-colors`, never bare `transition`/`transition-all`/`transition-transform` (real motion such as a chevron turning is allowlisted with a reason in `scripts/transition-utilities.mjs`).
 - Admin density: `--qa-row`, `--qa-control`, `--qa-gap`, `--qa-gutter` (`src/features/admin/ui/admin-density.css`).
 
-`npm run lint:tokens` fails on: raw colours outside `src/theme/themes/`, stock `rounded`/`rounded-lg`/`shadow-*` (the theme resets them, they render nothing; `shadow-float` and `shadow-glow` are ours), `text-[<n>px]`, `rounded-[…]`, `z-[…]`. The only exceptions are listed per file in `ALLOWED` in `scripts/arbitrary-utilities.mjs`; do not add to it without a reason line in the PR.
+`npm run lint:tokens` fails on: raw colours outside `src/theme/themes/`, stock `rounded`/`rounded-lg`/`shadow-*` (the theme resets them, they render nothing; `shadow-float` and `shadow-glow` are ours), stock `text-lg` … `text-9xl` (use the steps above; a swapped `text-xl` keeps its line with `leading-7`), `rounded-tile`/`rounded-panel`, bare `transition`/`transition-all`/`transition-transform`, `uppercase` on a table header, `border-line`/`border-line-strong` on a form control (its border is `border-line-control`), `text-[<n>px]`, `rounded-[…]`, `z-[…]`. The only exceptions are listed per file in `ALLOWED` in `scripts/arbitrary-utilities.mjs`; do not add to it without a reason line in the PR.
 
 ## 3. Primitives
 

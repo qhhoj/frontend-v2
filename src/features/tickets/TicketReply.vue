@@ -99,7 +99,7 @@ async function insertCanned(filled: string, title: string) {
           name="reply"
           :rows="isFolded ? 1 : 4"
           :placeholder="isFolded ? $t('ticket.replyFolded') : $t('ticket.replyPlaceholder')"
-          class="rounded-cell border border-line bg-surface px-3.5 py-2.5 text-base font-normal text-content placeholder:text-muted"
+          class="rounded-cell border border-line-control bg-surface px-3.5 py-2.5 text-base font-normal text-content placeholder:text-muted"
           :class="isFolded ? 'min-h-11 resize-none' : 'min-h-28'"
         />
       </label>

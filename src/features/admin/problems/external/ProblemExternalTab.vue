@@ -39,7 +39,7 @@ async function confirmRemove() {
     @retry="() => void query.refetch()"
   >
     <template #skeleton>
-      <SkeletonBlock class="h-72 w-full rounded-panel" />
+      <SkeletonBlock class="h-72 w-full rounded-card" />
     </template>
     <ExternalJudgeNotConnected v-if="query.data.value && !query.data.value.connected" />
     <Card v-else-if="query.data.value" variant="flat" padding="md" class="flex flex-col gap-5">

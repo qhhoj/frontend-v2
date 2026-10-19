@@ -56,7 +56,7 @@ const formatCount = (value: number) => formatNumber(value, locale.locale);
       <dl v-if="!isError" data-testid="home-counts" class="grid gap-3 max-sm:hidden sm:grid-cols-4">
         <div v-for="key in COUNT_KEYS" :key="key" class="flex flex-col">
           <dt class="text-sm text-muted">{{ $t(`home.anon.counts.${key}`) }}</dt>
-          <dd class="font-mono text-lg font-semibold tabular-nums">
+          <dd class="font-mono text-subtitle leading-7 font-semibold tabular-nums">
             <span v-if="counts">{{ formatCount(counts[key]) }}</span>
             <SkeletonBlock
               v-else-if="isPending"

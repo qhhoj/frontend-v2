@@ -27,7 +27,7 @@ watch(
 );
 /** Days and hours (`28 ngày 14 giờ`, P-18) are longer than a clock: one line at the stat size instead of the hero's. */
 const isLong = (until: string) => Date.parse(until) - now.value >= LONG_COUNTDOWN_SECONDS * 1000;
-const sizeOf = (until: string) => (isLong(until) ? 'text-stat' : 'text-3xl md:text-5xl');
+const sizeOf = (until: string) => (isLong(until) ? 'text-stat' : 'text-stat md:text-hero');
 const instantLabel = (instant: string) => formatDate(instant, 'datetime', locale.locale);
 const LABELS = { start: 'contests.detail.notStarted', end: 'contests.detail.timeLeft' } as const;
 const freezeClock = computed(() => {

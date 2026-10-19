@@ -99,10 +99,7 @@ const status = computed(() => viewerStatusOf(props.problem.viewerStatus));
 </script>
 
 <template>
-  <Card
-    :class="['rounded-panel p-4', !problem.types.length && narrow?.limits]"
-    data-testid="problem-facts"
-  >
+  <Card :class="['p-4', !problem.types.length && narrow?.limits]" data-testid="problem-facts">
     <dl data-testid="limits" :class="['grid grid-cols-2 gap-x-3 gap-y-3.5', narrow?.limits]">
       <div v-for="fact in facts" :key="fact.key">
         <dt class="text-meta text-muted">{{ $t(fact.label) }}</dt>

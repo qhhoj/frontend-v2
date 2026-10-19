@@ -14,7 +14,7 @@ const authors = defineModel<UserChip[]>('authors', { required: true });
 
 <template>
   <section
-    class="flex flex-col gap-5 rounded-panel border border-line bg-surface-solid p-4 sm:p-5"
+    class="flex flex-col gap-5 rounded-card border border-line bg-surface-solid p-4 sm:p-5"
     aria-labelledby="post-staff"
   >
     <h2 id="post-staff" class="font-display text-base font-bold text-accent-text">

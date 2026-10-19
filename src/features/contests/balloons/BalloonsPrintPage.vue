@@ -81,7 +81,7 @@ const printSheet = () => window.print();
             v-for="(item, index) in queue.items"
             :key="balloonRowId(item)"
             data-testid="print-row"
-            class="flex min-h-14 items-center gap-4 border-b border-line py-2 text-xl"
+            class="flex min-h-14 items-center gap-4 border-b border-line py-2 text-section leading-7"
           >
             <span class="w-8 text-right font-mono text-muted">{{ index + 1 }}</span>
             <span

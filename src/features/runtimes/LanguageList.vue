@@ -21,11 +21,11 @@ const toggle = (key: string) => (openKey.value = openKey.value === key ? null : 
 </script>
 
 <template>
-  <Card class="overflow-hidden rounded-panel">
+  <Card class="overflow-hidden">
     <header
       class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-4 sm:px-6"
     >
-      <h2 class="font-display text-xl font-bold">
+      <h2 class="font-display text-section leading-7 font-bold">
         {{ $t('runtimes.languages') }}
         <span class="text-sm font-normal text-muted">({{ languages.length }})</span>
       </h2>
@@ -36,7 +36,7 @@ const toggle = (key: string) => (openKey.value = openKey.value === key ? null : 
           type="search"
           :aria-label="$t('runtimes.search')"
           :placeholder="$t('runtimes.search')"
-          class="min-h-11 rounded-pill border border-line-strong bg-surface-solid pr-4 pl-9 text-sm"
+          class="min-h-11 rounded-pill border border-line-control bg-surface-solid pr-4 pl-9 text-sm"
         />
       </label>
     </header>

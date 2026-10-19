@@ -20,7 +20,7 @@ const LINK =
   <nav
     data-testid="problem-switcher"
     :aria-label="$t('problemSwitcher.title')"
-    class="glass min-w-0 rounded-panel p-2 lg:sticky lg:top-20"
+    class="glass min-w-0 rounded-card p-2 lg:sticky lg:top-20"
   >
     <RouterLink
       :to="{ name: 'contest', params: { key: contestKey } }"
@@ -34,7 +34,7 @@ const LINK =
           :aria-current="entry.isCurrent ? 'page' : undefined"
           :class="LINK"
         >
-          <span class="font-display text-lg font-bold">{{ entry.label }}</span>
+          <span class="font-display text-subtitle leading-7 font-bold">{{ entry.label }}</span>
           <span class="flex min-w-0 flex-col">
             <span class="max-w-40 truncate font-semibold lg:max-w-none lg:whitespace-normal">{{
               entry.name

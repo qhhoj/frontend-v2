@@ -41,7 +41,9 @@ function choose(reply: CannedReply) {
   </AppButton>
   <Popover ref="popover" :labelledby="titleId" @show="isOpen = true" @hide="isOpen = false">
     <div class="flex w-[min(24rem,calc(100vw-4rem))] flex-col gap-3">
-      <p :id="titleId" class="font-display text-lg font-bold">{{ $t('cannedPicker.title') }}</p>
+      <p :id="titleId" class="font-display text-subtitle leading-7 font-bold">
+        {{ $t('cannedPicker.title') }}
+      </p>
       <p class="text-meta text-muted">{{ $t('cannedPicker.hint') }}</p>
       <QueryState
         :loading="query.isLoading.value"

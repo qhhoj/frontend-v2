@@ -12,4 +12,4 @@ export const toolbarControlClass = (active: boolean) =>
 
 /** A bare text input given the same box as a toolbar control (for forms that lay their own label out). */
 export const TOOLBAR_INPUT_CLASS =
-  'h-10 rounded-row border border-line-strong bg-surface px-3.5 pointer-coarse:h-11 text-sm text-content placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';
+  'h-10 rounded-row border border-line-control bg-surface px-3.5 pointer-coarse:h-11 text-sm text-content placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';

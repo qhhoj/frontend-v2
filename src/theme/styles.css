@@ -139,9 +139,7 @@
   --font-mono: var(--qh-font-mono);
   --radius-cell: var(--qh-radius-cell);
   --radius-row: var(--qh-radius-row);
-  --radius-tile: var(--qh-radius-tile);
   --radius-card: var(--qh-radius-card);
-  --radius-panel: var(--qh-radius-panel);
   --radius-pill: var(--qh-radius-pill);
   --radius-skeleton: var(--qh-radius-skeleton);
   --radius-control: var(--qh-radius-control);

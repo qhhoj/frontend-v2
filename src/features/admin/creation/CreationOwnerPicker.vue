@@ -42,7 +42,7 @@ const notice = computed<'failed' | 'none' | null>(() => {
 const SITE = '';
 const MAX_CARDS = 6;
 const OWNER_CARD =
-  'flex min-h-10 min-w-0 cursor-pointer items-center gap-2 rounded-row border border-line bg-surface-solid px-3 py-1.5 has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:checked]:ring-1 has-[:checked]:ring-accent';
+  'flex min-h-10 min-w-0 cursor-pointer items-center gap-2 rounded-row border border-line-control bg-surface-solid px-3 py-1.5 has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:checked]:ring-1 has-[:checked]:ring-accent';
 const groupId = useId();
 
 const requestedSlug = computed(() =>

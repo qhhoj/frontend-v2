@@ -19,7 +19,10 @@ const { data: contest, isPending, error, refetch } = useRunningContestQuery();
             <p data-skeleton-region="label" class="text-meta font-semibold">
               <SkeletonBlock text class="w-28" />
             </p>
-            <h2 data-skeleton-region="name" class="mt-2 font-display text-xl font-semibold">
+            <h2
+              data-skeleton-region="name"
+              class="mt-2 font-display text-section leading-7 font-semibold"
+            >
               <SkeletonBlock text class="w-3/4" />
             </h2>
             <p data-skeleton-region="countdown" class="mt-1.5 text-[32px] font-semibold">
@@ -39,7 +42,9 @@ const { data: contest, isPending, error, refetch } = useRunningContestQuery();
               <span aria-hidden="true" class="size-2 rounded-full bg-accent shadow-glow" />
               {{ $t('home.liveContest') }}
             </p>
-            <h2 class="mt-2 font-display text-xl font-semibold">{{ contest.name }}</h2>
+            <h2 class="mt-2 font-display text-section leading-7 font-semibold">
+              {{ contest.name }}
+            </h2>
             <p class="mt-1.5 text-[32px] font-semibold">
               <span class="sr-only">{{ $t('home.endsIn') }}</span>
               <CountdownTimer :until="contest.endTime" @elapsed="refetch()" />

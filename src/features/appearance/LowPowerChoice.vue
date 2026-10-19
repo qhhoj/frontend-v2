@@ -22,7 +22,7 @@ function choose(preference: LowPowerPreference) {
 <template>
   <Card id="low-power" data-testid="low-power-section" class="flex scroll-mt-24 flex-col gap-5 p-6">
     <div>
-      <h2 class="font-display text-xl font-semibold">{{ $t('lowPower.title') }}</h2>
+      <h2 class="font-display text-section leading-7 font-semibold">{{ $t('lowPower.title') }}</h2>
       <p class="mt-1 text-meta text-muted">{{ $t('lowPower.lead') }}</p>
     </div>
     <fieldset class="grid gap-3 md:grid-cols-3">
@@ -31,8 +31,8 @@ function choose(preference: LowPowerPreference) {
         v-for="option in LOW_POWER_PREFERENCES"
         :key="option"
         :data-testid="`low-power-${option}`"
-        class="flex cursor-pointer flex-col gap-2 rounded-tile border-2 bg-surface-strong p-4"
-        :class="lowPower.preference === option ? 'border-accent' : 'border-line'"
+        class="flex cursor-pointer flex-col gap-2 rounded-row border-2 bg-surface-strong p-4"
+        :class="lowPower.preference === option ? 'border-accent' : 'border-line-control'"
       >
         <span class="flex min-h-11 items-center gap-3 font-semibold">
           <input

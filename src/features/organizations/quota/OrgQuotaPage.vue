@@ -43,12 +43,12 @@ const number = (value: number) => formatNumber(value, locale.locale);
           class="h-[129px] w-full rounded-row md:h-[4.5rem]"
         />
         <div data-skeleton-region="quota-meters" class="grid gap-5 md:grid-cols-2">
-          <SkeletonBlock class="h-[177px] w-full rounded-panel md:h-32" />
-          <SkeletonBlock class="h-[149px] w-full rounded-panel md:h-32" />
+          <SkeletonBlock class="h-[177px] w-full rounded-card md:h-32" />
+          <SkeletonBlock class="h-[149px] w-full rounded-card md:h-32" />
         </div>
         <SkeletonBlock
           data-skeleton-region="credit-ledger"
-          class="h-[606px] w-full rounded-panel md:h-64"
+          class="h-[606px] w-full rounded-card md:h-64"
         />
       </template>
       <template v-if="data">

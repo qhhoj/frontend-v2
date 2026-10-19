@@ -61,9 +61,7 @@ const oneDay = computed(() =>
         <ContestChips :contest="contest" with-tags />
       </div>
       <div>
-        <h1
-          class="flex items-center gap-3 font-display text-2xl leading-tight font-bold tracking-tight md:text-4xl"
-        >
+        <h1 class="flex items-center gap-3 page-title tracking-tight">
           <img
             v-if="contest.logoOverrideImage"
             :src="contest.logoOverrideImage"

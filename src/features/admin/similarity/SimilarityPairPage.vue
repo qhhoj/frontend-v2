@@ -48,7 +48,9 @@ function selectFragment(index: number) {
 <template>
   <section v-if="isMissing" class="flex flex-col items-center gap-3 px-6 py-8 text-center">
     <AdminBit placement="refused" />
-    <h1 class="font-display text-xl font-bold">{{ $t('admin.similarity.pair.notFound') }}</h1>
+    <h1 class="font-display text-section leading-7 font-bold">
+      {{ $t('admin.similarity.pair.notFound') }}
+    </h1>
   </section>
   <QueryState
     v-else

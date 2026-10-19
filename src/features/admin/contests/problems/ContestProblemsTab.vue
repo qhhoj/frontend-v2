@@ -72,7 +72,7 @@ watch(
 );
 const copyPanelId = useId();
 const formId = useId();
-const HEAD = 'px-2 py-2 text-xs font-semibold tracking-wide uppercase';
+const HEAD = 'px-2 py-2 text-meta font-semibold text-muted';
 </script>
 
 <template>

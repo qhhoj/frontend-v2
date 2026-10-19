@@ -53,7 +53,7 @@ onBeforeUnmount(() => {
   >
     <div class="flex h-full flex-col">
       <div class="flex min-h-14 items-center justify-between gap-2 border-b border-line px-4">
-        <h2 :id="titleId" class="font-display text-lg font-semibold">
+        <h2 :id="titleId" class="font-display text-subtitle leading-7 font-semibold">
           {{ $t('admin.shell.navLabel') }}
         </h2>
         <div class="flex items-center gap-2">

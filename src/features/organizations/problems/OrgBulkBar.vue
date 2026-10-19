@@ -11,7 +11,7 @@ const emit = defineEmits<{ archive: []; unarchive: []; tag: []; clear: [] }>();
     role="region"
     :aria-label="$t('orgProblems.bulk.label')"
     data-testid="org-bulk-bar"
-    class="sticky bottom-3 z-10 flex flex-wrap items-center gap-2 rounded-panel border border-line-strong bg-surface-solid p-3"
+    class="sticky bottom-3 z-10 flex flex-wrap items-center gap-2 rounded-row border border-line-strong bg-surface-solid p-3"
   >
     <p role="status" class="mr-auto font-semibold">
       {{ $t('orgProblems.bulk.selected', { count }, count) }}

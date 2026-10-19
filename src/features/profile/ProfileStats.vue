@@ -60,11 +60,11 @@ const tiles = computed<StatTile[]>(() => [
       <div
         v-for="tile in tiles"
         :key="tile.key"
-        class="rounded-tile border border-line p-3"
+        class="rounded-row border border-line p-3"
         :class="tile.phoneHidden && 'max-md:hidden'"
       >
         <dt class="text-sm text-muted">{{ tile.label }}</dt>
-        <dd class="font-display text-2xl font-semibold">{{ tile.value }}</dd>
+        <dd class="font-display text-display leading-8 font-semibold">{{ tile.value }}</dd>
         <dd v-if="tile.hint" class="text-xs text-muted">{{ tile.hint }}</dd>
       </div>
     </dl>

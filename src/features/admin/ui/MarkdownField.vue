@@ -126,7 +126,7 @@ const describedBy = computed(() =>
       :hidden="tab !== 'preview'"
       class="flex flex-col gap-1.5"
     >
-      <div class="min-h-40 rounded-tile border border-line bg-surface-strong p-4">
+      <div class="min-h-40 rounded-row border border-line bg-surface-strong p-4">
         <UserContent :html="preview.html.value" />
       </div>
       <p v-if="preview.isRateLimited.value" class="text-xs text-negative">
@@ -175,7 +175,7 @@ const describedBy = computed(() =>
         :class="pane === 'preview' ? 'flex' : 'hidden'"
       >
         <p class="text-sm font-semibold">{{ previewHeading }}</p>
-        <div class="min-h-40 rounded-tile border border-line bg-surface-strong p-4">
+        <div class="min-h-40 rounded-row border border-line bg-surface-strong p-4">
           <UserContent :html="preview.html.value" />
         </div>
         <p v-if="preview.isRateLimited.value" class="text-xs text-negative">

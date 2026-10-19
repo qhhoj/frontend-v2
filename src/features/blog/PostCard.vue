@@ -44,7 +44,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         {{ $t('blog.pinnedLabel') }}
       </p>
       <h2
-        class="line-clamp-2 max-h-[2lh] text-lg leading-snug font-semibold [overflow-wrap:anywhere]"
+        class="line-clamp-2 max-h-[2lh] text-subtitle leading-snug font-semibold [overflow-wrap:anywhere]"
       >
         <RouterLink :to="{ name: 'post', params: { id: post.id } }" class="hover:underline">
           {{ post.title }}

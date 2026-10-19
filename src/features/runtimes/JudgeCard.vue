@@ -21,7 +21,7 @@ const uptime = computed(() =>
     :class="{ 'opacity-80': !judge.online }"
   >
     <header class="flex items-center justify-between gap-2">
-      <h3 class="font-display text-lg font-bold">{{ judge.name }}</h3>
+      <h3 class="font-display text-subtitle leading-7 font-bold">{{ judge.name }}</h3>
       <span class="flex items-center gap-1.5 text-sm" :class="{ 'text-muted': !judge.online }">
         <span
           aria-hidden="true"

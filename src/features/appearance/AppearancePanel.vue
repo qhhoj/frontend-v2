@@ -48,7 +48,9 @@ const lowPowerOptions = computed(() =>
   <Popover ref="popover" :labelledby="TITLE_ID" @show="isOpen = true" @hide="isOpen = false">
     <div class="flex w-[min(20rem,calc(100vw-4rem))] flex-col gap-4">
       <div class="flex items-center justify-between gap-3">
-        <p :id="TITLE_ID" class="font-display text-lg font-bold">{{ $t('appearance.title') }}</p>
+        <p :id="TITLE_ID" class="font-display text-subtitle leading-7 font-bold">
+          {{ $t('appearance.title') }}
+        </p>
         <BitMascot :look="PLACEMENT_LOOKS.hero" blinks class="[--bit-px:2px]" />
       </div>
       <!-- ModeChoice's two groups (Style, Mode) name themselves. -->

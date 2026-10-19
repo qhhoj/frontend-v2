@@ -10,7 +10,7 @@ import type { useSubmitForm } from './use-submit-form';
 const SHEET_ID = 'submit-sheet';
 /** The bar and the open sheet are one surface in two sizes. */
 const SHEET_SURFACE =
-  'fixed inset-x-0 bottom-0 z-30 rounded-t-panel border-t border-line-accent bg-surface-solid pb-[env(safe-area-inset-bottom)]';
+  'fixed inset-x-0 bottom-0 z-30 rounded-t-card border-t border-line-accent bg-surface-solid pb-[env(safe-area-inset-bottom)]';
 defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;

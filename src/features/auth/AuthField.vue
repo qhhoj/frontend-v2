@@ -47,7 +47,7 @@ const extraDescribedBy = computed(
 );
 const BORDERS = { positive: 'border-positive', negative: 'border-negative' } as const;
 const border = computed(() =>
-  props.error ? BORDERS.negative : props.tone ? BORDERS[props.tone] : 'border-line-strong',
+  props.error ? BORDERS.negative : props.tone ? BORDERS[props.tone] : 'border-line-control',
 );
 </script>
 

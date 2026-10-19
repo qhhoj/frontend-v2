@@ -101,7 +101,7 @@ const commit = () => setRange(draftMin.value, draftMax.value);
             :max="SLIDER.max"
             :step="SLIDER.step"
             :value="min ?? ''"
-            class="h-11 w-full rounded-row border border-line bg-surface-strong px-3 text-content"
+            class="h-11 w-full rounded-row border border-line-control bg-surface-strong px-3 text-content"
             @change="setMin(numberOf($event))"
           />
         </label>
@@ -115,7 +115,7 @@ const commit = () => setRange(draftMin.value, draftMax.value);
             :max="SLIDER.max"
             :step="SLIDER.step"
             :value="max ?? ''"
-            class="h-11 w-full rounded-row border border-line bg-surface-strong px-3 text-content"
+            class="h-11 w-full rounded-row border border-line-control bg-surface-strong px-3 text-content"
             @change="setMax(numberOf($event))"
           />
         </label>

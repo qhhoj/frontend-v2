@@ -11,7 +11,9 @@ const props = withDefaults(
   { size: 'md' },
 );
 const sizeClass = computed(() =>
-  props.size === 'lg' ? 'size-[76px] rounded-row text-3xl' : 'size-12 rounded-cell text-lg',
+  props.size === 'lg'
+    ? 'size-[76px] rounded-row text-page'
+    : 'size-12 rounded-cell text-subtitle leading-7',
 );
 const initials = computed(() => initialsOf(props.organization.name, props.organization.shortName));
 </script>

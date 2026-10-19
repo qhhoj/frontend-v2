@@ -67,7 +67,7 @@ const emptyNextOf = (code: string): ContestProblem => {
         data-testid="own-only"
         class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"
       >
-        <h2 class="font-display text-lg font-bold">
+        <h2 class="font-display text-subtitle leading-7 font-bold">
           {{ $t('contests.submissions.ownHeading') }}
         </h2>
         <p

@@ -275,7 +275,7 @@ useCommentJump({
           id="comments-heading"
           ref="heading"
           tabindex="-1"
-          class="font-display text-xl font-semibold outline-none sm:text-2xl"
+          class="font-display text-section leading-7 font-semibold outline-none sm:text-display sm:leading-8"
         >
           {{ $t('comments.title') }}
         </h2>

@@ -32,7 +32,7 @@ const save = () => patch({ notes: draft.value }, () => (isEdited.value = false))
           v-model="draft"
           name="notes"
           rows="5"
-          class="rounded-cell border border-line bg-surface px-3.5 py-2.5 text-base text-content"
+          class="rounded-cell border border-line-control bg-surface px-3.5 py-2.5 text-base text-content"
           @input="isEdited = true"
         />
       </label>

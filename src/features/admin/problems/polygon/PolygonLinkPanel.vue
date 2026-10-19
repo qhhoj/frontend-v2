@@ -179,7 +179,7 @@ const onHistoryToggle = (event: Event) =>
           <span class="font-sans text-xs text-muted">{{
             $t('admin.polygonLink.panel.inUse')
           }}</span>
-          <span class="text-xl font-bold">r{{ state.link.revision }}</span>
+          <span class="text-section leading-7 font-bold">r{{ state.link.revision }}</span>
           <span v-if="state.link.packageCreatedAt" class="font-sans text-xs text-muted">{{
             $t('admin.polygonLink.history.builtAt', {
               date: dateText(state.link.packageCreatedAt),
@@ -192,7 +192,9 @@ const onHistoryToggle = (event: Event) =>
             <span class="font-sans text-xs text-muted">{{
               $t('admin.polygonLink.panel.latest')
             }}</span>
-            <span class="text-xl font-bold">r{{ state.latestPackage.revision }}</span>
+            <span class="text-section leading-7 font-bold"
+              >r{{ state.latestPackage.revision }}</span
+            >
             <PackageTypePill class="font-sans" :type="state.latestPackage.type" />
             <span v-if="state.latestPackage.createdAt" class="font-sans text-xs text-muted">{{
               $t('admin.polygonLink.history.builtAt', {
