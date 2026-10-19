@@ -1,8 +1,7 @@
 import { ref, watch } from 'vue';
 import type { Ref } from 'vue';
-import type { SubmissionListItem } from '@/api/types/submissions';
 import { useLiveStream } from '@/api/events';
-import type { SubmissionFeedEvent } from '@/api/types/submissions';
+import type { SubmissionFeedEvent, SubmissionListItem } from '@/api/types/submissions';
 import { createSettleWindow } from '@/lib/settle-window';
 import { createFrameSummary } from './frame-summary';
 import { useAnnouncer, useListFilterKey, useNewRowBaseline } from './live-list-state';
