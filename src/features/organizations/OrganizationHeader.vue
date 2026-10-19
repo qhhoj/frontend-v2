@@ -10,6 +10,7 @@ import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { medalClass } from '@/lib/medal';
+import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import MembershipChip from './MembershipChip.vue';
@@ -25,6 +26,8 @@ import { joinModeKey, slotsLine } from './organization-facts';
  * the way in (`MembershipPanel`) or, for a member, the ⋯ menu that holds "Rời tổ chức". `rank` is null while unknown.
  */
 const props = defineProps<{ organization: OrganizationDetail; rank: number | null }>();
+/** On a phone the actions drop under the title; the lone ⋯ would take a row of its own, so it joins the chips line instead. */
+const isPhone = useMediaQuery(PHONE_QUERY);
 const locale = useLocaleStore();
 const session = useSessionStore();
 const editTarget = computed(() => organizationEditTarget(session.user, props.organization));
@@ -63,6 +66,7 @@ const phoneLines = computed(() => [
         compact
         :path="shortLinkPath({ kind: 'organization', slug: organization.slug })"
       />
+      <OrganizationMenu v-if="isMember && isPhone" :organization="organization" />
     </template>
     <template #lead>
       <!-- Phone: two lines at most, each cut with an ellipsis; from md every fact on one wrapping line. -->
@@ -83,7 +87,7 @@ const phoneLines = computed(() => [
       </div>
     </template>
     <template #actions>
-      <OrganizationMenu v-if="isMember" :organization="organization" />
+      <OrganizationMenu v-if="isMember && !isPhone" :organization="organization" />
       <MembershipPanel :organization="organization" :state="state" />
     </template>
   </PageHeader>

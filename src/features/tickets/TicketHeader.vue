@@ -41,15 +41,15 @@ const LINK_CLASS = 'inline-flex flex-wrap items-center gap-2 text-sm hover:under
 </script>
 
 <template>
-  <GlassCard as="header" data-testid="ticket-header" class="flex flex-col gap-3 p-5 sm:p-6">
-    <nav :aria-label="$t('ticket.breadcrumb')" class="text-meta text-muted">
-      <RouterLink :to="{ name: 'tickets' }" class="hover:underline">{{
-        $t('ticket.list')
-      }}</RouterLink>
-      <span aria-hidden="true"> / </span>
-      <span>{{ shortTicketId(ticket.id) }}</span>
-    </nav>
-    <PageHeader :title="ticket.title">
+  <GlassCard data-testid="ticket-header" class="flex flex-col gap-3 p-5 sm:p-6">
+    <PageHeader
+      :title="ticket.title"
+      :crumbs="[
+        { label: $t('ticket.list'), to: { name: 'tickets' } },
+        { label: shortTicketId(ticket.id), mono: true },
+      ]"
+      :back="{ to: { name: 'tickets' }, label: $t('ticket.list') }"
+    >
       <template #above>
         <div class="flex flex-wrap items-center gap-2">
           <TicketStatusPill :is-open="ticket.isOpen" :is-contributive="ticket.isContributive" />
@@ -78,10 +78,10 @@ const LINK_CLASS = 'inline-flex flex-wrap items-center gap-2 text-sm hover:under
         </div>
       </template>
       <template #lead>
-        <p v-if="isCreator" class="text-sm font-semibold text-accent-soft-text">
+        <p v-if="isCreator" class="mt-1 text-sm font-semibold text-accent-soft-text">
           {{ $t('ticket.yours') }}
         </p>
-        <p v-else-if="isStaffView" class="flex items-center gap-2 text-sm font-semibold">
+        <p v-else-if="isStaffView" class="mt-1 flex items-center gap-2 text-sm font-semibold">
           <StateBit variant="staff" size="inline" />
           <span>{{ $t('ticket.staffView') }}</span>
         </p>

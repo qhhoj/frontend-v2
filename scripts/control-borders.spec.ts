@@ -46,6 +46,38 @@ describe('hairlineControlBorders', () => {
     ]);
   });
 
+  it('flags a hairline and a field variant in separate literals of one element', () => {
+    expect(
+      found(`<label class="border border-line" :class="open ? 'focus-within:ring-2' : ''">`),
+    ).toEqual(['1:border-line']);
+    expect(
+      found(
+        `<div\n  :class="[err ? 'border-negative' : 'border-line-strong', 'placeholder:x']"\n>`,
+      ),
+    ).toEqual(['2:border-line-strong']);
+    expect(found(`<input class="sm:border-line" />`)).toEqual(['1:sm:border-line']);
+  });
+
+  it.each([
+    `<label class="border border-line group-focus-within:ring-2">`,
+    `<label class="border border-line peer-placeholder:text-muted">`,
+    `<label class="border border-line has-[input:checked]:border-accent">`,
+    `<label class="border border-line has-[:focus]:ring-2">`,
+    `<label class="border border-line [&:focus-within]:ring-2">`,
+    `<label class="border border-line [&:has(input:checked)]:bg-accent">`,
+    `<label class="border border-line md:group-has-checked:bg-accent">`,
+  ])('flags an arbitrary or group-prefixed field variant: %s', (source) => {
+    expect(found(source)).toEqual(['1:border-line']);
+  });
+
+  it.each([
+    `<div class="border border-line hover:border-line-strong" :class="a ? 'x' : 'focus-visible:ring-2'">`,
+    `<div class="border border-line [&:hover]:bg-surface group-hover:bg-surface">`,
+    `<div class="border border-line"><p class="focus-within:ring-2">x</p></div>`,
+  ])('accepts a hairline whose element has no field variant: %s', (source) => {
+    expect(found(source)).toEqual([]);
+  });
+
   it.each([
     `<input class="rounded-row border border-line-control bg-surface-strong" />`,
     `<select class="border border-line-control" :class="error ? 'border-negative' : ''">`,
