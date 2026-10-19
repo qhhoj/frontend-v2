@@ -107,7 +107,7 @@ const isHidden = computed(
 <template>
   <Card as="div" data-testid="cases-card" class="overflow-hidden rounded-card">
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 pt-5 pb-3 sm:px-6">
-      <h2 class="font-display text-title font-bold">{{ $t('submission.cases.title') }}</h2>
+      <h2 class="section-title">{{ $t('submission.cases.title') }}</h2>
       <span v-if="running" class="text-meta text-muted">{{ $t('submission.liveUpdates') }}</span>
     </div>
     <div v-if="compileError" class="px-6 pb-4 sm:px-8">

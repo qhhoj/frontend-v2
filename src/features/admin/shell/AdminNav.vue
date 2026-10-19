@@ -43,10 +43,10 @@ const GROUP_CLASS =
       :key="navGroup.id"
       :aria-labelledby="`${idPrefix}-${navGroup.id}`"
     >
-      <h2 v-if="holdsCurrent(navGroup)" :id="`${idPrefix}-${navGroup.id}`" :class="GROUP_CLASS">
+      <p v-if="holdsCurrent(navGroup)" :id="`${idPrefix}-${navGroup.id}`" :class="GROUP_CLASS">
         {{ $t(navGroup.labelKey) }}
-      </h2>
-      <h2 v-else>
+      </p>
+      <div v-else>
         <button
           :id="`${idPrefix}-${navGroup.id}`"
           type="button"
@@ -63,7 +63,7 @@ const GROUP_CLASS =
             :class="isOpen(navGroup.id) ? '' : '-rotate-90'"
           />
         </button>
-      </h2>
+      </div>
       <ul
         v-show="holdsCurrent(navGroup) || isOpen(navGroup.id)"
         :id="`${idPrefix}-${navGroup.id}-items`"

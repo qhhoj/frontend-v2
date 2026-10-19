@@ -25,7 +25,7 @@ function valueText(rule: RuleRow): string {
 
 <template>
   <Card class="p-5">
-    <h2 class="mb-3 font-display text-base font-bold">{{ $t('contests.rules.title') }}</h2>
+    <h2 class="mb-3 section-title">{{ $t('contests.rules.title') }}</h2>
     <dl class="flex flex-col gap-2.5 text-sm">
       <div
         v-for="rule in rules"

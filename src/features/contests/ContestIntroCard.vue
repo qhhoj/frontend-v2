@@ -8,7 +8,7 @@ defineProps<{ contest: ContestDetail }>();
 
 <template>
   <Card v-if="contest.descriptionHtml" data-testid="contest-intro" class="p-5 md:p-6">
-    <h2 class="mb-2 font-display text-base font-bold">{{ $t('contests.rules.intro') }}</h2>
+    <h2 class="mb-2 section-title">{{ $t('contests.rules.intro') }}</h2>
     <UserContent :html="contest.descriptionHtml" />
   </Card>
 </template>
