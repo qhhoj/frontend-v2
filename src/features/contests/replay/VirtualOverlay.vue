@@ -73,7 +73,7 @@ const summaryBit = computed(() =>
       <template #skeleton>
         <p
           data-overlay-part="summary"
-          class="glass flex items-center gap-3 rounded-tile px-5 py-3.5"
+          class="glass flex items-center gap-3 rounded-row px-5 py-3.5"
         >
           <SkeletonBlock class="size-12 shrink-0" />
           <SkeletonBlock text class="w-64 max-w-full" />
@@ -86,7 +86,7 @@ const summaryBit = computed(() =>
       <template v-if="board">
         <p
           data-overlay-part="summary"
-          class="glass flex items-center gap-3 rounded-tile px-5 py-3.5"
+          class="glass flex items-center gap-3 rounded-row px-5 py-3.5"
         >
           <InlineBit :kind="summaryBit" :data-bit-kind="summaryBit" />
           <span v-if="rank !== null">{{ $t('replay.overlay.summary', { rank, realRank }) }}</span>

@@ -31,7 +31,7 @@ function choose(preference: LowPowerPreference) {
         v-for="option in LOW_POWER_PREFERENCES"
         :key="option"
         :data-testid="`low-power-${option}`"
-        class="flex cursor-pointer flex-col gap-2 rounded-tile border-2 bg-surface-strong p-4"
+        class="flex cursor-pointer flex-col gap-2 rounded-row border-2 bg-surface-strong p-4"
         :class="lowPower.preference === option ? 'border-accent' : 'border-line'"
       >
         <span class="flex min-h-11 items-center gap-3 font-semibold">

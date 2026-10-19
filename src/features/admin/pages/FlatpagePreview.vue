@@ -58,7 +58,7 @@ const CHIP_TONES = {
     </div>
     <div
       data-testid="preview"
-      class="min-h-40 overflow-auto rounded-tile border border-line bg-surface-strong p-4"
+      class="min-h-40 overflow-auto rounded-row border border-line bg-surface-strong p-4"
     >
       <UserContent :html="html" />
     </div>

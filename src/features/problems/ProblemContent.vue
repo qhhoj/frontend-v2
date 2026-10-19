@@ -82,11 +82,7 @@ function panelIdOf(tabId: string) {
   <ProblemArchivedNotice :code="problem.code" :organization-ids="problem.organizations" />
   <div :class="layout.grid">
     <!-- The statement tab's card carries the problem header; on the editorial tab the card is header and tabs only. -->
-    <Card
-      as="div"
-      data-testid="statement-card"
-      :class="['min-w-0 rounded-panel p-6 sm:p-8', layout.left]"
-    >
+    <Card as="div" data-testid="statement-card" :class="['min-w-0 p-6 sm:p-8', layout.left]">
       <ProblemHeader :problem="problem" :section="tab === 'editorial' ? 'editorial' : 'statement'">
         <template #strip>
           <ProblemLimitStrip

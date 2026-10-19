@@ -5,4 +5,4 @@
  * The skeleton and `ProfileHeader` share this class string, so the two boxes cannot drift apart.
  */
 export const RATING_BOX_CLASSES =
-  'flex min-h-[158px] flex-col gap-2 rounded-tile border border-line p-5';
+  'flex min-h-[158px] flex-col gap-2 rounded-row border border-line p-5';

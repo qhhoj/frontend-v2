@@ -68,7 +68,7 @@ function confirmDelete() {
     as="section"
     data-testid="org-tag-catalogue"
     aria-labelledby="org-tags-title"
-    class="flex flex-col gap-3 rounded-panel p-5"
+    class="flex flex-col gap-3 p-5"
   >
     <header class="flex items-center justify-between gap-2">
       <h2 id="org-tags-title" class="font-display text-base font-bold">

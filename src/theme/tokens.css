@@ -22,9 +22,7 @@
   --qh-sidebar-width: 20rem;
   --qh-radius-cell: 12px;
   --qh-radius-row: 16px;
-  --qh-radius-tile: 20px;
   --qh-radius-card: 24px;
-  --qh-radius-panel: 28px;
   --qh-radius-pill: 999px;
   --qh-radius-skeleton: 8px;
   /* Radius by role: controls (buttons, tabs, segmented) are pills on public pages; the admin scope (.qh-admin) sets 12 px. */

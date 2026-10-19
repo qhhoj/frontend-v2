@@ -89,7 +89,7 @@ const ROW =
     as="nav"
     :aria-label="$t('problem.rail.links.label')"
     data-testid="header-actions"
-    class="rounded-panel p-2"
+    class="p-2"
   >
     <div class="flex items-center gap-2 py-1.5 pr-1.5 pl-3">
       <h2 class="flex-1 font-display text-sm font-bold">

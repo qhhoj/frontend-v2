@@ -61,7 +61,7 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 
 ## Shape, depth, motion
 
-- Radius by role: controls `rounded-control` (`--qh-radius-control`: pill, 12 px in the admin scope `.qh-admin`), inputs and code `rounded-cell` 12, inset tiles and notices `rounded-row` 16, cards and dialogs `rounded-card` 24, chips/tabs/segmented `rounded-pill`. `rounded-tile` 20 and `rounded-panel` 28 are legacy: no new uses. No `rounded-[…]` outside the lint allowlist.
+- Radius by role: controls `rounded-control` (`--qh-radius-control`: pill, 12 px in the admin scope `.qh-admin`), inputs and code `rounded-cell` 12, inset tiles and notices `rounded-row` 16, cards and dialogs `rounded-card` 24, chips/tabs/segmented `rounded-pill`. `rounded-tile` 20 and `rounded-panel` 28 are gone (lint-banned, no tokens); a menu or popover is `rounded-row`. No `rounded-[…]` outside the lint allowlist.
 - Control heights: `--qh-control` 44 px (md), `--qh-control-sm` 36 px (44 px on coarse pointers; the admin scope's default), `--qh-control-lg` 56 px (swap card submit).
 - Z scale: `z-sticky` 10, `z-savebar` 20, `z-header` 30, `z-bit` 40, `z-overlay` 50, `z-toast` 1200 (above PrimeVue's 1000/1100 layers). No `z-[…]`.
 - Depth is hairlines and tone steps in Clay. Glass blurs 24 px at Glass 0 (Clear), scaled down to 0 at Glass 100 (Solid, opaque `--qh-surface-solid`); the personal Glass level moves `--qh-surface-live` and `--qh-blur-live` only. One soft shadow, `shadow-float` (`--qh-shadow-float`), on floating surfaces only: modals, menus, popovers, toasts. No other drop shadows (the live-dot glow exists in Glass only). Control borders use `--qh-line-control` (3:1 on the ground); `--qh-line` stays the hairline of cards and dividers.

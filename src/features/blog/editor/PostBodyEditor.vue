@@ -61,7 +61,7 @@ async function apply(action: MarkdownAction) {
       :label="$t('postEditor.body.label')"
       overflow="scroll"
     />
-    <div class="overflow-hidden rounded-tile border border-line-strong bg-surface-solid">
+    <div class="overflow-hidden rounded-row border border-line-strong bg-surface-solid">
       <div
         v-show="!isPhone || tab === 'write'"
         role="toolbar"

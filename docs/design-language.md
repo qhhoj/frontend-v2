@@ -11,7 +11,7 @@ Root problem it fixes: the same control was built four ways (admin `controls.ts`
 | Type (font size only) | `text-tiny` 11 · `text-caption` 12 · `text-meta` 13 · `text-sm` 14 · `text-base` 16 · `text-title` 17 · `text-subtitle` 18 · `text-section` 20 · `text-display` 24 · `text-page` 26 · `text-stat` 26 (+ `font-mono`) · `text-hero` 40 · `text-score` 56 (submission score) |
 | Leading | tiny/caption 16 px · meta 18 · sm 20 · base 24 · title 22 · subtitle/section/display set none (add a `leading-*`) · page 1.25 · stat/hero/score 1 |
 | Control height | `--qh-control` 44 (md) · `--qh-control-sm` 36, 44 on coarse pointers · `--qh-control-lg` 56 (swap card submit) |
-| Radius by role | `rounded-control` (`--qh-radius-control`: pill; 12 in admin) · inputs, code `rounded-cell` 12 · inset tiles, notices `rounded-row` 16 · cards, dialogs `rounded-card` 24 · chips, tabs, segmented `rounded-pill`. `tile` 20 and `panel` 28: no new uses |
+| Radius by role | `rounded-control` (`--qh-radius-control`: pill; 12 in admin) · inputs, code `rounded-cell` 12 · inset tiles, notices `rounded-row` 16 · cards, dialogs `rounded-card` 24 · chips, tabs, segmented `rounded-pill`. menus, popovers `rounded-row`. `tile` 20 and `panel` 28 no longer exist: lint-banned, tokens removed |
 | Control border | `border-line-control` (`--qh-line-control`): the border of inputs, selects, textareas and secondary buttons, at least 3:1 on the ground, the card and the inner tile (WCAG 1.4.11, checked per theme in `themes.node.spec.ts`). `border-line` stays the hairline of cards and dividers; `border-line-strong` the edge of menus and popovers |
 | Elevation | `shadow-float` (`--qh-shadow-float`, `0 8px 24px`, 12 % ink in light, 50 % black in dark): floating surfaces only, which the preset gives Modal, menus, Select lists and popovers, and `AdminToastHost` its toasts. Cards, tables and sticky bars stay flat |
 | Icons | Lucide at three sizes: 14 (`size-3.5`) dense admin chrome and small chips · 16 (`size-4`) the default, in buttons, inputs and rows · 20 (`size-5`) hero and empty states. `IconButton` and `Chip` draw an icon that has no `size-*` class of its own at the size of their button (16, 20 in `lg`) or chip (14 sm, 16 md) |
@@ -25,7 +25,7 @@ Root problem it fixes: the same control was built four ways (admin `controls.ts`
 
 Admin scope: `AdminShell` puts `qh-admin` on `<html>` while mounted (teleported dialogs included). It sets `--qh-radius-control` to 12 px and `--qh-control` to `--qh-control-sm`.
 
-Lint (`npm run lint:tokens`, `scripts/check-tokens.mjs`) errors on raw colours, stock `rounded-*`/`shadow-*`, stock `text-lg` … `text-9xl`, `text-[<n>px|rem]`, `rounded-[…]` and `z-[…]`. Exceptions are listed by file in `scripts/arbitrary-utilities.mjs` (`ALLOWED`): off-scale display sizes waiting for PageHeader/StatGrid, and radii under 5 px on tiny marks.
+Lint (`npm run lint:tokens`, `scripts/check-tokens.mjs`) errors on raw colours, stock `rounded-*`/`shadow-*`, stock `text-lg` … `text-9xl`, `rounded-tile`/`rounded-panel`, `text-[<n>px|rem]`, `rounded-[…]` and `z-[…]`. Exceptions are listed by file in `scripts/arbitrary-utilities.mjs` (`ALLOWED`): off-scale display sizes waiting for PageHeader/StatGrid, and radii under 5 px on tiny marks.
 
 ## Primitives (`src/components/ui/`)
 

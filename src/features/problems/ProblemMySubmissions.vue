@@ -73,7 +73,7 @@ const rows = computed(() =>
 </script>
 
 <template>
-  <Card class="flex flex-col gap-2 rounded-panel p-4" data-testid="rail-my-submissions">
+  <Card class="flex flex-col gap-2 p-4" data-testid="rail-my-submissions">
     <div class="flex items-center justify-between gap-2">
       <h2 class="flex items-center gap-2 font-display text-title font-bold">
         {{ $t('problem.rail.mine.title') }}

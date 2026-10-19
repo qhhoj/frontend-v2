@@ -18,7 +18,7 @@ const viewBox = computed(() => {
     :aria-label="label"
     :viewBox="viewBox"
     shape-rendering="crispEdges"
-    class="size-[200px] shrink-0 rounded-tile border border-line bg-qr-paper text-qr-ink"
+    class="size-[200px] shrink-0 rounded-row border border-line bg-qr-paper text-qr-ink"
   >
     <path :d="qrPath(modules)" fill="currentColor" />
   </svg>

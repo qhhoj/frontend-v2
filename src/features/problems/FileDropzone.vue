@@ -41,7 +41,7 @@ function removeFile() {
     <p
       v-if="disabled"
       aria-disabled="true"
-      class="rounded-tile border border-dashed border-line p-4 text-sm text-muted"
+      class="rounded-row border border-dashed border-line p-4 text-sm text-muted"
     >
       {{ $t('submit.file.uploadDisabled') }}
     </p>
@@ -57,7 +57,7 @@ function removeFile() {
       />
       <label
         :for="inputId"
-        class="flex min-h-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-tile border border-dashed border-line-accent bg-accent-soft p-3 text-center text-sm text-accent-soft-text peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus"
+        class="flex min-h-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-row border border-dashed border-line-accent bg-accent-soft p-3 text-center text-sm text-accent-soft-text peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus"
         :class="{ 'bg-surface-hover': isDraggingOver }"
         @dragover.prevent="isDraggingOver = true"
         @dragleave.self="isDraggingOver = false"
@@ -74,7 +74,7 @@ function removeFile() {
     </template>
     <div
       v-if="file && !disabled"
-      class="flex items-center gap-2 rounded-tile bg-surface-strong py-1 pr-1 pl-3 text-sm"
+      class="flex items-center gap-2 rounded-row bg-surface-strong py-1 pr-1 pl-3 text-sm"
     >
       <FileText class="size-5 shrink-0 text-muted" aria-hidden="true" />
       <span class="min-w-0 flex-1 truncate" :title="file.name">{{ file.name }}</span>

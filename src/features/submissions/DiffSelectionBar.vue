@@ -27,7 +27,7 @@ const summary = computed(() =>
 <template>
   <div
     data-testid="diff-selection"
-    class="sticky bottom-3 z-10 flex flex-wrap items-center gap-3 rounded-tile border border-line-accent bg-surface-solid px-4 py-2"
+    class="sticky bottom-3 z-10 flex flex-wrap items-center gap-3 rounded-row border border-line-accent bg-surface-solid px-4 py-2"
   >
     <InlineBit v-if="picked.length === MAX_DIFF_PICKS" :kind="DIFF_INLINE_BITS.pickedTwo" />
     <p aria-live="polite" class="min-w-0 flex-1 text-sm font-semibold">{{ summary }}</p>

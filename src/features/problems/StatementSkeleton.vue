@@ -11,7 +11,7 @@ defineProps<{ header?: boolean; stripClass?: string }>();
 </script>
 
 <template>
-  <Card as="div" data-testid="statement-card" class="rounded-panel p-6 sm:p-8">
+  <Card as="div" data-testid="statement-card" class="p-6 sm:p-8">
     <ProblemHeaderSkeleton v-if="header" :strip-class="stripClass ?? 'lg:hidden'" class="mb-4" />
     <div data-skeleton-region="statement" class="flex flex-col gap-4 text-sm leading-[1.75]">
       <p v-for="paragraph in PARAGRAPHS" :key="paragraph">

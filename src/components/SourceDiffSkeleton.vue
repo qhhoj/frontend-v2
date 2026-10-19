@@ -8,7 +8,7 @@ const LINE_WIDTHS = ['w-1/3', 'w-1/2', 'w-2/5', 'w-3/5', 'w-1/4'] as const;
 </script>
 
 <template>
-  <GlassCard as="div" class="overflow-hidden rounded-panel">
+  <GlassCard as="div" class="overflow-hidden">
     <div data-skeleton-region="diff-summary" class="flex flex-wrap gap-2 px-5 py-4 text-sm sm:px-6">
       <SkeletonBlock pill class="h-7 w-12 sm:w-20" />
       <SkeletonBlock pill class="h-7 w-12 sm:w-20" />

@@ -36,7 +36,7 @@ defineProps<{ kind: ContestPhase }>();
       data-skeleton-region="upcoming-row"
       class="flex flex-wrap items-center gap-4 border-t border-line px-5 py-4 first:border-t-0"
     >
-      <SkeletonBlock class="size-16 shrink-0 rounded-tile" />
+      <SkeletonBlock class="size-16 shrink-0 rounded-row" />
       <div class="flex min-w-0 flex-1 flex-col gap-1.5">
         <div class="font-display text-subtitle leading-7 font-semibold">
           <SkeletonBlock text class="w-2/3" />

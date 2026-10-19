@@ -99,7 +99,7 @@ const phoneToneOf = (line: PhoneLine) => (line.kind === 'same' ? 'text-muted' : 
 </script>
 
 <template>
-  <GlassCard as="div" data-testid="source-diff" class="overflow-hidden rounded-panel">
+  <GlassCard as="div" data-testid="source-diff" class="overflow-hidden">
     <ul data-testid="diff-summary" class="flex flex-wrap gap-2 px-5 py-4 text-sm sm:px-6">
       <li class="rounded-pill bg-verdict-ac-bg px-3 py-1 font-semibold text-verdict-ac">
         <SummaryPill

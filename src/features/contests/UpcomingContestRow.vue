@@ -42,7 +42,7 @@ const startsInText = computed(() =>
   >
     <span
       data-testid="day-chip"
-      class="flex size-16 shrink-0 flex-col items-center justify-center rounded-tile bg-accent-soft text-accent-soft-text"
+      class="flex size-16 shrink-0 flex-col items-center justify-center rounded-row bg-accent-soft text-accent-soft-text"
     >
       <span class="font-display text-display leading-none font-bold">{{ dayTile.day }}</span>
       <span class="text-caption font-semibold">{{ dayTile.month }}</span>

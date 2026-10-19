@@ -154,7 +154,7 @@ const SIDES: readonly DiffSide[] = ['left', 'right'];
         v-if="languages"
         data-testid="diff-languages"
         role="note"
-        class="flex flex-wrap items-center gap-3 rounded-tile border border-line px-4 py-3 text-sm"
+        class="flex flex-wrap items-center gap-3 rounded-row border border-line px-4 py-3 text-sm"
       >
         <InlineBit :kind="DIFF_INLINE_BITS.languages" />
         <span

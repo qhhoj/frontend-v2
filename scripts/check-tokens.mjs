@@ -2,11 +2,13 @@
 // Colours live only in src/theme/themes/*.css; everything else uses semantic tokens. Specs are skipped (contrast tests use literal colours).
 // Stock radius/shadow class names are rejected too: `@theme` resets them, so they render nothing. So are the stock type sizes `text-lg` ... `text-9xl`,
 // which skip the named scale (scripts/stock-utilities.mjs).
+// The retired radius roles rounded-tile and rounded-panel are rejected as well (scripts/retired-utilities.mjs).
 // So are arbitrary sizes, radii and z-indexes (`text-[13px]`, `rounded-[3px]`, `z-[5]`): use the named steps (scripts/arbitrary-utilities.mjs).
 // The exemptions are Bit's sprite palettes (src/mascot/bit-sprite.ts) and the avatar's sprite data (src/mascot/avatar/avatar-sprites.ts):
 // image-like data that Bit keeps in every theme.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { retiredUtilities } from './retired-utilities.mjs';
 import { stockUtilities } from './stock-utilities.mjs';
 import { ALLOWED, arbitraryUtilities } from './arbitrary-utilities.mjs';
 
@@ -46,8 +48,12 @@ const CHECKS = [
     ),
   },
   {
-    message: `Stock classes that skip the named scales: the theme resets rounded-lg and shadow-md (they render nothing), and text-lg...text-9xl bypass the type scale (use rounded-cell|row|tile|card|panel|pill|skeleton, shadow-glow|float, text-subtitle|section|display|page|stat|hero|score):`,
+    message: `Stock classes that skip the named scales: the theme resets rounded-lg and shadow-md (they render nothing), and text-lg...text-9xl bypass the type scale (use rounded-cell|row|card|pill|skeleton|control, shadow-glow|float, text-subtitle|section|display|page|stat|hero|score):`,
     find: perLine(stockUtilities),
+  },
+  {
+    message: `Retired radius roles rounded-tile (20 px) and rounded-panel (28 px): use rounded-row for an inset tile, a notice or a menu, rounded-cell for code and fields, rounded-card for a card or a dialog (docs/design-language.md):`,
+    find: perLine(retiredUtilities),
   },
   {
     message: `Colour literals outside src/theme/themes/ (use a --qh- token):`,

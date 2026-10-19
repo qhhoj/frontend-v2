@@ -19,7 +19,7 @@ const CELL = 'py-2 pr-3 align-middle';
     as="section"
     data-testid="credit-ledger"
     aria-labelledby="credit-ledger-title"
-    class="flex flex-col gap-3 rounded-panel p-5"
+    class="flex flex-col gap-3 p-5"
   >
     <h2 id="credit-ledger-title" class="font-display text-base font-bold">
       {{ $t('orgQuota.ledger', { month: monthText }) }}

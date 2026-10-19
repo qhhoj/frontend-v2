@@ -139,7 +139,7 @@ const fixedAuthor = computed(() =>
             <button
               v-if="isPhone"
               type="button"
-              class="flex min-h-12 items-center justify-between rounded-panel border border-line bg-surface-strong px-4 font-semibold"
+              class="flex min-h-12 items-center justify-between rounded-row border border-line bg-surface-strong px-4 font-semibold"
               :aria-expanded="isSettingsOpen"
               aria-controls="post-settings-column"
               @click="isSettingsOpen = !isSettingsOpen"

@@ -21,7 +21,7 @@ const toggle = (key: string) => (openKey.value = openKey.value === key ? null : 
 </script>
 
 <template>
-  <Card class="overflow-hidden rounded-panel">
+  <Card class="overflow-hidden">
     <header
       class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-4 sm:px-6"
     >

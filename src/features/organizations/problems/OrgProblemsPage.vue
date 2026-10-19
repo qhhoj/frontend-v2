@@ -117,7 +117,7 @@ function saveTags(tagIds: string[]) {
         as="div"
         tabindex="-1"
         data-testid="org-problem-list"
-        class="flex min-w-0 flex-col gap-4 rounded-panel p-5"
+        class="flex min-w-0 flex-col gap-4 p-5"
       >
         <div v-if="canCreate && listState !== 'empty'" class="flex justify-end">
           <AppButton data-testid="org-tab-create-problem" :to="createTarget">

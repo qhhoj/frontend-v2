@@ -48,7 +48,7 @@ const LABEL = 'text-xs font-bold tracking-wide text-muted uppercase';
 
 <template>
   <section
-    class="flex flex-col gap-5 rounded-panel border border-line bg-surface-solid p-4 sm:p-5"
+    class="flex flex-col gap-5 rounded-card border border-line bg-surface-solid p-4 sm:p-5"
     aria-labelledby="post-settings"
   >
     <h2 id="post-settings" class="font-display text-base font-bold text-accent-text">
