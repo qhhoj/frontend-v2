@@ -3,6 +3,7 @@ import { problemTypeLabel } from '@/features/problems/problem-type-label';
 import { computed, ref, useId } from 'vue';
 import { Plus, X } from 'lucide-vue-next';
 import type { ProblemEditingMeta } from '@/api/types/problem-editing';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import { usePermissions } from '@/stores/use-permissions';
 import AdminField from '../../ui/AdminField.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
@@ -174,7 +175,7 @@ function setLanguageAllowed(languageId: string, isAllowed: boolean) {
             :disabled="isStaffLocked"
             @change="setLanguageAllowed(language.id, ($event.target as HTMLInputElement).checked)"
           />
-          {{ language.name }}
+          <LanguageLabel :language="language" />
         </label>
       </div>
       <p v-if="isStaffLocked" :id="allowedLanguagesLockId" class="text-xs text-muted">

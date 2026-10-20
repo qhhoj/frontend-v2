@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import type { SubmissionDetail } from '@/api/types/submissions';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import Card from '@/components/ui/Card.vue';
 import UserLink from '@/components/UserLink.vue';
 import type { SubmissionInContest } from '@/features/contests/submission/submission-contest';
@@ -14,7 +14,7 @@ const NO_VALUE = '—';
 const CLOCK_REFRESH_MS = 60_000;
 
 /** The aside card: problem, author, time, language and judge (order in `summary-facts.ts`). Keep `SubmissionFactsSkeleton.vue` in step. */
-const props = defineProps<{
+defineProps<{
   submission: SubmissionDetail;
   /** The problem's name when it is readable; the row's own name is the fallback. */
   problemName: string | null;
@@ -23,10 +23,6 @@ const props = defineProps<{
 }>();
 const locale = useLocaleStore();
 const now = useNow(CLOCK_REFRESH_MS);
-const plainFacts = computed(() => [
-  { key: 'language', value: props.submission.language?.name ?? NO_VALUE },
-  { key: 'judge', value: props.submission.judgedOn ?? NO_VALUE },
-]);
 </script>
 
 <template>
@@ -86,12 +82,17 @@ const plainFacts = computed(() => [
           }}</time
         >
       </dd>
-      <template v-for="fact in plainFacts" :key="fact.key">
-        <dt :data-fact="fact.key" class="text-meta text-muted">
-          {{ $t(`submission.facts.${fact.key}`) }}
-        </dt>
-        <dd class="min-w-0 font-mono [overflow-wrap:anywhere]">{{ fact.value }}</dd>
-      </template>
+      <dt data-fact="language" class="text-meta text-muted">
+        {{ $t('submission.facts.language') }}
+      </dt>
+      <dd class="min-w-0 font-mono">
+        <LanguageLabel v-if="submission.language" :language="submission.language" />
+        <template v-else>{{ NO_VALUE }}</template>
+      </dd>
+      <dt data-fact="judge" class="text-meta text-muted">{{ $t('submission.facts.judge') }}</dt>
+      <dd class="min-w-0 font-mono [overflow-wrap:anywhere]">
+        {{ submission.judgedOn ?? NO_VALUE }}
+      </dd>
     </dl>
   </Card>
 </template>

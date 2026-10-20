@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import ProgressBar from '@/components/ui/ProgressBar.vue';
 import Card from '@/components/ui/Card.vue';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import { computed } from 'vue';
 import type { ContestLanguageStats } from '@/api/types/contests';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { formatPercent, languageShare } from './stats-summary';
 
-const props = defineProps<{ languages: ContestLanguageStats[] }>();
+/** `key` is the judge key for the icon (`null`: generic icon); the stats rows carry only the language id. */
+const props = defineProps<{ languages: (ContestLanguageStats & { key: string | null })[] }>();
 const locale = useLocaleStore();
 /** Each language with its share of all submissions, computed once per row. */
 const rows = computed(() =>
@@ -54,7 +56,9 @@ const count = (value: number) => formatNumber(value, locale.locale);
             :key="language.languageId"
             class="border-t border-line"
           >
-            <th scope="row" class="px-4 py-3 text-left font-semibold">{{ language.name }}</th>
+            <th scope="row" class="px-4 py-3 text-left font-semibold">
+              <LanguageLabel :language="language" />
+            </th>
             <td class="px-4 py-3">
               <div class="flex items-center gap-3">
                 <ProgressBar :value="share" :max="1" :label="language.name" class="flex-1" />

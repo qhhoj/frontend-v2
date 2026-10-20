@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import UserLink from '@/components/UserLink.vue';
 import { formatAgoCompact, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
@@ -193,7 +194,8 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
               :class="[bodyCell, tierOf('language'), 'truncate text-muted']"
               :title="row.language?.name"
             >
-              {{ row.language?.name ?? NO_VALUE }}
+              <LanguageLabel v-if="row.language" :language="row.language" />
+              <template v-else>{{ NO_VALUE }}</template>
             </td>
             <td
               v-if="isShown('when')"

@@ -6,6 +6,7 @@ import type { SubmissionDetail } from '@/api/types/submissions';
 import AppButton from '@/components/ui/AppButton.vue';
 import BitLoop from '@/components/BitLoop.vue';
 import BitMascot from '@/components/BitMascot.vue';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
@@ -149,7 +150,17 @@ const problem = computed(() => {
         <p v-if="isProvisional" data-testid="provisional" class="text-meta text-muted">
           {{ $t('submission.provisional') }}
         </p>
-        <p v-if="line" data-testid="hero-line" class="mt-2 text-meta text-muted">{{ line }}</p>
+        <p
+          v-if="line || submission.language"
+          data-testid="hero-line"
+          class="mt-2 text-meta text-muted"
+        >
+          {{ line }}
+          <!-- The "·" wraps with the language, never alone at a line end. -->
+          <span v-if="submission.language" class="whitespace-nowrap"
+            ><template v-if="line">· </template><LanguageLabel :language="submission.language"
+          /></span>
+        </p>
         <p v-if="submission.isPretested" class="mt-1 text-meta text-muted">
           {{ $t('submission.pretest') }}
         </p>

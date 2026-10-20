@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import LanguageIcon from '@/components/language/LanguageIcon.vue';
 import AdminChip from '../ui/AdminChip.vue';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import type { AdminColumn } from '../ui/table/table-columns';
@@ -55,6 +56,8 @@ const percentOf = (count: number) =>
     </template>
     <template #cell-name="{ row }">
       <span class="inline-flex flex-wrap items-center gap-1.5">
+        <!-- Icon and a name that may wrap: this column shares the row with the per-judge versions. -->
+        <LanguageIcon :language-key="row.key" />
         {{ row.name }}
         <AdminChip v-if="row.fileOnly">{{ $t('admin.languages.table.fileOnly') }}</AdminChip>
       </span>

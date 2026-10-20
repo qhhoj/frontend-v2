@@ -2,6 +2,8 @@
 import { STAFF_ICONS } from '@/features/admin/ui/staff-action-icons';
 import { computed } from 'vue';
 import type { Language } from '@/api/types/problems';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
+import { languageById } from '@/components/language/language-by-id';
 import { SUBMISSION_RESULT_CODES } from '@/api/types/submissions';
 import AdminField from '../ui/AdminField.vue';
 import AdminSwitch from '../ui/AdminSwitch.vue';
@@ -30,6 +32,7 @@ const PRESETS = Object.keys(RESULT_PRESETS) as ResultPreset[];
 const languageOptions = computed(() =>
   props.languages.map((language) => ({ value: language.id, label: language.name })),
 );
+const keyOfLanguage = (id: string) => languageById(props.languages, id)?.key ?? null;
 const siteWide = computed(() => isSiteWide(filter.value));
 const applyPreset = (preset: ResultPreset) => {
   filter.value.results = [...RESULT_PRESETS[preset]];
@@ -92,7 +95,11 @@ const applyPreset = (preset: ResultPreset) => {
         v-model="filter.languageIds"
         :options="languageOptions"
         name="rejudge-language"
-      />
+      >
+        <template #label="{ option }">
+          <LanguageLabel :language="{ key: keyOfLanguage(option.value), name: option.label }" />
+        </template>
+      </AdminCheckChips>
     </fieldset>
 
     <fieldset class="flex flex-col gap-2">

@@ -9,7 +9,7 @@ export interface CheckChipOption<V extends string = string> {
   title?: string;
 }
 
-/** Checkbox pills for a multi-pick filter (verdicts, languages, statuses). `mono` sets codes in the mono face. */
+/** Checkbox pills for a multi-pick filter (verdicts, languages, statuses). `mono` sets codes in the mono face; `#label` draws a label of its own. */
 defineProps<{ options: readonly CheckChipOption<Value>[]; name: string; mono?: boolean }>();
 const picked = defineModel<Value[]>({ required: true });
 </script>
@@ -23,7 +23,9 @@ const picked = defineModel<Value[]>({ required: true });
       :title="option.title"
     >
       <input v-model="picked" type="checkbox" :name="name" :value="option.value" />
-      <span :class="mono && 'font-mono'">{{ option.label }}</span>
+      <slot name="label" :option="option">
+        <span :class="mono && 'font-mono'">{{ option.label }}</span>
+      </slot>
       <span v-if="option.title" class="sr-only">{{ option.title }}</span>
     </label>
   </div>

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { SubmissionListItem } from '@/api/types/submissions';
+import LanguageIcon from '@/components/language/LanguageIcon.vue';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import UserLink from '@/components/UserLink.vue';
 import { translate } from '@/i18n';
 import { formatCaseMemory, formatCaseTime } from '@/lib/format';
@@ -19,7 +21,7 @@ import TestStrip from './TestStrip.vue';
 /**
  * From md, the list's roomy rows as cards: score ring; problem, then submitter and age, then the per-test strip; verdict and
  * time, memory and language in a fixed-width right column, so every card's strip has the same width. Below md (P-08) a
- * ledger of 56 px rows in one card: ring, problem over "user · language · run time · age", and the verdict code. `columns`
+ * ledger of 56 px rows in one card: ring, problem over "user · run time · language · age", and the verdict code. `columns`
  * hides what the table would hide. A row without `testSummary` (hidden from this viewer, or an older backend) has no strip.
  */
 const props = defineProps<{
@@ -49,10 +51,12 @@ const rowLabel = (row: SubmissionListItem) =>
     problem: row.problem?.name ?? NO_VALUE,
     verdict: translate(submissionVerdictOf(row).labelKey),
   });
-/** The phone's second line after the submitter: language, then the run time once judged. */
-const phoneMeta = (row: SubmissionListItem) => [
-  ...(isShown('language') && row.language ? [row.language.name] : []),
-  ...(hasCost(row) ? [formatCaseTime(row.time!)] : []),
+type PhoneMetaPart =
+  { kind: 'time'; text: string } | { kind: 'language'; key: string; name: string };
+/** The phone's second line after the submitter: the run time once judged, then the language, so a cut line loses the name, not the time. */
+const phoneMeta = (row: SubmissionListItem): PhoneMetaPart[] => [
+  ...(hasCost(row) ? [{ kind: 'time' as const, text: formatCaseTime(row.time!) }] : []),
+  ...(isShown('language') && row.language ? [{ kind: 'language' as const, ...row.language }] : []),
 ];
 /** On md+ each chip fills a fixed slot with right-aligned tabular figures, so time, memory and language line up across cards. */
 const PILL =
@@ -72,8 +76,8 @@ const PILL =
       class="@container grid min-h-14 cursor-pointer items-center gap-x-3 gap-y-2 bg-surface-solid px-3 py-2 hover:bg-surface-hover max-md:border-t max-md:border-line max-md:first:border-t-0 md:gap-x-4 md:rounded-row md:border md:border-line md:px-5 md:py-3.5"
       :class="[
         pickedIds
-          ? 'grid-cols-[auto_auto_minmax(0,1fr)_auto] md:grid-cols-[auto_auto_minmax(0,1fr)_15rem_auto]'
-          : 'grid-cols-[auto_minmax(0,1fr)_auto] md:grid-cols-[auto_minmax(0,1fr)_15rem_auto]',
+          ? 'grid-cols-[auto_auto_minmax(0,1fr)_auto] md:grid-cols-[auto_auto_minmax(0,1fr)_16.5rem_auto]'
+          : 'grid-cols-[auto_minmax(0,1fr)_auto] md:grid-cols-[auto_minmax(0,1fr)_16.5rem_auto]',
         { 'row-added': highlightIds.has(row.id) },
       ]"
       @click="openRow($event, row.id)"
@@ -103,14 +107,21 @@ const PILL =
             :username="row.user.username"
             :rating="row.user.rating"
           />
-          <template v-for="(part, index) in phoneMeta(row)" :key="part">
+          <template v-for="(part, index) in phoneMeta(row)" :key="part.kind">
             <span
               v-if="index > 0 || (isShown('user') && row.user)"
               aria-hidden="true"
               class="mx-1 md:hidden"
               >·</span
             >
-            <span class="font-mono whitespace-nowrap md:hidden">{{ part }}</span>
+            <!-- Icon and name inline, not one box: a cut line ends in "…" after the icon instead of dropping both. -->
+            <template v-if="part.kind === 'language'"
+              ><LanguageIcon
+                :language-key="part.key"
+                class="mr-1 align-text-bottom md:hidden"
+              /><span class="font-mono whitespace-nowrap md:hidden">{{ part.name }}</span></template
+            >
+            <span v-else class="font-mono whitespace-nowrap md:hidden">{{ part.text }}</span>
           </template>
           <span
             v-if="isShown('when') && (isShown('user') || phoneMeta(row).length)"
@@ -159,9 +170,12 @@ const PILL =
           <span
             v-if="isShown('language') && row.language"
             :title="row.language.name"
-            :class="[PILL, 'truncate bg-surface-strong text-muted md:col-start-3']"
-            >{{ row.language.name }}</span
-          >
+            :class="[
+              PILL,
+              'flex min-w-0 bg-surface-strong text-muted md:col-start-3 md:justify-end',
+            ]"
+            ><LanguageLabel :language="row.language"
+          /></span>
         </div>
       </div>
       <SubmissionSourceLink :id="row.id" class="max-md:hidden" />

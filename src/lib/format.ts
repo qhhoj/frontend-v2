@@ -53,10 +53,6 @@ export const initials = (name: string) =>
     .join('')
     .toLocaleUpperCase();
 
-/** Stable 0..5 pick of a token-pill gradient for a code or username. */
-export const coinIndex = (seed: string) =>
-  Array.from(seed).reduce((hash, symbol) => (hash * 31 + symbol.codePointAt(0)!) % 9973, 7) % 6;
-
 /** `seconds` with one decimal, two when needed: 1 -> `1.0s`, 0.25 -> `0.25s`. */
 export const formatTimeLimit = (seconds: number) =>
   `${Number.isInteger(seconds * 10) ? seconds.toFixed(1) : seconds.toFixed(2)}s`;

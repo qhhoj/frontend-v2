@@ -1,4 +1,4 @@
-import { ratingHistory, userPage } from './fixtures';
+import { problemMeta, ratingHistory, userPage } from './fixtures';
 import {
   activity,
   commentThreadPage,
@@ -27,6 +27,8 @@ export const profileRoutes = (user: UserPage = userPage()): Routes => ({
 });
 /** The profile tabs of one user. */
 export const profileTabRoutes = (username = 'user_01'): Routes => ({
+  // The PP table reads the language keys (icons) from the problem meta.
+  'GET /problems/meta': ok(problemMeta()),
   [`GET /users/${username}/solved`]: ok(solved()),
   [`GET /users/${username}/pp-breakdown`]: page([ppEntry(1), ppEntry(2)], {
     pageSize: 10,

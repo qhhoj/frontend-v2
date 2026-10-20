@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ChevronDown } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, useSlots } from 'vue';
 import { toolbarControlClass } from './toolbar-classes';
 
 /**
  * A native select (keyboard and screen readers for free) dressed as a toolbar button with a visible prefix. The select
  * itself covers the whole control, border included, invisible, so a tap anywhere on it opens the list and it is as tall as the
- * control (a touch target); the chosen text is drawn under it, in a box as wide as the longest option so the control keeps its width.
+ * control (a touch target); the chosen text is drawn under it, in a box as wide as the longest option so the control keeps its width. A `chosen-icon` slot (e.g. the chosen language's
+ * icon) is drawn inside that box, which then reserves its 16 px and gap for every option, chosen or not.
  */
 const props = defineProps<{
   label: string;
@@ -15,6 +16,7 @@ const props = defineProps<{
   active: boolean;
 }>();
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>();
+const hasIcon = Boolean(useSlots()['chosen-icon']);
 const chosen = computed(
   () => props.options.find((option) => option.value === props.modelValue)?.label ?? '',
 );
@@ -28,9 +30,13 @@ const chosen = computed(
         v-for="option in options"
         :key="option.value"
         class="invisible col-start-1 row-start-1 truncate"
+        :class="{ 'pl-5.5': hasIcon }"
         >{{ option.label }}</span
       >
-      <span class="col-start-1 row-start-1 truncate">{{ chosen }}</span>
+      <span class="col-start-1 row-start-1 flex min-w-0 items-center gap-1.5">
+        <slot name="chosen-icon" />
+        <span class="truncate">{{ chosen }}</span>
+      </span>
     </span>
     <select
       :value="modelValue"

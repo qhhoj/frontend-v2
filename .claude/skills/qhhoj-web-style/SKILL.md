@@ -43,6 +43,7 @@ Other tokens:
 - Control border: `border-line-control` on inputs, selects, textareas and secondary buttons (3:1 on their ground, WCAG 1.4.11); `border-line` stays the hairline of cards and dividers, `border-line-strong` the edge of menus and popovers.
 - Elevation: `shadow-float` on floating surfaces only (Modal, menus, popovers, toasts get it from the kit); everything else is flat.
 - Icons (Lucide): 14 dense admin chrome and small chips · 16 default · 20 hero and empty states. `IconButton` and `Chip` size an icon with no `size-*` class themselves.
+- Language marks: the one exception to Lucide-only. A programming language is shown as `LanguageLabel` (icon + name) or `LanguageIcon` (`src/components/language/`): a monochrome logo in the text colour, 16 px inline or a 32 px tile; versions share their language's icon; a language without a logo gets a Lucide icon or a short glyph in the same box. Never print `language.name` bare (native options and sentences excepted), never use a brand mark for anything but a language, never as a control. New logos and their licences: `src/assets/languages/LICENSES.md`.
 - Placeholder: muted text, never the content colour at 50 %.
 - Motion: `--qh-duration-fast` 150 ms, `--qh-duration` 200 ms, on colour, border and opacity only: `transition-colors`, never bare `transition`/`transition-all`/`transition-transform` (real motion such as a chevron turning is allowlisted with a reason in `scripts/transition-utilities.mjs`).
 - Admin density: `--qa-row`, `--qa-control`, `--qa-gap`, `--qa-gutter` (`src/features/admin/ui/admin-density.css`).
@@ -93,7 +94,7 @@ Known gaps: `Notice` has no icon override, `Chip` has no `to`, `StatGrid` values
 - No horizontal page scroll from 320 to 1440 px (`e2e/topbar-fit.e2e.ts`, `e2e/containment.e2e.ts`).
 - Empty states always offer one next step (`EmptyState`'s `#action` slot). Skeletons are shaped from the real component, never fixed pixel heights.
 - Active tab = `bg-accent-soft` + `text-accent-soft-text` + accent border.
-- Copy: Vietnamese first, through i18n (vi and en both), short and plain. Lucide icons only, no emoji. Dates: only `formatDate` presets from `src/lib/format-date.ts` (`short`, `date`, `datetime`; seconds only in logs), never `toLocale*String` or `Intl.DateTimeFormat` (`npm run lint:dates`).
+- Copy: Vietnamese first, through i18n (vi and en both), short and plain. Lucide icons only (language marks through `LanguageIcon` excepted), no emoji. Dates: only `formatDate` presets from `src/lib/format-date.ts` (`short`, `date`, `datetime`; seconds only in logs), never `toLocale*String` or `Intl.DateTimeFormat` (`npm run lint:dates`).
 - Person names in mock-ups, placeholders, examples and fixtures shown on screen: only `bitcoder` (a handle, not a real-looking personal name). Never invent other names.
 
 ## 5. Process

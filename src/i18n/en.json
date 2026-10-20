@@ -2738,6 +2738,8 @@
     "asleep": "Asleep. Submissions are routed to another judge.",
     "languages": "Programming languages",
     "search": "Find a language",
+    "logoCredit": "Language logos are trademarks of their owners.",
+    "logoLicences": "Sources and licences",
     "noMatch": "No language matches.",
     "noJudge": "No judge yet",
     "mismatch": "{count} on another version",

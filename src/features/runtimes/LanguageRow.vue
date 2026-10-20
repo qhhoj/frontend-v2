@@ -2,6 +2,7 @@
 import { ChevronDown, ChevronRight } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { RuntimeJudge, RuntimeLanguage } from '@/api/types/runtimes';
+import LanguageIcon from '@/components/language/LanguageIcon.vue';
 import Chip from '@/components/ui/Chip.vue';
 import { commonCompiler, commonVersion, mismatchedJudges } from './runtimes-model';
 
@@ -30,6 +31,7 @@ const detailId = computed(() => `language-${props.language.key}`);
       :class="{ 'bg-surface-strong': isOpen }"
       @click="$emit('toggle')"
     >
+      <LanguageIcon :language-key="language.key" size="md" />
       <span class="min-w-32 flex-1">
         <b>{{ language.name }}</b>
         <span class="block text-xs text-muted"

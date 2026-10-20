@@ -2738,6 +2738,8 @@
     "asleep": "Đang ngủ. Bài nộp được chuyển sang máy khác.",
     "languages": "Ngôn ngữ lập trình",
     "search": "Tìm ngôn ngữ",
+    "logoCredit": "Biểu tượng ngôn ngữ là nhãn hiệu của chủ sở hữu.",
+    "logoLicences": "Nguồn và giấy phép",
     "noMatch": "Không có ngôn ngữ nào khớp.",
     "noJudge": "Chưa có máy chấm",
     "mismatch": "{count} máy khác phiên bản",

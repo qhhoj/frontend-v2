@@ -3,6 +3,7 @@ import { Download, ExternalLink } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { API_BASE } from '@/api/client';
 import CopyButton from '@/components/CopyButton.vue';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { formatFileSize } from '@/lib/format';
 import { sourceLineCount } from '@/lib/source';
@@ -11,6 +12,7 @@ import { sourceLineCount } from '@/lib/source';
 const props = defineProps<{
   id: string;
   filename: string | null;
+  languageKey: string | null;
   languageName: string | null;
   text: string;
 }>();
@@ -31,7 +33,8 @@ const base = computed(() => `${API_BASE}/submissions/${encodeURIComponent(props.
       <b v-if="filename">{{ filename }}</b>
       <span class="text-muted">
         <template v-if="filename"> · </template
-        ><template v-if="languageName">{{ languageName }} · </template
+        ><template v-if="languageName"
+          ><LanguageLabel :language="{ key: languageKey, name: languageName }" /> · </template
         >{{ $t('submission.source.lines', { count: lines }) }} · {{ sizeText }}</span
       >
     </span>

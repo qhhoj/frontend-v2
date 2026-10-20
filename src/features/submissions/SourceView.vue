@@ -139,6 +139,7 @@ const isExpanded = computed(() => expandChoice.value ?? lineCount.value <= UNFOL
         v-if="data"
         :id="id"
         :filename="data.filename"
+        :language-key="languageKey"
         :language-name="languageName"
         :text="source"
       />
