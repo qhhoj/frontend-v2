@@ -233,3 +233,21 @@
   --qh-blob-2: rgba(242, 166, 90, 0.2);
   --qh-blob-3: rgba(217, 119, 87, 0.14);
 }
+
+:root[data-theme='glass-dark'][data-accent='red'],
+:root[data-theme='glass-dark'] [data-accent='red'] {
+  --qh-surface-hover: rgba(255, 255, 255, 0.08);
+  --qh-line-accent: #a85a50;
+  --qh-accent: #d0766c;
+  --qh-accent-2: #da8a80;
+  --qh-accent-text: #f59a90;
+  --qh-accent-soft: rgba(208, 118, 108, 0.14);
+  --qh-accent-soft-text: #f5d0ca;
+  --qh-on-accent: #140a1f;
+  --qh-focus-ring: #eeb2aa;
+  --qh-gradient-accent: linear-gradient(90deg, #d0766c, #da8a80);
+  --qh-glow: 0 0 12px #d0766c;
+  --qh-blob-1: rgba(208, 118, 108, 0.24);
+  --qh-blob-2: rgba(196, 80, 76, 0.2);
+  --qh-blob-3: rgba(208, 118, 108, 0.14);
+}

@@ -47,7 +47,7 @@
       document.documentElement.dataset.theme = theme;
       document.querySelector('meta[name="theme-color"]').setAttribute('content', grounds[theme]);
       // `accents` must match ACCENTS in src/theme/appearance.ts; prepaint.spec.ts enforces it.
-      var accents = ['clay', 'orchid', 'ocean', 'mint', 'sunset', 'gold', 'mono'];
+      var accents = ['clay', 'orchid', 'ocean', 'mint', 'sunset', 'gold', 'mono', 'red'];
       var look = null;
       try {
         look = JSON.parse(localStorage.getItem('qhhoj.paintedAppearance'));

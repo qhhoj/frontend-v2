@@ -7351,7 +7351,7 @@ export interface components {
              * @description Accent colour preset.
              * @enum {string}
              */
-            accent: "clay" | "gold" | "mint" | "mono" | "ocean" | "orchid" | "sunset";
+            accent: "clay" | "gold" | "mint" | "mono" | "ocean" | "orchid" | "red" | "sunset";
             /** @description Glass effect strength, 0-100. */
             glass: number;
             /** @description Glow effect strength, 0-100. */

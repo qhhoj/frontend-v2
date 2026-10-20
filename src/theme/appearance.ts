@@ -12,6 +12,7 @@ export const ACCENTS = [
   { id: 'sunset', labelKey: 'appearance.accent.sunset' },
   { id: 'gold', labelKey: 'appearance.accent.gold' },
   { id: 'mono', labelKey: 'appearance.accent.mono' },
+  { id: 'red', labelKey: 'appearance.accent.red' },
 ] as const;
 
 export type AccentId = (typeof ACCENTS)[number]['id'];
