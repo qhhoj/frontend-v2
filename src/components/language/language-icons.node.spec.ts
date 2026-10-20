@@ -95,7 +95,10 @@ describe('language icons', () => {
     },
   );
 
-  it('falls back to the generic icon when the caller has no key', () => {
-    expect(languageIconOf(null, 'sm')).toEqual({ kind: 'lucide', icon: FileCode2 });
-  });
+  it.each([[null], [undefined]])(
+    'falls back to the generic icon when the caller has no key (%j)',
+    (key) => {
+      expect(languageIconOf(key, 'sm')).toEqual({ kind: 'lucide', icon: FileCode2 });
+    },
+  );
 });
