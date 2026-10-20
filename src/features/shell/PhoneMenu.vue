@@ -22,8 +22,9 @@ import { useAccountLinks } from './account-links';
 /**
  * P-01 A: the phone header's menu. A sheet drops from the top with what the desktop row shows beside the navigation:
  * the language, the light/dark mode (the rest of the look is one link away), the official-mode pill and the account
- * (its pages and sign-out, or sign-in and register), and for a signed-in viewer the notifications with their unread count,
- * which a dot on the menu button signals too. Any navigation closes it; focus goes back to the menu button.
+ * (who is signed in, then its pages in the desktop menu's order and sign-out, or sign-in and register), and for a
+ * signed-in viewer the notifications with their unread count, which a dot on the menu button signals too. Any
+ * navigation closes it; focus goes back to the menu button.
  */
 const props = defineProps<{ unread: number }>();
 const LANGUAGES: ReadonlyArray<{ value: Locale; label: string }> = [
@@ -104,11 +105,18 @@ const drawerPt = computed(() => ({
       v-if="session.user"
       :aria-label="$t('account.menu', { username: session.user.username })"
     >
-      <RouterLink :to="{ name: 'user', params: { username: session.user.username } }" :class="ROW">
+      <div
+        data-testid="phone-menu-identity"
+        class="flex min-h-11 items-center gap-3 px-3 font-semibold"
+      >
         <UserAvatar :username="session.user.username" :size="28" class="shrink-0" />
         <span :class="['min-w-0 truncate', ratingTextClass(session.user.rating)]">{{
           session.user.username
         }}</span>
+      </div>
+      <RouterLink v-for="link in links" :key="link.labelKey" :to="link.to" :class="ROW">
+        <component :is="link.icon" aria-hidden="true" class="size-5 text-muted" />
+        {{ $t(link.labelKey) }}
       </RouterLink>
       <RouterLink
         :to="{ name: 'notifications' }"
@@ -125,10 +133,6 @@ const drawerPt = computed(() => ({
           >
           <span class="sr-only">{{ $t('notifications.unreadCount', { count: unread }) }}</span>
         </template>
-      </RouterLink>
-      <RouterLink v-for="link in links" :key="link.labelKey" :to="link.to" :class="ROW">
-        <component :is="link.icon" aria-hidden="true" class="size-5 text-muted" />
-        {{ $t(link.labelKey) }}
       </RouterLink>
     </section>
     <div>

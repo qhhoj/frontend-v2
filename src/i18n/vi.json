@@ -404,6 +404,7 @@
     "register": "Đăng ký",
     "logout": "Đăng xuất",
     "menu": "Tài khoản của {username}",
+    "profile": "Hồ sơ của tôi",
     "settings": "Cài đặt",
     "admin": "Quản trị"
   },
@@ -443,6 +444,7 @@
     },
     "profile": {
       "lead": "Thông tin công khai và lựa chọn mặc định khi bạn nộp bài.",
+      "viewPublic": "Xem hồ sơ công khai",
       "firstNameHint": "Hiện trên trang cá nhân, bảng xếp hạng và bình luận. Tên đăng nhập {username} không đổi được.",
       "aboutViews": "Cách xem phần giới thiệu",
       "aboutTab": {
