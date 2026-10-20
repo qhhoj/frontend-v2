@@ -26,7 +26,8 @@ const props = defineProps<{
   submissions: SubmissionListItem[];
   columns: readonly ColumnKey[];
   highlightIds: ReadonlySet<string>;
-  problemLabels: Record<string, string>;
+  /** A contest's problems by code: the row shows the letter and scores by the contest's points. */
+  contestProblems: Readonly<Record<string, { label: string; points: number }>>;
   pickedIds?: readonly string[];
 }>();
 const emit = defineEmits<{ togglePick: [id: string] }>();
@@ -37,6 +38,8 @@ const now = useNow(RELATIVE_REFRESH_MS);
 const isShown = (key: ColumnKey) => props.columns.includes(key);
 const pickOrder = (id: string) => (props.pickedIds?.indexOf(id) ?? -1) + 1;
 const summaryOf = (row: SubmissionListItem) => row.testSummary ?? null;
+const contestProblemOf = (row: SubmissionListItem) =>
+  row.problem ? props.contestProblems[row.problem.code] : undefined;
 const hasCost = (row: SubmissionListItem) =>
   isShown('cost') && isFinished(row) && row.time !== null && row.memory !== null;
 const rowLabel = (row: SubmissionListItem) =>
@@ -83,13 +86,13 @@ const PILL =
         :picked-count="pickedIds.length"
         @toggle="emit('togglePick', $event)"
       />
-      <ScoreRing :row="row" />
+      <ScoreRing :row="row" :contest-max="contestProblemOf(row)?.points" />
       <div class="min-w-0">
         <SubmissionProblemName
           v-if="isShown('problem')"
           class="text-sm md:text-base"
           :problem="row.problem"
-          :label="row.problem ? problemLabels[row.problem.code] : undefined"
+          :label="contestProblemOf(row)?.label"
           show-code
         />
         <div

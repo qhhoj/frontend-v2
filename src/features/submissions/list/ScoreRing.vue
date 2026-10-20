@@ -9,17 +9,25 @@ import { isFinished } from '../submission-row';
 /**
  * A card's score (40 px in a phone's ledger row, 56 px from md): the share of the problem's points as a ring in the verdict's colour, the percent in the middle. A row still
  * being graded fills with the points judged so far; one with no score (CE, IE, queued) shows its code on an empty ring.
+ * `contestMax` (a contest's list) scores the row by its contest points over the contest problem's, as the ranking does.
  */
-const props = defineProps<{ row: SubmissionListItem }>();
+const props = defineProps<{ row: SubmissionListItem; contestMax?: number }>();
 const PERCENT = 100;
 const FULL_TURN_DEGREES = 360;
 const verdict = computed(() => submissionVerdictOf(props.row));
 const isGrading = computed(() => props.row.status === 'G');
+/** The contest's points when the list is a contest's and the row still holds them, else the problem's. */
+const score = computed(() => {
+  const contestPoints = props.row.contest?.points ?? null;
+  if (props.contestMax !== undefined && contestPoints !== null)
+    return { points: contestPoints, max: props.contestMax };
+  return { points: props.row.points, max: props.row.problem?.points ?? 0 };
+});
 const fraction = computed(() => {
   if (isGrading.value) return ringFraction(props.row);
-  const max = props.row.problem?.points ?? 0;
-  if (!isFinished(props.row) || props.row.points === null || max <= 0) return null;
-  return Math.min(1, Math.max(0, props.row.points / max));
+  const { points, max } = score.value;
+  if (!isFinished(props.row) || points === null || max <= 0) return null;
+  return Math.min(1, Math.max(0, points / max));
 });
 const percent = computed(() => Math.round((fraction.value ?? 0) * PERCENT));
 const colour = computed(() =>

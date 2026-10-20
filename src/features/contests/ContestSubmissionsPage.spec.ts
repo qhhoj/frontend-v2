@@ -97,13 +97,15 @@ describe('contest submissions tab', () => {
     expect(wrapper.find('[data-testid="own-only"]').exists()).toBe(false);
   });
 
-  it('filters by problem letter and lists ledger rows, without the site-wide stats (P-21)', async () => {
+  it('lists the site rows with the contest letter and contest score, without the site-wide stats', async () => {
     vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
     const twoProblems = contestDetail({ problems: [contestProblem(0), contestProblem(1)] });
     const row = submissionItem({
       id: 'sub-b',
       problem: { code: 'r42b', name: 'Bài B', isDeleted: false, points: 100 },
       result: 'WA',
+      points: 65,
+      contest: { key: 'r42', name: 'r42', minute: 30, points: 0 },
     });
     const calls = mockApi({
       ...signedInViewer(),
@@ -113,12 +115,10 @@ describe('contest submissions tab', () => {
     });
     const { wrapper } = await mountApp('/contests/r42/submissions');
     expect(calls.some((call) => call.path === '/submissions/stats')).toBe(false);
-    const ledgerRow = wrapper.get('[data-testid="submission-ledger"] [data-id="sub-b"]');
-    expect(ledgerRow.text()).toContain('B');
-    expect(ledgerRow.text()).toContain('WA');
-    const chipB = wrapper.findAll('[role="search"] button').find((chip) => chip.text() === 'B')!;
-    await chipB.trigger('click');
-    await vi.waitFor(() => expect(listCalls(calls).at(-1)!.query.get('problem')).toBe('r42b'));
+    const card = wrapper.get('[data-testid="submission-card-list"] [data-id="sub-b"]');
+    expect(card.text()).toContain('B');
+    expect(card.text()).toContain('WA');
+    expect(card.get('[role="img"]').attributes('aria-label')).toBe('Điểm 0%');
   });
 
   it.each([
@@ -146,10 +146,10 @@ describe('contest submissions tab', () => {
     expect(link.attributes('href')).toBe(href);
   });
 
-  it('keeps the live switch and lights the letter, not an advanced panel, for a problem link', async () => {
+  it('keeps the live switch and opens the filters on the problem of a problem link', async () => {
     vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
     const twoProblems = contestDetail({ problems: [contestProblem(0), contestProblem(1)] });
-    mockApi({
+    const calls = mockApi({
       ...signedInViewer(),
       ...contestPageRoutes(twoProblems),
       'GET /contests/r42/submissions': page([]),
@@ -157,9 +157,7 @@ describe('contest submissions tab', () => {
     });
     const { wrapper } = await mountApp('/contests/r42/submissions?problem=r42b&live=0');
     expect(wrapper.get('[data-testid="live-toggle"]').attributes('aria-pressed')).toBe('false');
-    expect(wrapper.find('[data-testid="advanced-filters"]').exists()).toBe(false);
-    expect(wrapper.find('#submission-advanced-filters').exists()).toBe(false);
-    const chipB = wrapper.findAll('[role="search"] button').find((chip) => chip.text() === 'B')!;
-    expect(chipB.attributes('aria-pressed')).toBe('true');
+    expect(wrapper.find('#submission-advanced-filters').exists()).toBe(true);
+    expect(listCalls(calls)[0]!.query.get('problem')).toBe('r42b');
   });
 });

@@ -15,7 +15,6 @@ import { usePageTitle } from '@/router/page-title';
 import { useSessionStore } from '@/stores/session.store';
 import ContestCompactHeader from './ContestCompactHeader.vue';
 import ContestNotFound from './ContestNotFound.vue';
-import ContestSubmissionChips from './ContestSubmissionChips.vue';
 import ContestTabs from './ContestTabs.vue';
 import { useContestQuery } from './contests.queries';
 import { ownSubmissionsOnly } from './own-submissions';
@@ -40,11 +39,6 @@ const problemSource = computed<ProblemPickerSource>(() => ({
   kind: 'contest',
   problems: contest.value?.problems ?? [],
 }));
-const labels = computed(() =>
-  Object.fromEntries(
-    (contest.value?.problems ?? []).map((problem) => [problem.code, problem.label]),
-  ),
-);
 const isMissing = computed(
   () => contestError.value instanceof ApiError && contestError.value.status === 404,
 );
@@ -92,11 +86,7 @@ const emptyNextOf = (code: string): ContestProblem => {
         v-if="canAsk"
         :scope="scope"
         :problem-source="problemSource"
-        :problem-labels="labels"
         :show-stats="false"
-        ledger
-        :advanced-filters="!isOwnOnly"
-        problem-by-chip
         show-status-groups
         empty-key="contests.submissions.empty"
       >
@@ -109,15 +99,6 @@ const emptyNextOf = (code: string): ContestProblem => {
               $t('contests.submissions.openProblem', { label: emptyNextOf(filters.problem).label })
             }}
           </AppButton>
-        </template>
-        <template #filters="{ filters, update, advanced, toggleAdvanced }">
-          <ContestSubmissionChips
-            :filters="filters"
-            :problems="contest?.problems ?? []"
-            :advanced="advanced"
-            @update="update"
-            @toggle-advanced="toggleAdvanced"
-          />
         </template>
       </SubmissionList>
     </template>
