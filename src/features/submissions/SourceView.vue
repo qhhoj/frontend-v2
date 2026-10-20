@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppButton from '@/components/ui/AppButton.vue';
-import { computed, onMounted, ref, toRef, watchEffect } from 'vue';
+import { computed, onMounted, ref, toRef, watch, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import type { SourceAccess } from '@/api/types/submissions';
@@ -70,8 +70,15 @@ const lineCount = computed(() => sourceLineCount(source.value));
 const lineNumbers = computed(() =>
   Array.from({ length: lineCount.value }, (_unused, index) => index + 1).join('\n'),
 );
-/** The source opens folded, whatever its length; "View source" links (#source) open it unfolded. */
-const isExpanded = ref(route.hash === '#source');
+/** A source up to this many lines opens unfolded, since the code is what most readers come for; a longer one opens folded. */
+const UNFOLDED_MAX_LINES = 200;
+/** The reader's own choice, null to follow the length; "View source" links (#source) open the source unfolded whatever its length. */
+const expandChoice = ref<boolean | null>(route.hash === '#source' ? true : null);
+watch(
+  () => props.id,
+  () => (expandChoice.value = null),
+);
+const isExpanded = computed(() => expandChoice.value ?? lineCount.value <= UNFOLDED_MAX_LINES);
 </script>
 
 <template>
@@ -83,7 +90,7 @@ const isExpanded = ref(route.hash === '#source');
           v-if="data && isExpanded"
           aria-controls="source-code"
           :aria-expanded="true"
-          @click="isExpanded = false"
+          @click="expandChoice = false"
         >
           {{ $t('submission.source.collapse') }}
         </AppButton>
@@ -122,7 +129,7 @@ const isExpanded = ref(route.hash === '#source');
           aria-controls="source-code"
           :aria-expanded="false"
           class="flex min-h-11 w-full items-center justify-center rounded-row border border-dashed border-line bg-surface-strong px-5 font-mono text-sm font-semibold hover:bg-surface-hover"
-          @click="isExpanded = true"
+          @click="expandChoice = true"
         >
           {{ $t('submission.source.expand', { count: lineCount }) }}
         </button>

@@ -1,5 +1,5 @@
 import type { CaseStatus, SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
-import { PARTIAL_CODE, isPartial } from '@/lib/verdicts';
+import { BLOCK_TONE_CLASSES, PARTIAL_CODE, caseVerdictOf, isPartial } from '@/lib/verdicts';
 
 /** The case status of a test the judge did not run because an earlier test of its subtask failed. */
 export const SKIPPED_STATUS: CaseStatus = 'SC';
@@ -27,6 +27,12 @@ export interface OverviewRow {
 }
 
 const isSkipped = (testCase: SubmissionCase) => testCase.status === SKIPPED_STATUS;
+/** The tone of a test's square or tile: dashed when skipped, outlined when partial (the caller fills it), else solid by verdict. */
+export function caseTileClass(testCase: SubmissionCase): string {
+  if (isSkipped(testCase)) return 'border border-dashed border-line-strong';
+  const { code, tone } = caseVerdictOf(testCase);
+  return code === PARTIAL_CODE ? 'border border-verdict-partial' : BLOCK_TONE_CLASSES[tone];
+}
 /** A test that did not pass and was run (a skipped test is not a failure). */
 export const isFailed = (testCase: SubmissionCase) =>
   testCase.status !== 'AC' && !isSkipped(testCase);

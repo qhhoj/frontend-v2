@@ -33,7 +33,6 @@ describe('a submission of a deleted problem', () => {
     expect(wrapper.find('a[href="/problems/duongdi"]').exists()).toBe(false);
     expect(wrapper.text()).toContain('Đường đi ngắn nhất');
     expect(calls.some((call) => call.path === '/problems/duongdi')).toBe(false);
-    await wrapper.get('[data-testid="source-expand"]').trigger('click');
     expect(wrapper.text()).toContain('int main');
   });
 

@@ -5,27 +5,22 @@ import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
-import {
-  BLOCK_TONE_CLASSES,
-  PARTIAL_CODE,
-  VERDICT_TONE_CLASSES,
-  caseVerdictOf,
-  verdictOfCode,
-} from '@/lib/verdicts';
+import { PARTIAL_CODE, VERDICT_TONE_CLASSES, caseVerdictOf, verdictOfCode } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import {
   buildOverviewRows,
+  caseTileClass,
   earnedTone,
   reasonParts,
   scoreConversion,
-  SKIPPED_STATUS,
   type OverviewRow,
 } from './test-overview';
 
 /**
  * The foot of the result card (`CasesTable.vue`'s `footer` slot): with subtasks, one row each, one square per test filled by its
  * share of points; then the total with how test points became the score. Squares link to the test's row (`#case-<n>`). Below
- * `sm` the squares hide and each subtask row stacks: name and points, then the verdict and its reason.
+ * `sm` the squares hide and each subtask row stacks: name and points, then the verdict and its reason. From `xl` the card is the
+ * page's narrow rail, its test rows sit just above, so the squares hide there too and the table needs no minimum width.
  */
 const props = defineProps<{
   cases: SubmissionCase[] | null;
@@ -58,11 +53,6 @@ const rows = computed(() => buildOverviewRows(props.cases, props.batches));
 const hasBatches = computed(() => rows.value.some((row) => row.batch !== null));
 
 const caseLabel = (testCase: SubmissionCase) => translate(caseVerdictOf(testCase).labelKey);
-function squareClass(testCase: SubmissionCase): string {
-  if (testCase.status === SKIPPED_STATUS) return 'border border-dashed border-line-strong';
-  const { code, tone } = caseVerdictOf(testCase);
-  return code === PARTIAL_CODE ? 'border border-verdict-partial' : BLOCK_TONE_CLASSES[tone];
-}
 /** A partial square fills from the bottom by the test's share of its points. */
 function squareStyle(testCase: SubmissionCase) {
   if (caseVerdictOf(testCase).code !== PARTIAL_CODE) return undefined;
@@ -136,7 +126,7 @@ const explanation = computed(() => {
 <template>
   <div v-if="rows.length" data-testid="test-overview">
     <ScrollRegion v-if="hasBatches" :label="$t('submission.overview.scrollRegion')">
-      <table class="w-full border-collapse text-sm max-sm:block sm:min-w-[640px]">
+      <table class="w-full border-collapse text-sm max-sm:block sm:min-w-[640px] xl:min-w-0">
         <caption
           class="border-t border-line px-4 pt-4 pb-2 text-left text-sm font-bold max-sm:block sm:px-6"
         >
@@ -149,7 +139,7 @@ const explanation = computed(() => {
             <th scope="col" class="px-4 py-2 font-medium sm:px-6">
               {{ $t('submission.overview.group') }}
             </th>
-            <th scope="col" class="px-3 py-2 font-medium max-sm:hidden">
+            <th scope="col" class="px-3 py-2 font-medium max-sm:hidden xl:hidden">
               {{ $t('submission.overview.tests') }}
             </th>
             <th scope="col" class="px-3 py-2 font-medium">
@@ -183,7 +173,7 @@ const explanation = computed(() => {
                 }}
               </span>
             </th>
-            <td class="px-3 py-3.5 max-sm:hidden">
+            <td class="px-3 py-3.5 max-sm:hidden xl:hidden">
               <div class="flex max-w-72 flex-wrap gap-1">
                 <a
                   v-for="testCase in row.cases"
@@ -192,7 +182,7 @@ const explanation = computed(() => {
                   :title="squareTitle(testCase)"
                   :aria-label="squareTitle(testCase)"
                   class="size-4 rounded-skeleton focus-visible:outline-2 focus-visible:outline-offset-2"
-                  :class="squareClass(testCase)"
+                  :class="caseTileClass(testCase)"
                   :style="squareStyle(testCase)"
                 />
               </div>

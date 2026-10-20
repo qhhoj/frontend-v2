@@ -1464,6 +1464,12 @@
       "explainMin": "Each subtask scores its lowest test. Sum {parts} = {cases}, scaled {percent}% × {max} = {points} points.",
       "rounding": "Test points show 2 decimals; the total uses exact points rounded to 1 decimal."
     },
+    "summary": {
+      "tiles": "Each test",
+      "allCorrect": "All {count} tests correct · slowest {time} · {memory}",
+      "table": "Table of {count} tests (time, memory)",
+      "moreLosses": "+{count} more tests lost points · Table of {total} tests"
+    },
     "cases": {
       "title": "Judging result",
       "scrollRegion": "Judging result, scroll sideways",
@@ -1479,7 +1485,8 @@
       "feedback": "Feedback",
       "extendedFeedback": "Detailed feedback",
       "output": "Output",
-      "compileLogHidden": "Compilation error. The compile log shows only to viewers who may see the source."
+      "compileLogHidden": "Compilation error. The compile log shows only to viewers who may see the source.",
+      "detailsTitle": "Test details"
     },
     "source": {
       "title": "Source code",
