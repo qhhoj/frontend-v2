@@ -39,11 +39,12 @@ describe('contest submissions tab', () => {
     const calls = mockApi({
       ...signedInViewer(),
       ...contestPageRoutes(contestDetail()),
-      'GET /contests/r42/submissions': page([]),
+      'GET /contests/r42/submissions': page([submissionItem()]),
       ...submissionListRoutes,
     });
     const { wrapper } = await mountApp('/contests/r42/submissions?user=other');
     expect(wrapper.get('[data-testid="own-only"]').text()).toContain('chỉ bạn thấy');
+    expect(wrapper.get('[data-id="sub-1"]').text()).not.toContain(sessionUser().username);
     expect(listCalls(calls)[0]!.query.get('user')).toBe(sessionUser().username);
     await wrapper.get('[data-testid="advanced-filters"]').trigger('click');
     expect(wrapper.find('#submission-advanced-filters').exists()).toBe(true);
@@ -99,29 +100,35 @@ describe('contest submissions tab', () => {
     expect(wrapper.find('[data-testid="own-only"]').exists()).toBe(false);
   });
 
-  it('lists the site rows with the contest letter and contest score, without the site-wide stats', async () => {
-    vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
-    const twoProblems = contestDetail({ problems: [contestProblem(0), contestProblem(1)] });
-    const row = submissionItem({
-      id: 'sub-b',
-      problem: { code: 'r42b', name: 'Bài B', isDeleted: false, points: 100 },
-      result: 'WA',
-      points: 65,
-      contest: { key: 'r42', name: 'r42', minute: 30, points: 0 },
-    });
-    const calls = mockApi({
-      ...signedInViewer(),
-      ...contestPageRoutes(twoProblems),
-      'GET /contests/r42/submissions': page([row]),
-      ...submissionListRoutes,
-    });
-    const { wrapper } = await mountApp('/contests/r42/submissions');
-    expect(calls.some((call) => call.path === '/submissions/stats')).toBe(false);
-    const card = wrapper.get('[data-testid="submission-card-list"] [data-id="sub-b"]');
-    expect(card.text()).toContain('B');
-    expect(card.text()).toContain('WA');
-    expect(card.get('[role="img"]').attributes('aria-label')).toBe('Điểm 0%');
-  });
+  it.each([
+    ["its contest points over the contest problem's", 30, 'Điểm 60%'],
+    ["its own points over the problem's once no contest row holds any", null, 'Điểm 65%'],
+  ])(
+    'lists the site rows with the contest letter, scored by %s, without the site-wide stats',
+    async (_case, contestPoints, ringLabel) => {
+      vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
+      const problems = [contestProblem(0), contestProblem(1, { points: 50 })];
+      const row = submissionItem({
+        id: 'sub-b',
+        problem: { code: 'r42b', name: 'Bài B', isDeleted: false, points: 100 },
+        result: 'WA',
+        points: 65,
+        contest: { key: 'r42', name: 'r42', minute: 30, points: contestPoints },
+      });
+      const calls = mockApi({
+        ...signedInViewer(),
+        ...contestPageRoutes(contestDetail({ problems })),
+        'GET /contests/r42/submissions': page([row]),
+        ...submissionListRoutes,
+      });
+      const { wrapper } = await mountApp('/contests/r42/submissions');
+      expect(calls.some((call) => call.path === '/submissions/stats')).toBe(false);
+      const card = wrapper.get('[data-testid="submission-card-list"] [data-id="sub-b"]');
+      expect(card.text()).toContain('B');
+      expect(card.text()).toContain('WA');
+      expect(card.get('[role="img"]').attributes('aria-label')).toBe(ringLabel);
+    },
+  );
 
   it.each([
     ['the first problem', '/contests/r42/submissions', 'Mở đề bài A', '/problems/r42a'],

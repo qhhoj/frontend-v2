@@ -69,9 +69,11 @@ const hasFixedUser = computed(() => fixedUserOf(props.scope) !== null);
 const chipUsername = computed(() =>
   isSignedIn.value && !hasFixedUser.value ? (session.user?.username ?? null) : null,
 );
-/** "Của tôi" on: every row is the viewer's own, so the rows leave the name out and the run time keeps its room. */
+/** One user's list (the scope's, or "Của tôi" on): the rows leave the name out and the run time keeps its room. */
 const isOwnList = computed(
-  () => chipUsername.value !== null && filters.value.user === chipUsername.value,
+  () =>
+    hasFixedUser.value ||
+    (chipUsername.value !== null && filters.value.user === chipUsername.value),
 );
 const shownColumns = computed(() => {
   const columns = props.columnKeys ?? ALL_COLUMN_KEYS;
