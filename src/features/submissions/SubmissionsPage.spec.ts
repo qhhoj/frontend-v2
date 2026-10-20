@@ -189,6 +189,22 @@ describe('the submission cards', () => {
     ]);
   });
 
+  it('scores a contest row by its problem points, not its contest points', async () => {
+    const contestRow = submissionItem({
+      result: 'WA',
+      points: 65,
+      contest: { key: 'r42', name: 'r42', minute: 30, points: 30 },
+    });
+    mockApi({
+      ...signedInViewer(),
+      ...submissionListRoutes,
+      'GET /submissions': page([contestRow]),
+    });
+    const { wrapper } = await openList();
+    const ring = wrapper.get('[data-id="sub-1"] > [role="img"]');
+    expect(ring.attributes('aria-label')).toBe('Điểm 65%');
+  });
+
   it('names the test under the strip as the arrow keys move along it', async () => {
     mockApi({ ...signedInViewer(), ...submissionListRoutes, 'GET /submissions': page([judged]) });
     const { wrapper } = await openList();
