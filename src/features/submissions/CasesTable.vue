@@ -6,9 +6,10 @@ import VerdictLabel from '@/components/VerdictLabel.vue';
 import { translate } from '@/i18n';
 import CaseDetails from './CaseDetails.vue';
 import { caseDetails, type CaseDetail } from './case-details';
-import { formatCaseMemory, formatCaseTime, formatNumber } from '@/lib/format';
+import { formatCaseMemory, formatCaseTime } from '@/lib/format';
 import { PARTIAL_CODE, caseVerdictOf, type Verdict } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
+import { formatCasePoints, pendingPositions } from './test-overview';
 
 /**
  * The result card ("Kết quả chấm"): the compile log, one row per test, then the `footer` slot (the subtasks and the total,
@@ -33,11 +34,6 @@ const props = defineProps<{
 
 const locale = useLocaleStore();
 const NO_VALUE = '—';
-const POINT_FRACTION_DIGITS = 2;
-const formatPoints = (earned: number, total: number) =>
-  [earned, total]
-    .map((value) => formatNumber(value, locale.locale, POINT_FRACTION_DIGITS, false))
-    .join('/');
 const COLUMN_KEYS = ['test', 'result', 'time', 'memory', 'points'] as const;
 
 interface GradedRow {
@@ -56,7 +52,7 @@ const caseRow = (testCase: SubmissionCase): GradedRow => ({
   verdict: caseVerdictOf(testCase),
   time: formatCaseTime(testCase.time),
   memory: formatCaseMemory(testCase.memory),
-  points: formatPoints(testCase.points, testCase.total),
+  points: formatCasePoints(testCase.points, testCase.total, locale.locale),
   details: caseDetails(testCase),
 });
 const batchRow = (batch: SubmissionBatch): GradedRow => ({
@@ -65,22 +61,16 @@ const batchRow = (batch: SubmissionBatch): GradedRow => ({
   verdict: caseVerdictOf(batch),
   time: NO_VALUE,
   memory: NO_VALUE,
-  points: formatPoints(batch.points, batch.total),
+  points: formatCasePoints(batch.points, batch.total, locale.locale),
   details: [],
 });
 
 const gradedRows = computed(() =>
   props.cases ? props.cases.map(caseRow) : (props.batches ?? []).map(batchRow),
 );
-/** Numbers of the tests after the graded ones; only a row in progress with a known test count has them. */
-const pendingNumbers = computed(() => {
-  if (!props.running || !props.cases || !props.totalCases) return [];
-  const firstPending = props.cases.length + 1;
-  return Array.from(
-    { length: Math.max(0, props.totalCases - props.cases.length) },
-    (_unused, offset) => firstPending + offset,
-  );
-});
+const pendingNumbers = computed(() =>
+  pendingPositions(props.cases, props.totalCases, props.running),
+);
 /** The phone card grid of a row and where each cell sits in it; from `sm` up they are plain table cells. */
 const ROW_CARD =
   'max-sm:grid max-sm:grid-cols-[auto_minmax(0,1fr)_auto] max-sm:items-center max-sm:gap-x-2.5 max-sm:gap-y-0.5 max-sm:px-4 max-sm:py-2.5';

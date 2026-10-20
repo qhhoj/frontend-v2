@@ -51,6 +51,12 @@ describe('ResultSummaryCard', () => {
     expect(wrapper.text()).toContain('Tất cả 10 test đúng · lâu nhất 0.01s · 3.2 MB');
   });
 
+  it('never says all correct when fewer tests were graded than the problem has', () => {
+    const wrapper = mountCard([], { totalCases: 20 });
+    expect(wrapper.text()).toContain('10/20 test đúng');
+    expect(wrapper.text()).not.toContain('Tất cả');
+  });
+
   it('shows the tests still waiting while the grading goes on, not as buttons', () => {
     const wrapper = mountComponent(ResultSummaryCard, {
       props: { cases: cases([]).slice(0, 4), batches: null, totalCases: 10, running: true },

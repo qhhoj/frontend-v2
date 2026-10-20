@@ -335,6 +335,39 @@ describe('submission page', () => {
   });
 });
 
+describe('submission page layout below xl', () => {
+  /** The cards of the page body in DOM order; below xl `max-xl:order-first` lifts a card to the top of the stack. */
+  const bodyOrder = (wrapper: Awaited<ReturnType<typeof openSubmission>>['wrapper']) =>
+    [
+      ...wrapper.element.querySelectorAll(
+        '[data-testid="result-summary"], #source, [data-testid="cases-card"]',
+      ),
+    ].map((card) => card.id || card.getAttribute('data-testid'));
+
+  it('puts a compile error above the source and sums no tests up', async () => {
+    const compileError = submissionDetail({
+      status: 'CE',
+      result: 'CE',
+      points: null,
+      error: 'main.cpp:3: error: expected ;',
+      cases: [],
+    });
+    mockApi({ ...signedInViewer(), ...submissionPageRoutes(compileError), ...problemPageRoutes() });
+    const { wrapper } = await openSubmission('sub-1');
+    const casesCard = wrapper.get('[data-testid="cases-card"]');
+    expect(casesCard.text()).toContain('main.cpp:3: error: expected ;');
+    expect(wrapper.find('[data-testid="result-summary"]').exists()).toBe(false);
+    expect(casesCard.classes()).toContain('max-xl:order-first');
+  });
+
+  it('sums a wrong answer up above the source and keeps the full table after it', async () => {
+    mockApi({ ...signedInViewer(), ...submissionPageRoutes(), ...problemPageRoutes() });
+    const { wrapper } = await openSubmission('sub-1');
+    expect(bodyOrder(wrapper)).toEqual(['result-summary', 'source', 'cases']);
+    expect(wrapper.get('[data-testid="cases-card"]').classes()).not.toContain('max-xl:order-first');
+  });
+});
+
 describe('submission page of a contest submission (P-14 B)', () => {
   const contest = contestDetail({
     formatName: 'ioi',

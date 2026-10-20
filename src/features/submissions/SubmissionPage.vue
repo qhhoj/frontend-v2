@@ -155,9 +155,10 @@ const hasResultSummary = computed(() => {
           <SubmissionHeroSkeleton />
           <SubmissionFactsSkeleton />
         </div>
+        <!-- Results first, as the page puts its result summary above the source below xl; from xl the grid places both. -->
         <div :class="SUMMARY">
-          <SourceViewSkeleton :class="SOURCE_PLACE" />
           <CasesTableSkeleton :class="RESULTS_PLACE" />
+          <SourceViewSkeleton :class="SOURCE_PLACE" />
         </div>
       </template>
       <div v-if="row && verdict" :class="STACK">

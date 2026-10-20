@@ -4,13 +4,15 @@ import { ArrowDownWideNarrow, Info, Sigma } from 'lucide-vue-next';
 import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { translate } from '@/i18n';
-import { formatNumber } from '@/lib/format';
 import { PARTIAL_CODE, VERDICT_TONE_CLASSES, caseVerdictOf, verdictOfCode } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import {
   buildOverviewRows,
   caseTileClass,
+  caseTitle,
   earnedTone,
+  formatCasePoints,
+  formatPoints,
   reasonParts,
   scoreConversion,
   type OverviewRow,
@@ -37,11 +39,10 @@ const props = defineProps<{
   inContest?: boolean;
 }>();
 
-const POINT_FRACTION_DIGITS = 2;
 const PERCENT = 100;
 const NO_VALUE = '—';
 const locale = useLocaleStore();
-const format = (value: number) => formatNumber(value, locale.locale, POINT_FRACTION_DIGITS, false);
+const format = (value: number) => formatPoints(value, locale.locale);
 const EARNED_TONE_CLASSES = {
   full: 'text-verdict-ac',
   none: 'text-verdict-wa',
@@ -52,7 +53,6 @@ const RULE_ICONS = { sum: Sigma, min: ArrowDownWideNarrow } as const;
 const rows = computed(() => buildOverviewRows(props.cases, props.batches));
 const hasBatches = computed(() => rows.value.some((row) => row.batch !== null));
 
-const caseLabel = (testCase: SubmissionCase) => translate(caseVerdictOf(testCase).labelKey);
 /** A partial square fills from the bottom by the test's share of its points. */
 function squareStyle(testCase: SubmissionCase) {
   if (caseVerdictOf(testCase).code !== PARTIAL_CODE) return undefined;
@@ -61,12 +61,7 @@ function squareStyle(testCase: SubmissionCase) {
     background: `linear-gradient(to top, var(--qh-verdict-partial) ${filled}%, var(--qh-partial-bg-3) 0)`,
   };
 }
-const squareTitle = (testCase: SubmissionCase) =>
-  translate('submission.overview.testTitle', {
-    number: testCase.position,
-    verdict: caseLabel(testCase),
-    points: `${format(testCase.points)}/${format(testCase.total)}`,
-  });
+const squareTitle = (testCase: SubmissionCase) => caseTitle(testCase, locale.locale);
 const rowName = (row: OverviewRow) =>
   row.batch === null
     ? translate('submission.overview.allTests')
@@ -103,7 +98,7 @@ const scoreText = computed(() => {
 });
 const totalText = computed(() =>
   conversion.value
-    ? `${format(props.casePoints)}/${format(props.caseTotal)} → ${scoreText.value}`
+    ? `${formatCasePoints(props.casePoints, props.caseTotal, locale.locale)} → ${scoreText.value}`
     : scoreText.value,
 );
 const explanation = computed(() => {
@@ -111,7 +106,7 @@ const explanation = computed(() => {
   const values = {
     count: props.cases?.length ?? 0,
     parts: rows.value.map((row) => format(row.earned)).join(' + '),
-    cases: `${format(props.casePoints)}/${format(props.caseTotal)}`,
+    cases: formatCasePoints(props.casePoints, props.caseTotal, locale.locale),
     percent: format(conversion.value.share * PERCENT),
     max: format(props.problemPoints),
     points: format(props.points),
