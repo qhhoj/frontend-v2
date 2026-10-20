@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import EmptyState from '@/components/EmptyState.vue';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -71,9 +72,11 @@ const LIST_BOX = 'min-h-[382px] sm:min-h-0';
             <VerdictBadge :verdict="submissionVerdictOf(item)" />
             <span class="min-w-32 flex-1">
               <span class="block truncate font-semibold">{{ item.problem?.name ?? '—' }}</span>
-              <span class="block text-meta text-muted"
+              <span class="flex min-w-0 items-center gap-1 text-meta text-muted"
                 >{{ $t(submissionVerdictOf(item).labelKey) }} ·
-                {{ item.language?.name ?? '—' }}</span
+                <LanguageLabel v-if="item.language" :language="item.language" /><template v-else
+                  >—</template
+                ></span
               >
             </span>
             <span class="ml-auto text-right font-mono text-meta text-muted">

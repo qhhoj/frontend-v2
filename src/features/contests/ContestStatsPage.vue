@@ -8,6 +8,7 @@ import Card from '@/components/ui/Card.vue';
 import StatGrid from '@/components/ui/StatGrid.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { useLanguageKeys } from '@/features/problems/use-language-keys';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
 import ContestCompactHeader from './ContestCompactHeader.vue';
@@ -24,6 +25,13 @@ const locale = useLocaleStore();
 const key = computed(() => String(route.params.key));
 const { data: contest, error: contestError } = useContestQuery(key);
 const { data: stats, isPending, error, refetch } = useContestStatsQuery(key);
+const { keyOfId } = useLanguageKeys(() => Boolean(stats.value?.languages.length));
+const languageRows = computed(() =>
+  (stats.value?.languages ?? []).map((language) => ({
+    ...language,
+    key: keyOfId(language.languageId),
+  })),
+);
 usePageTitle(() => contest.value?.name);
 const isClosed = computed(() => error.value instanceof ApiError && error.value.status === 403);
 const isMissing = computed(
@@ -82,7 +90,7 @@ const tiles = computed(() =>
         <template v-if="stats">
           <StatGrid data-testid="stats-tiles" :items="tiles" :cols="4" mode="stat" />
           <ProblemResultsTable :problems="stats.problems" :solver-counts="solverCounts" />
-          <LanguageStatsTable :languages="stats.languages" />
+          <LanguageStatsTable :languages="languageRows" />
         </template>
       </QueryState>
     </template>

@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { Plus, X } from 'lucide-vue-next';
 import type { LanguageOption } from '@/api/types/problem-editing';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { INPUT, buttonClass, iconButtonClass } from '../../ui/controls';
 import type { LanguageLimitForm } from './problem-form';
@@ -19,8 +20,9 @@ const props = defineProps<{
 }>();
 const pickedLanguageId = ref('');
 
-const nameOf = (languageId: string) =>
-  props.languages.find((language) => language.id === languageId)?.name ?? languageId;
+const languageOf = (languageId: string) =>
+  props.languages.find((language) => language.id === languageId);
+const nameOf = (languageId: string) => languageOf(languageId)?.name ?? languageId;
 const unlistedLanguages = computed(() =>
   props.languages.filter(
     (language) => !limits.value.some((limit) => limit.languageId === language.id),
@@ -64,7 +66,12 @@ const ROW =
         <span
           class="col-span-1 flex min-h-(--qa-control) items-center text-sm font-semibold sm:col-span-1"
         >
-          {{ nameOf(limit.languageId) }}
+          <LanguageLabel
+            :language="{
+              key: languageOf(limit.languageId)?.key ?? null,
+              name: nameOf(limit.languageId),
+            }"
+          />
         </span>
         <span class="flex justify-end sm:order-last">
           <button

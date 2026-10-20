@@ -2,6 +2,7 @@
 import { Search } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import type { RuntimeJudge, RuntimeLanguage } from '@/api/types/runtimes';
+import { LANGUAGE_LOGO_LICENCES_URL } from '@/components/language/language-icons';
 import Card from '@/components/ui/Card.vue';
 import LanguageRow from './LanguageRow.vue';
 
@@ -51,5 +52,15 @@ const toggle = (key: string) => (openKey.value = openKey.value === key ? null : 
       />
     </ul>
     <p v-else class="px-6 py-6 text-muted">{{ $t('runtimes.noMatch') }}</p>
+    <p class="border-t border-line px-4 py-3 text-meta text-muted sm:px-6">
+      {{ $t('runtimes.logoCredit') }}
+      <a
+        :href="LANGUAGE_LOGO_LICENCES_URL"
+        target="_blank"
+        rel="noopener"
+        class="underline underline-offset-2 hover:no-underline"
+        >{{ $t('runtimes.logoLicences') }}</a
+      >
+    </p>
   </Card>
 </template>

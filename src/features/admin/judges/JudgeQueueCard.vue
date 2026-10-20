@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { formatNumber } from '@/lib/format';
@@ -118,7 +119,7 @@ const largest = computed(() =>
               :key="row.id"
               class="flex justify-between gap-3 py-1.5"
             >
-              <span>{{ row.name ?? row.id }}</span>
+              <LanguageLabel :language="{ key: row.key, name: row.name ?? row.id }" />
               <span class="flex gap-3">
                 <span class="font-mono">{{ formatNumber(row.count, locale.locale) }}</span>
                 <span

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { Language } from '@/api/types/problems';
+import LanguageIcon from '@/components/language/LanguageIcon.vue';
 import ToolbarSelect from '@/components/ToolbarSelect.vue';
 import { translate } from '@/i18n';
 import type { SubmissionFilters } from './use-submission-filters';
@@ -13,6 +14,9 @@ const options = computed(() => [
   { value: ANY_LANGUAGE, label: translate('submissions.rail.anyLanguage') },
   ...props.languages.map((language) => ({ value: language.id, label: language.name })),
 ]);
+const chosen = computed(() =>
+  props.languages.find((language) => language.id === props.filters.languageIds[0]),
+);
 const pick = (languageId: string) =>
   emit('update', { languageIds: languageId === ANY_LANGUAGE ? [] : [languageId] });
 </script>
@@ -24,5 +28,7 @@ const pick = (languageId: string) =>
     :options="options"
     :active="filters.languageIds.length > 0"
     @update:model-value="pick"
-  />
+  >
+    <template v-if="chosen" #chosen-icon><LanguageIcon :language-key="chosen.key" /></template>
+  </ToolbarSelect>
 </template>

@@ -101,14 +101,14 @@ Verdicts (text + tint, always with a text label and an icon): AC green, WA red, 
 - Text >= 4.5:1 on the worst ground, large text >= 3:1; accent fills and the accent border >= 3:1; focus ring 2 px `--qh-focus-ring`, offset 2 px, never removed.
 - Meaning never by colour alone: verdicts carry text, frozen cells carry `?`, first solve carries a legend.
 - Touch targets >= 44 px; real `<button>`/`<a>`; icon-only buttons have `aria-label`.
-- Icons: Lucide only, no emoji.
+- Icons: Lucide only, no emoji. The one exception: programming-language marks through `LanguageIcon`/`LanguageLabel` (monochrome, in the text colour, beside the language name, never a control).
 - Every accent preset keeps the default's contrast rules (`themes.spec.ts`). Disabled controls keep full-contrast labels: no `opacity` on text.
 - Responsive at 375, 768, 1024, 1440; wide tables scroll inside their card, never the page.
 
 ## Pre-delivery checklist
 
 - [ ] A new theme defines the seven accent presets and `npm test` is green for all
-- [ ] No emoji icons; Lucide only
+- [ ] No emoji icons; Lucide only (language marks via `LanguageIcon` excepted)
 - [ ] No raw colours in components
 - [ ] Hover/focus states, 150-200 ms
 - [ ] Contrast checked in all four themes

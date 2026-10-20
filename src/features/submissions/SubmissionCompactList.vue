@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SubmissionListItem } from '@/api/types/submissions';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import UserLink from '@/components/UserLink.vue';
 import { formatAgoCompact, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
@@ -79,9 +80,14 @@ const costOf = (row: SubmissionListItem) =>
             >{{ formatAgoCompact(row.date, now, locale.locale) }}</time
           >
           <span v-if="isShown('when') && isShown('language')" aria-hidden="true">·</span>
-          <span v-if="isShown('language')" class="truncate" :title="row.language?.name">{{
-            row.language?.name ?? NO_VALUE
-          }}</span>
+          <template v-if="isShown('language')">
+            <LanguageLabel
+              v-if="row.language"
+              :language="row.language"
+              :title="row.language.name"
+            />
+            <span v-else>{{ NO_VALUE }}</span>
+          </template>
         </div>
         <div v-if="costOf(row)" class="font-mono text-xs whitespace-nowrap text-muted">
           {{ costOf(row) }}

@@ -5,11 +5,13 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { SubmissionResult } from '@/api/types/submissions';
 import EmptyState from '@/components/EmptyState.vue';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import Card from '@/components/ui/Card.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
+import { useLanguageKeys } from '@/features/problems/use-language-keys';
 import { usePpQuery } from '@/features/users/users.queries';
 import { formatFixed, formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
@@ -34,6 +36,7 @@ const username = computed(() => String(route.params.username));
 const page = computed(() => pageFromQuery(route.query.page));
 const { data, error, isPending, refetch } = usePpQuery(username, page);
 const entries = computed(() => data.value?.items ?? []);
+const { keyOfShortName } = useLanguageKeys(() => entries.value.length > 0);
 const ranks = computed(() => ({
   first: entries.value[0]?.rank ?? 0,
   last: entries.value.at(-1)?.rank ?? 0,
@@ -134,8 +137,14 @@ const verdictFor = (result: string | null): Verdict =>
                           {{ entry.submission.casePoints }}/{{ entry.submission.caseTotal }}
                         </span>
                       </span>
-                      <span class="text-xs whitespace-nowrap text-muted">
-                        {{ entry.submission.language }} ·
+                      <span class="flex items-center gap-1 text-xs whitespace-nowrap text-muted">
+                        <LanguageLabel
+                          :language="{
+                            key: keyOfShortName(entry.submission.language),
+                            name: entry.submission.language,
+                          }"
+                        />
+                        ·
                         {{ formatDate(entry.submission.date, 'date', locale.locale) }}
                       </span>
                     </RouterLink>

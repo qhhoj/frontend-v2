@@ -23,6 +23,8 @@ const chosen = computed(
 <template>
   <label class="relative" :class="toolbarControlClass(active)">
     <span class="text-muted">{{ label }}:</span>
+    <!-- Drawn before the chosen text, e.g. the chosen language's icon. -->
+    <slot name="chosen-icon" />
     <span aria-hidden="true" class="grid max-w-44 pr-5 text-left">
       <span
         v-for="option in options"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SubmissionDetail } from '@/api/types/submissions';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import UserLink from '@/components/UserLink.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
 import { submissionVerdictOf } from '@/lib/verdicts';
@@ -24,8 +25,10 @@ defineProps<{ label: string; id: string; detail: SubmissionDetail | undefined }>
       <VerdictBadge v-if="detail" :verdict="submissionVerdictOf(detail)" size="sm" />
       <UserLink v-if="detail?.user" :username="detail.user.username" :rating="detail.user.rating" />
     </p>
-    <p v-if="detail" class="truncate text-sm text-muted">
-      {{ detail.problem?.name ?? '—' }} · {{ detail.language?.name ?? '—' }}
+    <p v-if="detail" class="flex min-w-0 items-center gap-1 text-sm whitespace-nowrap text-muted">
+      <span class="min-w-0 truncate">{{ detail.problem?.name ?? '—' }}</span> ·
+      <LanguageLabel v-if="detail.language" :language="detail.language" />
+      <template v-else>—</template>
     </p>
   </div>
 </template>

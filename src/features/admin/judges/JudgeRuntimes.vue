@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { JudgeRuntime } from '@/api/types/judges-admin';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import type { AdminColumn } from '../ui/table/table-columns';
 
@@ -28,6 +29,10 @@ const columns = computed<AdminColumn[]>(() => [
       :rows="runtimes"
       :row-key="(runtime) => runtime.language"
       :label="$t('admin.judges.runtimes.caption')"
-    />
+    >
+      <template #cell-language="{ row }">
+        <LanguageLabel :language="{ key: row.language, name: row.language }" />
+      </template>
+    </AdminDataTable>
   </section>
 </template>

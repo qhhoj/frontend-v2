@@ -3,6 +3,7 @@ import { Copy, ExternalLink } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { NumberedPageMeta } from '@/api/client';
+import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import UserLink from '@/components/UserLink.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
@@ -145,7 +146,10 @@ const menuItems = (row: SubmissionListItem): RowMenuItem[] => [
     <template #cell-memory="{ row }">
       {{ row.memory === null ? '—' : formatCaseMemory(row.memory) }}
     </template>
-    <template #cell-language="{ row }">{{ row.language?.name ?? '—' }}</template>
+    <template #cell-language="{ row }">
+      <LanguageLabel v-if="row.language" :language="row.language" />
+      <template v-else>—</template>
+    </template>
     <template #cell-date="{ row }">
       <!-- The day and the clock wrap apart in a tight table, never in the middle of the date. -->
       <time class="text-muted" :datetime="row.date" :title="SITE_TIME_ZONE"

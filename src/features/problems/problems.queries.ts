@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
-import type { Ref } from 'vue';
+import type { MaybeRefOrGetter, Ref } from 'vue';
 import { fetchEditorial, fetchProblem, fetchProblemMeta, fetchProblems } from '@/api/problems.api';
 import type { StatementLanguage } from '@/api/types/problems';
 import { useViewerId } from '@/stores/use-viewer-id';
@@ -8,8 +8,13 @@ import { toApiFilters } from './use-problem-filters';
 import type { ProblemFilters } from './use-problem-filters';
 
 /** Types, groups and languages change rarely. */
-export const useProblemMetaQuery = () =>
-  useQuery({ queryKey: ['problems', 'meta'], queryFn: fetchProblemMeta, staleTime: 10 * 60_000 });
+export const useProblemMetaQuery = (options: { enabled?: MaybeRefOrGetter<boolean> } = {}) =>
+  useQuery({
+    queryKey: ['problems', 'meta'],
+    queryFn: fetchProblemMeta,
+    staleTime: 10 * 60_000,
+    enabled: options.enabled,
+  });
 
 export const PROBLEM_PAGE_SIZE = 50;
 

@@ -98,6 +98,7 @@ Data flow: page -> `features/<area>/<area>.queries.ts` (vue-query) -> `api/<area
 | Canned replies: placeholders and picker                      | `src/features/tickets/canned/`                                                                                                                                                           |
 | Staff ticket queue: claim, "Xử lý" fold, filters             | `src/features/admin/tickets/` (`ticket-queue.ts` holds the URL format and the one-save patch)                                                                                            |
 | Bit in notifications, official mode and tickets              | `NOTIFICATION_BITS` (`notification-bits.ts`), `TICKET_BITS` (`ticket-bits.ts`)                                                                                                           |
+| A language's icon (key to logo, fallback, new language)      | `src/components/language/language-icons.ts`; logo files and their licences in `src/assets/languages/` (`LICENSES.md`)                                                                    |
 
 ## Auth screens
 
@@ -139,3 +140,7 @@ To add a screen: add its entry to `ADMIN_SCREENS`, add one `SCREEN_COMPONENTS` l
 
 - [CONTRIBUTING.md](CONTRIBUTING.md): conventions, styling and theme rules, testing
 - [docs/decisions.md](docs/decisions.md): design decisions, backend asks and known gaps
+
+## Licence
+
+AGPL-3.0 ([LICENSE](LICENSE)). The language logos in `src/assets/languages/` keep their own licences (CC0-1.0, MIT, Apache-2.0, Unlicense, and CC BY-SA 2.5/4.0 for PHP, Ruby, Rust and Zig), listed per file with their sources in [`src/assets/languages/LICENSES.md`](src/assets/languages/LICENSES.md). The marks are trademarks of their owners.

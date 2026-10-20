@@ -2,17 +2,18 @@ import type { CaseStatus, SubmissionDetail } from '@/api/types/submissions';
 import { formatCaseMemory, formatCaseTime } from '@/lib/format';
 import { isFailed, isFullCase } from './test-overview';
 
-/** One part of the hero's second line: an i18n key and its values, or a ready text (time, memory, language). */
+/** One part of the hero's second line: an i18n key and its values, or a ready text (time, memory). */
 export type HeroPart =
   | { key: 'failed'; values: { number: number; status: CaseStatus } }
   | { key: 'passed'; values: { passed: number; total: number } }
   | { text: string };
 
-type HeroSource = Pick<SubmissionDetail, 'cases' | 'totalCases' | 'time' | 'memory' | 'language'>;
+type HeroSource = Pick<SubmissionDetail, 'cases' | 'totalCases' | 'time' | 'memory'>;
 
 /**
  * The line under the verdict: the first failing test, how many tests passed with full points (as in the overview), then
- * time, memory and language, each only when known. Hidden case results (`cases` null) leave out the test parts.
+ * time and memory, each only when known (the hero ends the line with the language and its icon). Hidden case results
+ * (`cases` null) leave out the test parts.
  */
 export function heroParts(row: HeroSource): HeroPart[] {
   const parts: HeroPart[] = [];
@@ -28,6 +29,5 @@ export function heroParts(row: HeroSource): HeroPart[] {
   }
   if (row.time !== null) parts.push({ text: formatCaseTime(row.time) });
   if (row.memory !== null) parts.push({ text: formatCaseMemory(row.memory) });
-  if (row.language) parts.push({ text: row.language.name });
   return parts;
 }
