@@ -500,6 +500,8 @@
     "restore": "Khôi phục",
     "disqualifyTitle": "Loại {username} khỏi bảng xếp hạng?",
     "disqualifyBody": "{kind} lúc {time} sẽ bị đánh dấu loại và gỡ khỏi bảng. Có thể khôi phục lại bất cứ lúc nào.",
+    "restoreTitle": "Khôi phục {username} vào bảng xếp hạng?",
+    "restoreBody": "{kind} lúc {time} trở lại bảng, thí sinh được bỏ cấm khỏi kỳ thi và bảng xếp hạng được tính lại.",
     "empty": "Không có lượt tham gia nào khớp.",
     "footnote": "Người bị loại vẫn thấy bài nộp của mình nhưng bị gỡ khỏi bảng xếp hạng.",
     "bulk": {

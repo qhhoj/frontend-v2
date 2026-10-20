@@ -13,10 +13,10 @@ import { useAdminMutation } from '../../ui/use-admin-mutation';
 import type { AdminQueryKey } from '../../ui/use-admin-mutation';
 
 /** The actions that confirm in a dialog first. */
-export type ParticipationDialog = 'moveStart' | 'disqualify' | 'delete';
+export type ParticipationDialog = 'moveStart' | 'disqualify' | 'restore' | 'delete';
 
 /**
- * A participation's row actions: restore and recompute run at once; moving the start, disqualifying and deleting open a
+ * A participation's row actions: recompute runs at once; moving the start, disqualifying, restoring and deleting open a
  * dialog (`open`). The backend writes the contest's banned-users list on a (re)disqualify, so the contest settings are
  * refetched too: a later General save must not send the stale list and un-ban the user.
  */
@@ -37,6 +37,7 @@ export function useParticipationActions(contestKey: () => string) {
     mutate: (row: Participation) => setDisqualified(contestKey(), row.id, false),
     invalidates,
     successText: named('admin.contestOps.participants.restored'),
+    onDone: close,
   });
   const recompute = useAdminMutation({
     mutate: (row: Participation) => recomputeParticipation(contestKey(), row.id),
@@ -64,7 +65,7 @@ export function useParticipationActions(contestKey: () => string) {
   });
 
   function openDialog(dialog: ParticipationDialog, row: Participation) {
-    ({ moveStart, disqualify, delete: remove })[dialog].reset();
+    ({ moveStart, disqualify, restore, delete: remove })[dialog].reset();
     open.value = { dialog, row };
   }
 
@@ -83,7 +84,7 @@ export function useParticipationActions(contestKey: () => string) {
       ? {
           label: translate('admin.contests.participants.restore'),
           icon: RotateCcw,
-          run: () => void restore.run(row),
+          run: () => openDialog('restore', row),
         }
       : {
           label: translate('admin.contests.participants.disqualify'),
@@ -100,8 +101,8 @@ export function useParticipationActions(contestKey: () => string) {
   ];
 
   /** A refusal of an action that ran without a dialog, for the line above the table. */
-  const directFailure = () => restore.failure.value ?? recompute.failure.value;
+  const directFailure = () => recompute.failure.value;
 
-  return { open, close, menuOf, directFailure, disqualify, moveStart, remove };
+  return { open, close, menuOf, directFailure, disqualify, restore, moveStart, remove };
 }
 export type ParticipationActions = ReturnType<typeof useParticipationActions>;

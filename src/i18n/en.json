@@ -1669,7 +1669,9 @@
       "submit": "Ban",
       "done": "{username} is banned",
       "doneBody": "The account can no longer sign in and left the leaderboards.",
-      "bannedWithReason": "This account is banned. Reason: {reason}"
+      "bannedWithReason": "This account is banned. Reason: {reason}",
+      "banned": "This account is banned.",
+      "unban": "Unban"
     }
   },
   "profileTabs": {

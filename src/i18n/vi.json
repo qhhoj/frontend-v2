@@ -1669,7 +1669,9 @@
       "submit": "Cấm",
       "done": "Đã cấm {username}",
       "doneBody": "Tài khoản không đăng nhập được và đã rời bảng xếp hạng.",
-      "bannedWithReason": "Tài khoản đã bị cấm. Lý do: {reason}"
+      "bannedWithReason": "Tài khoản đã bị cấm. Lý do: {reason}",
+      "banned": "Tài khoản đã bị cấm.",
+      "unban": "Bỏ cấm"
     }
   },
   "profileTabs": {

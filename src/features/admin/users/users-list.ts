@@ -4,6 +4,7 @@ import type { UserPage } from '@/api/types/users';
 import type { StaffUser, StaffUserQuery } from '@/api/types/users-admin';
 import { STAFF_USERS_PAGE_SIZE } from '@/api/users-admin.api';
 import { pageFromQuery } from '@/lib/paging';
+import { isBannedPage } from '@/lib/user-ban';
 
 export { BAN_REASON_MAX_LENGTH };
 /** The backend refuses deeper pages (skipping is linear in the page number). */
@@ -21,8 +22,7 @@ export const canImpersonate = (viewerIsSuperuser: boolean, page: UserPage) =>
   page.staff !== null &&
   !page.staff.isSuperuser &&
   page.staff.isActive &&
-  page.staff.banReason === null &&
-  page.displayRank !== 'banned';
+  !isBannedPage(page);
 
 /** Why a ban reason cannot be sent, or null: the reason is required and at most `BAN_REASON_MAX_LENGTH` characters. */
 export const banReasonProblem = (reason: string): 'required' | 'tooLong' | null => {

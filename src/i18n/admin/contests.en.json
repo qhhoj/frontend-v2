@@ -500,6 +500,8 @@
     "restore": "Restore",
     "disqualifyTitle": "Remove {username} from the ranking?",
     "disqualifyBody": "{kind} at {time} will be marked disqualified and taken off the ranking. It can be restored at any time.",
+    "restoreTitle": "Restore {username} to the ranking?",
+    "restoreBody": "{kind} at {time} returns to the board, the contest ban is lifted and the ranking is recomputed.",
     "empty": "No participations match.",
     "footnote": "Disqualified users still see their own submissions, but are taken off the ranking.",
     "bulk": {

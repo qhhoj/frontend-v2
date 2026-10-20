@@ -4,13 +4,14 @@ import { useI18n } from 'vue-i18n';
 import { useQueryClient } from '@tanstack/vue-query';
 import type { UserPage } from '@/api/types/users';
 import { banUser } from '@/api/users.api';
-import { unbanUser } from '@/api/users-admin.api';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { isBannedPage } from '@/lib/user-ban';
 import { failureTextOf, isConflict } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { BUTTON, INPUT } from '../ui/controls';
+import UnbanUserDialog from './UnbanUserDialog.vue';
 import UserDangerRow from './UserDangerRow.vue';
 import { banReasonProblem } from './users-list';
 import { invalidateUserModeration } from './users.queries';
@@ -21,20 +22,14 @@ const queryClient = useQueryClient();
 const reason = ref('');
 const reasonRequiredText = ref<string | null>(null);
 const isConfirmOpen = ref(false);
-const isBanned = computed(() => props.user.displayRank === 'banned');
+const isUnbanOpen = ref(false);
+const isBanned = computed(() => isBannedPage(props.user));
 
 const ban = useAdminMutation({
   mutate: (vars: { username: string; reason: string }) => banUser(vars.username, vars.reason),
   successText: (_result, vars) => t('admin.users.moderation.done', { username: vars.username }),
   onDone: (_result, vars) => {
     void invalidateUserModeration(queryClient, vars.username);
-  },
-});
-const unban = useAdminMutation({
-  mutate: (username: string) => unbanUser(username),
-  successText: (_result, username) => t('admin.users.moderation.unbanned', { username }),
-  onDone: (_result, username) => {
-    void invalidateUserModeration(queryClient, username);
   },
 });
 
@@ -46,11 +41,6 @@ const banRefusal = computed(() => {
   const error = ban.failure.value;
   if (error === null || Object.keys(ban.fieldErrors.value).length > 0) return null;
   return isConflict(error) ? t('admin.users.moderation.alreadyBanned') : failureTextOf(error);
-});
-const unbanRefusal = computed(() => {
-  const error = unban.failure.value;
-  if (error === null) return null;
-  return isConflict(error) ? t('admin.users.moderation.notBanned') : failureTextOf(error);
 });
 
 const banReasonText = (problem: 'required' | 'tooLong') =>
@@ -101,7 +91,6 @@ async function confirmBan() {
     </template>
     <template #status>
       <AdminStatus v-if="banRefusal" kind="refused" :text="banRefusal" />
-      <AdminStatus v-if="unbanRefusal" kind="refused" :text="unbanRefusal" />
     </template>
   </UserDangerRow>
   <UserDangerRow
@@ -113,12 +102,16 @@ async function confirmBan() {
         : $t('admin.users.moderation.banned.noReason')
     "
   >
-    <button type="button" :class="BUTTON.secondary" @click="unban.run(user.username)">
+    <button
+      type="button"
+      data-testid="unban-open"
+      :class="BUTTON.secondary"
+      @click="isUnbanOpen = true"
+    >
       {{ $t('admin.users.moderation.banned.unban') }}
     </button>
     <template #status>
       <p class="text-xs text-muted">{{ $t('admin.users.moderation.banned.unbanHint') }}</p>
-      <AdminStatus v-if="unbanRefusal" kind="refused" :text="unbanRefusal" />
     </template>
   </UserDangerRow>
   <ConfirmDialog
@@ -130,4 +123,5 @@ async function confirmBan() {
     :busy="ban.isPending.value"
     @confirm="confirmBan"
   />
+  <UnbanUserDialog v-model:visible="isUnbanOpen" :username="user.username" />
 </template>

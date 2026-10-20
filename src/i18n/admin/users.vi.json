@@ -78,6 +78,10 @@
       "noReason": "Không có lý do được ghi.",
       "unban": "Bỏ cấm",
       "unbanHint": "Bỏ cấm trả hạng “user”, hiện lại và kích hoạt."
+    },
+    "unbanDialog": {
+      "title": "Bỏ cấm {username}?",
+      "body": "Tài khoản được trả hạng “user”, hiện lại trên bảng xếp hạng và đăng nhập lại được."
     }
   },
   "impersonate": {
