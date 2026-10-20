@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { UserRound } from 'lucide-vue-next';
+import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import { computed, nextTick, ref } from 'vue';
 import { ApiError } from '@/api/client';
@@ -112,6 +114,15 @@ async function submit() {
           :items="fieldSummary.items"
         />
         <SettingsCard :title="$t('settings.nav.profile')" :lead="$t('settings.profile.lead')">
+          <template v-if="session.user" #header-end>
+            <AppButton
+              size="sm"
+              :to="{ name: 'user', params: { username: session.user.username } }"
+            >
+              <template #icon><UserRound class="size-4" aria-hidden="true" /></template>
+              {{ $t('settings.profile.viewPublic') }}
+            </AppButton>
+          </template>
           <SettingsNotice v-if="saveErrorSentence" tone="error" bit="sweat">
             {{ saveErrorSentence }}
             <template v-if="offline" #action>

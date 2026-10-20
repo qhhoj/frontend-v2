@@ -404,6 +404,7 @@
     "register": "Sign up",
     "logout": "Sign out",
     "menu": "Account of {username}",
+    "profile": "My profile",
     "settings": "Settings",
     "admin": "Administration"
   },
@@ -443,6 +444,7 @@
     },
     "profile": {
       "lead": "Public details and the defaults used when you submit.",
+      "viewPublic": "View public profile",
       "firstNameHint": "Shown on your profile page, the rankings and comments. The username {username} cannot change.",
       "aboutViews": "About text views",
       "aboutTab": {

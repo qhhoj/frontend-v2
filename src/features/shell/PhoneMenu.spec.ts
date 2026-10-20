@@ -49,6 +49,20 @@ describe('phone menu (P-01 A)', () => {
     expect(row.textContent).toContain('3 chưa đọc');
   });
 
+  it("leads the account's pages with the signed-in viewer's own profile", async () => {
+    mockApi({
+      ...blogListRoutes,
+      'GET /auth/me': signedIn({ user: sessionUser({ username: 'bitcoder' }) }),
+      'GET /profile': ok(profile()),
+    });
+    await openOnPhone('/blog');
+    const account = sheet()!.querySelector('section[aria-label="Tài khoản của bitcoder"]')!;
+    const first = account.querySelector('a')!;
+    expect(first.textContent?.trim()).toBe('Hồ sơ của tôi');
+    expect(first.getAttribute('href')).toBe('/users/bitcoder');
+    expect(account.querySelectorAll('a[href="/users/bitcoder"]')).toHaveLength(1);
+  });
+
   it("lists the account's pages for staff and closes when one is followed", async () => {
     mockApi({
       ...blogListRoutes,

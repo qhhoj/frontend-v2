@@ -49,6 +49,19 @@ describe('app shell', () => {
     expect(wrapper.find('a[href="/login?redirect=/blog"]').exists()).toBe(true);
   });
 
+  it("opens the user menu on a link to the signed-in viewer's own profile", async () => {
+    mockApi({
+      ...blogListRoutes,
+      'GET /auth/me': signedIn({ user: sessionUser({ username: 'bitcoder' }) }),
+      'GET /profile': ok(profile()),
+    });
+    const { wrapper } = await mountApp('/blog');
+    await wrapper.get('button[aria-label="Tài khoản của bitcoder"]').trigger('click');
+    const first = document.body.querySelector('[role="menuitem"]')!;
+    expect(first.textContent?.trim()).toBe('Hồ sơ của tôi');
+    expect(first.querySelector('a')!.getAttribute('href')).toBe('/users/bitcoder');
+  });
+
   it('offers administration to staff', async () => {
     mockApi({
       ...blogListRoutes,
