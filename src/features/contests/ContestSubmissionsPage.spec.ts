@@ -45,6 +45,8 @@ describe('contest submissions tab', () => {
     const { wrapper } = await mountApp('/contests/r42/submissions?user=other');
     expect(wrapper.get('[data-testid="own-only"]').text()).toContain('chỉ bạn thấy');
     expect(listCalls(calls)[0]!.query.get('user')).toBe(sessionUser().username);
+    await wrapper.get('[data-testid="advanced-filters"]').trigger('click');
+    expect(wrapper.find('#submission-advanced-filters').exists()).toBe(true);
     expect(wrapper.find('input[placeholder="tên đăng nhập"]').exists()).toBe(false);
   });
 
