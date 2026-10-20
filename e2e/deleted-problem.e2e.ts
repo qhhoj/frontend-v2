@@ -26,6 +26,5 @@ test('the submission of a deleted problem shows the tombstone with Bit and keeps
   await expect(notice.getByTestId('inline-bit')).toBeVisible();
   await expect(page.getByTestId('cases-card')).toHaveCount(0);
   await expect(page.locator('a[href="/problems/duongdi"]')).toHaveCount(0);
-  await page.getByTestId('source-expand').click();
   await expect(page.getByText('int main', { exact: false })).toBeVisible();
 });

@@ -1464,6 +1464,12 @@
       "explainMin": "Mỗi subtask lấy điểm test thấp nhất của nó. Tổng {parts} = {cases}, quy đổi {percent}% × {max} = {points} điểm.",
       "rounding": "Điểm từng test làm tròn 2 chữ số khi hiển thị; tổng dùng điểm gốc, làm tròn 1 chữ số."
     },
+    "summary": {
+      "tiles": "Từng test",
+      "allCorrect": "Tất cả {count} test đúng · lâu nhất {time} · {memory}",
+      "table": "Bảng {count} test (thời gian, bộ nhớ)",
+      "moreLosses": "+{count} test mất điểm khác · Bảng {total} test"
+    },
     "cases": {
       "title": "Kết quả chấm",
       "scrollRegion": "Kết quả chấm, cuộn ngang",
@@ -1479,7 +1485,8 @@
       "feedback": "Phản hồi",
       "extendedFeedback": "Phản hồi chi tiết",
       "output": "Đầu ra",
-      "compileLogHidden": "Lỗi biên dịch. Thông báo biên dịch chỉ hiện cho người xem được mã nguồn."
+      "compileLogHidden": "Lỗi biên dịch. Thông báo biên dịch chỉ hiện cho người xem được mã nguồn.",
+      "detailsTitle": "Chi tiết từng test"
     },
     "source": {
       "title": "Mã nguồn",

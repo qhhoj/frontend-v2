@@ -20,9 +20,6 @@ describe('SourceView highlighting', () => {
     const source = 'return 1;';
     mockApi({ ...anonymousViewer, 'GET /submissions/sub-1/source': ok({ id: 'sub-1', source }) });
     const view = mountComponent(SourceView, { props: props('CPP17') });
-    await vi.waitFor(() => expect(view.find('[data-testid="source-expand"]').exists()).toBe(true));
-    await view.get('[data-testid="source-expand"]').trigger('click');
-    await flushPromises();
     await vi.waitFor(() => expect(view.find('pre.pr-6 .syn-keyword').exists()).toBe(true));
     await view.setProps(props('PAS') as never);
     await flushPromises();
@@ -31,6 +28,33 @@ describe('SourceView highlighting', () => {
     await view.setProps(props('PY3') as never);
     await vi.waitFor(() => expect(view.find('pre.pr-6 .syn-keyword').exists()).toBe(true));
     expect(view.get('pre.pr-6').text()).toBe(source);
+  });
+});
+
+describe('SourceView fold', () => {
+  const lines = (count: number) => Array.from({ length: count }, (_unused, index) => `x${index}`);
+
+  it('opens a source of up to 200 lines unfolded', async () => {
+    mockApi({
+      ...anonymousViewer,
+      'GET /submissions/sub-1/source': ok({ id: 'sub-1', source: lines(200).join('\n') }),
+    });
+    const view = mountComponent(SourceView, { props: props(null) });
+    await vi.waitFor(() => expect(view.find('#source-code').exists()).toBe(true));
+    expect(view.find('[data-testid="source-expand"]').exists()).toBe(false);
+  });
+
+  it('folds a longer source behind its line count until asked', async () => {
+    mockApi({
+      ...anonymousViewer,
+      'GET /submissions/sub-1/source': ok({ id: 'sub-1', source: lines(201).join('\n') }),
+    });
+    const view = mountComponent(SourceView, { props: props(null) });
+    await vi.waitFor(() => expect(view.find('[data-testid="source-expand"]').exists()).toBe(true));
+    expect(view.get('[data-testid="source-expand"]').text()).toContain('201 dòng');
+    expect(view.find('#source-code').exists()).toBe(false);
+    await view.get('[data-testid="source-expand"]').trigger('click');
+    expect(view.get('#source-code').text()).toContain('x200');
   });
 });
 

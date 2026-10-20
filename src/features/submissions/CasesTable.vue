@@ -4,6 +4,8 @@ import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
 import { translate } from '@/i18n';
+import CaseDetails from './CaseDetails.vue';
+import { caseDetails, type CaseDetail } from './case-details';
 import { formatCaseMemory, formatCaseTime, formatNumber } from '@/lib/format';
 import { PARTIAL_CODE, caseVerdictOf, type Verdict } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -11,7 +13,8 @@ import { useLocaleStore } from '@/stores/locale.store';
 /**
  * The result card ("Kết quả chấm"): the compile log, one row per test, then the `footer` slot (the subtasks and the total,
  * `TestOverview.vue`). Keep `CasesTableSkeleton.vue` in step: same card, header cells and row classes. Below `sm` the same rows lay out as cards
- * (test, verdict and points, then time and memory), so each test keeps one `#case-<n>` anchor.
+ * (test, verdict and points, then time and memory), so each test keeps one `#case-<n>` anchor. From `xl` the card sits in the
+ * page's narrow rail beside the source, so its cells tighten there (`xl:px-3`) and the table drops its minimum width.
  */
 const props = defineProps<{
   cases: SubmissionCase[] | null;
@@ -24,6 +27,8 @@ const props = defineProps<{
   compileError?: string | null;
   /** A compile error whose log this viewer may not read (it quotes the code): said instead of "no test results". */
   compileLogHidden?: boolean;
+  /** Below `xl` a summary card (`ResultSummaryCard.vue`) stands above the source, so this card is titled as the per-test details there. */
+  summarized?: boolean;
 }>();
 
 const locale = useLocaleStore();
@@ -34,12 +39,6 @@ const formatPoints = (earned: number, total: number) =>
     .map((value) => formatNumber(value, locale.locale, POINT_FRACTION_DIGITS, false))
     .join('/');
 const COLUMN_KEYS = ['test', 'result', 'time', 'memory', 'points'] as const;
-/** Judge text a case may carry, in reading order. */
-const DETAIL_FIELDS = [
-  { field: 'feedback', labelKey: 'submission.cases.feedback' },
-  { field: 'extendedFeedback', labelKey: 'submission.cases.extendedFeedback' },
-  { field: 'output', labelKey: 'submission.cases.output' },
-] as const;
 
 interface GradedRow {
   key: string;
@@ -48,7 +47,7 @@ interface GradedRow {
   time: string;
   memory: string;
   points: string;
-  details: { field: string; label: string; text: string }[];
+  details: CaseDetail[];
 }
 
 const caseRow = (testCase: SubmissionCase): GradedRow => ({
@@ -58,9 +57,7 @@ const caseRow = (testCase: SubmissionCase): GradedRow => ({
   time: formatCaseTime(testCase.time),
   memory: formatCaseMemory(testCase.memory),
   points: formatPoints(testCase.points, testCase.total),
-  details: DETAIL_FIELDS.flatMap(({ field, labelKey }) =>
-    testCase[field] ? [{ field, label: translate(labelKey), text: testCase[field] }] : [],
-  ),
+  details: caseDetails(testCase),
 });
 const batchRow = (batch: SubmissionBatch): GradedRow => ({
   key: `batch-${batch.batch}`,
@@ -87,7 +84,7 @@ const pendingNumbers = computed(() => {
 /** The phone card grid of a row and where each cell sits in it; from `sm` up they are plain table cells. */
 const ROW_CARD =
   'max-sm:grid max-sm:grid-cols-[auto_minmax(0,1fr)_auto] max-sm:items-center max-sm:gap-x-2.5 max-sm:gap-y-0.5 max-sm:px-4 max-sm:py-2.5';
-const CELL = 'px-6 py-3 max-sm:p-0';
+const CELL = 'px-6 py-3 max-sm:p-0 xl:px-3 xl:py-2.5';
 const NUMBER_CELL = `${CELL} text-right font-mono tabular-nums`;
 const CELL_PLACES = {
   test: 'max-sm:col-start-1 max-sm:row-start-1',
@@ -105,9 +102,18 @@ const isHidden = computed(
 </script>
 
 <template>
-  <Card as="div" data-testid="cases-card" class="overflow-hidden rounded-card">
+  <Card
+    id="cases"
+    as="div"
+    data-testid="cases-card"
+    class="scroll-mt-20 overflow-hidden rounded-card"
+  >
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 pt-5 pb-3 sm:px-6">
-      <h2 class="section-title">{{ $t('submission.cases.title') }}</h2>
+      <h2 v-if="summarized" class="section-title">
+        <span class="xl:hidden">{{ $t('submission.cases.detailsTitle') }}</span>
+        <span class="max-xl:hidden">{{ $t('submission.cases.title') }}</span>
+      </h2>
+      <h2 v-else class="section-title">{{ $t('submission.cases.title') }}</h2>
       <span v-if="running" class="text-meta text-muted">{{ $t('submission.liveUpdates') }}</span>
     </div>
     <div v-if="compileError" class="px-6 pb-4 sm:px-8">
@@ -124,7 +130,7 @@ const isHidden = computed(
       :aria-label="$t('submission.cases.scrollRegion')"
       class="overflow-x-auto focus-visible:-outline-offset-2"
     >
-      <table class="w-full border-collapse text-sm max-sm:block sm:min-w-[560px]">
+      <table class="w-full border-collapse text-sm max-sm:block sm:min-w-[560px] xl:min-w-0">
         <caption class="sr-only">
           {{
             $t('submission.cases.title')
@@ -136,7 +142,7 @@ const isHidden = computed(
               v-for="column in COLUMN_KEYS"
               :key="column"
               scope="col"
-              class="px-6 py-3 font-medium"
+              class="px-6 py-3 font-medium xl:px-3 xl:py-2.5"
               :class="{ 'text-right': column !== 'test' && column !== 'result' }"
             >
               {{ $t(`submission.cases.${column}`) }}
@@ -166,13 +172,8 @@ const isHidden = computed(
               </td>
             </tr>
             <tr v-if="row.details.length" class="max-sm:block">
-              <td colspan="5" class="px-6 pb-3 max-sm:block max-sm:px-4">
-                <div v-for="detail in row.details" :key="detail.field" class="mt-1.5">
-                  <p class="text-meta text-muted">{{ detail.label }}</p>
-                  <pre
-                    class="mt-1 max-h-48 overflow-auto rounded-cell bg-surface-strong p-3 font-mono text-meta whitespace-pre-wrap [overflow-wrap:anywhere]"
-                    >{{ detail.text }}</pre>
-                </div>
+              <td colspan="5" class="px-6 pb-3 max-sm:block max-sm:px-4 xl:px-3">
+                <CaseDetails :details="row.details" />
               </td>
             </tr>
           </template>

@@ -14,14 +14,14 @@ const NUMBER_COLUMN_COUNT = 3;
       <h2 class="section-title"><SkeletonBlock text class="w-40" /></h2>
     </div>
     <div class="overflow-x-auto">
-      <table aria-hidden="true" class="w-full border-collapse sm:min-w-[560px] text-sm">
+      <table aria-hidden="true" class="w-full border-collapse sm:min-w-[560px] xl:min-w-0 text-sm">
         <thead>
           <tr class="text-left text-meta text-muted">
             <th
               v-for="column in COLUMN_COUNT"
               :key="column"
               scope="col"
-              class="px-6 py-3 font-medium"
+              class="px-6 py-3 font-medium xl:px-3 xl:py-2.5"
             >
               <SkeletonBlock text class="w-12" />
             </th>
@@ -34,14 +34,14 @@ const NUMBER_COLUMN_COUNT = 3;
             data-skeleton-region="case-row"
             class="border-t border-line"
           >
-            <th scope="row" class="px-6 py-3 text-left font-mono font-normal">
+            <th scope="row" class="px-6 py-3 text-left font-mono font-normal xl:px-3 xl:py-2.5">
               <SkeletonBlock text class="w-6" />
             </th>
-            <td class="px-6 py-3"><SkeletonBlock pill class="h-7 w-32" /></td>
+            <td class="px-6 py-3 xl:px-3 xl:py-2.5"><SkeletonBlock pill class="h-7 w-32" /></td>
             <td
               v-for="column in NUMBER_COLUMN_COUNT"
               :key="column"
-              class="px-6 py-3 text-right font-mono"
+              class="px-6 py-3 text-right font-mono xl:px-3 xl:py-2.5"
             >
               <SkeletonBlock text class="ml-auto w-14" />
             </td>
