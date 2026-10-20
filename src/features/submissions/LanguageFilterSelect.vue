@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import type { Language } from '@/api/types/problems';
 import LanguageIcon from '@/components/language/LanguageIcon.vue';
+import { languageById } from '@/components/language/language-by-id';
 import ToolbarSelect from '@/components/ToolbarSelect.vue';
 import { translate } from '@/i18n';
 import type { SubmissionFilters } from './use-submission-filters';
@@ -14,9 +15,10 @@ const options = computed(() => [
   { value: ANY_LANGUAGE, label: translate('submissions.rail.anyLanguage') },
   ...props.languages.map((language) => ({ value: language.id, label: language.name })),
 ]);
-const chosen = computed(() =>
-  props.languages.find((language) => language.id === props.filters.languageIds[0]),
-);
+const chosen = computed(() => {
+  const languageId = props.filters.languageIds[0];
+  return languageId === undefined ? undefined : languageById(props.languages, languageId);
+});
 const pick = (languageId: string) =>
   emit('update', { languageIds: languageId === ANY_LANGUAGE ? [] : [languageId] });
 </script>
@@ -29,6 +31,6 @@ const pick = (languageId: string) =>
     :active="filters.languageIds.length > 0"
     @update:model-value="pick"
   >
-    <template v-if="chosen" #chosen-icon><LanguageIcon :language-key="chosen.key" /></template>
+    <template #chosen-icon><LanguageIcon v-if="chosen" :language-key="chosen.key" /></template>
   </ToolbarSelect>
 </template>

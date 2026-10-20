@@ -1,5 +1,6 @@
 import { computed } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
+import { languageById } from '@/components/language/language-by-id';
 import { useProblemMetaQuery } from './problems.queries';
 
 /**
@@ -11,7 +12,7 @@ export function useLanguageKeys(needed: MaybeRefOrGetter<boolean>) {
   const meta = useProblemMetaQuery({ enabled: needed });
   const languages = computed(() => meta.data.value?.languages ?? []);
   return {
-    keyOfId: (id: string) => languages.value.find((language) => language.id === id)?.key ?? null,
+    keyOfId: (id: string) => languageById(languages.value, id)?.key ?? null,
     /** The pp table names a language by its short name, or its key when it has none. */
     keyOfShortName: (name: string) =>
       languages.value.find((language) => (language.shortName || language.key) === name)?.key ??

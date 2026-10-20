@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { Language } from '@/api/types/problems';
+import { languageById } from '@/components/language/language-by-id';
 import { SUBMISSION_RESULT_CODES } from '@/api/types/submissions';
 import AdminField from '../ui/AdminField.vue';
 import VerdictChips from '../ui/VerdictChips.vue';
@@ -50,7 +51,7 @@ const results = computed({
   set: (codes) => change({ results: codes }),
 });
 
-const languageName = (id: string) => props.languages.find((item) => item.id === id)?.name ?? id;
+const languageName = (id: string) => languageById(props.languages, id)?.name ?? id;
 const chips = computed<ActiveFilter[]>(() => [
   ...(props.filters.user
     ? [{ key: 'user', label: `${t('admin.submissions.filters.user')}: ${props.filters.user}` }]
