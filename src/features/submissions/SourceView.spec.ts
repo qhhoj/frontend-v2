@@ -56,6 +56,20 @@ describe('SourceView fold', () => {
     await view.get('[data-testid="source-expand"]').trigger('click');
     expect(view.get('#source-code').text()).toContain('x200');
   });
+
+  it('opens the next long source unfolded when the address carries #source', async () => {
+    const source = lines(201).join('\n');
+    mockApi({
+      ...anonymousViewer,
+      'GET /submissions/sub-1/source': ok({ id: 'sub-1', source }),
+      'GET /submissions/sub-2/source': ok({ id: 'sub-2', source }),
+    });
+    const view = mountComponent(SourceView, { props: props(null) });
+    await vi.waitFor(() => expect(view.find('[data-testid="source-expand"]').exists()).toBe(true));
+    await view.vm.$router.push('/submissions/sub-2#source');
+    await view.setProps({ ...props(null), id: 'sub-2' } as never);
+    await vi.waitFor(() => expect(view.find('#source-code').exists()).toBe(true));
+  });
 });
 
 describe('SourceView access', () => {

@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { submissionCase } from '@/test/fixtures';
-import { buildOverviewRows, reasonParts, scoreConversion } from './test-overview';
+import {
+  buildOverviewRows,
+  caseTitle,
+  formatCasePoints,
+  pendingPositions,
+  reasonParts,
+  scoreConversion,
+} from './test-overview';
 
 const testCase = (position: number, status: 'AC' | 'WA' | 'TLE' | 'SC', batch: number | null) =>
   submissionCase({ position, status, batch, points: status === 'AC' ? 10 : 0, total: 10 });
@@ -103,5 +110,33 @@ describe('scoreConversion', () => {
 
   it('stays quiet when the formula does not give the stored points (no partial scoring)', () => {
     expect(scoreConversion(50, 100, 0, 800)).toBeNull();
+  });
+});
+
+describe('pendingPositions', () => {
+  const graded = [1, 2, 3].map((position) => submissionCase({ position }));
+
+  it('numbers the tests after the graded ones while the grading goes on', () => {
+    expect(pendingPositions(graded, 6, true)).toEqual([4, 5, 6]);
+  });
+
+  it('has none when the grading is over, the test count is unknown or the results are hidden', () => {
+    expect(pendingPositions(graded, 6, false)).toEqual([]);
+    expect(pendingPositions(graded, null, true)).toEqual([]);
+    expect(pendingPositions(null, 6, true)).toEqual([]);
+    expect(pendingPositions(graded, 2, true)).toEqual([]);
+  });
+});
+
+describe('formatCasePoints and caseTitle', () => {
+  it('writes points in the locale with up to two decimals', () => {
+    expect(formatCasePoints(0.5, 1, 'vi')).toBe('0,5/1');
+    expect(formatCasePoints(1 / 3, 1, 'en')).toBe('0.33/1');
+    expect(formatCasePoints(1500, 2000, 'vi')).toBe('1500/2000');
+  });
+
+  it('names the test, its verdict and its points', () => {
+    const wrong = submissionCase({ position: 3, status: 'WA', points: 0, total: 1 });
+    expect(caseTitle(wrong, 'vi')).toBe('Test 3: Sai kết quả, 0/1');
   });
 });

@@ -73,10 +73,11 @@ const lineNumbers = computed(() =>
 /** A source up to this many lines opens unfolded, since the code is what most readers come for; a longer one opens folded. */
 const UNFOLDED_MAX_LINES = 200;
 /** The reader's own choice, null to follow the length; "View source" links (#source) open the source unfolded whatever its length. */
-const expandChoice = ref<boolean | null>(route.hash === '#source' ? true : null);
+const choiceFromHash = () => (route.hash === '#source' ? true : null);
+const expandChoice = ref<boolean | null>(choiceFromHash());
 watch(
   () => props.id,
-  () => (expandChoice.value = null),
+  () => (expandChoice.value = choiceFromHash()),
 );
 const isExpanded = computed(() => expandChoice.value ?? lineCount.value <= UNFOLDED_MAX_LINES);
 </script>

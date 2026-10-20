@@ -1,4 +1,6 @@
 import type { CaseStatus, SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
+import { translate, type Locale } from '@/i18n';
+import { formatNumber } from '@/lib/format';
 import { BLOCK_TONE_CLASSES, PARTIAL_CODE, caseVerdictOf, isPartial } from '@/lib/verdicts';
 
 /** The case status of a test the judge did not run because an earlier test of its subtask failed. */
@@ -24,6 +26,35 @@ export interface OverviewRow {
   lowestPosition: number | null;
   earned: number;
   max: number;
+}
+
+/** Test and subtask points keep up to two decimals, e.g. `0,25`. */
+const POINT_FRACTION_DIGITS = 2;
+export const formatPoints = (value: number, locale: Locale) =>
+  formatNumber(value, locale, POINT_FRACTION_DIGITS, false);
+/** Earned out of possible points, e.g. `0,5/1`. */
+export const formatCasePoints = (points: number, total: number, locale: Locale) =>
+  `${formatPoints(points, locale)}/${formatPoints(total, locale)}`;
+/** A test's tile or square title: "Test 3: Sai kết quả, 0/1". */
+export const caseTitle = (testCase: SubmissionCase, locale: Locale) =>
+  translate('submission.overview.testTitle', {
+    number: testCase.position,
+    verdict: translate(caseVerdictOf(testCase).labelKey),
+    points: formatCasePoints(testCase.points, testCase.total, locale),
+  });
+
+/** Positions of the tests after the graded ones; only a grading in progress with a known test count has them. */
+export function pendingPositions(
+  cases: SubmissionCase[] | null,
+  totalCases: number | null,
+  running: boolean,
+): number[] {
+  if (!running || !cases || !totalCases) return [];
+  const first = cases.length + 1;
+  return Array.from(
+    { length: Math.max(0, totalCases - cases.length) },
+    (_unused, offset) => first + offset,
+  );
 }
 
 const isSkipped = (testCase: SubmissionCase) => testCase.status === SKIPPED_STATUS;

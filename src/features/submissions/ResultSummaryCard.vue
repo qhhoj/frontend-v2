@@ -4,12 +4,20 @@ import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
 import { translate } from '@/i18n';
-import { formatCaseMemory, formatCaseTime, formatNumber } from '@/lib/format';
+import { formatCaseMemory, formatCaseTime } from '@/lib/format';
 import { PARTIAL_CODE, caseVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import CaseDetails from './CaseDetails.vue';
 import { caseDetails } from './case-details';
-import { SKIPPED_STATUS, buildOverviewRows, caseTileClass, isFullCase } from './test-overview';
+import {
+  SKIPPED_STATUS,
+  buildOverviewRows,
+  caseTileClass,
+  caseTitle,
+  formatCasePoints,
+  isFullCase,
+  pendingPositions,
+} from './test-overview';
 
 /**
  * The result summary above the source, below `xl` only (from `xl` the full table stands beside the source instead): one
@@ -27,12 +35,10 @@ const props = defineProps<{
 
 /** At most this many point-losing tests open by themselves; the others are a tap or the table away. */
 const OPEN_LOSSES_MAX = 3;
-const POINT_FRACTION_DIGITS = 2;
 const TILE =
   'flex size-8 items-center justify-center rounded-skeleton font-mono text-caption font-bold pointer-coarse:size-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';
 const OPEN_TILE = 'ring-2 ring-content ring-offset-2 ring-offset-surface-solid';
 const locale = useLocaleStore();
-const format = (value: number) => formatNumber(value, locale.locale, POINT_FRACTION_DIGITS, false);
 
 const isLoss = (testCase: SubmissionCase) =>
   !isFullCase(testCase) && testCase.status !== SKIPPED_STATUS;
@@ -52,14 +58,7 @@ const closedLossCount = computed(
 
 const testCount = computed(() => props.totalCases ?? props.cases.length);
 const passedCount = computed(() => props.cases.filter(isFullCase).length);
-const pendingPositions = computed(() => {
-  if (!props.running || !props.totalCases) return [];
-  const first = props.cases.length + 1;
-  return Array.from(
-    { length: Math.max(0, props.totalCases - props.cases.length) },
-    (_unused, offset) => first + offset,
-  );
-});
+const pending = computed(() => pendingPositions(props.cases, props.totalCases, props.running));
 /** One tile row per subtask (a plain problem has one unnamed row); waiting tests join a plain row or get their own. */
 const groups = computed(() => {
   const graded = buildOverviewRows(props.cases, props.batches).map((row) => ({
@@ -69,31 +68,27 @@ const groups = computed(() => {
     cases: row.cases,
     pending: [] as number[],
   }));
-  if (pendingPositions.value.length === 0) return graded;
+  if (pending.value.length === 0) return graded;
   const plain = graded.length === 1 && graded[0]!.label === null ? graded[0] : null;
-  if (plain) return [{ ...plain, pending: pendingPositions.value }];
+  if (plain) return [{ ...plain, pending: pending.value }];
   const label = graded.length ? translate('submission.cases.pending') : null;
-  return [...graded, { key: 'pending', label, cases: [], pending: pendingPositions.value }];
+  return [...graded, { key: 'pending', label, cases: [], pending: pending.value }];
 });
 
 const isPartialCase = (testCase: SubmissionCase) => caseVerdictOf(testCase).code === PARTIAL_CODE;
-const tileLabel = (testCase: SubmissionCase) =>
-  translate('submission.overview.testTitle', {
-    number: testCase.position,
-    verdict: translate(caseVerdictOf(testCase).labelKey),
-    points: `${format(testCase.points)}/${format(testCase.total)}`,
-  });
+const tileLabel = (testCase: SubmissionCase) => caseTitle(testCase, locale.locale);
 const pendingLabel = (position: number) =>
   `${translate('submission.cases.test')} ${position}: ${translate('submission.cases.pending')}`;
 const caseFacts = (testCase: SubmissionCase) =>
   [
     formatCaseTime(testCase.time),
     formatCaseMemory(testCase.memory),
-    `${format(testCase.points)}/${format(testCase.total)}`,
+    formatCasePoints(testCase.points, testCase.total, locale.locale),
   ].join(' · ');
-/** The one line of an all-correct result: nothing to open, so its slowest time and largest memory. */
+/** The one line of an all-correct result: nothing to open, so its slowest time and largest memory. Only when every one of
+ * the problem's tests passed, so it never says "all" beside a header that counts fewer. */
 const allCorrectLine = computed(() => {
-  if (props.running || losses.value.length > 0 || props.cases.length === 0) return null;
+  if (props.running || props.cases.length === 0 || passedCount.value < testCount.value) return null;
   return translate('submission.summary.allCorrect', {
     count: props.cases.length,
     time: formatCaseTime(Math.max(...props.cases.map((testCase) => testCase.time))),
