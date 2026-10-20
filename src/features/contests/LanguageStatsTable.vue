@@ -8,8 +8,7 @@ import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { formatPercent, languageShare } from './stats-summary';
 
-/** `key` is the judge key for the icon (`null`: generic icon); the stats rows carry only the language id. */
-const props = defineProps<{ languages: (ContestLanguageStats & { key: string | null })[] }>();
+const props = defineProps<{ languages: ContestLanguageStats[] }>();
 const locale = useLocaleStore();
 /** Each language with its share of all submissions, computed once per row. */
 const rows = computed(() =>
@@ -57,7 +56,7 @@ const count = (value: number) => formatNumber(value, locale.locale);
             class="border-t border-line"
           >
             <th scope="row" class="px-4 py-3 text-left font-semibold">
-              <LanguageLabel :language="language" />
+              <LanguageLabel :language="{ key: language.languageKey, name: language.name }" />
             </th>
             <td class="px-4 py-3">
               <div class="flex items-center gap-3">

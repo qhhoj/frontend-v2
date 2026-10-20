@@ -8169,6 +8169,8 @@ export interface components {
             /** @description Submissions in this language. */
             count: number;
             languageId: string;
+            /** @description Language key such as `CPP17`; null if the language is gone. */
+            languageKey: string | null;
             /** @description Language name. */
             name: string;
         };
@@ -10473,6 +10475,8 @@ export interface components {
             id: string;
             /** @description Short name of the programming language. */
             language: string;
+            /** @description Language key such as `CPP17`; null if the language is gone. */
+            languageKey: string | null;
             /** @description Verdict code such as `AC`; null if none. */
             result: string | null;
         };
