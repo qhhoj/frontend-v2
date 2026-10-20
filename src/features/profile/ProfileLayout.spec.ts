@@ -4,7 +4,7 @@ import { userPage as makeUser } from '@/test/fixtures';
 import { organizationSummary } from '@/test/community-fixtures';
 import { sessionUser, userPage } from '@/test/fixtures';
 import { profileRoutes } from '@/test/community-routes';
-import { fail, mockApi, noContent } from '@/test/mock-api';
+import { fail, mockApi, noContent, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 
@@ -123,15 +123,48 @@ it('shows no ban opener for a superuser target, and says nothing about a ban', a
   expect(wrapper.find('[data-testid="ban-status"]').exists()).toBe(false);
 });
 
-it('shows an already-banned target read-only, with its reason and no opener', async () => {
-  const banned = makeUser({
+const bannedOther = () =>
+  makeUser({
     ...other,
-    staff: { isSuperuser: false, isActive: true, banReason: 'Nộp bài giống hệt.' },
+    displayRank: 'banned',
+    staff: { isSuperuser: false, isActive: false, banReason: 'Nộp bài giống hệt.' },
   });
-  mockApi({ ...viewerWith(['judge.ban_user']), ...profileRoutes(banned) });
+
+it('shows an already-banned target with its reason and an unban opener instead of the ban', async () => {
+  mockApi({ ...viewerWith(['judge.ban_user']), ...profileRoutes(bannedOther()) });
   const { wrapper } = await mountApp('/users/ngoc_anh');
   expect(wrapper.find('[data-testid="ban-open"]').exists()).toBe(false);
   expect(wrapper.get('[data-testid="ban-status"]').text()).toContain('Nộp bài giống hệt.');
+  expect(wrapper.get('button[data-testid="unban-open"]').text()).toBe('Bỏ cấm');
+});
+
+it('shows no unban opener to a viewer without judge.ban_user', async () => {
+  mockApi({ ...signedInViewer(), ...profileRoutes(bannedOther()) });
+  const { wrapper } = await mountApp('/users/ngoc_anh');
+  expect(wrapper.find('[data-testid="unban-open"]').exists()).toBe(false);
+});
+
+it('unbans only after confirming, then refetches the profile and offers the ban again', async () => {
+  let isBanned = true;
+  const calls = mockApi({
+    ...viewerWith(['judge.ban_user']),
+    ...profileRoutes(other),
+    'GET /users/ngoc_anh': () => ok(isBanned ? bannedOther() : other),
+    'POST /users/ngoc_anh/unban': () => {
+      isBanned = false;
+      return noContent();
+    },
+  });
+  const { wrapper } = await mountApp('/users/ngoc_anh');
+  await wrapper.get('button[data-testid="unban-open"]').trigger('click');
+  await flushPromises();
+  expect(calls.some((call) => call.path.endsWith('/unban'))).toBe(false);
+  submitDialog(document.querySelector('[role="dialog"]')!);
+  await flushPromises();
+  expect(calls.filter((call) => call.path === '/users/ngoc_anh/unban')).toHaveLength(1);
+  await vi.waitFor(() => expect(wrapper.find('[data-testid="ban-open"]').exists()).toBe(true));
+  expect(wrapper.find('[data-testid="ban-status"]').exists()).toBe(false);
+  expect(document.body.textContent).toContain('Đã bỏ cấm ngoc_anh.');
 });
 
 it('keeps the ban of one profile off a cached next profile', async () => {

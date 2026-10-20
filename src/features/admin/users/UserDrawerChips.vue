@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { KeyRound, ShieldCheck, Trophy } from 'lucide-vue-next';
 import type { UserPage } from '@/api/types/users';
 import type { UserEdit } from '@/api/types/users-admin';
+import { isBannedPage } from '@/lib/user-ban';
 import AdminChip from '../ui/AdminChip.vue';
 import UserStatusChips from './UserStatusChips.vue';
 import type { UserStatus } from './users-list';
@@ -11,7 +12,7 @@ import type { UserStatus } from './users-list';
 const props = defineProps<{ page: UserPage; edit?: UserEdit }>();
 const status = computed<UserStatus>(() => {
   const staff = props.page.staff;
-  if (props.page.displayRank === 'banned' || staff?.banReason) return 'banned';
+  if (isBannedPage(props.page)) return 'banned';
   return staff && !staff.isActive ? 'inactive' : 'active';
 });
 </script>

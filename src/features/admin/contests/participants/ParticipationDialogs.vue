@@ -9,7 +9,7 @@ import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
 import { participationKindKey } from './participations';
 import type { ParticipationActions } from './use-participation-actions';
 
-/** The confirm dialogs of the participation row menu: move the start, disqualify, delete. */
+/** The confirm dialogs of the participation row menu: move the start, disqualify, restore, delete. */
 const props = defineProps<{ actions: ParticipationActions }>();
 /** Kept after a dialog closes, so its text does not blank while it fades and focus can still find the row. */
 const row = ref<Participation | null>(null);
@@ -29,6 +29,7 @@ const isOpen = (dialog: string) =>
   });
 const isMoveOpen = isOpen('moveStart');
 const isDisqualifyOpen = isOpen('disqualify');
+const isRestoreOpen = isOpen('restore');
 const isDeleteOpen = isOpen('delete');
 const username = computed(() => row.value?.user.username ?? '');
 const kindText = computed(() => {
@@ -41,7 +42,8 @@ const start = ref<string | null>(null);
 watch(isMoveOpen, (shown) => {
   if (shown) start.value = row.value?.realStart ?? null;
 });
-const { disqualify, moveStart, remove } = props.actions;
+const { disqualify, restore, moveStart, remove } = props.actions;
+const startText = computed(() => (row.value ? formatInZone(row.value.realStart) : ''));
 /** Focus lands on the row's status after a dialog closes: the menu that opened it is gone by then. */
 const statusCell = () =>
   row.value ? document.getElementById(`participation-status-${row.value.id}`) : null;
@@ -80,7 +82,7 @@ const statusCell = () =>
     :body="
       $t('admin.contests.participants.disqualifyBody', {
         kind: kindText,
-        time: row ? formatInZone(row.realStart) : '',
+        time: startText,
       })
     "
     :confirm-label="$t('admin.contests.participants.disqualify')"
@@ -91,6 +93,22 @@ const statusCell = () =>
     <template #error>
       <p v-if="disqualify.failure.value" role="alert" class="text-sm text-negative">
         {{ failureTextOf(disqualify.failure.value) }}
+      </p>
+    </template>
+  </ConfirmDialog>
+
+  <ConfirmDialog
+    v-model:visible="isRestoreOpen"
+    :return-focus-to="statusCell"
+    :title="$t('admin.contests.participants.restoreTitle', { username })"
+    :body="$t('admin.contests.participants.restoreBody', { kind: kindText, time: startText })"
+    :confirm-label="$t('admin.contests.participants.restore')"
+    :busy="restore.isPending.value"
+    @confirm="row && restore.run(row)"
+  >
+    <template #error>
+      <p v-if="restore.failure.value" role="alert" class="text-sm text-negative">
+        {{ failureTextOf(restore.failure.value) }}
       </p>
     </template>
   </ConfirmDialog>

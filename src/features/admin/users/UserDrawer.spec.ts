@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { mockApi, ok } from '@/test/mock-api';
+import { mockApi, noContent, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { confirmDialog, superuserViewer } from '@/test/admin-routes';
 import { userPage } from '@/test/fixtures';
@@ -39,6 +39,32 @@ async function openWithFullName(fullName: string) {
 
 describe('UserDrawer', () => {
   vi.setConfig({ testTimeout: 20_000 });
+
+  it('unbans a banned account only after confirming, toasts it and refetches the user', async () => {
+    const calls = mockApi({
+      ...routes(),
+      'GET /users/tuan_k': ok(
+        userPage({
+          username: 'tuan_k',
+          displayRank: 'banned',
+          staff: { isSuperuser: false, isActive: false, banReason: 'Nộp bài hộ.' },
+        }),
+      ),
+      'POST /users/tuan_k/unban': noContent(),
+    });
+    await mountApp('/admin/users?user=tuan_k&section=account');
+    await vi.waitFor(() => expect(inBody('[data-testid="unban-open"]')).not.toBeNull());
+    expect(document.body.textContent).toContain('Lý do cấm: Nộp bài hộ.');
+    inBody<HTMLButtonElement>('[data-testid="unban-open"]')!.click();
+    await flushPromises();
+    expect(calls.some((call) => call.path.endsWith('/unban'))).toBe(false);
+    const userReads = () => calls.filter((call) => call.path === '/users/tuan_k').length;
+    const before = userReads();
+    await confirmDialog('Bỏ cấm');
+    expect(calls.filter((call) => call.path === '/users/tuan_k/unban')).toHaveLength(1);
+    await vi.waitFor(() => expect(document.body.textContent).toContain('Đã bỏ cấm tuan_k.'));
+    expect(userReads()).toBeGreaterThan(before);
+  });
 
   it('saves the open tab from the footer, sending only the changed field', async () => {
     const calls = mockApi(routes());

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import type { UserPage } from '@/api/types/users';
 import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
 import { userEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
+import UnbanUserDialog from '@/features/admin/users/UnbanUserDialog.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
@@ -12,6 +13,7 @@ import { formatDate } from '@/lib/format-date';
 import { hasPermission } from '@/lib/permissions';
 import { ratingTier, tierColor } from '@/lib/rating-tiers';
 import { TIER_TEXT_CLASSES } from '@/lib/tier-classes';
+import { isBannedPage } from '@/lib/user-ban';
 import { useLocaleStore } from '@/stores/locale.store';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
@@ -29,14 +31,15 @@ const tierLabelKey = computed(() => `tiers.${tier.value ?? 'unrated'}`);
 const editTarget = computed(() => userEditTarget(session.user, props.user.username));
 const isOwn = computed(() => props.user.username === session.user?.username);
 const banReason = computed(() => props.user.staff?.banReason ?? null);
+const isBanned = computed(() => isBannedPage(props.user));
+const canModerate = computed(() => hasPermission(session.user, 'judge.ban_user') && !isOwn.value);
 /** The backend refuses to ban a superuser, an account already banned (409) or oneself: offer the action only where it can work. */
 const canBan = computed(
-  () =>
-    hasPermission(session.user, 'judge.ban_user') &&
-    !isOwn.value &&
-    !props.user.staff?.isSuperuser &&
-    !banReason.value,
+  () => canModerate.value && !props.user.staff?.isSuperuser && !isBanned.value,
 );
+/** The inverse of the ban, for the same permission: unbanning an account that is not banned is a 409. */
+const canUnban = computed(() => canModerate.value && isBanned.value);
+const isUnbanOpen = ref(false);
 const isSignedIn = computed(() => session.status === 'authenticated');
 const joinedDate = computed(() => formatDate(props.user.dateJoined, 'date', locale.locale));
 </script>
@@ -84,11 +87,25 @@ const joinedDate = computed(() => formatDate(props.user.dateJoined, 'date', loca
           <AppButton to="/blog/new">{{ $t('profile.write') }}</AppButton>
         </template>
         <BanUserDialog v-else-if="canBan" :key="user.username" :username="user.username" />
+        <template v-else-if="canUnban">
+          <AppButton data-testid="unban-open" @click="isUnbanOpen = true">
+            {{ $t('profile.ban.unban') }}
+          </AppButton>
+          <UnbanUserDialog
+            :key="user.username"
+            v-model:visible="isUnbanOpen"
+            :username="user.username"
+          />
+        </template>
         <AdminEditLink :to="editTarget" />
         <ShortLinkButton :path="shortLinkPath({ kind: 'user', username: user.username })" />
       </div>
-      <p v-if="banReason" data-testid="ban-status" class="text-sm text-negative">
-        {{ $t('profile.ban.bannedWithReason', { reason: banReason }) }}
+      <p v-if="banReason || canUnban" data-testid="ban-status" class="text-sm text-negative">
+        {{
+          banReason
+            ? $t('profile.ban.bannedWithReason', { reason: banReason })
+            : $t('profile.ban.banned')
+        }}
       </p>
     </div>
     <div data-testid="rating-box" :class="RATING_BOX_CLASSES">

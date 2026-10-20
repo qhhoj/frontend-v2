@@ -61,6 +61,41 @@ describe('ContestParticipantsTab', () => {
     ).toHaveLength(2);
   });
 
+  it('restores a disqualified participation only after confirming, then refetches the list', async () => {
+    const calls = mockApi({
+      ...staffViewer(['judge.edit_own_contest']),
+      ...contestEditorRoutes(),
+      'GET /contests/hcmus-w41/participations': page([participation({ isDisqualified: true })], {
+        pageSize: 50,
+        total: 214,
+      }),
+      'POST /contests/hcmus-w41/participations/p-1/disqualify': ok({
+        id: 'p-1',
+        virtual: 0,
+        isRegistered: true,
+        isDisqualified: false,
+        realStart: '2026-10-08T06:00:00.000Z',
+        endTime: '2026-10-08T10:00:00.000Z',
+      }),
+    });
+    const { wrapper } = await mountAndWaitFor(
+      '/admin/contests/hcmus-w41/participants',
+      '214 lượt tham gia',
+    );
+    expect(wrapper.get('tbody tr').text()).toContain('Bị loại');
+    await pickRowAction(wrapper, 'Khôi phục');
+    expect(calls.some((call) => call.path.endsWith('/disqualify'))).toBe(false);
+    expect(document.body.textContent).toContain('Khôi phục ngocanh vào bảng xếp hạng?');
+    await confirmDialog('Khôi phục');
+    expect(calls.find((call) => call.path.endsWith('/disqualify'))?.body).toEqual({
+      disqualified: false,
+    });
+    expect(document.body.textContent).toContain('Đã khôi phục ngocanh.');
+    expect(
+      calls.filter((call) => call.method === 'GET' && call.path.endsWith('/participations')),
+    ).toHaveLength(2);
+  });
+
   const disqualifyRoutes = () => ({
     ...staffViewer(['judge.edit_own_contest']),
     ...contestEditorRoutes(),

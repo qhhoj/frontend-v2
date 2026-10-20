@@ -78,6 +78,10 @@
       "noReason": "No reason was recorded.",
       "unban": "Unban",
       "unbanHint": "Unbanning restores the rank \"user\", shows the account again and activates it."
+    },
+    "unbanDialog": {
+      "title": "Unban {username}?",
+      "body": "The account gets the rank \"user\" back, shows on the leaderboard again and can sign in again."
     }
   },
   "impersonate": {
