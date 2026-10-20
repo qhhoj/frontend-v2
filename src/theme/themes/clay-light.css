@@ -234,3 +234,21 @@
   --qh-blob-2: rgba(250, 249, 245, 0);
   --qh-blob-3: rgba(250, 249, 245, 0);
 }
+
+:root[data-theme='clay-light'][data-accent='red'],
+:root[data-theme='clay-light'] [data-accent='red'] {
+  --qh-surface-hover: #f1ede4;
+  --qh-line-accent: #a33f33;
+  --qh-accent: #a33f33;
+  --qh-accent-2: #84332a;
+  --qh-accent-text: #a33f33;
+  --qh-accent-soft: rgba(163, 63, 51, 0.1);
+  --qh-accent-soft-text: #7c3027;
+  --qh-on-accent: #ffffff;
+  --qh-focus-ring: #a33f33;
+  --qh-gradient-accent: linear-gradient(90deg, #a33f33, #a33f33);
+  --qh-glow: 0 0 0 0 rgba(0, 0, 0, 0);
+  --qh-blob-1: rgba(250, 249, 245, 0);
+  --qh-blob-2: rgba(250, 249, 245, 0);
+  --qh-blob-3: rgba(250, 249, 245, 0);
+}

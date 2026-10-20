@@ -661,7 +661,8 @@
       "mint": "Mint",
       "sunset": "Sunset",
       "gold": "Gold",
-      "mono": "Mono"
+      "mono": "Mono",
+      "red": "Red"
     },
     "glass": "Glass",
     "glassOnly": "Glass and glow only apply to the Glass themes.",
