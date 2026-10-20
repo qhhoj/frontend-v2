@@ -434,12 +434,14 @@ export const contestStats = (overrides: Partial<ContestStats> = {}): ContestStat
     {
       languageId: '0192a000-0000-7000-8000-0000000000c1',
       name: 'C++20',
+      languageKey: 'CPP20',
       count: 1952,
       acRate: 38.4,
     },
     {
       languageId: '0192a000-0000-7000-8000-0000000000c2',
       name: 'Python 3',
+      languageKey: 'PY3',
       count: 402,
       acRate: 21.9,
     },

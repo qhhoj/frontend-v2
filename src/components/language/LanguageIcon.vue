@@ -54,4 +54,12 @@ const maskStyle = computed(() =>
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-size: contain;
 }
+
+/* Forced colours drop backgrounds, which would erase the mask's fill: paint it in the system text colour instead. */
+@media (forced-colors: active) {
+  .language-mask {
+    forced-color-adjust: none;
+    background-color: CanvasText;
+  }
+}
 </style>

@@ -3,13 +3,7 @@ import { pixelsOf, pixelsOfKind } from '@/test/bit-pixels';
 import { contestPageRoutes } from '@/test/contest-routes';
 import { fail, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
-import {
-  contestDetail,
-  contestProblem,
-  contestStats,
-  languageItem,
-  problemMeta,
-} from '@/test/fixtures';
+import { contestDetail, contestProblem, contestStats } from '@/test/fixtures';
 import { anonymousViewer } from '@/test/problem-routes';
 
 /** Longer than the query's first retry delay (1 s), so a retrying query would have asked again. */
@@ -43,7 +37,6 @@ describe('contest stats tab', () => {
     mockApi({
       ...anonymousViewer,
       ...contestPageRoutes(detail),
-      'GET /problems/meta': ok(problemMeta()),
       'GET /contests/r42/stats': ok(contestStats()),
     });
     const { wrapper } = await mountApp('/contests/r42/stats');
@@ -56,29 +49,26 @@ describe('contest stats tab', () => {
     expect(rows[1]!.findAll('td')[SOLVED_CELL]!.text()).toBe('—');
   });
 
-  it('marks each language row with its own icon, resolved from the language id', async () => {
+  it('marks each language row with the icon of its language key, a gone language with the generic one', async () => {
     const [cpp, python] = contestStats().languages;
-    mockApi({
+    const calls = mockApi({
       ...anonymousViewer,
       ...contestPageRoutes(),
-      'GET /problems/meta': ok({
-        ...problemMeta(),
-        languages: [
-          languageItem(cpp!.languageId, 'CPP20', 'C++20'),
-          languageItem(python!.languageId, 'PY3', 'Python 3'),
-        ],
-      }),
-      'GET /contests/r42/stats': ok(contestStats()),
+      'GET /contests/r42/stats': ok(
+        contestStats({ languages: [cpp!, { ...python!, languageKey: null }] }),
+      ),
     });
     const { wrapper } = await mountApp('/contests/r42/stats');
     await vi.waitFor(() =>
       expect(wrapper.find('[data-testid="language-stats"] .language-mask').exists()).toBe(true),
     );
-    const masks = wrapper
-      .findAll('[data-testid="language-stats"] tbody th [data-testid="language-icon"]')
-      .map((icon) => icon.find('.language-mask').attributes('style') ?? '');
-    expect(masks).toHaveLength(2);
-    expect(masks[0]).toContain('cpp.svg');
-    expect(masks[1]).toContain('python.svg');
+    const icons = wrapper.findAll(
+      '[data-testid="language-stats"] tbody th [data-testid="language-icon"]',
+    );
+    expect(icons).toHaveLength(2);
+    expect(icons[0]!.get('.language-mask').attributes('style')).toContain('cpp.svg');
+    expect(icons[1]!.find('.language-mask').exists()).toBe(false);
+    expect(icons[1]!.find('svg').exists()).toBe(true);
+    expect(calls.some((call) => call.path === '/problems/meta')).toBe(false);
   });
 });

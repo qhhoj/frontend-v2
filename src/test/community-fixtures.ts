@@ -318,6 +318,7 @@ export const ppEntry = (rank: number, overrides: Partial<PpEntry> = {}): PpEntry
     caseTotal: 100,
     result: 'AC',
     language: 'C++20',
+    languageKey: 'CPP20',
   },
   ...overrides,
 });

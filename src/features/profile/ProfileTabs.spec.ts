@@ -27,6 +27,26 @@ describe('profile tabs', () => {
     expect(wrapper.text()).toContain('100,0%');
     expect(calls.find((call) => call.path.endsWith('/pp-breakdown'))!.query.get('page')).toBe('1');
   });
+  it('marks each PP row with the icon of its language key, without asking for the problem meta', async () => {
+    const python = ppEntry(2);
+    const calls = mockApi({
+      ...anonymousViewer,
+      ...base,
+      'GET /users/user_01/pp-breakdown': page(
+        [ppEntry(1), { ...python, submission: { ...python.submission, languageKey: 'PY3' } }],
+        { pageSize: 10, hasMore: false, total: undefined },
+      ),
+    });
+    const { wrapper } = await mountApp('/users/user_01/pp');
+    await flushPromises();
+    const masks = wrapper
+      .findAll('tbody [data-testid="language-icon"] .language-mask')
+      .map((mask) => mask.attributes('style') ?? '');
+    expect(masks).toHaveLength(2);
+    expect(masks[0]).toContain('cpp.svg');
+    expect(masks[1]).toContain('python.svg');
+    expect(calls.some((call) => call.path === '/problems/meta')).toBe(false);
+  });
   it('loads older comments with the cursor the server gave', async () => {
     const viewer = signedInViewer({
       user: sessionUser({ permissions: ['judge.view_all_user_comment'] }),

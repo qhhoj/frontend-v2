@@ -113,9 +113,15 @@ export function languageFamily(key: string): string | null {
   );
 }
 
-/** What to draw for `key` at `size`; `null` (key not known to the caller) draws the generic icon. */
-export function languageIconOf(key: string | null, size: LanguageIconSize): LanguageIcon {
-  const family = key === null ? null : languageFamily(key);
+/**
+ * What to draw for `key` at `size`; no key draws the generic icon. `undefined` is accepted because an older
+ * backend omits the field, and an icon must never break the page it sits on.
+ */
+export function languageIconOf(
+  key: string | null | undefined,
+  size: LanguageIconSize,
+): LanguageIcon {
+  const family = key == null ? null : languageFamily(key);
   const url = family && LOGO_URLS.get(family);
   if (url) return { kind: 'logo', url };
   const icon = family && LUCIDE_BY_FAMILY.get(family);
