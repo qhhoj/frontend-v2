@@ -215,6 +215,9 @@ describe('PolygonLinkPanel', () => {
       expect(panel.get('[data-local-edits="kept"]').text()).toBe('giới hạn thời gian, checker'),
     );
     expect(panel.get('[data-local-edits="updated"]').text()).toBe('giới hạn bộ nhớ');
+    expect(panel.get('[data-testid="local-edits"] h3').text()).toBe(
+      'Thiết lập chấm (lần đồng bộ vừa rồi)',
+    );
 
     const ticked = await openDialog();
     expect(ticked.checked).toBe(false);

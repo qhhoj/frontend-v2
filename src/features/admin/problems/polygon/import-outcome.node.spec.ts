@@ -102,16 +102,35 @@ describe('summaryRowsOf', () => {
     );
   });
 
-  it('says an interactive problem is judged by its interactor, and a checker left out', () => {
+  it("says an interactive problem's checker runs on what the interactor wrote", () => {
     const rows = summaryRowsOf(
-      summary({ interactive: true, checkerIgnored: true, timeLimit: { polygon: 0.5, applied: 1 } }),
+      summary({ interactive: true, timeLimit: { polygon: 0.5, applied: 1 } }),
     );
     expect(rows[0]).toEqual({
       key: 'checker',
-      value: 'Bài tương tác: interactor chấm',
-      note: 'Checker của gói không chạy',
+      value:
+        'Bài tương tác: std::wcmp.cpp → Checker riêng của bài, chạy trên output của interactor',
+      note: null,
     });
     expect(rows[2]!.note).toBe('Polygon: 0.5s, nâng theo mức tối thiểu');
+  });
+
+  it('says the interactor alone judges when a sync kept a grader that does not run the checker', () => {
+    expect(
+      summaryRowsOf(summary({ interactive: true, checkerIgnored: true }), ['grader'])[0],
+    ).toEqual({
+      key: 'checker',
+      value: 'Bài tương tác: chỉ interactor chấm',
+      note: 'Checker của gói không chạy vì grader giữ bản sửa trên QHHOJ',
+    });
+  });
+
+  it('notes a kept checker of an interactive problem as kept, not mapped', () => {
+    expect(summaryRowsOf(summary({ interactive: true }), ['checker'])[0]).toEqual({
+      key: 'checker',
+      value: 'Bài tương tác: Checker riêng của bài, chạy trên output của interactor',
+      note: 'Giữ bản sửa trên QHHOJ · Polygon: std::wcmp.cpp',
+    });
   });
 
   it('names a site checker by its data-tab label', () => {

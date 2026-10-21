@@ -187,7 +187,11 @@ const isHistoryOpen = ref(false);
       @sync="openSync"
       @edit-options="openDrawer"
     />
-    <LocalEditsList v-if="lastLocalEdits && !isRunning" :local-edits="lastLocalEdits" />
+    <LocalEditsList
+      v-if="lastLocalEdits && !isRunning"
+      :local-edits="lastLocalEdits"
+      is-last-sync
+    />
 
     <dl class="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-4 gap-y-1 text-sm">
       <dt class="text-muted">{{ $t('admin.polygonLink.panel.facts.polygon') }}</dt>

@@ -264,18 +264,19 @@
         "time": "Time",
         "memory": "Memory"
       },
-      "interactive": "Interactive: the interactor judges",
-      "checkerIgnored": "The package checker is not run",
+      "interactive": "Interactive: {checker}, run on what the interactor wrote",
+      "interactorOnly": "Interactive: the interactor alone judges",
+      "checkerIgnored": "The package checker is not run because the grader was kept as edited on QHHOJ",
       "tests": "{count} tests",
       "cases": "{count} judged cases",
       "batches": "{count} groups",
       "lowered": "Polygon: {polygon}, lowered to the maximum",
       "raised": "Polygon: {polygon}, raised to the minimum",
-      "kept": "Kept as edited on QHHOJ · Polygon: {polygon}",
-      "keptOnly": "Kept as edited on QHHOJ"
+      "kept": "Kept as edited on QHHOJ · Polygon: {polygon}"
     },
     "localEdits": {
       "title": "Judging settings",
+      "lastSyncTitle": "Judging settings (last sync)",
       "kept": "Kept as edited on QHHOJ",
       "updated": "Taken from the package",
       "settings": {

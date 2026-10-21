@@ -264,18 +264,19 @@
         "time": "Thời gian",
         "memory": "Bộ nhớ"
       },
-      "interactive": "Bài tương tác: interactor chấm",
-      "checkerIgnored": "Checker của gói không chạy",
+      "interactive": "Bài tương tác: {checker}, chạy trên output của interactor",
+      "interactorOnly": "Bài tương tác: chỉ interactor chấm",
+      "checkerIgnored": "Checker của gói không chạy vì grader giữ bản sửa trên QHHOJ",
       "tests": "{count} test",
       "cases": "{count} lượt chấm",
       "batches": "{count} nhóm",
       "lowered": "Polygon: {polygon}, hạ theo mức tối đa",
       "raised": "Polygon: {polygon}, nâng theo mức tối thiểu",
-      "kept": "Giữ bản sửa trên QHHOJ · Polygon: {polygon}",
-      "keptOnly": "Giữ bản sửa trên QHHOJ"
+      "kept": "Giữ bản sửa trên QHHOJ · Polygon: {polygon}"
     },
     "localEdits": {
       "title": "Thiết lập chấm",
+      "lastSyncTitle": "Thiết lập chấm (lần đồng bộ vừa rồi)",
       "kept": "Giữ bản sửa trên QHHOJ",
       "updated": "Lấy theo gói",
       "settings": {
@@ -317,7 +318,7 @@
       "kept": "Giữ nguyên: mã bài, điểm, nhóm, dạng bài, tác giả, người duyệt, ngôn ngữ được nộp, Unicode, nobigmath, giới hạn và cắt output.",
       "overwriteLocal": {
         "label": "Ghi đè cả thiết lập đã sửa trên QHHOJ",
-        "consequence": "Giới hạn, chấm từng phần, checker, grader về lại giá trị trong gói."
+        "consequence": "Giới hạn, chấm điểm từng phần, checker, grader về lại giá trị trong gói."
       }
     },
     "unlinkConfirm": {

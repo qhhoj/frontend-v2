@@ -83,18 +83,23 @@ function checkerName(checker: Summary['checker']): string {
 
 /** A setting a sync kept as edited on QHHOJ, beside what the package has. */
 const keptNote = (polygon: string | null) =>
-  polygon ? translate(`${LINK}.summary.kept`, { polygon }) : translate(`${LINK}.summary.keptOnly`);
+  polygon ? translate(`${LINK}.summary.kept`, { polygon }) : translate(`${LINK}.localEdits.kept`);
 
+/**
+ * The checker as stored: kept by a sync, or mapped from the package. An interactive problem's checker runs on what the
+ * interactor wrote, unless a sync kept a local grader without one (`checkerIgnored`): then the interactor alone decides.
+ */
 function checkerRow(summary: Summary, isKept: boolean): SummaryRow {
-  if (summary.interactive) {
-    const value = translate(`${LINK}.summary.interactive`);
-    const note = summary.checkerIgnored ? translate(`${LINK}.summary.checkerIgnored`) : null;
-    return { key: 'checker', value, note };
+  if (summary.checkerIgnored) {
+    const value = translate(`${LINK}.summary.interactorOnly`);
+    return { key: 'checker', value, note: translate(`${LINK}.summary.checkerIgnored`) };
   }
   const name = checkerName(summary.checker);
-  if (isKept) return { key: 'checker', value: name, note: keptNote(summary.polygonChecker) };
-  const value = summary.polygonChecker ? `${summary.polygonChecker} → ${name}` : name;
-  return { key: 'checker', value, note: null };
+  const mapped = summary.polygonChecker && !isKept ? `${summary.polygonChecker} → ${name}` : name;
+  const value = summary.interactive
+    ? translate(`${LINK}.summary.interactive`, { checker: mapped })
+    : mapped;
+  return { key: 'checker', value, note: isKept ? keptNote(summary.polygonChecker) : null };
 }
 
 function testsRow({ tests, cases, batches }: Summary): SummaryRow {
