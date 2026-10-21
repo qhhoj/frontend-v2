@@ -20,6 +20,7 @@ import PolygonSourcePanel from './PolygonSourcePanel.vue';
 import PolygonUpdateTarget from './PolygonUpdateTarget.vue';
 import {
   defaultLanguageChoice,
+  isLanguageFieldDrawn,
   repeatedLanguageErrors,
   repeatedLanguages,
   toLanguageOptions,
@@ -109,11 +110,16 @@ const submitLabelOf = (form: ImportForm) =>
     ? translate('admin.polygonLink.configure.update.submit', { code: form.code })
     : translate('admin.polygon.form.submit');
 
-/** Field problems show under their fields (`code_taken` on `code`, a language under its select); the rest get the line. */
+/**
+ * Field problems show under their fields (`code_taken` on `code`, a language under its select); the rest get the line,
+ * and so does a language refusal whose select is not on screen (one statement, one tutorial or none).
+ */
 const refusal = computed(() => {
   if (!failure.value || IMPORT_FORM_FIELDS.some((field) => field in fieldErrors.value)) return null;
-  if (optionsRefusal.value) return optionsRefusal.value.field ? null : optionsRefusal.value.text;
-  return importRefusalText(failure.value);
+  const options = optionsRefusal.value;
+  if (!options) return importRefusalText(failure.value);
+  const isDrawn = options.field && isLanguageFieldDrawn(options.field, statements, languages.value);
+  return isDrawn ? null : options.text;
 });
 </script>
 

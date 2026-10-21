@@ -33,6 +33,7 @@ async function openOptions(importAnswer: MockResponse = ok({ jobId: 'job-1' })) 
     'GET /problems/imports/job-1': ok(importJob({ code: 'kminmax' })),
     'GET /problems/abc': ok(editableProblem({ code: 'abc', name: 'Dãy con có tổng lớn nhất' })),
     'GET /problems/kminmax': fail(404, 'not_found'),
+    'GET /problems/boom': fail(503, 'unavailable'),
   });
   const { wrapper } = await mountApp('/admin/problems/polygon');
   await vi.waitFor(() => expect(wrapper.find('#polygon-link').exists()).toBe(true), {
@@ -101,6 +102,20 @@ describe('Polygon configure step', () => {
     expect(wrapper.text()).toContain('Chọn ngôn ngữ trên QHHOJ hoặc Bỏ qua cho đề russian.');
   });
 
+  it('shows a language refusal on the page line when its select is not on screen', async () => {
+    const { wrapper } = await openOptions(
+      fail(400, 'tutorial_language_required', undefined, undefined, {
+        params: { languages: ['english', 'vietnamese'] },
+      }),
+    );
+    // English skipped: one tutorial counts, so no tutorial select is drawn.
+    await selectLabelled(wrapper, 'english').setValue('skip');
+    expect(wrapper.find('[data-testid="polygon-tutorial-line"]').exists()).toBe(true);
+    await wrapper.get('form').trigger('submit');
+    await flushPromises();
+    expect(wrapper.text()).toContain('Chọn đề lấy lời giải trong số: english, vietnamese.');
+  });
+
   it('names the update target and starts the update only after the overwrite is confirmed', async () => {
     const { wrapper, calls } = await openOptions();
     await wrapper.get('input[name="import-mode"][value="update"]').setValue();
@@ -124,5 +139,19 @@ describe('Polygon configure step', () => {
     expect(importBodies(calls)).toEqual([]);
     await confirmDialog('Ghi đè abc và nhập');
     expect(importBodies(calls)).toEqual([expect.objectContaining({ code: 'abc', mode: 'update' })]);
+  });
+
+  it('says an update target is missing only when the server says so, not when asking it failed', async () => {
+    const { wrapper, calls } = await openOptions();
+    await wrapper.get('input[name="import-mode"][value="update"]').setValue();
+    await vi.waitFor(() =>
+      expect(wrapper.get('[data-testid="polygon-update-target"]').text()).toContain(
+        'Không tìm thấy bài kminmax',
+      ),
+    );
+    await wrapper.get('#import-code').setValue('boom');
+    await vi.waitFor(() => expect(calls.some((call) => call.path === '/problems/boom')).toBe(true));
+    await flushPromises();
+    expect(wrapper.find('[data-testid="polygon-update-target"]').exists()).toBe(false);
   });
 });

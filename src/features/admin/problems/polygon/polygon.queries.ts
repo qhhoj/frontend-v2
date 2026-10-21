@@ -10,6 +10,7 @@ import {
 import { fetchMyImports } from '@/api/problem-imports.api';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { isFinal, phaseOf } from '../import/import-job';
+import { polygonImportsOf } from './polygon-my-imports';
 
 export const polygonStatusKey = (viewer: string) => ['admin', 'polygon', 'status', viewer] as const;
 export const polygonLinkKey = (code: string, viewer: string) =>
@@ -58,12 +59,15 @@ export function usePolygonSyncsQuery(
 const MY_IMPORTS_POLL_MS = 15_000;
 export const myImportsKey = (viewer: string) => ['admin', 'imports', 'mine', viewer] as const;
 
-/** The viewer's imports of the last day, to return to one after leaving its page; refreshed while one still runs. */
+/**
+ * The viewer's Polygon imports and syncs of the last day, to return to one after leaving its page (zip uploads left out:
+ * the wizard cannot show them); refreshed while one still runs.
+ */
 export function useMyImportsQuery() {
   const viewer = useViewerId();
   return useQuery({
     queryKey: computed(() => myImportsKey(viewer.value)),
-    queryFn: fetchMyImports,
+    queryFn: async () => polygonImportsOf(await fetchMyImports()),
     staleTime: 0,
     refetchInterval: (query) =>
       query.state.data?.some((job) => !isFinal(phaseOf(job.state))) ? MY_IMPORTS_POLL_MS : false,

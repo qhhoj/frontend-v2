@@ -109,6 +109,8 @@ function mockWizard(api: FakeApi) {
     job('job-3', 'kminmax', 'active', 2),
     job('job-2', 'lcshint', 'failed', 40),
     job('job-1', 'sort', 'completed', 95),
+    // A zip upload: no purpose, no page in this wizard.
+    { ...job('job-0', 'zipupload', 'completed', 100), purpose: null },
   ]);
   api.routes['POST /polygon/resolve'] = ({ body }) => {
     const name = (body as { link: string }).link.split('/').pop() ?? '';
@@ -138,6 +140,7 @@ for (const viewport of VIEWPORTS) {
     mockWizard(api);
     await page.goto('/admin/problems/polygon');
     await expect(page.getByTestId('polygon-my-imports')).toContainText('lcshint');
+    await expect(page.getByTestId('polygon-my-imports')).not.toContainText('zipupload');
     await expect(page.getByText('Cấp quyền đọc', { exact: true })).toBeVisible();
     await shoot(page, viewport.name, 'link-empty');
 
