@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '@/api/client';
-import { linkRefusalOf, parsePolygonLink } from './polygon-problem-link';
+import { linkRefusalOf, parsePolygonLink, polygonLinkUrl } from './polygon-problem-link';
 
 const LINK = 'https://polygon.codeforces.com/p3n21nw/LamTerQH/qhh-evolution-ioi';
 
@@ -12,7 +12,6 @@ describe('parsePolygonLink', () => {
   });
 
   it.each([
-    ['plain http', LINK.replace('https:', 'http:')],
     ['a look-alike host', LINK.replace('codeforces.com', 'codeforces.com.evil.io')],
     ['credentials', LINK.replace('https://', 'https://a:b@')],
     ['no token', 'https://polygon.codeforces.com/LamTerQH/qhh-evolution-ioi'],
@@ -20,6 +19,38 @@ describe('parsePolygonLink', () => {
     ['an extra segment', `${LINK}/tests`],
     ['not a URL', 'LamTerQH/qhh-evolution-ioi'],
   ])('refuses %s', (_case, text) => {
+    expect(parsePolygonLink(text)).toBeNull();
+  });
+});
+
+describe('parsePolygonLink normalisation', () => {
+  const parts = { token: 'p3n21nw', owner: 'LamTerQH', name: 'qhh-evolution-ioi' };
+  const BARE = LINK.replace('https://', '');
+
+  it.each([
+    ['http', LINK.replace('https:', 'http:')],
+    ['no scheme', BARE],
+    ['no scheme, upper-case host', BARE.replace('polygon', 'POLYGON')],
+    ['a trailing dot', `${LINK}.`],
+    ['wrapping angle brackets', `<${LINK}>`],
+    ['brackets and a trailing dot', `<${LINK}>.`],
+    ['http with spaces around', `  ${LINK.replace('https:', 'http:')}  `],
+  ])('reads %s as the https link', (_case, text) => {
+    expect(parsePolygonLink(text)).toEqual(parts);
+  });
+
+  it('builds the https address the server is asked about', () => {
+    expect(polygonLinkUrl(parts)).toBe(LINK);
+  });
+
+  it.each([
+    [
+      'a look-alike host without a scheme',
+      BARE.replace('codeforces.com', 'codeforces.com.evil.io'),
+    ],
+    ['ftp', LINK.replace('https:', 'ftp:')],
+    ['a trailing double slash', `${LINK}//`],
+  ])('still refuses %s', (_case, text) => {
     expect(parsePolygonLink(text)).toBeNull();
   });
 });

@@ -17,6 +17,11 @@ describe('errorMessageKey', () => {
     expect(errorMessageKey(new ApiError('http_error', 413, 'x'))).toBe('errors.payload_too_large');
   });
 
+  it('lets a refusal with its own text win over the generic 413 text', () => {
+    const tooLarge = new ApiError('polygon_package_too_large', 413, 'x');
+    expect(errorMessageKey(tooLarge)).toBe('errors.polygon_package_too_large');
+  });
+
   it('falls back to the generic message for unknown codes and non-API errors', () => {
     expect(errorMessageKey(new ApiError('teapot', 418, 'x'))).toBe('errors.generic');
     expect(errorMessageKey(new Error('boom'))).toBe('errors.generic');

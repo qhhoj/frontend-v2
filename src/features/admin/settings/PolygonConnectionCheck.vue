@@ -52,7 +52,7 @@ function run() {
       :text="
         $t('admin.polygonLink.check.ok', {
           time: checkedAt,
-          account: accountName,
+          account: accountName || $t('admin.polygonLink.howTo.unnamed'),
           count: result.problemCount,
         })
       "

@@ -32,7 +32,7 @@
   },
   "wizard": {
     "title": "Import from Polygon",
-    "lead": "Give the {account} account Read access on Polygon, paste the problem link, configure it, then follow the import.",
+    "lead": "Give {account} Read access on Polygon, paste the problem link, configure it, then follow the import.",
     "stepsLabel": "Import steps",
     "steps": {
       "link": "Problem",
@@ -63,8 +63,8 @@
       "body": "Paste the full address of the problem page: https://polygon.codeforces.com/p…/owner/name."
     },
     "refused": {
-      "title": "{account} cannot open this link",
-      "body": "Give the {account} account READ access on Polygon (Manage access), then copy the link again from the problem page."
+      "title": "This link cannot be opened by {account}",
+      "body": "Give {account} READ access on Polygon (Manage access), then copy the link again from the problem page."
     },
     "noPackage": {
       "title": "Build a package first",

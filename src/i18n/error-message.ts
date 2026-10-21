@@ -7,7 +7,8 @@ const hasText = (key: string) => i18n.global.te(key, DEFAULT_LOCALE);
 
 /** The code that names the refusal: a 403 `forbidden` is told apart by its issue (`board_frozen`, `board_hidden`), a 413 by its status. */
 function refusalCode(error: ApiError): string {
-  if (error.status === PAYLOAD_TOO_LARGE_STATUS) return 'payload_too_large';
+  if (error.status === PAYLOAD_TOO_LARGE_STATUS && !hasText(`errors.${error.code}`))
+    return 'payload_too_large';
   const issueCode = error.issues[0]?.code;
   if (error.code === 'forbidden' && issueCode && hasText(`errors.${issueCode}`)) return issueCode;
   return error.code;

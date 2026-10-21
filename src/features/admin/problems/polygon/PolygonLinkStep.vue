@@ -5,6 +5,7 @@ import { ApiError } from '@/api/client';
 import { resolvePolygonLink } from '@/api/polygon.api';
 import type { PolygonProblem } from '@/api/types/polygon';
 import { formatDate } from '@/lib/format-date';
+import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../../ui/AdminChip.vue';
 import { CARD, INPUT, buttonClass } from '../../ui/controls';
@@ -13,7 +14,7 @@ import PackageStatePill from './PackageStatePill.vue';
 import PackageTypePill from './PackageTypePill.vue';
 import PolygonLinkRefusal from './PolygonLinkRefusal.vue';
 import PolygonSetterHowTo from './PolygonSetterHowTo.vue';
-import { linkRefusalOf, parsePolygonLink } from './polygon-problem-link';
+import { linkRefusalOf, parsePolygonLink, polygonLinkUrl } from './polygon-problem-link';
 import type { LinkRefusal } from './polygon-problem-link';
 
 /**
@@ -24,10 +25,12 @@ const props = defineProps<{ accountName: string; initialLink: string }>();
 const emit = defineEmits<{ resolved: [link: string, problem: PolygonProblem] }>();
 const CHECK_DELAY_MS = 400;
 const locale = useLocaleStore();
-const account = computed(() => props.accountName || 'qhhoj');
+const account = computed(() => props.accountName || translate('admin.polygonLink.howTo.unnamed'));
 
 const text = ref(props.initialLink);
 const parts = computed(() => parsePolygonLink(text.value));
+/** What is sent and compared: the normalised address, so `http://` or a scheme-less paste checks once. */
+const address = computed(() => (parts.value ? polygonLinkUrl(parts.value) : ''));
 const isMalformed = computed(() => text.value.trim() !== '' && parts.value === null);
 
 /** The last check sent: the link it was for and its answer; a newer check makes an older answer stale. */
@@ -57,11 +60,10 @@ async function check(link: string) {
 
 /** Each check counts against a per-user limit, so only a well-formed link that changed is sent, after a pause. */
 watch(
-  text,
-  (value) => {
+  address,
+  (link) => {
     clearTimeout(timer);
-    const link = value.trim();
-    if (!parts.value || link === checked.value.link) return;
+    if (!link || link === checked.value.link) return;
     timer = setTimeout(() => void check(link), CHECK_DELAY_MS);
   },
   { immediate: true },
@@ -69,7 +71,7 @@ watch(
 onBeforeUnmount(() => clearTimeout(timer));
 
 const current = computed(() =>
-  checked.value.link === text.value.trim() && !isChecking.value ? checked.value : null,
+  checked.value.link === address.value && !isChecking.value ? checked.value : null,
 );
 const preview = computed(() => current.value?.problem ?? null);
 const refusal = computed<LinkRefusal | null>(() =>
@@ -144,7 +146,7 @@ const builtAt = computed(() =>
         :refusal="refusal"
         :account-name="account"
         :is-checking="isChecking"
-        @check-again="check(text.trim())"
+        @check-again="check(address)"
       />
 
       <section
@@ -184,7 +186,7 @@ const builtAt = computed(() =>
           type="button"
           :class="buttonClass('primary')"
           :aria-disabled="!preview || undefined"
-          @click="preview && emit('resolved', text.trim(), preview)"
+          @click="preview && emit('resolved', address, preview)"
         >
           {{ $t('admin.polygonLink.link.next') }}
         </button>
