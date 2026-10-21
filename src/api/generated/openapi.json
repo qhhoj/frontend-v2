@@ -1509,6 +1509,39 @@
         },
         "type": "object"
       },
+      "Checker": {
+        "description": "What judges answers: `standard` (hcmp) or `bridged` (the package's own testlib checker); an interactive problem's interactor decides alone.",
+        "enum": [
+          "bridged",
+          "easy",
+          "floats",
+          "floatsabs",
+          "floatsrel",
+          "identical",
+          "linecount",
+          "linematches",
+          "rstripped",
+          "sorted",
+          "standard",
+          "unordered"
+        ],
+        "type": "string"
+      },
+      "ClampedLimitResponse": {
+        "properties": {
+          "applied": {
+            "type": "number"
+          },
+          "polygon": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "polygon",
+          "applied"
+        ],
+        "type": "object"
+      },
       "CloneContestDto": {
         "properties": {
           "key": {
@@ -6123,6 +6156,48 @@
         ],
         "type": "object"
       },
+      "ImportAttentionResponse": {
+        "properties": {
+          "code": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PolygonImportErrorCode"
+              }
+            ],
+            "description": "Always `imported_needs_attention`."
+          },
+          "message": {
+            "description": "What failed, in English.",
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "nullable": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "code",
+          "params",
+          "message"
+        ],
+        "type": "object"
+      },
       "ImportGhostsDto": {
         "properties": {
           "anonymize": {
@@ -6146,10 +6221,47 @@
       },
       "ImportJobResponse": {
         "properties": {
+          "code": {
+            "description": "Code of the problem the job creates or updates.",
+            "type": "string"
+          },
+          "createdAt": {
+            "description": "When it was queued.",
+            "format": "date-time",
+            "type": "string"
+          },
           "error": {
-            "description": "Only an import error written for the requester; any other failure is \"Import failed\".",
+            "description": "Only an import error written for the requester; any other failure is \"Import failed\". Null unless failed.",
             "nullable": true,
             "type": "string"
+          },
+          "errorCode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PolygonImportErrorCode"
+              }
+            ],
+            "nullable": true
+          },
+          "errorParams": {
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "nullable": true,
+            "type": "object"
           },
           "failedStep": {
             "allOf": [
@@ -6160,8 +6272,21 @@
             "description": "Where a failed job stopped: `checking` (before any work), a progress step, `saving` (the database write) or `finishing` (data files after the write); null unless failed, and for jobs that failed before it was recorded.",
             "nullable": true
           },
+          "finishedAt": {
+            "description": "When it ended; null while queued or running.",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
           "id": {
             "description": "Job id.",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "create",
+              "update"
+            ],
             "type": "string"
           },
           "progress": {
@@ -6170,9 +6295,23 @@
                 "$ref": "#/components/schemas/ImportProgressResponse"
               }
             ],
-            "description": "Progress of the running step; null while queued and once finished.",
+            "description": "Progress of the running step; null unless the job runs.",
             "nullable": true,
             "type": "object"
+          },
+          "purpose": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PolygonSyncPurpose"
+              }
+            ],
+            "description": "`link` (a first import from a Polygon link), `sync`, or null for an uploaded package.",
+            "nullable": true
+          },
+          "queuePosition": {
+            "description": "1-based place in the queue while the job waits (1: next); null otherwise.",
+            "nullable": true,
+            "type": "number"
           },
           "result": {
             "allOf": [
@@ -6184,12 +6323,16 @@
             "nullable": true,
             "type": "object"
           },
+          "retryable": {
+            "description": "The same request may pass later (Polygon or the judges were out, the problem changed meanwhile): offer \"try again\". False for failures the options or the package must fix.",
+            "type": "boolean"
+          },
           "state": {
-            "description": "BullMQ state: waiting | active | completed | failed | delayed | prioritized.",
+            "description": "BullMQ state: waiting | active | completed | failed | delayed (waiting for its retry) | prioritized (an automatic sync).",
             "type": "string"
           },
           "step": {
-            "description": "Step for a progress display: queued, then downloading (Polygon imports only), statements, generating (the tests of a Polygon standard package, on a judge), tests, and done or failed.",
+            "description": "Step for a progress display: queued, then downloading (Polygon imports only), statements, generating (the tests of a Polygon standard package, on a judge), tests, and done or failed. Only a running job shows a progress step.",
             "enum": [
               "done",
               "downloading",
@@ -6203,13 +6346,22 @@
           }
         },
         "required": [
+          "mode",
+          "purpose",
           "step",
+          "errorCode",
+          "errorParams",
           "failedStep",
           "id",
+          "code",
           "state",
           "progress",
+          "queuePosition",
           "result",
-          "error"
+          "error",
+          "retryable",
+          "createdAt",
+          "finishedAt"
         ],
         "type": "object"
       },
@@ -6254,6 +6406,16 @@
       },
       "ImportResultResponse": {
         "properties": {
+          "attention": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ImportAttentionResponse"
+              }
+            ],
+            "description": "Set when the problem was imported but needs a repair.",
+            "nullable": true,
+            "type": "object"
+          },
           "code": {
             "description": "Its code.",
             "type": "string"
@@ -6261,11 +6423,86 @@
           "problemId": {
             "description": "Id of the created or updated problem.",
             "type": "string"
+          },
+          "summary": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ImportSummaryResponse"
+              }
+            ],
+            "description": "Null for jobs from before it was recorded and for a sync another sync had already applied.",
+            "nullable": true,
+            "type": "object"
           }
         },
         "required": [
           "problemId",
-          "code"
+          "code",
+          "summary",
+          "attention"
+        ],
+        "type": "object"
+      },
+      "ImportSummaryResponse": {
+        "properties": {
+          "batches": {
+            "type": "number"
+          },
+          "cases": {
+            "description": "Judged cases, dependency copies counted.",
+            "type": "number"
+          },
+          "checker": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Checker"
+              }
+            ],
+            "description": "What judges answers: `standard` (hcmp) or `bridged` (the package's own testlib checker); an interactive problem's interactor decides alone."
+          },
+          "checkerIgnored": {
+            "description": "An interactive problem's checker that is not run.",
+            "type": "boolean"
+          },
+          "interactive": {
+            "type": "boolean"
+          },
+          "memoryLimit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClampedLimitResponse"
+              }
+            ],
+            "description": "KiB."
+          },
+          "polygonChecker": {
+            "description": "The package's checker (`std::wcmp.cpp`, or a custom checker's source path); null for an interactive problem without one.",
+            "nullable": true,
+            "type": "string"
+          },
+          "tests": {
+            "description": "Distinct tests.",
+            "type": "number"
+          },
+          "timeLimit": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClampedLimitResponse"
+              }
+            ],
+            "description": "Seconds."
+          }
+        },
+        "required": [
+          "checker",
+          "polygonChecker",
+          "interactive",
+          "checkerIgnored",
+          "tests",
+          "cases",
+          "batches",
+          "timeLimit",
+          "memoryLimit"
         ],
         "type": "object"
       },
@@ -8331,6 +8568,40 @@
         ],
         "type": "object"
       },
+      "PolygonImportErrorCode": {
+        "enum": [
+          "checker_unsupported",
+          "generation_failed",
+          "generation_no_judge",
+          "generation_timeout",
+          "import_failed",
+          "imported_needs_attention",
+          "package_incomplete",
+          "package_invalid",
+          "package_needs_full",
+          "polygon_already_linked",
+          "polygon_clock_skew",
+          "polygon_failed",
+          "polygon_not_connected",
+          "polygon_package_too_large",
+          "polygon_package_unavailable",
+          "polygon_unauthorized",
+          "polygon_unavailable",
+          "problem_changed",
+          "problem_code_taken",
+          "problem_not_found",
+          "problem_not_importable",
+          "problem_unlinked",
+          "requester_forbidden",
+          "statement_language_repeated",
+          "statement_language_required",
+          "statement_language_unmapped",
+          "storage_full",
+          "too_many_testcases",
+          "tutorial_language_required"
+        ],
+        "type": "string"
+      },
       "PolygonLatestPackageResponse": {
         "properties": {
           "createdAt": {
@@ -8450,7 +8721,7 @@
             "type": "number"
           },
           "statementLanguages": {
-            "description": "Mapping `<polygon language>=<site language>` (`en` or `vi`) for translations; repeat the parameter.",
+            "description": "Mapping `<polygon language>=<site language>` (`en` or `vi`) for translations, or `<polygon language>=skip` to leave a statement out; repeat the parameter. Every statement but the main one needs an entry.",
             "items": {
               "type": "string"
             },
@@ -8476,6 +8747,48 @@
         ],
         "type": "object"
       },
+      "PolygonLinkOptionsResponse": {
+        "properties": {
+          "appendMainSolution": {
+            "type": "boolean"
+          },
+          "ignoreZeroPointBatches": {
+            "type": "boolean"
+          },
+          "ignoreZeroPointCases": {
+            "type": "boolean"
+          },
+          "mainStatementLanguage": {
+            "nullable": true,
+            "type": "string"
+          },
+          "maxCases": {
+            "description": "Testcase limit of the user who linked the problem; a sync of more tests fails with `too_many_testcases`. Not editable.",
+            "type": "number"
+          },
+          "statementLanguages": {
+            "description": "`<polygon language>=<en|vi|skip>`, sorted, in the form the import and the PATCH take.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "tutorialLanguage": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "mainStatementLanguage",
+          "statementLanguages",
+          "tutorialLanguage",
+          "ignoreZeroPointBatches",
+          "ignoreZeroPointCases",
+          "appendMainSolution",
+          "maxCases"
+        ],
+        "type": "object"
+      },
       "PolygonLinkResponse": {
         "properties": {
           "autoSync": {
@@ -8491,6 +8804,35 @@
             "nullable": true,
             "type": "string"
           },
+          "lastSyncErrorCode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PolygonImportErrorCode"
+              }
+            ],
+            "description": "The last sync's failure as a code (`imported_needs_attention` when it imported but needs a repair); null after a success.",
+            "nullable": true
+          },
+          "lastSyncErrorParams": {
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "nullable": true,
+            "type": "object"
+          },
           "lastSyncResult": {
             "allOf": [
               {
@@ -8505,6 +8847,9 @@
           },
           "name": {
             "type": "string"
+          },
+          "options": {
+            "$ref": "#/components/schemas/PolygonLinkOptionsResponse"
           },
           "owner": {
             "type": "string"
@@ -8534,6 +8879,8 @@
         },
         "required": [
           "lastSyncResult",
+          "lastSyncErrorCode",
+          "lastSyncErrorParams",
           "problemId",
           "name",
           "owner",
@@ -8544,7 +8891,8 @@
           "linkedAt",
           "lastSyncAt",
           "lastSyncError",
-          "autoSync"
+          "autoSync",
+          "options"
         ],
         "type": "object"
       },
@@ -8562,11 +8910,17 @@
           },
           "link": {
             "$ref": "#/components/schemas/PolygonLinkResponse"
+          },
+          "runningJobId": {
+            "description": "The queued or running sync (or update import) of the problem, to poll at `GET /problems/imports/{jobId}`; null when none.",
+            "nullable": true,
+            "type": "string"
           }
         },
         "required": [
           "link",
-          "latestPackage"
+          "latestPackage",
+          "runningJobId"
         ],
         "type": "object"
       },
@@ -8589,6 +8943,11 @@
       },
       "PolygonProblemLinkDto": {
         "properties": {
+          "code": {
+            "description": "The problem the link is for, when re-linking an existing one: it may already hold this link.",
+            "pattern": "^[a-z0-9_]{1,32}$",
+            "type": "string"
+          },
           "link": {
             "description": "The problem page address, `https://polygon.codeforces.com/p…/owner/name`.",
             "maxLength": 300,
@@ -8629,6 +8988,13 @@
             "description": "Current revision of the problem on Polygon.",
             "type": "number"
           },
+          "statements": {
+            "description": "Every statement language, sorted by name: with two or more, an import names the main one and maps or skips the others (`statementLanguages`); with two or more tutorials it names `tutorialLanguage`.",
+            "items": {
+              "$ref": "#/components/schemas/PolygonStatementLanguageResponse"
+            },
+            "type": "array"
+          },
           "title": {
             "description": "Statement name (Vietnamese, else English, else any language); null when no statement is named.",
             "nullable": true,
@@ -8639,10 +9005,34 @@
           "id",
           "name",
           "title",
+          "statements",
           "owner",
           "revision",
           "modified",
           "latestPackage"
+        ],
+        "type": "object"
+      },
+      "PolygonStatementLanguageResponse": {
+        "properties": {
+          "hasTutorial": {
+            "description": "It has a tutorial, which an import can take as the editorial.",
+            "type": "boolean"
+          },
+          "language": {
+            "description": "Polygon's language name, such as `vietnamese` or `english`.",
+            "type": "string"
+          },
+          "title": {
+            "description": "The statement's title in that language; null when unnamed.",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "language",
+          "title",
+          "hasTutorial"
         ],
         "type": "object"
       },
@@ -8664,6 +9054,7 @@
         "type": "object"
       },
       "PolygonSyncPurpose": {
+        "description": "`link` (a first import from a Polygon link), `sync`, or null for an uploaded package.",
         "enum": [
           "link",
           "sync"
@@ -8687,6 +9078,34 @@
             "description": "Why it failed, as shown to the requester; null when it succeeded.",
             "nullable": true,
             "type": "string"
+          },
+          "errorCode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PolygonImportErrorCode"
+              }
+            ],
+            "nullable": true
+          },
+          "errorParams": {
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              ]
+            },
+            "nullable": true,
+            "type": "object"
           },
           "failedStep": {
             "allOf": [
@@ -8776,6 +9195,8 @@
           "trigger",
           "result",
           "failedStep",
+          "errorCode",
+          "errorParams",
           "id",
           "problemId",
           "code",
@@ -15750,13 +16171,40 @@
       },
       "UpdatePolygonLinkDto": {
         "properties": {
-          "autoSync": {
+          "appendMainSolution": {
             "type": "boolean"
+          },
+          "autoSync": {
+            "description": "Check Polygon every 10 minutes and sync a newer READY package.",
+            "type": "boolean"
+          },
+          "ignoreZeroPointBatches": {
+            "type": "boolean"
+          },
+          "ignoreZeroPointCases": {
+            "type": "boolean"
+          },
+          "mainStatementLanguage": {
+            "description": "Polygon language of the statement stored as the base statement; null lets a single-statement package decide.",
+            "maxLength": 30,
+            "nullable": true,
+            "type": "string"
+          },
+          "statementLanguages": {
+            "description": "The whole mapping `<polygon language>=<en|vi|skip>`, as the import takes it; replaces the saved one.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "tutorialLanguage": {
+            "description": "Polygon language of the tutorial imported as the editorial; null for none or a single tutorial.",
+            "maxLength": 30,
+            "nullable": true,
+            "type": "string"
           }
         },
-        "required": [
-          "autoSync"
-        ],
         "type": "object"
       },
       "UpdatePostDto": {
@@ -32358,7 +32806,7 @@
     },
     "/api/internal/polygon/resolve": {
       "post": {
-        "description": "Needs the right to create a problem on the site (`judge.add_problem`) or for an organization (`judge.create_organization_problem` and an administered organization), or `judge.sync_polygon_problem`. The body takes the problem page\naddress, `https://polygon.codeforces.com/p…/owner/name`; its `p…` part is\nthe permission: the server finds `owner/name` among the problems shared\nwith the QHHOJ account and compares the token with the `<problem url>` of\nthe newest READY package's problem.xml (read once per problem, then\ncached). Answers the problem, its statement title and the newest READY\npackage (`type` full or standard). Each check, here or on import, counts\ntowards 20 per 10 minutes per user. Errors: 400 `polygon_link_invalid`\n(not a problem link), 404 `polygon_link_refused` (not shared with the account, or the token does not\nmatch: one answer for both), 409 `polygon_no_package` (no READY package to\ncheck against), `polygon_package_not_ready` (newest package not READY),\n`polygon_already_linked` (names the QHHOJ problem, also as\n`linkedProblemCode`, only to a user who may edit it) or\n`polygon_not_connected`, 502 `polygon_package_unavailable` (Polygon\nanswered the package download with an HTTP error), other 502/503 Polygon\nerrors, 429 `rate_limited`.",
+        "description": "Needs the right to create a problem on the site (`judge.add_problem`) or for an organization (`judge.create_organization_problem` and an administered organization), or `judge.sync_polygon_problem`. The body takes the problem page\naddress, `https://polygon.codeforces.com/p…/owner/name`; its `p…` part is\nthe permission: the server finds `owner/name` among the problems shared\nwith the QHHOJ account and compares the token with the `<problem url>` of\nthe newest READY package's problem.xml (read once per problem, then\ncached). Answers the problem, its statement title, its statement\nlanguages (with title and whether each has a tutorial; the import's\nlanguage options name them) and the newest READY\npackage (`type` full or standard). Each check, here or on import, counts\ntowards 20 per 10 minutes per user. Errors: 400 `polygon_link_invalid`\n(not a problem link), 404 `polygon_link_refused` (not shared with the account, or the token does not\nmatch: one answer for both), 409 `polygon_no_package` (Polygon has no\npackage at all), `polygon_package_not_ready` (newest package not READY;\n`newestPackage` gives its id, revision, state RUNNING or FAILED and\nPolygon's comment on it), `polygon_link_checking` (another request is\ndownloading the package for this problem's first check; `Retry-After`),\n`polygon_already_linked` (names the QHHOJ problem, also as\n`linkedProblemCode`, only to a user who may edit it; the optional `code`\nis the problem being re-linked, which may hold the link itself),\n`polygon_linked_deleted` (the holder is deleted but not yet purged: restore\nit and unlink; `linkedProblemCode` as above) or\n`polygon_not_connected`, 502 `polygon_package_unavailable` (Polygon\nanswered the package download with an HTTP error), other 502/503 Polygon\nerrors, 429 `rate_limited`.",
         "operationId": "PolygonController_resolve",
         "parameters": [],
         "requestBody": {
@@ -33526,6 +33974,67 @@
       }
     },
     "/api/internal/problems/imports": {
+      "get": {
+        "description": "`mine=1` (required): the caller's import and sync jobs the queue still\nkeeps, running and finished in the last day, newest first, in the shape\nof `GET /problems/imports/{jobId}`, so a setter can return to an import\nafter leaving its page.",
+        "operationId": "ProblemImportsController_mine",
+        "parameters": [
+          {
+            "description": "`1`: the caller's own jobs, the only list there is.",
+            "in": "query",
+            "name": "mine",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/ImportJobResponse"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "List my Polygon imports and syncs",
+        "tags": [
+          "Problem editing"
+        ]
+      },
       "post": {
         "description": "Needs the rights of the change: creating a problem needs\n`judge.add_problem` (or, with `organization`, that organization's creation\nrights), updating needs write access to the problem's test data (else 403\n`forbidden`). No Polygon-specific permission.\nSend the Polygon package as a multipart `file` (a zip with `problem.xml` at\nits root, up to 512 MiB) and the options in the query string: `code`, `mode`\n(`create` or `update`), `organization`, authors, curators, group, types,\npoints, statement language mapping and the zero-point and main-solution\nswitches. A create with `organization` (a slug) makes the problem private\nto that organization under the rules of\n`POST /organizations/{slug}/problems` instead of `judge.add_problem`: its\nrights (404 unknown organization, 403 `forbidden`), the code prefix (400\n`organization_code_prefix`), its credits (spent when the job is queued,\nkept if the job fails later) and its storage. The package\nis checked, then imported by a background job; the answer is 202 with a\n`jobId` to poll at `GET /problems/imports/{jobId}`. Limited to 10 imports\nper hour per user. Errors: 400 `code_taken`, 400 for a bad package\n(`no_problem_xml` or a zip error code), 403 `quota_exceeded`, 413\n`file_too_large`, 429 `rate_limited`.",
         "operationId": "ProblemImportsController_start",
@@ -33664,7 +34173,7 @@
             }
           },
           {
-            "description": "Mapping `<polygon language>=<site language>` (`en` or `vi`) for translations; repeat the parameter.",
+            "description": "Mapping `<polygon language>=<site language>` (`en` or `vi`) for translations, or `<polygon language>=skip` to leave a statement out; repeat the parameter. Every statement but the main one needs an entry.",
             "in": "query",
             "name": "statementLanguages",
             "required": false,
@@ -33752,16 +34261,15 @@
     },
     "/api/internal/problems/imports/{jobId}": {
       "get": {
-        "description": "Returns the job state (`waiting`,\n`active`, `completed`, `failed`, ...), the imported problem when completed,\nand the error written for the requester when it failed. Only the user who\nstarted the job, or a superuser, can read it; anyone else gets the same 404\n`not_found` as for an unknown id. Finished jobs stay readable for a day.",
+        "description": "Returns the job state (`waiting`,\n`active`, `completed`, `failed`, ...), its code, mode and purpose, its\nplace in the queue while it waits, the imported problem with a conversion\nsummary (checker mapping, tests, cases, batches, clamped limits) when\ncompleted, or `result.attention` when the problem was imported but a file\nstep after the write failed (a sync repairs it), and, when it failed, the\nerror written for the requester with `errorCode`, `errorParams` and\n`retryable` (whether the same request may pass later). An outage (Polygon\nunreachable, no judge to generate tests) is retried once two minutes\nlater; the job is `delayed` meanwhile. The user who\nstarted the job and a superuser can read it, and so can anyone with write\naccess to the test data of the problem an update (a sync too) imports\ninto; anyone else gets the same 404 `not_found` as for an unknown id. The\nstep and progress are shown only while the job runs. Finished jobs stay\nreadable for a day.",
         "operationId": "ProblemImportsController_status",
         "parameters": [
           {
-            "description": "Job id from the start response.",
+            "description": "Job id from the start response (a UUIDv7, or `polygon-sync-…` for a Polygon sync).",
             "in": "path",
             "name": "jobId",
             "required": true,
             "schema": {
-              "format": "uuid",
               "type": "string"
             }
           }
@@ -35993,7 +36501,7 @@
         ]
       },
       "get": {
-        "description": "Needs write access to the problem's test data. Returns the link (Polygon id, synced revision and package, last sync\ntime, result and error, auto-sync switch) and Polygon's newest package,\nwhich is null when Polygon cannot be asked. Errors: 404 `not_found`, 404\n`polygon_not_linked`, 403 `forbidden`.",
+        "description": "Needs write access to the problem's test data. Returns the link (Polygon id, synced revision and package, last sync\ntime, result and error, auto-sync switch), Polygon's newest package,\nwhich is null when Polygon cannot be asked, and `runningJobId`, the queued\nor running sync (or update import) of the problem to poll at\n`GET /problems/imports/{jobId}`. Errors: 404 `not_found`, 404\n`polygon_not_linked`, 403 `forbidden`.",
         "operationId": "ProblemPolygonLinkController_state",
         "parameters": [
           {
@@ -36051,7 +36559,7 @@
         ]
       },
       "patch": {
-        "description": "Needs `judge.sync_polygon_problem` and write access to the problem's test\ndata. With `autoSync` on, the worker checks Polygon every 10 minutes and\nsyncs a newer READY package as the user who switched it on, except while a\ncontest using the problem is running; each run needs that user to still\nhold the permission and the write access, else it fails and is recorded on\nthe link. Writes a problem revision. Errors: 404 `polygon_not_linked`, 409\n`conflict` when the link changed meanwhile.",
+        "description": "Needs `judge.sync_polygon_problem` and write access to the problem's test\ndata. Every field is optional; an omitted one keeps its value. With\n`autoSync` on, the worker checks Polygon every 10 minutes and syncs a newer\nREADY package as the user who switched it on, except while a contest using\nthe problem is running; each run needs that user to still hold the\npermission and the write access, else it fails and is recorded on the\nlink. The statement and test options apply from the next sync (manual or\nautomatic; one already queued keeps its own) and are checked against\nPolygon's statements and tests first, with the codes a sync fails with\n(400 `statement_language_required`, `statement_language_unmapped`,\n`statement_language_repeated`, `tutorial_language_required`,\n`too_many_testcases`, `params` as the job's `errorParams`); Polygon not\nanswering skips that check. The testcase limit (`options.maxCases`) is the\nlinking user's and is not editable. Writes a problem revision of the fields\nthat changed. Errors: 404 `polygon_not_linked`, 409 `conflict` when the\nlink changed meanwhile.",
         "operationId": "ProblemPolygonLinkController_update",
         "parameters": [
           {
@@ -36113,7 +36621,7 @@
             }
           }
         },
-        "summary": "Switch a problem's Polygon auto-sync",
+        "summary": "Change a problem's Polygon auto-sync and import options",
         "tags": [
           "Problem editing"
         ]
@@ -36121,7 +36629,7 @@
     },
     "/api/internal/problems/{code}/polygon/sync": {
       "post": {
-        "description": "Needs `judge.sync_polygon_problem` and write access to the problem's test\ndata. Queues the import job in sync mode on the newest READY package:\nstatement, tutorial, tests, checker and limits are overwritten; code,\npoints, group, types, authors, curators and allowed languages are kept.\nThe result is recorded on the link. Answers 202 with a `jobId` to poll at\n`GET /problems/imports/{jobId}`. The worker checks the package against the\nstorage of the organization an organization-private problem is charged to\n(the package size minus the test data it replaces). Counts towards the 10 imports an hour per\nuser. Errors: 403 `forbidden`, 404 `polygon_not_linked`, 409\n`polygon_package_not_ready`,\n409 `polygon_not_connected`, 502/503 Polygon errors, 429 `rate_limited`.",
+        "description": "Needs `judge.sync_polygon_problem` and write access to the problem's test\ndata. Queues the import job in sync mode on the newest READY package:\nstatement, tutorial, tests, checker and limits are overwritten; code,\npoints, group, types, authors, curators and allowed languages are kept.\nThe result is recorded on the link. Answers 202 with a `jobId` to poll at\n`GET /problems/imports/{jobId}`; the id is one per problem and package, so\nwhile a sync of that package (manual or automatic) is queued or running\nthe answer is that job, and nothing is spent. Every sync takes the link's\ntestcase limit, whoever starts it. The worker checks the package against the\nstorage of the organization an organization-private problem is charged to\n(the package size minus the test data it replaces). Counts towards the 10 imports an hour per\nuser. Errors: 403 `forbidden`, 404 `polygon_not_linked`, 409\n`polygon_package_not_ready`,\n409 `polygon_not_connected`, 502/503 Polygon errors, 429 `rate_limited`.",
         "operationId": "ProblemPolygonLinkController_sync",
         "parameters": [
           {

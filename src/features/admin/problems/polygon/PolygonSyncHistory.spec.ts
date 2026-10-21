@@ -23,6 +23,8 @@ const run = (overrides: Partial<PolygonSyncRun> = {}): PolygonSyncRun => ({
   result: 'ok',
   failedStep: null,
   error: null,
+  errorCode: null,
+  errorParams: null,
   finishedAt: '2026-10-03T03:00:00Z',
   ...overrides,
 });

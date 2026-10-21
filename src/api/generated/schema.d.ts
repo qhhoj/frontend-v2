@@ -4530,14 +4530,22 @@ export interface paths {
          *     the permission: the server finds `owner/name` among the problems shared
          *     with the QHHOJ account and compares the token with the `<problem url>` of
          *     the newest READY package's problem.xml (read once per problem, then
-         *     cached). Answers the problem, its statement title and the newest READY
+         *     cached). Answers the problem, its statement title, its statement
+         *     languages (with title and whether each has a tutorial; the import's
+         *     language options name them) and the newest READY
          *     package (`type` full or standard). Each check, here or on import, counts
          *     towards 20 per 10 minutes per user. Errors: 400 `polygon_link_invalid`
          *     (not a problem link), 404 `polygon_link_refused` (not shared with the account, or the token does not
-         *     match: one answer for both), 409 `polygon_no_package` (no READY package to
-         *     check against), `polygon_package_not_ready` (newest package not READY),
+         *     match: one answer for both), 409 `polygon_no_package` (Polygon has no
+         *     package at all), `polygon_package_not_ready` (newest package not READY;
+         *     `newestPackage` gives its id, revision, state RUNNING or FAILED and
+         *     Polygon's comment on it), `polygon_link_checking` (another request is
+         *     downloading the package for this problem's first check; `Retry-After`),
          *     `polygon_already_linked` (names the QHHOJ problem, also as
-         *     `linkedProblemCode`, only to a user who may edit it) or
+         *     `linkedProblemCode`, only to a user who may edit it; the optional `code`
+         *     is the problem being re-linked, which may hold the link itself),
+         *     `polygon_linked_deleted` (the holder is deleted but not yet purged: restore
+         *     it and unlink; `linkedProblemCode` as above) or
          *     `polygon_not_connected`, 502 `polygon_package_unavailable` (Polygon
          *     answered the package download with an HTTP error), other 502/503 Polygon
          *     errors, 429 `rate_limited`.
@@ -5293,8 +5301,10 @@ export interface paths {
         /**
          * Get a problem's Polygon link
          * @description Needs write access to the problem's test data. Returns the link (Polygon id, synced revision and package, last sync
-         *     time, result and error, auto-sync switch) and Polygon's newest package,
-         *     which is null when Polygon cannot be asked. Errors: 404 `not_found`, 404
+         *     time, result and error, auto-sync switch), Polygon's newest package,
+         *     which is null when Polygon cannot be asked, and `runningJobId`, the queued
+         *     or running sync (or update import) of the problem to poll at
+         *     `GET /problems/imports/{jobId}`. Errors: 404 `not_found`, 404
          *     `polygon_not_linked`, 403 `forbidden`.
          */
         get: operations["ProblemPolygonLinkController_state"];
@@ -5311,14 +5321,23 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * Switch a problem's Polygon auto-sync
+         * Change a problem's Polygon auto-sync and import options
          * @description Needs `judge.sync_polygon_problem` and write access to the problem's test
-         *     data. With `autoSync` on, the worker checks Polygon every 10 minutes and
-         *     syncs a newer READY package as the user who switched it on, except while a
-         *     contest using the problem is running; each run needs that user to still
-         *     hold the permission and the write access, else it fails and is recorded on
-         *     the link. Writes a problem revision. Errors: 404 `polygon_not_linked`, 409
-         *     `conflict` when the link changed meanwhile.
+         *     data. Every field is optional; an omitted one keeps its value. With
+         *     `autoSync` on, the worker checks Polygon every 10 minutes and syncs a newer
+         *     READY package as the user who switched it on, except while a contest using
+         *     the problem is running; each run needs that user to still hold the
+         *     permission and the write access, else it fails and is recorded on the
+         *     link. The statement and test options apply from the next sync (manual or
+         *     automatic; one already queued keeps its own) and are checked against
+         *     Polygon's statements and tests first, with the codes a sync fails with
+         *     (400 `statement_language_required`, `statement_language_unmapped`,
+         *     `statement_language_repeated`, `tutorial_language_required`,
+         *     `too_many_testcases`, `params` as the job's `errorParams`); Polygon not
+         *     answering skips that check. The testcase limit (`options.maxCases`) is the
+         *     linking user's and is not editable. Writes a problem revision of the fields
+         *     that changed. Errors: 404 `polygon_not_linked`, 409 `conflict` when the
+         *     link changed meanwhile.
          */
         patch: operations["ProblemPolygonLinkController_update"];
         trace?: never;
@@ -5339,7 +5358,10 @@ export interface paths {
          *     statement, tutorial, tests, checker and limits are overwritten; code,
          *     points, group, types, authors, curators and allowed languages are kept.
          *     The result is recorded on the link. Answers 202 with a `jobId` to poll at
-         *     `GET /problems/imports/{jobId}`. The worker checks the package against the
+         *     `GET /problems/imports/{jobId}`; the id is one per problem and package, so
+         *     while a sync of that package (manual or automatic) is queued or running
+         *     the answer is that job, and nothing is spent. Every sync takes the link's
+         *     testcase limit, whoever starts it. The worker checks the package against the
          *     storage of the organization an organization-private problem is charged to
          *     (the package size minus the test data it replaces). Counts towards the 10 imports an hour per
          *     user. Errors: 403 `forbidden`, 404 `polygon_not_linked`, 409
@@ -5627,7 +5649,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * List my Polygon imports and syncs
+         * @description `mine=1` (required): the caller's import and sync jobs the queue still
+         *     keeps, running and finished in the last day, newest first, in the shape
+         *     of `GET /problems/imports/{jobId}`, so a setter can return to an import
+         *     after leaving its page.
+         */
+        get: operations["ProblemImportsController_mine"];
         put?: never;
         /**
          * Import a Polygon package as a new or existing problem
@@ -5668,10 +5697,20 @@ export interface paths {
         /**
          * Get the state of a Polygon import job
          * @description Returns the job state (`waiting`,
-         *     `active`, `completed`, `failed`, ...), the imported problem when completed,
-         *     and the error written for the requester when it failed. Only the user who
-         *     started the job, or a superuser, can read it; anyone else gets the same 404
-         *     `not_found` as for an unknown id. Finished jobs stay readable for a day.
+         *     `active`, `completed`, `failed`, ...), its code, mode and purpose, its
+         *     place in the queue while it waits, the imported problem with a conversion
+         *     summary (checker mapping, tests, cases, batches, clamped limits) when
+         *     completed, or `result.attention` when the problem was imported but a file
+         *     step after the write failed (a sync repairs it), and, when it failed, the
+         *     error written for the requester with `errorCode`, `errorParams` and
+         *     `retryable` (whether the same request may pass later). An outage (Polygon
+         *     unreachable, no judge to generate tests) is retried once two minutes
+         *     later; the job is `delayed` meanwhile. The user who
+         *     started the job and a superuser can read it, and so can anyone with write
+         *     access to the test data of the problem an update (a sync too) imports
+         *     into; anyone else gets the same 404 `not_found` as for an unknown id. The
+         *     step and progress are shown only while the job runs. Finished jobs stay
+         *     readable for a day.
          */
         get: operations["ProblemImportsController_status"];
         put?: never;
@@ -7731,6 +7770,15 @@ export interface components {
             /** @description Codenames to take away, legacy ones included. */
             removePermissions?: string[];
         };
+        /**
+         * @description What judges answers: `standard` (hcmp) or `bridged` (the package's own testlib checker); an interactive problem's interactor decides alone.
+         * @enum {string}
+         */
+        Checker: "bridged" | "easy" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "linematches" | "rstripped" | "sorted" | "standard" | "unordered";
+        ClampedLimitResponse: {
+            applied: number;
+            polygon: number;
+        };
         CloneContestDto: {
             /**
              * @description Key of the new contest: lowercase letters, digits and underscores, at most
@@ -9378,6 +9426,15 @@ export interface components {
             /** @description Login name. */
             username: string;
         };
+        ImportAttentionResponse: {
+            /** @description Always `imported_needs_attention`. */
+            code: components["schemas"]["PolygonImportErrorCode"];
+            /** @description What failed, in English. */
+            message: string;
+            params: {
+                [key: string]: string | number | string[];
+            } | null;
+        };
         ImportGhostsDto: {
             /** @description Replace every label by "Ghost 001", ...: labels may be real students' names. */
             anonymize?: boolean;
@@ -9392,20 +9449,44 @@ export interface components {
             dryRun?: boolean;
         };
         ImportJobResponse: {
-            /** @description Only an import error written for the requester; any other failure is "Import failed". */
+            /** @description Code of the problem the job creates or updates. */
+            code: string;
+            /**
+             * Format: date-time
+             * @description When it was queued.
+             */
+            createdAt: string;
+            /** @description Only an import error written for the requester; any other failure is "Import failed". Null unless failed. */
             error: string | null;
+            errorCode: components["schemas"]["PolygonImportErrorCode"] | null;
+            errorParams: {
+                [key: string]: string | number | string[];
+            } | null;
             /** @description Where a failed job stopped: `checking` (before any work), a progress step, `saving` (the database write) or `finishing` (data files after the write); null unless failed, and for jobs that failed before it was recorded. */
             failedStep: components["schemas"]["PolygonSyncStep"] | null;
+            /**
+             * Format: date-time
+             * @description When it ended; null while queued or running.
+             */
+            finishedAt: string | null;
             /** @description Job id. */
             id: string;
-            /** @description Progress of the running step; null while queued and once finished. */
+            /** @enum {string} */
+            mode: "create" | "update";
+            /** @description Progress of the running step; null unless the job runs. */
             progress: components["schemas"]["ImportProgressResponse"] | null;
+            /** @description `link` (a first import from a Polygon link), `sync`, or null for an uploaded package. */
+            purpose: components["schemas"]["PolygonSyncPurpose"] | null;
+            /** @description 1-based place in the queue while the job waits (1: next); null otherwise. */
+            queuePosition: number | null;
             /** @description The imported problem; null until the job completes. */
             result: components["schemas"]["ImportResultResponse"] | null;
-            /** @description BullMQ state: waiting | active | completed | failed | delayed | prioritized. */
+            /** @description The same request may pass later (Polygon or the judges were out, the problem changed meanwhile): offer "try again". False for failures the options or the package must fix. */
+            retryable: boolean;
+            /** @description BullMQ state: waiting | active | completed | failed | delayed (waiting for its retry) | prioritized (an automatic sync). */
             state: string;
             /**
-             * @description Step for a progress display: queued, then downloading (Polygon imports only), statements, generating (the tests of a Polygon standard package, on a judge), tests, and done or failed.
+             * @description Step for a progress display: queued, then downloading (Polygon imports only), statements, generating (the tests of a Polygon standard package, on a judge), tests, and done or failed. Only a running job shows a progress step.
              * @enum {string}
              */
             step: "done" | "downloading" | "failed" | "generating" | "queued" | "statements" | "tests";
@@ -9421,10 +9502,32 @@ export interface components {
             total: number | null;
         };
         ImportResultResponse: {
+            /** @description Set when the problem was imported but needs a repair. */
+            attention: components["schemas"]["ImportAttentionResponse"] | null;
             /** @description Its code. */
             code: string;
             /** @description Id of the created or updated problem. */
             problemId: string;
+            /** @description Null for jobs from before it was recorded and for a sync another sync had already applied. */
+            summary: components["schemas"]["ImportSummaryResponse"] | null;
+        };
+        ImportSummaryResponse: {
+            batches: number;
+            /** @description Judged cases, dependency copies counted. */
+            cases: number;
+            /** @description What judges answers: `standard` (hcmp) or `bridged` (the package's own testlib checker); an interactive problem's interactor decides alone. */
+            checker: components["schemas"]["Checker"];
+            /** @description An interactive problem's checker that is not run. */
+            checkerIgnored: boolean;
+            interactive: boolean;
+            /** @description KiB. */
+            memoryLimit: components["schemas"]["ClampedLimitResponse"];
+            /** @description The package's checker (`std::wcmp.cpp`, or a custom checker's source path); null for an interactive problem without one. */
+            polygonChecker: string | null;
+            /** @description Distinct tests. */
+            tests: number;
+            /** @description Seconds. */
+            timeLimit: components["schemas"]["ClampedLimitResponse"];
         };
         IntegrationClientActingUserResponse: {
             /** @description User id. */
@@ -10198,6 +10301,8 @@ export interface components {
             /** @description English label; the frontend may translate by codename. */
             label: string;
         };
+        /** @enum {string} */
+        PolygonImportErrorCode: "checker_unsupported" | "generation_failed" | "generation_no_judge" | "generation_timeout" | "import_failed" | "imported_needs_attention" | "package_incomplete" | "package_invalid" | "package_needs_full" | "polygon_already_linked" | "polygon_clock_skew" | "polygon_failed" | "polygon_not_connected" | "polygon_package_too_large" | "polygon_package_unavailable" | "polygon_unauthorized" | "polygon_unavailable" | "problem_changed" | "problem_code_taken" | "problem_not_found" | "problem_not_importable" | "problem_unlinked" | "requester_forbidden" | "statement_language_repeated" | "statement_language_required" | "statement_language_unmapped" | "storage_full" | "too_many_testcases" | "tutorial_language_required";
         PolygonLatestPackageResponse: {
             /**
              * Format: date-time
@@ -10253,12 +10358,23 @@ export interface components {
             organization?: string;
             /** @description Points the problem is worth, 800 to 3500. */
             points?: number;
-            /** @description Mapping `<polygon language>=<site language>` (`en` or `vi`) for translations; repeat the parameter. */
+            /** @description Mapping `<polygon language>=<site language>` (`en` or `vi`) for translations, or `<polygon language>=skip` to leave a statement out; repeat the parameter. Every statement but the main one needs an entry. */
             statementLanguages?: string[];
             /** @description Polygon language of the tutorial imported as the editorial. */
             tutorialLanguage?: string;
             /** @description Problem type ids; repeat the parameter. */
             typeIds?: string[];
+        };
+        PolygonLinkOptionsResponse: {
+            appendMainSolution: boolean;
+            ignoreZeroPointBatches: boolean;
+            ignoreZeroPointCases: boolean;
+            mainStatementLanguage: string | null;
+            /** @description Testcase limit of the user who linked the problem; a sync of more tests fails with `too_many_testcases`. Not editable. */
+            maxCases: number;
+            /** @description `<polygon language>=<en|vi|skip>`, sorted, in the form the import and the PATCH take. */
+            statementLanguages: string[];
+            tutorialLanguage: string | null;
         };
         PolygonLinkResponse: {
             autoSync: boolean;
@@ -10266,10 +10382,16 @@ export interface components {
             lastSyncAt: string | null;
             /** @description Why the last sync failed, as shown to the requester. */
             lastSyncError: string | null;
+            /** @description The last sync's failure as a code (`imported_needs_attention` when it imported but needs a repair); null after a success. */
+            lastSyncErrorCode: components["schemas"]["PolygonImportErrorCode"] | null;
+            lastSyncErrorParams: {
+                [key: string]: string | number | string[];
+            } | null;
             lastSyncResult: components["schemas"]["PolygonSyncResult"] | null;
             /** Format: date-time */
             linkedAt: string;
             name: string;
+            options: components["schemas"]["PolygonLinkOptionsResponse"];
             owner: string;
             /**
              * Format: date-time
@@ -10288,6 +10410,8 @@ export interface components {
             /** @description The newest package on Polygon now; null when Polygon could not be asked (not connected, unreachable, access revoked). */
             latestPackage: components["schemas"]["PolygonLatestPackageResponse"] | null;
             link: components["schemas"]["PolygonLinkResponse"];
+            /** @description The queued or running sync (or update import) of the problem, to poll at `GET /problems/imports/{jobId}`; null when none. */
+            runningJobId: string | null;
         };
         /** @enum {string} */
         PolygonPackageState: "FAILED" | "NONE" | "READY" | "RUNNING";
@@ -10297,6 +10421,8 @@ export interface components {
          */
         PolygonPackageType: "full" | "standard";
         PolygonProblemLinkDto: {
+            /** @description The problem the link is for, when re-linking an existing one: it may already hold this link. */
+            code?: string;
             /** @description The problem page address, `https://polygon.codeforces.com/p…/owner/name`. */
             link: string;
         };
@@ -10312,7 +10438,17 @@ export interface components {
             owner: string;
             /** @description Current revision of the problem on Polygon. */
             revision: number;
+            /** @description Every statement language, sorted by name: with two or more, an import names the main one and maps or skips the others (`statementLanguages`); with two or more tutorials it names `tutorialLanguage`. */
+            statements: components["schemas"]["PolygonStatementLanguageResponse"][];
             /** @description Statement name (Vietnamese, else English, else any language); null when no statement is named. */
+            title: string | null;
+        };
+        PolygonStatementLanguageResponse: {
+            /** @description It has a tutorial, which an import can take as the editorial. */
+            hasTutorial: boolean;
+            /** @description Polygon's language name, such as `vietnamese` or `english`. */
+            language: string;
+            /** @description The statement's title in that language; null when unnamed. */
             title: string | null;
         };
         PolygonStatusResponse: {
@@ -10321,7 +10457,10 @@ export interface components {
             /** @description Both `polygon.apiKey` and `polygon.apiSecret` are set. */
             connected: boolean;
         };
-        /** @enum {string} */
+        /**
+         * @description `link` (a first import from a Polygon link), `sync`, or null for an uploaded package.
+         * @enum {string}
+         */
         PolygonSyncPurpose: "link" | "sync";
         /** @enum {string} */
         PolygonSyncResult: "failed" | "ok";
@@ -10330,6 +10469,10 @@ export interface components {
             code: string;
             /** @description Why it failed, as shown to the requester; null when it succeeded. */
             error: string | null;
+            errorCode: components["schemas"]["PolygonImportErrorCode"] | null;
+            errorParams: {
+                [key: string]: string | number | string[];
+            } | null;
             failedStep: components["schemas"]["PolygonSyncStep"] | null;
             /**
              * Format: date-time
@@ -12845,7 +12988,17 @@ export interface components {
             realStart: string;
         };
         UpdatePolygonLinkDto: {
-            autoSync: boolean;
+            appendMainSolution?: boolean;
+            /** @description Check Polygon every 10 minutes and sync a newer READY package. */
+            autoSync?: boolean;
+            ignoreZeroPointBatches?: boolean;
+            ignoreZeroPointCases?: boolean;
+            /** @description Polygon language of the statement stored as the base statement; null lets a single-statement package decide. */
+            mainStatementLanguage?: string | null;
+            /** @description The whole mapping `<polygon language>=<en|vi|skip>`, as the import takes it; replaces the saved one. */
+            statementLanguages?: string[];
+            /** @description Polygon language of the tutorial imported as the editorial; null for none or a single tutorial. */
+            tutorialLanguage?: string | null;
         };
         UpdatePostDto: {
             /** @description Replaces the authors; `judge.edit_all_post`. */
@@ -23916,6 +24069,41 @@ export interface operations {
             };
         };
     };
+    ProblemImportsController_mine: {
+        parameters: {
+            query: {
+                /** @description `1`: the caller's own jobs, the only list there is. */
+                mine: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ImportJobResponse"][];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     ProblemImportsController_start: {
         parameters: {
             query: {
@@ -23941,7 +24129,7 @@ export interface operations {
                 organization?: string;
                 /** @description Points the problem is worth, 800 to 3500. */
                 points?: number;
-                /** @description Mapping `<polygon language>=<site language>` (`en` or `vi`) for translations; repeat the parameter. */
+                /** @description Mapping `<polygon language>=<site language>` (`en` or `vi`) for translations, or `<polygon language>=skip` to leave a statement out; repeat the parameter. Every statement but the main one needs an entry. */
                 statementLanguages?: string[];
                 /** @description Polygon language of the tutorial imported as the editorial. */
                 tutorialLanguage?: string;
@@ -23989,7 +24177,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description Job id from the start response. */
+                /** @description Job id from the start response (a UUIDv7, or `polygon-sync-…` for a Polygon sync). */
                 jobId: string;
             };
             cookie?: never;
