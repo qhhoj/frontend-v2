@@ -18,8 +18,12 @@ export const testPolygonConnection = () => apiSend('post', '/polygon/test');
 export const fetchPolygonLink = (code: string) =>
   apiGet('/problems/{code}/polygon', { path: { code } });
 
-export const syncPolygonLink = (code: string) =>
-  apiSend('post', '/problems/{code}/polygon/sync', { path: { code } });
+/** Keeps the settings edited on QHHOJ since the last import unless `overwriteLocalEdits`; no body then. */
+export const syncPolygonLink = (code: string, overwriteLocalEdits = false) =>
+  apiSend('post', '/problems/{code}/polygon/sync', {
+    path: { code },
+    ...(overwriteLocalEdits ? { body: { overwriteLocalEdits: true } } : {}),
+  });
 
 /** Auto-sync and the saved import options; an omitted field keeps its value. */
 export const updatePolygonLink = (code: string, body: PolygonLinkUpdate) =>

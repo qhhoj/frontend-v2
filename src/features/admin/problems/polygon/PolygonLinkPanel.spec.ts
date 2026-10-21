@@ -163,4 +163,67 @@ describe('PolygonLinkPanel', () => {
     );
     expect(panel.get('[data-banner]').text()).toContain('Thứ 1 trong hàng đợi');
   });
+  it('keeps the settings edited on QHHOJ unless the dialog is ticked, then says what the sync kept', async () => {
+    const bodies: unknown[] = [];
+    const panel = await mountPanel(['judge.sync_polygon_problem'], {
+      'POST /problems/hcmus41c/polygon/sync': ({ body }) => {
+        bodies.push(body);
+        return { status: 202, body: { data: { jobId: 'job-sync' } } };
+      },
+      'GET /problems/imports/job-sync': ok(
+        importJob({
+          id: 'job-sync',
+          code: 'hcmus41c',
+          purpose: 'sync',
+          state: 'completed',
+          result: {
+            problemId: 'p-1',
+            code: 'hcmus41c',
+            summary: null,
+            attention: null,
+            localEdits: { kept: ['timeLimit', 'checker'], updated: ['memoryLimit'] },
+          },
+        }),
+      ),
+    });
+    const openDialog = async () => {
+      await vi.waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeNull());
+      const button = panel.findAll('button').find((one) => one.text().startsWith('Đồng bộ ngay'));
+      await button!.trigger('click');
+      return vi.waitFor(() => {
+        const box = document.body.querySelector<HTMLInputElement>(
+          '[role="dialog"] input[type="checkbox"]',
+        );
+        expect(box).not.toBeNull();
+        return box!;
+      });
+    };
+    const confirm = () =>
+      [...document.body.querySelectorAll<HTMLButtonElement>('[role="dialog"] button')]
+        .find((one) => one.textContent?.trim() === 'Đồng bộ và ghi đè')!
+        .click();
+
+    const box = await openDialog();
+    expect(box.checked).toBe(false);
+    expect(document.body.querySelector('[role="dialog"]')!.textContent).toContain(
+      'Ghi đè cả thiết lập đã sửa trên QHHOJ',
+    );
+    confirm();
+    await vi.waitFor(() => expect(bodies).toHaveLength(1));
+    expect(bodies[0]).toBeUndefined();
+    await vi.waitFor(() =>
+      expect(panel.get('[data-local-edits="kept"]').text()).toBe('giới hạn thời gian, checker'),
+    );
+    expect(panel.get('[data-local-edits="updated"]').text()).toBe('giới hạn bộ nhớ');
+    expect(panel.get('[data-testid="local-edits"] h3').text()).toBe(
+      'Thiết lập chấm (lần đồng bộ vừa rồi)',
+    );
+
+    const ticked = await openDialog();
+    expect(ticked.checked).toBe(false);
+    ticked.click();
+    confirm();
+    await vi.waitFor(() => expect(bodies).toHaveLength(2));
+    expect(bodies[1]).toEqual({ overwriteLocalEdits: true });
+  });
 });

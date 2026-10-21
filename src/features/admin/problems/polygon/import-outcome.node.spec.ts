@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { Schemas } from '@/api/schemas';
 import { importJob } from '@/test/admin-fixtures/polygon';
 import {
+  localEditsRowsOf,
   outcomeActionOf,
   outcomeKindOf,
   queueLinesOf,
@@ -101,22 +102,82 @@ describe('summaryRowsOf', () => {
     );
   });
 
-  it('says an interactive problem is judged by its interactor, and a checker left out', () => {
+  it("says an interactive problem's checker runs on what the interactor wrote", () => {
     const rows = summaryRowsOf(
-      summary({ interactive: true, checkerIgnored: true, timeLimit: { polygon: 0.5, applied: 1 } }),
+      summary({ interactive: true, timeLimit: { polygon: 0.5, applied: 1 } }),
     );
     expect(rows[0]).toEqual({
       key: 'checker',
-      value: 'Bài tương tác: interactor chấm',
-      note: 'Checker của gói không chạy',
+      value:
+        'Bài tương tác: std::wcmp.cpp → Checker riêng của bài, chạy trên output của interactor',
+      note: null,
     });
     expect(rows[2]!.note).toBe('Polygon: 0.5s, nâng theo mức tối thiểu');
+  });
+
+  it('says the interactor alone judges when a sync kept a grader that does not run the checker', () => {
+    expect(
+      summaryRowsOf(summary({ interactive: true, checkerIgnored: true }), ['grader'])[0],
+    ).toEqual({
+      key: 'checker',
+      value: 'Bài tương tác: chỉ interactor chấm',
+      note: 'Checker của gói không chạy vì grader giữ bản sửa trên QHHOJ',
+    });
+  });
+
+  it('notes a kept checker of an interactive problem as kept, not mapped', () => {
+    expect(summaryRowsOf(summary({ interactive: true }), ['checker'])[0]).toEqual({
+      key: 'checker',
+      value: 'Bài tương tác: Checker riêng của bài, chạy trên output của interactor',
+      note: 'Giữ bản sửa trên QHHOJ · Polygon: std::wcmp.cpp',
+    });
   });
 
   it('names a site checker by its data-tab label', () => {
     expect(summaryRowsOf(summary({ checker: 'standard', polygonChecker: null }))[0]!.value).toBe(
       'So khớp đáp án (bỏ qua khoảng trắng thừa)',
     );
+  });
+
+  it('says a limit and a checker a sync kept as edited on QHHOJ were kept, not clamped or mapped', () => {
+    const rows = summaryRowsOf(summary({ timeLimit: { polygon: 1, applied: 2 } }), [
+      'checker',
+      'timeLimit',
+      'memoryLimit',
+    ]);
+    expect(rows[0]).toEqual({
+      key: 'checker',
+      value: 'Checker riêng của bài',
+      note: 'Giữ bản sửa trên QHHOJ · Polygon: std::wcmp.cpp',
+    });
+    expect(rows[2]).toEqual({
+      key: 'time',
+      value: '2.0s',
+      note: 'Giữ bản sửa trên QHHOJ · Polygon: 1.0s',
+    });
+    expect(rows[3]!.note).toBe('Giữ bản sửa trên QHHOJ · Polygon: 1024MB');
+  });
+
+  it('leaves a kept limit equal to the package without a note', () => {
+    expect(summaryRowsOf(summary(), ['timeLimit'])[2]!.note).toBeNull();
+  });
+});
+
+describe('localEditsRowsOf', () => {
+  it('names the kept settings, then those taken from the package, in the data-tab order', () => {
+    expect(
+      localEditsRowsOf({ kept: ['checker', 'timeLimit'], updated: ['grader', 'partial'] }),
+    ).toEqual([
+      { kind: 'kept', names: 'giới hạn thời gian, checker' },
+      { kind: 'updated', names: 'chấm điểm từng phần, grader' },
+    ]);
+  });
+
+  it('has no row for an empty list', () => {
+    expect(localEditsRowsOf({ kept: [], updated: ['memoryLimit'] })).toEqual([
+      { kind: 'updated', names: 'giới hạn bộ nhớ' },
+    ]);
+    expect(localEditsRowsOf({ kept: [], updated: [] })).toEqual([]);
   });
 });
 

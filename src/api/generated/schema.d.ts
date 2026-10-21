@@ -7780,7 +7780,7 @@ export interface components {
             removePermissions?: string[];
         };
         /**
-         * @description What judges answers: `standard` (hcmp) or `bridged` (the package's own testlib checker), or the checker a sync kept; an interactive problem's interactor decides alone.
+         * @description What judges answers: `standard` (hcmp) or `bridged` (the package's own testlib checker), or the checker a sync kept; an interactive problem runs it on what the interactor wrote.
          * @enum {string}
          */
         Checker: "bridged" | "easy" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "linematches" | "rstripped" | "sorted" | "standard" | "unordered";
@@ -9526,9 +9526,9 @@ export interface components {
             batches: number;
             /** @description Judged cases, dependency copies counted. */
             cases: number;
-            /** @description What judges answers: `standard` (hcmp) or `bridged` (the package's own testlib checker), or the checker a sync kept; an interactive problem's interactor decides alone. */
+            /** @description What judges answers: `standard` (hcmp) or `bridged` (the package's own testlib checker), or the checker a sync kept; an interactive problem runs it on what the interactor wrote. */
             checker: components["schemas"]["Checker"];
-            /** @description An interactive problem's checker that is not run. */
+            /** @description An interactive problem whose checker is not run, because a sync kept a local grader where the interactor alone decides. */
             checkerIgnored: boolean;
             interactive: boolean;
             /** @description KiB. */

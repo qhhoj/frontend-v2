@@ -21,6 +21,7 @@ import { useImportSteps } from '../import/use-import-steps';
 import ImportOutcomeHeader from './ImportOutcomeHeader.vue';
 import ImportStepBar from './ImportStepBar.vue';
 import ImportSummaryTable from './ImportSummaryTable.vue';
+import LocalEditsList from './LocalEditsList.vue';
 import { outcomeActionOf, outcomeKindOf, queueLinesOf, runningLineOf } from './import-outcome';
 import type { OutcomeKind } from './import-outcome';
 import { importErrorOf } from './polygon-import-errors';
@@ -30,6 +31,7 @@ import { importErrorOf } from './polygon-import-errors';
  * conversion summary, then its one action: "Thử lại" after a failure that may pass by itself, "Sửa thiết lập" back to the
  * options kept in the wizard (`canEdit`), "Đồng bộ lại" after a post-commit failure or a failed sync that may pass,
  * "Sửa tùy chọn đồng bộ" to the problem's Polygon card when a sync's options failed, "Kiểm tra lại" after polling gave up.
+ * A finished sync also says which judging settings it kept as edited on QHHOJ and which it took from the package.
  * A sync answered with the job id already followed (one id per problem and package) is polled again.
  */
 const props = defineProps<{ jobId: string; body: PolygonImportBody | null; canEdit: boolean }>();
@@ -159,10 +161,15 @@ const syncOptionsTo = computed(() => ({
       <ImportSummaryTable
         v-else-if="kind === 'done' && job?.result?.summary"
         :summary="job.result.summary"
+        :kept="job.result.localEdits?.kept"
       />
       <Notice v-else-if="kind === 'lost'" compact tone="info" :title="$t(`${KEY}.lost.title`)">
         {{ $t(`${KEY}.lost.text`) }}
       </Notice>
+      <LocalEditsList
+        v-if="(kind === 'done' || kind === 'attention') && job?.result?.localEdits"
+        :local-edits="job.result.localEdits"
+      />
       <p v-if="pollFailure && !stop" class="text-meta text-muted">
         {{ $t('admin.polygon.progress.pollFailed') }}
       </p>
