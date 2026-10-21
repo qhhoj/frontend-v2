@@ -144,6 +144,7 @@ for (const viewport of VIEWPORTS) {
     await paste(page, linkOf('stale'));
     await expect(page.locator('[data-caution="stale"]')).toContainText('Polygon đã có r10');
     await expect(page.locator('[data-caution="standard"]')).toBeVisible();
+    await expect(page.getByTestId('polygon-how-to')).not.toHaveAttribute('open');
     expect(await axeViolationsIn(page)).toEqual([]);
     await shoot(page, viewport.name, 'link-cautions');
 
@@ -187,6 +188,13 @@ for (const viewport of VIEWPORTS) {
     await expect(page.getByLabel('Đề chính')).toHaveValue('vietnamese');
     expect(await axeViolationsIn(page)).toEqual([]);
     await shoot(page, viewport.name, 'configure-create');
+
+    await page.getByLabel('russian').selectOption('en');
+    await page.getByRole('button', { name: 'Bắt đầu nhập' }).click();
+    await expect(page.getByText('Đề khác đã là Tiếng Anh (en)')).toBeVisible();
+    expect(api.requestsTo('POST /polygon/import')).toHaveLength(0);
+    await shoot(page, viewport.name, 'configure-repeated');
+    await page.getByLabel('russian').selectOption('skip');
 
     await page.getByLabel('Cập nhật').check();
     await page.getByLabel('Bài sẽ cập nhật').fill('abc');

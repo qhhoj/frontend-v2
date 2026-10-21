@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { BadgeCheck, ChevronRight, LoaderCircle } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Notice from '@/components/ui/Notice.vue';
 import type { PolygonProblem } from '@/api/types/polygon';
 import { translate } from '@/i18n';
@@ -15,7 +15,8 @@ import { useLinkCheck } from './use-link-check';
 /**
  * Step 1 (link option A): one field. Once the pasted text reads as a problem link the server checks it (the `p…` token
  * against the newest package) and the preview, its cautions or the refusal appear inline; "Tiếp tục" opens the options.
- * The how-to is open while the field starts empty; the viewer's recent imports sit under the card.
+ * The how-to is open while the field starts empty and folds once a link checks out; the viewer's recent imports sit under
+ * the card.
  */
 const props = defineProps<{ accountName: string; initialLink: string }>();
 const emit = defineEmits<{ resolved: [link: string, problem: PolygonProblem] }>();
@@ -33,6 +34,12 @@ const {
   autoRecheckIn,
   checkAgain,
 } = useLinkCheck(props.initialLink);
+const isHowToOpen = ref(props.initialLink === '');
+watch(preview, (checked) => {
+  if (checked) isHowToOpen.value = false;
+});
+const onHowToToggle = (event: Event) =>
+  (isHowToOpen.value = (event.target as HTMLDetailsElement).open);
 const isFromText = computed(
   () => refusal.value?.kind === 'invalid' || refusal.value?.kind === 'editing',
 );
@@ -45,7 +52,12 @@ const elapsed = computed(() => {
 
 <template>
   <div class="flex flex-col gap-4">
-    <details :open="initialLink === '' || undefined" :class="[CARD, 'group px-4 py-1 md:px-5']">
+    <details
+      :open="isHowToOpen"
+      :class="[CARD, 'group px-4 py-1 md:px-5']"
+      data-testid="polygon-how-to"
+      @toggle="onHowToToggle"
+    >
       <summary class="flex min-h-11 cursor-pointer flex-wrap items-center gap-x-2 font-semibold">
         <ChevronRight
           aria-hidden="true"
