@@ -946,6 +946,7 @@
     "polygon_unavailable": "Không liên lạc được Polygon lúc này (không trả lời, hoặc trả về trang lỗi thay vì API). Thử lại sau vài phút.",
     "polygon_package_unavailable": "Polygon không gửi được gói. Thử lại sau vài phút; nếu vẫn lỗi, hãy build gói mới trên Polygon.",
     "polygon_package_not_ready": "Gói mới nhất trên Polygon chưa sẵn sàng (đang dựng, bị lỗi hoặc chưa từng dựng). Hãy chờ dựng xong hoặc dựng gói mới trên Polygon.",
+    "polygon_sync_queued": "Một lượt đồng bộ giữ thiết lập đã sửa trên QHHOJ đang chờ hoặc đang chạy. Đợi lượt đó xong rồi ghi đè.",
     "polygon_already_linked": "Bài Polygon này đã liên kết với một bài trên QHHOJ.",
     "polygon_not_linked": "Bài này không liên kết với Polygon.",
     "polygon_package_too_large": "Gói Polygon quá lớn (tối đa 512 MiB).",

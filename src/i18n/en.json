@@ -946,6 +946,7 @@
     "polygon_unavailable": "Polygon cannot be reached right now (no answer, or an error page instead of the API). Try again in a few minutes.",
     "polygon_package_unavailable": "Polygon could not hand over the package. Try again in a few minutes; if it keeps failing, build a new package on Polygon.",
     "polygon_package_not_ready": "The newest package on Polygon is not ready (still building, failed, or never built). Wait for it to finish or build a new package on Polygon.",
+    "polygon_sync_queued": "A sync that keeps the settings edited on QHHOJ is queued or running. Wait for it to end, then overwrite.",
     "polygon_already_linked": "This Polygon problem is already linked to a QHHOJ problem.",
     "polygon_not_linked": "This problem is not linked to Polygon.",
     "polygon_package_too_large": "The Polygon package is too large (512 MiB at most).",

@@ -83,6 +83,10 @@
     "title": "Not enough storage",
     "fix": "The organization has no room for this package. Ask an administrator to raise its quota."
   },
+  "catalog_missing": {
+    "title": "QHHOJ has no problem group or type yet",
+    "fix": "A new problem needs a group and a type. Ask an administrator to add them, then import again."
+  },
   "problem_code_taken": {
     "title": "The problem code is taken",
     "fix": "Pick another code, or choose Update to overwrite that problem."

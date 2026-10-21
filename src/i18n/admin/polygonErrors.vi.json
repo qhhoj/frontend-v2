@@ -83,6 +83,10 @@
     "title": "Không đủ dung lượng lưu trữ",
     "fix": "Tổ chức không còn chỗ cho gói này. Nhờ quản trị viên nâng hạn mức."
   },
+  "catalog_missing": {
+    "title": "QHHOJ chưa có nhóm bài hoặc loại bài nào",
+    "fix": "Bài mới cần một nhóm và một loại. Nhờ quản trị viên tạo, rồi nhập lại."
+  },
   "problem_code_taken": {
     "title": "Mã bài đã có",
     "fix": "Chọn mã khác, hoặc chọn Cập nhật để ghi đè bài đó."
