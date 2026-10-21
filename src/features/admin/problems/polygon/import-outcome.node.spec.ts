@@ -14,6 +14,7 @@ const result = (attention: Schemas['ImportResultResponse']['attention'] = null) 
   code: 'kminmax',
   summary: null,
   attention,
+  localEdits: null,
 });
 const summary = (
   overrides: Partial<Schemas['ImportSummaryResponse']> = {},

@@ -5330,7 +5330,8 @@ export interface paths {
          *     permission and the write access, else it fails and is recorded on the
          *     link. The statement and test options apply from the next sync (manual or
          *     automatic; one already queued keeps its own) and are checked against
-         *     Polygon's statements and tests first, with the codes a sync fails with
+         *     Polygon's statements and tests (its working copy, which may be newer than
+         *     the newest package) first, with the codes a sync fails with
          *     (400 `statement_language_required`, `statement_language_unmapped`,
          *     `statement_language_repeated`, `tutorial_language_required`,
          *     `too_many_testcases`, `params` as the job's `errorParams`); Polygon not
@@ -5355,8 +5356,15 @@ export interface paths {
          * Sync a linked problem from Polygon
          * @description Needs `judge.sync_polygon_problem` and write access to the problem's test
          *     data. Queues the import job in sync mode on the newest READY package:
-         *     statement, tutorial, tests, checker and limits are overwritten; code,
-         *     points, group, types, authors, curators and allowed languages are kept.
+         *     statement, tutorial and tests are overwritten; code, points, group, types,
+         *     authors, curators and allowed languages are kept. The time and memory
+         *     limits, partial scoring, checker (type, arguments, source) and grader
+         *     settings come from the package too, except each one edited on QHHOJ since
+         *     the last import, which is kept unless the body sets
+         *     `overwriteLocalEdits`; the job's `result.localEdits` lists what was kept
+         *     and what was updated. The link's statement options are checked against
+         *     Polygon's working copy, which may be newer than the package synced: a
+         *     language not in the package yet can be set to `skip`.
          *     The result is recorded on the link. Answers 202 with a `jobId` to poll at
          *     `GET /problems/imports/{jobId}`; the id is one per problem and package, so
          *     while a sync of that package (manual or automatic) is queued or running
@@ -5365,7 +5373,8 @@ export interface paths {
          *     storage of the organization an organization-private problem is charged to
          *     (the package size minus the test data it replaces). Counts towards the 10 imports an hour per
          *     user. Errors: 403 `forbidden`, 404 `polygon_not_linked`, 409
-         *     `polygon_package_not_ready`,
+         *     `polygon_package_not_ready`, 409 `polygon_sync_queued` (an
+         *     `overwriteLocalEdits` sync while one keeping them is queued or running),
          *     409 `polygon_not_connected`, 502/503 Polygon errors, 429 `rate_limited`.
          */
         post: operations["ProblemPolygonLinkController_sync"];
@@ -7771,7 +7780,7 @@ export interface components {
             removePermissions?: string[];
         };
         /**
-         * @description What judges answers: `standard` (hcmp) or `bridged` (the package's own testlib checker); an interactive problem's interactor decides alone.
+         * @description What judges answers: `standard` (hcmp) or `bridged` (the package's own testlib checker), or the checker a sync kept; an interactive problem's interactor decides alone.
          * @enum {string}
          */
         Checker: "bridged" | "easy" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "linematches" | "rstripped" | "sorted" | "standard" | "unordered";
@@ -9506,6 +9515,8 @@ export interface components {
             attention: components["schemas"]["ImportAttentionResponse"] | null;
             /** @description Its code. */
             code: string;
+            /** @description Syncs only; null for a first import and for jobs from before it was recorded. */
+            localEdits: components["schemas"]["LocalEditsResponse"] | null;
             /** @description Id of the created or updated problem. */
             problemId: string;
             /** @description Null for jobs from before it was recorded and for a sync another sync had already applied. */
@@ -9515,7 +9526,7 @@ export interface components {
             batches: number;
             /** @description Judged cases, dependency copies counted. */
             cases: number;
-            /** @description What judges answers: `standard` (hcmp) or `bridged` (the package's own testlib checker); an interactive problem's interactor decides alone. */
+            /** @description What judges answers: `standard` (hcmp) or `bridged` (the package's own testlib checker), or the checker a sync kept; an interactive problem's interactor decides alone. */
             checker: components["schemas"]["Checker"];
             /** @description An interactive problem's checker that is not run. */
             checkerIgnored: boolean;
@@ -9835,6 +9846,12 @@ export interface components {
             lastSeenAt: string;
             /** @description The signed-in user. */
             user: components["schemas"]["UserSummaryResponse"];
+        };
+        LocalEditsResponse: {
+            /** @description Edited on QHHOJ since the last import: the problem keeps its value. */
+            kept: components["schemas"]["SyncedSetting"][];
+            /** @description Took the package's value: changed on Polygon, or a local edit overwritten on request. */
+            updated: components["schemas"]["SyncedSetting"][];
         };
         LoginDto: {
             /** @description Account password. */
@@ -10302,7 +10319,7 @@ export interface components {
             label: string;
         };
         /** @enum {string} */
-        PolygonImportErrorCode: "checker_unsupported" | "generation_failed" | "generation_no_judge" | "generation_timeout" | "import_failed" | "imported_needs_attention" | "package_incomplete" | "package_invalid" | "package_needs_full" | "polygon_already_linked" | "polygon_clock_skew" | "polygon_failed" | "polygon_not_connected" | "polygon_package_too_large" | "polygon_package_unavailable" | "polygon_unauthorized" | "polygon_unavailable" | "problem_changed" | "problem_code_taken" | "problem_not_found" | "problem_not_importable" | "problem_unlinked" | "requester_forbidden" | "statement_language_repeated" | "statement_language_required" | "statement_language_unmapped" | "storage_full" | "too_many_testcases" | "tutorial_language_required";
+        PolygonImportErrorCode: "catalog_missing" | "checker_unsupported" | "generation_failed" | "generation_no_judge" | "generation_timeout" | "import_failed" | "imported_needs_attention" | "package_incomplete" | "package_invalid" | "package_needs_full" | "polygon_already_linked" | "polygon_clock_skew" | "polygon_failed" | "polygon_not_connected" | "polygon_package_too_large" | "polygon_package_unavailable" | "polygon_unauthorized" | "polygon_unavailable" | "problem_changed" | "problem_code_taken" | "problem_not_found" | "problem_not_importable" | "problem_unlinked" | "requester_forbidden" | "statement_language_repeated" | "statement_language_required" | "statement_language_unmapped" | "storage_full" | "too_many_testcases" | "tutorial_language_required";
         PolygonLatestPackageResponse: {
             /**
              * Format: date-time
@@ -12359,6 +12376,11 @@ export interface components {
              */
             startTime: string;
         };
+        /**
+         * @description Edited on QHHOJ since the last import: the problem keeps its value.
+         * @enum {string}
+         */
+        SyncedSetting: "checker" | "grader" | "memoryLimit" | "partial" | "timeLimit";
         SyncParticipantsDto: {
             /** @description Usernames of existing, active users; sync never creates a user. */
             usernames: string[];
@@ -12368,6 +12390,10 @@ export interface components {
             applied: number;
             /** @description Usernames that matched no active user, as the client sent them. */
             unknown: string[];
+        };
+        SyncPolygonProblemDto: {
+            /** @description Replace the time and memory limits, partial scoring, checker and grader settings edited on QHHOJ since the last import with the package's values; by default they are kept. */
+            overwriteLocalEdits?: boolean;
         };
         SyncProblemDto: {
             /** @description Code of an existing problem the acting user can see. */
@@ -23583,7 +23609,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SyncPolygonProblemDto"];
+            };
+        };
         responses: {
             202: {
                 headers: {

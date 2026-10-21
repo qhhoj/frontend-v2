@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { importJob } from '@/test/admin-fixtures/polygon';
 import { myImportStatusOf } from './polygon-my-imports';
 
-const RESULT = { code: 'kminmax', problemId: 'p-1', summary: null, attention: null };
+const RESULT = {
+  code: 'kminmax',
+  problemId: 'p-1',
+  summary: null,
+  attention: null,
+  localEdits: null,
+};
 
 describe('myImportStatusOf', () => {
   it.each([
