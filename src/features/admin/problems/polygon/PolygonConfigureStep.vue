@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { startPolygonLinkImport } from '@/api/polygon.api';
 import type { ImportOptions } from '@/api/types/problem-imports';
 import type { PolygonImportBody, PolygonProblem } from '@/api/types/polygon';
+import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
 import { SYNC_POLYGON } from '../../admin-screens';
 import AdminStatus from '../../ui/AdminStatus.vue';
@@ -11,10 +12,21 @@ import { useAdminMutation } from '../../ui/use-admin-mutation';
 import ImportCheckbox from '../import/ImportCheckbox.vue';
 import ImportOptionsForm from '../import/ImportOptionsForm.vue';
 import { IMPORT_FORM_FIELDS, codeFromPolygonName } from '../import/import-form';
+import type { ImportForm } from '../import/import-form';
 import { importRefusalText } from '../import/import-refusal';
+import PolygonLanguageFields from './PolygonLanguageFields.vue';
+import PolygonOverwriteConfirm from './PolygonOverwriteConfirm.vue';
 import PolygonSourcePanel from './PolygonSourcePanel.vue';
+import PolygonUpdateTarget from './PolygonUpdateTarget.vue';
+import { defaultLanguageChoice, repeatedLanguages, toLanguageOptions } from './polygon-languages';
+import { optionsRefusalOf } from './polygon-options-refusal';
+import { packageRevisionOf } from './polygon-preview';
 
-/** Step 2: the zip import's options for the checked link's problem, plus auto-sync; "Bắt đầu nhập" starts the job. */
+/**
+ * Step 2 (configure option A): the import's target, the package's statement languages (selects fed by the preview),
+ * judging and sync, then the QHHOJ catalog folded. "Bắt đầu nhập" starts the job; an update first confirms what the
+ * package overwrites.
+ */
 const props = defineProps<{ link: string; problem: PolygonProblem }>();
 const emit = defineEmits<{ back: []; started: [jobId: string, body: PolygonImportBody] }>();
 const autoSync = ref(false);
@@ -22,31 +34,73 @@ const autoSync = ref(false);
 const { canAny } = usePermissions();
 const canAutoSync = computed(() => canAny(SYNC_POLYGON));
 const initial = { code: codeFromPolygonName(props.problem.name) };
+const statements = props.problem.statements;
+const languages = ref(defaultLanguageChoice(statements));
+/** The update body waiting for the overwrite confirmation. */
+const pending = ref<PolygonImportBody | null>(null);
+const isConfirmOpen = computed({
+  get: () => pending.value !== null,
+  set: (open) => void (open || (pending.value = null)),
+});
 
-const { run, isPending, fieldErrors, failure } = useAdminMutation({
+const { run, isPending, fieldErrors, failure, reset } = useAdminMutation({
   mutate: (body: PolygonImportBody) => startPolygonLinkImport(body),
   onDone: ({ jobId }, body) => emit('started', jobId, body),
 });
+const optionsRefusal = computed(() => optionsRefusalOf(failure.value));
+/** A language refusal is about the choice as sent: a new choice clears it. */
+watch(languages, () => void (optionsRefusal.value && reset()));
+
+/** Two translations into one site language are refused by the server; said under the second one before it is asked. */
+const languageErrors = computed(() => {
+  const errors: Record<string, string> = {};
+  for (const language of repeatedLanguages(languages.value))
+    errors[`other:${language}`] = translate('admin.polygonLink.configure.languages.repeated', {
+      site: translate(
+        `admin.polygonLink.configure.languages.site.${languages.value.others[language]}`,
+      ),
+    });
+  const server = optionsRefusal.value;
+  if (server?.field) errors[server.field] ??= server.text;
+  return errors;
+});
+
+const bodyOf = (options: ImportOptions): PolygonImportBody => ({
+  ...options,
+  ...toLanguageOptions(statements, languages.value),
+  link: props.link,
+  mode: options.mode ?? 'create',
+  ignoreZeroPointBatches: options.ignoreZeroPointBatches ?? false,
+  ignoreZeroPointCases: options.ignoreZeroPointCases ?? false,
+  appendMainSolution: options.appendMainSolution ?? false,
+  autoSync: autoSync.value,
+});
 
 function start({ options }: { options: ImportOptions }) {
-  const body: PolygonImportBody = {
-    ...options,
-    link: props.link,
-    mode: options.mode ?? 'create',
-    ignoreZeroPointBatches: options.ignoreZeroPointBatches ?? false,
-    ignoreZeroPointCases: options.ignoreZeroPointCases ?? false,
-    appendMainSolution: options.appendMainSolution ?? false,
-    autoSync: autoSync.value,
-  };
-  void run(body);
+  if (repeatedLanguages(languages.value).length > 0) return;
+  const body = bodyOf(options);
+  if (body.mode === 'update') pending.value = body;
+  else void run(body);
 }
 
-/** Field problems show under their fields (`code_taken` on `code`); the rest (`polygon_already_linked`, 429) get the line. */
-const refusal = computed(() =>
-  failure.value && !IMPORT_FORM_FIELDS.some((field) => field in fieldErrors.value)
-    ? importRefusalText(failure.value)
-    : null,
-);
+/** A refused update closes the dialog: the refusal shows beside its field or on the page line. */
+async function confirmUpdate() {
+  if (!pending.value) return;
+  await run(pending.value);
+  pending.value = null;
+}
+
+const submitLabelOf = (form: ImportForm) =>
+  form.mode === 'update' && form.code
+    ? translate('admin.polygonLink.configure.update.submit', { code: form.code })
+    : translate('admin.polygon.form.submit');
+
+/** Field problems show under their fields (`code_taken` on `code`, a language under its select); the rest get the line. */
+const refusal = computed(() => {
+  if (!failure.value || IMPORT_FORM_FIELDS.some((field) => field in fieldErrors.value)) return null;
+  if (optionsRefusal.value) return optionsRefusal.value.field ? null : optionsRefusal.value.text;
+  return importRefusalText(failure.value);
+});
 </script>
 
 <template>
@@ -59,8 +113,19 @@ const refusal = computed(() =>
         :initial="initial"
         :is-pending="isPending"
         :server-errors="fieldErrors"
+        :submit-label-of="submitLabelOf"
         @start="start"
       >
+        <template #target="{ mode, code }">
+          <PolygonUpdateTarget v-if="mode === 'update'" :code="code" />
+        </template>
+        <template #languages>
+          <PolygonLanguageFields
+            v-model="languages"
+            :statements="statements"
+            :errors="languageErrors"
+          />
+        </template>
         <template #extra>
           <ImportCheckbox
             v-if="canAutoSync"
@@ -68,10 +133,15 @@ const refusal = computed(() =>
             :label="$t('admin.polygonLink.configure.autoSync')"
             :description="
               $t('admin.polygonLink.configure.autoSyncHint', {
-                revision: problem.latestPackage.revision ?? problem.revision,
+                revision: packageRevisionOf(problem),
               })
             "
+            :help="$t('admin.polygonLink.configure.autoSyncMore')"
+            :help-label="$t('admin.polygonLink.configure.autoSyncMoreLabel')"
           />
+        </template>
+        <template #before-actions>
+          <PolygonSourcePanel :problem="problem" class="xl:hidden" />
         </template>
         <template #actions>
           <button type="button" :class="buttonClass('ghost')" @click="emit('back')">
@@ -81,6 +151,16 @@ const refusal = computed(() =>
       </ImportOptionsForm>
       <AdminStatus v-if="refusal" kind="refused" :text="refusal" />
     </div>
-    <PolygonSourcePanel :problem="problem" />
+    <div class="hidden xl:sticky xl:top-4 xl:block">
+      <PolygonSourcePanel :problem="problem" />
+    </div>
+    <PolygonOverwriteConfirm
+      v-if="pending"
+      v-model:visible="isConfirmOpen"
+      :code="pending.code"
+      :problem="problem"
+      :busy="isPending"
+      @confirm="confirmUpdate"
+    />
   </div>
 </template>

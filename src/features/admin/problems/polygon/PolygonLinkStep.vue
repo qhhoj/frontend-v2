@@ -1,94 +1,77 @@
 <script setup lang="ts">
-import { BadgeCheck } from 'lucide-vue-next';
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
-import { ApiError } from '@/api/client';
-import { resolvePolygonLink } from '@/api/polygon.api';
+import { BadgeCheck, ChevronRight, LoaderCircle } from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue';
+import Notice from '@/components/ui/Notice.vue';
 import type { PolygonProblem } from '@/api/types/polygon';
-import { formatDate } from '@/lib/format-date';
 import { translate } from '@/i18n';
-import { useLocaleStore } from '@/stores/locale.store';
 import AdminChip from '../../ui/AdminChip.vue';
 import { CARD, INPUT, buttonClass } from '../../ui/controls';
-import AdminNotice from '../../ui/feedback/AdminNotice.vue';
-import PackageStatePill from './PackageStatePill.vue';
-import PackageTypePill from './PackageTypePill.vue';
+import PolygonLinkPreview from './PolygonLinkPreview.vue';
 import PolygonLinkRefusal from './PolygonLinkRefusal.vue';
+import PolygonMyImports from './PolygonMyImports.vue';
 import PolygonSetterHowTo from './PolygonSetterHowTo.vue';
-import { linkRefusalOf, parsePolygonLink, polygonLinkUrl } from './polygon-problem-link';
-import type { LinkRefusal } from './polygon-problem-link';
+import { useLinkCheck } from './use-link-check';
 
 /**
- * Step 1 (board W1): one field. Once the pasted text reads as a problem link the server checks it (the `p…` token
- * against the newest package) and the preview appears inline; "Tiếp tục" opens the options.
+ * Step 1 (link option A): one field. Once the pasted text reads as a problem link the server checks it (the `p…` token
+ * against the newest package) and the preview, its cautions or the refusal appear inline; "Tiếp tục" opens the options.
+ * The how-to is open while the field starts empty and folds once a link checks out; the viewer's recent imports sit under
+ * the card.
  */
 const props = defineProps<{ accountName: string; initialLink: string }>();
 const emit = defineEmits<{ resolved: [link: string, problem: PolygonProblem] }>();
-const CHECK_DELAY_MS = 400;
-const locale = useLocaleStore();
+/** A check this slow is downloading the package for the problem's first check. */
+const SLOW_CHECK_SECONDS = 4;
 const account = computed(() => props.accountName || translate('admin.polygonLink.howTo.unnamed'));
-
-const text = ref(props.initialLink);
-const parts = computed(() => parsePolygonLink(text.value));
-/** What is sent and compared: the normalised address, so `http://` or a scheme-less paste checks once. */
-const address = computed(() => (parts.value ? polygonLinkUrl(parts.value) : ''));
-const isMalformed = computed(() => text.value.trim() !== '' && parts.value === null);
-
-/** The last check sent: the link it was for and its answer; a newer check makes an older answer stale. */
-const checked = ref<{ link: string; problem: PolygonProblem | null; refusal: LinkRefusal | null }>({
-  link: '',
-  problem: null,
-  refusal: null,
-});
-const isChecking = ref(false);
-let sequence = 0;
-let timer: ReturnType<typeof setTimeout> | undefined;
-
-async function check(link: string) {
-  const mine = (sequence += 1);
-  isChecking.value = true;
-  checked.value = { link, problem: null, refusal: null };
-  try {
-    const problem = await resolvePolygonLink(link);
-    if (mine === sequence) checked.value = { link, problem, refusal: null };
-  } catch (error) {
-    if (!(error instanceof ApiError)) throw error;
-    if (mine === sequence) checked.value = { link, problem: null, refusal: linkRefusalOf(error) };
-  } finally {
-    if (mine === sequence) isChecking.value = false;
-  }
-}
-
-/** Each check counts against a per-user limit, so only a well-formed link that changed is sent, after a pause. */
-watch(
+const {
+  text,
+  parts,
   address,
-  (link) => {
-    clearTimeout(timer);
-    if (!link || link === checked.value.link) return;
-    timer = setTimeout(() => void check(link), CHECK_DELAY_MS);
-  },
-  { immediate: true },
+  preview,
+  refusal,
+  isChecking,
+  elapsedSeconds,
+  autoRecheckIn,
+  checkAgain,
+} = useLinkCheck(props.initialLink);
+const isHowToOpen = ref(props.initialLink === '');
+watch(preview, (checked) => {
+  if (checked) isHowToOpen.value = false;
+});
+const onHowToToggle = (event: Event) =>
+  (isHowToOpen.value = (event.target as HTMLDetailsElement).open);
+const isFromText = computed(
+  () => refusal.value?.kind === 'invalid' || refusal.value?.kind === 'editing',
 );
-onBeforeUnmount(() => clearTimeout(timer));
-
-const current = computed(() =>
-  checked.value.link === address.value && !isChecking.value ? checked.value : null,
-);
-const preview = computed(() => current.value?.problem ?? null);
-const refusal = computed<LinkRefusal | null>(() =>
-  isMalformed.value ? { kind: 'invalid' } : (current.value?.refusal ?? null),
-);
-const builtAt = computed(() =>
-  preview.value?.latestPackage.createdAt
-    ? formatDate(preview.value.latestPackage.createdAt, 'datetime', locale.locale)
-    : '-',
-);
+const isSlow = computed(() => isChecking.value && elapsedSeconds.value >= SLOW_CHECK_SECONDS);
+const elapsed = computed(() => {
+  const seconds = elapsedSeconds.value;
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+});
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <AdminNotice :title="$t('admin.polygonLink.howTo.title')">
-      <PolygonSetterHowTo :account-name="accountName" headless />
-    </AdminNotice>
+    <details
+      :open="isHowToOpen"
+      :class="[CARD, 'group px-4 py-1 md:px-5']"
+      data-testid="polygon-how-to"
+      @toggle="onHowToToggle"
+    >
+      <summary class="flex min-h-11 cursor-pointer flex-wrap items-center gap-x-2 font-semibold">
+        <ChevronRight
+          aria-hidden="true"
+          class="size-4 text-muted transition-transform group-open:rotate-90"
+          :stroke-width="1.75"
+        />
+        {{ $t('admin.polygonLink.howTo.fold') }}
+        <span class="text-meta font-normal text-muted">{{
+          $t('admin.polygonLink.howTo.foldMeta')
+        }}</span>
+      </summary>
+      <PolygonSetterHowTo :account-name="accountName" headless class="mb-4 pt-1" />
+    </details>
+
     <div :class="[CARD, 'flex min-w-0 flex-col gap-4 p-4 md:p-5']">
       <div class="flex flex-col gap-1.5">
         <label for="polygon-link" class="font-semibold">{{
@@ -107,7 +90,7 @@ const builtAt = computed(() =>
           maxlength="300"
           :placeholder="$t('admin.polygonLink.link.placeholder')"
           aria-describedby="polygon-link-hint polygon-link-parts"
-          :aria-invalid="isMalformed || undefined"
+          :aria-invalid="isFromText || undefined"
           :class="[INPUT, 'font-mono text-sm']"
         />
         <p
@@ -123,63 +106,53 @@ const builtAt = computed(() =>
             <span aria-hidden="true">·</span>
             <span
               >{{ $t('admin.polygonLink.link.owner') }}
-              <strong class="font-mono text-content">{{ parts.owner }}</strong></span
+              <strong class="font-mono text-content break-all">{{ parts.owner }}</strong></span
             >
             <span aria-hidden="true">·</span>
             <span
               >{{ $t('admin.polygonLink.link.problem') }}
-              <strong class="font-mono text-content">{{ parts.name }}</strong></span
+              <strong class="font-mono text-content break-all">{{ parts.name }}</strong></span
             >
             <span v-if="isChecking">{{ $t('admin.polygonLink.link.checking') }}</span>
-            <template v-else-if="preview">
-              <span class="font-mono">→ #{{ preview.id }}</span>
-              <AdminChip tone="positive" :icon="BadgeCheck" data-testid="polygon-link-verified">{{
-                $t('admin.polygonLink.link.verified')
-              }}</AdminChip>
-            </template>
+            <AdminChip
+              v-else-if="preview"
+              tone="positive"
+              :icon="BadgeCheck"
+              data-testid="polygon-link-verified"
+              >{{ $t('admin.polygonLink.link.verified') }}</AdminChip
+            >
           </template>
         </p>
       </div>
 
+      <Notice
+        v-if="isSlow"
+        compact
+        :role="null"
+        :title="$t('admin.polygonLink.link.slow.title')"
+        data-testid="polygon-link-slow"
+      >
+        <p>{{ $t('admin.polygonLink.link.slow.body') }}</p>
+        <p class="mt-1 flex items-center gap-1.5 text-muted">
+          <LoaderCircle aria-hidden="true" class="size-4 animate-spin" :stroke-width="1.75" />
+          {{ $t('admin.polygonLink.link.slow.elapsed', { time: elapsed }) }}
+        </p>
+      </Notice>
       <PolygonLinkRefusal
-        v-if="refusal"
+        v-else-if="refusal"
         :refusal="refusal"
         :account-name="account"
         :is-checking="isChecking"
-        @check-again="check(address)"
+        :from-text="isFromText"
+        :auto-recheck-in="autoRecheckIn"
+        @check-again="checkAgain"
       />
-
-      <section
+      <PolygonLinkPreview
         v-if="preview"
-        data-testid="polygon-link-preview"
-        class="flex flex-col gap-2 rounded-row border border-line bg-surface-strong p-4"
-      >
-        <div class="flex flex-wrap items-start justify-between gap-2">
-          <h2 class="font-display text-subtitle leading-7 font-bold break-words">
-            {{ preview.title ?? preview.name }}
-            <span class="font-mono text-sm font-normal text-muted"
-              >{{ preview.name }} · #{{ preview.id }}</span
-            >
-          </h2>
-          <PackageStatePill state="READY" />
-        </div>
-        <p class="flex flex-wrap gap-x-2 text-sm text-muted">
-          <span
-            >{{ $t('admin.polygonLink.source.owner') }}
-            <strong class="font-mono text-content">{{ preview.owner }}</strong></span
-          >
-          <span aria-hidden="true">·</span>
-          <span>{{
-            $t('admin.polygonLink.link.packageValue', {
-              revision: preview.latestPackage.revision ?? preview.revision,
-              id: preview.latestPackage.id ?? '-',
-              time: builtAt,
-            })
-          }}</span>
-          <PackageTypePill :type="preview.latestPackage.type" />
-        </p>
-        <p class="text-sm text-muted">{{ $t('admin.polygonLink.link.notLinked') }}</p>
-      </section>
+        :problem="preview"
+        :is-checking="isChecking"
+        @check-again="checkAgain"
+      />
 
       <div class="flex flex-wrap justify-end gap-2">
         <button
@@ -192,5 +165,7 @@ const builtAt = computed(() =>
         </button>
       </div>
     </div>
+
+    <PolygonMyImports />
   </div>
 </template>

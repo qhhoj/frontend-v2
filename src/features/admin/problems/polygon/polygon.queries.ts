@@ -7,7 +7,9 @@ import {
   fetchPolygonSyncs,
   fetchProblemPolygonSyncs,
 } from '@/api/polygon.api';
+import { fetchMyImports } from '@/api/problem-imports.api';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { isFinal, phaseOf } from '../import/import-job';
 
 export const polygonStatusKey = (viewer: string) => ['admin', 'polygon', 'status', viewer] as const;
 export const polygonLinkKey = (code: string, viewer: string) =>
@@ -49,5 +51,21 @@ export function usePolygonSyncsQuery(
         ? fetchPolygonSyncs(toValue(page))
         : fetchProblemPolygonSyncs(problem, toValue(page));
     },
+  });
+}
+
+/** A running import's row moves on its own; the list is not worth the job page's 2 s. */
+const MY_IMPORTS_POLL_MS = 15_000;
+export const myImportsKey = (viewer: string) => ['admin', 'imports', 'mine', viewer] as const;
+
+/** The viewer's imports of the last day, to return to one after leaving its page; refreshed while one still runs. */
+export function useMyImportsQuery() {
+  const viewer = useViewerId();
+  return useQuery({
+    queryKey: computed(() => myImportsKey(viewer.value)),
+    queryFn: fetchMyImports,
+    staleTime: 0,
+    refetchInterval: (query) =>
+      query.state.data?.some((job) => !isFinal(phaseOf(job.state))) ? MY_IMPORTS_POLL_MS : false,
   });
 }

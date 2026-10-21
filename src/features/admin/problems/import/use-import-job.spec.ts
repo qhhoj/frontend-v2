@@ -4,20 +4,13 @@ import { defineComponent, ref } from 'vue';
 import { ApiError } from '@/api/client';
 import { fetchImportJob } from '@/api/problem-imports.api';
 import type { ImportJob } from '@/api/types/problem-imports';
+import { importJob } from '@/test/admin-fixtures/polygon';
 import { useImportJob } from './use-import-job';
 
 vi.mock('@/api/problem-imports.api', () => ({ fetchImportJob: vi.fn() }));
 const fetchMock = vi.mocked(fetchImportJob);
 
-const job = (state: string, id = 'job-1'): ImportJob => ({
-  id,
-  state,
-  step: 'queued',
-  progress: null,
-  result: null,
-  error: null,
-  failedStep: null,
-});
+const job = (state: string, id = 'job-1'): ImportJob => importJob({ id, state });
 const apiError = (status: number) => new ApiError('error', status, 'error');
 const callsFor = (id: string) => fetchMock.mock.calls.filter(([called]) => called === id).length;
 

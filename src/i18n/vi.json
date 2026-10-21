@@ -958,7 +958,14 @@
     "external_judge_rejected": "Máy chấm ngoài từ chối yêu cầu.",
     "external_judge_unavailable": "Hiện chưa kết nối được máy chấm ngoài. Thử lại sau.",
     "ticket_claimed": "Người khác vừa nhận phiếu này; phiếu đã được tải lại.",
-    "ticket_closed": "Phiếu đã đóng. Mở lại phiếu trước khi nhận."
+    "ticket_closed": "Phiếu đã đóng. Mở lại phiếu trước khi nhận.",
+    "polygon_linked_deleted": "Bài Polygon này đang liên kết với một bài đã xóa trên QHHOJ: khôi phục bài đó rồi hủy liên kết, hoặc chờ bài bị xóa hẳn.",
+    "polygon_link_checking": "Gói của bài đang được tải cho lần kiểm tra đầu. Kiểm tra lại sau ít phút.",
+    "statement_language_required": "Chọn đề chính trong các đề của gói.",
+    "statement_language_unmapped": "Mỗi đề không phải đề chính cần một ngôn ngữ trên QHHOJ hoặc Bỏ qua.",
+    "statement_language_repeated": "Hai đề cùng một ngôn ngữ trên QHHOJ: chọn ngôn ngữ khác hoặc Bỏ qua.",
+    "tutorial_language_required": "Gói có nhiều lời giải: chọn đề lấy lời giải.",
+    "too_many_testcases": "Bài có nhiều test hơn giới hạn của bạn."
   },
   "common": {
     "scrollHint": "Vuốt ngang để xem thêm cột →",

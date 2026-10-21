@@ -66,6 +66,7 @@ describe('imports by an organization problem creator', () => {
     const calls = mockApi({
       ...teacherRoutes(),
       'GET /polygon/status': ok({ connected: true, accountName: 'qhhoj' }),
+      'GET /problems/imports': ok([]),
       'POST /polygon/resolve': ok(polygonProblem()),
       'POST /polygon/import': { status: 202, body: { data: { jobId: 'job-1' } } },
       'GET /problems/imports/job-1': ok({
@@ -106,6 +107,7 @@ describe('imports when the viewer has nowhere to create', () => {
     ...teacherRoutes(),
     'GET /organizations': page([]),
     'GET /polygon/status': ok({ connected: true, accountName: 'qhhoj' }),
+    'GET /problems/imports': ok([]),
     'POST /polygon/resolve': ok(polygonProblem()),
   });
   const NONE = '[data-testid="creation-owner-none"]';

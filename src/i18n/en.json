@@ -958,7 +958,14 @@
     "external_judge_rejected": "The external judge rejected the request.",
     "external_judge_unavailable": "The external judge cannot be reached right now. Try again later.",
     "ticket_claimed": "Someone else just took this ticket; it has been reloaded.",
-    "ticket_closed": "The ticket is closed. Reopen it before taking it."
+    "ticket_closed": "The ticket is closed. Reopen it before taking it.",
+    "polygon_linked_deleted": "This Polygon problem is linked to a deleted QHHOJ problem: restore it and unlink it, or wait for its purge.",
+    "polygon_link_checking": "The problem's package is being downloaded for its first check. Check again in a few minutes.",
+    "statement_language_required": "Pick the main statement among the package's statements.",
+    "statement_language_unmapped": "Every statement but the main one needs a QHHOJ language or Skip.",
+    "statement_language_repeated": "Two statements map to the same QHHOJ language: pick another language or Skip.",
+    "tutorial_language_required": "The package has several tutorials: pick the one to use as the editorial.",
+    "too_many_testcases": "The problem has more tests than your limit."
   },
   "common": {
     "scrollHint": "Swipe sideways to see more columns →",

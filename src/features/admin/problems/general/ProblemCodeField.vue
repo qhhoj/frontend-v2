@@ -8,8 +8,14 @@ import AdminField from '../../ui/AdminField.vue';
  */
 const code = defineModel<string>({ required: true });
 const props = withDefaults(
-  defineProps<{ prefix: string; error?: string; inputId?: string; hint?: string }>(),
-  { error: undefined, inputId: 'problem-code', hint: undefined },
+  defineProps<{
+    prefix: string;
+    error?: string;
+    inputId?: string;
+    hint?: string;
+    label?: string;
+  }>(),
+  { error: undefined, inputId: 'problem-code', hint: undefined, label: undefined },
 );
 
 const suffixOf = (value: string, prefix: string) =>
@@ -32,7 +38,7 @@ watch(
   <AdminField
     v-slot="{ id, describedBy }"
     :input-id="inputId"
-    :label="$t('admin.problems.general.basics.code')"
+    :label="label ?? $t('admin.problems.general.basics.code')"
     :hint="
       prefix
         ? $t('admin.creation.problem.prefixHint', { prefix, example: `${prefix}bai1` })

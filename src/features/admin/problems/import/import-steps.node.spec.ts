@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ImportJob } from '@/api/types/problem-imports';
+import { importJob } from '@/test/admin-fixtures/polygon';
 import { downloadProgressOf, failedRowOf, importStepsOf } from './import-steps';
 
 const statuses = (steps: ReturnType<typeof importStepsOf>) =>
@@ -78,15 +79,8 @@ describe('importStepsOf', () => {
   });
 });
 
-const job = (progress: ImportJob['progress']): ImportJob => ({
-  id: 'job-1',
-  state: 'active',
-  step: progress?.step ?? 'queued',
-  progress,
-  result: null,
-  error: null,
-  failedStep: null,
-});
+const job = (progress: ImportJob['progress']): ImportJob =>
+  importJob({ state: 'active', step: progress?.step ?? 'queued', progress });
 
 describe('downloadProgressOf', () => {
   it('gives the bytes and the share while downloading', () => {

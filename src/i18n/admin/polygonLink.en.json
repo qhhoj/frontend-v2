@@ -15,14 +15,27 @@
   },
   "howTo": {
     "title": "How-to for problem setters",
-    "steps": {
-      "access": "Open the problem on polygon.codeforces.com; in Manage access, add {account} with Read access.",
-      "package": "Commit your changes and build a full package (Packages, Create package, Full); wait until it is READY.",
-      "paste": "Copy the address of the problem page (https://polygon.codeforces.com/p…/owner/name) and paste it into Import from Polygon on QHHOJ."
-    },
     "unnamed": "the QHHOJ account",
     "readIsEnough": "Read access is enough: QHHOJ changes nothing on Polygon. Treat the link like a password: anyone who has it and may import on QHHOJ can import the problem.",
-    "copy": "Copy the account name {account}"
+    "copy": "Copy the account name {account}",
+    "fold": "How to get the link",
+    "foldMeta": "3 steps on Polygon",
+    "steps": {
+      "access": {
+        "title": "Give read access",
+        "body": "On Polygon, open the problem, go to Manage access and add {account} with Read access."
+      },
+      "package": {
+        "title": "Build a package",
+        "body": "Commit your changes, go to Packages, click Create package (Full imports faster) and wait for READY."
+      },
+      "paste": {
+        "title": "Paste the problem link",
+        "body": "Copy the link shaped like {shape}, not an address with ccid or session."
+      }
+    },
+    "inPackage": "Every package also records this link in its problem.xml (the url attribute of the problem tag).",
+    "shape": "https://polygon.codeforces.com/p…/owner/name"
   },
   "check": {
     "button": "Test the connection",
@@ -55,7 +68,13 @@
     "packageValue": "r{revision}, package #{id}, built {time}",
     "notLinked": "Not linked to any QHHOJ problem yet.",
     "checkAgain": "Check again",
-    "next": "Continue"
+    "next": "Continue",
+    "slow": {
+      "title": "Downloading the package to verify the link",
+      "body": "A problem's first check downloads its whole package; a large one can take a few minutes. Keep this page open.",
+      "elapsed": "Waited {time}"
+    },
+    "previewMeta": "Owner {owner} · package #{id} (r{revision}, {type}) · built {time}"
   },
   "refusal": {
     "invalid": {
@@ -67,18 +86,40 @@
       "body": "Give {account} READ access on Polygon (Manage access), then copy the link again from the problem page."
     },
     "noPackage": {
-      "title": "Build a package first",
-      "body": "QHHOJ checks the link against the newest package, so the problem needs at least one ready package. Build a full package on Polygon, then check again."
+      "title": "The problem has no package yet",
+      "body": "QHHOJ checks the link against a package of the problem. On Polygon, go to Packages, click Create package (Full imports faster), wait for READY, then check again."
     },
     "notReady": {
       "title": "No ready package to import",
-      "body": "The newest package is not ready: it is still building or it failed. On Polygon, open Packages and build a full or standard package; if one is running, wait until it finishes."
+      "body": "The newest package is not ready: it is still building or it failed. On Polygon, open Packages and build a full or standard package; if one is running, wait until it finishes.",
+      "FAILED": "The newest package (r{revision}) failed on Polygon",
+      "RUNNING": "The newest package (r{revision}) is still building",
+      "comment": "Polygon says:",
+      "failedBody": "Fix it on Polygon, build the package again, then check again.",
+      "failedNoComment": "Open Packages on Polygon to see the error, fix it, build the package again, then check again.",
+      "runningBody": "Wait until Polygon finishes (state READY), then check again."
     },
     "linked": {
       "title": "Already on QHHOJ",
       "withCode": "This Polygon problem is linked to {code}. Open it and use Sync.",
       "open": "Open {code}",
       "hidden": "This Polygon problem is already linked to a QHHOJ problem."
+    },
+    "editing": {
+      "title": "This is an editing-session address",
+      "body": "Addresses with ccid, session or problemId only open while signed in. Paste the problem link shaped like {shape}."
+    },
+    "checking": {
+      "title": "The problem's package is being downloaded for its first check",
+      "auto": "Another check is downloading the package. QHHOJ checks again in {wait}.",
+      "manual": "A large package can take a few minutes. Click Check again in a little while."
+    },
+    "linkedDeleted": {
+      "title": "This Polygon problem is linked to the deleted problem {code}",
+      "titleHidden": "This Polygon problem is linked to a deleted problem",
+      "body": "Restore {code} and use Sync; or restore it and unlink {code} to import again. Once {code} is purged, the link is freed.",
+      "bodyHidden": "That problem's managers can restore it and unlink it; once it is purged, the link is freed.",
+      "open": "Open Deleted"
     }
   },
   "notConnected": {
@@ -105,11 +146,58 @@
   },
   "configure": {
     "title": "Configure the import",
-    "lead": "The same as a .zip import. Statements, tests and the checker come from the Polygon package; the rest are QHHOJ settings.",
+    "lead": "Statements, tests and the checker come from the Polygon package; the rest are QHHOJ settings.",
     "board": "Problem on QHHOJ",
     "autoSync": "Sync automatically on a new package",
-    "autoSyncHint": "When the owner builds a ready package newer than r{revision}, QHHOJ imports the statements, tests and checker again (checked every 10 minutes, deferred while a contest using the problem runs).",
-    "back": "Back"
+    "autoSyncHint": "When a package newer than r{revision} is built, re-import statements, tests and the checker.",
+    "back": "Back",
+    "autoSyncMore": "Checked every 10 minutes; postponed while a contest using the problem is running.",
+    "autoSyncMoreLabel": "More about auto-sync",
+    "judging": "Judging and sync",
+    "languages": {
+      "title": "Statement languages from Polygon",
+      "single": "The package has one statement ({language}); it becomes the problem statement.",
+      "main": "Main statement",
+      "mainHint": "The package has {count} statements: {languages}.",
+      "others": "Other statements",
+      "site": {
+        "en": "English (en)",
+        "vi": "Vietnamese (vi)",
+        "skip": "Skip"
+      },
+      "tutorial": "Take the editorial from",
+      "tutorialHint": "{count} statements have a tutorial on Polygon; pick one.",
+      "tutorialOne": "The editorial comes from the {language} statement.",
+      "tutorialNone": "No statement has a tutorial on Polygon.",
+      "repeated": "Another statement is already {site}: pick another language or Skip."
+    },
+    "update": {
+      "target": "Will overwrite {code}",
+      "targetBody": "{title}. Click Update to see what is replaced.",
+      "targetMissing": "No problem {code} among the problems you can edit.",
+      "submit": "Update {code}…"
+    },
+    "confirm": {
+      "title": "Overwrite {code} with the Polygon package?",
+      "replaced": "Replaced:",
+      "items": {
+        "statements": "Statement and translations",
+        "tutorial": "Editorial",
+        "tests": "Tests and test groups → the tests of package r{revision}",
+        "checker": "Checker, time and memory limits",
+        "link": "Polygon link → {name} #{id}"
+      },
+      "kept": "Kept: code, points, group, types, authors, curators, allowed languages (except the fields you fill in QHHOJ settings).",
+      "lost": "Edits to the items above made on QHHOJ will be lost.",
+      "confirm": "Overwrite {code} and import"
+    },
+    "refusal": {
+      "statement_language_required": "Pick the main statement among: {languages}.",
+      "statement_language_unmapped": "Pick a QHHOJ language or Skip for the {language} statement.",
+      "statement_language_repeated": "Two statements are {language}: pick another language or Skip.",
+      "tutorial_language_required": "Pick the editorial among: {languages}.",
+      "too_many_testcases": "The problem has {count} tests, over your limit of {limit}."
+    }
   },
   "progress": {
     "title": "Importing from Polygon",
@@ -194,6 +282,35 @@
       "package": "Package",
       "how": "How",
       "by": "Requested by"
+    }
+  },
+  "caution": {
+    "stale": {
+      "title": "The newest package is r{package}; Polygon is at r{revision}",
+      "body": "QHHOJ will import r{package}. To import the newer revision: commit, build a package, then check again.",
+      "bodyModified": "QHHOJ will import r{package}. The problem also has uncommitted changes. To import the newer revision: commit, build a package, then check again."
+    },
+    "modified": {
+      "title": "The problem has uncommitted changes on Polygon",
+      "body": "QHHOJ will import package r{package}, without those changes. To import them: commit, build a package, then check again."
+    },
+    "standard": {
+      "title": "Standard package: tests are generated on a judge",
+      "body": "The import can take many minutes and needs a running judge. A Full package imports faster."
+    }
+  },
+  "myImports": {
+    "title": "My imports",
+    "window": "Last 24 hours",
+    "sync": "sync",
+    "view": "View",
+    "viewLabel": "View the import of {code}",
+    "status": {
+      "queued": "Waiting",
+      "running": "Running",
+      "done": "Done",
+      "failed": "Failed",
+      "attention": "Needs attention"
     }
   }
 }

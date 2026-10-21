@@ -23,12 +23,15 @@ const run = (overrides: Partial<PolygonSyncRun> = {}): PolygonSyncRun => ({
   result: 'ok',
   failedStep: null,
   error: null,
+  errorCode: null,
+  errorParams: null,
   finishedAt: '2026-10-03T03:00:00Z',
   ...overrides,
 });
 const routes = (permissions: string[]) => ({
   ...staffViewer(['judge.edit_own_problem', 'judge.sync_polygon_problem', ...permissions]),
   'GET /polygon/status': ok({ connected: true, accountName: 'qhhoj' }),
+  'GET /problems/imports': ok([]),
   'GET /polygon/syncs': page([
     run({
       id: 'run-2',

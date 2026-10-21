@@ -1,4 +1,5 @@
 import type { PolygonLinkState, PolygonProblem } from '../../api/types/polygon';
+import type { ImportJob } from '../../api/types/problem-imports';
 
 type PolygonPackage = PolygonProblem['latestPackage'];
 export const polygonPackage = (overrides: Partial<PolygonPackage> = {}): PolygonPackage => ({
@@ -17,6 +18,7 @@ export const polygonProblem = (overrides: Partial<PolygonProblem> = {}): Polygon
   owner: 'lamter',
   revision: 11,
   modified: false,
+  statements: [{ language: 'vietnamese', title: 'Xâu đối xứng dài nhất', hasTutorial: false }],
   latestPackage: polygonPackage(),
   ...overrides,
 });
@@ -37,8 +39,41 @@ export const polygonLinkState = (
     lastSyncAt: '2026-10-03T02:12:00Z',
     lastSyncResult: 'ok',
     lastSyncError: null,
+    lastSyncErrorCode: null,
+    lastSyncErrorParams: null,
     autoSync: false,
+    options: {
+      appendMainSolution: false,
+      ignoreZeroPointBatches: false,
+      ignoreZeroPointCases: false,
+      mainStatementLanguage: null,
+      maxCases: 100,
+      statementLanguages: [],
+      tutorialLanguage: null,
+    },
     ...link,
   },
   latestPackage,
+  runningJobId: null,
+});
+
+/** A queued create import of `bitcoder`'s problem; tests override the state, step and result they look at. */
+export const importJob = (overrides: Partial<ImportJob> = {}): ImportJob => ({
+  id: 'job-1',
+  code: 'xau_doi_xung',
+  mode: 'create',
+  purpose: 'link',
+  state: 'waiting',
+  step: 'queued',
+  progress: null,
+  queuePosition: null,
+  result: null,
+  error: null,
+  errorCode: null,
+  errorParams: null,
+  failedStep: null,
+  retryable: false,
+  createdAt: '2026-10-21T03:00:00Z',
+  finishedAt: null,
+  ...overrides,
 });
