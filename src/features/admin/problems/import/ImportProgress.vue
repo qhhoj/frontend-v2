@@ -71,8 +71,7 @@ const labelKey = (key: string, status: StepStatus) =>
       {{ $t('admin.polygon.progress.title', { code }) }}
     </h2>
     <p v-if="job" class="text-sm text-muted">
-      {{ $t('admin.polygon.progress.state') }}: <span class="font-mono">{{ job.state }}</span>
-      <template v-if="!isFinished"> · {{ $t('admin.polygon.progress.runningHint') }}</template>
+      <template v-if="!isFinished">{{ $t('admin.polygon.progress.runningHint') }}</template>
     </p>
 
     <ol class="flex flex-col gap-1">

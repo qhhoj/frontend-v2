@@ -15,9 +15,28 @@ const TOKEN = /^p[0-9A-Za-z]{6}$/;
 const OWNER = /^[A-Za-z0-9_.-]{1,24}$/;
 const NAME = /^[a-z0-9][a-z0-9-]{0,63}$/;
 
-/** The parts of a pasted link, or null: https, the exact host, three path segments; a query or fragment is ignored. */
+/**
+ * A pasted link as the server's https-only parser expects it: surrounding spaces, a trailing "." and wrapping `<>`
+ * (how chat apps and sentences deliver a link) are dropped, and `http://` or no scheme becomes `https://`.
+ */
+function withHttps(text: string): string {
+  const unwrapped = text
+    .trim()
+    .replace(/\.$/, '')
+    .replace(/^<(.*)>$/, '$1')
+    .trim();
+  if (/^https:\/\//i.test(unwrapped)) return unwrapped;
+  if (/^http:\/\//i.test(unwrapped)) return unwrapped.replace(/^http/i, 'https');
+  return unwrapped.toLowerCase().startsWith(`${HOST}/`) ? `https://${unwrapped}` : unwrapped;
+}
+
+/** The address the server is asked to check for these parts. */
+export const polygonLinkUrl = ({ token, owner, name }: PolygonProblemLink) =>
+  `https://${HOST}/${token}/${owner}/${name}`;
+
+/** The parts of a pasted link, or null: the exact host, three path segments; a query or fragment is ignored. */
 export function parsePolygonLink(text: string): PolygonProblemLink | null {
-  const trimmed = text.trim();
+  const trimmed = withHttps(text);
   if (trimmed.length > MAX_LENGTH) return null;
   let url: URL;
   try {

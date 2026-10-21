@@ -101,6 +101,22 @@ describe('import owner', () => {
   });
 });
 
+describe('toImportOptions empty choices', () => {
+  it('leaves out empty lists and blank text, so a JSON body never clears the stored catalog', () => {
+    const options = toImportOptions({ ...readyForm(), mainStatementLanguage: '  ' });
+    expect(options.authors).toBeUndefined();
+    expect(options.curators).toBeUndefined();
+    expect(options.typeIds).toBeUndefined();
+    expect(options.statementLanguages).toBeUndefined();
+    expect(options.mainStatementLanguage).toBeUndefined();
+  });
+
+  it('sends the chosen lists', () => {
+    const form = { ...readyForm(), typeIds: ['t1'], authors: [{ id: 'a1', username: 'bitcoder' }] };
+    expect(toImportOptions(form)).toMatchObject({ typeIds: ['t1'], authors: ['a1'] });
+  });
+});
+
 describe('import rights', () => {
   const rights = (site: boolean, organizations: boolean, canRelink = true) => ({
     canEditOwn: true,

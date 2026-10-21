@@ -67,7 +67,9 @@ const refusal = computed(() =>
             v-model="autoSync"
             :label="$t('admin.polygonLink.configure.autoSync')"
             :description="
-              $t('admin.polygonLink.configure.autoSyncHint', { revision: problem.revision })
+              $t('admin.polygonLink.configure.autoSyncHint', {
+                revision: problem.latestPackage.revision ?? problem.revision,
+              })
             "
           />
         </template>

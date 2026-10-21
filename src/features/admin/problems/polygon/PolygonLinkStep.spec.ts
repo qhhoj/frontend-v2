@@ -59,7 +59,7 @@ describe('Polygon link step', () => {
 
   it('asks for READ access when qhhoj cannot open the link', async () => {
     expect(await refusalText(fail(404, 'polygon_link_refused'))).toContain(
-      'Hãy cấp quyền READ cho tài khoản qhhoj trên Polygon',
+      'Hãy cấp quyền READ cho qhhoj trên Polygon',
     );
   });
 

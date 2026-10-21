@@ -20,7 +20,7 @@
       "package": "Commit thay đổi và dựng gói đầy đủ (Packages, Create package, Full); chờ trạng thái READY.",
       "paste": "Sao chép địa chỉ trang của bài (https://polygon.codeforces.com/p…/chủ-bài/tên-bài) và dán vào Nhập từ Polygon trên QHHOJ."
     },
-    "unnamed": "tài khoản của QHHOJ",
+    "unnamed": "tài khoản QHHOJ",
     "readIsEnough": "Quyền đọc là đủ: QHHOJ không sửa gì trên Polygon. Giữ liên kết như mật khẩu: ai có liên kết và quyền nhập trên QHHOJ đều nhập được bài.",
     "copy": "Sao chép tên tài khoản {account}"
   },
@@ -32,7 +32,7 @@
   },
   "wizard": {
     "title": "Nhập từ Polygon",
-    "lead": "Cấp quyền đọc cho tài khoản {account} trên Polygon, dán liên kết của bài, thiết lập, rồi theo dõi tiến trình.",
+    "lead": "Cấp quyền đọc cho {account} trên Polygon, dán liên kết của bài, thiết lập, rồi theo dõi tiến trình.",
     "stepsLabel": "Các bước nhập",
     "steps": {
       "link": "Bài",
@@ -63,8 +63,8 @@
       "body": "Dán đầy đủ địa chỉ trang của bài: https://polygon.codeforces.com/p…/chủ-bài/tên-bài."
     },
     "refused": {
-      "title": "{account} không mở được liên kết này",
-      "body": "Hãy cấp quyền READ cho tài khoản {account} trên Polygon (Manage access), rồi sao chép lại liên kết từ trang của bài."
+      "title": "Không mở được liên kết này bằng {account}",
+      "body": "Hãy cấp quyền READ cho {account} trên Polygon (Manage access), rồi sao chép lại liên kết từ trang của bài."
     },
     "noPackage": {
       "title": "Hãy dựng gói trước",

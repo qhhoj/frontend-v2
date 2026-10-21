@@ -64,7 +64,9 @@ const LEAD_KEYS = {
   <div class="flex flex-col gap-4">
     <AdminPageHeader
       :title="$t(TITLE_KEYS[state.step])"
-      :lead="$t(LEAD_KEYS[state.step], { account: accountName || 'qhhoj' })"
+      :lead="
+        $t(LEAD_KEYS[state.step], { account: accountName || $t('admin.polygonLink.howTo.unnamed') })
+      "
     >
       <template #actions>
         <RouterLink :to="{ name: 'admin-problemImport' }" :class="buttonClass('secondary')">{{

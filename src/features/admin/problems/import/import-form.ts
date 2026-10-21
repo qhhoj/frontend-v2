@@ -154,6 +154,9 @@ export function missingForMode(mode: ImportMode, rights: ImportRights): string |
   return rights.canRelink ? null : SYNC_POLYGON;
 }
 
+/** The list, or undefined when empty: an empty list in a JSON body would clear the stored authors, curators or types. */
+const nonEmpty = <T>(items: T[]) => (items.length > 0 ? items : undefined);
+
 const optionalText = (text: string) => text.trim() || undefined;
 
 /** Options as the query string takes them: an empty choice is left out, not sent as an empty value. */
@@ -162,13 +165,13 @@ export function toImportOptions(form: ImportForm): ImportOptions {
     code: form.code,
     mode: form.mode,
     organization: form.mode === 'create' ? form.owner?.slug : undefined,
-    authors: form.authors.map((chip) => chip.id),
-    curators: form.curators.map((chip) => chip.id),
+    authors: nonEmpty(form.authors.map((chip) => chip.id)),
+    curators: nonEmpty(form.curators.map((chip) => chip.id)),
     groupId: form.groupId || undefined,
-    typeIds: form.typeIds,
+    typeIds: nonEmpty(form.typeIds),
     points: form.points.trim() ? Number(form.points) : undefined,
     mainStatementLanguage: optionalText(form.mainStatementLanguage),
-    statementLanguages: parseLanguageMap(form.languageMapText).pairs,
+    statementLanguages: nonEmpty(parseLanguageMap(form.languageMapText).pairs),
     tutorialLanguage: optionalText(form.tutorialLanguage),
     ignoreZeroPointBatches: form.ignoreZeroPointBatches,
     ignoreZeroPointCases: form.ignoreZeroPointCases,
