@@ -47,28 +47,30 @@ const LOOKS: Record<MyImportStatus, { tone: ChipTone; icon: Component }> = {
       <li
         v-for="{ job, status } in rows"
         :key="job.id"
-        class="flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1 border-t border-line py-2 first:border-t-0"
+        class="flex min-h-11 items-center gap-3 border-t border-line py-2 first:border-t-0"
       >
-        <span class="min-w-0 flex-1 basis-32 font-mono text-sm break-all">
+        <span class="min-w-0 flex-1 truncate font-mono text-sm" :title="job.code">
           {{ job.code }}
           <span v-if="job.purpose === 'sync'" class="font-sans text-meta text-muted">
             · {{ $t('admin.polygonLink.myImports.sync') }}</span
           >
         </span>
-        <Chip :tone="LOOKS[status].tone" :icon="LOOKS[status].icon">{{
-          $t(`admin.polygonLink.myImports.status.${status}`)
-        }}</Chip>
-        <time
-          :datetime="job.createdAt"
-          class="font-mono text-meta whitespace-nowrap text-muted tabular-nums"
-          >{{ formatAgoCompact(job.createdAt, now, locale.locale) }}</time
-        >
-        <RouterLink
-          :to="{ name: 'admin-polygonImport', query: { job: job.id } }"
-          class="inline-flex min-h-6 items-center text-sm font-semibold text-accent-text underline underline-offset-2 pointer-coarse:min-h-11"
-          :aria-label="$t('admin.polygonLink.myImports.viewLabel', { code: job.code })"
-          >{{ $t('admin.polygonLink.myImports.view') }}</RouterLink
-        >
+        <span class="flex shrink-0 items-center gap-3">
+          <Chip :tone="LOOKS[status].tone" :icon="LOOKS[status].icon">{{
+            $t(`admin.polygonLink.myImports.status.${status}`)
+          }}</Chip>
+          <time
+            :datetime="job.createdAt"
+            class="font-mono text-meta whitespace-nowrap text-muted tabular-nums"
+            >{{ formatAgoCompact(job.createdAt, now, locale.locale) }}</time
+          >
+          <RouterLink
+            :to="{ name: 'admin-polygonImport', query: { job: job.id } }"
+            class="inline-flex min-h-6 items-center text-sm font-semibold text-accent-text underline underline-offset-2 pointer-coarse:min-h-11"
+            :aria-label="$t('admin.polygonLink.myImports.viewLabel', { code: job.code })"
+            >{{ $t('admin.polygonLink.myImports.view') }}</RouterLink
+          >
+        </span>
       </li>
     </ul>
   </Card>
