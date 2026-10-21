@@ -10,25 +10,33 @@ import ImportCheckbox from '../import/ImportCheckbox.vue';
 import { importRefusalText } from '../import/import-refusal';
 import PolygonLanguageFields from './PolygonLanguageFields.vue';
 import type { ImportErrorText } from './polygon-import-errors';
-import { repeatedLanguageErrors, repeatedLanguages } from './polygon-languages';
+import {
+  isLanguageFieldDrawn,
+  repeatedLanguageErrors,
+  repeatedLanguages,
+} from './polygon-languages';
 import { linkChoiceOf, linkOptionsBodyOf, linkStatementsOf } from './polygon-link-options';
-import { optionsFieldOf, optionsRefusalOf } from './polygon-options-refusal';
+import type { OptionsFailure } from './polygon-link-options';
+import { optionsFailureOf, optionsFieldOf, optionsRefusalOf } from './polygon-options-refusal';
 
 /**
  * "Sửa" on the link panel (option C): the saved sync options in a 560 px drawer. The statements come from the saved
- * options and the last sync's failure (no preview without the link's token); the failure's own fix shows under its
- * field until the choice changes. Saving replaces the options for the next sync; the server checks them against Polygon.
+ * options, the last sync's failure and every refusal of a save here (no preview without the link's token), so the field a
+ * refusal names is drawn; the last sync's fix shows under its field until the choice changes. A refusal whose field is
+ * still not drawn shows on the page line. Saving replaces the options for the next sync; the server checks them against
+ * Polygon as it is now.
  */
 const props = defineProps<{ code: string; link: PolygonLink; error: ImportErrorText }>();
 const visible = defineModel<boolean>('visible', { required: true });
 const emit = defineEmits<{ saved: [link: PolygonLink] }>();
 
+/** Refusals of a save, kept after the choice changes: the statements they name stay on offer. */
+const refusedSaves = ref<OptionsFailure[]>([]);
 const statements = computed(() =>
-  linkStatementsOf(
-    props.link.options,
-    props.link.lastSyncErrorCode,
-    props.link.lastSyncErrorParams,
-  ),
+  linkStatementsOf(props.link.options, [
+    { code: props.link.lastSyncErrorCode, params: props.link.lastSyncErrorParams },
+    ...refusedSaves.value,
+  ]),
 );
 const languages = ref(linkChoiceOf(props.link.options, statements.value));
 const flags = ref({
@@ -43,6 +51,10 @@ const save = useAdminMutation({
   onSuccess: (link) => emit('saved', link),
 });
 const refusal = computed(() => optionsRefusalOf(save.failure.value));
+watch(save.failure, (error) => {
+  const failure = optionsFailureOf(error);
+  if (failure) refusedSaves.value = [...refusedSaves.value, failure];
+});
 watch(languages, () => {
   isChanged.value = true;
   if (refusal.value) save.reset();
@@ -58,7 +70,9 @@ const fieldErrors = computed(() => {
   return errors;
 });
 const pageRefusal = computed(() => {
-  if (!save.failure.value || refusal.value?.field) return null;
+  const field = refusal.value?.field;
+  if (!save.failure.value) return null;
+  if (field && isLanguageFieldDrawn(field, statements.value, languages.value)) return null;
   return refusal.value?.text ?? importRefusalText(save.failure.value);
 });
 const submit = () => repeatedLanguages(languages.value).length === 0 && save.run(undefined);

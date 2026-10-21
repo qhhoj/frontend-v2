@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '@/api/client';
-import { optionsRefusalOf } from './polygon-options-refusal';
+import { optionsFailureOf, optionsRefusalOf } from './polygon-options-refusal';
 
 const refusal = (code: string, params?: Record<string, unknown>) =>
   optionsRefusalOf(new ApiError(code, 400, 'refused', { extra: params ? { params } : {} }));
@@ -31,5 +31,17 @@ describe('optionsRefusalOf', () => {
   it('leaves other failures, and non-API errors, to the generic line', () => {
     expect(refusal('problem_code_taken')).toBeNull();
     expect(optionsRefusalOf(new Error('boom'))).toBeNull();
+  });
+});
+
+describe('optionsFailureOf', () => {
+  it('keeps the code and params of a refusal of the options, nothing for any other failure', () => {
+    const params = { languages: ['vietnamese', 'english'] };
+    const error = new ApiError('statement_language_required', 400, 'refused', {
+      extra: { params },
+    });
+    expect(optionsFailureOf(error)).toEqual({ code: 'statement_language_required', params });
+    expect(optionsFailureOf(new ApiError('problem_code_taken', 409, 'taken'))).toBeNull();
+    expect(optionsFailureOf(new Error('x'))).toBeNull();
   });
 });

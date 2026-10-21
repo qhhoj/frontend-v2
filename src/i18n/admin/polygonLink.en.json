@@ -168,6 +168,7 @@
       "tutorial": "Take the editorial from",
       "tutorialHint": "{count} statements have a tutorial on Polygon; pick one.",
       "tutorialOne": "The editorial comes from the {language} statement.",
+      "pick": "Pick a statement",
       "tutorialNone": "No statement has a tutorial on Polygon.",
       "repeated": "Another statement is already {site}: pick another language or Skip."
     },

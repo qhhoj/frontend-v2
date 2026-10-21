@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   defaultLanguageChoice,
+  isLanguageFieldDrawn,
   repeatedLanguages,
   settleLanguageChoice,
   toLanguageOptions,
@@ -109,5 +110,28 @@ describe('toLanguageOptions', () => {
     expect(
       toLanguageOptions(THREE, { ...choice, others: { ...choice.others } }).tutorialLanguage,
     ).toBeUndefined();
+  });
+});
+
+describe('isLanguageFieldDrawn', () => {
+  const choice = defaultLanguageChoice(THREE);
+
+  it('draws no field for fewer than two statements', () => {
+    const single = [statement('english', true)];
+    for (const field of ['main', 'others', 'tutorial', 'other:english'])
+      expect(isLanguageFieldDrawn(field, single, defaultLanguageChoice(single))).toBe(false);
+  });
+
+  it('draws the main and others fields, and a select for each statement the choice has', () => {
+    expect(isLanguageFieldDrawn('main', THREE, choice)).toBe(true);
+    expect(isLanguageFieldDrawn('others', THREE, choice)).toBe(true);
+    expect(isLanguageFieldDrawn('other:russian', THREE, choice)).toBe(true);
+    expect(isLanguageFieldDrawn('other:polish', THREE, choice)).toBe(false);
+  });
+
+  it('draws the tutorial only while two or more tutorials count', () => {
+    expect(isLanguageFieldDrawn('tutorial', THREE, choice)).toBe(true);
+    const skipped = { ...choice, others: { ...choice.others, english: 'skip' as const } };
+    expect(isLanguageFieldDrawn('tutorial', THREE, skipped)).toBe(false);
   });
 });

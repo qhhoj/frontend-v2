@@ -1,7 +1,6 @@
 import type { Schemas } from '@/api/schemas';
 import type { PolygonProblem } from '@/api/types/polygon';
 import { translate } from '@/i18n';
-import type { ImportErrorCode, ImportErrorParams } from './polygon-import-errors';
 import { SITE_LANGUAGE_CHOICES, settleLanguageChoice } from './polygon-languages';
 import type { LanguageChoice, SiteLanguageChoice } from './polygon-languages';
 
@@ -30,8 +29,14 @@ function savedPairs(options: Options): Record<string, SiteLanguageChoice> {
 const listParam = (value: unknown): string[] =>
   Array.isArray(value) ? value.map(String) : typeof value === 'string' ? [value] : [];
 
-/** The Polygon languages a sync failure names: a statement without a site language, or the choices it lacked. */
-function failureLanguages(code: ImportErrorCode | null, params: ImportErrorParams): string[] {
+/** A sync failure or a refusal of the options: its code and params. */
+export interface OptionsFailure {
+  code: string | null;
+  params: Record<string, unknown> | null;
+}
+
+/** The Polygon languages a failure names: a statement without a site language, or the choices it lacked. */
+function failureLanguages({ code, params }: OptionsFailure): string[] {
   switch (code) {
     case 'statement_language_unmapped':
       return listParam(params?.language);
@@ -45,19 +50,16 @@ function failureLanguages(code: ImportErrorCode | null, params: ImportErrorParam
 
 /**
  * The statements the drawer offers, without a preview of the package: the ones the saved options name, plus the ones the
- * last sync's failure named (a statement new on Polygon). A tutorial is known only where it was chosen or listed by a
- * `tutorial_language_required` failure: elsewhere the server ignores the choice anyway.
+ * failures named (the last sync's, the refusals of a save: a statement new on Polygon). A tutorial is known only where it
+ * was chosen or listed by a `tutorial_language_required` failure: elsewhere the server ignores the choice anyway.
  */
-export function linkStatementsOf(
-  options: Options,
-  code: ImportErrorCode | null,
-  params: ImportErrorParams,
-): Statement[] {
+export function linkStatementsOf(options: Options, failures: OptionsFailure[]): Statement[] {
   const named = [options.mainStatementLanguage ?? '', ...Object.keys(savedPairs(options))];
-  const languages = [...new Set([...named, ...failureLanguages(code, params)])].filter(Boolean);
+  const languages = [...new Set([...named, ...failures.flatMap(failureLanguages)])].filter(Boolean);
   const tutorials = new Set([options.tutorialLanguage ?? '']);
-  if (code === 'tutorial_language_required')
-    for (const language of listParam(params?.languages)) tutorials.add(language);
+  for (const { code, params } of failures)
+    if (code === 'tutorial_language_required')
+      for (const language of listParam(params?.languages)) tutorials.add(language);
   return languages.map((language) => ({
     language,
     title: null,

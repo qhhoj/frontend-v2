@@ -26,16 +26,16 @@ const flags = {
 
 describe('linkStatementsOf', () => {
   it('lists the statements the saved options name, the tutorial where one was chosen', () => {
-    expect(linkStatementsOf(options(), null, null)).toEqual([
+    expect(linkStatementsOf(options(), [])).toEqual([
       { language: 'vietnamese', title: null, hasTutorial: true },
       { language: 'english', title: null, hasTutorial: false },
     ]);
   });
 
   it('adds a statement the last sync found without a site language', () => {
-    const statements = linkStatementsOf(options(), 'statement_language_unmapped', {
-      language: 'russian',
-    });
+    const statements = linkStatementsOf(options(), [
+      { code: 'statement_language_unmapped', params: { language: 'russian' } },
+    ]);
     expect(statements.map(({ language }) => language)).toEqual([
       'vietnamese',
       'english',
@@ -44,11 +44,9 @@ describe('linkStatementsOf', () => {
   });
 
   it('offers every tutorial a tutorial_language_required failure listed', () => {
-    const statements = linkStatementsOf(
-      options({ tutorialLanguage: null }),
-      'tutorial_language_required',
-      { languages: ['english', 'vietnamese'] },
-    );
+    const statements = linkStatementsOf(options({ tutorialLanguage: null }), [
+      { code: 'tutorial_language_required', params: { languages: ['english', 'vietnamese'] } },
+    ]);
     expect(
       statements.filter(({ hasTutorial }) => hasTutorial).map(({ language }) => language),
     ).toEqual(['vietnamese', 'english']);
@@ -60,15 +58,32 @@ describe('linkStatementsOf', () => {
       statementLanguages: [],
       tutorialLanguage: null,
     });
-    expect(linkStatementsOf(single, null, null)).toEqual([]);
+    expect(linkStatementsOf(single, [])).toEqual([]);
+  });
+
+  it('offers what a refused save named beside the last sync failure, for a package that had one statement', () => {
+    const single = options({
+      mainStatementLanguage: null,
+      statementLanguages: [],
+      tutorialLanguage: null,
+    });
+    const statements = linkStatementsOf(single, [
+      { code: null, params: null },
+      { code: 'statement_language_required', params: { languages: ['vietnamese', 'english'] } },
+      { code: 'tutorial_language_required', params: { languages: ['vietnamese', 'english'] } },
+    ]);
+    expect(statements).toEqual([
+      { language: 'vietnamese', title: null, hasTutorial: true },
+      { language: 'english', title: null, hasTutorial: true },
+    ]);
   });
 });
 
 describe('linkChoiceOf and linkOptionsBodyOf', () => {
   it('round-trips the saved options, a new statement skipped until the setter maps it', () => {
-    const statements = linkStatementsOf(options(), 'statement_language_unmapped', {
-      language: 'russian',
-    });
+    const statements = linkStatementsOf(options(), [
+      { code: 'statement_language_unmapped', params: { language: 'russian' } },
+    ]);
     const choice = linkChoiceOf(options(), statements);
     expect(choice).toEqual({
       main: 'vietnamese',

@@ -168,6 +168,7 @@
       "tutorial": "Lời giải (editorial) lấy từ",
       "tutorialHint": "{count} đề có lời giải trên Polygon; chọn một.",
       "tutorialOne": "Lời giải lấy từ đề {language}.",
+      "pick": "Chọn một đề",
       "tutorialNone": "Không đề nào có lời giải trên Polygon.",
       "repeated": "Đề khác đã là {site}: chọn ngôn ngữ khác hoặc Bỏ qua."
     },

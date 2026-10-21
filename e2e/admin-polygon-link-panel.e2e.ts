@@ -151,4 +151,51 @@ for (const viewport of VIEWPORTS) {
     await expect(page.getByTestId('polygon-link-options')).toContainText('russian: bỏ qua');
     await shoot(page, viewport.name, 'panel-saved');
   });
+  test(`Polygon link panel at ${viewport.name}: a save refused for a statement new on Polygon`, async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize(viewport);
+    const single = {
+      ...OPTIONS,
+      mainStatementLanguage: null,
+      statementLanguages: [],
+      tutorialLanguage: null,
+    };
+    const state = linkState({ options: single });
+    panelRoutes(api, state);
+    api.routes['PATCH /problems/hcmus41c/polygon'] = ({ body }) =>
+      (body as { mainStatementLanguage: string | null }).mainStatementLanguage
+        ? adminOk({ ...state.link, options: { ...single, ...(body as Record<string, unknown>) } })
+        : {
+            status: 400,
+            body: {
+              error: {
+                code: 'statement_language_required',
+                message: 'invalid main statement language (none)',
+                params: { languages: ['vietnamese', 'english'] },
+              },
+            },
+          };
+    await page.goto(DATA_TAB);
+    await page.getByRole('button', { name: 'Sửa tùy chọn khi đồng bộ' }).click();
+    const drawer = dialogOf(page);
+    await expect(drawer).toContainText('gói có một đề');
+    await drawer.getByRole('button', { name: 'Lưu tùy chọn' }).click();
+
+    await expect(drawer).toContainText('Chọn đề chính trong số: vietnamese, english.');
+    await expect(drawer.getByLabel('Đề chính')).toHaveValue('');
+    expect(await axeViolationsIn(page)).toEqual([]);
+    await shoot(page, viewport.name, 'panel-refused');
+
+    await drawer.getByLabel('Đề chính').selectOption('vietnamese');
+    await expect(drawer).not.toContainText('Chọn đề chính trong số');
+    await drawer.getByRole('button', { name: 'Lưu tùy chọn' }).click();
+    await expect(banner(page)).toHaveAttribute('data-banner', 'saved');
+    const patches = api.requestsTo('PATCH /problems/hcmus41c/polygon');
+    expect(JSON.parse(patches[1]?.postData?.toString() ?? '{}')).toMatchObject({
+      mainStatementLanguage: 'vietnamese',
+      statementLanguages: ['english=en'],
+    });
+  });
 }

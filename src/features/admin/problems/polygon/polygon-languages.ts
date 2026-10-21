@@ -31,6 +31,22 @@ export function tutorialCandidates(statements: Statement[], choice: LanguageChoi
     .map(({ language }) => language);
 }
 
+/**
+ * Whether `PolygonLanguageFields` draws the field an error is keyed by (`main`, `others`, `other:<language>`, `tutorial`):
+ * none for fewer than two statements, a statement's select only when the choice has it, the tutorial's only for two or
+ * more candidates. An error for a field it does not draw belongs on the page line.
+ */
+export function isLanguageFieldDrawn(
+  field: string,
+  statements: Statement[],
+  choice: LanguageChoice,
+): boolean {
+  if (statements.length < 2) return false;
+  if (field === 'tutorial') return tutorialCandidates(statements, choice).length > 1;
+  if (field.startsWith('other:')) return Object.hasOwn(choice.others, field.slice('other:'.length));
+  return field === 'main' || field === 'others';
+}
+
 /** The choice made whole for these statements: every other statement has a choice, the tutorial is one that counts. */
 export function settleLanguageChoice(
   statements: Statement[],
