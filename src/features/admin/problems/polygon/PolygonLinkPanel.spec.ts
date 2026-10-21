@@ -4,7 +4,7 @@ import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { staffViewer } from '@/test/admin-routes';
 import { problemEditorRoutes } from '@/test/admin-fixtures/problems';
-import { polygonLinkState } from '@/test/admin-fixtures/polygon';
+import { importJob, polygonLinkState } from '@/test/admin-fixtures/polygon';
 
 const mountPanel = async (permissions: string[], routes: Record<string, MockHandler> = {}) => {
   mockApi({
@@ -122,5 +122,45 @@ describe('PolygonLinkPanel', () => {
     await vi.waitFor(() =>
       expect(panel.get('[data-testid="polygon-link-options"]').text()).toContain('russian: bỏ qua'),
     );
+  });
+  it('follows a sync again when the server answers the job id it already followed', async () => {
+    const syncs: unknown[] = [];
+    const panel = await mountPanel(['judge.sync_polygon_problem'], {
+      'POST /problems/hcmus41c/polygon/sync': () => {
+        syncs.push(null);
+        return { status: 202, body: { data: { jobId: 'job-sync' } } };
+      },
+      // Unknown to the queue the first time (polling stops), queued once synced again.
+      'GET /problems/imports/job-sync': () =>
+        syncs.length < 2
+          ? { status: 404, body: { error: { code: 'not_found', message: 'not_found' } } }
+          : ok(importJob({ id: 'job-sync', code: 'hcmus41c', purpose: 'sync', queuePosition: 1 })),
+    });
+    const syncNow = async () => {
+      await vi.waitFor(() => expect(document.body.querySelector('[role="dialog"]')).toBeNull());
+      const button = panel.findAll('button').find((one) => one.text().startsWith('Đồng bộ ngay'));
+      await button!.trigger('click');
+      const confirm = await vi.waitFor(() => {
+        const found = [...document.body.querySelectorAll('[role="dialog"] button')].find(
+          (one) => one.textContent?.trim() === 'Đồng bộ và ghi đè',
+        );
+        expect(found).toBeDefined();
+        return found as HTMLButtonElement;
+      });
+      confirm.click();
+    };
+    await syncNow();
+    await vi.waitFor(() => expect(syncs).toHaveLength(1));
+    await vi.waitFor(() =>
+      expect(panel.findAll('button').some((one) => one.text().startsWith('Đồng bộ ngay'))).toBe(
+        true,
+      ),
+    );
+    await syncNow();
+    await vi.waitFor(() => expect(syncs).toHaveLength(2));
+    await vi.waitFor(() =>
+      expect(panel.get('[data-banner]').attributes('data-banner')).toBe('running'),
+    );
+    expect(panel.get('[data-banner]').text()).toContain('Thứ 1 trong hàng đợi');
   });
 });

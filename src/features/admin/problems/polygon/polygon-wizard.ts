@@ -24,8 +24,8 @@ export type WizardState =
   | { step: 'link'; link: string }
   | ({ step: 'configure' } & ConfigureSetup)
   /**
-   * After a reload only the job id (from the URL) is known: no body to retry with and no setup to edit; a new job
-   * (a sync that repairs an imported problem) can still be followed.
+   * After a reload, or once a sync repairs the imported problem, only the job id is known: no body to retry with and
+   * no setup to edit (a sync runs on the link's saved options); a new job can still be followed.
    */
   | {
       step: 'progress';
@@ -47,15 +47,18 @@ const EMPTY: WizardState = { step: 'link', link: '' };
 export const initialWizardState = (jobId: string | null): WizardState =>
   jobId ? { step: 'progress', jobId, body: null, setup: null } : EMPTY;
 
-function onStarted(state: WizardState, event: Extract<WizardEvent, { type: 'started' }>) {
+function onStarted(
+  state: WizardState,
+  event: Extract<WizardEvent, { type: 'started' }>,
+): WizardState {
   const { jobId, body, draft = null } = event;
   if (state.step === 'configure') {
     const setup = { link: state.link, problem: state.problem, draft };
-    return { step: 'progress', jobId, body, setup } as const;
+    return { step: 'progress', jobId, body, setup };
   }
-  // A retry or a repairing sync: a new job, the same link, options and form.
-  if (state.step === 'progress') return { ...state, jobId, body: body ?? state.body };
-  return state;
+  if (state.step !== 'progress') return state;
+  // A retry: the same body and form. A repairing sync runs on the link's saved options: neither applies any more.
+  return body ? { ...state, jobId, body } : { step: 'progress', jobId, body: null, setup: null };
 }
 
 /** Back to the options as they were sent; nothing to go back to after a reload. */

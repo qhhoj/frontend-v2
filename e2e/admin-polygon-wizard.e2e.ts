@@ -356,6 +356,50 @@ for (const viewport of VIEWPORTS) {
     expect(bodies.map(({ code }) => code)).toEqual(['kminmax_v2', 'kminmax_v2', 'kminmax_v2']);
   });
 
+  test(`Polygon progress at ${viewport.name}: a repairing sync fails, then syncs again under its job id`, async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize(viewport);
+    mockWizard(api);
+    api.routes['POST /polygon/import'] = { status: 202, body: { data: { jobId: 'job-imported' } } };
+    api.routes['GET /problems/imports/job-imported'] = adminOk(
+      progressJob('job-imported', PROGRESS_JOBS.attention),
+    );
+    // One job id per problem and package: the second sync answers the id the page already follows.
+    api.routes['POST /problems/kminmax/polygon/sync'] = {
+      status: 202,
+      body: { data: { jobId: 'job-sync' } },
+    };
+    const syncs = () => api.requestsTo('POST /problems/kminmax/polygon/sync').length;
+    api.routes['GET /problems/imports/job-sync'] = () =>
+      syncs() < 2
+        ? adminOk(
+            failedJob('job-sync', 'polygon_unavailable', {
+              purpose: 'sync',
+              retryable: true,
+              failedStep: 'downloading',
+            }),
+          )
+        : adminOk(progressJob('job-sync', { ...PROGRESS_JOBS.done, purpose: 'sync' }));
+
+    await page.goto('/admin/problems/polygon');
+    await paste(page, linkOf('kminmax'));
+    await page.getByRole('button', { name: 'Tiếp tục' }).click();
+    await page.getByRole('button', { name: 'Bắt đầu nhập' }).click();
+    await expect(outcome(page)).toContainText('Đã nhập kminmax, cần xem lại');
+    await outcome(page).getByRole('button', { name: 'Đồng bộ lại kminmax' }).click();
+
+    await expect(page).toHaveURL(/job=job-sync/);
+    await expect(outcome(page)).toContainText('Không đồng bộ được kminmax');
+    await expect(outcome(page).getByRole('button', { name: 'Thử lại' })).toHaveCount(0);
+    await expect(outcome(page).getByRole('button', { name: 'Sửa thiết lập' })).toHaveCount(0);
+    await outcome(page).getByRole('button', { name: 'Đồng bộ lại kminmax' }).click();
+    await expect(outcome(page)).toContainText('Đã đồng bộ kminmax');
+    expect(api.requestsTo('POST /polygon/import')).toHaveLength(1);
+    expect(syncs()).toBe(2);
+  });
+
   test(`Polygon progress at ${viewport.name}: polling gives up, then checks again`, async ({
     page,
     api,

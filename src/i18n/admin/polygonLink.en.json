@@ -225,6 +225,11 @@
         "failed": "Could not sync {code}",
         "lost": "State of {code} unknown",
         "gone": "Cannot follow the sync of {code}"
+      },
+      "unnamed": {
+        "waiting": "Asking for the state of the import",
+        "lost": "State of the import unknown",
+        "gone": "Cannot follow this import"
       }
     },
     "queue": {
@@ -245,15 +250,14 @@
     },
     "recheck": "Check again",
     "edit": "Change options",
+    "syncOptions": "Change sync options",
     "resync": "Sync {code} again",
     "serverSays": "Details from the server: {text}",
     "stepsFold": "Step details",
-    "barLabel": "Step {done}/{total}",
     "summary": {
       "title": "What differs from Polygon",
       "item": "Item",
       "value": "On QHHOJ",
-      "note": "Note",
       "rows": {
         "checker": "Checker",
         "tests": "Tests",
@@ -305,8 +309,7 @@
     },
     "banner": {
       "running": {
-        "title": "Syncing",
-        "waiting": "Waiting for the server to take the sync."
+        "title": "Syncing"
       },
       "saved": {
         "title": "Options saved",

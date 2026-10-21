@@ -225,6 +225,11 @@
         "failed": "Không đồng bộ được {code}",
         "lost": "Chưa rõ trạng thái {code}",
         "gone": "Không theo dõi được lượt đồng bộ {code}"
+      },
+      "unnamed": {
+        "waiting": "Đang hỏi trạng thái lượt nhập",
+        "lost": "Chưa rõ trạng thái lượt nhập",
+        "gone": "Không theo dõi được lượt nhập này"
       }
     },
     "queue": {
@@ -245,15 +250,14 @@
     },
     "recheck": "Kiểm tra lại",
     "edit": "Sửa thiết lập",
+    "syncOptions": "Sửa tùy chọn đồng bộ",
     "resync": "Đồng bộ lại {code}",
     "serverSays": "Chi tiết từ hệ thống: {text}",
     "stepsFold": "Chi tiết các bước",
-    "barLabel": "Bước {done}/{total}",
     "summary": {
       "title": "Khác gì so với Polygon",
       "item": "Mục",
       "value": "Trên QHHOJ",
-      "note": "Ghi chú",
       "rows": {
         "checker": "Checker",
         "tests": "Test",
@@ -305,8 +309,7 @@
     },
     "banner": {
       "running": {
-        "title": "Đang đồng bộ",
-        "waiting": "Đang chờ máy chủ nhận lượt đồng bộ."
+        "title": "Đang đồng bộ"
       },
       "saved": {
         "title": "Đã lưu tùy chọn",

@@ -103,6 +103,8 @@ const sync = useAdminMutation({
   onDone: ({ jobId }) => {
     isSyncOpen.value = false;
     isSaved.value = false;
+    // One job id per problem and package: the same id as the one followed is polled again.
+    if (jobId === runningJobId.value) syncJob.recheck();
     startedJobId.value = jobId;
   },
 });
@@ -176,7 +178,7 @@ const isHistoryOpen = ref(false);
 
     <dl class="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-4 gap-y-1 text-sm">
       <dt class="text-muted">{{ $t('admin.polygonLink.panel.facts.polygon') }}</dt>
-      <dd class="font-mono break-all">
+      <dd class="font-mono break-words">
         {{ state.link.name }} · {{ state.link.problemId }} · {{ state.link.owner }}
       </dd>
       <dt class="text-muted">{{ $t('admin.polygonLink.panel.facts.options') }}</dt>

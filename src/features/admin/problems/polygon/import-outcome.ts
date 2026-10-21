@@ -114,7 +114,7 @@ export const summaryRowsOf = (summary: Summary): SummaryRow[] => [
 ];
 
 /** The outcome's one primary action; null leaves only "Nhập bài khác". */
-export type OutcomeAction = 'open' | 'resync' | 'retry' | 'edit' | 'recheck' | null;
+export type OutcomeAction = 'open' | 'resync' | 'retry' | 'edit' | 'syncOptions' | 'recheck' | null;
 
 /** What this page can do for the job: retry it (its body is known), edit its options (its form is), sync the problem. */
 export interface OutcomeAbilities {
@@ -123,11 +123,23 @@ export interface OutcomeAbilities {
   sync: boolean;
 }
 
+/** Why the job failed, as far as its action goes; a sync runs on the link's saved options, not on an import's form. */
+export interface OutcomeFailure {
+  retryable: boolean;
+  kind: ImportErrorKind;
+  isSync: boolean;
+}
+
+/** A failed sync: synced again when it may pass by itself, else its options changed on the problem's Polygon card. */
+function syncFailedActionOf(failure: OutcomeFailure, can: OutcomeAbilities): OutcomeAction {
+  if (!can.sync) return null;
+  if (failure.retryable) return 'resync';
+  return failure.kind === 'options' ? 'syncOptions' : null;
+}
+
 /** A failure: try again only when it may pass by itself, else back to the options when they or the code caused it. */
-function failedActionOf(
-  failure: { retryable: boolean; kind: ImportErrorKind },
-  can: OutcomeAbilities,
-): OutcomeAction {
+function failedActionOf(failure: OutcomeFailure, can: OutcomeAbilities): OutcomeAction {
+  if (failure.isSync) return syncFailedActionOf(failure, can);
   if (failure.retryable) return can.retry ? 'retry' : null;
   const isSetup = failure.kind === 'options' || failure.kind === 'target';
   return isSetup && can.edit ? 'edit' : null;
@@ -135,7 +147,7 @@ function failedActionOf(
 
 export function outcomeActionOf(
   kind: OutcomeKind,
-  failure: { retryable: boolean; kind: ImportErrorKind },
+  failure: OutcomeFailure,
   can: OutcomeAbilities,
 ): OutcomeAction {
   switch (kind) {

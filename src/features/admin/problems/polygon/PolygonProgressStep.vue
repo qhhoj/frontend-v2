@@ -28,7 +28,9 @@ import { importErrorOf } from './polygon-import-errors';
 /**
  * Step 3 (progress option B): the outcome first (header, one segment per step), then its cause and fix or the
  * conversion summary, then its one action: "Thử lại" after a failure that may pass by itself, "Sửa thiết lập" back to the
- * options kept in the wizard (`canEdit`), "Đồng bộ lại" after a post-commit failure, "Kiểm tra lại" after polling gave up.
+ * options kept in the wizard (`canEdit`), "Đồng bộ lại" after a post-commit failure or a failed sync that may pass,
+ * "Sửa tùy chọn đồng bộ" to the problem's Polygon card when a sync's options failed, "Kiểm tra lại" after polling gave up.
+ * A sync answered with the job id already followed (one id per problem and package) is polled again.
  */
 const props = defineProps<{ jobId: string; body: PolygonImportBody | null; canEdit: boolean }>();
 const emit = defineEmits<{
@@ -57,7 +59,11 @@ const detail = computed(() =>
 const action = computed(() =>
   outcomeActionOf(
     kind.value,
-    { retryable: job.value?.retryable ?? false, kind: error.value.kind },
+    {
+      retryable: job.value?.retryable ?? false,
+      kind: error.value.kind,
+      isSync: job.value?.purpose === 'sync',
+    },
     { retry: !!props.body, edit: props.canEdit, sync: canAny(SYNC_POLYGON) },
   ),
 );
@@ -67,7 +73,11 @@ const lastSeenAt = ref(new Date().toISOString());
 watch(job, () => (lastSeenAt.value = new Date().toISOString()));
 
 const KEY = 'admin.polygonLink.progress';
+/** Kinds that can come before any answer (after a reload), when nothing names the problem yet. */
+const UNNAMED: ReadonlySet<OutcomeKind> = new Set(['waiting', 'lost', 'gone']);
 const title = computed(() => {
+  if (!code.value && UNNAMED.has(kind.value))
+    return translate(`${KEY}.outcome.unnamed.${kind.value}`);
   const verb = job.value?.purpose === 'sync' ? 'sync' : 'import';
   return translate(`${KEY}.outcome.${verb}.${kind.value}`, { code: code.value });
 });
@@ -111,10 +121,18 @@ const retry = useAdminMutation({
 });
 const resync = useAdminMutation({
   mutate: (problem: string) => syncPolygonLink(problem),
-  onDone: ({ jobId }) => emit('started', jobId, null),
+  onDone: ({ jobId }) => {
+    if (jobId === props.jobId) recheck();
+    emit('started', jobId, null);
+  },
 });
 const actionFailure = computed(() => retry.failure.value ?? resync.failure.value);
 const openTo = computed(() => ({ name: 'admin-problemGeneral', params: { code: code.value } }));
+const syncOptionsTo = computed(() => ({
+  name: 'admin-problemData',
+  params: { code: code.value },
+  query: { view: 'advanced' },
+}));
 </script>
 
 <template>
@@ -176,6 +194,10 @@ const openTo = computed(() => ({ name: 'admin-problemGeneral', params: { code: c
         <AppButton v-else-if="action === 'edit'" tone="primary" @click="emit('edit')">
           <template #icon><Pencil aria-hidden="true" class="size-4" /></template>
           {{ $t(`${KEY}.edit`) }}
+        </AppButton>
+        <AppButton v-else-if="action === 'syncOptions'" tone="primary" :to="syncOptionsTo">
+          <template #icon><Pencil aria-hidden="true" class="size-4" /></template>
+          {{ $t(`${KEY}.syncOptions`) }}
         </AppButton>
         <AppButton v-else-if="action === 'recheck'" tone="primary" @click="recheck()">
           <template #icon><RefreshCw aria-hidden="true" class="size-4" /></template>

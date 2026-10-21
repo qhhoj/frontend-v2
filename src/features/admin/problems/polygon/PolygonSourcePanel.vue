@@ -23,7 +23,7 @@ const locale = useLocaleStore();
     </div>
     <dl class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 text-sm">
       <dt class="text-muted">Polygon</dt>
-      <dd class="font-mono break-all">{{ problem.name }} · {{ problem.id }}</dd>
+      <dd class="font-mono break-words">{{ problem.name }} · {{ problem.id }}</dd>
       <dt class="text-muted">{{ $t('admin.polygonLink.source.owner') }}</dt>
       <dd>{{ problem.owner }}</dd>
       <dt class="text-muted">{{ $t('admin.polygonLink.source.package') }}</dt>

@@ -43,11 +43,17 @@ describe('wizardReducer', () => {
     });
   });
 
-  it('replaces the job on a retry or a repairing sync, keeping the body and the form', () => {
+  it('replaces the job on a retry, keeping the body and the form', () => {
     const progress = started();
-    const sync = wizardReducer(progress, { type: 'started', jobId: 'job-2', body: null });
-    expect(sync).toEqual({ ...progress, jobId: 'job-2' });
-    expect(wizardReducer(sync, { type: 'edit' })).toMatchObject({ step: 'configure', draft });
+    const retried = wizardReducer(progress, { type: 'started', jobId: 'job-2', body });
+    expect(retried).toEqual({ ...progress, jobId: 'job-2' });
+    expect(wizardReducer(retried, { type: 'edit' })).toMatchObject({ step: 'configure', draft });
+  });
+
+  it('drops the import body and form on a repairing sync: it runs on the link options', () => {
+    const sync = wizardReducer(started(), { type: 'started', jobId: 'job-2', body: null });
+    expect(sync).toEqual({ step: 'progress', jobId: 'job-2', body: null, setup: null });
+    expect(wizardReducer(sync, { type: 'edit' })).toBe(sync);
   });
 
   it('after a reload: nothing to edit or retry, but a repairing sync is followed', () => {

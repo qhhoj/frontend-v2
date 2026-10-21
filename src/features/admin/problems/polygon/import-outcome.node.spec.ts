@@ -122,10 +122,11 @@ describe('summaryRowsOf', () => {
 
 describe('outcomeActionOf', () => {
   const all = { retry: true, edit: true, sync: true };
-  const failure = (retryable: boolean, kind: 'options' | 'target' | 'transient' | 'other') => ({
-    retryable,
-    kind,
-  });
+  const failure = (
+    retryable: boolean,
+    kind: 'options' | 'target' | 'transient' | 'other',
+    isSync = false,
+  ) => ({ retryable, kind, isSync });
 
   it('retries only a failure that may pass by itself, and only with the body it was sent with', () => {
     expect(outcomeActionOf('failed', failure(true, 'transient'), all)).toBe('retry');
@@ -141,6 +142,18 @@ describe('outcomeActionOf', () => {
       outcomeActionOf('failed', failure(false, 'options'), { ...all, edit: false }),
     ).toBeNull();
     expect(outcomeActionOf('failed', failure(false, 'other'), all)).toBeNull();
+  });
+
+  it('runs a failed sync again as a sync, never with an import body or form, and sends its options to the link', () => {
+    expect(outcomeActionOf('failed', failure(true, 'transient', true), all)).toBe('resync');
+    expect(outcomeActionOf('failed', failure(false, 'options', true), all)).toBe('syncOptions');
+    expect(outcomeActionOf('failed', failure(false, 'target', true), all)).toBeNull();
+    expect(
+      outcomeActionOf('failed', failure(true, 'transient', true), { ...all, sync: false }),
+    ).toBeNull();
+    expect(
+      outcomeActionOf('failed', failure(false, 'options', true), { ...all, sync: false }),
+    ).toBeNull();
   });
 
   it('repairs an imported problem with a sync, or opens it without the sync right', () => {
