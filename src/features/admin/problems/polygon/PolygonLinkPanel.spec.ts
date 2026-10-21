@@ -70,4 +70,57 @@ describe('PolygonLinkPanel', () => {
     );
     expect(drawer()!.querySelector('[data-testid="polygon-languages"]')).not.toBeNull();
   });
+  it('draws a select for a statement new on Polygon that a refused save names, and the next save passes', async () => {
+    const base = polygonLinkState().link.options;
+    const options = {
+      ...base,
+      mainStatementLanguage: 'vietnamese',
+      statementLanguages: ['english=en'],
+    };
+    const link = polygonLinkState({ options }).link;
+    const bodies: unknown[] = [];
+    const unmapped = {
+      code: 'statement_language_unmapped',
+      message: 'statement russian has no site language',
+      params: { language: 'russian' },
+    };
+    const panel = await mountPanel(['judge.sync_polygon_problem'], {
+      'GET /problems/hcmus41c/polygon': ok(polygonLinkState({ options })),
+      'PATCH /problems/hcmus41c/polygon': ({ body }) => {
+        bodies.push(body);
+        if (bodies.length === 1) return { status: 400, body: { error: unmapped } };
+        return ok({ ...link, options: { ...options, ...(body as object) } });
+      },
+    });
+    await panel.get('[aria-label="Sửa tùy chọn khi đồng bộ"]').trigger('click');
+    const drawer = () => document.body.querySelector<HTMLElement>('[role="dialog"]');
+    const saveButton = () =>
+      [...drawer()!.querySelectorAll('button')].find(
+        (button) => button.textContent?.trim() === 'Lưu tùy chọn',
+      )!;
+    await vi.waitFor(() => expect(drawer()?.textContent).toContain('Lưu tùy chọn'));
+    saveButton().click();
+
+    const russianSelect = () => {
+      const label = [...drawer()!.querySelectorAll('label')].find(
+        (element) => element.textContent?.trim() === 'russian',
+      );
+      return label ? drawer()!.querySelector<HTMLSelectElement>(`[id="${label.htmlFor}"]`) : null;
+    };
+    await vi.waitFor(() => expect(russianSelect()?.value).toBe('skip'));
+    const errorId = russianSelect()!.getAttribute('aria-describedby') ?? '';
+    expect(document.getElementById(errorId)?.textContent).toContain(
+      'Chọn ngôn ngữ trên QHHOJ hoặc Bỏ qua cho đề russian.',
+    );
+
+    saveButton().click();
+    await vi.waitFor(() => expect(bodies).toHaveLength(2));
+    expect(bodies[1]).toMatchObject({
+      mainStatementLanguage: 'vietnamese',
+      statementLanguages: ['english=en', 'russian=skip'],
+    });
+    await vi.waitFor(() =>
+      expect(panel.get('[data-testid="polygon-link-options"]').text()).toContain('russian: bỏ qua'),
+    );
+  });
 });

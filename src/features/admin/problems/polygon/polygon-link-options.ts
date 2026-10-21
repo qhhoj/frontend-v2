@@ -1,7 +1,11 @@
 import type { Schemas } from '@/api/schemas';
 import type { PolygonProblem } from '@/api/types/polygon';
 import { translate } from '@/i18n';
-import { SITE_LANGUAGE_CHOICES, settleLanguageChoice } from './polygon-languages';
+import {
+  SITE_LANGUAGE_CHOICES,
+  repeatedLanguages,
+  settleLanguageChoice,
+} from './polygon-languages';
 import type { LanguageChoice, SiteLanguageChoice } from './polygon-languages';
 
 type Options = Schemas['PolygonLinkOptionsResponse'];
@@ -65,6 +69,27 @@ export function linkStatementsOf(options: Options, failures: OptionsFailure[]): 
     title: null,
     hasTutorial: tutorials.has(language),
   }));
+}
+
+/**
+ * Whether the choice already answers a failure of the options: the main statement or the tutorial is one it listed, the
+ * statement it named has a choice, no site language is taken twice. Its fix then no longer belongs under the field.
+ */
+export function isFailureAnswered({ code, params }: OptionsFailure, choice: LanguageChoice) {
+  switch (code) {
+    case 'statement_language_required':
+      return listParam(params?.languages).includes(choice.main);
+    case 'tutorial_language_required':
+      return listParam(params?.languages).includes(choice.tutorial);
+    case 'statement_language_unmapped':
+      return listParam(params?.language).every((language) =>
+        Object.hasOwn(choice.others, language),
+      );
+    case 'statement_language_repeated':
+      return repeatedLanguages(choice).length === 0;
+    default:
+      return false;
+  }
 }
 
 /** The saved options as the language selects hold them, made whole for these statements. */

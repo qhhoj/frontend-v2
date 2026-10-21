@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Schemas } from '@/api/schemas';
 import {
+  isFailureAnswered,
   linkChoiceOf,
   linkOptionsBodyOf,
   linkOptionsLineOf,
@@ -105,6 +106,41 @@ describe('linkChoiceOf and linkOptionsBodyOf', () => {
       statementLanguages: [],
       tutorialLanguage: null,
     });
+  });
+});
+
+describe('isFailureAnswered', () => {
+  const choice = { main: 'vietnamese', others: { english: 'en' as const }, tutorial: 'vietnamese' };
+  const failure = (code: string, params: Record<string, unknown>) => ({ code, params });
+
+  it('answers a missing main or tutorial with one the failure listed', () => {
+    const listed = { languages: ['vietnamese', 'english'] };
+    expect(isFailureAnswered(failure('statement_language_required', listed), choice)).toBe(true);
+    expect(isFailureAnswered(failure('tutorial_language_required', listed), choice)).toBe(true);
+    const unpicked = { ...choice, main: '', tutorial: '' };
+    expect(isFailureAnswered(failure('statement_language_required', listed), unpicked)).toBe(false);
+    expect(isFailureAnswered(failure('tutorial_language_required', listed), unpicked)).toBe(false);
+  });
+
+  it('answers an unmapped statement once it has a choice, skip included', () => {
+    const unmapped = failure('statement_language_unmapped', { language: 'russian' });
+    expect(isFailureAnswered(unmapped, choice)).toBe(false);
+    const skipped = { ...choice, others: { ...choice.others, russian: 'skip' as const } };
+    expect(isFailureAnswered(unmapped, skipped)).toBe(true);
+  });
+
+  it('answers a repeated site language only when none repeats', () => {
+    const repeated = failure('statement_language_repeated', { language: 'russian' });
+    expect(isFailureAnswered(repeated, choice)).toBe(true);
+    const twice = { ...choice, others: { english: 'en' as const, russian: 'en' as const } };
+    expect(isFailureAnswered(repeated, twice)).toBe(false);
+  });
+
+  it('never answers a failure the languages cannot fix', () => {
+    expect(isFailureAnswered(failure('too_many_testcases', { count: 9, limit: 5 }), choice)).toBe(
+      false,
+    );
+    expect(isFailureAnswered({ code: null, params: null }, choice)).toBe(false);
   });
 });
 

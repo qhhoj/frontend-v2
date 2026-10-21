@@ -69,6 +69,21 @@ export function settleLanguageChoice(
   return { ...settled, tutorial };
 }
 
+/**
+ * The choice with a select for every statement now on offer (a refusal named one new on Polygon): each new one takes its
+ * default; the main statement and the tutorial stay as they are, so an empty main still asks to be picked.
+ */
+export function withEveryStatement(
+  statements: Statement[],
+  choice: LanguageChoice,
+): LanguageChoice {
+  if (!choice.main) return choice;
+  const others = { ...choice.others };
+  for (const { language } of statements)
+    if (language !== choice.main) others[language] ??= siteDefaultOf(language);
+  return { ...choice, others };
+}
+
 /** Vietnamese, else English, else the first statement is the main one; English and Vietnamese others become translations. */
 export function defaultLanguageChoice(statements: Statement[]): LanguageChoice {
   const languages = statements.map(({ language }) => language);

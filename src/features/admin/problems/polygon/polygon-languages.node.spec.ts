@@ -6,6 +6,7 @@ import {
   settleLanguageChoice,
   toLanguageOptions,
   tutorialCandidates,
+  withEveryStatement,
 } from './polygon-languages';
 
 const statement = (language: string, hasTutorial = false) => ({
@@ -133,5 +134,22 @@ describe('isLanguageFieldDrawn', () => {
     expect(isLanguageFieldDrawn('tutorial', THREE, choice)).toBe(true);
     const skipped = { ...choice, others: { ...choice.others, english: 'skip' as const } };
     expect(isLanguageFieldDrawn('tutorial', THREE, skipped)).toBe(false);
+  });
+});
+
+describe('withEveryStatement', () => {
+  it('gives a statement new on offer its default and keeps the main statement and tutorial', () => {
+    const choice = { main: 'vietnamese', others: { english: 'vi' as const }, tutorial: 'english' };
+    const statements = [...THREE, statement('polish')];
+    expect(withEveryStatement(statements, choice)).toEqual({
+      main: 'vietnamese',
+      others: { english: 'vi', russian: 'skip', polish: 'skip' },
+      tutorial: 'english',
+    });
+  });
+
+  it('leaves a choice without a main statement as it is, so the main still asks to be picked', () => {
+    const empty = { main: '', others: {}, tutorial: '' };
+    expect(withEveryStatement(THREE, empty)).toEqual(empty);
   });
 });

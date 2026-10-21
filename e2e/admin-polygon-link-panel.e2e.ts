@@ -135,8 +135,9 @@ for (const viewport of VIEWPORTS) {
     await banner(page).getByRole('button', { name: 'Sửa tùy chọn' }).click();
     const drawer = dialogOf(page);
     await expect(drawer).toContainText('Tùy chọn khi đồng bộ');
+    // Prefilled with Bỏ qua, which answers the last sync: its fix stays on the banner, not under the select.
     await expect(drawer.getByLabel('russian')).toHaveValue('skip');
-    await expect(drawer).toContainText('Chọn en, vi hoặc Bỏ qua cho đề russian.');
+    await expect(drawer).not.toContainText('Chọn en, vi hoặc Bỏ qua cho đề russian.');
     expect(await axeViolationsIn(page)).toEqual([]);
     await shoot(page, viewport.name, 'panel-edit');
 
