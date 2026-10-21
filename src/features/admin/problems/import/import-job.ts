@@ -35,8 +35,8 @@ export function stopOfError(error: unknown): PollStop | null {
 /** Backoff for the n-th retry (1 based): 2 s, 4 s, 8 s and so on. */
 export const retryDelayMs = (retry: number) => IMPORT_POLL_MS * 2 ** (retry - 1);
 
-/** Backend `LANGUAGE_PAIR`: the Polygon language name is lowercase letters, the site language `en` or `vi`. */
-const PAIR = /^[a-z]+=(en|vi)$/;
+/** Backend `LANGUAGE_PAIR`: the Polygon language name is lowercase letters, then the site language `en` or `vi`, or `skip` to leave the statement out. */
+const PAIR = /^[a-z]+=(en|vi|skip)$/;
 export function parseLanguageMap(text: string) {
   const entries = text
     .split(/[\n,]/)

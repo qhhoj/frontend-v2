@@ -8,3 +8,7 @@ export const startZipImport = (options: ImportOptions, file: File) =>
 
 export const fetchImportJob = (jobId: string): Promise<ImportJob> =>
   apiGet('/problems/imports/{jobId}', { path: { jobId } });
+
+/** The viewer's own import and sync jobs of the last day, running and finished, newest first. */
+export const fetchMyImports = (): Promise<ImportJob[]> =>
+  apiGet('/problems/imports', { query: { mine: true } });

@@ -15,14 +15,27 @@
   },
   "howTo": {
     "title": "Hướng dẫn cho người ra đề",
-    "steps": {
-      "access": "Mở bài trên polygon.codeforces.com, vào Manage access, thêm {account} với quyền đọc (Read).",
-      "package": "Commit thay đổi và dựng gói đầy đủ (Packages, Create package, Full); chờ trạng thái READY.",
-      "paste": "Sao chép địa chỉ trang của bài (https://polygon.codeforces.com/p…/chủ-bài/tên-bài) và dán vào Nhập từ Polygon trên QHHOJ."
-    },
     "unnamed": "tài khoản QHHOJ",
     "readIsEnough": "Quyền đọc là đủ: QHHOJ không sửa gì trên Polygon. Giữ liên kết như mật khẩu: ai có liên kết và quyền nhập trên QHHOJ đều nhập được bài.",
-    "copy": "Sao chép tên tài khoản {account}"
+    "copy": "Sao chép tên tài khoản {account}",
+    "fold": "Cách lấy liên kết",
+    "foldMeta": "3 bước trên Polygon",
+    "steps": {
+      "access": {
+        "title": "Cấp quyền đọc",
+        "body": "Trên Polygon, mở bài, vào Manage access, thêm {account} với quyền Read."
+      },
+      "package": {
+        "title": "Dựng gói",
+        "body": "Commit thay đổi, vào Packages, bấm Create package (Full nhập nhanh hơn), chờ READY."
+      },
+      "paste": {
+        "title": "Dán liên kết bài",
+        "body": "Sao chép liên kết dạng {shape}, không phải địa chỉ có ccid hay session."
+      }
+    },
+    "inPackage": "Liên kết này cũng được ghi trong tệp problem.xml của mọi gói (thuộc tính url của thẻ problem).",
+    "shape": "https://polygon.codeforces.com/p…/chủ-bài/tên-bài"
   },
   "check": {
     "button": "Kiểm tra kết nối",
@@ -55,7 +68,13 @@
     "packageValue": "r{revision}, gói #{id}, dựng lúc {time}",
     "notLinked": "Chưa liên kết với bài nào trên QHHOJ.",
     "checkAgain": "Kiểm tra lại",
-    "next": "Tiếp tục"
+    "next": "Tiếp tục",
+    "slow": {
+      "title": "Đang tải gói để xác minh liên kết",
+      "body": "Lần kiểm tra đầu của một bài tải cả gói; gói lớn có thể mất vài phút. Cứ để trang mở.",
+      "elapsed": "Đã chờ {time}"
+    },
+    "previewMeta": "Chủ bài {owner} · gói #{id} (r{revision}, {type}) · dựng lúc {time}"
   },
   "refusal": {
     "invalid": {
@@ -67,18 +86,40 @@
       "body": "Hãy cấp quyền READ cho {account} trên Polygon (Manage access), rồi sao chép lại liên kết từ trang của bài."
     },
     "noPackage": {
-      "title": "Hãy dựng gói trước",
-      "body": "QHHOJ đối chiếu liên kết với gói mới nhất, nên bài cần ít nhất một gói sẵn sàng. Trên Polygon, dựng gói đầy đủ rồi kiểm tra lại."
+      "title": "Bài chưa có gói nào",
+      "body": "QHHOJ đối chiếu liên kết với một gói của bài. Trên Polygon, vào Packages, bấm Create package (Full nhập nhanh hơn), chờ READY rồi kiểm tra lại."
     },
     "notReady": {
       "title": "Chưa có gói sẵn sàng để nhập",
-      "body": "Gói mới nhất chưa sẵn sàng: đang dựng hoặc bị lỗi. Trên Polygon, mở Packages và dựng gói đầy đủ hoặc gói chuẩn; nếu gói đang chạy thì chờ xong."
+      "body": "Gói mới nhất chưa sẵn sàng: đang dựng hoặc bị lỗi. Trên Polygon, mở Packages và dựng gói đầy đủ hoặc gói chuẩn; nếu gói đang chạy thì chờ xong.",
+      "FAILED": "Gói mới nhất (r{revision}) bị lỗi trên Polygon",
+      "RUNNING": "Gói mới nhất (r{revision}) đang được dựng",
+      "comment": "Polygon báo:",
+      "failedBody": "Sửa trên Polygon, dựng lại gói, rồi kiểm tra lại.",
+      "failedNoComment": "Mở Packages trên Polygon để xem lỗi, sửa, dựng lại gói, rồi kiểm tra lại.",
+      "runningBody": "Chờ Polygon dựng xong (trạng thái READY) rồi kiểm tra lại."
     },
     "linked": {
       "title": "Bài đã có trên QHHOJ",
       "withCode": "Bài Polygon này đã liên kết với {code}. Mở bài đó và dùng Đồng bộ.",
       "open": "Mở {code}",
       "hidden": "Bài Polygon này đã liên kết với một bài trên QHHOJ."
+    },
+    "editing": {
+      "title": "Đây là địa chỉ trang soạn bài",
+      "body": "Địa chỉ có ccid, session hay problemId chỉ mở được khi đăng nhập. Dán liên kết bài dạng {shape}."
+    },
+    "checking": {
+      "title": "Gói của bài đang được tải cho lần kiểm tra đầu",
+      "auto": "Một lượt kiểm tra khác đang tải gói. QHHOJ tự kiểm tra lại sau {wait}.",
+      "manual": "Gói lớn có thể mất vài phút. Bấm Kiểm tra lại sau ít phút."
+    },
+    "linkedDeleted": {
+      "title": "Bài Polygon này đang liên kết với bài đã xóa {code}",
+      "titleHidden": "Bài Polygon này đang liên kết với một bài đã xóa",
+      "body": "Khôi phục {code} rồi dùng Đồng bộ; hoặc khôi phục, hủy liên kết của {code} để nhập lại. Khi {code} bị xóa hẳn, liên kết tự được gỡ.",
+      "bodyHidden": "Người quản lý bài đó có thể khôi phục rồi hủy liên kết; khi bài bị xóa hẳn, liên kết tự được gỡ.",
+      "open": "Mở mục Đã xóa"
     }
   },
   "notConnected": {
@@ -105,11 +146,58 @@
   },
   "configure": {
     "title": "Thiết lập bài nhập",
-    "lead": "Giống như khi nhập tệp .zip. Đề, test và checker lấy từ gói Polygon; phần còn lại là cài đặt của QHHOJ.",
+    "lead": "Đề, test và checker lấy từ gói Polygon; phần còn lại là cài đặt của QHHOJ.",
     "board": "Bài trên QHHOJ",
     "autoSync": "Tự đồng bộ khi có gói mới",
-    "autoSyncHint": "Khi chủ bài dựng gói sẵn sàng mới hơn r{revision}, QHHOJ tự nhập lại đề, test và checker (kiểm tra mỗi 10 phút, hoãn khi kỳ thi dùng bài đang diễn ra).",
-    "back": "Quay lại"
+    "autoSyncHint": "Có gói mới hơn r{revision} thì tự nhập lại đề, test, checker.",
+    "back": "Quay lại",
+    "autoSyncMore": "Kiểm tra mỗi 10 phút; hoãn khi kỳ thi dùng bài đang diễn ra.",
+    "autoSyncMoreLabel": "Thêm về tự đồng bộ",
+    "judging": "Chấm và đồng bộ",
+    "languages": {
+      "title": "Ngôn ngữ đề từ Polygon",
+      "single": "Gói có một đề ({language}); đề này là đề của bài.",
+      "main": "Đề chính",
+      "mainHint": "Gói có {count} đề: {languages}.",
+      "others": "Các đề còn lại",
+      "site": {
+        "en": "Tiếng Anh (en)",
+        "vi": "Tiếng Việt (vi)",
+        "skip": "Bỏ qua"
+      },
+      "tutorial": "Lời giải (editorial) lấy từ",
+      "tutorialHint": "{count} đề có lời giải trên Polygon; chọn một.",
+      "tutorialOne": "Lời giải lấy từ đề {language}.",
+      "tutorialNone": "Không đề nào có lời giải trên Polygon.",
+      "repeated": "Đề khác đã là {site}: chọn ngôn ngữ khác hoặc Bỏ qua."
+    },
+    "update": {
+      "target": "Sẽ ghi đè bài {code}",
+      "targetBody": "{title}. Bấm Cập nhật để xem những gì bị thay.",
+      "targetMissing": "Không tìm thấy bài {code} trong các bài bạn sửa được.",
+      "submit": "Cập nhật {code}…"
+    },
+    "confirm": {
+      "title": "Ghi đè {code} bằng gói Polygon?",
+      "replaced": "Sẽ bị thay:",
+      "items": {
+        "statements": "Đề bài và bản dịch",
+        "tutorial": "Lời giải",
+        "tests": "Test và nhóm test → test của gói r{revision}",
+        "checker": "Checker và giới hạn thời gian, bộ nhớ",
+        "link": "Liên kết Polygon → {name} #{id}"
+      },
+      "kept": "Giữ nguyên: mã bài, điểm, nhóm, dạng bài, tác giả, người duyệt, ngôn ngữ được nộp (trừ ô bạn điền trong Cài đặt trên QHHOJ).",
+      "lost": "Sửa đổi các mục trên trong QHHOJ sẽ mất.",
+      "confirm": "Ghi đè {code} và nhập"
+    },
+    "refusal": {
+      "statement_language_required": "Chọn đề chính trong số: {languages}.",
+      "statement_language_unmapped": "Chọn ngôn ngữ trên QHHOJ hoặc Bỏ qua cho đề {language}.",
+      "statement_language_repeated": "Hai đề cùng là {language}: chọn ngôn ngữ khác hoặc Bỏ qua.",
+      "tutorial_language_required": "Chọn đề lấy lời giải trong số: {languages}.",
+      "too_many_testcases": "Bài có {count} test, vượt giới hạn {limit} test của bạn."
+    }
   },
   "progress": {
     "title": "Đang nhập từ Polygon",
@@ -194,6 +282,35 @@
       "package": "Gói",
       "how": "Cách chạy",
       "by": "Người yêu cầu"
+    }
+  },
+  "caution": {
+    "stale": {
+      "title": "Gói mới nhất là r{package}, Polygon đã có r{revision}",
+      "body": "QHHOJ sẽ nhập r{package}. Muốn nhập bản mới: commit, dựng gói, rồi kiểm tra lại.",
+      "bodyModified": "QHHOJ sẽ nhập r{package}. Bài còn thay đổi chưa commit. Muốn nhập bản mới: commit, dựng gói, rồi kiểm tra lại."
+    },
+    "modified": {
+      "title": "Bài trên Polygon còn thay đổi chưa commit",
+      "body": "QHHOJ sẽ nhập gói r{package}, không có các thay đổi đó. Muốn nhập chúng: commit, dựng gói, rồi kiểm tra lại."
+    },
+    "standard": {
+      "title": "Gói chuẩn: test được sinh trên judge",
+      "body": "Nhập có thể mất nhiều phút và cần một judge đang chạy. Gói đầy đủ (Full) nhập nhanh hơn."
+    }
+  },
+  "myImports": {
+    "title": "Lượt nhập của tôi",
+    "window": "24 giờ qua",
+    "sync": "đồng bộ",
+    "view": "Xem",
+    "viewLabel": "Xem lượt nhập {code}",
+    "status": {
+      "queued": "Đang chờ",
+      "running": "Đang chạy",
+      "done": "Xong",
+      "failed": "Lỗi",
+      "attention": "Cần xem lại"
     }
   }
 }

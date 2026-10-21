@@ -1,27 +1,25 @@
 <script setup lang="ts">
-import { problemTypeLabel } from '@/features/problems/problem-type-label';
-import { FileArchive } from 'lucide-vue-next';
+import { ChevronRight, FileArchive } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import type { ImportOptions } from '@/api/types/problem-imports';
 import { formatFileSize } from '@/lib/format';
 import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
-import { useProblemEditingMetaQuery } from '../problem-editing.queries';
 import ProblemCodeField from '../general/ProblemCodeField.vue';
 import CreationOwnerPicker from '../../creation/CreationOwnerPicker.vue';
 import { useCreationScope } from '../../creation/creation-scope';
 import { SYNC_POLYGON } from '../../admin-screens';
 import AdminField from '../../ui/AdminField.vue';
-import AdminCheckChips from '../../ui/AdminCheckChips.vue';
 import UploadButton from '../../ui/UploadButton.vue';
-import UsernameChips from '../../ui/UsernameChips.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { CARD, INPUT, buttonClass } from '../../ui/controls';
 import { needsPermissionText } from '../../ui/permission-text';
 import { UPLOAD_LIMITS, tooLargeFor } from '../../ui/upload-limits';
+import ImportCatalogFields from './ImportCatalogFields.vue';
 import ImportCheckbox from './ImportCheckbox.vue';
 import {
   IMPORT_MODES,
+  POINTS_MIN,
   IMPORT_MODE_PERMISSION,
   canCreateFor,
   missingForMode,
@@ -32,9 +30,11 @@ import {
 import type { ImportForm, ImportMode } from './import-form';
 
 /**
- * The import options of both imports. The zip import (`withFile`) adds the package drop zone; an import from Polygon has
- * none, starts from `initial` (the code from the Polygon name) and adds its own switch (`extra` slot) and back button
- * (`actions` slot).
+ * The import options of both imports. The zip import (`withFile`) adds the package drop zone and types the statement
+ * languages. An import from Polygon (`linksPolygon`, configure option A) has no file, starts from `initial` (the code from
+ * the Polygon name), puts its own language selects (`languages` slot) and options (`extra` slot) before the QHHOJ catalog
+ * fields, which it folds ("sửa được sau"), and adds the update target (`target` slot), its source card on phones
+ * (`before-actions` slot) and its back button (`actions` slot).
  */
 const props = withDefaults(
   defineProps<{
@@ -45,18 +45,21 @@ const props = withDefaults(
     initial?: Partial<ImportForm>;
     /** An import from a Polygon link: its update replaces the problem's link. */
     linksPolygon?: boolean;
+    /** The submit button's text for the form as it stands; "Bắt đầu nhập" when absent. */
+    submitLabelOf?: (form: ImportForm) => string;
   }>(),
-  { withFile: true, title: undefined, initial: undefined, linksPolygon: false },
+  {
+    withFile: true,
+    title: undefined,
+    initial: undefined,
+    linksPolygon: false,
+    submitLabelOf: undefined,
+  },
 );
 const emit = defineEmits<{ start: [submission: { options: ImportOptions; file: File | null }] }>();
 
 const form = ref<ImportForm>({ ...emptyImportForm(), ...props.initial });
 const localErrors = ref<FieldErrors>({});
-const { data: meta } = useProblemEditingMetaQuery();
-const groups = computed(() => meta.value?.groups ?? []);
-const typeOptions = computed(() =>
-  (meta.value?.types ?? []).map((type) => ({ value: type.id, label: problemTypeLabel(type) })),
-);
 const errorOf = (field: string) => localErrors.value[field] ?? props.serverErrors[field];
 const isOwnerReady = ref(false);
 const isOwnerBlocked = ref(false);
@@ -163,14 +166,6 @@ function submit() {
       />
 
       <div class="grid gap-5 @lg:grid-cols-2">
-        <ProblemCodeField
-          v-model="form.code"
-          input-id="import-code"
-          :hint="$t('admin.polygon.form.codeInvalid')"
-          :prefix="codePrefix"
-          :error="errorOf('code')"
-        />
-
         <fieldset class="flex flex-col gap-2">
           <legend class="mb-1.5 text-sm font-semibold">
             {{ $t('admin.polygon.form.mode.label') }}
@@ -196,111 +191,112 @@ function submit() {
           <p v-if="errorOf('mode')" class="text-sm text-negative">{{ errorOf('mode') }}</p>
         </fieldset>
 
-        <AdminField
-          v-slot="{ id, describedBy }"
-          :label="$t('admin.polygon.form.group')"
-          :error="errorOf('groupId')"
-        >
-          <select :id="id" v-model="form.groupId" :class="INPUT" :aria-describedby="describedBy">
-            <option value="">{{ $t('admin.polygon.form.groupDefault') }}</option>
-            <option v-for="group in groups" :key="group.id" :value="group.id">
-              {{ group.fullName }}
-            </option>
-          </select>
-        </AdminField>
-
-        <AdminField
-          v-slot="{ id, describedBy, invalid }"
-          :label="$t('admin.polygon.form.points')"
-          :hint="$t('admin.polygon.form.pointsHint')"
-          :error="errorOf('points')"
-        >
-          <input
-            :id="id"
-            v-model="form.points"
-            type="number"
-            inputmode="numeric"
-            min="800"
-            max="3500"
-            :class="INPUT"
-            :aria-describedby="describedBy"
-            :aria-invalid="invalid ? 'true' : undefined"
-          />
-        </AdminField>
-
-        <fieldset class="flex flex-col gap-2 @lg:col-span-2">
-          <legend class="mb-1.5 text-sm font-semibold">{{ $t('admin.polygon.form.types') }}</legend>
-          <p v-if="errorOf('typeIds')" class="text-sm text-negative">{{ errorOf('typeIds') }}</p>
-          <AdminCheckChips v-model="form.typeIds" :options="typeOptions" name="import-types" />
-        </fieldset>
-
-        <UsernameChips
-          v-model="form.authors"
-          :label="$t('admin.polygon.form.authors')"
-          :error="errorOf('authors')"
+        <ProblemCodeField
+          v-model="form.code"
+          input-id="import-code"
+          :label="linksPolygon && !isCreate ? $t('admin.polygon.form.codeUpdate') : undefined"
+          :hint="$t('admin.polygon.form.codeInvalid')"
+          :prefix="codePrefix"
+          :error="errorOf('code')"
         />
-        <UsernameChips
-          v-model="form.curators"
-          :label="$t('admin.polygon.form.curators')"
-          :error="errorOf('curators')"
-        />
-
-        <AdminField
-          v-slot="{ id, describedBy }"
-          :label="$t('admin.polygon.form.mainLanguage')"
-          :hint="$t('admin.polygon.form.mainLanguageHint')"
-          :error="errorOf('mainStatementLanguage')"
-        >
-          <input
-            :id="id"
-            v-model="form.mainStatementLanguage"
-            :class="INPUT"
-            autocomplete="off"
-            :aria-describedby="describedBy"
-          />
-        </AdminField>
-
-        <AdminField
-          v-slot="{ id }"
-          :label="$t('admin.polygon.form.solutionLanguage')"
-          :error="errorOf('tutorialLanguage')"
-        >
-          <input :id="id" v-model="form.tutorialLanguage" :class="INPUT" autocomplete="off" />
-        </AdminField>
-
-        <AdminField
-          v-slot="{ id, describedBy, invalid }"
-          class="@lg:col-span-2"
-          :label="$t('admin.polygon.form.languageMap')"
-          :hint="$t('admin.polygon.form.languageMapHint')"
-          :error="errorOf('statementLanguages')"
-        >
-          <textarea
-            :id="id"
-            v-model="form.languageMapText"
-            rows="3"
-            :class="[INPUT, 'py-2']"
-            :aria-describedby="describedBy"
-            :aria-invalid="invalid ? 'true' : undefined"
-          />
-        </AdminField>
       </div>
 
-      <div class="grid gap-3 border-t border-line pt-4 @lg:grid-cols-2">
-        <ImportCheckbox
-          v-model="form.ignoreZeroPointBatches"
-          :label="$t('admin.polygon.form.ignoreBatches')"
-        />
-        <ImportCheckbox
-          v-model="form.ignoreZeroPointCases"
-          :label="$t('admin.polygon.form.ignoreCases')"
-        />
-        <ImportCheckbox
-          v-model="form.appendMainSolution"
-          :label="$t('admin.polygon.form.appendSolution')"
-        />
-        <slot name="extra" />
+      <slot name="target" :mode="form.mode" :code="form.code" />
+
+      <ImportCatalogFields v-if="!linksPolygon" v-model:form="form" :error-of="errorOf" />
+
+      <slot name="languages">
+        <div class="grid gap-5 @lg:grid-cols-2">
+          <AdminField
+            v-slot="{ id, describedBy }"
+            :label="$t('admin.polygon.form.mainLanguage')"
+            :hint="$t('admin.polygon.form.mainLanguageHint')"
+            :error="errorOf('mainStatementLanguage')"
+          >
+            <input
+              :id="id"
+              v-model="form.mainStatementLanguage"
+              :class="INPUT"
+              autocomplete="off"
+              :aria-describedby="describedBy"
+            />
+          </AdminField>
+
+          <AdminField
+            v-slot="{ id }"
+            :label="$t('admin.polygon.form.solutionLanguage')"
+            :error="errorOf('tutorialLanguage')"
+          >
+            <input :id="id" v-model="form.tutorialLanguage" :class="INPUT" autocomplete="off" />
+          </AdminField>
+
+          <AdminField
+            v-slot="{ id, describedBy, invalid }"
+            class="@lg:col-span-2"
+            :label="$t('admin.polygon.form.languageMap')"
+            :hint="$t('admin.polygon.form.languageMapHint')"
+            :error="errorOf('statementLanguages')"
+          >
+            <textarea
+              :id="id"
+              v-model="form.languageMapText"
+              rows="3"
+              :class="[INPUT, 'py-2']"
+              :aria-describedby="describedBy"
+              :aria-invalid="invalid ? 'true' : undefined"
+            />
+          </AdminField>
+        </div>
+      </slot>
+
+      <div class="flex flex-col gap-3 border-t border-line pt-4">
+        <h3 v-if="linksPolygon" class="font-display font-semibold">
+          {{ $t('admin.polygonLink.configure.judging') }}
+        </h3>
+        <div class="grid gap-3 @lg:grid-cols-2">
+          <ImportCheckbox
+            v-model="form.ignoreZeroPointBatches"
+            :label="$t('admin.polygon.form.ignoreBatches')"
+            :description="$t('admin.polygon.form.ignoreBatchesHint')"
+          />
+          <ImportCheckbox
+            v-model="form.ignoreZeroPointCases"
+            :label="$t('admin.polygon.form.ignoreCases')"
+            :description="$t('admin.polygon.form.ignoreCasesHint')"
+          />
+          <ImportCheckbox
+            v-model="form.appendMainSolution"
+            :label="$t('admin.polygon.form.appendSolution')"
+            :description="$t('admin.polygon.form.appendSolutionHint')"
+          />
+          <slot name="extra" />
+        </div>
       </div>
+
+      <details
+        v-if="linksPolygon"
+        class="group border-t border-line pt-2"
+        data-testid="import-catalog-fold"
+      >
+        <summary
+          class="flex min-h-11 cursor-pointer flex-wrap items-center gap-x-2 font-display font-semibold"
+        >
+          <ChevronRight
+            aria-hidden="true"
+            class="size-4 text-muted transition-transform group-open:rotate-90"
+            :stroke-width="1.75"
+          />
+          {{ $t('admin.polygon.form.catalog') }}
+          <span class="font-sans text-meta font-normal text-muted">{{
+            isCreate
+              ? $t('admin.polygon.form.catalogCreate', { points: POINTS_MIN })
+              : $t('admin.polygon.form.catalogUpdate')
+          }}</span>
+        </summary>
+        <ImportCatalogFields v-model:form="form" :error-of="errorOf" class="pt-3 pb-1" />
+      </details>
+
+      <slot name="before-actions" />
 
       <div class="flex flex-wrap items-center gap-2 border-t border-line pt-4">
         <slot name="actions" />
@@ -317,7 +313,7 @@ function submit() {
           :aria-disabled="isSubmitBlocked || undefined"
           :aria-describedby="submitReason ? 'import-submit-reason' : undefined"
         >
-          {{ $t('admin.polygon.form.submit') }}
+          {{ submitLabelOf ? submitLabelOf(form) : $t('admin.polygon.form.submit') }}
         </button>
       </div>
     </form>

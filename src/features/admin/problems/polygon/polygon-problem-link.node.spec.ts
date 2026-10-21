@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { ApiError } from '@/api/client';
-import { linkRefusalOf, parsePolygonLink, polygonLinkUrl } from './polygon-problem-link';
+import {
+  linkRefusalOf,
+  parsePolygonLink,
+  polygonLinkUrl,
+  textRefusalOf,
+} from './polygon-problem-link';
 
 const LINK = 'https://polygon.codeforces.com/p3n21nw/LamTerQH/qhh-evolution-ioi';
 
@@ -55,15 +60,73 @@ describe('parsePolygonLink normalisation', () => {
   });
 });
 
-describe('linkRefusalOf', () => {
-  const refusal = (code: string, extra: Record<string, unknown> = {}) =>
-    linkRefusalOf(new ApiError(code, 409, 'refused', { extra }));
+describe('textRefusalOf', () => {
+  it.each([
+    ['empty text', '  '],
+    ['a problem link', LINK],
+    ['a problem link with its editing session', `${LINK}?ccid=a1b2&session=d4e5`],
+  ])('has nothing to say about %s', (_case, text) => {
+    expect(textRefusalOf(text)).toBeNull();
+  });
 
-  it('tells the four link refusals apart by code', () => {
+  it.each([
+    ['a session page', 'https://polygon.codeforces.com/generalInfo?ccid=a1b2c3&session=d4e5f6'],
+    ['the edit-start page', 'https://polygon.codeforces.com/edit-start?problemId=595944'],
+    ['a session page without a scheme', 'polygon.codeforces.com/tests?ccid=1&session=2'],
+  ])('calls %s an editing address', (_case, text) => {
+    expect(textRefusalOf(text)).toEqual({ kind: 'editing' });
+  });
+
+  it.each([
+    ['another host with a session', 'https://codeforces.com/problemset?session=1'],
+    ['a Polygon page without a session', 'https://polygon.codeforces.com/problems'],
+    ['plain words', 'kminmax'],
+  ])('calls %s not a link', (_case, text) => {
+    expect(textRefusalOf(text)).toEqual({ kind: 'invalid' });
+  });
+});
+
+describe('linkRefusalOf', () => {
+  const refusal = (code: string, extra: Record<string, unknown> = {}, status = 409) =>
+    linkRefusalOf(new ApiError(code, status, 'refused', { extra, retryAfterSeconds: 60 }));
+
+  it('tells the fixed link refusals apart by code', () => {
     expect(refusal('polygon_link_invalid')).toEqual({ kind: 'invalid' });
     expect(refusal('polygon_link_refused')).toEqual({ kind: 'refused' });
     expect(refusal('polygon_no_package')).toEqual({ kind: 'noPackage' });
-    expect(refusal('polygon_package_not_ready')).toEqual({ kind: 'notReady' });
+  });
+
+  it("carries Polygon's newest package and its comment when none is READY", () => {
+    const newest = { id: 1100002, revision: 11, state: 'FAILED', comment: 'wa.cpp passed' };
+    expect(refusal('polygon_package_not_ready', { newestPackage: newest })).toEqual({
+      kind: 'notReady',
+      newest,
+    });
+  });
+
+  it.each([
+    ['missing', undefined],
+    ['of an unknown state', { id: 1, revision: 2, state: 'READY', comment: null }],
+    ['without a revision', { id: 1, state: 'RUNNING', comment: null }],
+  ])('drops a newest package %s', (_case, newestPackage) => {
+    expect(refusal('polygon_package_not_ready', { newestPackage })).toEqual({
+      kind: 'notReady',
+      newest: null,
+    });
+  });
+
+  it('reads an empty comment as none', () => {
+    const newest = { id: 1, revision: 2, state: 'RUNNING', comment: '' };
+    expect(refusal('polygon_package_not_ready', { newestPackage: newest })).toEqual({
+      kind: 'notReady',
+      newest: { ...newest, comment: null },
+    });
+  });
+
+  it('reads a running first check and a proxy timeout as "still checking"', () => {
+    const checking = { kind: 'checking', retryAfterSeconds: 60 };
+    expect(refusal('polygon_link_checking')).toEqual(checking);
+    expect(refusal('http_error', {}, 504)).toEqual(checking);
   });
 
   it('names the linked problem only when the server sent its code', () => {
@@ -72,6 +135,14 @@ describe('linkRefusalOf', () => {
       code: 'qhhdisc',
     });
     expect(refusal('polygon_already_linked')).toEqual({ kind: 'linked', code: null });
+  });
+
+  it('tells a link held by a deleted problem from a live one', () => {
+    expect(refusal('polygon_linked_deleted', { linkedProblemCode: 'abc' })).toEqual({
+      kind: 'linkedDeleted',
+      code: 'abc',
+    });
+    expect(refusal('polygon_linked_deleted')).toEqual({ kind: 'linkedDeleted', code: null });
   });
 
   it('leaves any other failure to the generic failure line', () => {

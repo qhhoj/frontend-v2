@@ -12,9 +12,7 @@ const locale = useLocaleStore();
 </script>
 
 <template>
-  <aside
-    class="flex flex-col gap-4 rounded-row border border-line bg-surface p-4 md:p-5 xl:sticky xl:top-4"
-  >
+  <aside class="flex flex-col gap-4 rounded-row border border-line bg-surface p-4 md:p-5">
     <div>
       <p class="text-xs font-bold tracking-wide text-muted uppercase">
         {{ $t('admin.polygonLink.source.label') }}
