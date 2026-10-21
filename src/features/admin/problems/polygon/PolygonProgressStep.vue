@@ -163,13 +163,13 @@ const syncOptionsTo = computed(() => ({
         :summary="job.result.summary"
         :kept="job.result.localEdits?.kept"
       />
+      <Notice v-else-if="kind === 'lost'" compact tone="info" :title="$t(`${KEY}.lost.title`)">
+        {{ $t(`${KEY}.lost.text`) }}
+      </Notice>
       <LocalEditsList
         v-if="(kind === 'done' || kind === 'attention') && job?.result?.localEdits"
         :local-edits="job.result.localEdits"
       />
-      <Notice v-else-if="kind === 'lost'" compact tone="info" :title="$t(`${KEY}.lost.title`)">
-        {{ $t(`${KEY}.lost.text`) }}
-      </Notice>
       <p v-if="pollFailure && !stop" class="text-meta text-muted">
         {{ $t('admin.polygon.progress.pollFailed') }}
       </p>

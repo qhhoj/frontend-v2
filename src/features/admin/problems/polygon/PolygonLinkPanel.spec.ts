@@ -212,9 +212,7 @@ describe('PolygonLinkPanel', () => {
     await vi.waitFor(() => expect(bodies).toHaveLength(1));
     expect(bodies[0]).toBeUndefined();
     await vi.waitFor(() =>
-      expect(panel.get('[data-testid="local-edits"]').text()).toContain(
-        'Giữ bản sửa trên QHHOJgiới hạn thời gian, checker',
-      ),
+      expect(panel.get('[data-local-edits="kept"]').text()).toBe('giới hạn thời gian, checker'),
     );
     expect(panel.get('[data-local-edits="updated"]').text()).toBe('giới hạn bộ nhớ');
 
