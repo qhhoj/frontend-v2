@@ -74,6 +74,24 @@ describe('useImportJob stops and retries', () => {
     expect(callsFor('job-1')).toBe(attempts);
   });
 
+  it('asks again on a recheck after giving up, keeping the last job seen until the answer', async () => {
+    fetchMock
+      .mockResolvedValueOnce(job('active'))
+      .mockRejectedValue(new ApiError('network_error', 0, 'Network error'));
+    const { view } = mountPoll('job-1');
+    await flushPromises();
+    await vi.advanceTimersByTimeAsync(10 * 60_000);
+    expect(view.stop.value).toBe('gaveUp');
+    let answer!: (value: ImportJob) => void;
+    fetchMock.mockImplementation(() => new Promise((resolve) => (answer = resolve)));
+    view.recheck();
+    expect(view.stop.value).toBeNull();
+    expect(view.job.value?.state).toBe('active');
+    answer(job('completed'));
+    await flushPromises();
+    expect(view.job.value?.state).toBe('completed');
+  });
+
   it('keeps polling after a 503 when the next answer comes back', async () => {
     fetchMock.mockRejectedValueOnce(apiError(503)).mockResolvedValue(job('completed'));
     const { view } = mountPoll('job-1');

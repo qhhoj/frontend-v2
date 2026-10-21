@@ -13,7 +13,8 @@ import type { LanguageChoice, SiteLanguageChoice } from './polygon-languages';
 /**
  * The statement languages of the package (configure option A): the main statement, what each other statement becomes
  * (a translation or skipped) and, when two or more count, which tutorial is the editorial. Every change is settled, so the
- * choice always fits the statements. `errors` holds `main`, `tutorial`, `others` and `other:<language>`.
+ * choice always fits the statements; an empty main or tutorial (a refused save in the link drawer) shows "Chọn một đề"
+ * until picked. `errors` holds `main`, `tutorial`, `others` and `other:<language>`.
  */
 const props = defineProps<{
   statements: PolygonProblem['statements'];
@@ -63,7 +64,11 @@ const statementLabel = ({ language, title }: PolygonProblem['statements'][number
         "
         :error="errors.main"
       >
-        <SelectField :model-value="choice.main" @update:model-value="setMain">
+        <SelectField
+          :model-value="choice.main"
+          :placeholder="choice.main ? undefined : $t('admin.polygonLink.configure.languages.pick')"
+          @update:model-value="setMain"
+        >
           <option
             v-for="statement in statements"
             :key="statement.language"
@@ -74,7 +79,7 @@ const statementLabel = ({ language, title }: PolygonProblem['statements'][number
         </SelectField>
       </FormField>
 
-      <fieldset class="flex flex-col gap-2">
+      <fieldset v-if="others.length > 0" class="flex flex-col gap-2">
         <legend class="mb-1.5 text-sm font-semibold">
           {{ $t('admin.polygonLink.configure.languages.others') }}
         </legend>
@@ -108,7 +113,13 @@ const statementLabel = ({ language, title }: PolygonProblem['statements'][number
         "
         :error="errors.tutorial"
       >
-        <SelectField :model-value="choice.tutorial" @update:model-value="setTutorial">
+        <SelectField
+          :model-value="choice.tutorial"
+          :placeholder="
+            choice.tutorial ? undefined : $t('admin.polygonLink.configure.languages.pick')
+          "
+          @update:model-value="setTutorial"
+        >
           <option v-for="language in tutorials" :key="language" :value="language">
             {{ language }}
           </option>

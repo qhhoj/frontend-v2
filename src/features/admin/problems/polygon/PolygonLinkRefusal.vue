@@ -23,6 +23,11 @@ const emit = defineEmits<{ checkAgain: [] }>();
 const CHECK_AGAIN = new Set(['noPackage', 'notReady', 'checking', 'other']);
 const canCheckAgain = computed(() => CHECK_AGAIN.has(props.refusal.kind));
 const { can } = usePermissions();
+/** "Mở mục Đã xóa" needs the deleted problem's code and the right to restore it. */
+const canOpenDeleted = computed(
+  () =>
+    props.refusal.kind === 'linkedDeleted' && !!props.refusal.code && can('judge.delete_problem'),
+);
 const shape = computed(() => translate('admin.polygonLink.howTo.shape'));
 
 /** The title of a refusal: its kind's own, with the code or package it names. */
@@ -93,9 +98,9 @@ const title = computed(() => {
       {{ $t(`admin.polygonLink.refusal.${refusal.kind}.body`, { account: accountName, shape }) }}
     </p>
     <template #action>
-      <div v-if="canCheckAgain || refusal.kind === 'linkedDeleted'" class="mt-2">
+      <div v-if="canOpenDeleted || canCheckAgain" class="mt-2">
         <RouterLink
-          v-if="refusal.kind === 'linkedDeleted' && refusal.code && can('judge.delete_problem')"
+          v-if="canOpenDeleted"
           :to="{ name: 'admin-problemsDeleted' }"
           :class="buttonClass('secondary', 'sm')"
           >{{ $t('admin.polygonLink.refusal.linkedDeleted.open') }}</RouterLink

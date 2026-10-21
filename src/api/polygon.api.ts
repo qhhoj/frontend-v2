@@ -1,5 +1,5 @@
 import { apiGet, apiGetPage, apiSend } from './typed';
-import type { PolygonImportBody } from './types/polygon';
+import type { PolygonImportBody, PolygonLinkUpdate } from './types/polygon';
 
 /** Whether the key and secret are set, and the account name setters share with; no call to Polygon. */
 export const fetchPolygonStatus = () => apiGet('/polygon/status');
@@ -21,8 +21,9 @@ export const fetchPolygonLink = (code: string) =>
 export const syncPolygonLink = (code: string) =>
   apiSend('post', '/problems/{code}/polygon/sync', { path: { code } });
 
-export const updatePolygonLink = (code: string, autoSync: boolean) =>
-  apiSend('patch', '/problems/{code}/polygon', { path: { code }, body: { autoSync } });
+/** Auto-sync and the saved import options; an omitted field keeps its value. */
+export const updatePolygonLink = (code: string, body: PolygonLinkUpdate) =>
+  apiSend('patch', '/problems/{code}/polygon', { path: { code }, body });
 
 export const unlinkPolygon = (code: string) =>
   apiSend('delete', '/problems/{code}/polygon', { path: { code } });

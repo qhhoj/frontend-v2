@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   defaultLanguageChoice,
+  isLanguageFieldDrawn,
   repeatedLanguages,
   settleLanguageChoice,
   toLanguageOptions,
   tutorialCandidates,
+  withEveryStatement,
 } from './polygon-languages';
 
 const statement = (language: string, hasTutorial = false) => ({
@@ -109,5 +111,45 @@ describe('toLanguageOptions', () => {
     expect(
       toLanguageOptions(THREE, { ...choice, others: { ...choice.others } }).tutorialLanguage,
     ).toBeUndefined();
+  });
+});
+
+describe('isLanguageFieldDrawn', () => {
+  const choice = defaultLanguageChoice(THREE);
+
+  it('draws no field for fewer than two statements', () => {
+    const single = [statement('english', true)];
+    for (const field of ['main', 'others', 'tutorial', 'other:english'])
+      expect(isLanguageFieldDrawn(field, single, defaultLanguageChoice(single))).toBe(false);
+  });
+
+  it('draws the main and others fields, and a select for each statement the choice has', () => {
+    expect(isLanguageFieldDrawn('main', THREE, choice)).toBe(true);
+    expect(isLanguageFieldDrawn('others', THREE, choice)).toBe(true);
+    expect(isLanguageFieldDrawn('other:russian', THREE, choice)).toBe(true);
+    expect(isLanguageFieldDrawn('other:polish', THREE, choice)).toBe(false);
+  });
+
+  it('draws the tutorial only while two or more tutorials count', () => {
+    expect(isLanguageFieldDrawn('tutorial', THREE, choice)).toBe(true);
+    const skipped = { ...choice, others: { ...choice.others, english: 'skip' as const } };
+    expect(isLanguageFieldDrawn('tutorial', THREE, skipped)).toBe(false);
+  });
+});
+
+describe('withEveryStatement', () => {
+  it('gives a statement new on offer its default and keeps the main statement and tutorial', () => {
+    const choice = { main: 'vietnamese', others: { english: 'vi' as const }, tutorial: 'english' };
+    const statements = [...THREE, statement('polish')];
+    expect(withEveryStatement(statements, choice)).toEqual({
+      main: 'vietnamese',
+      others: { english: 'vi', russian: 'skip', polish: 'skip' },
+      tutorial: 'english',
+    });
+  });
+
+  it('leaves a choice without a main statement as it is, so the main still asks to be picked', () => {
+    const empty = { main: '', others: {}, tutorial: '' };
+    expect(withEveryStatement(THREE, empty)).toEqual(empty);
   });
 });

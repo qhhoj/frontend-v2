@@ -81,7 +81,9 @@ const LEAD_KEYS = {
       :key="state.jobId"
       :job-id="state.jobId"
       :body="state.body"
+      :can-edit="!!state.setup"
       @started="(jobId, body) => send({ type: 'started', jobId, body })"
+      @edit="send({ type: 'edit' })"
       @restart="send({ type: 'restart' })"
     />
     <QueryState
@@ -104,8 +106,9 @@ const LEAD_KEYS = {
         v-else
         :link="state.link"
         :problem="state.problem"
+        :draft="state.draft"
         @back="send({ type: 'back' })"
-        @started="(jobId, body) => send({ type: 'started', jobId, body })"
+        @started="(jobId, body, draft) => send({ type: 'started', jobId, body, draft })"
       />
     </QueryState>
     <details

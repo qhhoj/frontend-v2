@@ -1,5 +1,6 @@
 import type { PolygonProblem } from '@/api/types/polygon';
 import type { ImportOptions } from '@/api/types/problem-imports';
+import { translate } from '@/i18n';
 
 type Statement = PolygonProblem['statements'][number];
 
@@ -30,6 +31,22 @@ export function tutorialCandidates(statements: Statement[], choice: LanguageChoi
     .map(({ language }) => language);
 }
 
+/**
+ * Whether `PolygonLanguageFields` draws the field an error is keyed by (`main`, `others`, `other:<language>`, `tutorial`):
+ * none for fewer than two statements, a statement's select only when the choice has it, the tutorial's only for two or
+ * more candidates. An error for a field it does not draw belongs on the page line.
+ */
+export function isLanguageFieldDrawn(
+  field: string,
+  statements: Statement[],
+  choice: LanguageChoice,
+): boolean {
+  if (statements.length < 2) return false;
+  if (field === 'tutorial') return tutorialCandidates(statements, choice).length > 1;
+  if (field.startsWith('other:')) return Object.hasOwn(choice.others, field.slice('other:'.length));
+  return field === 'main' || field === 'others';
+}
+
 /** The choice made whole for these statements: every other statement has a choice, the tutorial is one that counts. */
 export function settleLanguageChoice(
   statements: Statement[],
@@ -52,6 +69,21 @@ export function settleLanguageChoice(
   return { ...settled, tutorial };
 }
 
+/**
+ * The choice with a select for every statement now on offer (a refusal named one new on Polygon): each new one takes its
+ * default; the main statement and the tutorial stay as they are, so an empty main still asks to be picked.
+ */
+export function withEveryStatement(
+  statements: Statement[],
+  choice: LanguageChoice,
+): LanguageChoice {
+  if (!choice.main) return choice;
+  const others = { ...choice.others };
+  for (const { language } of statements)
+    if (language !== choice.main) others[language] ??= siteDefaultOf(language);
+  return { ...choice, others };
+}
+
 /** Vietnamese, else English, else the first statement is the main one; English and Vietnamese others become translations. */
 export function defaultLanguageChoice(statements: Statement[]): LanguageChoice {
   const languages = statements.map(({ language }) => language);
@@ -70,6 +102,16 @@ export function repeatedLanguages(choice: LanguageChoice): string[] {
       return isRepeated;
     })
     .map(([language]) => language);
+}
+
+/** "Đề khác đã là …" under each statement that repeats a site language, keyed as `PolygonLanguageFields` takes errors. */
+export function repeatedLanguageErrors(choice: LanguageChoice): Record<string, string> {
+  const errors: Record<string, string> = {};
+  for (const language of repeatedLanguages(choice))
+    errors[`other:${language}`] = translate('admin.polygonLink.configure.languages.repeated', {
+      site: translate(`admin.polygonLink.configure.languages.site.${choice.others[language]}`),
+    });
+  return errors;
 }
 
 type LanguageOptions = Pick<

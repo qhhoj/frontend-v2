@@ -56,7 +56,10 @@ const props = withDefaults(
     submitLabelOf: undefined,
   },
 );
-const emit = defineEmits<{ start: [submission: { options: ImportOptions; file: File | null }] }>();
+/** `form` is the form as submitted (a copy), for a caller that refills it later. */
+const emit = defineEmits<{
+  start: [submission: { options: ImportOptions; file: File | null; form: ImportForm }];
+}>();
 
 const form = ref<ImportForm>({ ...emptyImportForm(), ...props.initial });
 const localErrors = ref<FieldErrors>({});
@@ -116,7 +119,8 @@ function submit() {
   if (props.isPending || isWaitingForOwner.value) return;
   localErrors.value = importFormErrors(form.value, missingOnSubmit, { needsFile: props.withFile });
   if (Object.keys(localErrors.value).length > 0) return;
-  emit('start', { options: toImportOptions(form.value), file: form.value.file });
+  const submitted = { ...form.value };
+  emit('start', { options: toImportOptions(submitted), file: submitted.file, form: submitted });
 }
 </script>
 

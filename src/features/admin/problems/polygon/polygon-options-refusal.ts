@@ -30,7 +30,8 @@ const textOf = (value: unknown): string => {
   return typeof value === 'string' || typeof value === 'number' ? String(value) : '';
 };
 
-function fieldOf(code: string, params: Params): string | null {
+/** The language field a refusal (or a sync failure) with this code and params belongs under; null for the page line. */
+export function optionsFieldOf(code: string, params: Params): string | null {
   switch (code) {
     case 'statement_language_required':
       return 'main';
@@ -45,15 +46,22 @@ function fieldOf(code: string, params: Params): string | null {
   }
 }
 
+/** A refusal of the options as its code and params (the shape of a sync failure), or null for any other failure. */
+export function optionsFailureOf(error: unknown): { code: string; params: Params } | null {
+  if (!(error instanceof ApiError) || !OPTION_CODES.has(error.code)) return null;
+  return { code: error.code, params: paramsOf(error) };
+}
+
 /** The refusal as the configure step shows it, or null when the failure is not about the options. */
 export function optionsRefusalOf(error: unknown): OptionsRefusal | null {
-  if (!(error instanceof ApiError) || !OPTION_CODES.has(error.code)) return null;
-  const params = paramsOf(error);
-  const text = translate(`admin.polygonLink.configure.refusal.${error.code}`, {
+  const failure = optionsFailureOf(error);
+  if (!failure) return null;
+  const { code, params } = failure;
+  const text = translate(`admin.polygonLink.configure.refusal.${code}`, {
     languages: textOf(params.languages),
     language: textOf(params.language),
     count: textOf(params.count),
     limit: textOf(params.limit),
   });
-  return { field: fieldOf(error.code, params), text };
+  return { field: optionsFieldOf(code, params), text };
 }

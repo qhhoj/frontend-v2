@@ -71,6 +71,7 @@
     },
     "steps": {
       "queued": "Đã xếp hàng",
+      "checking": "Kiểm tra trước khi nhập",
       "downloading": "Tải gói từ Polygon",
       "statements": "Chuyển đề bài",
       "generating": "Đang sinh test",

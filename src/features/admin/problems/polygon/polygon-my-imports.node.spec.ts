@@ -1,8 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import { importJob } from '@/test/admin-fixtures/polygon';
-import { myImportStatusOf } from './polygon-my-imports';
+import { myImportStatusOf, polygonImportsOf } from './polygon-my-imports';
 
-const RESULT = { code: 'kminmax', problemId: 'p-1', summary: null, attention: null };
+const RESULT = {
+  code: 'kminmax',
+  problemId: 'p-1',
+  summary: null,
+  attention: null,
+  localEdits: null,
+};
+
+describe('polygonImportsOf', () => {
+  it('keeps Polygon imports and syncs, leaves out zip uploads', () => {
+    const jobs = [
+      importJob({ id: 'link', purpose: 'link' }),
+      importJob({ id: 'zip', purpose: null }),
+      importJob({ id: 'sync', purpose: 'sync' }),
+    ];
+    expect(polygonImportsOf(jobs).map(({ id }) => id)).toEqual(['link', 'sync']);
+  });
+});
 
 describe('myImportStatusOf', () => {
   it.each([

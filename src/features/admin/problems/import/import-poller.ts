@@ -34,9 +34,14 @@ export class ImportPoller {
   constructor(private readonly refs: PollerRefs) {}
 
   start(id: string | null) {
+    this.refs.job.value = null;
+    this.resume(id);
+  }
+
+  /** Asks again after polling stopped ("Kiểm tra lại"), keeping the last answer on screen until the next one. */
+  resume(id: string | null) {
     this.run += 1;
     clearTimeout(this.timer);
-    this.refs.job.value = null;
     this.refs.failure.value = null;
     this.refs.stop.value = null;
     this.retries = 0;
