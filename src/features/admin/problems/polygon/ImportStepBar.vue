@@ -12,8 +12,13 @@ const FILLS: Record<StepStatus, string> = {
   failed: 'bg-negative',
   pending: 'bg-surface-strong',
 };
-const fillOf = (step: ShownStep, attention: boolean) =>
-  attention && step.key === 'end' ? 'bg-warning' : FILLS[step.status];
+/** The end fails with every failed job; the bar marks it only when no step before it failed. */
+function fillOf(step: ShownStep, steps: ShownStep[], attention: boolean) {
+  if (step.key !== 'end') return FILLS[step.status];
+  if (attention) return 'bg-warning';
+  const isStepFailed = steps.some(({ key, status }) => key !== 'end' && status === 'failed');
+  return step.status === 'failed' && isStepFailed ? FILLS.pending : FILLS[step.status];
+}
 </script>
 
 <template>
@@ -22,7 +27,7 @@ const fillOf = (step: ShownStep, attention: boolean) =>
       v-for="step in steps"
       :key="step.key"
       class="h-1.5 flex-1 rounded-pill"
-      :class="fillOf(step, attention)"
+      :class="fillOf(step, steps, attention)"
       :data-status="step.status"
     />
   </div>

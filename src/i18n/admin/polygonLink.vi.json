@@ -200,7 +200,7 @@
     }
   },
   "progress": {
-    "title": "Đang nhập từ Polygon",
+    "title": "Nhập từ Polygon",
     "lead": "Gói được xử lý nền. Có thể rời trang; lượt nhập vẫn chạy và có trong “Lượt nhập của tôi”.",
     "retry": "Thử lại",
     "another": "Nhập bài khác",

@@ -200,7 +200,7 @@
     }
   },
   "progress": {
-    "title": "Importing from Polygon",
+    "title": "Import from Polygon",
     "lead": "The package is processed in the background. You can leave; the import keeps running and stays in “My imports”.",
     "retry": "Try again",
     "another": "Import another problem",

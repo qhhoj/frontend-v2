@@ -210,3 +210,173 @@ for (const viewport of VIEWPORTS) {
     await expect.poll(() => api.requestsTo('POST /polygon/import').length).toBe(1);
   });
 }
+
+/** Progress option B: one job per state, opened by its `?job=` link (a reload: no form to edit or body to retry). */
+const progressJob = (id: string, overrides: Record<string, unknown>) => ({
+  ...job(id, 'kminmax', 'active', 7),
+  finishedAt: new Date().toISOString(),
+  ...overrides,
+});
+const SUMMARY = {
+  checker: 'bridged',
+  polygonChecker: 'std::wcmp.cpp',
+  interactive: false,
+  checkerIgnored: false,
+  tests: 42,
+  cases: 42,
+  batches: 4,
+  timeLimit: { polygon: 1, applied: 1 },
+  memoryLimit: { polygon: 1048576, applied: 524288 },
+};
+const PROGRESS_JOBS: Record<string, Record<string, unknown>> = {
+  queued: { state: 'waiting', step: 'queued', queuePosition: 2, finishedAt: null },
+  run: {
+    step: 'generating',
+    progress: { step: 'generating', done: 18, total: 42 },
+    finishedAt: null,
+  },
+  done: {
+    state: 'completed',
+    step: 'done',
+    result: { problemId: 'p-1', code: 'kminmax', summary: SUMMARY, attention: null },
+  },
+  attention: {
+    state: 'completed',
+    step: 'done',
+    result: {
+      problemId: 'p-1',
+      code: 'kminmax',
+      summary: SUMMARY,
+      attention: { code: 'imported_needs_attention', params: {}, message: 'init.yml failed' },
+    },
+  },
+};
+const failedJob = (id: string, errorCode: string, extra: Record<string, unknown> = {}) =>
+  progressJob(id, { state: 'failed', step: 'failed', errorCode, ...extra });
+const outcome = (page: Page) => page.getByTestId('import-outcome');
+
+for (const viewport of VIEWPORTS) {
+  test(`Polygon progress states at ${viewport.name}`, async ({ page, api }) => {
+    await page.setViewportSize(viewport);
+    mockWizard(api);
+    for (const [state, overrides] of Object.entries(PROGRESS_JOBS))
+      api.routes[`GET /problems/imports/job-${state}`] = adminOk(
+        progressJob(`job-${state}`, overrides),
+      );
+    api.routes['POST /problems/kminmax/polygon/sync'] = {
+      status: 202,
+      body: { data: { jobId: 'job-run' } },
+    };
+
+    await page.goto('/admin/problems/polygon?job=job-queued');
+    await expect(outcome(page)).toContainText('Thứ 2 trong hàng đợi');
+    await expect(outcome(page)).toContainText('Trước bạn: 1 lượt.');
+    await shoot(page, viewport.name, 'progress-queued');
+
+    await page.goto('/admin/problems/polygon?job=job-run');
+    await expect(outcome(page)).toContainText('Đang sinh test 18/42');
+    await expect(
+      page.getByTestId('import-step-bar').locator('[data-status="current"]'),
+    ).toHaveCount(1);
+    await shoot(page, viewport.name, 'progress-run');
+
+    await page.goto('/admin/problems/polygon?job=job-done');
+    await expect(page.getByTestId('import-summary')).toContainText('std::wcmp.cpp');
+    await expect(page.getByTestId('import-summary')).toContainText('Polygon: 1024MB');
+    await expect(outcome(page).getByRole('link', { name: 'Mở kminmax' })).toBeVisible();
+    expect(await axeViolationsIn(page)).toEqual([]);
+    await shoot(page, viewport.name, 'progress-done');
+
+    await page.goto('/admin/problems/polygon?job=job-attention');
+    await expect(outcome(page)).toContainText('Đã nhập kminmax, cần xem lại');
+    await expect(outcome(page).getByRole('link', { name: 'Mở kminmax' })).toBeVisible();
+    await shoot(page, viewport.name, 'progress-attention');
+    await outcome(page).getByRole('button', { name: 'Đồng bộ lại kminmax' }).click();
+    await expect(page).toHaveURL(/job=job-run/);
+    await expect(outcome(page)).toContainText('Đang nhập kminmax');
+  });
+
+  test(`Polygon progress at ${viewport.name}: a failure, back to the kept options, then a retry`, async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize(viewport);
+    mockWizard(api);
+    const started = ['job-unmapped', 'job-outage', 'job-retried'];
+    api.routes['POST /polygon/import'] = () => ({
+      status: 202,
+      body: { data: { jobId: started.shift() } },
+    });
+    api.routes['GET /problems/imports/job-unmapped'] = adminOk(
+      failedJob('job-unmapped', 'statement_language_unmapped', {
+        errorParams: { language: 'russian' },
+        failedStep: 'statements',
+      }),
+    );
+    api.routes['GET /problems/imports/job-outage'] = adminOk(
+      failedJob('job-outage', 'polygon_unavailable', {
+        retryable: true,
+        failedStep: 'downloading',
+      }),
+    );
+    api.routes['GET /problems/imports/job-retried'] = adminOk(progressJob('job-retried', {}));
+
+    await page.goto('/admin/problems/polygon');
+    await paste(page, linkOf('kminmax'));
+    await page.getByRole('button', { name: 'Tiếp tục' }).click();
+    await page.getByLabel('Mã bài').fill('kminmax_v2');
+    const languages = page.getByTestId('polygon-languages');
+    await languages.getByLabel('russian').selectOption('vi');
+    await languages.getByLabel('english').selectOption('skip');
+    await page.getByRole('button', { name: 'Bắt đầu nhập' }).click();
+
+    await expect(outcome(page)).toContainText('Đề russian chưa được gán ngôn ngữ');
+    await expect(outcome(page)).toContainText('Dừng ở bước: chuyển đề bài.');
+    await expect(outcome(page).getByRole('button', { name: 'Thử lại' })).toHaveCount(0);
+    expect(await axeViolationsIn(page)).toEqual([]);
+    await shoot(page, viewport.name, 'progress-failed');
+
+    await outcome(page).getByRole('button', { name: 'Sửa thiết lập' }).click();
+    await expect(page.getByLabel('Mã bài')).toHaveValue('kminmax_v2');
+    await expect(languages.getByLabel('russian')).toHaveValue('vi');
+    await expect(languages.getByLabel('english')).toHaveValue('skip');
+    await page.getByRole('button', { name: 'Bắt đầu nhập' }).click();
+
+    await expect(outcome(page)).toContainText('Không kết nối được Polygon');
+    await expect(outcome(page).getByRole('button', { name: 'Sửa thiết lập' })).toHaveCount(0);
+    await shoot(page, viewport.name, 'progress-failed-transient');
+    await outcome(page).getByRole('button', { name: 'Thử lại' }).click();
+    await expect(page).toHaveURL(/job=job-retried/);
+    const bodies = api
+      .requestsTo('POST /polygon/import')
+      .map((seen) => JSON.parse(seen.postData?.toString() ?? '{}') as { code: string });
+    expect(bodies.map(({ code }) => code)).toEqual(['kminmax_v2', 'kminmax_v2', 'kminmax_v2']);
+  });
+
+  test(`Polygon progress at ${viewport.name}: polling gives up, then checks again`, async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize(viewport);
+    mockWizard(api);
+    let isUp = true;
+    api.routes['GET /problems/imports/job-lost'] = () =>
+      isUp
+        ? adminOk(progressJob('job-lost', PROGRESS_JOBS.run))
+        : { status: 503, body: { error: { code: 'unavailable', message: 'down' } } };
+    await page.clock.install();
+    await page.goto('/admin/problems/polygon?job=job-lost');
+    await expect(outcome(page)).toContainText('Đang sinh test 18/42');
+    isUp = false;
+    await expect(async () => {
+      await page.clock.fastForward(40_000);
+      await expect(page.locator('[data-outcome="lost"]')).toBeVisible({ timeout: 500 });
+    }).toPass({ timeout: 30_000 });
+    await expect(outcome(page)).toContainText('Lần cuối thấy: Đang sinh test 18/42');
+    await shoot(page, viewport.name, 'progress-gaveup');
+
+    isUp = true;
+    await outcome(page).getByRole('button', { name: 'Kiểm tra lại' }).click();
+    await expect(page.locator('[data-outcome="running"]')).toBeVisible();
+  });
+}

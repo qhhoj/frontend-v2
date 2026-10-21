@@ -118,7 +118,7 @@ const openTo = computed(() => ({ name: 'admin-problemGeneral', params: { code: c
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex max-w-220 flex-col gap-4">
     <Card
       variant="flat"
       class="flex flex-col gap-4 p-4 md:p-5"
