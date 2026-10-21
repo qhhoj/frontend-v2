@@ -79,7 +79,7 @@ const statementLabel = ({ language, title }: PolygonProblem['statements'][number
         </SelectField>
       </FormField>
 
-      <fieldset class="flex flex-col gap-2">
+      <fieldset v-if="others.length > 0" class="flex flex-col gap-2">
         <legend class="mb-1.5 text-sm font-semibold">
           {{ $t('admin.polygonLink.configure.languages.others') }}
         </legend>
