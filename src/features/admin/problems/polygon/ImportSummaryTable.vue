@@ -4,9 +4,15 @@ import type { Schemas } from '@/api/schemas';
 import { TriangleAlert } from 'lucide-vue-next';
 import { summaryRowsOf } from './import-outcome';
 
-/** "Khác gì so với Polygon": what the conversion made of the package, a clamp noted beside the value it changed. */
-const props = defineProps<{ summary: Schemas['ImportSummaryResponse'] }>();
-const rows = computed(() => summaryRowsOf(props.summary));
+/**
+ * "Khác gì so với Polygon": what the conversion made of the package, a clamp noted beside the value it changed, and a
+ * setting a sync kept as edited on QHHOJ (`kept`) noted the same way.
+ */
+const props = defineProps<{
+  summary: Schemas['ImportSummaryResponse'];
+  kept?: readonly Schemas['SyncedSetting'][];
+}>();
+const rows = computed(() => summaryRowsOf(props.summary, props.kept));
 </script>
 
 <template>

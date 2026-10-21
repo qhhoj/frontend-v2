@@ -270,7 +270,21 @@
       "cases": "{count} judged cases",
       "batches": "{count} groups",
       "lowered": "Polygon: {polygon}, lowered to the maximum",
-      "raised": "Polygon: {polygon}, raised to the minimum"
+      "raised": "Polygon: {polygon}, raised to the minimum",
+      "kept": "Kept as edited on QHHOJ · Polygon: {polygon}",
+      "keptOnly": "Kept as edited on QHHOJ"
+    },
+    "localEdits": {
+      "title": "Judging settings",
+      "kept": "Kept as edited on QHHOJ",
+      "updated": "Taken from the package",
+      "settings": {
+        "timeLimit": "time limit",
+        "memoryLimit": "memory limit",
+        "partial": "partial scoring",
+        "checker": "checker",
+        "grader": "grader"
+      }
     }
   },
   "panel": {
@@ -298,9 +312,13 @@
     "syncConfirm": {
       "title": "Sync {code} from Polygon?",
       "confirm": "Sync and overwrite",
-      "overwrites": "The sync overwrites on QHHOJ: statements and translations, the tutorial, tests, the checker, time and memory limits.",
-      "lost": "Every edit to those on QHHOJ since the last import is lost; copy it to Polygon first if you need it.",
-      "kept": "Kept: code, points, group, types, authors, curators, allowed languages."
+      "overwrites": "The sync overwrites on QHHOJ: statements and translations, the tutorial, tests. Limits, partial scoring, checker and grader also come from the package, except those edited on QHHOJ since the last import: they are kept.",
+      "lost": "Edits to statements, the tutorial and tests on QHHOJ since the last import are lost; copy them to Polygon first if you need them.",
+      "kept": "Kept: code, points, group, types, authors, curators, allowed languages, Unicode, nobigmath, output limit and prefix.",
+      "overwriteLocal": {
+        "label": "Also overwrite settings edited on QHHOJ",
+        "consequence": "Limits, partial scoring, checker, grader go back to the package."
+      }
     },
     "unlinkConfirm": {
       "title": "Unlink {code} from Polygon?",

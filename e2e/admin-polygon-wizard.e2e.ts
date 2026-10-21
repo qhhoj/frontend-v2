@@ -381,7 +381,19 @@ for (const viewport of VIEWPORTS) {
               failedStep: 'downloading',
             }),
           )
-        : adminOk(progressJob('job-sync', { ...PROGRESS_JOBS.done, purpose: 'sync' }));
+        : adminOk(
+            progressJob('job-sync', {
+              ...PROGRESS_JOBS.done,
+              purpose: 'sync',
+              result: {
+                problemId: 'p-1',
+                code: 'kminmax',
+                summary: SUMMARY,
+                attention: null,
+                localEdits: { kept: ['memoryLimit', 'checker'], updated: ['timeLimit'] },
+              },
+            }),
+          );
 
     await page.goto('/admin/problems/polygon');
     await paste(page, linkOf('kminmax'));
@@ -396,8 +408,24 @@ for (const viewport of VIEWPORTS) {
     await expect(outcome(page).getByRole('button', { name: 'Sửa thiết lập' })).toHaveCount(0);
     await outcome(page).getByRole('button', { name: 'Đồng bộ lại kminmax' }).click();
     await expect(outcome(page)).toContainText('Đã đồng bộ kminmax');
+    // The sync kept the memory limit and checker edited on QHHOJ: no clamp, no mapping claimed for them.
+    const summary = page.getByTestId('import-summary');
+    await expect(summary).toContainText('Giữ bản sửa trên QHHOJ · Polygon: 1024MB');
+    await expect(summary).toContainText('Giữ bản sửa trên QHHOJ · Polygon: std::wcmp.cpp');
+    await expect(summary).not.toContainText('hạ theo mức tối đa');
+    const localEdits = page.getByTestId('local-edits');
+    await expect(localEdits.locator('[data-local-edits="kept"]')).toHaveText(
+      'giới hạn bộ nhớ, checker',
+    );
+    await expect(localEdits.locator('[data-local-edits="updated"]')).toHaveText(
+      'giới hạn thời gian',
+    );
+    await shoot(page, viewport.name, 'progress-sync-local-edits');
     expect(api.requestsTo('POST /polygon/import')).toHaveLength(1);
     expect(syncs()).toBe(2);
+    // "Đồng bộ lại" keeps the settings edited on QHHOJ: no overwrite asked.
+    for (const seen of api.requestsTo('POST /problems/kminmax/polygon/sync'))
+      expect(seen.postData).toBeNull();
   });
 
   test(`Polygon progress at ${viewport.name}: polling gives up, then checks again`, async ({

@@ -270,7 +270,21 @@
       "cases": "{count} lượt chấm",
       "batches": "{count} nhóm",
       "lowered": "Polygon: {polygon}, hạ theo mức tối đa",
-      "raised": "Polygon: {polygon}, nâng theo mức tối thiểu"
+      "raised": "Polygon: {polygon}, nâng theo mức tối thiểu",
+      "kept": "Giữ bản sửa trên QHHOJ · Polygon: {polygon}",
+      "keptOnly": "Giữ bản sửa trên QHHOJ"
+    },
+    "localEdits": {
+      "title": "Thiết lập chấm",
+      "kept": "Giữ bản sửa trên QHHOJ",
+      "updated": "Lấy theo gói",
+      "settings": {
+        "timeLimit": "giới hạn thời gian",
+        "memoryLimit": "giới hạn bộ nhớ",
+        "partial": "chấm điểm từng phần",
+        "checker": "checker",
+        "grader": "grader"
+      }
     }
   },
   "panel": {
@@ -298,9 +312,13 @@
     "syncConfirm": {
       "title": "Đồng bộ {code} từ Polygon?",
       "confirm": "Đồng bộ và ghi đè",
-      "overwrites": "Đồng bộ sẽ ghi đè trên QHHOJ: đề bài và bản dịch, lời giải, test, checker, giới hạn thời gian và bộ nhớ.",
-      "lost": "Mọi sửa đổi các mục đó trên QHHOJ từ lần nhập trước sẽ mất; hãy chép sang Polygon trước nếu cần giữ.",
-      "kept": "Giữ nguyên: mã bài, điểm, nhóm, dạng bài, tác giả, người duyệt, ngôn ngữ được nộp."
+      "overwrites": "Đồng bộ sẽ ghi đè trên QHHOJ: đề bài và bản dịch, lời giải, test. Giới hạn, chấm điểm từng phần, checker và grader cũng lấy theo gói, trừ mục đã sửa trên QHHOJ từ lần nhập trước: mục đó được giữ.",
+      "lost": "Sửa đổi đề bài, lời giải và test trên QHHOJ từ lần nhập trước sẽ mất; hãy chép sang Polygon trước nếu cần giữ.",
+      "kept": "Giữ nguyên: mã bài, điểm, nhóm, dạng bài, tác giả, người duyệt, ngôn ngữ được nộp, Unicode, nobigmath, giới hạn và cắt output.",
+      "overwriteLocal": {
+        "label": "Ghi đè cả thiết lập đã sửa trên QHHOJ",
+        "consequence": "Giới hạn, chấm từng phần, checker, grader về lại giá trị trong gói."
+      }
     },
     "unlinkConfirm": {
       "title": "Hủy liên kết {code} với Polygon?",

@@ -85,10 +85,71 @@ for (const viewport of VIEWPORTS) {
     await shoot(page, viewport.name, 'panel-newer');
 
     await banner(page).getByRole('button', { name: 'Đồng bộ ngay' }).click();
-    await dialogOf(page).getByRole('button', { name: 'Đồng bộ và ghi đè' }).click();
+    const dialog = dialogOf(page);
+    await expect(dialog).toContainText(
+      'trừ mục đã sửa trên QHHOJ từ lần nhập trước: mục đó được giữ',
+    );
+    await expect(dialog.getByLabel('Ghi đè cả thiết lập đã sửa trên QHHOJ')).not.toBeChecked();
+    expect(await axeViolationsIn(page)).toEqual([]);
+    await shoot(page, viewport.name, 'panel-sync-dialog');
+    await dialog.getByRole('button', { name: 'Đồng bộ và ghi đè' }).click();
     await expect(banner(page)).toHaveAttribute('data-banner', 'running');
     await expect(banner(page)).toContainText('Thứ 1 trong hàng đợi');
     await expect(banner(page).getByRole('button')).toHaveCount(0);
+    // Unticked: the sync keeps the settings edited on QHHOJ, so it sends no body.
+    const [sync] = api.requestsTo('POST /problems/hcmus41c/polygon/sync');
+    expect(sync?.postData).toBeNull();
+  });
+
+  test(`Polygon link panel at ${viewport.name}: a sync that overwrites settings edited on QHHOJ`, async ({
+    page,
+    api,
+  }) => {
+    await page.setViewportSize(viewport);
+    panelRoutes(api, linkState());
+    api.routes['POST /problems/hcmus41c/polygon/sync'] = {
+      status: 202,
+      body: { data: { jobId: 'job-sync' } },
+    };
+    api.routes['GET /problems/imports/job-sync'] = adminOk(
+      importJob({
+        id: 'job-sync',
+        code: 'hcmus41c',
+        purpose: 'sync',
+        state: 'completed',
+        step: 'done',
+        result: {
+          problemId: 'p-1',
+          code: 'hcmus41c',
+          summary: null,
+          attention: null,
+          localEdits: { kept: [], updated: ['timeLimit', 'checker', 'grader'] },
+        },
+      }),
+    );
+    await page.goto(DATA_TAB);
+    await banner(page).getByRole('button', { name: 'Đồng bộ ngay' }).click();
+    const dialog = dialogOf(page);
+    await dialog.getByLabel('Ghi đè cả thiết lập đã sửa trên QHHOJ').check();
+    await expect(dialog).toContainText('về lại giá trị trong gói');
+    await dialog.getByRole('button', { name: 'Đồng bộ và ghi đè' }).click();
+    await expect(dialog).toBeHidden();
+
+    const [sync] = api.requestsTo('POST /problems/hcmus41c/polygon/sync');
+    expect(JSON.parse(sync?.postData?.toString() ?? '{}')).toEqual({ overwriteLocalEdits: true });
+    const localEdits = page.getByTestId('polygon-link-panel').getByTestId('local-edits');
+    await expect(localEdits.locator('[data-local-edits="updated"]')).toHaveText(
+      'giới hạn thời gian, checker, grader',
+    );
+    await expect(localEdits.locator('[data-local-edits="kept"]')).toHaveCount(0);
+    expect(await axeViolationsIn(page)).toEqual([]);
+    await shoot(page, viewport.name, 'panel-local-edits');
+
+    // The next open asks again: the choice is off.
+    await banner(page).getByRole('button').first().click();
+    await expect(
+      dialogOf(page).getByLabel('Ghi đè cả thiết lập đã sửa trên QHHOJ'),
+    ).not.toBeChecked();
   });
 
   test(`Polygon link panel at ${viewport.name}: a sync running before the reload`, async ({

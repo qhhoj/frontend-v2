@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { ChevronRight, Link2, Unlink } from 'lucide-vue-next';
 import { ApiError } from '@/api/client';
 import { syncPolygonLink, unlinkPolygon, updatePolygonLink } from '@/api/polygon.api';
+import type { Schemas } from '@/api/schemas';
 import type { PolygonLink } from '@/api/types/polygon';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AppButton from '@/components/ui/AppButton.vue';
@@ -13,6 +14,7 @@ import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import { usePermissions } from '@/stores/use-permissions';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AdminStatus from '../../ui/AdminStatus.vue';
+import ImportCheckbox from '../import/ImportCheckbox.vue';
 import { failureTextOf } from '../../ui/admin-errors';
 import { SYNC_POLYGON } from '../../admin-screens';
 import { needsPermissionText } from '../../ui/permission-text';
@@ -21,6 +23,7 @@ import { isFinal } from '../import/import-job';
 import { importRefusalText } from '../import/import-refusal';
 import { useImportJob } from '../import/use-import-job';
 import { PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
+import LocalEditsList from './LocalEditsList.vue';
 import PolygonLinkBanner from './PolygonLinkBanner.vue';
 import PolygonLinkOptionsDrawer from './PolygonLinkOptionsDrawer.vue';
 import PolygonSyncHistory from './PolygonSyncHistory.vue';
@@ -34,6 +37,8 @@ import { polygonLinkKey, usePolygonLinkQuery } from './polygon.queries';
  * The data tab's Polygon card (option C), only for a linked problem (404 `polygon_not_linked` hides it): a status banner
  * with its one action, then the link, the saved options ("Sửa" opens a drawer) and auto-sync on one line each, then the
  * history and unlink. A running sync (started here, or found by its job id after a reload) replaces the action.
+ * The sync dialog keeps the settings edited on QHHOJ unless "Ghi đè cả thiết lập…" is ticked (off on every open); a sync
+ * that ended here then says which it kept and which it took from the package (the link does not record it).
  * Changing anything needs `judge.sync_polygon_problem`; without it the card only reads.
  */
 const props = defineProps<{ code: string }>();
@@ -59,9 +64,12 @@ const isRunning = computed(() => {
   const phase = syncJob.phase.value;
   return !!runningJobId.value && !syncJob.stop.value && !(phase && isFinal(phase));
 });
+/** What the sync that ended here did with the settings edited on QHHOJ; read before the job id is cleared. */
+const lastLocalEdits = ref<Schemas['LocalEditsResponse'] | null>(null);
 /** A finished sync changed the link's `lastSync*` and maybe every tab of the problem. */
 watch(syncJob.phase, (phase) => {
   if (!phase || !isFinal(phase)) return;
+  lastLocalEdits.value = syncJob.job.value?.result?.localEdits ?? null;
   endedJobId.value = runningJobId.value;
   startedJobId.value = null;
   void queryClient.invalidateQueries({ queryKey: ['admin'] });
@@ -98,11 +106,14 @@ const CHIP_TONES: Record<BannerKind, ChipTone> = {
 };
 
 const isSyncOpen = ref(false);
+/** Off on every open: overwriting what was edited on QHHOJ is asked for each time. */
+const isOverwrite = ref(false);
 const sync = useAdminMutation({
-  mutate: () => syncPolygonLink(props.code),
+  mutate: (overwrite: boolean) => syncPolygonLink(props.code, overwrite),
   onDone: ({ jobId }) => {
     isSyncOpen.value = false;
     isSaved.value = false;
+    lastLocalEdits.value = null;
     // One job id per problem and package: the same id as the one followed is polled again.
     if (jobId === runningJobId.value) syncJob.recheck();
     startedJobId.value = jobId;
@@ -110,6 +121,7 @@ const sync = useAdminMutation({
 });
 function openSync() {
   sync.reset();
+  isOverwrite.value = false;
   isSyncOpen.value = true;
 }
 
@@ -175,6 +187,7 @@ const isHistoryOpen = ref(false);
       @sync="openSync"
       @edit-options="openDrawer"
     />
+    <LocalEditsList v-if="lastLocalEdits && !isRunning" :local-edits="lastLocalEdits" />
 
     <dl class="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-4 gap-y-1 text-sm">
       <dt class="text-muted">{{ $t('admin.polygonLink.panel.facts.polygon') }}</dt>
@@ -259,12 +272,19 @@ const isHistoryOpen = ref(false);
       :title="$t('admin.polygonLink.panel.syncConfirm.title', { code })"
       :confirm-label="$t('admin.polygonLink.panel.syncConfirm.confirm')"
       :busy="sync.isPending.value"
-      @confirm="sync.run(undefined)"
+      @confirm="sync.run(isOverwrite)"
     >
       <div class="flex flex-col gap-2 text-sm">
         <p class="font-semibold">{{ $t('admin.polygonLink.panel.syncConfirm.overwrites') }}</p>
         <p>{{ $t('admin.polygonLink.panel.syncConfirm.lost') }}</p>
         <p class="text-muted">{{ $t('admin.polygonLink.panel.syncConfirm.kept') }}</p>
+        <ImportCheckbox
+          v-model="isOverwrite"
+          tone="danger"
+          class="mt-1 border-t border-line pt-3"
+          :label="$t('admin.polygonLink.panel.syncConfirm.overwriteLocal.label')"
+          :description="$t('admin.polygonLink.panel.syncConfirm.overwriteLocal.consequence')"
+        />
       </div>
       <template #error>
         <AdminStatus

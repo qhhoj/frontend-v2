@@ -66,6 +66,7 @@ export function runningLineOf(job: ImportJob): string {
 
 type Summary = Schemas['ImportSummaryResponse'];
 type Limit = Schemas['ClampedLimitResponse'];
+type SyncedSetting = Schemas['SyncedSetting'];
 export interface SummaryRow {
   key: 'checker' | 'tests' | 'time' | 'memory';
   value: string;
@@ -80,13 +81,18 @@ function checkerName(checker: Summary['checker']): string {
   return i18n.global.te(key) ? translate(key) : checker;
 }
 
-function checkerRow(summary: Summary): SummaryRow {
+/** A setting a sync kept as edited on QHHOJ, beside what the package has. */
+const keptNote = (polygon: string | null) =>
+  polygon ? translate(`${LINK}.summary.kept`, { polygon }) : translate(`${LINK}.summary.keptOnly`);
+
+function checkerRow(summary: Summary, isKept: boolean): SummaryRow {
   if (summary.interactive) {
     const value = translate(`${LINK}.summary.interactive`);
     const note = summary.checkerIgnored ? translate(`${LINK}.summary.checkerIgnored`) : null;
     return { key: 'checker', value, note };
   }
   const name = checkerName(summary.checker);
+  if (isKept) return { key: 'checker', value: name, note: keptNote(summary.polygonChecker) };
   const value = summary.polygonChecker ? `${summary.polygonChecker} → ${name}` : name;
   return { key: 'checker', value, note: null };
 }
@@ -98,20 +104,59 @@ function testsRow({ tests, cases, batches }: Summary): SummaryRow {
   return { key: 'tests', value: parts.join(' · '), note: null };
 }
 
-function limitRow(key: SummaryRow['key'], limit: Limit, format: (n: number) => string): SummaryRow {
+function limitRow(
+  key: SummaryRow['key'],
+  limit: Limit,
+  format: (n: number) => string,
+  isKept: boolean,
+): SummaryRow {
   if (limit.polygon === limit.applied) return { key, value: format(limit.applied), note: null };
+  if (isKept) return { key, value: format(limit.applied), note: keptNote(format(limit.polygon)) };
   const way = limit.applied < limit.polygon ? 'lowered' : 'raised';
   const note = translate(`${LINK}.summary.${way}`, { polygon: format(limit.polygon) });
   return { key, value: format(limit.applied), note };
 }
 
-/** "Khác gì so với Polygon": the checker mapping, the tests as judged, and each limit with its clamp. */
-export const summaryRowsOf = (summary: Summary): SummaryRow[] => [
-  checkerRow(summary),
+/**
+ * "Khác gì so với Polygon": the checker mapping, the tests as judged, and each limit with its clamp; a setting in `kept`
+ * (a sync kept it as edited on QHHOJ) says so instead.
+ */
+export const summaryRowsOf = (
+  summary: Summary,
+  kept: readonly SyncedSetting[] = [],
+): SummaryRow[] => [
+  checkerRow(summary, kept.includes('checker')),
   testsRow(summary),
-  limitRow('time', summary.timeLimit, formatTimeLimit),
-  limitRow('memory', summary.memoryLimit, formatMemoryLimit),
+  limitRow('time', summary.timeLimit, formatTimeLimit, kept.includes('timeLimit')),
+  limitRow('memory', summary.memoryLimit, formatMemoryLimit, kept.includes('memoryLimit')),
 ];
+
+/** The order settings are named in, as the data tab draws them. */
+const SETTING_ORDER: readonly SyncedSetting[] = [
+  'timeLimit',
+  'memoryLimit',
+  'partial',
+  'checker',
+  'grader',
+];
+export interface LocalEditsRow {
+  kind: 'kept' | 'updated';
+  /** The settings' names, comma-separated. */
+  names: string;
+}
+
+/** What a sync did with the settings a setter may edit on QHHOJ: kept, then taken from the package; an empty list has no row. */
+export function localEditsRowsOf(localEdits: Schemas['LocalEditsResponse']): LocalEditsRow[] {
+  const namesOf = (settings: readonly SyncedSetting[]) =>
+    SETTING_ORDER.filter((setting) => settings.includes(setting))
+      .map((setting) => translate(`${LINK}.localEdits.settings.${setting}`))
+      .join(', ');
+  const rows: LocalEditsRow[] = [
+    { kind: 'kept', names: namesOf(localEdits.kept) },
+    { kind: 'updated', names: namesOf(localEdits.updated) },
+  ];
+  return rows.filter((row) => row.names);
+}
 
 /** The outcome's one primary action; null leaves only "Nhập bài khác". */
 export type OutcomeAction = 'open' | 'resync' | 'retry' | 'edit' | 'syncOptions' | 'recheck' | null;
