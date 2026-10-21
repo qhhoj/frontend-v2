@@ -30,7 +30,8 @@ const textOf = (value: unknown): string => {
   return typeof value === 'string' || typeof value === 'number' ? String(value) : '';
 };
 
-function fieldOf(code: string, params: Params): string | null {
+/** The language field a refusal (or a sync failure) with this code and params belongs under; null for the page line. */
+export function optionsFieldOf(code: string, params: Params): string | null {
   switch (code) {
     case 'statement_language_required':
       return 'main';
@@ -55,5 +56,5 @@ export function optionsRefusalOf(error: unknown): OptionsRefusal | null {
     count: textOf(params.count),
     limit: textOf(params.limit),
   });
-  return { field: fieldOf(error.code, params), text };
+  return { field: optionsFieldOf(error.code, params), text };
 }

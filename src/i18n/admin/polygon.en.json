@@ -71,6 +71,7 @@
     },
     "steps": {
       "queued": "Queued",
+      "checking": "Checks before the import",
       "downloading": "Downloading the package from Polygon",
       "statements": "Converting statements",
       "generating": "Generating tests",

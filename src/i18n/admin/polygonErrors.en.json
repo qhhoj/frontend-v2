@@ -1,0 +1,122 @@
+{
+  "polygon_not_connected": {
+    "title": "Polygon is not connected",
+    "fix": "An administrator needs to save the Polygon API key and secret in Settings."
+  },
+  "polygon_unauthorized": {
+    "title": "Polygon refused the API key",
+    "fix": "The Polygon key or secret is wrong. An administrator needs to save it again in Settings."
+  },
+  "polygon_clock_skew": {
+    "title": "Polygon refused the signature",
+    "fix": "The server clock is off from Polygon's. Tell an administrator."
+  },
+  "polygon_failed": {
+    "title": "Polygon answered with an error",
+    "fix": "Try again in a few minutes."
+  },
+  "polygon_unavailable": {
+    "title": "Polygon cannot be reached",
+    "fix": "Polygon did not answer. Try again in a few minutes."
+  },
+  "polygon_package_unavailable": {
+    "title": "Polygon could not hand over the package",
+    "fix": "Try again in a few minutes; if it keeps failing, build a new package on Polygon."
+  },
+  "polygon_package_too_large": {
+    "title": "The package is larger than 512 MiB",
+    "fix": "Make the tests smaller, then build a new package on Polygon."
+  },
+  "import_failed": {
+    "title": "The import failed",
+    "fix": "Something went wrong on the server. Try again; if it keeps failing, tell an administrator."
+  },
+  "package_invalid": {
+    "title": "Part of the package cannot be converted",
+    "fix": "Fix the part named below on Polygon, build a new package, then import again."
+  },
+  "package_incomplete": {
+    "title": "The full package has no tests",
+    "fix": "The package was built without its tests. Build a full package with tests on Polygon."
+  },
+  "package_needs_full": {
+    "title": "This problem needs a full package",
+    "fix": "An interactive problem or a multi-file generator needs a full package. Build one on Polygon."
+  },
+  "too_many_testcases": {
+    "title": "{count} tests, over the limit of {limit}",
+    "fix": "Leave out the 0-point groups or tests, or remove tests on Polygon."
+  },
+  "statement_language_required": {
+    "title": "No main statement picked",
+    "fix": "The package has the statements {languages}. Pick one as the main statement."
+  },
+  "statement_language_unmapped": {
+    "title": "The {language} statement has no language",
+    "fix": "Pick en, vi or Skip for the {language} statement."
+  },
+  "statement_language_repeated": {
+    "title": "Two statements are both {language}",
+    "fix": "Give one of them another language, or Skip it."
+  },
+  "tutorial_language_required": {
+    "title": "No tutorial picked",
+    "fix": "The package has tutorials in {languages}. Pick one as the editorial."
+  },
+  "checker_unsupported": {
+    "title": "The package's checker cannot run here",
+    "fix": "Change the checker on Polygon, build a new package, then import again."
+  },
+  "generation_failed": {
+    "title": "Generating the tests on a judge failed",
+    "fix": "Check the generators and the main solution on Polygon, or use a full package."
+  },
+  "generation_no_judge": {
+    "title": "No judge to generate the tests",
+    "fix": "It was retried once already. Try again when a judge is online."
+  },
+  "generation_timeout": {
+    "title": "Generating the tests took too long",
+    "fix": "Use a full package to skip test generation."
+  },
+  "storage_full": {
+    "title": "Not enough storage",
+    "fix": "The organization has no room for this package. Ask an administrator to raise its quota."
+  },
+  "problem_code_taken": {
+    "title": "The problem code is taken",
+    "fix": "Pick another code, or choose Update to overwrite that problem."
+  },
+  "problem_not_found": {
+    "title": "The problem to update is gone",
+    "fix": "It was deleted or its code changed. Check the code."
+  },
+  "problem_not_importable": {
+    "title": "This problem cannot take an import",
+    "fix": "It is deleted, a mirror, managed by hand, or its markup changed. Pick another problem."
+  },
+  "problem_changed": {
+    "title": "The problem changed while the job waited",
+    "fix": "Its tests or content were just edited. Try again to import over the new state."
+  },
+  "problem_unlinked": {
+    "title": "The problem was unlinked",
+    "fix": "It was no longer linked to Polygon when the sync ran."
+  },
+  "polygon_already_linked": {
+    "title": "This Polygon problem is already linked",
+    "fix": "It is linked to another QHHOJ problem. Update that one instead of creating a new one."
+  },
+  "requester_forbidden": {
+    "title": "Missing a permission",
+    "fix": "You lost a permission the job needs. Ask an administrator for it."
+  },
+  "imported_needs_attention": {
+    "title": "Imported, but placing the data files failed",
+    "fix": "Sync again to place the data files; the settings stay as they are."
+  },
+  "unknown": {
+    "title": "The import failed",
+    "fix": "The server gave no reason. Try again; if it keeps failing, tell an administrator."
+  }
+}

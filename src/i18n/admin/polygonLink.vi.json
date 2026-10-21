@@ -201,46 +201,93 @@
   },
   "progress": {
     "title": "Đang nhập từ Polygon",
-    "lead": "Gói được xử lý nền. Có thể rời trang; lượt nhập vẫn chạy và xem lại được ở địa chỉ này trong 24 giờ.",
+    "lead": "Gói được xử lý nền. Có thể rời trang; lượt nhập vẫn chạy và có trong “Lượt nhập của tôi”.",
     "retry": "Thử lại",
-    "another": "Nhập bài khác"
+    "another": "Nhập bài khác",
+    "outcome": {
+      "import": {
+        "waiting": "Đang hỏi trạng thái {code}",
+        "queued": "Đang chờ nhập {code}",
+        "running": "Đang nhập {code}",
+        "done": "Đã nhập {code}",
+        "attention": "Đã nhập {code}, cần xem lại",
+        "failed": "Không nhập được {code}",
+        "lost": "Chưa rõ trạng thái {code}",
+        "gone": "Không theo dõi được lượt nhập {code}"
+      },
+      "sync": {
+        "waiting": "Đang hỏi trạng thái {code}",
+        "queued": "Đang chờ đồng bộ {code}",
+        "running": "Đang đồng bộ {code}",
+        "done": "Đã đồng bộ {code}",
+        "attention": "Đã đồng bộ {code}, cần xem lại",
+        "failed": "Không đồng bộ được {code}",
+        "lost": "Chưa rõ trạng thái {code}",
+        "gone": "Không theo dõi được lượt đồng bộ {code}"
+      }
+    },
+    "queue": {
+      "waiting": "Đang chờ trong hàng đợi",
+      "place": "Thứ {position} trong hàng đợi",
+      "noneAhead": "Trước bạn: không còn lượt nào.",
+      "ahead": "Trước bạn: {count} lượt."
+    },
+    "hint": {
+      "running": "Có thể rời trang; lượt nhập vẫn chạy.",
+      "generating": "Bước sinh test thường mất 2 đến 30 phút."
+    },
+    "finished": "Xong lúc {date} · mất {duration}",
+    "lastSeen": "Lần cuối thấy: {step} lúc {time}",
+    "lost": {
+      "title": "Không lấy được trạng thái sau nhiều lần thử",
+      "text": "Trang đã hỏi nhiều lần không được. Lượt nhập vẫn chạy trên máy chủ."
+    },
+    "recheck": "Kiểm tra lại",
+    "edit": "Sửa thiết lập",
+    "resync": "Đồng bộ lại {code}",
+    "serverSays": "Chi tiết từ hệ thống: {text}",
+    "stepsFold": "Chi tiết các bước",
+    "barLabel": "Bước {done}/{total}",
+    "summary": {
+      "title": "Khác gì so với Polygon",
+      "item": "Mục",
+      "value": "Trên QHHOJ",
+      "note": "Ghi chú",
+      "rows": {
+        "checker": "Checker",
+        "tests": "Test",
+        "time": "Thời gian",
+        "memory": "Bộ nhớ"
+      },
+      "interactive": "Bài tương tác: interactor chấm",
+      "checkerIgnored": "Checker của gói không chạy",
+      "tests": "{count} test",
+      "cases": "{count} lượt chấm",
+      "batches": "{count} nhóm",
+      "lowered": "Polygon: {polygon}, hạ theo mức tối đa",
+      "raised": "Polygon: {polygon}, nâng theo mức tối thiểu"
+    }
   },
   "panel": {
     "title": "Liên kết Polygon",
     "status": {
       "newer": "Có bản mới",
       "upToDate": "Đã cập nhật",
-      "syncFailed": "Đồng bộ lỗi",
       "notReady": "Gói chưa sẵn sàng",
-      "unknown": "Không hỏi được Polygon"
+      "unknown": "Không hỏi được Polygon",
+      "running": "Đang đồng bộ",
+      "saved": "Chờ đồng bộ",
+      "failed": "Đồng bộ lỗi",
+      "attention": "Cần xem lại"
     },
-    "problem": "Bài trên Polygon",
-    "lastSync": "Lần đồng bộ cuối",
     "linkedAt": "Chưa đồng bộ (liên kết {date})",
-    "result": "Kết quả",
-    "results": {
-      "ok": "Thành công, đang dùng r{revision}",
-      "failed": "Thất bại",
-      "never": "Chưa đồng bộ"
-    },
-    "inUse": "Đang dùng",
-    "latest": "Mới nhất",
     "revisionText": {
-      "newer": "Gói #{id} của r{revision} đã dựng xong. Đồng bộ để lấy bản mới.",
-      "upToDate": "Đang dùng gói sẵn sàng mới nhất (gói #{package}).",
-      "syncFailed": "Gói mới nhất trên Polygon: r{revision} ({state}). Lần đồng bộ trước lỗi; bài vẫn dùng bản cũ.",
       "notReady": "Gói mới nhất trên Polygon chưa sẵn sàng ({state}); chưa đồng bộ được.",
       "unknown": "Không hỏi được Polygon lúc này: chưa kết nối, mất kết nối hoặc tài khoản bị thu quyền đọc."
     },
-    "syncFailed": "Đồng bộ lúc {date} thất bại: {reason} Bài chưa bị thay đổi.",
     "syncNow": "Đồng bộ ngay",
-    "syncNowRevision": "Đồng bộ ngay (r{revision})",
-    "syncBlocked": "Cần một gói sẵn sàng trên Polygon để đồng bộ.",
-    "autoSyncOn": "Có gói sẵn sàng mới hơn thì tự nhập lại đề, test và checker. Đang bật.",
-    "autoSyncOff": "Có gói sẵn sàng mới hơn thì tự nhập lại đề, test và checker. Đang tắt.",
     "unlink": "Hủy liên kết",
     "readOnly": "{needs} để đồng bộ, bật tự đồng bộ hoặc hủy liên kết.",
-    "autoSyncState": "Tự đồng bộ: {state}",
     "on": "bật",
     "off": "tắt",
     "syncConfirm": {
@@ -254,6 +301,66 @@
       "title": "Hủy liên kết {code} với Polygon?",
       "body": "Nội dung bài giữ nguyên; chỉ ngừng đồng bộ (cả tự đồng bộ). Muốn liên kết lại thì nhập lại bài ở chế độ cập nhật.",
       "confirm": "Hủy liên kết"
+    },
+    "banner": {
+      "running": {
+        "title": "Đang đồng bộ",
+        "waiting": "Đang chờ máy chủ nhận lượt đồng bộ."
+      },
+      "saved": {
+        "title": "Đã lưu tùy chọn",
+        "text": "Áp dụng từ lần đồng bộ sau; bài hiện tại chưa đổi."
+      },
+      "failed": {
+        "title": "Đồng bộ lỗi · bài vẫn dùng r{revision}"
+      },
+      "attention": {
+        "title": "Đồng bộ xong nhưng cần xem lại"
+      },
+      "newer": {
+        "title": "Có bản mới: r{latest} (đang dùng r{revision})",
+        "text": "Gói dựng {date}."
+      },
+      "upToDate": {
+        "title": "Đang dùng bản mới nhất r{revision}",
+        "text": "Đồng bộ lần cuối {date}."
+      },
+      "notReady": {
+        "title": "Gói mới nhất trên Polygon chưa sẵn sàng"
+      },
+      "unknown": {
+        "title": "Không hỏi được Polygon"
+      }
+    },
+    "facts": {
+      "polygon": "Polygon",
+      "options": "Tùy chọn",
+      "autoSync": "Tự đồng bộ"
+    },
+    "edit": "Sửa",
+    "editLabel": "Sửa tùy chọn khi đồng bộ",
+    "turnOn": "Bật",
+    "turnOff": "Tắt",
+    "syncAgain": "Đồng bộ lại",
+    "editOptions": "Sửa tùy chọn",
+    "options": {
+      "main": "{language} (chính)",
+      "mapped": "{language} → {site}",
+      "skipped": "{language}: bỏ qua",
+      "tutorial": "lời giải từ {language}",
+      "defaults": "Theo gói, không chọn gì thêm",
+      "flags": {
+        "ignoreZeroPointBatches": "bỏ nhóm 0 điểm",
+        "ignoreZeroPointCases": "bỏ test 0 điểm",
+        "appendMainSolution": "thêm lời giải chính"
+      }
+    },
+    "drawer": {
+      "title": "Tùy chọn khi đồng bộ",
+      "note": "Áp dụng từ lần đồng bộ sau; bài hiện tại không đổi.",
+      "save": "Lưu tùy chọn",
+      "cancel": "Hủy",
+      "noLanguages": "Tùy chọn đã lưu không chọn đề nào: gói có một đề, đề đó là đề chính."
     }
   },
   "history": {

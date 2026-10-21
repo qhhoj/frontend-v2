@@ -22,6 +22,7 @@ export const ALLOWED = {
   'features/admin/problems/import/ImportOptionsForm.vue': { 'transition-transform': CHEVRON },
   'features/admin/problems/polygon/PolygonLinkPanel.vue': { 'transition-transform': CHEVRON },
   'features/admin/problems/polygon/PolygonLinkStep.vue': { 'transition-transform': CHEVRON },
+  'features/admin/problems/polygon/PolygonProgressStep.vue': { 'transition-transform': CHEVRON },
   'features/admin/problems/polygon/PolygonWizardPage.vue': { 'transition-transform': CHEVRON },
   'features/admin/shell/AdminNav.vue': { 'transition-transform': CHEVRON },
   'features/admin/tickets/TicketHandlingSection.vue': { 'transition-transform': CHEVRON },

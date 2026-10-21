@@ -1,5 +1,6 @@
 import type { ImportJob } from '@/api/types/problem-imports';
 import type { PolygonSyncStep } from '@/api/types/polygon';
+import { formatFileSize } from '@/lib/format';
 
 export type ImportStepKey = ImportJob['step'];
 /** The steps a job passes through while it runs (`queued` included); `done` and `failed` end it. */
@@ -7,22 +8,24 @@ export type RunningStep = Exclude<ImportStepKey, 'done' | 'failed'>;
 /** Where the job comes from: only a Polygon import or sync downloads the package first. */
 export type ImportSource = 'zip' | 'polygon';
 export type StepStatus = 'done' | 'current' | 'pending' | 'failed';
+/** A row before the end: a running step, or `checking` (the checks before the download), which a job never reports as running. */
+export type StepRow = RunningStep | 'checking';
 export interface ShownStep {
-  key: RunningStep | 'end';
+  key: StepRow | 'end';
   status: StepStatus;
 }
 
-const RUNNING_STEPS: Record<ImportSource, RunningStep[]> = {
+const ROWS: Record<ImportSource, StepRow[]> = {
   zip: ['queued', 'statements', 'tests'],
-  polygon: ['queued', 'downloading', 'statements', 'generating', 'tests'],
+  polygon: ['queued', 'checking', 'downloading', 'statements', 'generating', 'tests'],
 };
 
 export const isRunningStep = (step: ImportStepKey): step is RunningStep =>
   step !== 'done' && step !== 'failed';
 
-/** The row a failed job's `failedStep` belongs to: the checks before any work fail the queued row; the database write and the file moves after it fail the end, every running row having passed. */
-const FAILED_ROW: Record<PolygonSyncStep, RunningStep | 'end'> = {
-  checking: 'queued',
+/** The row a failed job's `failedStep` belongs to: the database write and the file moves after it fail the end, every running row having passed. */
+const FAILED_ROW: Record<PolygonSyncStep, StepRow | 'end'> = {
+  checking: 'checking',
   downloading: 'downloading',
   statements: 'statements',
   generating: 'generating',
@@ -32,11 +35,17 @@ const FAILED_ROW: Record<PolygonSyncStep, RunningStep | 'end'> = {
 };
 export const failedRowOf = (step: PolygonSyncStep) => FAILED_ROW[step];
 
-function failedSteps(running: RunningStep[], failedAt: RunningStep | 'end' | null): ShownStep[] {
-  const failedIndex =
-    failedAt === 'end' ? running.length : failedAt ? running.indexOf(failedAt) : -1;
+/** Where a failure sits in these rows: a list without the checks row (a zip import) fails them on its first row. */
+function failedIndexOf(rows: StepRow[], failedAt: StepRow | 'end' | null) {
+  if (failedAt === 'end') return rows.length;
+  if (failedAt === 'checking' && !rows.includes('checking')) return 0;
+  return failedAt ? rows.indexOf(failedAt) : -1;
+}
+
+function failedSteps(rows: StepRow[], failedAt: StepRow | 'end' | null): ShownStep[] {
+  const failedIndex = failedIndexOf(rows, failedAt);
   return [
-    ...running.map((key, index): ShownStep => {
+    ...rows.map((key, index): ShownStep => {
       if (index < failedIndex) return { key, status: 'done' };
       return { key, status: index === failedIndex ? 'failed' : 'pending' };
     }),
@@ -52,18 +61,18 @@ function failedSteps(running: RunningStep[], failedAt: RunningStep | 'end' | nul
 export function importStepsOf(
   source: ImportSource,
   step: ImportStepKey,
-  failedAt: RunningStep | 'end' | null = null,
+  failedAt: StepRow | 'end' | null = null,
 ): ShownStep[] {
-  const running = RUNNING_STEPS[source];
-  if (step === 'failed') return failedSteps(running, failedAt);
+  const rows = ROWS[source];
+  if (step === 'failed') return failedSteps(rows, failedAt);
   if (step === 'done')
     return [
-      ...running.map((key): ShownStep => ({ key, status: 'done' })),
+      ...rows.map((key): ShownStep => ({ key, status: 'done' })),
       { key: 'end', status: 'done' },
     ];
-  const currentIndex = running.indexOf(step);
+  const currentIndex = rows.indexOf(step);
   return [
-    ...running.map((key, index): ShownStep => ({
+    ...rows.map((key, index): ShownStep => ({
       key,
       status: index < currentIndex ? 'done' : index === currentIndex ? 'current' : 'pending',
     })),
@@ -78,4 +87,12 @@ export function downloadProgressOf(job: ImportJob | null) {
   const share =
     progress.total && progress.total > 0 ? Math.min(1, progress.done / progress.total) : null;
   return { done: progress.done, total: progress.total, share };
+}
+
+/** The downloaded bytes as text (`1.2 MB / 40.0 MB`, or the bytes alone without a size); '' outside the download. */
+export function downloadTextOf(job: ImportJob | null): string {
+  const download = downloadProgressOf(job);
+  if (!download) return '';
+  const done = formatFileSize(download.done);
+  return download.total === null ? done : `${done} / ${formatFileSize(download.total)}`;
 }

@@ -7,7 +7,7 @@ import { ImportPoller } from './import-poller';
 
 /**
  * Polls the job every 2 s until it is completed or failed. A 404, 401/403 or the unknown state stops it at once;
- * network, 429 and 5xx errors are retried with backoff, then it stops as `gaveUp`. Stops on unmount too.
+ * network, 429 and 5xx errors are retried with backoff, then it stops as `gaveUp` until `recheck`. Stops on unmount too.
  */
 export function useImportJob(jobId: Ref<string | null>) {
   const job = ref<ImportJob | null>(null);
@@ -18,5 +18,7 @@ export function useImportJob(jobId: Ref<string | null>) {
 
   watch(jobId, (id) => poller.start(id), { immediate: true });
   onBeforeUnmount(() => poller.dispose());
-  return { job, phase, failure, stop };
+  /** Polls again after it stopped; the last job seen stays shown meanwhile. */
+  const recheck = () => poller.resume(jobId.value);
+  return { job, phase, failure, stop, recheck };
 }

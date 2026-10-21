@@ -39,6 +39,8 @@ const routes = (permissions: string[]) => ({
       result: 'failed',
       failedStep: 'tests',
       error: 'too many tests',
+      errorCode: 'too_many_testcases',
+      errorParams: { count: 120, limit: 100 },
     }),
     run(),
   ]),
@@ -60,7 +62,7 @@ const openAllSyncs = async (wrapper: Wrapper) => {
 };
 
 describe('Polygon sync history on the wizard page', () => {
-  it('lists every run with its problem, and says where a failed one stopped and why', async () => {
+  it('lists every run with its problem, and says where a failed one stopped and why, translated', async () => {
     const calls = mockApi(routes(['judge.edit_all_problem']));
     const wrapper = await mountWizard();
     expect(calls.some((call) => call.path.startsWith('/polygon/syncs'))).toBe(false);
@@ -70,7 +72,7 @@ describe('Polygon sync history on the wizard page', () => {
     expect(failed!.text()).toContain('xau_doi_xung');
     expect(failed!.text()).toContain('Tự động');
     expect(failed!.text()).toContain('Dừng ở bước: tải test lên.');
-    expect(failed!.text()).toContain('too many tests');
+    expect(failed!.text()).toContain('Bài có 120 test, quá giới hạn 100');
     expect(succeeded!.text()).toContain('Thủ công');
     expect(succeeded!.text()).not.toContain('Dừng ở bước');
   });

@@ -31,10 +31,9 @@ describe('PolygonLinkPanel', () => {
     expect(panel.get('[data-testid="polygon-link-read-only"]').text()).toContain(
       'Cần quyền “Đồng bộ bài từ Polygon”',
     );
-    expect(panel.text()).toContain('Tự đồng bộ: bật');
+    expect(panel.get('[data-testid="polygon-link-auto-sync"]').text()).toBe('bật');
     expect(buttonsOf(panel).some((label) => label.startsWith('Đồng bộ ngay'))).toBe(false);
-    expect(buttonsOf(panel)).not.toContain('Hủy liên kết');
-    expect(panel.find('[role="switch"]').exists()).toBe(false);
+    expect(buttonsOf(panel)).toEqual([expect.stringContaining('Lịch sử đồng bộ')]);
   });
 
   it('gives a sync permission holder the sync, auto-sync and unlink controls', async () => {

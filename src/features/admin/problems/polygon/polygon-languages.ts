@@ -1,5 +1,6 @@
 import type { PolygonProblem } from '@/api/types/polygon';
 import type { ImportOptions } from '@/api/types/problem-imports';
+import { translate } from '@/i18n';
 
 type Statement = PolygonProblem['statements'][number];
 
@@ -70,6 +71,16 @@ export function repeatedLanguages(choice: LanguageChoice): string[] {
       return isRepeated;
     })
     .map(([language]) => language);
+}
+
+/** "Đề khác đã là …" under each statement that repeats a site language, keyed as `PolygonLanguageFields` takes errors. */
+export function repeatedLanguageErrors(choice: LanguageChoice): Record<string, string> {
+  const errors: Record<string, string> = {};
+  for (const language of repeatedLanguages(choice))
+    errors[`other:${language}`] = translate('admin.polygonLink.configure.languages.repeated', {
+      site: translate(`admin.polygonLink.configure.languages.site.${choice.others[language]}`),
+    });
+  return errors;
 }
 
 type LanguageOptions = Pick<

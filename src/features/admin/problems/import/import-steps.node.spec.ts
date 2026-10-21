@@ -7,9 +7,10 @@ const statuses = (steps: ReturnType<typeof importStepsOf>) =>
   steps.map((step) => `${step.key}:${step.status}`);
 
 describe('importStepsOf', () => {
-  it('lists the download step only for a Polygon job', () => {
+  it('lists the checks and the download only for a Polygon job', () => {
     expect(importStepsOf('polygon', 'queued').map((step) => step.key)).toEqual([
       'queued',
+      'checking',
       'downloading',
       'statements',
       'generating',
@@ -27,6 +28,7 @@ describe('importStepsOf', () => {
   it('marks the steps before the current one done and the rest pending', () => {
     expect(statuses(importStepsOf('polygon', 'statements'))).toEqual([
       'queued:done',
+      'checking:done',
       'downloading:done',
       'statements:current',
       'generating:pending',
@@ -39,9 +41,23 @@ describe('importStepsOf', () => {
     expect(importStepsOf('zip', 'done').every((step) => step.status === 'done')).toBe(true);
   });
 
+  it('passes the checks only once the download starts', () => {
+    expect(statuses(importStepsOf('polygon', 'queued')).slice(0, 3)).toEqual([
+      'queued:current',
+      'checking:pending',
+      'downloading:pending',
+    ]);
+    expect(statuses(importStepsOf('polygon', 'downloading')).slice(0, 3)).toEqual([
+      'queued:done',
+      'checking:done',
+      'downloading:current',
+    ]);
+  });
+
   it('fails the last step the page saw and keeps the earlier ones done', () => {
     expect(statuses(importStepsOf('polygon', 'failed', 'tests'))).toEqual([
       'queued:done',
+      'checking:done',
       'downloading:done',
       'statements:done',
       'generating:done',
@@ -50,12 +66,19 @@ describe('importStepsOf', () => {
     ]);
   });
 
-  it('places the server failure step: checks fail the queued row, the write and the file moves fail the end', () => {
+  it('places the server failure step: the checks fail their row (the first one of a zip import), the write and the file moves the end', () => {
     expect(statuses(importStepsOf('polygon', 'failed', failedRowOf('checking')))).toEqual([
-      'queued:failed',
+      'queued:done',
+      'checking:failed',
       'downloading:pending',
       'statements:pending',
       'generating:pending',
+      'tests:pending',
+      'end:failed',
+    ]);
+    expect(statuses(importStepsOf('zip', 'failed', failedRowOf('checking')))).toEqual([
+      'queued:failed',
+      'statements:pending',
       'tests:pending',
       'end:failed',
     ]);

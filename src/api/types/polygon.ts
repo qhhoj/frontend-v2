@@ -6,6 +6,7 @@ export type PolygonProblem = Schemas['PolygonProblemResponse'];
 export type PolygonPackageState = Schemas['PolygonPackageState'];
 export type PolygonPackageType = Schemas['PolygonPackageType'];
 export type PolygonImportBody = JsonBodyOf<'/polygon/import', 'post'>;
+export type PolygonLinkUpdate = JsonBodyOf<'/problems/{code}/polygon', 'patch'>;
 export type PolygonTestResult = Schemas['PolygonTestResponse'];
 export type PolygonLink = Schemas['PolygonLinkResponse'];
 export type PolygonLinkState = Schemas['PolygonLinkStateResponse'];

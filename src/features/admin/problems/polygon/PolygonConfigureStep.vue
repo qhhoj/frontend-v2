@@ -11,31 +11,47 @@ import { buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import ImportCheckbox from '../import/ImportCheckbox.vue';
 import ImportOptionsForm from '../import/ImportOptionsForm.vue';
-import { IMPORT_FORM_FIELDS, codeFromPolygonName } from '../import/import-form';
+import { IMPORT_FORM_FIELDS, codeFromPolygonName, emptyImportForm } from '../import/import-form';
 import type { ImportForm } from '../import/import-form';
 import { importRefusalText } from '../import/import-refusal';
 import PolygonLanguageFields from './PolygonLanguageFields.vue';
 import PolygonOverwriteConfirm from './PolygonOverwriteConfirm.vue';
 import PolygonSourcePanel from './PolygonSourcePanel.vue';
 import PolygonUpdateTarget from './PolygonUpdateTarget.vue';
-import { defaultLanguageChoice, repeatedLanguages, toLanguageOptions } from './polygon-languages';
+import {
+  defaultLanguageChoice,
+  repeatedLanguageErrors,
+  repeatedLanguages,
+  toLanguageOptions,
+} from './polygon-languages';
 import { optionsRefusalOf } from './polygon-options-refusal';
 import { packageRevisionOf } from './polygon-preview';
+import type { ConfigureDraft } from './polygon-wizard';
 
 /**
  * Step 2 (configure option A): the import's target, the package's statement languages (selects fed by the preview),
  * judging and sync, then the QHHOJ catalog folded. "Bắt đầu nhập" starts the job; an update first confirms what the
  * package overwrites.
  */
-const props = defineProps<{ link: string; problem: PolygonProblem }>();
-const emit = defineEmits<{ back: []; started: [jobId: string, body: PolygonImportBody] }>();
-const autoSync = ref(false);
+const props = defineProps<{
+  link: string;
+  problem: PolygonProblem;
+  /** The form as it was sent, when "Sửa thiết lập" comes back to it. */
+  draft: ConfigureDraft | null;
+}>();
+const emit = defineEmits<{
+  back: [];
+  started: [jobId: string, body: PolygonImportBody, draft: ConfigureDraft];
+}>();
+const autoSync = ref(props.draft?.autoSync ?? false);
 /** Auto-sync runs with the importer's `judge.sync_polygon_problem`; an importer without it links with auto-sync off. */
 const { canAny } = usePermissions();
 const canAutoSync = computed(() => canAny(SYNC_POLYGON));
-const initial = { code: codeFromPolygonName(props.problem.name) };
+const initial = props.draft?.form ?? { code: codeFromPolygonName(props.problem.name) };
 const statements = props.problem.statements;
-const languages = ref(defaultLanguageChoice(statements));
+const languages = ref(props.draft?.languages ?? defaultLanguageChoice(statements));
+/** The form of the start in flight, handed to the progress step with its job. */
+const sentForm = ref<ImportForm | null>(null);
 /** The update body waiting for the overwrite confirmation. */
 const pending = ref<PolygonImportBody | null>(null);
 const isConfirmOpen = computed({
@@ -45,7 +61,10 @@ const isConfirmOpen = computed({
 
 const { run, isPending, fieldErrors, failure, reset } = useAdminMutation({
   mutate: (body: PolygonImportBody) => startPolygonLinkImport(body),
-  onDone: ({ jobId }, body) => emit('started', jobId, body),
+  onDone: ({ jobId }, body) => {
+    const form = sentForm.value ?? { ...emptyImportForm(), ...initial };
+    emit('started', jobId, body, { form, languages: languages.value, autoSync: autoSync.value });
+  },
 });
 const optionsRefusal = computed(() => optionsRefusalOf(failure.value));
 /** A language refusal is about the choice as sent: a new choice clears it. */
@@ -53,13 +72,7 @@ watch(languages, () => void (optionsRefusal.value && reset()));
 
 /** Two translations into one site language are refused by the server; said under the second one before it is asked. */
 const languageErrors = computed(() => {
-  const errors: Record<string, string> = {};
-  for (const language of repeatedLanguages(languages.value))
-    errors[`other:${language}`] = translate('admin.polygonLink.configure.languages.repeated', {
-      site: translate(
-        `admin.polygonLink.configure.languages.site.${languages.value.others[language]}`,
-      ),
-    });
+  const errors = repeatedLanguageErrors(languages.value);
   const server = optionsRefusal.value;
   if (server?.field) errors[server.field] ??= server.text;
   return errors;
@@ -76,8 +89,9 @@ const bodyOf = (options: ImportOptions): PolygonImportBody => ({
   autoSync: autoSync.value,
 });
 
-function start({ options }: { options: ImportOptions }) {
+function start({ options, form }: { options: ImportOptions; form: ImportForm }) {
   if (repeatedLanguages(languages.value).length > 0) return;
+  sentForm.value = form;
   const body = bodyOf(options);
   if (body.mode === 'update') pending.value = body;
   else void run(body);

@@ -1,0 +1,109 @@
+import type { Schemas } from '@/api/schemas';
+import type { PolygonProblem } from '@/api/types/polygon';
+import { translate } from '@/i18n';
+import type { ImportErrorCode, ImportErrorParams } from './polygon-import-errors';
+import { SITE_LANGUAGE_CHOICES, settleLanguageChoice } from './polygon-languages';
+import type { LanguageChoice, SiteLanguageChoice } from './polygon-languages';
+
+type Options = Schemas['PolygonLinkOptionsResponse'];
+type Statement = PolygonProblem['statements'][number];
+/** The flags the drawer edits beside the languages. */
+export type LinkFlags = Pick<
+  Options,
+  'ignoreZeroPointBatches' | 'ignoreZeroPointCases' | 'appendMainSolution'
+>;
+/** The PATCH body of the link's saved options; `maxCases` is not editable, `autoSync` has its own switch. */
+export type LinkOptionsBody = LinkFlags &
+  Pick<Options, 'mainStatementLanguage' | 'statementLanguages' | 'tutorialLanguage'>;
+
+/** `english=en` pairs as a map; a malformed pair or an unknown site language is left out. */
+function savedPairs(options: Options): Record<string, SiteLanguageChoice> {
+  const pairs: Record<string, SiteLanguageChoice> = {};
+  for (const pair of options.statementLanguages) {
+    const [language = '', site = ''] = pair.split('=');
+    if (language && (SITE_LANGUAGE_CHOICES as readonly string[]).includes(site))
+      pairs[language] = site as SiteLanguageChoice;
+  }
+  return pairs;
+}
+
+const listParam = (value: unknown): string[] =>
+  Array.isArray(value) ? value.map(String) : typeof value === 'string' ? [value] : [];
+
+/** The Polygon languages a sync failure names: a statement without a site language, or the choices it lacked. */
+function failureLanguages(code: ImportErrorCode | null, params: ImportErrorParams): string[] {
+  switch (code) {
+    case 'statement_language_unmapped':
+      return listParam(params?.language);
+    case 'statement_language_required':
+    case 'tutorial_language_required':
+      return listParam(params?.languages);
+    default:
+      return [];
+  }
+}
+
+/**
+ * The statements the drawer offers, without a preview of the package: the ones the saved options name, plus the ones the
+ * last sync's failure named (a statement new on Polygon). A tutorial is known only where it was chosen or listed by a
+ * `tutorial_language_required` failure: elsewhere the server ignores the choice anyway.
+ */
+export function linkStatementsOf(
+  options: Options,
+  code: ImportErrorCode | null,
+  params: ImportErrorParams,
+): Statement[] {
+  const named = [options.mainStatementLanguage ?? '', ...Object.keys(savedPairs(options))];
+  const languages = [...new Set([...named, ...failureLanguages(code, params)])].filter(Boolean);
+  const tutorials = new Set([options.tutorialLanguage ?? '']);
+  if (code === 'tutorial_language_required')
+    for (const language of listParam(params?.languages)) tutorials.add(language);
+  return languages.map((language) => ({
+    language,
+    title: null,
+    hasTutorial: tutorials.has(language),
+  }));
+}
+
+/** The saved options as the language selects hold them, made whole for these statements. */
+export const linkChoiceOf = (options: Options, statements: Statement[]): LanguageChoice =>
+  settleLanguageChoice(statements, {
+    main: options.mainStatementLanguage ?? '',
+    others: savedPairs(options),
+    tutorial: options.tutorialLanguage ?? '',
+  });
+
+/** The whole saved options as the PATCH replaces them. */
+export const linkOptionsBodyOf = (choice: LanguageChoice, flags: LinkFlags): LinkOptionsBody => ({
+  mainStatementLanguage: choice.main || null,
+  statementLanguages: Object.entries(choice.others).map(
+    ([language, site]) => `${language}=${site}`,
+  ),
+  tutorialLanguage: choice.tutorial || null,
+  ignoreZeroPointBatches: flags.ignoreZeroPointBatches,
+  ignoreZeroPointCases: flags.ignoreZeroPointCases,
+  appendMainSolution: flags.appendMainSolution,
+});
+
+const KEY = 'admin.polygonLink.panel.options';
+const FLAGS = ['ignoreZeroPointBatches', 'ignoreZeroPointCases', 'appendMainSolution'] as const;
+
+/** The saved options on one line: the main statement, what each other one becomes, the tutorial and the flags set. */
+export function linkOptionsLineOf(options: Options): string {
+  const pairs = Object.entries(savedPairs(options)).map(([language, site]) =>
+    site === 'skip'
+      ? translate(`${KEY}.skipped`, { language })
+      : translate(`${KEY}.mapped`, { language, site }),
+  );
+  const parts = [
+    ...(options.mainStatementLanguage
+      ? [translate(`${KEY}.main`, { language: options.mainStatementLanguage })]
+      : []),
+    ...pairs,
+    ...(options.tutorialLanguage
+      ? [translate(`${KEY}.tutorial`, { language: options.tutorialLanguage })]
+      : []),
+    ...FLAGS.filter((flag) => options[flag]).map((flag) => translate(`${KEY}.flags.${flag}`)),
+  ];
+  return parts.length > 0 ? parts.join(' · ') : translate(`${KEY}.defaults`);
+}

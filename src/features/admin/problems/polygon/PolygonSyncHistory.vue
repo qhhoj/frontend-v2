@@ -12,6 +12,7 @@ import AdminChip from '../../ui/AdminChip.vue';
 import AdminUserLabel from '../../ui/AdminUserLabel.vue';
 import AdminDataTable from '../../ui/table/AdminDataTable.vue';
 import type { AdminColumn } from '../../ui/table/table-columns';
+import { importErrorOf } from './polygon-import-errors';
 import { usePolygonSyncsQuery } from './polygon.queries';
 
 /**
@@ -38,6 +39,9 @@ const columns = computed<AdminColumn[]>(() => [
   { key: 'by', label: t('admin.polygonLink.history.columns.by'), priority: 'meta' },
 ]);
 const dateText = (date: string) => formatDate(date, 'datetime', locale.locale);
+/** A run with a code says why in the reader's language; an older one has only the server's English. */
+const reasonOf = (row: PolygonSyncRun) =>
+  row.errorCode ? importErrorOf(row.errorCode, row.errorParams).title : row.error;
 const isFailed = (run: PolygonSyncRun) => run.result === 'failed';
 </script>
 
@@ -68,7 +72,7 @@ const isFailed = (run: PolygonSyncRun) => run.result === 'failed';
             })
           }}
         </template>
-        {{ row.error }}
+        {{ reasonOf(row) }}
       </span>
     </template>
     <template #cell-result="{ row }">

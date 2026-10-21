@@ -1,0 +1,122 @@
+{
+  "polygon_not_connected": {
+    "title": "Polygon chưa được kết nối",
+    "fix": "Quản trị viên cần lưu khóa API và secret Polygon trong Cài đặt."
+  },
+  "polygon_unauthorized": {
+    "title": "Polygon từ chối khóa API",
+    "fix": "Khóa hoặc secret Polygon sai. Quản trị viên cần lưu lại trong Cài đặt."
+  },
+  "polygon_clock_skew": {
+    "title": "Polygon từ chối chữ ký",
+    "fix": "Đồng hồ máy chủ lệch so với Polygon. Báo quản trị viên."
+  },
+  "polygon_failed": {
+    "title": "Polygon báo lỗi khi giao gói",
+    "fix": "Thử lại sau ít phút."
+  },
+  "polygon_unavailable": {
+    "title": "Không kết nối được Polygon",
+    "fix": "Polygon chưa trả lời. Thử lại sau ít phút."
+  },
+  "polygon_package_unavailable": {
+    "title": "Polygon không giao được gói",
+    "fix": "Thử lại sau ít phút; nếu vẫn lỗi, dựng gói mới trên Polygon."
+  },
+  "polygon_package_too_large": {
+    "title": "Gói lớn hơn 512 MiB",
+    "fix": "Giảm kích thước test rồi dựng gói mới trên Polygon."
+  },
+  "import_failed": {
+    "title": "Không nhập được",
+    "fix": "Hệ thống lỗi chưa rõ nguyên nhân. Thử lại; nếu vẫn lỗi, báo quản trị viên."
+  },
+  "package_invalid": {
+    "title": "Gói có phần không chuyển được",
+    "fix": "Sửa phần được báo dưới đây trên Polygon, dựng gói mới rồi nhập lại."
+  },
+  "package_incomplete": {
+    "title": "Gói full thiếu test",
+    "fix": "Gói được dựng mà không kèm test. Dựng lại gói full có test trên Polygon."
+  },
+  "package_needs_full": {
+    "title": "Bài này cần gói full",
+    "fix": "Bài tương tác hoặc generator nhiều tệp cần gói full. Dựng gói full trên Polygon."
+  },
+  "too_many_testcases": {
+    "title": "Bài có {count} test, quá giới hạn {limit}",
+    "fix": "Bỏ nhóm hoặc test 0 điểm, hoặc bớt test trên Polygon."
+  },
+  "statement_language_required": {
+    "title": "Chưa chọn đề chính",
+    "fix": "Gói có các đề {languages}. Chọn một đề làm đề chính."
+  },
+  "statement_language_unmapped": {
+    "title": "Đề {language} chưa được gán ngôn ngữ",
+    "fix": "Chọn en, vi hoặc Bỏ qua cho đề {language}."
+  },
+  "statement_language_repeated": {
+    "title": "Hai đề cùng là ngôn ngữ {language}",
+    "fix": "Đổi một đề sang ngôn ngữ khác hoặc Bỏ qua."
+  },
+  "tutorial_language_required": {
+    "title": "Chưa chọn lời giải",
+    "fix": "Gói có lời giải ở {languages}. Chọn một bản làm lời giải."
+  },
+  "checker_unsupported": {
+    "title": "Checker của gói không chạy được",
+    "fix": "Đổi checker trên Polygon, dựng gói mới rồi nhập lại."
+  },
+  "generation_failed": {
+    "title": "Sinh test trên judge lỗi",
+    "fix": "Kiểm tra generator và lời giải chính trên Polygon, hoặc dùng gói full."
+  },
+  "generation_no_judge": {
+    "title": "Chưa có judge để sinh test",
+    "fix": "Hệ thống đã tự thử lại một lần. Thử lại khi có judge trực tuyến."
+  },
+  "generation_timeout": {
+    "title": "Sinh test quá lâu",
+    "fix": "Dùng gói full để bỏ qua bước sinh test."
+  },
+  "storage_full": {
+    "title": "Không đủ dung lượng lưu trữ",
+    "fix": "Tổ chức không còn chỗ cho gói này. Nhờ quản trị viên nâng hạn mức."
+  },
+  "problem_code_taken": {
+    "title": "Mã bài đã có",
+    "fix": "Chọn mã khác, hoặc chọn Cập nhật để ghi đè bài đó."
+  },
+  "problem_not_found": {
+    "title": "Không thấy bài cần cập nhật",
+    "fix": "Bài đã bị xóa hoặc đổi mã. Kiểm tra lại mã bài."
+  },
+  "problem_not_importable": {
+    "title": "Bài này không nhận gói nhập",
+    "fix": "Bài đã xóa, là bản sao, được quản lý thủ công hoặc vừa đổi kiểu soạn. Chọn bài khác."
+  },
+  "problem_changed": {
+    "title": "Bài thay đổi trong lúc chờ",
+    "fix": "Test hoặc nội dung bài vừa được sửa. Thử lại để nhập theo bản mới."
+  },
+  "problem_unlinked": {
+    "title": "Bài đã hủy liên kết",
+    "fix": "Bài không còn liên kết với Polygon khi lượt đồng bộ chạy."
+  },
+  "polygon_already_linked": {
+    "title": "Bài Polygon này đã liên kết",
+    "fix": "Nó đã liên kết với một bài QHHOJ khác. Cập nhật bài đó thay vì tạo bài mới."
+  },
+  "requester_forbidden": {
+    "title": "Thiếu quyền",
+    "fix": "Bạn vừa mất một quyền lượt nhập cần. Nhờ quản trị viên cấp lại."
+  },
+  "imported_needs_attention": {
+    "title": "Bài đã nhập, nhưng bước đặt tệp dữ liệu lỗi",
+    "fix": "Đồng bộ lại để đặt lại tệp dữ liệu; thiết lập giữ nguyên."
+  },
+  "unknown": {
+    "title": "Không nhập được",
+    "fix": "Hệ thống không cho biết thêm lý do. Thử lại; nếu vẫn lỗi, báo quản trị viên."
+  }
+}

@@ -1,62 +1,207 @@
 <script setup lang="ts">
-import { computed, toRef } from 'vue';
-import { startPolygonLinkImport } from '@/api/polygon.api';
+import { ChevronRight, ExternalLink, Pencil, RefreshCw, RotateCcw } from 'lucide-vue-next';
+import { computed, ref, toRef, watch } from 'vue';
+import { startPolygonLinkImport, syncPolygonLink } from '@/api/polygon.api';
 import type { PolygonImportBody } from '@/api/types/polygon';
+import AppButton from '@/components/ui/AppButton.vue';
+import Card from '@/components/ui/Card.vue';
+import Notice from '@/components/ui/Notice.vue';
+import { translate } from '@/i18n';
+import { formatDuration } from '@/lib/format';
+import { formatClock, formatDate } from '@/lib/format-date';
+import { useLocaleStore } from '@/stores/locale.store';
+import { usePermissions } from '@/stores/use-permissions';
+import { SYNC_POLYGON } from '../../admin-screens';
 import AdminStatus from '../../ui/AdminStatus.vue';
-import { buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
-import ImportProgress from '../import/ImportProgress.vue';
+import ImportStepList from '../import/ImportStepList.vue';
 import { importRefusalText } from '../import/import-refusal';
 import { useImportJob } from '../import/use-import-job';
+import { useImportSteps } from '../import/use-import-steps';
+import ImportOutcomeHeader from './ImportOutcomeHeader.vue';
+import ImportStepBar from './ImportStepBar.vue';
+import ImportSummaryTable from './ImportSummaryTable.vue';
+import { outcomeActionOf, outcomeKindOf, queueLinesOf, runningLineOf } from './import-outcome';
+import type { OutcomeKind } from './import-outcome';
+import { importErrorOf } from './polygon-import-errors';
 
-/** Step 3: follows the job; a failed one can be started again with the same link and options while this page still has them. */
-const props = defineProps<{ jobId: string; body: PolygonImportBody | null }>();
-const emit = defineEmits<{ started: [jobId: string, body: PolygonImportBody]; restart: [] }>();
-const { job, phase, failure: pollFailure, stop } = useImportJob(toRef(props, 'jobId'));
-const code = computed(() => job.value?.result?.code ?? props.body?.code ?? '');
-const isFinished = computed(
-  () => phase.value === 'done' || phase.value === 'failed' || !!stop.value,
+/**
+ * Step 3 (progress option B): the outcome first (header, one segment per step), then its cause and fix or the
+ * conversion summary, then its one action: "Thử lại" after a failure that may pass by itself, "Sửa thiết lập" back to the
+ * options kept in the wizard (`canEdit`), "Đồng bộ lại" after a post-commit failure, "Kiểm tra lại" after polling gave up.
+ */
+const props = defineProps<{ jobId: string; body: PolygonImportBody | null; canEdit: boolean }>();
+const emit = defineEmits<{
+  started: [jobId: string, body: PolygonImportBody | null];
+  edit: [];
+  restart: [];
+}>();
+const locale = useLocaleStore();
+const { canAny } = usePermissions();
+const { job, phase, failure: pollFailure, stop, recheck } = useImportJob(toRef(props, 'jobId'));
+const steps = useImportSteps('polygon', job);
+const kind = computed(() => outcomeKindOf(phase.value, job.value, stop.value));
+const code = computed(() => job.value?.result?.code ?? job.value?.code ?? props.body?.code ?? '');
+const error = computed(() =>
+  importErrorOf(job.value?.errorCode ?? null, job.value?.errorParams ?? null),
 );
+const attention = computed(() =>
+  importErrorOf('imported_needs_attention', job.value?.result?.attention?.params ?? null),
+);
+/** The converter's own words: the only specifics of a refused package or checker. */
+const detail = computed(() =>
+  error.value.kind === 'other' && job.value?.errorCode !== 'import_failed'
+    ? (job.value?.error ?? '')
+    : '',
+);
+const action = computed(() =>
+  outcomeActionOf(
+    kind.value,
+    { retryable: job.value?.retryable ?? false, kind: error.value.kind },
+    { retry: !!props.body, edit: props.canEdit, sync: canAny(SYNC_POLYGON) },
+  ),
+);
+
+/** When the job was last seen: the "Chưa rõ trạng thái" line says how old its step is. */
+const lastSeenAt = ref(new Date().toISOString());
+watch(job, () => (lastSeenAt.value = new Date().toISOString()));
+
+const KEY = 'admin.polygonLink.progress';
+const title = computed(() => {
+  const verb = job.value?.purpose === 'sync' ? 'sync' : 'import';
+  return translate(`${KEY}.outcome.${verb}.${kind.value}`, { code: code.value });
+});
+function finishedLine() {
+  const { createdAt, finishedAt } = job.value ?? {};
+  if (!createdAt || !finishedAt) return '';
+  const seconds = (Date.parse(finishedAt) - Date.parse(createdAt)) / 1000;
+  const date = formatDate(finishedAt, 'datetime', locale.locale);
+  return translate(`${KEY}.finished`, { date, duration: formatDuration(seconds) });
+}
+function failedLine() {
+  const step = job.value?.failedStep;
+  if (!step) return '';
+  const name = translate(`admin.polygon.progress.failedSteps.${step}`);
+  return translate('admin.polygon.progress.stoppedAt', { step: name });
+}
+function lastSeenLine() {
+  if (!job.value) return '';
+  const time = formatClock(lastSeenAt.value);
+  return translate(`${KEY}.lastSeen`, { step: runningLineOf(job.value), time });
+}
+const LINES: Partial<Record<OutcomeKind, () => string>> = {
+  queued: () => queueLinesOf(job.value?.queuePosition ?? null).place,
+  running: () => (job.value ? runningLineOf(job.value) : ''),
+  done: finishedLine,
+  attention: () => attention.value.title,
+  failed: failedLine,
+  lost: lastSeenLine,
+  gone: () => (stop.value ? translate(`admin.polygon.progress.stopped.${stop.value}`) : ''),
+};
+const line = computed(() => LINES[kind.value]?.() ?? '');
+const hint = computed(() => {
+  if (kind.value === 'queued') return queueLinesOf(job.value?.queuePosition ?? null).ahead;
+  if (kind.value !== 'running') return '';
+  return translate(`${KEY}.hint.${job.value?.step === 'generating' ? 'generating' : 'running'}`);
+});
 
 const retry = useAdminMutation({
   mutate: (body: PolygonImportBody) => startPolygonLinkImport(body),
   onDone: ({ jobId }, body) => emit('started', jobId, body),
 });
-const retryRefusal = computed(() =>
-  retry.failure.value ? importRefusalText(retry.failure.value) : null,
-);
+const resync = useAdminMutation({
+  mutate: (problem: string) => syncPolygonLink(problem),
+  onDone: ({ jobId }) => emit('started', jobId, null),
+});
+const actionFailure = computed(() => retry.failure.value ?? resync.failure.value);
+const openTo = computed(() => ({ name: 'admin-problemGeneral', params: { code: code.value } }));
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <ImportProgress
-      source="polygon"
-      :code="code"
-      :phase="phase"
-      :job="job"
-      :poll-failure="pollFailure"
-      :stop="stop"
+    <Card
+      variant="flat"
+      class="flex flex-col gap-4 p-4 md:p-5"
+      aria-labelledby="import-outcome-title"
+      aria-live="polite"
+      data-testid="import-outcome"
     >
-      <template #actions>
-        <button
-          v-if="phase === 'failed' && body"
-          type="button"
-          :class="buttonClass('primary')"
-          :aria-busy="retry.isPending.value || undefined"
+      <ImportOutcomeHeader :kind="kind" :title="title" :line="line" />
+      <ImportStepBar :steps="steps" :attention="kind === 'attention'" />
+      <p v-if="hint" class="text-meta text-muted">{{ hint }}</p>
+
+      <div v-if="kind === 'failed'" class="flex flex-col gap-1" data-testid="import-failure">
+        <p class="font-semibold">{{ error.title }}</p>
+        <p class="text-sm">{{ error.fix }}</p>
+        <p v-if="detail" class="font-mono text-meta break-words text-muted">
+          {{ $t(`${KEY}.serverSays`, { text: detail }) }}
+        </p>
+      </div>
+      <p v-else-if="kind === 'attention'" class="text-sm">{{ attention.fix }}</p>
+      <ImportSummaryTable
+        v-else-if="kind === 'done' && job?.result?.summary"
+        :summary="job.result.summary"
+      />
+      <Notice v-else-if="kind === 'lost'" compact tone="info" :title="$t(`${KEY}.lost.title`)">
+        {{ $t(`${KEY}.lost.text`) }}
+      </Notice>
+      <p v-if="pollFailure && !stop" class="text-meta text-muted">
+        {{ $t('admin.polygon.progress.pollFailed') }}
+      </p>
+
+      <div class="flex flex-wrap gap-2 empty:hidden">
+        <AppButton v-if="action === 'open'" tone="primary" :to="openTo">
+          <template #icon><ExternalLink aria-hidden="true" class="size-4" /></template>
+          {{ $t('admin.polygon.progress.open', { code }) }}
+        </AppButton>
+        <template v-else-if="action === 'resync'">
+          <AppButton tone="primary" :loading="resync.isPending.value" @click="resync.run(code)">
+            <template #icon><RefreshCw aria-hidden="true" class="size-4" /></template>
+            {{ $t(`${KEY}.resync`, { code }) }}
+          </AppButton>
+          <AppButton :to="openTo">
+            <template #icon><ExternalLink aria-hidden="true" class="size-4" /></template>
+            {{ $t('admin.polygon.progress.open', { code }) }}
+          </AppButton>
+        </template>
+        <AppButton
+          v-else-if="action === 'retry' && body"
+          tone="primary"
+          :loading="retry.isPending.value"
           @click="retry.run(body)"
         >
-          {{ $t('admin.polygonLink.progress.retry') }}
-        </button>
-        <button
-          v-if="isFinished"
-          type="button"
-          :class="buttonClass('secondary')"
+          <template #icon><RotateCcw aria-hidden="true" class="size-4" /></template>
+          {{ $t(`${KEY}.retry`) }}
+        </AppButton>
+        <AppButton v-else-if="action === 'edit'" tone="primary" @click="emit('edit')">
+          <template #icon><Pencil aria-hidden="true" class="size-4" /></template>
+          {{ $t(`${KEY}.edit`) }}
+        </AppButton>
+        <AppButton v-else-if="action === 'recheck'" tone="primary" @click="recheck()">
+          <template #icon><RefreshCw aria-hidden="true" class="size-4" /></template>
+          {{ $t(`${KEY}.recheck`) }}
+        </AppButton>
+        <AppButton
+          v-if="kind !== 'lost' && kind !== 'waiting'"
+          :tone="action ? 'ghost' : 'secondary'"
           @click="emit('restart')"
         >
-          {{ $t('admin.polygonLink.progress.another') }}
-        </button>
-      </template>
-    </ImportProgress>
-    <AdminStatus v-if="retryRefusal" kind="refused" :text="retryRefusal" />
+          {{ $t(`${KEY}.another`) }}
+        </AppButton>
+      </div>
+
+      <details class="group border-t border-line pt-3">
+        <summary class="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-semibold">
+          <ChevronRight
+            aria-hidden="true"
+            class="size-4 text-muted transition-transform group-open:rotate-90"
+            :stroke-width="1.75"
+          />
+          {{ $t(`${KEY}.stepsFold`) }}
+        </summary>
+        <ImportStepList :steps="steps" :job="job" class="mt-2" />
+      </details>
+    </Card>
+    <AdminStatus v-if="actionFailure" kind="refused" :text="importRefusalText(actionFailure)" />
   </div>
 </template>

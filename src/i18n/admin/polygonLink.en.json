@@ -201,46 +201,93 @@
   },
   "progress": {
     "title": "Importing from Polygon",
-    "lead": "The package is processed in the background. You may leave; the import keeps running and stays at this address for 24 hours.",
+    "lead": "The package is processed in the background. You can leave; the import keeps running and stays in “My imports”.",
     "retry": "Try again",
-    "another": "Import another problem"
+    "another": "Import another problem",
+    "outcome": {
+      "import": {
+        "waiting": "Asking for the state of {code}",
+        "queued": "Waiting to import {code}",
+        "running": "Importing {code}",
+        "done": "Imported {code}",
+        "attention": "Imported {code}, needs a look",
+        "failed": "Could not import {code}",
+        "lost": "State of {code} unknown",
+        "gone": "Cannot follow the import of {code}"
+      },
+      "sync": {
+        "waiting": "Asking for the state of {code}",
+        "queued": "Waiting to sync {code}",
+        "running": "Syncing {code}",
+        "done": "Synced {code}",
+        "attention": "Synced {code}, needs a look",
+        "failed": "Could not sync {code}",
+        "lost": "State of {code} unknown",
+        "gone": "Cannot follow the sync of {code}"
+      }
+    },
+    "queue": {
+      "waiting": "Waiting in the queue",
+      "place": "Number {position} in the queue",
+      "noneAhead": "Ahead of you: none.",
+      "ahead": "Ahead of you: {count}."
+    },
+    "hint": {
+      "running": "You can leave; the import keeps running.",
+      "generating": "Generating tests usually takes 2 to 30 minutes."
+    },
+    "finished": "Finished {date} · took {duration}",
+    "lastSeen": "Last seen: {step} at {time}",
+    "lost": {
+      "title": "No state after several tries",
+      "text": "The page asked several times without an answer. The import keeps running on the server."
+    },
+    "recheck": "Check again",
+    "edit": "Change options",
+    "resync": "Sync {code} again",
+    "serverSays": "Details from the server: {text}",
+    "stepsFold": "Step details",
+    "barLabel": "Step {done}/{total}",
+    "summary": {
+      "title": "What differs from Polygon",
+      "item": "Item",
+      "value": "On QHHOJ",
+      "note": "Note",
+      "rows": {
+        "checker": "Checker",
+        "tests": "Tests",
+        "time": "Time",
+        "memory": "Memory"
+      },
+      "interactive": "Interactive: the interactor judges",
+      "checkerIgnored": "The package checker is not run",
+      "tests": "{count} tests",
+      "cases": "{count} judged cases",
+      "batches": "{count} groups",
+      "lowered": "Polygon: {polygon}, lowered to the maximum",
+      "raised": "Polygon: {polygon}, raised to the minimum"
+    }
   },
   "panel": {
     "title": "Polygon link",
     "status": {
       "newer": "Newer version",
       "upToDate": "Up to date",
-      "syncFailed": "Sync failed",
       "notReady": "Package not ready",
-      "unknown": "Polygon unreachable"
+      "unknown": "Polygon unreachable",
+      "running": "Syncing",
+      "saved": "Waiting for a sync",
+      "failed": "Sync failed",
+      "attention": "Needs a look"
     },
-    "problem": "Polygon problem",
-    "lastSync": "Last sync",
     "linkedAt": "Never synced (linked {date})",
-    "result": "Result",
-    "results": {
-      "ok": "Succeeded, using r{revision}",
-      "failed": "Failed",
-      "never": "Never synced"
-    },
-    "inUse": "In use",
-    "latest": "Newest",
     "revisionText": {
-      "newer": "Package #{id} of r{revision} is built. Sync to take the new version.",
-      "upToDate": "Using the newest ready package (package #{package}).",
-      "syncFailed": "Newest package on Polygon: r{revision} ({state}). The last sync failed; the problem keeps the old version.",
       "notReady": "The newest package on Polygon is not ready ({state}); it cannot be synced yet.",
       "unknown": "Polygon cannot be asked right now: not connected, unreachable, or the account lost read access."
     },
-    "syncFailed": "The sync at {date} failed: {reason} The problem was not changed.",
     "syncNow": "Sync now",
-    "syncNowRevision": "Sync now (r{revision})",
-    "syncBlocked": "Syncing needs a ready package on Polygon.",
-    "autoSyncOn": "A newer ready package re-imports the statements, tests and checker. On.",
-    "autoSyncOff": "A newer ready package re-imports the statements, tests and checker. Off.",
     "unlink": "Unlink",
     "readOnly": "{needs} to sync, switch auto-sync or unlink.",
-    "autoSyncState": "Auto-sync: {state}",
     "on": "on",
     "off": "off",
     "syncConfirm": {
@@ -254,6 +301,66 @@
       "title": "Unlink {code} from Polygon?",
       "body": "The problem's content stays; only syncing stops (auto-sync too). To link again, import the problem in update mode.",
       "confirm": "Unlink"
+    },
+    "banner": {
+      "running": {
+        "title": "Syncing",
+        "waiting": "Waiting for the server to take the sync."
+      },
+      "saved": {
+        "title": "Options saved",
+        "text": "They apply from the next sync; the problem has not changed yet."
+      },
+      "failed": {
+        "title": "Sync failed · still on r{revision}"
+      },
+      "attention": {
+        "title": "Synced, but needs a look"
+      },
+      "newer": {
+        "title": "Newer version: r{latest} (using r{revision})",
+        "text": "Package built {date}."
+      },
+      "upToDate": {
+        "title": "Using the newest version r{revision}",
+        "text": "Last synced {date}."
+      },
+      "notReady": {
+        "title": "The newest package on Polygon is not ready"
+      },
+      "unknown": {
+        "title": "Polygon could not be asked"
+      }
+    },
+    "facts": {
+      "polygon": "Polygon",
+      "options": "Options",
+      "autoSync": "Auto-sync"
+    },
+    "edit": "Edit",
+    "editLabel": "Edit the sync options",
+    "turnOn": "Turn on",
+    "turnOff": "Turn off",
+    "syncAgain": "Sync again",
+    "editOptions": "Edit options",
+    "options": {
+      "main": "{language} (main)",
+      "mapped": "{language} → {site}",
+      "skipped": "{language}: skipped",
+      "tutorial": "tutorial from {language}",
+      "defaults": "As the package has it, nothing chosen",
+      "flags": {
+        "ignoreZeroPointBatches": "0-point groups left out",
+        "ignoreZeroPointCases": "0-point tests left out",
+        "appendMainSolution": "main solution added"
+      }
+    },
+    "drawer": {
+      "title": "Sync options",
+      "note": "They apply from the next sync; the problem does not change now.",
+      "save": "Save options",
+      "cancel": "Cancel",
+      "noLanguages": "The saved options pick no statement: the package has one, and it is the main one."
     }
   },
   "history": {
