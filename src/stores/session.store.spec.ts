@@ -1,7 +1,7 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiRequest, onCsrfFailed, onUnauthorized } from '@/api/client';
-import { partialSession, sessionResponse, signedIn, signedOut } from '@/test/fixtures';
+import { partialSession, sessionResponse, sessionUser, signedIn, signedOut } from '@/test/fixtures';
 import { fail, mockApi, noContent, ok } from '@/test/mock-api';
 import { useSessionStore } from './session.store';
 
@@ -106,6 +106,48 @@ describe('useSessionStore', () => {
         .map((call) => call.headers.get('X-CSRF-Token')),
     ).toEqual(['csrf-1', 'csrf-2']);
   });
+
+  it('does not resend a write after csrf_failed when another tab signed in as someone else', async () => {
+    const other = sessionUser({ id: '0192a000-0000-7000-8000-000000000002', username: 'user_02' });
+    let meCalls = 0;
+    const calls = mockApi({
+      'GET /auth/me': () =>
+        ++meCalls === 1 ? signedIn() : signedIn({ user: other, csrfToken: 'csrf-2' }),
+      'PATCH /profile': () => fail(403, 'csrf_failed'),
+    });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    await expect(
+      apiRequest('/profile', { method: 'PATCH', body: { about: 'draft' } }),
+    ).rejects.toMatchObject({ code: 'csrf_failed' });
+    expect(calls.filter((call) => call.method === 'PATCH')).toHaveLength(1);
+    expect(session.user?.username).toBe('user_02');
+  });
+
+  it('signs out with a stale token: resends the sign-out with a fresh token, never shows the other session, and lets a login through', async () => {
+    let meCalls = 0;
+    const shown: (string | null)[] = [];
+    let shownBeforeLogin: (string | null)[] = [];
+    const calls = mockApi({
+      'GET /auth/me': () => ok(sessionResponse({ csrfToken: `csrf-${++meCalls}` })),
+      'POST /auth/logout': (call) =>
+        call.headers.get('X-CSRF-Token') === 'csrf-2' ? noContent() : fail(403, 'csrf_failed'),
+      'POST /auth/login': () => {
+        shownBeforeLogin = [...shown];
+        return signedIn({ csrfToken: 'csrf-login' });
+      },
+    });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    session.$subscribe(() => shown.push(session.user?.username ?? null), { flush: 'sync' });
+    await session.logout();
+    await session.login({ username: 'user_01', password: 'secret-password' });
+    const logouts = calls.filter((call) => call.path === '/auth/logout');
+    expect(logouts.map((call) => call.headers.get('X-CSRF-Token'))).toEqual(['csrf-1', 'csrf-2']);
+    expect(shownBeforeLogin.length).toBeGreaterThan(0);
+    expect(shownBeforeLogin.every((username) => username === null)).toBe(true);
+    expect(session.status).toBe('authenticated');
+  }, 2000);
 
   it('keeps the factors a partial session may use, and forgets them once the session is whole', async () => {
     let verified = false;

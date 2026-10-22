@@ -61,14 +61,19 @@ export const useSessionStore = defineStore('session', () => {
   }
 
   /** 401 means signed out; any other failure leaves the status unknown and is rethrown. */
-  async function refresh() {
-    await signingOut;
+  async function loadSession() {
     try {
       apply(await fetchSession());
     } catch (error) {
       if (!(error instanceof ApiError && error.code === 'unauthorized')) throw error;
       apply(null);
     }
+  }
+
+  /** Waits for a sign-out in flight, so the reload cannot bring back the session it is ending. */
+  async function refresh() {
+    await signingOut;
+    await loadSession();
   }
 
   /** The first caller loads `/auth/me`; concurrent callers share it; later callers return at once. */
@@ -91,12 +96,29 @@ export const useSessionStore = defineStore('session', () => {
 
   /** Ends the session here at once, without waiting for the server (it may be unreachable, and the viewer need not wait for it). */
   function logout() {
-    signingOut = logoutRequest().then(
-      () => undefined,
-      () => undefined,
-    );
+    signingOut = endServerSession();
     apply(null);
     return Promise.resolve();
+  }
+
+  /** Never rejects. A stale token (another tab signed in again) is reloaded and the sign-out sent once more: ending this browser's session is what the viewer asked for. */
+  async function endServerSession() {
+    try {
+      await logoutRequest();
+    } catch (error) {
+      if (error instanceof ApiError && error.code === 'csrf_failed')
+        await resendLogoutWithFreshToken().catch(() => undefined);
+    }
+  }
+
+  /** Takes only the token of the session the cookie now holds, so this signed-out tab never shows it. */
+  async function resendLogoutWithFreshToken() {
+    setCsrfToken((await fetchSession())?.csrfToken ?? null);
+    try {
+      await logoutRequest();
+    } finally {
+      setCsrfToken(null);
+    }
   }
 
   /** The server ended this viewer's session and this tab could not learn it: the guest state, with no request. */
@@ -114,7 +136,18 @@ export const useSessionStore = defineStore('session', () => {
   /** Superuser: view the site as another account; the cache of the staff account is dropped by `useAccountCacheSync` when the user changes. Rethrows, so the caller can say why it was refused. */
   const startImpersonating = async (userId: string) => apply(await startImpersonation(userId));
 
-  onCsrfFailed(refresh);
+  /**
+   * A write refused with `csrf_failed`: reload the session, and allow the resend only when it still belongs to the account that sent the
+   * write (another tab may have signed in as someone else). A signed-out tab has no one to resend as, and its sign-out retries itself.
+   */
+  async function reloadForResend(): Promise<boolean> {
+    const senderId = user.value?.id ?? null;
+    if (senderId === null) return false;
+    await loadSession();
+    return user.value?.id === senderId;
+  }
+
+  onCsrfFailed(reloadForResend);
   /** A protected request answered 401: the session expired, so the viewer is signed out here (guards redirect on the next navigation). */
   onUnauthorized(() => apply(null));
 
