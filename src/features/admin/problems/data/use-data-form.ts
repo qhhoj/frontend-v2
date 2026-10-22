@@ -19,7 +19,7 @@ const sentShape = (form: DataForm) => JSON.parse(dataSnapshot(form)) as object;
 /**
  * The data tab's form: seeded from the query, saved as a whole. A clean form follows the server (a Polygon sync, an
  * upload), so a later save never sends the old configuration back; a refetch never overwrites an edit.
- * `saved` is the configuration the form was last seeded from or saved as: the dirty count compares with it, discard goes back to it.
+ * `saved` is the configuration the form was last seeded from or saved as: the dirty count compares with it.
  */
 export function useDataForm(code: () => string) {
   const queryClient = useQueryClient();
@@ -71,8 +71,10 @@ export function useDataForm(code: () => string) {
     { immediate: true },
   );
 
+  /** Back to what the server last said, which a sync during the edit may have changed. */
   function discard() {
-    if (saved.value) seed(saved.value);
+    const latest = query.data.value ?? saved.value;
+    if (latest) seed(latest);
   }
 
   function save() {

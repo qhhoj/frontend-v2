@@ -139,6 +139,26 @@ describe('ProblemDataTab', () => {
     expect(body.unicode).toBe(true);
   });
 
+  it('discards an edit made before a sync back to the synced configuration', async () => {
+    const { server, calls } = syncRoutes();
+    const { wrapper, queryClient } = await mountAdmin(
+      '/admin/problems/hcmus41c/data?view=advanced',
+    );
+    await wrapper.get('#data-unicode').setValue(true);
+    server.data = syncedData;
+    await finishSync(queryClient);
+    await buttonLabelled(wrapper, 'Hủy thay đổi').trigger('click');
+    await flushPromises();
+    await wrapper.get('#data-nobigmath').setValue(true);
+    await saveConfig(wrapper);
+    const body = calls.find((call) => call.method === 'PUT')!.body as {
+      checker: string;
+      unicode: boolean;
+      cases: unknown[];
+    };
+    expect(body).toMatchObject({ checker: 'floats', unicode: false, cases: syncedData.cases });
+  });
+
   it('sets file I/O from the controls and refuses to save a name the judge would reject', async () => {
     const calls = mockApi({
       ...staffViewer(EDIT),
