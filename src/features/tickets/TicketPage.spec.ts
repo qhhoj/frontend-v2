@@ -184,3 +184,53 @@ describe('ticket page: general issue links', () => {
     expect(wrapper.get('[data-testid="ticket-header"]').text()).toContain('javascript:alert(1)');
   });
 });
+
+describe('ticket page: returning to a ticket already seen', () => {
+  const handler = { editNotes: true, markGood: true, assign: true, claim: false };
+  const mockTwoTickets = () =>
+    mockApi({
+      ...signedInViewer(),
+      ...homeRoutes,
+      [`GET /tickets/${id}`]: ok(
+        ticketDetail({ title: 'Phiếu A', notes: 'Ghi chú A', can: handler }),
+      ),
+      [`GET /tickets/${OTHER_ID}`]: ok(
+        ticketDetail({ id: OTHER_ID, title: 'Phiếu B', notes: 'Ghi chú B', can: handler }),
+      ),
+      [`PATCH /tickets/${id}`]: ok({}),
+      [`PATCH /tickets/${OTHER_ID}`]: ok({}),
+    });
+
+  it('sends notes, close and mark-good to the ticket on screen, not the one seen before', async () => {
+    const calls = mockTwoTickets();
+    const { wrapper, router } = await mountApp(`/tickets/${id}`);
+    await router.push(`/tickets/${OTHER_ID}`);
+    await flushPromises();
+    await router.push(`/tickets/${id}`);
+    await flushPromises();
+    expect(wrapper.get('h1').text()).toBe('Phiếu A');
+    await wrapper.get('textarea[name="notes"]').setValue('Ghi chú A mới');
+    const notes = wrapper.get('textarea[name="notes"]').element as HTMLTextAreaElement;
+    notes.form!.dispatchEvent(new Event('submit'));
+    await wrapper.get('button[data-testid="toggle-open"]').trigger('click');
+    await wrapper.get('button[data-testid="mark-good"]').trigger('click');
+    await flushPromises();
+    const patched = calls.filter((call) => call.method === 'PATCH').map((call) => call.path);
+    expect(patched).toEqual([`/tickets/${id}`, `/tickets/${id}`, `/tickets/${id}`]);
+  });
+
+  it('drops the drafts typed on the other ticket', async () => {
+    mockTwoTickets();
+    const { wrapper, router } = await mountApp(`/tickets/${id}`);
+    await router.push(`/tickets/${OTHER_ID}`);
+    await flushPromises();
+    await wrapper.get('textarea[name="notes"]').setValue('Ghi chú B đang sửa');
+    await wrapper.get('textarea[name="reply"]').setValue('Trả lời phiếu B');
+    await router.push(`/tickets/${id}`);
+    await flushPromises();
+    expect((wrapper.get('textarea[name="notes"]').element as HTMLTextAreaElement).value).toBe(
+      'Ghi chú A',
+    );
+    expect((wrapper.get('textarea[name="reply"]').element as HTMLTextAreaElement).value).toBe('');
+  });
+});
