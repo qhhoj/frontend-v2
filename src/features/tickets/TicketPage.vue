@@ -66,7 +66,11 @@ function takeSentFlag(current: Router): boolean {
           :title="$t('ticket.sentTitle')"
           :body="$t('ticket.sentBody')"
         />
-        <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
+        <!-- Keyed by ticket: a jump between tickets remounts the panels, so drafts and PATCHes never cross over. -->
+        <div
+          :key="ticket.id"
+          class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]"
+        >
           <div class="flex min-w-0 flex-col gap-5">
             <TicketHeader :ticket="ticket" />
             <TicketMessages :ticket="ticket" :is-live="isLive" />
