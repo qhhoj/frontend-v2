@@ -53,9 +53,9 @@ const roundTo = (value: number, precision: number) => {
   const scale = 10 ** precision;
   return Math.round(value * scale) / scale;
 };
-/** Float sums such as 99.999999 count as the full score once rounded to the contest precision. Zero points never solve, even on a 0-point problem. */
-const isFullPoints = (points: number, problem: RankingProblem, precision: number) =>
-  points > 0 && roundTo(points, precision) >= roundTo(problem.points, precision);
+/** Full points up to float noise (99.99999999999999 of 100), not up to display rounding (99.5 is partial). Zero points never solve, even on a 0-point problem. */
+const isFullPoints = (points: number, problem: RankingProblem) =>
+  points > 0 && points >= problem.points - 1e-9 * Math.max(1, problem.points);
 
 /** ioi16 and final_submission never accumulate time. */
 const NO_CUMTIME_FORMATS = new Set<ContestFormatName>(['ioi16', 'final_submission']);
@@ -113,7 +113,8 @@ const READ_TRIES: Partial<Record<ContestFormatName, (cell: ProblemCell) => Tries
     const tries = Number(cell.tries ?? 0);
     return {
       wrong: Math.max(tries - (Number(cell.points ?? 0) > 0 ? 1 : 0), 0),
-      pending: cell.pending === true ? tries : 0,
+      // With penalty 0 the backend stores no tries, so a pending cell holds at least one.
+      pending: cell.pending === true ? Math.max(tries, 1) : 0,
     };
   },
   /** `{time, points, penalty: wrong tries, pending: number of tries after the freeze}` */
@@ -145,10 +146,7 @@ function penaltyCell(
   const { wrong, pending } = READ_TRIES[context.formatName]!(cell);
   const points = Number(cell.points ?? 0);
   // icpc scores 0 or the problem's points; vnoj can score part of them and is solved only at full points.
-  const solved =
-    context.formatName === 'icpc'
-      ? points > 0
-      : isFullPoints(points, problem, context.pointsPrecision);
+  const solved = context.formatName === 'icpc' ? points > 0 : isFullPoints(points, problem);
   if (solved) return solvedPenaltyCell(cell, wrong, isFirst, context.locale);
   if (pending > 0)
     return {
@@ -213,7 +211,7 @@ function pointsCell(
   context: RankingContext,
 ): RankingCellView {
   const points = Number(cell.points ?? 0);
-  if (isFullPoints(points, problem, context.pointsPrecision))
+  if (isFullPoints(points, problem))
     return scoredCell(points, cell, isFirst ? 'first-solve' : 'solved', context);
   if (points <= 0) {
     const text = pointsText(0, context);
