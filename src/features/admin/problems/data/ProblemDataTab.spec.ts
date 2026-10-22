@@ -3,7 +3,7 @@ import { flushPromises } from '@vue/test-utils';
 import { mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { cancelDialog, confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
-import { problemData, problemEditorRoutes } from '@/test/admin-fixtures/problems';
+import { problemData, problemEditorRoutes, testCase } from '@/test/admin-fixtures/problems';
 
 type Mounted = Awaited<ReturnType<typeof mountApp>>;
 const EDIT = ['judge.edit_own_problem'];
@@ -83,6 +83,60 @@ describe('ProblemDataTab', () => {
       nobigmath: false,
       cases: migrated.cases,
     });
+  });
+
+  /** The configuration a Polygon sync leaves: other tests and checker. The GET answers `before` until `synced` is set. */
+  const syncedData = problemData({
+    checker: 'floats',
+    checkerArgs: { precision: 6 },
+    cases: [testCase({ type: 'C', input: 'p/1.in', output: 'p/1.out', points: 100 })],
+    archiveFiles: ['p/1.in', 'p/1.out'],
+  });
+  const syncRoutes = () => {
+    const server = { data: problemData() };
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': () => ok(server.data),
+      'PUT /problems/hcmus41c/data': (call) => ok({ ...server.data, ...(call.body as object) }),
+    });
+    return { server, calls };
+  };
+  /** What the Polygon card does when a sync ends: every admin query is read again. */
+  const finishSync = async (queryClient: Mounted['queryClient']) => {
+    await queryClient.invalidateQueries({ queryKey: ['admin'] });
+    await flushPromises();
+  };
+
+  it('follows a sync while the form is clean, so the next save keeps the synced tests and checker', async () => {
+    const { server, calls } = syncRoutes();
+    const { wrapper, queryClient } = await mountAdmin(
+      '/admin/problems/hcmus41c/data?view=advanced',
+    );
+    server.data = syncedData;
+    await finishSync(queryClient);
+    await wrapper.get('#data-unicode').setValue(true);
+    await saveConfig(wrapper);
+    const body = calls.find((call) => call.method === 'PUT')!.body as {
+      checker: string;
+      cases: unknown[];
+    };
+    expect(body.checker).toBe('floats');
+    expect(body.cases).toEqual(syncedData.cases);
+  });
+
+  it('keeps an unsaved edit when a sync ends', async () => {
+    const { server, calls } = syncRoutes();
+    const { wrapper, queryClient } = await mountAdmin(
+      '/admin/problems/hcmus41c/data?view=advanced',
+    );
+    await wrapper.get('#data-unicode').setValue(true);
+    server.data = syncedData;
+    await finishSync(queryClient);
+    expect((wrapper.get('#data-unicode').element as HTMLInputElement).checked).toBe(true);
+    await saveConfig(wrapper);
+    const body = calls.find((call) => call.method === 'PUT')!.body as { unicode: boolean };
+    expect(body.unicode).toBe(true);
   });
 
   it('sets file I/O from the controls and refuses to save a name the judge would reject', async () => {

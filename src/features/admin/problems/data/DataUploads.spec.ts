@@ -39,8 +39,9 @@ describe('test data uploads', () => {
       'GET /problems/hcmus41c/data': ok(
         problemData({ customChecker: 'checker.cpp', checker: 'bridged' }),
       ),
+      // The server clears only the file's setting: the checker stays `bridged`.
       'DELETE /problems/hcmus41c/data/files/customChecker': ok(
-        problemData({ customChecker: null }),
+        problemData({ customChecker: null, checker: 'bridged' }),
       ),
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
