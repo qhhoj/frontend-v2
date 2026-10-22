@@ -79,7 +79,10 @@ describe('api client', () => {
         ++attempts === 1 ? fail(403, 'csrf_failed') : ok({ aborted: true }),
     });
     setCsrfToken('stale');
-    onCsrfFailed(() => Promise.resolve(setCsrfToken('fresh')));
+    onCsrfFailed(() => {
+      setCsrfToken('fresh');
+      return Promise.resolve(true);
+    });
     await expect(apiRequest('/submissions/abc/abort', { method: 'POST' })).resolves.toEqual({
       aborted: true,
     });
@@ -89,12 +92,24 @@ describe('api client', () => {
   it('does not retry a second csrf_failed', async () => {
     let refreshes = 0;
     const calls = mockApi({ 'POST /submissions/abc/abort': fail(403, 'csrf_failed') });
-    onCsrfFailed(() => Promise.resolve(void refreshes++));
+    onCsrfFailed(() => {
+      refreshes++;
+      return Promise.resolve(true);
+    });
     await expect(apiRequest('/submissions/abc/abort', { method: 'POST' })).rejects.toMatchObject({
       code: 'csrf_failed',
     });
     expect(calls).toHaveLength(2);
     expect(refreshes).toBe(1);
+  });
+
+  it('does not resend after csrf_failed when the refresh refuses it (the session changed account)', async () => {
+    const calls = mockApi({ 'PATCH /profile': fail(403, 'csrf_failed') });
+    onCsrfFailed(() => Promise.resolve(false));
+    await expect(
+      apiRequest('/profile', { method: 'PATCH', body: { about: 'draft' } }),
+    ).rejects.toMatchObject({ code: 'csrf_failed' });
+    expect(calls).toHaveLength(1);
   });
 
   it('reports an expired session on a protected request but not on the session probe', async () => {
@@ -143,7 +158,9 @@ describe('api client', () => {
           ? fail(403, 'csrf_failed')
           : ok('b'),
     });
-    const refresh = vi.fn(() => new Promise<void>((resolve) => setTimeout(resolve, 5)));
+    const refresh = vi.fn(
+      () => new Promise<boolean>((resolve) => setTimeout(() => resolve(true), 5)),
+    );
     onCsrfFailed(refresh);
     await expect(
       Promise.all([apiRequest('/a', { method: 'POST' }), apiRequest('/b', { method: 'POST' })]),
@@ -151,18 +168,13 @@ describe('api client', () => {
     expect(refresh).toHaveBeenCalledOnce();
   });
 
-  it('survives a failing refresh: the retry reports its own error and unauthorized is handled', async () => {
-    let attempts = 0;
-    mockApi({
-      'POST /a': () => (++attempts === 1 ? fail(403, 'csrf_failed') : fail(401, 'unauthorized')),
-    });
-    const handler = vi.fn();
-    onUnauthorized(handler);
+  it('survives a failing refresh: the request reports its own csrf_failed and is not resent', async () => {
+    const calls = mockApi({ 'POST /a': fail(403, 'csrf_failed') });
     onCsrfFailed(() => Promise.reject(new Error('offline')));
     await expect(apiRequest('/a', { method: 'POST' })).rejects.toMatchObject({
-      code: 'unauthorized',
+      code: 'csrf_failed',
     });
-    expect(handler).toHaveBeenCalledOnce();
+    expect(calls).toHaveLength(1);
   });
 
   it('rejects a list answer without page metadata', async () => {

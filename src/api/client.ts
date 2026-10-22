@@ -68,15 +68,19 @@ let csrfToken: string | null = null;
 /** Set from `/auth/me` and login; memory only, never stored. */
 export const setCsrfToken = (token: string | null) => void (csrfToken = token);
 
-let refreshCsrf: (() => Promise<void>) | null = null;
-/** The session store installs this: it reloads `/auth/me` so a retried request carries a fresh token. */
-export const onCsrfFailed = (handler: (() => Promise<void>) | null) => void (refreshCsrf = handler);
+let refreshCsrf: (() => Promise<boolean>) | null = null;
+/**
+ * The session store installs this: it reloads `/auth/me` so a retried request carries a fresh token, and resolves true only when the
+ * session still belongs to the account that sent the request (another tab may have signed in as someone else).
+ */
+export const onCsrfFailed = (handler: (() => Promise<boolean>) | null) =>
+  void (refreshCsrf = handler);
 
-let refreshing: Promise<void> | null = null;
-/** Parallel `csrf_failed` answers share one refresh; a failing refresh is ignored so the request's own error surfaces. */
-const refreshOnce = (): Promise<void> => {
-  refreshing ??= (refreshCsrf?.() ?? Promise.resolve())
-    .catch(() => undefined)
+let refreshing: Promise<boolean> | null = null;
+/** Parallel `csrf_failed` answers share one refresh; a failing refresh allows no retry, so the request's own error surfaces. */
+const refreshOnce = (): Promise<boolean> => {
+  refreshing ??= (refreshCsrf?.() ?? Promise.resolve(false))
+    .catch(() => false)
     .finally(() => void (refreshing = null));
   return refreshing;
 };
@@ -172,10 +176,8 @@ async function request(
     })) as Envelope;
   }
   const error = await errorOf(response);
-  if (error.code === 'csrf_failed' && refreshCsrf && !retried) {
-    await refreshOnce();
+  if (error.code === 'csrf_failed' && refreshCsrf && !retried && (await refreshOnce()))
     return request(path, options, true);
-  }
   notifySessionHooks(error, path);
   throw error;
 }
