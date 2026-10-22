@@ -17,8 +17,9 @@ import { useInvalidArgs } from './use-invalid-args';
 const sentShape = (form: DataForm) => JSON.parse(dataSnapshot(form)) as object;
 
 /**
- * The data tab's form: seeded once from the query (a background refetch never overwrites an edit), saved as a whole.
- * `saved` is the configuration the form was last seeded from or saved as: the dirty count compares with it, discard goes back to it.
+ * The data tab's form: seeded from the query, saved as a whole. A clean form follows the server (a Polygon sync, an
+ * upload), so a later save never sends the old configuration back; a refetch never overwrites an edit.
+ * `saved` is the configuration the form was last seeded from or saved as: the dirty count compares with it.
  */
 export function useDataForm(code: () => string) {
   const queryClient = useQueryClient();
@@ -56,16 +57,24 @@ export function useDataForm(code: () => string) {
     form.value = null;
     saved.value = null;
   });
+  /** Whether the server's configuration differs from the one the form was seeded from (row keys and non-form fields aside). */
+  const isNewConfig = (data: ProblemData) =>
+    !saved.value ||
+    countChanges(sentShape(toDataForm(data)), sentShape(toDataForm(saved.value))) > 0;
+  /** Nothing typed: no change, and no args box holding text that does not parse. */
+  const isClean = () => dirtyCount.value === 0 && badRowNumbers.value.length === 0;
   watch(
     () => query.data.value,
     (data) => {
-      if (data && form.value === null) seed(data);
+      if (data && isClean() && isNewConfig(data)) seed(data);
     },
     { immediate: true },
   );
 
+  /** Back to what the server last said, which a sync during the edit may have changed. */
   function discard() {
-    if (saved.value) seed(saved.value);
+    const latest = query.data.value ?? saved.value;
+    if (latest) seed(latest);
   }
 
   function save() {
