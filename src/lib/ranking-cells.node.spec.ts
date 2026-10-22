@@ -45,6 +45,12 @@ describe('ranking cells, icpc', () => {
     });
   });
 
+  it('hides a frozen try behind ?1 when penalty 0 stores no tries', () => {
+    expect(
+      rankingCell({ time: null, points: 0, tries: 0, pending: true }, problem(), 'me', icpc),
+    ).toMatchObject({ kind: 'pending', text: '?1', labelParams: { tries: 1 } });
+  });
+
   it('leaves untouched problems empty', () => {
     expect(rankingCell(undefined, problem(), 'me', icpc).kind).toBe('empty');
     expect(rankingCell({ time: null, points: 0, tries: 0 }, problem(), 'me', icpc).kind).toBe(
@@ -237,13 +243,26 @@ describe('ranking cells, vnoj partial points', () => {
 });
 
 describe('points precision and locale', () => {
-  it('counts a float sum that rounds to the full score as solved', () => {
+  it('counts a float sum off the full score by float noise only as solved', () => {
     expect(
-      rankingCell({ points: 99.999999, time: 0 }, problem(), 'me', context('ioi', 2)),
+      rankingCell({ points: 99.99999999999999, time: 0 }, problem(), 'me', context('ioi', 2)),
     ).toMatchObject({ kind: 'solved', text: '100' });
+  });
+
+  it('keeps a score that only rounds to the full score partial', () => {
+    expect(rankingCell({ points: 99.5, time: 0 }, problem(), 'me', context('ioi', 0)).kind).toBe(
+      'partial',
+    );
+    expect(rankingCell({ points: 99.96, time: 0 }, problem(), 'me', context('ioi', 1)).kind).toBe(
+      'partial',
+    );
     expect(
-      rankingCell({ points: 99.999999, time: 0 }, problem(), 'me', context('ioi', 8)).kind,
-    ).toBe('partial');
+      solvedCount(
+        { participationId: 'me', cells: { p1: { points: 99.5, time: 0 } } },
+        [problem()],
+        context('ioi', 0),
+      ),
+    ).toBe(0);
   });
 });
 
