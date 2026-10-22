@@ -7,6 +7,7 @@ import { translate } from '@/i18n';
 import { PARTIAL_CODE, VERDICT_TONE_CLASSES, caseVerdictOf, verdictOfCode } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import {
+  PLAIN_ROW_KEY,
   buildOverviewRows,
   caseTileClass,
   caseTitle,
@@ -62,10 +63,12 @@ function squareStyle(testCase: SubmissionCase) {
   };
 }
 const squareTitle = (testCase: SubmissionCase) => caseTitle(testCase, locale.locale);
-const rowName = (row: OverviewRow) =>
-  row.batch === null
-    ? translate('submission.overview.allTests')
-    : translate('submission.overview.subtask', { number: row.batch });
+function rowName(row: OverviewRow): string {
+  if (row.batch !== null) return translate('submission.overview.subtask', { number: row.batch });
+  return translate(
+    row.key === PLAIN_ROW_KEY ? 'submission.overview.plainTests' : 'submission.overview.allTests',
+  );
+}
 const rowChipClass = (row: OverviewRow) => VERDICT_TONE_CLASSES[verdictOfCode(row.verdict).tone];
 
 function rowReason(row: OverviewRow): string {

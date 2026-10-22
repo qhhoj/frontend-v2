@@ -65,4 +65,21 @@ describe('ResultSummaryCard', () => {
     expect(wrapper.findAll('li[aria-label$="Chờ chấm"]')).toHaveLength(6);
     expect(wrapper.text()).not.toContain('Tất cả');
   });
+
+  it('shows a failed test outside any subtask beside the subtasks, under its own label', () => {
+    const mixed = [
+      submissionCase({ position: 1, status: 'WA', points: 0 }),
+      submissionCase({ position: 2, batch: 1 }),
+      submissionCase({ position: 3, batch: 1 }),
+    ];
+    const wrapper = mountComponent(ResultSummaryCard, {
+      props: { cases: mixed, batches: null, totalCases: 3, running: false },
+    });
+    expect(wrapper.findAll('[data-testid="result-tile"]').map((tile) => tile.text())).toEqual([
+      '1',
+      '2',
+      '3',
+    ]);
+    expect(wrapper.find('ol[aria-label="Test lẻ"]').exists()).toBe(true);
+  });
 });

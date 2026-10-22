@@ -59,7 +59,8 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
     const failed = firstFailedTest(row.value.cases);
     const parts: string[] = [];
     if (row.value.points !== null) {
-      const { score, max } = scoreOnScale(row.value.points, scale.value);
+      const { points, contest } = row.value;
+      const { score, max } = scoreOnScale({ points, contest }, scale.value);
       parts.push(`${format(score)} / ${format(max)}`);
     }
     if (failed) parts.push(translate('submit.result.failedAt', { test: failed }));

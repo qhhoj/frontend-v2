@@ -10,6 +10,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import CaseDetails from './CaseDetails.vue';
 import { caseDetails } from './case-details';
 import {
+  PLAIN_ROW_KEY,
   SKIPPED_STATUS,
   buildOverviewRows,
   caseTileClass,
@@ -17,6 +18,7 @@ import {
   formatCasePoints,
   isFullCase,
   pendingPositions,
+  type OverviewRow,
 } from './test-overview';
 
 /**
@@ -59,12 +61,16 @@ const closedLossCount = computed(
 const testCount = computed(() => props.totalCases ?? props.cases.length);
 const passedCount = computed(() => props.cases.filter(isFullCase).length);
 const pending = computed(() => pendingPositions(props.cases, props.totalCases, props.running));
+/** A subtask's name, the name of the tests outside any subtask beside subtasks, or none for a plain problem's one row. */
+function groupLabel(row: OverviewRow): string | null {
+  if (row.batch !== null) return translate('submission.overview.subtask', { number: row.batch });
+  return row.key === PLAIN_ROW_KEY ? translate('submission.overview.plainTests') : null;
+}
 /** One tile row per subtask (a plain problem has one unnamed row); waiting tests join a plain row or get their own. */
 const groups = computed(() => {
   const graded = buildOverviewRows(props.cases, props.batches).map((row) => ({
     key: row.key,
-    label:
-      row.batch === null ? null : translate('submission.overview.subtask', { number: row.batch }),
+    label: groupLabel(row),
     cases: row.cases,
     pending: [] as number[],
   }));

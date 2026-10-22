@@ -1460,6 +1460,7 @@
       "points": "Points",
       "subtask": "Subtask {number}",
       "allTests": "All tests",
+      "plainTests": "Standalone tests",
       "testTitle": "Test {number}: {verdict}, {points}",
       "allPassed": "{passed}/{total} tests passed",
       "failed": "Test {number} {verdict}",

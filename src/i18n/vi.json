@@ -1460,6 +1460,7 @@
       "points": "Điểm",
       "subtask": "Subtask {number}",
       "allTests": "Các test",
+      "plainTests": "Test lẻ",
       "testTitle": "Test {number}: {verdict}, {points}",
       "allPassed": "{passed}/{total} test đúng",
       "failed": "Test {number} {verdict}",
