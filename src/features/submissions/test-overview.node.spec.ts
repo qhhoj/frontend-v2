@@ -54,6 +54,16 @@ describe('buildOverviewRows', () => {
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({ batch: null, earned: 20, max: 30, verdict: 'WA' });
   });
+
+  it('keeps the tests outside any subtask in a summed row beside the subtasks, so the rows add up to the case points', () => {
+    const cases = [testCase(1, 'WA', null), testCase(2, 'AC', 1), testCase(3, 'AC', 1)];
+    const rows = buildOverviewRows(cases, null);
+    const plain = rows.find((row) => row.batch === null);
+    expect(plain).toMatchObject({ rule: 'sum', earned: 0, max: 10, verdict: 'WA' });
+    expect(plain?.cases.map((row) => row.position)).toEqual([1]);
+    expect(rows.flatMap((row) => row.cases)).toHaveLength(cases.length);
+    expect(rows.reduce((sum, row) => sum + row.max, 0)).toBe(20);
+  });
 });
 
 const scored = (position: number, points: number, batch: number | null = null, total = 5) =>

@@ -19,13 +19,26 @@ export interface ScoreScale {
   contest: { key: string; points: number; partial: boolean; precision: number } | null;
 }
 
+/** The submission as the strip scores it: its points on the problem's scale and the contest it was made in. */
+export interface ScoredSubmission {
+  points: number;
+  contest: { key: string; points: number | null } | null;
+}
+
 /**
- * A submission's points (on the problem's scale) on the strip's scale. In a contest the share of the problem's points
- * carries over to the contest's; a contest problem without partial scores pays only a full score.
+ * A submission's score on the strip's scale. A submission made in the scale's contest shows the contest points the API gives
+ * it, as the scoreboard counts them (a final-submission contest scores every problem partially). Otherwise, in a contest the
+ * share of the problem's points carries over to the contest's, and a problem without partial scores pays only a full score.
  */
-export function scoreOnScale(points: number, scale: ScoreScale): { score: number; max: number } {
+export function scoreOnScale(
+  submission: ScoredSubmission,
+  scale: ScoreScale,
+): { score: number; max: number } {
   const { contest, problemPoints } = scale;
+  const { points } = submission;
   if (!contest) return { score: points, max: problemPoints };
+  const own = submission.contest?.key === contest.key ? submission.contest.points : null;
+  if (own !== null) return { score: own, max: contest.points };
   const share = problemPoints > 0 ? points / problemPoints : 0;
   const counts = contest.partial || share >= 1;
   return { score: counts ? share * contest.points : 0, max: contest.points };

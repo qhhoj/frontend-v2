@@ -8,7 +8,7 @@ export const SKIPPED_STATUS: CaseStatus = 'SC';
 
 export interface OverviewRow {
   key: string;
-  /** The subtask number; null for the single row of a problem without subtasks. */
+  /** The subtask number; null for the row of tests outside any subtask (every test when the problem has none). */
   batch: number | null;
   cases: SubmissionCase[];
   /** The first failing status, else PC when a test earned part of its points, else AC (or SC when every test was skipped). */
@@ -128,21 +128,38 @@ function buildRow(
   };
 }
 
-/** One row per subtask in order of number, or a single row holding every test when the problem has no subtasks. */
+/** The key of the summed row holding the tests outside any subtask, when the problem also has subtasks. */
+export const PLAIN_ROW_KEY = 'plain';
+
+function groupBySubtask(cases: SubmissionCase[]) {
+  const plain: SubmissionCase[] = [];
+  const byBatch = new Map<number, SubmissionCase[]>();
+  for (const testCase of cases) {
+    if (testCase.batch === null) plain.push(testCase);
+    else byBatch.set(testCase.batch, [...(byBatch.get(testCase.batch) ?? []), testCase]);
+  }
+  return { plain, byBatch };
+}
+
+/**
+ * One row per subtask in order of number, or a single row holding every test when the problem has no subtasks. Tests
+ * outside any subtask next to subtasks get a summed row of their own (the backend adds their points too), placed before the
+ * subtasks when its first test comes first, else after.
+ */
 export function buildOverviewRows(
   cases: SubmissionCase[] | null,
   batches: SubmissionBatch[] | null,
 ): OverviewRow[] {
   if (!cases || cases.length === 0) return [];
-  const byBatch = new Map<number, SubmissionCase[]>();
-  for (const testCase of cases) {
-    if (testCase.batch === null) continue;
-    byBatch.set(testCase.batch, [...(byBatch.get(testCase.batch) ?? []), testCase]);
-  }
+  const { plain, byBatch } = groupBySubtask(cases);
   if (byBatch.size === 0) return [buildRow('all', null, cases, batches)];
-  return [...byBatch.entries()]
+  const subtaskRows = [...byBatch.entries()]
     .sort(([left], [right]) => left - right)
     .map(([batch, batchCases]) => buildRow(`batch-${batch}`, batch, batchCases, batches));
+  if (plain.length === 0) return subtaskRows;
+  const plainRow = buildRow(PLAIN_ROW_KEY, null, plain, batches);
+  const isFirst = plain[0]!.position < subtaskRows[0]!.cases[0]!.position;
+  return isFirst ? [plainRow, ...subtaskRows] : [...subtaskRows, plainRow];
 }
 
 /** How the points cell is coloured: full marks, nothing, or in between. */
