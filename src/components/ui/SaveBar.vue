@@ -12,7 +12,7 @@ import type { SaveBarProps } from './SaveBar.props';
 /**
  * The one save bar of a form: sticky to the bottom of the content column (z-savebar).
  * Left: "3 thay đổi chưa lưu", "Đã lưu lúc 14:02" for 3 s after a save, or why saving is not possible, in a polite live region
- * (the `status` slot replaces it). `hideIdleOnPhone`: below `sm` the bar shows only while it has one of those to say, and
+ * (the `status` slot replaces it), then `note` (changes elsewhere on the page that the leave guard also counts). `hideIdleOnPhone`: below `sm` the bar shows only while it has one of those to say, and
  * when it appears it keeps the focused field above itself.
  * Right: optional extra actions, "Hủy thay đổi" (emits `discard`) and the submit button.
  * The submit button is `type="submit"`: put the bar inside the `<form>`, or pass the form's id as `form`.
@@ -27,6 +27,7 @@ const props = withDefaults(defineProps<SaveBarProps>(), {
   savedAt: null,
   allowClean: false,
   blockedReason: undefined,
+  note: undefined,
   saveLabel: undefined,
   form: undefined,
   variant: 'page',
@@ -47,14 +48,14 @@ const savedTime = useSavedNote(
 );
 const slots = useSlots();
 const isIdle = computed(
-  () => !isDirty.value && !savedTime.value && !props.blockedReason && !slots.status,
+  () => !isDirty.value && !savedTime.value && !props.blockedReason && !props.note && !slots.status,
 );
 
 const statusText = computed(() => {
   if (props.blockedReason) return props.blockedReason;
   if (isDirty.value) return t('form.saveBar.unsaved', props.dirtyCount);
   if (savedTime.value) return t('form.saveBar.savedAt', { time: savedTime.value });
-  return props.allowClean ? '' : t('form.saveBar.clean');
+  return props.allowClean || props.note ? '' : t('form.saveBar.clean');
 });
 
 function guardSave(event: MouseEvent) {
@@ -120,15 +121,25 @@ function keepFocusAbove() {
     ]"
   >
     <p role="status" class="flex min-w-0 flex-1 basis-48 items-center gap-2 text-sm">
-      <span v-if="isDirty" aria-hidden="true" class="size-2 shrink-0 rounded-full bg-accent" />
+      <span
+        v-if="isDirty || note"
+        aria-hidden="true"
+        class="size-2 shrink-0 rounded-full bg-accent"
+      />
       <slot name="status">
         <span
           v-if="!isDirty && !blockedReason && savedTime"
           class="inline-flex items-center gap-1.5 font-semibold text-positive"
           ><Check class="size-4 shrink-0" aria-hidden="true" />{{ statusText }}</span
         >
-        <span v-else :class="isDirty ? 'font-semibold' : 'text-muted'">{{ statusText }}</span>
+        <span v-else-if="statusText" :class="isDirty ? 'font-semibold' : 'text-muted'">{{
+          statusText
+        }}</span>
       </slot>
+      <template v-if="note">
+        <span v-if="statusText || slots.status" aria-hidden="true" class="text-muted">·</span>
+        <span class="font-semibold">{{ note }}</span>
+      </template>
     </p>
     <div class="ml-auto flex flex-wrap items-center gap-2">
       <slot name="actions" />

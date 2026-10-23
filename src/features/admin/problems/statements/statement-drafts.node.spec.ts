@@ -35,7 +35,7 @@ describe('statement drafts', () => {
 });
 
 describe('visible statement errors', () => {
-  const missing = { name: '', description: '', exists: false };
+  const missing = { name: '', description: '', exists: false, storedDescription: '' };
   const errorsOf = (draft: typeof missing) => checkStatementDraft(draft, 'en');
 
   it('shows nothing for a missing translation that was only opened', () => {

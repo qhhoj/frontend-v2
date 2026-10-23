@@ -1,7 +1,7 @@
 import type { PreviewStyle } from '@/api/types/admin-common';
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../../ui/admin-errors';
-import { normalizeNewlines } from '../../ui/form/dirty-form';
+import { normalizeNewlines, sentText } from '../../ui/form/dirty-form';
 import {
   DISALLOWED_STATEMENT_CHARACTERS,
   MARKDOWN_MAX_LENGTH,
@@ -17,7 +17,16 @@ export interface StatementDraft {
   description: string;
   /** False for a language the problem has no translation for yet ("chưa có"). */
   exists: boolean;
+  /** The description as the backend stores it (maybe `\r\n`): sent back while the edit leaves it unchanged. */
+  storedDescription: string;
 }
+
+const storedDraft = (name: string, description: string): StatementDraft => ({
+  name,
+  description: normalizeNewlines(description),
+  exists: true,
+  storedDescription: description,
+});
 
 /**
  * A translation's draft, or the original description (`original`: always exists, its name is on the general tab). A missing
@@ -27,20 +36,17 @@ export interface StatementDraft {
 export function statementDraftOf(problem: EditableProblem, slot: StatementSlot): StatementDraft {
   const editor = problem.editor!;
   if (slot === 'original') {
-    return {
-      name: editor.baseName,
-      description: normalizeNewlines(editor.description),
-      exists: true,
-    };
+    return storedDraft(editor.baseName, editor.description);
   }
   const translation = editor.translations.find((candidate) => candidate.language === slot);
-  if (!translation) return { name: editor.baseName, description: '', exists: false };
-  return {
-    name: translation.name,
-    description: normalizeNewlines(translation.description),
-    exists: true,
-  };
+  if (!translation)
+    return { name: editor.baseName, description: '', exists: false, storedDescription: '' };
+  return storedDraft(translation.name, translation.description);
 }
+
+/** The description a save of the draft sends: the stored text while only its line breaks differ. */
+export const sentDescription = (draft: StatementDraft): string =>
+  sentText(draft.description, draft.storedDescription);
 
 /** The slot the tab opens on: the Vietnamese translation when there is one, else the base statement (never an empty "chưa có"). */
 export const initialSlotOf = (problem: EditableProblem): StatementSlot =>

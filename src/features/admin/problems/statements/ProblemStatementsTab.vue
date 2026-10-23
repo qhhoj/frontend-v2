@@ -48,11 +48,10 @@ const lockText = computed(() =>
   isLocked.value ? needsPermissionText(FULL_MARKUP_PERMISSION) : undefined,
 );
 /**
- * The bar adds the other slots' changes to its own count, so its numbers sum to the leave guard's:
+ * The other slots' changes, after the bar's own status, so the bar's numbers sum to the leave guard's:
  * "1 thay đổi chưa lưu · Tiếng Việt: 1 thay đổi chưa lưu".
  */
-const unsavedText = computed(() => {
-  const shown = dirtyCount.value > 0 ? [t('form.saveBar.unsaved', dirtyCount.value)] : [];
+const otherUnsavedText = computed(() => {
   const others = otherUnsaved.value.map(({ slot: item, count }) =>
     t(
       'admin.problems.statements.otherUnsaved',
@@ -63,7 +62,7 @@ const unsavedText = computed(() => {
       count,
     ),
   );
-  return [...shown, ...others].join(' · ');
+  return others.join(' · ') || undefined;
 });
 const SEGMENT =
   'inline-flex min-h-8 items-center gap-1.5 rounded-pill px-3 text-sm font-semibold whitespace-nowrap text-muted hover:text-content pointer-coarse:min-h-10 aria-checked:bg-accent-soft aria-checked:text-accent-soft-text';
@@ -162,12 +161,9 @@ const SEGMENT =
       :saved-at="savedAt"
       :blocked-reason="lockText"
       :save-label="$t(`admin.problems.statements.save.${slot}`)"
+      :note="otherUnsavedText"
       @discard="discard"
-    >
-      <template v-if="!lockText && otherUnsaved.length" #status>
-        <span class="font-semibold">{{ unsavedText }}</span>
-      </template>
-    </AdminSaveBar>
+    />
     <AdminLeaveGuard :dirty-count="totalDirtyCount" />
   </form>
 </template>

@@ -11,6 +11,7 @@ import {
   initialSlotOf,
   isOriginalLocked,
   previewStyleFor,
+  sentDescription,
   STATEMENT_SLOTS,
   statementDraftOf,
   visibleStatementErrors,
@@ -28,8 +29,9 @@ const seedDrafts = (problem: EditableProblem): Drafts =>
 
 /** The text a slot is saved with: a translation goes to PUT, the original description to PATCH on the problem. */
 function saveSlot(code: string, target: StatementSlot, draft: StatementDraft): Promise<unknown> {
-  if (target === 'original') return updateProblem(code, { description: draft.description });
-  return putTranslation(code, target, { name: draft.name, description: draft.description });
+  const description = sentDescription(draft);
+  if (target === 'original') return updateProblem(code, { description });
+  return putTranslation(code, target, { name: draft.name, description });
 }
 
 /** How many of a slot's two texts (name, description) differ from what was last saved. */
@@ -71,6 +73,7 @@ const isDescriptionWrite = (target: StatementSlot, drafts: Drafts, saved: Drafts
 /** After a save the slot's saved text is what was just written, and it is no longer missing. */
 function recordSaved(drafts: Ref<Drafts>, saved: Ref<Drafts>, target: StatementSlot) {
   drafts.value[target].exists = true;
+  drafts.value[target].storedDescription = sentDescription(drafts.value[target]);
   saved.value[target] = { ...drafts.value[target] };
 }
 
