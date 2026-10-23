@@ -1,7 +1,7 @@
 import { getCurrentInstance, h, render } from 'vue';
 import type { AppContext } from 'vue';
 import AdminToastHost from './AdminToastHost.vue';
-import { dismissToast, showToast } from './admin-toasts';
+import { clearToasts, dismissToast, showToast } from './admin-toasts';
 
 let host: HTMLElement | null = null;
 
@@ -28,4 +28,15 @@ export function useAdminToast({ lazy = false } = {}) {
     return showToast(input);
   };
   return { show, dismiss: dismissToast };
+}
+
+/**
+ * For specs, after each test: the host is rendered outside any app, so a wrapper's unmount never reaches it, and its
+ * 4 s self-close timers would fire into the next test or, after the last one, into a torn-down jsdom.
+ */
+export function resetToastHost() {
+  if (host) render(null, host);
+  host?.remove();
+  host = null;
+  clearToasts();
 }

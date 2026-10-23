@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, vi } from 'vitest';
 import { DEFAULT_LOCALE, i18n } from '@/i18n';
 import { FakeEventSource, installFakeEventSource } from './fake-event-source';
 import { stubMatchMedia } from './match-media';
+import { resetToastHost } from '@/features/admin/ui/feedback/use-admin-toast';
 import { takeUnmatchedRequests } from './mock-api';
 
 beforeEach(() => {
@@ -24,6 +25,7 @@ beforeEach(() => {
 
 afterEach(() => {
   const unmatched = takeUnmatchedRequests();
+  resetToastHost(); // rendered outside any app, so the auto-unmount does not reach it
   localStorage.clear();
   delete document.documentElement.dataset.theme;
   delete document.documentElement.dataset.accent;
