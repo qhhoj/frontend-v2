@@ -22,17 +22,18 @@ API_ORIGIN=http://localhost:3001 npm run dev
 
 - `npm run api:gen` copies `../backend-v2/openapi.json` (or `OPENAPI_SPEC=/path/to/openapi.json`) to `src/api/generated/openapi.json`, records the backend commit in `openapi.source` and regenerates `schema.d.ts`; commit all three. `npm run api:check` (CI) fails when they disagree; `npm run api:check -- --backend` also fails when the snapshot lags the backend checkout.
 
-| Command                | Purpose                                                                                                                                                  |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run dev`          | dev server on :5173                                                                                                                                      |
-| `npm run build`        | typecheck (`vue-tsc --build`) and production build to `dist/`                                                                                            |
-| `npm run preview`      | serve `dist/` on :4173                                                                                                                                   |
-| `npm test`             | Vitest: `*.node.spec.ts` in Node, the other specs in jsdom                                                                                               |
-| `npm run test:scripts` | Vitest: the specs of `scripts/` (api-gen, build helpers)                                                                                                 |
-| `npm run e2e`          | Playwright on :4310 (`E2E_PORT` for parallel runs): builds `dist/`, previews it and answers the API with a fake (`npx playwright install chromium` once) |
-| `npm run lint`         | ESLint, `prettier --check`, `lint:tokens` (no colour literals outside themes), `lint:copy` (vi spelling, quotes), `lint:dates` (`formatDate` only)       |
-| `npm run typecheck`    | `vue-tsc --build`                                                                                                                                        |
-| `npm run check`        | lint, typecheck, test                                                                                                                                    |
+| Command                | Purpose                                                                                                                                            |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`          | dev server on :5173                                                                                                                                |
+| `npm run build`        | typecheck (`vue-tsc --build`) and production build to `dist/`                                                                                      |
+| `npm run preview`      | serve `dist/` on :4173                                                                                                                             |
+| `npm test`             | Vitest: `*.node.spec.ts` in Node, the other specs in jsdom                                                                                         |
+| `npm run test:scripts` | Vitest: the specs of `scripts/` (api-gen, build helpers)                                                                                           |
+| `npm run lint`         | ESLint, `prettier --check`, `lint:tokens` (no colour literals outside themes), `lint:copy` (vi spelling, quotes), `lint:dates` (`formatDate` only) |
+| `npm run typecheck`    | `vue-tsc --build`                                                                                                                                  |
+| `npm run check`        | lint, typecheck, test                                                                                                                              |
+
+UI journeys are checked by agent-run Markdown click-by-click test scripts, kept outside this repo; there is no browser test suite here.
 
 ## Architecture
 
@@ -48,8 +49,7 @@ src/
   components/               shared UI
   features/<area>/          pages, their parts, <area>.queries.ts
   features/shell/           app shell, theme menu, account sync
-  test/                     Vitest setup, mount and API mocks, fixtures (shared with e2e)
-e2e/                        Playwright specs and the fake API (e2e/fixtures/api.ts)
+  test/                     Vitest setup, mount and API mocks, fixtures
 scripts/check-tokens.mjs    lint:tokens
 scripts/check-vi-copy.mjs   lint:copy
 scripts/check-date-format.mjs  lint:dates (the rule and its allow-list: date-format-calls.mjs)
@@ -122,19 +122,18 @@ Routes: `/login`, `/login/2fa`, `/register`, `/register/social?token=`, `/activa
 | Social buttons                                                   | the list comes from `GET /auth/social/providers`; `social-providers.ts` knows their labels                                                     |
 | Pages with a credential in the address                           | call `useNoReferrer()`; for a credential in the path, add the route to `CREDENTIAL_ROUTES` in `backend-v2/libs/community/src/user-activity.ts` |
 | Query parameters the login screen reads                          | `redirect` (a safe in-app path), `error` (OAuth callback codes), `notice` (`password-reset`)                                                   |
-| Auth e2e                                                         | `e2e/auth.e2e.ts`, `e2e/auth-accessibility.e2e.ts`; `installAuth` and its scoped `GET /organizations` in `e2e/fixtures/auth.ts`                |
 
 ## Admin
 
-Admin screens live in `src/features/admin/<area>/` (one folder per area: problems, contests, users, similarity, rejudge, search, ...), inside the shared `AdminShell`. `ADMIN_SCREENS` in `src/features/admin/admin-screens.ts` lists every screen once (id, path, permission, and an optional object-right `capability`); who may enter `/admin` and use each screen is decided in `admin-access.ts` (`canEnterAdmin`, `canUseAdmin`), not by the staff flag; `admin-routes.ts` turns it into routes and maps each id to its page in `SCREEN_COMPONENTS`. Texts are per area in `src/i18n/admin/<area>.vi.json` and `.en.json`, merged by `src/i18n/index.ts`. Fixtures for specs and e2e are in `src/test/admin-fixtures/`, e2e helpers (`signInAsStaff`, `adminOk`, `adminList`, `confirmInDialog`) in `e2e/fixtures/admin.ts`. Which Bit mascot each admin placement shows is decided in one place, `ADMIN-BIT-HOOK` in `src/features/admin/shell/admin-bit.ts`.
+Admin screens live in `src/features/admin/<area>/` (one folder per area: problems, contests, users, similarity, rejudge, search, ...), inside the shared `AdminShell`. `ADMIN_SCREENS` in `src/features/admin/admin-screens.ts` lists every screen once (id, path, permission, and an optional object-right `capability`); who may enter `/admin` and use each screen is decided in `admin-access.ts` (`canEnterAdmin`, `canUseAdmin`), not by the staff flag; `admin-routes.ts` turns it into routes and maps each id to its page in `SCREEN_COMPONENTS`. Texts are per area in `src/i18n/admin/<area>.vi.json` and `.en.json`, merged by `src/i18n/index.ts`. Fixtures for specs are in `src/test/admin-fixtures/`. Which Bit mascot each admin placement shows is decided in one place, `ADMIN-BIT-HOOK` in `src/features/admin/shell/admin-bit.ts`.
 
-The site screens (plan 8f-2) are judges, languages, users, organizations, blog moderation, site settings (with the site notice in its "Văn bản công khai" tab; `/admin/config` redirects there), static pages, the staff ticket queue, user activity and the change log, one folder each in `src/features/admin/`. Shared admin writes live in `src/api/*-admin.api.ts`; reads shared with the public pages (organizations, posts, tickets, `GET /site`) come from the community API files. Loading parity for the site screens is in `e2e/admin-site-loading.e2e.ts`. The canned ticket replies screen (`/admin/tickets/canned`, `src/features/admin/canned-replies/`) is reached from the ticket queue's header.
+The site screens (plan 8f-2) are judges, languages, users, organizations, blog moderation, site settings (with the site notice in its "Văn bản công khai" tab; `/admin/config` redirects there), static pages, the staff ticket queue, user activity and the change log, one folder each in `src/features/admin/`. Shared admin writes live in `src/api/*-admin.api.ts`; reads shared with the public pages (organizations, posts, tickets, `GET /site`) come from the community API files. The canned ticket replies screen (`/admin/tickets/canned`, `src/features/admin/canned-replies/`) is reached from the ticket queue's header.
 
 Plan F5 adds two site screens: short links (`src/features/admin/short-links/`, `judge.manage_short_link`) and external systems (`src/features/admin/integrations/`, `judge.manage_integration`, session-only, key shown once through `admin/ui/RevealKeyDialog.vue`).
 
 Plan VNOI F4 adds `problems/lifecycle/` (the "Đã xóa" tab and the danger-zone delete), `problems/package/` (the full package download on the Data tab) and `organizations/quotas/` (the staff quota overview) under `src/features/admin/`; the public organization tabs "Bài tập" and "Hạn mức" live in `src/features/organizations/problems/` and `src/features/organizations/quota/`, their Bit placements in `src/features/organizations/org-bits.ts`.
 
-To add a screen: add its entry to `ADMIN_SCREENS`, add one `SCREEN_COMPONENTS` line for it, add `admin.shell.screens.<id>` (nav title) and the area's i18n files, put the nav item in `shell/admin-nav.ts` if it has one, and add a skeleton with a `data-skeleton-region` sized to the loaded content plus a case in `e2e/admin-loading.e2e.ts` (or `e2e/admin-site-loading.e2e.ts` for a site screen).
+To add a screen: add its entry to `ADMIN_SCREENS`, add one `SCREEN_COMPONENTS` line for it, add `admin.shell.screens.<id>` (nav title) and the area's i18n files, put the nav item in `shell/admin-nav.ts` if it has one, and add a skeleton with a `data-skeleton-region` sized to the loaded content.
 
 ## More
 

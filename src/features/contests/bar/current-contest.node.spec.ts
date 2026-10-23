@@ -7,8 +7,8 @@ const current = (
   participation: Partial<CurrentParticipation['participation']> = {},
 ): CurrentParticipation => ({
   contest: {
-    key: 'e2e_live',
-    name: 'E2E Live Round',
+    key: 'live_round',
+    name: 'Live Round',
     startTime: '2026-10-17T08:00:00Z',
     endTime: '2026-10-17T12:00:00Z',
   },

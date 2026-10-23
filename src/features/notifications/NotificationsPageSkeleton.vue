@@ -2,7 +2,7 @@
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import NotificationRowSkeleton from './NotificationRowSkeleton.vue';
 
-/** Same wrappers as `NotificationList`: one day heading, then six rows (the e2e shift case answers six). */
+/** Same wrappers as `NotificationList`: one day heading, then six rows. */
 const PAGE_SKELETON_ROWS = 6;
 </script>
 

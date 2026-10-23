@@ -91,7 +91,7 @@ Known gaps: `Notice` has no icon override, `Chip` has no `to`, `StatGrid` values
 - Tables: numbers right-aligned, `font-mono tabular-nums whitespace-nowrap`; headers `text-meta text-muted`.
 - Public lists with more than 4 columns stack to cards under 640 px; others may scroll inside their card.
 - Ranking boards on phones: sticky rank + name columns, sideways scroll.
-- No horizontal page scroll from 320 to 1440 px (`e2e/topbar-fit.e2e.ts`, `e2e/containment.e2e.ts`).
+- No horizontal page scroll from 320 to 1440 px.
 - Empty states always offer one next step (`EmptyState`'s `#action` slot). Skeletons are shaped from the real component, never fixed pixel heights.
 - Active tab = `bg-accent-soft` + `text-accent-soft-text` + accent border.
 - Copy: Vietnamese first, through i18n (vi and en both), short and plain. Lucide icons only (language marks through `LanguageIcon` excepted), no emoji. Dates: only `formatDate` presets from `src/lib/format-date.ts` (`short`, `date`, `datetime`; seconds only in logs), never `toLocale*String` or `Intl.DateTimeFormat` (`npm run lint:dates`).

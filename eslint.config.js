@@ -5,15 +5,7 @@ import { WRAPPER_IMPORT_PATTERNS, WRAPPER_IMPORTERS } from './scripts/wrapper-im
 
 export default defineConfigWithVueTs(
   {
-    ignores: [
-      'dist/',
-      'coverage/',
-      'playwright-report/',
-      'test-results/',
-      'docs/',
-      'src/api/generated/',
-      '.superpowers/',
-    ],
+    ignores: ['dist/', 'coverage/', 'docs/', 'src/api/generated/', '.superpowers/'],
   },
   pluginVue.configs['flat/recommended'],
   vueTsConfigs.recommendedTypeChecked,

@@ -1,4 +1,4 @@
-// Relative type-only imports and no test helpers: the e2e tsconfig has no `@/` alias, and Playwright loads this file too.
+// Relative type-only imports and no test helpers.
 import type {
   Announcement,
   ContestActions,

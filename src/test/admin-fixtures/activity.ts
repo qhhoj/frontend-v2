@@ -1,4 +1,4 @@
-// Relative imports only: the e2e TypeScript project has no `@` alias and imports this file.
+// Relative imports only.
 import type { ActivityLog, ActivitySummary, LiveActivity } from '../../api/types/activity-admin';
 
 export const activityLog = (overrides: Partial<ActivityLog> = {}): ActivityLog => ({

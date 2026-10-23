@@ -2,7 +2,7 @@
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 
-/** Four rows shaped like `OrgProblemTable`, or like `OrgProblemCardList` on a phone (the e2e shift case answers four rows). */
+/** Four rows shaped like `OrgProblemTable`, or like `OrgProblemCardList` on a phone. */
 defineProps<{ isAdmin: boolean }>();
 const ROWS = 4;
 const CELL = 'py-2 pr-3 align-middle';

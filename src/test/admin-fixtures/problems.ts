@@ -5,7 +5,7 @@ import type {
 } from '../../api/types/problem-editing';
 import type { ProblemData, TestCase } from '../../api/types/problem-data';
 
-/** The same shape as mock-api's `ok`; importing mock-api would pull the `@` alias into the e2e project. */
+/** The same shape as mock-api's `ok`, without importing mock-api. */
 const ok = (data: unknown) => ({ body: { data } });
 
 export const LANG_CPP20 = '0192a000-0000-7000-8000-00000000c020';

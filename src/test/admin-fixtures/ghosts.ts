@@ -1,4 +1,4 @@
-// Relative import: Playwright loads this file and the e2e tsconfig has no `@/` alias.
+// Relative imports only.
 import type { Ghost } from '../../api/types/contest-ghosts';
 
 export const ghost = (overrides: Partial<Ghost> = {}): Ghost => ({
