@@ -8,6 +8,8 @@ import AdminStatus from '../ui/AdminStatus.vue';
 import { BUTTON } from '../ui/controls';
 
 const props = defineProps<{ username: string; email: string }>();
+/** Without an address there is nowhere to send the link: the button stays focusable but inert, and the note above says why. */
+const noEmail = computed(() => !props.email);
 const send = useAdminMutation({ mutate: () => sendUserResetLink(props.username) });
 /** An inactive account or a missing address carries an issue code; anything else (mail off, too many links) its error text. */
 const refusal = computed(() => {
@@ -30,9 +32,9 @@ const refusal = computed(() => {
       type="button"
       :class="BUTTON.secondary"
       class="self-start"
-      :aria-disabled="send.isPending.value || undefined"
+      :aria-disabled="noEmail || send.isPending.value || undefined"
       :aria-busy="send.isPending.value || undefined"
-      @click="send.run(undefined)"
+      @click="noEmail || send.run(undefined)"
     >
       {{ $t('admin.users.edit.reset.send') }}
     </button>

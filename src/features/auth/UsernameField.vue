@@ -6,7 +6,7 @@ import { usernameProblem } from '@/lib/username';
 import AuthField from './AuthField.vue';
 import { useUsernameAvailability } from './use-username-availability';
 
-withDefaults(defineProps<{ error?: string }>(), { error: undefined });
+const props = withDefaults(defineProps<{ error?: string }>(), { error: undefined });
 const model = defineModel<string>({ required: true });
 const PROBLEM_KEYS = {
   format: 'auth.issues.username_invalid_characters',
@@ -31,7 +31,8 @@ const LINE = {
   available: { key: 'auth.usernameFree', icon: Check, colour: 'text-positive' },
   taken: { key: 'auth.usernameBusy', icon: CircleAlert, colour: 'text-negative' },
 } as const;
-const line = computed(() => LINE[status.value]);
+/** One message under the field: a rule or server error replaces the live availability line. */
+const line = computed(() => ((problem.value ?? props.error) ? LINE.idle : LINE[status.value]));
 const availabilityId = useId();
 const hintId = useId();
 </script>

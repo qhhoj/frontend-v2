@@ -46,6 +46,27 @@ describe('login page', () => {
     expect(unknown.find('#main [role="status"]').exists()).toBe(false);
   });
 
+  it('names an empty field in Vietnamese instead of the browser bubble, and sends nothing', async () => {
+    const calls = mockApi(routes());
+    const { wrapper } = await mountApp('/login');
+    await wrapper.get('form').trigger('submit');
+    await flushPromises();
+    expect(wrapper.get('form').attributes('novalidate')).toBeDefined();
+    expect(wrapper.text()).toContain('Nhập tên đăng nhập.');
+    expect(wrapper.text()).toContain('Nhập mật khẩu.');
+    expect(calls.some((call) => call.path === '/auth/login')).toBe(false);
+    await wrapper.get('input[name="username"]').setValue('user_01');
+    expect(wrapper.text()).not.toContain('Nhập tên đăng nhập.');
+  });
+
+  it('says a staff-disabled account is disabled, without the activation link', async () => {
+    mockApi(routes({ 'POST /auth/login': fail(403, 'account_disabled') }));
+    const { wrapper } = await mountApp('/login');
+    await signIn(wrapper);
+    expect(wrapper.get('#main [role="alert"]').text()).toContain('vô hiệu hóa');
+    expect(wrapper.text()).not.toContain('Gửi lại email kích hoạt');
+  });
+
   it('shows a ban reason with markup as plain text', async () => {
     mockApi(
       routes({

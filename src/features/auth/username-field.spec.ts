@@ -51,4 +51,11 @@ describe('UsernameField', () => {
     expect(lineOf(wrapper).text()).toBe('Tên đã có người dùng');
     expect(wrapper.get('input').attributes('aria-invalid')).toBe('true');
   });
+
+  it('shows one message when the server also refuses the taken name', async () => {
+    const wrapper = mountField('busy_name', { error: 'Tên đăng nhập đã được dùng.' });
+    await settle();
+    expect(wrapper.text()).toContain('Tên đăng nhập đã được dùng.');
+    expect(wrapper.text()).not.toContain('Tên đã có người dùng');
+  });
 });

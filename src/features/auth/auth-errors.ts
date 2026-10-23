@@ -80,6 +80,7 @@ const CALLBACK_ERROR_CODES: readonly string[] = [
   'email_unverified',
   'banned',
   'account_not_activated',
+  'account_disabled',
 ];
 
 export const queryErrorText = (value: unknown): string | null =>
