@@ -99,7 +99,7 @@ const model = computed<MenuItem[]>(() => {
     <template #item="{ item, props: itemProps }">
       <a
         v-bind="itemProps.action"
-        class="flex min-h-10 cursor-pointer items-center gap-3 px-3 text-sm no-underline pointer-coarse:min-h-11"
+        class="flex min-h-10 cursor-pointer items-center gap-3 px-3 text-sm no-underline touch:min-h-11"
         :class="item.danger ? 'text-negative' : 'text-content'"
       >
         <component

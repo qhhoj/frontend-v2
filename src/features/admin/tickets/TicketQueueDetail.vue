@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { X } from 'lucide-vue-next';
 import { ref, useTemplateRef, watch } from 'vue';
+import type { ComponentPublicInstance } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -13,8 +16,9 @@ import { useTicketQuery } from '@/features/tickets/tickets.queries';
 import { useTicketStream } from '@/features/tickets/use-ticket-stream';
 import { formatDate } from '@/lib/format-date';
 import { useBottomScrollPadding } from '@/lib/use-bottom-scroll-padding';
+import { useRevealOnMount } from '@/lib/use-reveal-on-mount';
 import { useLocaleStore } from '@/stores/locale.store';
-import { buttonClass } from '../ui/controls';
+import { buttonClass, iconButtonClass } from '../ui/controls';
 import TicketClaimButton from './TicketClaimButton.vue';
 import TicketHandlingSection from './TicketHandlingSection.vue';
 import TicketMarkGood from './TicketMarkGood.vue';
@@ -27,12 +31,18 @@ import TicketMarkGood from './TicketMarkGood.vue';
  * per open ticket, so its live feed closes with it.
  */
 const props = defineProps<{ ticketId: string }>();
+const route = useRoute();
+const router = useRouter();
 const locale = useLocaleStore();
 const { data: ticket, error, isPending, refetch } = useTicketQuery(props.ticketId);
 const { isLive, announcement } = useTicketStream(props.ticketId);
 const { isPending: isSaving, failureKey, patch } = useTicketPatch(props.ticketId);
 const closeAfterReply = ref(false);
+/** Below `xl` the panel sits under the list: this takes the reader back to it. */
+const closePanel = () => router.replace({ query: { ...route.query, ticket: undefined } });
 
+const panel = useTemplateRef<ComponentPublicInstance>('panel');
+useRevealOnMount(panel);
 const replyBox = useTemplateRef<HTMLElement>('replyBox');
 const isPinned = (box: HTMLElement) => getComputedStyle(box).position === 'sticky';
 useBottomScrollPadding(replyBox, isPinned);
@@ -63,12 +73,28 @@ const toggleGood = () => {
 </script>
 
 <template>
-  <Card variant="flat" padding="md" data-testid="queue-detail" class="flex min-w-0 flex-col gap-5">
+  <Card
+    ref="panel"
+    variant="flat"
+    padding="md"
+    data-testid="queue-detail"
+    class="flex min-w-0 scroll-mt-20 flex-col gap-5"
+  >
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><SkeletonBlock class="h-96 w-full" /></template>
       <template v-if="ticket">
         <header class="flex flex-col gap-2">
           <div class="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              data-testid="close-panel"
+              :class="[iconButtonClass('ghost', 'sm'), 'order-last ml-auto xl:hidden']"
+              :aria-label="$t('admin.tickets.detail.closePanel')"
+              :title="$t('admin.tickets.detail.closePanel')"
+              @click="closePanel"
+            >
+              <X aria-hidden="true" class="size-4" :stroke-width="1.75" />
+            </button>
             <TicketStatusPill :is-open="ticket.isOpen" :is-contributive="ticket.isContributive" />
             <TicketLinkChip :link="ticket.link" />
           </div>

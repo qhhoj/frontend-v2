@@ -9,7 +9,7 @@ defineEmits<{ change: [checked: boolean] }>();
 
 <template>
   <label
-    class="inline-flex size-4 items-center justify-center align-middle pointer-coarse:-m-3.5 pointer-coarse:size-11"
+    class="inline-flex size-4 items-center justify-center align-middle touch:-m-3.5 touch:size-11"
   >
     <input
       type="checkbox"

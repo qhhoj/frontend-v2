@@ -36,6 +36,8 @@ const KEY = 'admin.problems.visibility';
 
 const isPublic = computed(() => props.problem.isPublic);
 const audience = computed(() => (props.problem.isOrganizationPrivate ? 'members' : 'everyone'));
+/** Who a shown problem is shown to: organization members only, or everyone (the `public` wording). */
+const shownTo = computed(() => (audience.value === 'members' ? 'members' : 'public'));
 const canChange = computed(
   () => Boolean(props.problem.editor?.canPublishToMembers) || can('judge.change_public_visibility'),
 );
@@ -90,12 +92,12 @@ function openDialog() {
           {{ $t(`${KEY}.title.${audience}`) }}
         </h2>
         <p class="m-0 text-meta text-muted">
-          {{ $t(`${KEY}.lead.${isPublic ? 'public' : 'private'}`) }}
+          {{ $t(`${KEY}.lead.${isPublic ? shownTo : 'private'}`) }}
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-2">
         <AdminChip v-if="isPublic" tone="positive" :icon="Globe">
-          {{ $t('admin.problems.header.public') }}
+          {{ $t(`admin.problems.header.${shownTo}`) }}
         </AdminChip>
         <AdminChip v-else :icon="Lock">{{ $t('admin.problems.header.private') }}</AdminChip>
         <AppButton

@@ -19,6 +19,7 @@ import { chosenIds } from './signup-choices';
 import { useAfterSignIn } from './use-after-sign-in';
 import { useAuthAction } from './use-auth-action';
 import { useNoReferrer } from './use-no-referrer';
+import { AUTH_LINK } from './auth-link';
 
 /** Why the signup cannot finish from this page; `null` while the form can still succeed. */
 type EndReason = 'token' | 'linked' | 'email';
@@ -27,7 +28,6 @@ const END_TEXT_KEYS = {
   token: 'errors.invalid_token',
   linked: 'auth.socialSignup.linked',
 } as const;
-const LINK = 'font-semibold text-accent-text underline';
 
 // Set before the first request: the pickers start their queries during setup, before this page mounts.
 useNoReferrer();
@@ -140,9 +140,11 @@ async function submit() {
     </form>
     <template v-else>
       <AuthError :text="endText" />
-      <div class="flex flex-col items-center gap-2 text-center text-sm">
-        <RouterLink :to="{ name: 'login' }" :class="LINK">{{ $t('auth.submitLogin') }}</RouterLink>
-        <RouterLink :to="{ name: 'forgot-password' }" :class="LINK">{{
+      <div class="flex flex-col items-center gap-2 text-center text-sm touch:gap-6">
+        <RouterLink :to="{ name: 'login' }" :class="AUTH_LINK">{{
+          $t('auth.submitLogin')
+        }}</RouterLink>
+        <RouterLink :to="{ name: 'forgot-password' }" :class="AUTH_LINK">{{
           $t('auth.forgot')
         }}</RouterLink>
       </div>

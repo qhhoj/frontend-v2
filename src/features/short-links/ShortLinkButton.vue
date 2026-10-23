@@ -52,7 +52,9 @@ const selectAll = (event: FocusEvent) => (event.target as HTMLInputElement).sele
       data-testid="short-link-button"
       class="inline-flex items-center justify-center rounded-pill border font-semibold"
       :class="[
-        compact ? 'size-10 cursor-pointer' : 'min-h-11 gap-2 px-4 text-sm max-sm:w-full',
+        compact
+          ? 'size-10 cursor-pointer touch:size-11'
+          : 'min-h-11 gap-2 px-4 text-sm max-sm:w-full',
         state === 'copied'
           ? 'border-accent bg-accent-soft text-accent-soft-text'
           : compact

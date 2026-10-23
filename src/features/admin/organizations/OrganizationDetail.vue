@@ -5,9 +5,11 @@ import { useRoute } from 'vue-router';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import { useOrganizationQuery } from '@/features/organizations/organizations.queries';
 import { usePermissions } from '@/stores/use-permissions';
+import AdminBit from '../shell/AdminBit.vue';
 import AdminChip from '../ui/AdminChip.vue';
 import AdminTabs from '../ui/AdminTabs.vue';
 import type { AdminTab } from '../ui/AdminTabs.vue';
+import { isNotFound } from '../ui/admin-errors';
 import { buttonClass, iconButtonClass } from '../ui/controls';
 import JoinRequestsPanel from './JoinRequestsPanel.vue';
 import MembersPanel from './MembersPanel.vue';
@@ -33,6 +35,8 @@ const { isSuperuser } = usePermissions();
 /** The page keys this view by organization, so `slug` never changes inside one instance. */
 const detail = props.slug === null ? null : useOrganizationQuery(props.slug);
 const organization = computed(() => detail?.data.value);
+/** The slug names no organization: the detail says so instead of offering an empty form. */
+const isMissing = computed(() => isNotFound(detail?.error.value));
 const canAdminister = computed(() => organization.value?.viewer?.canAdminister === true);
 const panel = computed<OrganizationPanel>(() =>
   canAdminister.value ? organizationPanelOf(route.query) : 'info',
@@ -99,23 +103,28 @@ const tabs = computed<AdminTab[]>(() =>
         </button>
       </div>
     </header>
-    <AdminTabs
-      v-if="canAdminister"
-      :tabs="tabs"
-      :current="panel"
-      :label="$t('admin.organizations.panels.label')"
-    />
-    <template v-if="panel === 'info'">
-      <OrganizationEditor :key="slug ?? 'new'" :slug="slug" @saved="emit('saved', $event)" />
-      <OrganizationDeleteCard
-        v-if="isSuperuser && slug !== null"
-        :key="`delete-${slug}`"
-        :slug="slug"
-        :on-deleted="onDeleted"
+    <p v-if="isMissing" role="alert" class="m-0 flex items-center gap-3">
+      <AdminBit placement="refused" />{{ $t('admin.organizations.detail.notFound', { slug }) }}
+    </p>
+    <template v-else>
+      <AdminTabs
+        v-if="canAdminister"
+        :tabs="tabs"
+        :current="panel"
+        :label="$t('admin.organizations.panels.label')"
       />
+      <template v-if="panel === 'info'">
+        <OrganizationEditor :key="slug ?? 'new'" :slug="slug" @saved="emit('saved', $event)" />
+        <OrganizationDeleteCard
+          v-if="isSuperuser && slug !== null"
+          :key="`delete-${slug}`"
+          :slug="slug"
+          :on-deleted="onDeleted"
+        />
+      </template>
+      <MembersPanel v-else-if="panel === 'members'" :key="`members-${slug}`" :slug="slug!" />
+      <JoinRequestsPanel v-else-if="panel === 'requests'" :key="`requests-${slug}`" :slug="slug!" />
+      <OrganizationHistoryPanel v-else :key="`history-${slug}`" :slug="slug!" />
     </template>
-    <MembersPanel v-else-if="panel === 'members'" :key="`members-${slug}`" :slug="slug!" />
-    <JoinRequestsPanel v-else-if="panel === 'requests'" :key="`requests-${slug}`" :slug="slug!" />
-    <OrganizationHistoryPanel v-else :key="`history-${slug}`" :slug="slug!" />
   </section>
 </template>

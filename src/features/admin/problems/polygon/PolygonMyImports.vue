@@ -66,7 +66,7 @@ const LOOKS: Record<MyImportStatus, { tone: ChipTone; icon: Component }> = {
           >
           <RouterLink
             :to="{ name: 'admin-polygonImport', query: { job: job.id } }"
-            class="inline-flex min-h-6 items-center text-sm font-semibold text-accent-text underline underline-offset-2 pointer-coarse:min-h-11"
+            class="inline-flex min-h-6 items-center text-sm font-semibold text-accent-text underline underline-offset-2 touch:min-h-11"
             :aria-label="$t('admin.polygonLink.myImports.viewLabel', { code: job.code })"
             >{{ $t('admin.polygonLink.myImports.view') }}</RouterLink
           >

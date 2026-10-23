@@ -535,6 +535,7 @@
   },
   "header": {
     "public": "Public",
+    "members": "Organization members",
     "private": "Private",
     "suggested": "Suggested"
   },
@@ -545,7 +546,8 @@
     },
     "lead": {
       "private": "Off: only the problem's staff see it. Publish once it is ready.",
-      "public": "On: contestants see the problem in the list and can submit."
+      "public": "On: contestants see the problem in the list and can submit.",
+      "members": "On: only organization members see the problem in the list and can submit."
     },
     "missing": "Missing:",
     "ready": "All steps done:",

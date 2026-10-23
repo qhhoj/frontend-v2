@@ -19,7 +19,7 @@
   }
 }
 
-@media (pointer: coarse) {
+@media (pointer: coarse), (max-width: 40rem) {
   :root {
     --qa-row: 3rem;
     --qa-control: 2.75rem;

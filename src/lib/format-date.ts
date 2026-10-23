@@ -160,8 +160,12 @@ const COMPACT_UNITS = [
   { unit: 'day', seconds: 86_400 },
 ] as const;
 
+/** A time this far ahead of the clock is skew between the server and the browser (a fresh item), not a future moment. */
+const CLOCK_SKEW_SECONDS = 30;
+
 export function formatRelative(date: string, now: number, locale: Locale): string {
-  const seconds = Math.round((Date.parse(date) - now) / 1000);
+  const offset = Math.round((Date.parse(date) - now) / 1000);
+  const seconds = offset > 0 && offset <= CLOCK_SKEW_SECONDS ? 0 : offset;
   const magnitude = Math.abs(seconds);
   const [value, unit]: [number, Intl.RelativeTimeFormatUnit] =
     magnitude < 60

@@ -138,6 +138,14 @@ it('shows an already-banned target with its reason and an unban opener instead o
   expect(wrapper.get('button[data-testid="unban-open"]').text()).toBe('Bỏ cấm');
 });
 
+it('shows no PP rank for a banned account even when the API still sends one', async () => {
+  mockApi({ ...signedInViewer(), ...profileRoutes({ ...bannedOther(), rank: 4 }) });
+  const { wrapper } = await mountApp('/users/ngoc_anh');
+  const stats = wrapper.get('[data-testid="profile-stats"]').text();
+  expect(stats).not.toContain('#4');
+  expect(stats).toContain('—');
+});
+
 it('shows no unban opener to a viewer without judge.ban_user', async () => {
   mockApi({ ...signedInViewer(), ...profileRoutes(bannedOther()) });
   const { wrapper } = await mountApp('/users/ngoc_anh');

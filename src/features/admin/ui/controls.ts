@@ -19,7 +19,7 @@ export const buttonClass = (tone: ButtonTone = 'secondary', size: ControlSize = 
 
 /** A square icon-only button; give it an `aria-label` and a `title`. */
 export const iconButtonClass = (tone: ButtonTone = 'ghost', size: ControlSize = 'md') =>
-  `${buttonClass(tone, size)} ${size === 'sm' ? 'min-w-8 px-0 pointer-coarse:min-w-11' : 'min-w-[var(--qa-control,2.25rem)] px-0'}`;
+  `${buttonClass(tone, size)} ${size === 'sm' ? 'min-w-8 px-0 touch:min-w-11' : 'min-w-[var(--qa-control,2.25rem)] px-0'}`;
 
 export const BUTTON = {
   primary: buttonClass('primary'),

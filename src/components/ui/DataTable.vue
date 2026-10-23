@@ -171,7 +171,7 @@ const HEAD_CELL = computed(
 );
 const HEAD_TEXT = 'text-meta font-semibold whitespace-nowrap text-muted';
 const SORT_BUTTON =
-  'inline-flex min-h-6 items-center gap-1 rounded-cell hover:text-content pointer-coarse:min-h-11';
+  'inline-flex min-h-6 items-center gap-1 rounded-cell hover:text-content touch:min-h-11';
 const FRAME = computed(() => CARD_VARIANTS[isCompact.value ? 'flat' : 'glass']);
 const frameStyle = computed(() => (props.maxHeight ? { maxHeight: props.maxHeight } : undefined));
 

@@ -204,6 +204,7 @@
   },
   "detail": {
     "back": "Tất cả tổ chức",
+    "notFound": "Không tìm thấy tổ chức {slug}.",
     "close": "Đóng tổ chức"
   },
   "panels": {

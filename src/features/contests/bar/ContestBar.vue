@@ -63,7 +63,7 @@ const currentLink = computed(() =>
   navSectionOverride.value === '/contests' ? (CLAIMED_BY[String(route.name ?? '')] ?? null) : null,
 );
 /** 44 px targets on a coarse pointer at every width (M-02, D-17): the link is as tall as the bar, at least as wide. */
-const COARSE_TARGET = 'pointer-coarse:h-11 pointer-coarse:min-w-11';
+const COARSE_TARGET = 'touch:h-11 touch:min-w-11';
 const LINK = [
   'inline-flex h-8 items-center justify-center gap-1.5 rounded-pill border border-transparent px-2.5 text-meta md:px-3 font-semibold whitespace-nowrap text-muted hover:bg-surface-hover hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-surface-solid aria-[current=page]:text-accent-soft-text',
   COARSE_TARGET,
@@ -79,7 +79,7 @@ const LINK = [
       !session.impersonatorId && 'sticky top-0',
     ]"
   >
-    <div class="page-gutter flex h-10 items-center gap-2 pointer-coarse:h-11 md:h-12 md:gap-3">
+    <div class="page-gutter flex h-10 items-center gap-2 touch:h-11 md:h-12 md:gap-3">
       <RouterLink
         :to="{ name: 'contest', params: { key: contestKey } }"
         :class="[

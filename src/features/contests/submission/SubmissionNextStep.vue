@@ -10,7 +10,7 @@ defineProps<{ next: ContestProblem }>();
   <RouterLink
     data-testid="submission-next"
     :to="{ name: 'problem', params: { code: next.code } }"
-    class="inline-flex min-h-9 items-center gap-1 self-start rounded-pill border border-line-strong bg-surface px-3.5 text-sm font-semibold hover:bg-surface-hover pointer-coarse:min-h-11"
+    class="inline-flex min-h-9 items-center gap-1 self-start rounded-pill border border-line-strong bg-surface px-3.5 text-sm font-semibold hover:bg-surface-hover touch:min-h-11"
   >
     {{ $t('submission.contest.next', { label: next.label, name: next.name }) }}
     <ChevronRight class="size-4" aria-hidden="true" />

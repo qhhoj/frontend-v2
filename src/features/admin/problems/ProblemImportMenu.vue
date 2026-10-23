@@ -49,7 +49,7 @@ const items = computed<MenuItem[]>(() => [
     <template #item="{ item, props: itemProps }">
       <a
         v-bind="itemProps.action"
-        class="flex min-h-10 cursor-pointer items-center gap-3 px-3 text-sm text-content no-underline pointer-coarse:min-h-11"
+        class="flex min-h-10 cursor-pointer items-center gap-3 px-3 text-sm text-content no-underline touch:min-h-11"
       >
         <component
           :is="item.rowIcon"

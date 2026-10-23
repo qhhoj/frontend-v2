@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { ArrowUpRight, Check, Copy, Globe, Lightbulb, Lock, Minus } from 'lucide-vue-next';
+import { ArrowUpRight, Check, Copy, Globe, Lightbulb, Lock, Minus, Users } from 'lucide-vue-next';
 import type { EditableProblem } from '@/api/types/problem-editing';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -33,8 +33,11 @@ const canEdit = computed(() => Boolean(problem.data.value?.canEdit && problem.da
 const canClone = computed(() => canEdit.value && can('judge.clone_problem'));
 const isCloneOpen = ref(false);
 
-/** The header's status chip: public, a suggestion still under review, or private. */
+/** The header's status chip: public (or shown to organization members only), a suggestion still under review, or private. */
 function statusOf(detail: EditableProblem): { key: string; tone: ChipTone; icon: typeof Globe } {
+  if (detail.isPublic && detail.isOrganizationPrivate) {
+    return { key: 'members', tone: 'positive', icon: Users };
+  }
   if (detail.isPublic) return { key: 'public', tone: 'positive', icon: Globe };
   if (detail.editor?.suggester) return { key: 'suggested', tone: 'caution', icon: Lightbulb };
   return { key: 'private', tone: 'neutral', icon: Lock };

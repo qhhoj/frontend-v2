@@ -51,7 +51,7 @@ const anonymousRemoval = useAdminMutation<void, void>({
   },
 });
 const MENU_ITEM =
-  'flex min-h-10 w-full items-center gap-3 rounded-cell px-3 text-left text-sm text-negative hover:bg-surface-hover pointer-coarse:min-h-11';
+  'flex min-h-10 w-full items-center gap-3 rounded-cell px-3 text-left text-sm text-negative hover:bg-surface-hover touch:min-h-11';
 </script>
 
 <template>

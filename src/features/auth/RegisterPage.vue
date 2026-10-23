@@ -17,6 +17,7 @@ import SignupChoices from './SignupChoices.vue';
 import UsernameField from './UsernameField.vue';
 import { chosenIds } from './signup-choices';
 import { useAuthAction } from './use-auth-action';
+import { AUTH_LINK } from './auth-link';
 
 /** RegisterA, then CheckEmail after a send, or Activation's "registration unavailable" card when the mailer is down. */
 type Phase = 'form' | 'sent' | 'mailUnavailable';
@@ -44,7 +45,6 @@ watch(
   () => form.organizationId,
   () => dismiss('organizationId'),
 );
-const LINK = 'font-semibold text-accent-text underline';
 
 /** What the backend would refuse anyway, checked here so the viewer is told at once. */
 const readyToSend = () =>
@@ -96,7 +96,7 @@ async function submit() {
     </InboxNotice>
     <div class="flex flex-col gap-3 text-center text-sm text-muted">
       <p>{{ $t('auth.heldUsername', { username: form.username }) }}</p>
-      <button type="button" :class="LINK" @click="registerAgain">
+      <button type="button" :class="AUTH_LINK" @click="registerAgain">
         {{ $t('auth.registerAgain') }}
       </button>
     </div>
@@ -124,7 +124,7 @@ async function submit() {
     <template #header-end>
       <span class="flex items-center gap-1"
         ><span class="text-muted max-sm:hidden">{{ $t('auth.haveAccountPrompt') }}</span>
-        <RouterLink :to="{ name: 'login' }" :class="LINK">{{
+        <RouterLink :to="{ name: 'login' }" :class="AUTH_LINK">{{
           $t('auth.submitLogin')
         }}</RouterLink></span
       >
@@ -185,7 +185,9 @@ async function submit() {
       <AuthSubmit :pending="pending">{{ $t('auth.submitRegister') }}</AuthSubmit>
       <p class="text-center text-sm text-muted">
         {{ $t('auth.haveAccountPrompt') }}
-        <RouterLink :to="{ name: 'login' }" :class="LINK">{{ $t('auth.submitLogin') }}</RouterLink>
+        <RouterLink :to="{ name: 'login' }" :class="AUTH_LINK">{{
+          $t('auth.submitLogin')
+        }}</RouterLink>
       </p>
     </form>
   </AuthLayout>

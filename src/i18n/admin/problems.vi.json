@@ -535,6 +535,7 @@
   },
   "header": {
     "public": "Công khai",
+    "members": "Thành viên tổ chức",
     "private": "Riêng tư",
     "suggested": "Đề xuất"
   },
@@ -545,7 +546,8 @@
     },
     "lead": {
       "private": "Đang tắt: chỉ người phụ trách bài thấy. Công khai khi bài đã sẵn sàng.",
-      "public": "Đang bật: thí sinh thấy bài trong danh sách và nộp được."
+      "public": "Đang bật: thí sinh thấy bài trong danh sách và nộp được.",
+      "members": "Đang bật: chỉ thành viên tổ chức thấy bài trong danh sách và nộp được."
     },
     "missing": "Còn thiếu:",
     "ready": "Đã đủ bước:",

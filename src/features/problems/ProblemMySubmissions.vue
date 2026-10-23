@@ -81,7 +81,7 @@ const rows = computed(() =>
       </h2>
       <RouterLink
         :to="{ name: 'submissions', query: { problem: code, user: session.user?.username } }"
-        class="inline-flex min-h-8 items-center text-meta font-bold text-accent-text hover:underline pointer-coarse:min-h-11"
+        class="inline-flex min-h-8 items-center text-meta font-bold text-accent-text hover:underline touch:min-h-11"
         >{{ $t('common.viewAll') }}</RouterLink
       >
     </div>

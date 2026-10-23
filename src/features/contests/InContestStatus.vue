@@ -32,7 +32,7 @@ watch(
   },
 );
 const LINK =
-  'inline-flex min-h-8 items-center font-semibold text-accent-text underline underline-offset-2 hover:no-underline pointer-coarse:min-h-11';
+  'inline-flex min-h-8 items-center font-semibold text-accent-text underline underline-offset-2 hover:no-underline touch:min-h-11';
 </script>
 
 <template>

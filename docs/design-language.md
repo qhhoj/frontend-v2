@@ -10,7 +10,7 @@ Root problem it fixes: the same control was built four ways (admin `controls.ts`
 |---|---|
 | Type (font size only) | `text-tiny` 11 · `text-caption` 12 · `text-meta` 13 · `text-sm` 14 · `text-base` 16 · `text-title` 17 · `text-subtitle` 18 · `text-section` 20 · `text-display` 24 · `text-page` 26 · `text-stat` 26 (+ `font-mono`) · `text-hero` 40 · `text-score` 56 (submission score) |
 | Leading | tiny/caption 16 px · meta 18 · sm 20 · base 24 · title 22 · subtitle/section/display set none (add a `leading-*`) · page 1.25 · stat/hero/score set none (add a `leading-*`) |
-| Control height | `--qh-control` 44 (md) · `--qh-control-sm` 36, 44 on coarse pointers · `--qh-control-lg` 56 (swap card submit) |
+| Control height | `--qh-control` 44 (md) · `--qh-control-sm` 36, 44 on touch (a coarse pointer or a viewport up to 640 px) · `--qh-control-lg` 56 (swap card submit) |
 | Radius by role | `rounded-control` (`--qh-radius-control`: pill; 12 in admin) · inputs, code `rounded-cell` 12 · inset tiles, notices `rounded-row` 16 · cards, dialogs `rounded-card` 24 · chips, tabs, segmented `rounded-pill`. menus, popovers `rounded-row`. `tile` 20 and `panel` 28 no longer exist: lint-banned, tokens removed |
 | Control border | `border-line-control` (`--qh-line-control`): the border of inputs, selects, textareas and secondary buttons, at least 3:1 on the ground, the card and the inner tile (WCAG 1.4.11, checked per theme in `themes.node.spec.ts`). `border-line` stays the hairline of cards and dividers (`lint:tokens` rejects `border-line` and `border-line-strong` on an input, select, textarea or a wrapper that shows its focus-within or checked state); `border-line-strong` the edge of menus and popovers |
 | Elevation | `shadow-float` (`--qh-shadow-float`, `0 8px 24px`, 12 % ink in light, 50 % black in dark): floating surfaces only, which the preset gives Modal, menus, Select lists and popovers, and `AdminToastHost` its toasts. Cards, tables and sticky bars stay flat |
@@ -40,7 +40,7 @@ Not built: MarkdownEditor, ListRow, SidebarLayout. Gaps: Notice icon override, C
 ## Rules
 
 - One primary action per view. Disabled = `aria-disabled` + token pair, never opacity. Busy = spinner (`AppButton loading`, label kept unless the caller changes it).
-- Inputs 16 px, 44 px tall, 12 px corners. Targets ≥ 44 px on coarse pointers.
+- Inputs 16 px, 44 px tall, 12 px corners. Targets ≥ 44 px on touch (a coarse pointer or a viewport up to 640 px; the `touch:` variant).
 - Hint ≤ one line (~60 chars); an error replaces it. Optional fields say "(tùy chọn)".
 - Feedback: standing state or refusal → inline Notice by its cause; form save → SaveBar text; row/bulk/background → toast. A failure is never toast-only.
 - Tables: th 13 muted in sentence case (`text-meta text-muted`, comfortable and compact alike; `lint:tokens` rejects `uppercase` on a header cell or header recipe), td 14; numbers right-aligned, mono, tabular, nowrap.

@@ -19,6 +19,7 @@ import { TWO_FACTOR_CARDS, isKeyUsable, twoFactorView } from './two-factor-view'
 import type { SecondFactorMode } from './two-factor-view';
 import { useAfterSignIn } from './use-after-sign-in';
 import { useAuthAction } from './use-auth-action';
+import { AUTH_LINK } from './auth-link';
 
 const session = useSessionStore();
 const router = useRouter();
@@ -53,7 +54,6 @@ const failed = computed(
   () =>
     Boolean(summary.value) || view.value === 'keyUnsupported' || view.value === 'sessionChanged',
 );
-const LINK = 'font-semibold text-accent-text underline';
 
 /** Any accepted factor flips the server session to authenticated; reload it, then leave like a password sign-in. */
 const finish = async () => {
@@ -186,7 +186,11 @@ async function signOut() {
       {{ $t('auth.twoFactor.signInAgain') }}
     </AppButton>
     <p v-if="hasCode" class="text-center text-sm">
-      <button type="button" :class="LINK" @click="switchTo(view === 'backup' ? 'app' : 'backup')">
+      <button
+        type="button"
+        :class="AUTH_LINK"
+        @click="switchTo(view === 'backup' ? 'app' : 'backup')"
+      >
         {{ view === 'backup' ? $t('auth.twoFactor.useApp') : $t('auth.twoFactor.useBackup') }}
       </button>
     </p>
@@ -200,7 +204,9 @@ async function signOut() {
           <strong class="font-mono text-content">{{ username }}</strong></span
         >
         <span aria-hidden="true">·</span>
-        <button type="button" :class="LINK" @click="signOut">{{ $t('account.logout') }}</button>
+        <button type="button" :class="AUTH_LINK" @click="signOut">
+          {{ $t('account.logout') }}
+        </button>
       </p>
     </template>
   </AuthLayout>

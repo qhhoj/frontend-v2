@@ -60,7 +60,7 @@ const FRAME = {
 };
 const SEGMENT = {
   md: 'min-h-11 flex-1 px-2 leading-tight',
-  sm: 'inline-flex min-h-7 shrink-0 items-center gap-1.5 px-3 font-semibold whitespace-nowrap pointer-coarse:min-h-11',
+  sm: 'inline-flex min-h-7 shrink-0 items-center gap-1.5 px-3 font-semibold whitespace-nowrap touch:min-h-11',
 };
 /** One active look for every tab set: accent-soft fill, accent border. Disabled keeps full-contrast text, no opacity. */
 const ACTIVE =

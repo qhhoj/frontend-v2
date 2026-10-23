@@ -46,7 +46,7 @@ const ADMIN_SCOPE_TONES: Record<ButtonTone, string> = {
 };
 
 const ADMIN_SIZES: Record<ButtonSize, string> = {
-  sm: 'min-h-8 pointer-coarse:min-h-11 gap-1.5 px-2.5',
+  sm: 'min-h-8 touch:min-h-11 gap-1.5 px-2.5',
   md: 'min-h-[var(--qa-control,2.25rem)] gap-2 px-3.5',
   lg: 'min-h-[var(--qa-control,2.25rem)] gap-2 px-3.5',
 };

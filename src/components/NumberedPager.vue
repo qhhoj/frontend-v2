@@ -36,7 +36,7 @@ const linkTo = (page: number) => {
 };
 const CELL = computed(() =>
   props.compact
-    ? 'inline-flex min-h-8 min-w-8 items-center justify-center rounded-cell px-2 font-mono text-sm font-semibold tabular-nums pointer-coarse:min-h-11 pointer-coarse:min-w-11'
+    ? 'inline-flex min-h-8 min-w-8 items-center justify-center rounded-cell px-2 font-mono text-sm font-semibold tabular-nums touch:min-h-11 touch:min-w-11'
     : 'inline-flex min-h-11 min-w-11 items-center justify-center rounded-pill px-3 font-semibold',
 );
 // A disabled arrow keeps its shape but reads as muted text with no hover fill (token colours only, no opacity).

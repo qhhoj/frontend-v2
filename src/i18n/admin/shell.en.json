@@ -126,8 +126,8 @@
     "unpublishedDetail": "Problems you can edit, seen only by their setters.",
     "aboutMine": "Tickets on my problems",
     "aboutMineDetail": "Open tickets about problems or contests you make.",
-    "published": "Public problems",
-    "publishedDetail": "Problems you can edit, shown to everyone.",
+    "published": "Shown problems",
+    "publishedDetail": "Problems you can edit, shown to everyone or to organization members.",
     "links": {
       "queue": "View the queue",
       "judges": "View judges",

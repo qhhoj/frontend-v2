@@ -46,7 +46,7 @@
   --qh-ease: cubic-bezier(0.2, 0, 0, 1);
 }
 
-@media (pointer: coarse) {
+@media (pointer: coarse), (max-width: 40rem) {
   :root {
     --qh-control-sm: 2.75rem;
   }

@@ -7,7 +7,7 @@ import type { SubmissionScope } from '@/features/submissions/list/submission-sco
 import { usePermissions } from '@/stores/use-permissions';
 import { useOrganization } from '../use-organization';
 
-/** Legacy `SubmissionListOrganization`: the site's submission list, narrowed to the members' rows. */
+/** Legacy `SubmissionListOrganization`: the site's submission list, narrowed to the members' rows. The stats strip counts the whole site, so it stays out. */
 const { slug, query: organizationQuery } = useOrganization();
 const { can } = usePermissions();
 const viewer = computed(() => organizationQuery.data.value?.viewer ?? null);
@@ -31,6 +31,7 @@ const problemSource = computed<ProblemPickerSource>(() =>
     :scope="scope"
     :enabled="canRead"
     :problem-source="problemSource"
+    :show-stats="false"
     empty-key="orgAdmin.submissions.empty"
   />
 </template>

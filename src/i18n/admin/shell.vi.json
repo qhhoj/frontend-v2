@@ -126,8 +126,8 @@
     "unpublishedDetail": "Bài bạn sửa được, chỉ người ra đề thấy.",
     "aboutMine": "Phiếu về bài của tôi",
     "aboutMineDetail": "Phiếu đang mở về bài hoặc kỳ thi bạn soạn.",
-    "published": "Bài công khai",
-    "publishedDetail": "Bài bạn sửa được, đang hiện cho mọi người.",
+    "published": "Bài đang hiện",
+    "publishedDetail": "Bài bạn sửa được, đã bật cho mọi người hoặc cho thành viên tổ chức.",
     "links": {
       "queue": "Xem hàng đợi",
       "judges": "Xem máy chấm",

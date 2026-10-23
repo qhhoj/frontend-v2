@@ -85,7 +85,7 @@ const rows = computed(() =>
               <RouterLink
                 v-if="link"
                 :to="link"
-                class="relative -my-2.5 inline-block py-2.5 font-mono font-semibold text-accent-text hover:underline pointer-coarse:after:absolute pointer-coarse:after:-inset-y-0.5 pointer-coarse:after:inset-x-0"
+                class="relative -my-2.5 inline-block py-2.5 font-mono font-semibold text-accent-text hover:underline touch:after:absolute touch:after:-inset-y-0.5 touch:after:inset-x-0"
                 >{{ sentence.object }}</RouterLink
               >
               <span v-else class="font-mono" :class="entry.object.deleted && 'line-through'">{{

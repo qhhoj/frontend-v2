@@ -204,6 +204,7 @@
   },
   "detail": {
     "back": "All organizations",
+    "notFound": "Organization {slug} not found.",
     "close": "Close the organization"
   },
   "panels": {
