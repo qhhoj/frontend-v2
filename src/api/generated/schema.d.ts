@@ -4134,10 +4134,12 @@ export interface paths {
          *     `isPublic` (members only) needs no extra permission. The code must start
          *     with the organization prefix — the slug's lowercase letters and digits
          *     followed by `_` — else 400 `organization_code_prefix` (superusers are
-         *     exempt). Every other rule of `POST /problems` applies: the creator becomes
-         *     a curator, staff fields stay gated, and the organization's quota is
-         *     charged. 404 for an unknown organization, 403 `forbidden` without the
-         *     rights.
+         *     exempt). `authors` and `curators` may name the organization's
+         *     administrators (and the creator) without `judge.edit_all_problem`; anyone
+         *     else there is 403 `forbidden`. Every other rule of `POST /problems`
+         *     applies: the creator becomes a curator, the other staff fields stay gated,
+         *     and the organization's quota is charged. 404 for an unknown organization,
+         *     403 `forbidden` without the rights.
          */
         post: operations["OrganizationProblemCreationController_create"];
         delete?: never;
@@ -4807,7 +4809,8 @@ export interface paths {
          *     needs `judge.high_problem_timelimit` (400 `time_limit_too_high`). Writes a
          *     revision, charges the organization's quota for organization-private problems
          *     (403 `quota_exceeded`) and returns the new problem as `GET /problems/{code}`
-         *     would. A taken or reserved code is 400 `code_taken`.
+         *     would. A taken or reserved code is 400 `code_taken`; a code whose test
+         *     data directory already exists is 400 `data_directory_taken`.
          */
         post: operations["ProblemEditingController_create"];
         delete?: never;
@@ -4942,8 +4945,9 @@ export interface paths {
          *     data, translations, editorial, people and counters are not copied. The
          *     caller becomes the only curator and the clone starts private. Charges the
          *     organization's quota when the source is organization-private (403
-         *     `quota_exceeded`); a taken code is 400 `code_taken`. Returns the new
-         *     problem.
+         *     `quota_exceeded`); a taken code is 400 `code_taken`, and a code whose
+         *     test data directory already exists is 400 `data_directory_taken`. Returns
+         *     the new problem.
          */
         post: operations["ProblemEditingController_clone"];
         delete?: never;
@@ -5023,7 +5027,9 @@ export interface paths {
          *     `customChecker`, `customGrader` or `customHeader`; send one multipart `file`
          *     of up to 1 MiB whose extension fits the kind (400 `extension_not_allowed`).
          *     It replaces the previous file of that kind and returns the new data
-         *     configuration. Shares the upload budget of 30 per hour per user.
+         *     configuration. Shares the upload budget of 30 per hour per user. A
+         *     `customHeader` is also compiled beside the custom checker, so a checker
+         *     that includes it works whatever the grader.
          */
         post: operations["ProblemDataController_uploadSource"];
         /**
@@ -5680,7 +5686,8 @@ export interface paths {
          *     switches. A create with `organization` (a slug) makes the problem private
          *     to that organization under the rules of
          *     `POST /organizations/{slug}/problems` instead of `judge.add_problem`: its
-         *     rights (404 unknown organization, 403 `forbidden`), the code prefix (400
+         *     rights (404 unknown organization, 403 `forbidden`), authors and curators
+         *     from its administrators only (else `judge.edit_all_problem`), the code prefix (400
          *     `organization_code_prefix`), its credits (spent when the job is queued,
          *     kept if the job fails later) and its storage. The package
          *     is checked, then imported by a background job; the answer is 202 with a
@@ -10678,7 +10685,7 @@ export interface components {
             customChecker: string | null;
             /** @description Name of the uploaded grader source; null when none. */
             customGrader: string | null;
-            /** @description Name of the uploaded header file; null when none. */
+            /** @description Name of the uploaded header file: the signature grader's, and compiled beside a custom checker too; null when none. */
             customHeader: string | null;
             /** @description Last init.yml generation error, empty when it was written. */
             feedback: string;
@@ -11052,7 +11059,7 @@ export interface components {
             /** @description Every test case, in judging order. */
             cases: components["schemas"]["TestCaseDto"][];
             /**
-             * @description Problem-wide checker: `standard`, `bridged` (the uploaded custom checker), `floats`, `floatsabs`, `floatsrel`, `identical`, `linecount`, `rstripped`, `sorted`, `unordered`, `easy` or `linematches`.
+             * @description Problem-wide checker: `standard`, `bridged` (the uploaded custom checker, compiled beside the uploaded header if any), `floats`, `floatsabs`, `floatsrel`, `identical`, `linecount`, `rstripped`, `sorted`, `unordered`, `easy` or `linematches`.
              * @enum {string}
              */
             checker: "bridged" | "easy" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "linematches" | "rstripped" | "sorted" | "standard" | "unordered";
@@ -11069,7 +11076,7 @@ export interface components {
              */
             grader: "interactive" | "output_only" | "signature" | "standard";
             /**
-             * @description Arguments of the grader; null for none. standard: `io_method` (`standard`/`file`), `io_input_file`, `io_output_file`; signature: `allow_main`. Others take none; anything else is 400.
+             * @description Arguments of the grader; null for none. standard: `io_method` (`standard`/`file`), `io_input_file`, `io_output_file`; interactive: `treat_checker_points_as_percentage` (the interactor's points); signature: `allow_main`. Others take none; anything else is 400.
              * @default null
              */
             graderArgs: {
@@ -11081,7 +11088,7 @@ export interface components {
              */
             nobigmath: boolean;
             /**
-             * @description Largest output accepted, in bytes (`output_limit_length`); null for the default.
+             * @description Largest output accepted, in bytes (`output_limit_length`), at most 64 MiB; null for the default.
              * @default null
              */
             outputLimit: number | null;
@@ -12532,7 +12539,7 @@ export interface components {
              */
             output: string;
             /**
-             * @description Largest output accepted, in bytes (`output_limit_length`); null for the default.
+             * @description Largest output accepted, in bytes (`output_limit_length`), at most 64 MiB; null for the default.
              * @default null
              */
             outputLimit: number | null;
