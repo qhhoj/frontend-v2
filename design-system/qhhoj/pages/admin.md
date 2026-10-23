@@ -282,7 +282,7 @@ Colour and opacity transitions use `--qh-duration-fast` (150 ms). Drawers and sh
   - A header with avatar, `tuan_k`, display name, the chips Hoạt động / 2FA / Đang thi, and a close button.
   - Tabs **Hồ sơ** (name, email, about, internal note, organizations, flags), **Bảo mật** (đặt mật khẩu mới, liên kết đặt lại, đặt lại 2FA), **Quyền** (roles, permissions) and **Tài khoản** (đổi tên, then the danger zone with Vô hiệu hóa, Cấm and Mạo danh).
   - The footer save bar applies to the current tab only.
-- Keep `data-testid="user-edit-open"`, `user-edit`, `role="dialog"` and the existing field labels (the e2e tests use `getByLabel('Họ và tên')`).
+- Keep `data-testid="user-edit-open"`, `user-edit`, `role="dialog"` and the existing field labels.
 
 ### Dashboard
 - Greeting row with one staff Bit, "Chào minhthu", and the three quick actions.
@@ -326,7 +326,7 @@ Parallelism:
 - After that, every P, C, U, J, K and W row can run in parallel, except chains inside an area (P2 → P3, C1 → C2 → C3/C4).
 - Remove `ui/classes.ts` aliases in the last screen PR to land.
 
-Test hooks every screen PR must keep (the e2e suite finds elements by these):
+Test hooks every screen PR must keep (the agent-run UI scripts find elements by these):
 - `data-testid` values (`user-edit-open`, `user-edit`, `admin-bit`, `audit-entry`, `admin-recent-changes`, `problem-package`, `publish-card`, `tag-editor`, `integration-table`, `short-link-form`, `revisions`, …).
 - Element ids (`#contest-section-info`, `#contest-add-problem`, `#contest-*` fields, `#tag-contests-add`, `#announcement-*`).
 - `tr[data-code]` on problem rows (the card fallback renders `data-code` on the card too).
@@ -334,4 +334,4 @@ Test hooks every screen PR must keep (the e2e suite finds elements by these):
 - `?sort=`, `?view=`, `?user=` query keys.
 - Aria-labels like "Xóa checker.cpp" and "Về mặc định 50".
 
-Per memory: UI-only PRs need no new tests, but the touched specs must stay green, and no full e2e runs on GH.
+Per memory: UI-only PRs need no new tests, but the touched specs must stay green.

@@ -7,14 +7,14 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 - API types: `openapi-typescript` 7.13.0 (exact) generates `src/api/generated/schema.d.ts` from the committed backend snapshot
 - Vue 3.5, Vite 8, TypeScript 5.9 (strict, `noUncheckedIndexedAccess`), Vue Router 5, Pinia 4, @tanstack/vue-query 5, vue-i18n 11, Tailwind 4, PrimeVue 4.5.5 (MIT, unstyled), lucide-vue-next, @fontsource fonts
 - Versions are exact in `package.json`. TypeScript stays on 5.9: typescript-eslint 8 supports `<6.1`
-- Tests: Vitest 5 + jsdom + @vue/test-utils; Playwright 1.63 + @axe-core/playwright
+- Tests: Vitest 5 + jsdom + @vue/test-utils
 
 ## Layout and names
 
 - Feature code lives in `src/features/<area>/`: `<Name>Page.vue` (routed), parts as `<Name>.vue`, `<area>.queries.ts`, `use-<name>.ts`
 - Shared UI in `src/components/`, pure helpers in `src/lib/`, backend access in `src/api/`
 - Composables `use-<name>.ts` export `use<Name>`; stores `<name>.store.ts` export `use<Name>Store`
-- Specs sit next to their file as `<file>.spec.ts`; e2e specs in `e2e/*.e2e.ts`
+- Specs sit next to their file as `<file>.spec.ts`
 - Meaningful names, no single-character identifiers (`id-length`); templates use `$t`, scripts `translate` from `@/i18n`
 - YAGNI, DRY, KISS; one pattern per job (page -> queries -> api -> client)
 
@@ -41,7 +41,7 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 - Only pass `isPending` for an enabled query: it stays true while a query is disabled or paused offline. For a query that can be disabled, pass `isLoading`
 - Adding a skeleton for a new card: copy the loaded markup's wrapper elements (same text, spacing and grid classes), replace each text line with `<SkeletonBlock text class="w-..." />` inside the element that carries the font classes, replace avatars, badges and tiles with fixed-size `SkeletonBlock` (`round` for circles), and repeat rows as many times as the query's page size. Heights then match without magic numbers
 - The Bit swarm and the live region live once in the shell (`LoadingLayer`); pages never mount their own. A new route is covered automatically (navigation and `QueryState` register as waiting sources)
-- Tests that need a page to stay loading: `hangRequestsExcept([...])` (unit), `api.hold('GET /path')` (e2e)
+- Tests that need a page to stay loading: `hangRequestsExcept([...])` (unit)
 
 ## Styling
 
@@ -81,7 +81,7 @@ Change a palette: edit the values in the theme file and run `npm test`.
 
 ## Accessibility
 
-- Text 4.5:1 on every ground, checked per theme by `themes.node.spec.ts` and by axe in e2e
+- Text 4.5:1 on every ground, checked per theme by `themes.node.spec.ts`
 - Never remove the focus ring; real `<button>`/`<a>`; `aria-label` on icon-only buttons; icons `aria-hidden="true"`
 - Meaning never by colour alone: verdicts carry their code and a spoken label; ranking cells `+n`/`−n`/`?n` plus a label
 - Touch targets at least 44 px (`min-h-11`, `size-11`); wide tables scroll inside their card
@@ -101,35 +101,13 @@ Change a palette: edit the values in the theme file and run `npm test`.
 - A spec that scans the source tree with `import.meta.glob` instead of importing it (a scanner spec) is never picked by `vitest --changed`; PR CI runs every such spec via `npm run test:scanners`, so keep the glob in the spec itself
 - One spec file per page: each extra file for the same page pays the jsdom start and the page's first import again
 - Components and pages: `mountApp(path)` (whole app, memory router) or `mountComponent(component)`; stub the API with `mockApi({ 'GET /path': ok(data) })`; any unmocked request fails the test
-- Fixtures in `src/test/fixtures.ts` are plain data with relative imports; e2e reuses them
+- Fixtures in `src/test/fixtures.ts` are plain data with relative imports
 - SSE: `installFakeEventSource()` and `latestEventSource().emit(type, data)`
-- E2E (`npm run e2e` or `npx playwright test`): Playwright builds `dist/` and starts `vite preview` on `127.0.0.1:4310` (or the port in `E2E_PORT`, for parallel runs), then stops it; outside CI it reuses a server already on that port. Any request the fake API (`e2e/fixtures/api.ts`) does not route fails the test
-- Accessibility scans run in the default theme (and the page matrix at desktop only) unless `E2E_FULL=1`, which the manual CI run sets: every theme, every viewport
-- E2E runs with `reducedMotion: 'reduce'`; wait for a visible element that only exists once the data has loaded, not for `networkidle`. Motion tests opt in with `test.use({ reducedMotion: 'no-preference' })`; the default stays `reduce`
-- Replay and ghost e2e (`replay`, `replay-overlay`, `admin-ghosts`, `admin-replay-rebuild`) run one worker on their own port; a 403 replay fixture carries `issues: [{ code: 'board_frozen' | 'board_hidden' }]`
-- Playwright never kills processes by name; stop only the servers you started
-- The shell reads `/site`, `/notifications`, `/notifications/unread-count` and `/tickets/summary` on signed-in pages: unit tests get `SHELL_DEFAULTS` (unrecorded) unless they route them, e2e gets the `FakeApi` defaults; count page streams with `pageStreams()`, the bell's stream with `userStream()`
+- The shell reads `/site`, `/notifications`, `/notifications/unread-count` and `/tickets/summary` on signed-in pages: unit tests get `SHELL_DEFAULTS` (unrecorded) unless they route them; count page streams with `pageStreams()`, the bell's stream with `userStream()`
 
-## Real-backend e2e
+## UI journeys
 
-Opt-in, never part of `npm run e2e` or CI: `E2E_REAL_API` adds the `real-backend` Playwright project (`e2e-real/*.real.ts`); the preview server then proxies `/api` to it. Without the variable the project does not exist.
-
-Local stack (backend-v2 `README.md` "Run", `CONTRIBUTING.md` "Seed script"). Always use a scratch database (`qhhoj_e2e_real`), never a production-like name.
-
-1. Mongo (replica set) and Redis, either way:
-   - docker: `docker compose up -d mongo redis` in backend-v2 (`MONGO_URL=mongodb://localhost:27017/qhhoj_e2e_real?replicaSet=rs0`, `REDIS_URL=redis://localhost:6379`)
-   - no docker: `mongod --replSet rs0 --bind_ip 127.0.0.1 --port 27018 --dbpath <empty dir> &`, once `mongosh --port 27018 --eval 'rs.initiate({_id:"rs0",members:[{_id:0,host:"127.0.0.1:27018"}]})'` (or the same `replSetInitiate` command from any driver), and `redis-server --port 6390 --save "" &` (`MONGO_URL='mongodb://127.0.0.1:27018/qhhoj_e2e_real?replicaSet=rs0&directConnection=true'`, `REDIS_URL=redis://127.0.0.1:6390`)
-2. Env for api and seed (backend-v2 shell): `NODE_ENV=development`, `ENCRYPTION_KEY` (64 hex), `TOKEN_SECRET`, `SITE_URL=http://127.0.0.1:4310` (the Origin the browser sends), `COOKIE_SECURE=false` (else Playwright's request context never sends the session cookie), `PORT=3100` (any free port; it must match `E2E_REAL_API`), and writable scratch dirs `MEDIA_ROOT`, `PROBLEM_DATA_ROOT`, `PDF_CACHE_ROOT`, `CONTEST_DATA_ROOT`, `USER_DATA_ROOT`
-3. `npm run seed:e2e` (idempotent: `e2e_user`, `e2e_admin`, problem `e2e_sum`, language `PY3`), then `npm run start:dev`
-4. `E2E_REAL_API=http://127.0.0.1:3100 npx playwright test --project=real-backend`. `reuseExistingServer` is on outside CI: a preview already on 4310 is reused even if it has no `API_ORIGIN`, so stop it first (only a server you started).
-
-`E2E_USER`, `E2E_PASSWORD`, `E2E_PROBLEM`, `E2E_LANGUAGE` default to `e2e_user`, `e2e-user-pass-1`, `e2e_sum`, `PY3`. The submitted program is a Python `a + b`.
-
-A verdict needs the worker, the bridge and a judge as well: start them as in backend-v2 `README.md` ("Run" table and "Submission flow"), then the test reaches AC. Without a judge the row stays `QU`: the test asserts `QU`/`P`, prints why it skipped the AC check, and waits 60 s first.
-
-Resetting between runs: a queued row counts toward the unfinished-submission limit, so a second judge-less run fails at the submit step with 429 `unfinished_submission_limit` (the page shows "too many submissions waiting"). Clear it with `mongosh --port 27018 qhhoj_e2e_real --eval 'db.submissions.deleteMany({})'` (adjust the port), or drop the scratch database and re-run `npm run seed:e2e`.
-
-`e2e_sum` has no archive and no `pdfStatementUrl`: never use it for data-editing tests; the PDF endpoint is probed directly.
+There is no browser test suite in this repo. UI journeys are checked by agent-run Markdown click-by-click test scripts, kept outside the repo.
 
 ## API types and drift check
 

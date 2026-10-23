@@ -2,7 +2,7 @@ import type { ContestListItem } from '../../api/types/contests';
 import type { ProblemListItem } from '../../api/types/problems';
 import { contestItem, problemItem } from '../fixtures';
 
-// Relative imports: e2e specs load this file through Playwright, which has no `@/` alias.
+// Relative imports only.
 
 /** A problem row as the staff index lists it. */
 export const adminProblemItem = (overrides: Partial<ProblemListItem> = {}): ProblemListItem => ({

@@ -19,7 +19,7 @@ import QuotaEditDialog from './QuotaEditDialog.vue';
 import QuotaMeter from './QuotaMeter.vue';
 import { useUsageOverviewQuery } from './quota-overview.queries';
 
-/** Rows the skeleton draws (the e2e shift case answers three organizations). */
+/** Rows the skeleton draws. */
 const SKELETON_ROWS = 3;
 const SORTS: UsageSort[] = ['name', 'credits'];
 const route = useRoute();

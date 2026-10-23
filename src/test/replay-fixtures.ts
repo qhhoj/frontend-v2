@@ -1,4 +1,4 @@
-/* Relative imports: e2e/fixtures/replay-api.ts loads this file outside the `@` alias. */
+/* Relative imports only. */
 import type { ContestDetail, ProblemCell, Ranking } from '../api/types/contests';
 import type {
   LoadedGhost,
