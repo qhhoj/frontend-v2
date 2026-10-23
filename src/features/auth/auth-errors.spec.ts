@@ -101,7 +101,7 @@ describe('fieldErrorTexts', () => {
 
   it('never shows the backend English for a code it has no text for, except in the English UI', () => {
     const error = rejected([issue('username', 'brand_new_code', 'username is odd')]);
-    expect(fieldErrorTexts(error)).toEqual({ username: 'Giá trị này chưa hợp lệ. Quá dài.' });
+    expect(fieldErrorTexts(error)).toEqual({ username: 'Giá trị này chưa hợp lệ.' });
     i18n.global.locale.value = 'en';
     expect(fieldErrorTexts(error)).toEqual({ username: 'username is odd' });
   });
