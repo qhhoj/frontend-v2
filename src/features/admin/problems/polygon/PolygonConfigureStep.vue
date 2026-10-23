@@ -119,7 +119,14 @@ const refusal = computed(() => {
   if (!failure.value || IMPORT_FORM_FIELDS.some((field) => field in fieldErrors.value)) return null;
   const options = optionsRefusal.value;
   if (!options) return importRefusalText(failure.value);
-  const isDrawn = options.field && isLanguageFieldDrawn(options.field, statements, languages.value);
+  const isDrawn =
+    options.field &&
+    isLanguageFieldDrawn(
+      options.field,
+      statements,
+      languages.value,
+      sentForm.value?.importTutorial,
+    );
   return isDrawn ? null : options.text;
 });
 </script>
@@ -140,9 +147,10 @@ const refusal = computed(() => {
         <template #target="{ mode, code }">
           <PolygonUpdateTarget v-if="mode === 'update'" :code="code" />
         </template>
-        <template #languages>
+        <template #languages="{ importTutorial }">
           <PolygonLanguageFields
             v-model="languages"
+            :import-tutorial="importTutorial"
             :statements="statements"
             :errors="languageErrors"
           />
@@ -181,6 +189,7 @@ const refusal = computed(() => {
       :code="pending.code"
       :problem="problem"
       :busy="isPending"
+      :import-tutorial="pending.importTutorial"
       @confirm="confirmUpdate"
     />
   </div>

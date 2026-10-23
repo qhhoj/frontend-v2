@@ -213,7 +213,7 @@ function submit() {
 
       <ImportCatalogFields v-if="!linksPolygon" v-model:form="form" :error-of="errorOf" />
 
-      <slot name="languages">
+      <slot name="languages" :import-tutorial="form.importTutorial">
         <div class="grid gap-5 @lg:grid-cols-2">
           <AdminField
             v-slot="{ id, describedBy }"

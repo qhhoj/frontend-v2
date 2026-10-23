@@ -83,7 +83,11 @@ const fieldErrors = computed(() => {
 const pageRefusal = computed(() => {
   const field = refusal.value?.field;
   if (!save.failure.value) return null;
-  if (field && isLanguageFieldDrawn(field, statements.value, languages.value)) return null;
+  if (
+    field &&
+    isLanguageFieldDrawn(field, statements.value, languages.value, flags.value.importTutorial)
+  )
+    return null;
   return refusal.value?.text ?? importRefusalText(save.failure.value);
 });
 const submit = () => repeatedLanguages(languages.value).length === 0 && save.run(undefined);
@@ -96,6 +100,7 @@ const submit = () => repeatedLanguages(languages.value).length === 0 && save.run
       :model-value="languages"
       :statements="statements"
       :errors="fieldErrors"
+      :import-tutorial="flags.importTutorial"
       @update:model-value="choose"
     />
     <p v-else class="text-sm text-muted">{{ $t('admin.polygonLink.panel.drawer.noLanguages') }}</p>

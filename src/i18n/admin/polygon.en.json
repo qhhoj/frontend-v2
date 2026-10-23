@@ -44,7 +44,7 @@
     "typesHint": "Empty: the default type.",
     "ignoreBatchesHint": "Zero-point test groups (usually the examples) are not judged; examples stay in the statement.",
     "ignoreCasesHint": "Single zero-point tests are not judged.",
-    "importTutorialHint": "Use the solution text written on Polygon as the problem's editorial.",
+    "importTutorialHint": "Use the solution text written on Polygon as the problem's editorial. Unticked: a new problem gets no editorial from the package; an existing one keeps its current editorial.",
     "appendSolutionHint": "Publish the main solution code with the editorial; solvers will see it.",
     "codeUpdate": "Problem to update"
   },

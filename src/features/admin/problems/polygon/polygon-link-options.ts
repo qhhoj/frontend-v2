@@ -132,7 +132,7 @@ export function linkOptionsLineOf(options: Options): string {
       ? [translate(`${KEY}.tutorial`, { language: options.tutorialLanguage })]
       : []),
     ...FLAGS.filter((flag) => options[flag]).map((flag) => translate(`${KEY}.flags.${flag}`)),
-    ...(options.importTutorial ? [] : [translate(`${KEY}.flags.skipTutorial`)]),
+    ...(options.importTutorial === false ? [translate(`${KEY}.flags.skipTutorial`)] : []),
   ];
   return parts.length > 0 ? parts.join(' · ') : translate(`${KEY}.defaults`);
 }

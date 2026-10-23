@@ -49,6 +49,8 @@ const canSync = computed(() => canAny(SYNC_POLYGON));
 const linkQuery = usePolygonLinkQuery(() => props.code);
 const state = computed(() => linkQuery.data.value ?? null);
 const linkKey = () => polygonLinkKey(props.code, viewer.value);
+/** The saved options skip the package tutorial: a sync leaves the editorial alone. */
+const keepsEditorial = computed(() => state.value?.link.options.importTutorial === false);
 const putLink = (link: PolygonLink) =>
   queryClient.setQueryData(linkKey(), state.value ? { ...state.value, link } : undefined);
 
@@ -279,8 +281,20 @@ const isHistoryOpen = ref(false);
       @confirm="sync.run(isOverwrite)"
     >
       <div class="flex flex-col gap-2 text-sm">
-        <p class="font-semibold">{{ $t('admin.polygonLink.panel.syncConfirm.overwrites') }}</p>
-        <p>{{ $t('admin.polygonLink.panel.syncConfirm.lost') }}</p>
+        <p class="font-semibold">
+          {{
+            $t(
+              `admin.polygonLink.panel.syncConfirm.${keepsEditorial ? 'overwritesKeepEditorial' : 'overwrites'}`,
+            )
+          }}
+        </p>
+        <p>
+          {{
+            $t(
+              `admin.polygonLink.panel.syncConfirm.${keepsEditorial ? 'lostKeepEditorial' : 'lost'}`,
+            )
+          }}
+        </p>
         <p class="text-muted">{{ $t('admin.polygonLink.panel.syncConfirm.kept') }}</p>
         <ImportCheckbox
           v-model="isOverwrite"

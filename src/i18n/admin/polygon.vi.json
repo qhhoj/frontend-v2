@@ -44,7 +44,7 @@
     "typesHint": "Để trống: dạng bài mặc định.",
     "ignoreBatchesHint": "Không chấm nhóm test 0 điểm (thường là ví dụ); ví dụ vẫn hiện trong đề.",
     "ignoreCasesHint": "Không chấm các test lẻ 0 điểm.",
-    "importTutorialHint": "Dùng phần lời giải viết trên Polygon làm lời giải của bài.",
+    "importTutorialHint": "Dùng phần lời giải viết trên Polygon làm lời giải của bài. Bỏ chọn: bài mới không có lời giải từ gói; bài đã có thì giữ nguyên lời giải hiện tại.",
     "appendSolutionHint": "Đăng code lời giải chính cùng lời giải; người giải sẽ thấy.",
     "codeUpdate": "Bài sẽ cập nhật"
   },
