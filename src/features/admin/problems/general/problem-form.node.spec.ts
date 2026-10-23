@@ -66,6 +66,7 @@ describe('problem form', () => {
     );
     expect(checkAllowedLanguages(seeded(), canEditAll)).toEqual({});
     expect(checkAllowedLanguages(none, nobodyCan)).toEqual({});
+    expect(checkAllowedLanguages(none, canEditAll, none)).toEqual({});
   });
 
   it('compares lists by value, so reordering a type list is a change and an equal copy is not', () => {

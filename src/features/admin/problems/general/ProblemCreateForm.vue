@@ -21,7 +21,13 @@ import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { PROBLEM_INDEX_KEY, PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
 import { EDIT_ALL_PROBLEM } from './field-lock';
 import ProblemCodeField from './ProblemCodeField.vue';
-import { checkProblemForm, cloneForm, emptyProblemForm, toProblemBody } from './problem-form';
+import {
+  checkAllowedLanguages,
+  checkProblemForm,
+  cloneForm,
+  emptyProblemForm,
+  toProblemBody,
+} from './problem-form';
 import type { ProblemForm } from './problem-form';
 
 /**
@@ -78,7 +84,10 @@ const errors = computed<FieldErrors>(() => ({
 
 /** The body, or null when a local check fails. Organization fields are set by the server, so they are never sent. */
 function checkedBody(): ProblemBody | null {
-  localErrors.value = checkProblemForm(form.value, can, owner.value?.problemCodePrefix ?? '');
+  localErrors.value = {
+    ...checkProblemForm(form.value, can, owner.value?.problemCodePrefix ?? ''),
+    ...checkAllowedLanguages(form.value, can),
+  };
   if (Object.keys(localErrors.value).length > 0) return null;
   return toProblemBody(form.value, can(EDIT_ALL_PROBLEM), defaults);
 }

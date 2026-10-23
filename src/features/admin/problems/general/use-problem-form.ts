@@ -85,7 +85,7 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
   async function save() {
     localErrors.value = {
       ...checkProblemForm(form.value, can),
-      ...checkAllowedLanguages(form.value, can),
+      ...checkAllowedLanguages(form.value, can, seed.value),
     };
     if (Object.keys(localErrors.value).length === 0 && isDirty.value && !hasUnreadableDate.value) {
       await mutation.run(problem().code);

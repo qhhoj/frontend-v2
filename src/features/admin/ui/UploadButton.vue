@@ -30,11 +30,11 @@ function onChange(event: Event) {
   refusal.value = '';
   isBusyNoticeShown.value = false;
   if (!file) return;
-  emit('attempt');
   if (props.isPending) {
     isBusyNoticeShown.value = true;
     return;
   }
+  emit('attempt');
   if (props.maxBytes !== undefined && tooLargeFor(file, props.maxBytes)) {
     refusal.value = formatFileSize(props.maxBytes);
     return;

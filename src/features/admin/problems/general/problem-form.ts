@@ -317,12 +317,17 @@ export function checkProblemForm(
   return errors;
 }
 
-/** The editor's extra check: a problem keeps at least one language to submit in. Only a viewer who can change the list is stopped by it (the others never send it). */
+/**
+ * A problem keeps at least one language to submit in. Only a viewer who can change the list is stopped by it (the others
+ * never send it), and only when the list differs from `seed`: a legacy problem with none can still save other edits.
+ */
 export function checkAllowedLanguages(
   form: ProblemForm,
   can: (permission: string) => boolean,
+  seed?: ProblemForm,
 ): FieldErrors {
-  return can(EDIT_ALL_PROBLEM) && form.allowedLanguages.length === 0
+  const isChanged = !seed || !sameJson(form.allowedLanguages, seed.allowedLanguages);
+  return can(EDIT_ALL_PROBLEM) && isChanged && form.allowedLanguages.length === 0
     ? { allowedLanguages: translate('admin.problems.general.errors.languages') }
     : {};
 }
