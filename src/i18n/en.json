@@ -1323,7 +1323,11 @@
     "searchLabel": "Find a contestant",
     "noMatch": "No contestant matches your search.",
     "hiddenTitle": "The ranking is hidden",
-    "hiddenBody": "The organisers hide the ranking while the contest runs; it opens after the contest ends.",
+    "hiddenBody": {
+      "always": "The ranking of this contest is hidden.",
+      "afterParticipation": "The ranking opens once your participation ends.",
+      "afterContest": "The ranking opens once the contest ends."
+    },
     "frozenTitle": "The board is frozen",
     "frozenBody": "In the last {minutes} minute new results show \"?\" until they are revealed. | In the last {minutes} minutes new results show \"?\" until they are revealed.",
     "podium": "Top 3",

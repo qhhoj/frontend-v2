@@ -76,13 +76,21 @@ const {
   computed(() => running.value || (withVirtual.value && virtualRun.value !== null)),
 );
 
-/** The organisers hide the board from this viewer while the contest runs: the board answers 403 or shows only their row. */
+/** The backend says the full board is closed to this viewer: it answers 403 or shows only their row. */
 const isBoardHidden = computed(
-  () =>
-    contest.value !== undefined &&
-    contest.value.phase !== 'ended' &&
-    !contest.value.viewer.canSeeFullScoreboard,
+  () => contest.value !== undefined && !contest.value.viewer.canSeeFullScoreboard,
 );
+/** When the board opens depends on the setting: never (H), after the viewer's own run (P), else after the contest. */
+const HIDDEN_BODY_KEYS = {
+  H: 'ranking.hiddenBody.always',
+  P: 'ranking.hiddenBody.afterParticipation',
+} as const;
+const hiddenBodyKey = computed(() => {
+  const visibility = contest.value?.scoreboardVisibility;
+  return visibility === 'H' || visibility === 'P'
+    ? HIDDEN_BODY_KEYS[visibility]
+    : 'ranking.hiddenBody.afterContest';
+});
 
 const search = ref('');
 const locale = useLocaleStore();
@@ -238,7 +246,7 @@ async function goToMyRow() {
           :title="$t('ranking.hiddenTitle')"
           data-testid="ranking-hidden"
         >
-          {{ $t('ranking.hiddenBody') }}
+          {{ $t(hiddenBodyKey) }}
         </Notice>
       </template>
     </QueryState>

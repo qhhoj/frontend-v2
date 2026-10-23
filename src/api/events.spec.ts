@@ -177,6 +177,21 @@ describe('useLiveStream: dropped connections', () => {
     }
   });
 
+  it('refreshes the cached reads when a reopened connection opens, not on the first open', () => {
+    vi.useFakeTimers();
+    try {
+      const { invalidate } = hold(ref(ticket('t1')), { cacheKey: () => ['tickets'] });
+      latestEventSource().emit('open', {});
+      expect(invalidate).not.toHaveBeenCalled();
+      latestEventSource().fail(true);
+      vi.advanceTimersByTime(FIRST_DELAY);
+      latestEventSource().emit('open', {});
+      expect(invalidate).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('delivers frames from a reopened connection and stops reopening after close()', () => {
     vi.useFakeTimers();
     try {
