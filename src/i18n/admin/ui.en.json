@@ -118,7 +118,17 @@
     "problem_unknown": "No problem has this code.",
     "organization_code_prefix": "An organization problem code must start with the organization prefix, followed by at least one character.",
     "organization_rights": "You can add or remove only organizations you may create problems for.",
-    "site_problem_rights": "Moving a problem out of every organization onto the main site needs the “Create problems” permission."
+    "site_problem_rights": "Moving a problem out of every organization onto the main site needs the “Create problems” permission.",
+    "unmapped": "This value is not valid.",
+    "slug_taken": "This slug is taken.",
+    "user_unknown": "No such user.",
+    "assignee_unknown": "Every assignee must be an active account.",
+    "generator_unsupported": "The judge does not run test generators; delete the generator.",
+    "nobigmath_unsupported": "The judge does not support nobigmath; turn it off.",
+    "ranking_column_missing": "The file has no {column} column.",
+    "ban_reason_reserved": "This reason is reserved for automatic contest-cheating bans.",
+    "ranking_row_columns": "Line {line} has {found} columns; the header has {expected}.",
+    "time_zone_invalid": "Not a valid time zone. Pick one from the list (for example Asia/Ho_Chi_Minh)."
   },
   "uploading": "Uploading…",
   "uploadBusy": "Still uploading. Choose the file again when it finishes.",

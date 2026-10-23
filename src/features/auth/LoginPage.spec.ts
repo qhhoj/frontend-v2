@@ -114,7 +114,7 @@ describe('login page', () => {
     const username = wrapper.get('input[name="username"]');
     expect(username.attributes('aria-invalid')).toBe('true');
     expect(wrapper.get(`#${username.attributes('aria-describedby')}`).text()).toBe(
-      'username must be shorter than or equal to 150 characters',
+      'Quá dài; hãy rút gọn.',
     );
     expect(document.activeElement).toBe(username.element);
   });

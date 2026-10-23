@@ -8,13 +8,14 @@ import { translate } from '@/i18n';
 import { formatAgo } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { kindIcon } from './notification-kinds';
+import { localizedTitle } from './notification-title';
 
 /** One inbox row (M1B): the row opens its target; the check button marks it read without leaving. */
 const props = defineProps<{ item: NotificationItem; isStale: boolean; canMarkRead: boolean }>();
 const emit = defineEmits<{ open: [item: NotificationItem]; markRead: [item: NotificationItem] }>();
 const locale = useLocaleStore();
 const title = computed(() =>
-  props.isStale ? translate('notifications.staleTitle') : props.item.title,
+  props.isStale ? translate('notifications.staleTitle') : localizedTitle(props.item),
 );
 const body = computed(() =>
   props.isStale ? translate('notifications.staleBody') : props.item.body,

@@ -7,6 +7,7 @@ import ContestProblemSwitcher from '@/features/contests/ContestProblemSwitcher.v
 import { useProblemRail } from '@/features/contests/use-problem-rail';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { useNavSection } from '@/features/shell/nav-section';
+import { translate } from '@/i18n';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
 import ProblemContent from './ProblemContent.vue';
@@ -29,7 +30,11 @@ const { contest, entries: railEntries } = useProblemRail(contestKey, () => code.
 /** A problem solved inside the viewer's contest belongs to "Kỳ thi" in the nav (P-15). */
 useNavSection(() => (contestKey.value ? '/contests' : null));
 
-usePageTitle(() => problem.value?.name);
+const isNotFound = computed(
+  () => error.value instanceof ApiError && error.value.code === 'not_found',
+);
+
+usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : problem.value?.name));
 
 const layout = computed(
   () => PROBLEM_LAYOUT[contest.value && railEntries.value ? 'contest' : 'plain'],
@@ -40,10 +45,6 @@ const editorialGone = ref(false);
 watch(code, () => {
   editorialGone.value = false;
 });
-
-const isNotFound = computed(
-  () => error.value instanceof ApiError && error.value.code === 'not_found',
-);
 
 /** Page tabs; 8e adds `discussion` here. */
 const tabs = computed(() => [

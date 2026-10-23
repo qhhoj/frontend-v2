@@ -1,8 +1,10 @@
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
 import { postAnnouncement } from '@/api/contest-editing.api';
 import type { Announcement } from '@/api/types/contest-editing';
+import type { FieldErrors } from '../../ui/admin-errors';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
+import { checkAnnouncementDraft } from './announcement-check';
 
 /**
  * The announcement draft and its post, shared by the admin composer and the one on the public Announcements tab. The
@@ -28,6 +30,13 @@ export function useAnnouncementComposer(
       options.onPosted?.(created);
     },
   });
-  const submit = () => post.run({ title: title.value, description: description.value });
-  return { title, description, post, submit };
+  /** The draft is checked here first, so a title the backend would refuse never costs a round trip. */
+  const localErrors = ref<FieldErrors>({});
+  const errors = computed(() => ({ ...localErrors.value, ...post.fieldErrors.value }));
+  function submit() {
+    localErrors.value = checkAnnouncementDraft({ title: title.value });
+    if (Object.keys(localErrors.value).length > 0) return undefined;
+    return post.run({ title: title.value.trim(), description: description.value });
+  }
+  return { title, description, post, errors, submit };
 }

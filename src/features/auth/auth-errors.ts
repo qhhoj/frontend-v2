@@ -1,6 +1,7 @@
 import { ApiError } from '@/api/client';
 import type { FieldIssue } from '@/api/client';
 import { DEFAULT_LOCALE, i18n, translate } from '@/i18n';
+import { unmappedMessageText } from '@/features/admin/ui/admin-errors';
 import { errorMessageKey } from '@/i18n/error-message';
 
 /** B8: the moderator's reason is a member of the `banned` error; the English message is never parsed. */
@@ -48,8 +49,9 @@ function knownIssueText({ field, code }: FieldIssue): string | null {
   return i18n.global.te(key, DEFAULT_LOCALE) ? translate(key) : null;
 }
 
-/** By code (B10); a code without text shows the backend's English message. */
-const issueText = (issue: FieldIssue): string => knownIssueText(issue) ?? issue.message;
+/** By code (B10); a code without text never shows the backend's English in the Vietnamese UI. */
+const issueText = (issue: FieldIssue): string =>
+  knownIssueText(issue) ?? unmappedMessageText(issue.message);
 
 /** Known issues on fields the form does not render: the one line that can still explain them. */
 export const hiddenIssueTexts = (error: unknown, visibleFields: readonly string[]): string[] =>
@@ -65,11 +67,14 @@ export function fieldErrorTexts(error: unknown): Record<string, string> {
   const messages: [string, string][] = error.issues.length
     ? error.issues.map((issue) => [issue.field, issueText(issue)])
     : Object.entries(error.fields).flatMap(([field, texts]) =>
-        texts.map((text): [string, string] => [field, text]),
+        texts.map((text): [string, string] => [field, unmappedMessageText(text)]),
       );
   const joined = new Map<string, string>();
-  for (const [field, text] of messages)
-    joined.set(field, joined.has(field) ? `${joined.get(field)} ${text}` : text);
+  for (const [field, text] of messages) {
+    const earlier = joined.get(field);
+    if (earlier === undefined) joined.set(field, text);
+    else if (!earlier.includes(text)) joined.set(field, `${earlier} ${text}`);
+  }
   return Object.fromEntries(joined);
 }
 

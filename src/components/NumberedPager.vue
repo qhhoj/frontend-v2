@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
-import { lastPageOf, pageWindow } from '@/lib/paging';
+import { lastPageOf, pageWindow, queryWithPage } from '@/lib/paging';
 
 /** Numbered page links (`?page=`, or the given `queryKey`), keeping every other query key; hidden when one page holds everything. `align="end"` puts them at the right (a pager above a list); `stepper` shows only the arrows around "page / last", the short pager above a list whose numbered one sits below it. */
 const props = withDefaults(
@@ -28,12 +28,7 @@ const last = computed(() => lastPageOf(props.meta));
 const slots = computed(() => pageWindow(props.meta.page, last.value));
 const hasPrevious = computed(() => props.meta.page > 1);
 const hasNext = computed(() => props.meta.page < last.value);
-const linkTo = (page: number) => {
-  const kept = Object.fromEntries(
-    Object.entries(route.query).filter(([key]) => key !== props.queryKey),
-  );
-  return { query: page === 1 ? kept : { ...kept, [props.queryKey]: String(page) } };
-};
+const linkTo = (page: number) => ({ query: queryWithPage(route.query, props.queryKey, page) });
 const CELL = computed(() =>
   props.compact
     ? 'inline-flex min-h-8 min-w-8 items-center justify-center rounded-cell px-2 font-mono text-sm font-semibold tabular-nums touch:min-h-11 touch:min-w-11'

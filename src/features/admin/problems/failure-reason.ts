@@ -1,5 +1,5 @@
 import { ApiError } from '@/api/client';
-import { adminIssueText, failureTextOf, hasIssueText } from '../ui/admin-errors';
+import { adminIssueText, failureTextOf, isKnownIssue } from '../ui/admin-errors';
 
 /**
  * The line for a failed write. A refusal names what failed by `issues[].code` (file refusals, zip reader, taken codes): the first
@@ -7,7 +7,7 @@ import { adminIssueText, failureTextOf, hasIssueText } from '../ui/admin-errors'
  */
 export function failureReasonOf(error: unknown): string {
   if (error instanceof ApiError) {
-    const known = error.issues.find((issue) => hasIssueText(issue.code));
+    const known = error.issues.find(isKnownIssue);
     if (known) return adminIssueText(known);
   }
   return failureTextOf(error);

@@ -5,6 +5,7 @@ import AppButton from '@/components/ui/AppButton.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { NOTIFICATION_BITS } from './notification-bits';
 import { isTicketKind } from './notification-kinds';
+import { localizedTitle } from './notification-title';
 import { useHighPriorityQuery } from './notifications.queries';
 import { useOpenNotification } from './use-open-notification';
 
@@ -35,7 +36,7 @@ const session = useSessionStore();
         <strong class="block text-xs tracking-wider uppercase">{{
           $t('notifications.banner.label')
         }}</strong>
-        <span class="block font-semibold">{{ item.title }}</span>
+        <span class="block font-semibold">{{ localizedTitle(item) }}</span>
         <span class="block">{{ item.body }}</span>
         <template #action>
           <span class="flex flex-wrap gap-2">

@@ -107,7 +107,9 @@
       "tags": "Tối đa 20 thẻ.",
       "pointsPrecision": "Từ 0 đến 10.",
       "penalty": "Nhập một số nguyên, không âm.",
-      "imageUrl": "Cần một địa chỉ http(s) hoặc đường dẫn bắt đầu bằng /, tối đa 150 ký tự."
+      "imageUrl": "Cần một địa chỉ http(s) hoặc đường dẫn bắt đầu bằng /, tối đa 150 ký tự.",
+      "key": "Khóa chỉ gồm chữ thường, số và dấu gạch dưới, 1 đến 32 ký tự.",
+      "name": "Tên kỳ thi từ 1 đến 100 ký tự."
     },
     "sections": {
       "info": "Thông tin kỳ thi",
@@ -348,7 +350,8 @@
     "empty": "Chưa có thông báo nào.",
     "pager": "{total} thông báo · trang {page} của {pages}",
     "pagerLabel": "Trang thông báo",
-    "listLabel": "Các thông báo đã đăng"
+    "listLabel": "Các thông báo đã đăng",
+    "titleError": "Tiêu đề từ 1 đến 100 ký tự."
   },
   "ranking": {
     "official": {

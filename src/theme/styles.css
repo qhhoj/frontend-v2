@@ -234,7 +234,8 @@
     opacity: 1;
   }
   100% {
-    transform: translateY(calc(var(--bit-px, 4px) * 9));
+    /* Ends in the puddle just under the sprite (rows 11 to 16): a longer fall crosses the heading below. */
+    transform: translateY(calc(var(--bit-px, 4px) * 4));
     opacity: 0;
   }
 }

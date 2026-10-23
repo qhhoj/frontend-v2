@@ -104,6 +104,7 @@ const attempt = () =>
         name="username"
         :label="$t('auth.username')"
         autocomplete="username"
+        maxlength="150"
         :error="fieldErrors.username"
         placeholder="bitcoder"
         required

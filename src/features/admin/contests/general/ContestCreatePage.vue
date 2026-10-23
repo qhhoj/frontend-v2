@@ -14,7 +14,12 @@ import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
 import { provideDateValidity } from '../../ui/form/date-validity';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
-import { checkContestForm, emptyContestForm, toContestBody } from '../contest-form';
+import {
+  checkContestForm,
+  checkContestIdentity,
+  emptyContestForm,
+  toContestBody,
+} from '../contest-form';
 import { usePermissions } from '@/stores/use-permissions';
 import ContestBasicForm from './ContestBasicForm.vue';
 
@@ -39,7 +44,10 @@ const ownerBlockedText = computed(() => {
     isOwnerBlocked.value ? 'admin.creation.owner.blocked' : 'admin.creation.owner.loading',
   );
 });
-const localErrors = computed(() => checkContestForm(form.value));
+const localErrors = computed(() => ({
+  ...checkContestForm(form.value),
+  ...checkContestIdentity(form.value),
+}));
 /** Errors show once a save was tried, not while the first field is still being typed. */
 const hasTried = ref(false);
 const { hasUnreadableDate } = provideDateValidity();
@@ -53,6 +61,8 @@ const mutation = useAdminMutation({
     void router.push({ name: 'admin-contestProblems', params: { key: created.key } });
   },
 });
+/** A refusal already written under a field ("Khóa này đã có.") needs no second line. */
+const hasServerFieldErrors = computed(() => Object.keys(mutation.fieldErrors.value).length > 0);
 const shownErrors = computed(() => ({
   ...(hasTried.value ? localErrors.value : {}),
   ...mutation.fieldErrors.value,
@@ -87,7 +97,7 @@ async function create() {
         </div>
       </div>
       <AdminStatus
-        v-if="mutation.failure.value"
+        v-if="mutation.failure.value && !hasServerFieldErrors"
         kind="refused"
         :text="failureTextOf(mutation.failure.value)"
       />

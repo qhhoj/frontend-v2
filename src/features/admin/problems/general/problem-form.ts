@@ -15,6 +15,9 @@ import { translate } from '@/i18n';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { PROBLEM_CODE_PATTERN } from '../problem-code';
 
+/** The backend's problem name rule: 1 to this many characters. */
+export const PROBLEM_NAME_MAX = 100;
+
 export const PROBLEM_LIMITS = {
   timeLimit: { min: 0.01, max: 60, highAbove: 5 },
   memoryLimit: { min: 0, max: 1_048_576 },
@@ -252,7 +255,7 @@ const requiredProblemFields = (form: ProblemForm): RequiredPart<ProblemBody> => 
   code: form.code,
   groupId: form.groupId,
   memoryLimit: form.memoryLimit,
-  name: form.name,
+  name: form.name.trim(),
   points: form.points,
   timeLimit: form.timeLimit,
   typeIds: form.typeIds,
@@ -298,7 +301,10 @@ export function checkProblemForm(
     errors.code = translate('admin.problems.general.errors.codeRequired');
   else if (!PROBLEM_CODE_PATTERN.test(form.code))
     errors.code = translate('admin.problems.general.errors.code');
-  if (!form.name.trim()) errors.name = translate('admin.problems.general.errors.nameRequired');
+  const nameLength = form.name.trim().length;
+  if (nameLength === 0) errors.name = translate('admin.problems.general.errors.nameRequired');
+  else if (nameLength > PROBLEM_NAME_MAX)
+    errors.name = translate('admin.problems.general.errors.name');
   const timeError = timeLimitError(form, can);
   if (timeError) errors.timeLimit = timeError;
   Object.assign(errors, languageTimeErrors(form, can));

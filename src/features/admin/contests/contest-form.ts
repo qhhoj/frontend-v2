@@ -539,7 +539,7 @@ export function toContestBody(
 /** Typed from the generated body: a required member the backend adds is a compile error here until it is listed. */
 const requiredContestFields = (form: ContestForm): RequiredPart<ContestBody> => ({
   key: form.key,
-  name: form.name,
+  name: form.name.trim(),
   startTime: form.startTime,
   endTime: form.endTime,
 });
@@ -611,6 +611,20 @@ function checkImages(form: ContestForm, message: Message): FieldErrors {
     if (value.length > IMAGE_URL_MAX || !IMAGE_URL_PATTERN.test(value))
       errors[field] = message('imageUrl');
   }
+  return errors;
+}
+
+/** The backend's contest key rule (`CONTEST_KEY_PATTERN`): lowercase letters, digits and underscores, 1 to 32. */
+export const CONTEST_KEY_PATTERN = /^[a-z0-9_]{1,32}$/;
+const CONTEST_NAME_MAX = 100;
+
+/** What only a new contest checks: its key (an old key is never re-checked) and its name, before any request. */
+export function checkContestIdentity(form: Pick<ContestForm, 'key' | 'name'>): FieldErrors {
+  const message: Message = (key) => translate(`admin.contests.general.errors.${key}`);
+  const errors: FieldErrors = {};
+  if (!CONTEST_KEY_PATTERN.test(form.key)) errors.key = message('key');
+  const nameLength = form.name.trim().length;
+  if (nameLength < 1 || nameLength > CONTEST_NAME_MAX) errors.name = message('name');
   return errors;
 }
 

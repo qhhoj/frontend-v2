@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
+import PageOutOfRange from '@/components/PageOutOfRange.vue';
 import Card from '@/components/ui/Card.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -188,7 +189,8 @@ watch(
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton><SubmissionCardListSkeleton /></template>
         <Card v-if="!rows.length" as="div">
-          <EmptyState>
+          <PageOutOfRange v-if="list && list.meta.page > 1" :meta="list.meta" :row-count="0" />
+          <EmptyState v-else>
             {{ emptyText }}
             <template v-if="$slots.emptyAction" #action
               ><slot name="emptyAction" :filters="filters"

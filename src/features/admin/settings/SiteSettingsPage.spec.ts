@@ -115,7 +115,9 @@ describe('SiteSettingsPage', () => {
     const site = block(wrapper, 'site');
     await site.get('input').setValue('Mars/Base');
     await clickIn(saveBar(wrapper), 'Lưu thay đổi');
-    expect(site.get('[role="alert"]').text()).toContain('Not an IANA time zone.');
+    expect(site.get('[role="alert"]').text()).toContain(
+      'Múi giờ không hợp lệ. Hãy chọn một múi giờ trong danh sách (ví dụ Asia/Ho_Chi_Minh).',
+    );
     expect((site.get('input').element as HTMLInputElement).value).toBe('Mars/Base');
   });
 
@@ -330,7 +332,9 @@ describe('one save bar for every tab', () => {
     await flushPromises();
     expect(calls.filter((call) => call.method === 'PATCH')).toHaveLength(2);
     expect(router.currentRoute.value.query.tab).toBe('general');
-    expect(block(wrapper, 'site').get('[role="alert"]').text()).toContain('Bad zone.');
+    expect(block(wrapper, 'site').get('[role="alert"]').text()).toContain(
+      'Múi giờ không hợp lệ. Hãy chọn một múi giờ trong danh sách (ví dụ Asia/Ho_Chi_Minh).',
+    );
     expect(saveBar(wrapper).text()).toContain('1 thay đổi chưa lưu');
   });
 

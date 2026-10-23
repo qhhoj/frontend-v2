@@ -100,7 +100,7 @@ describe('problem people, status and clone', () => {
     await openClone(wrapper);
     await typeCloneCode('hcmus41c_copy');
     await confirmDialog('Nhân bản');
-    expect(openDialog().textContent).toContain('That code is taken.');
+    expect(openDialog().textContent).toContain('Mã bài này đã có.');
     isTaken = false;
     await confirmDialog('Nhân bản');
     expect(invalidatedKeys(queryClient, keys)).toEqual(keys);

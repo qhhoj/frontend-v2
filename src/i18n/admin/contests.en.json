@@ -107,7 +107,9 @@
       "tags": "At most 20 tags.",
       "pointsPrecision": "From 0 to 10.",
       "penalty": "Enter a whole number, not negative.",
-      "imageUrl": "Use an http(s) address or a path starting with /, at most 150 characters."
+      "imageUrl": "Use an http(s) address or a path starting with /, at most 150 characters.",
+      "key": "The key may only hold lowercase letters, digits and underscores, 1 to 32 characters.",
+      "name": "The contest name must be 1 to 100 characters."
     },
     "sections": {
       "info": "Contest information",
@@ -348,7 +350,8 @@
     "empty": "No announcements yet.",
     "pager": "{total} announcements · page {page} of {pages}",
     "pagerLabel": "Announcement pages",
-    "listLabel": "Posted announcements"
+    "listLabel": "Posted announcements",
+    "titleError": "The title must be 1 to 100 characters."
   },
   "ranking": {
     "official": {

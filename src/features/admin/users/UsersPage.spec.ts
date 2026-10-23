@@ -93,7 +93,9 @@ describe('UsersPage', () => {
     await click('Cấm người dùng');
     await confirmDialog('Cấm');
     expect(inBody('#ban-reason')?.getAttribute('aria-invalid')).toBe('true');
-    expect(document.body.textContent).toContain('Reserved for automatic contest-cheating bans.');
+    expect(document.body.textContent).toContain(
+      'Lý do này dành riêng cho các vụ cấm tự động do gian lận trong kỳ thi.',
+    );
   });
 
   it('offers impersonation to a superuser only, and not for another superuser or a banned account', async () => {

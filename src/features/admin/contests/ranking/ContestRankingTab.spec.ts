@@ -61,7 +61,7 @@ describe('ContestRankingTab', () => {
     expect(calls.find((call) => call.method === 'PUT')?.body).toEqual({
       csv: 'rank,username\n1,a\n',
     });
-    expect(wrapper.text()).toContain('Line 14 has 9 columns; the header has 10.');
+    expect(wrapper.text()).toContain('Dòng 14 có 9 cột, trong khi tiêu đề có 10 cột.');
   });
 
   it('regenerates only after confirming that the old URL stops working', async () => {

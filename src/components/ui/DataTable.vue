@@ -5,6 +5,8 @@ import type { RouteLocationRaw } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
 import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
+import PageOutOfRange from '@/components/PageOutOfRange.vue';
+import { fallbackPageOf } from '@/lib/paging';
 import QueryState from '@/components/QueryState.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -180,6 +182,10 @@ const range = computed(() => {
   if (!pageMeta || !('total' in pageMeta)) return null;
   return rangeOf(pageMeta.page, pageMeta.pageSize, props.rows.length, pageMeta.total);
 });
+/** An empty page although earlier ones exist (an old or edited `?page=`): the empty text must not claim the list is empty. */
+const isPastLastPage = computed(
+  () => !!props.pager && fallbackPageOf(props.pager.meta, props.rows.length) !== null,
+);
 const hasFooter = computed(() => !props.loading && props.rows.length > 0);
 
 /** The skeleton's stand-in width for one cell: short for numbers and icon columns, long for the growing one. */
@@ -314,7 +320,13 @@ const offset = computed(() => (props.selectable ? 1 : 0));
       </template>
 
       <template v-if="rows.length === 0">
-        <slot name="empty">
+        <PageOutOfRange
+          v-if="pager && isPastLastPage"
+          :meta="pager.meta"
+          :row-count="rows.length"
+          :query-key="pager.queryKey"
+        />
+        <slot v-else name="empty">
           <div v-if="filtered" class="flex flex-col items-center gap-3 px-4 py-8 text-center">
             <p class="text-muted">{{ $t('admin.table.emptyFiltered') }}</p>
             <AppButton size="sm" @click="$emit('clear-filters')">

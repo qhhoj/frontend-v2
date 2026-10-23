@@ -254,7 +254,7 @@ watch(
         {{ $t('admin.creation.problem.nextNote') }}
       </p>
       <AdminStatus
-        v-if="createMutation.failure.value"
+        v-if="createMutation.failure.value && Object.keys(errors).length === 0"
         kind="refused"
         :text="failureTextOf(createMutation.failure.value)"
       />

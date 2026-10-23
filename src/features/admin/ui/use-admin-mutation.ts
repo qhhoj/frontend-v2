@@ -65,8 +65,8 @@ export function useAdminMutation<Vars, Result>(options: AdminMutationOptions<Var
     } catch (error) {
       // A programming error (not an ApiError) must surface, not turn into a page line.
       if (!(error instanceof ApiError)) throw error;
-      failure.value = error;
       fieldErrors.value = fieldErrorsOf(error);
+      failure.value = error;
       return undefined;
     } finally {
       isPending.value = false;

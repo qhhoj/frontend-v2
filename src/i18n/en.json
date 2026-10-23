@@ -18,6 +18,7 @@
     "openMenuUnread": "Open the menu, {count} unread notifications"
   },
   "pages": {
+    "problem": "Problem",
     "publicRanking": "Public ranking",
     "submissions": "Submissions",
     "submission": "Submission",
@@ -781,7 +782,10 @@
       "username_invalid_characters": "Use letters, digits and underscores only.",
       "email_invalid": "Enter a valid email address.",
       "organization_unavailable": "That school is not accepting new members. Choose another.",
-      "language_unknown": "Choose a language from the list."
+      "language_unknown": "Choose a language from the list.",
+      "unmapped": "This value is not valid.",
+      "max_length": "Too long; shorten it.",
+      "min_length": "Too short."
     },
     "usernameHint": "Letters, digits and underscores, up to 30 characters.",
     "usernameChecking": "Checking the name…",
@@ -970,7 +974,9 @@
     "statement_language_unmapped": "Every statement but the main one needs a QHHOJ language or Skip.",
     "statement_language_repeated": "Two statements map to the same QHHOJ language: pick another language or Skip.",
     "tutorial_language_required": "The package has several tutorials: pick the one to use as the editorial.",
-    "too_many_testcases": "The problem has more tests than your limit."
+    "too_many_testcases": "The problem has more tests than your limit.",
+    "already_participating": "This user already has a live participation in the contest.",
+    "participation_has_submissions": "The participation has submissions, so it cannot be deleted."
   },
   "common": {
     "scrollHint": "Swipe sideways to see more columns →",
@@ -1565,7 +1571,10 @@
   "pager": {
     "previous": "Previous page",
     "next": "Next page",
-    "position": "{page} / {last}"
+    "position": "{page} / {last}",
+    "outOfRange": "Page {page} is past the end of the list.",
+    "toFirst": "Back to the first page",
+    "toLast": "Go to the last page (page {page})"
   },
   "vote": {
     "up": "Vote up",
@@ -2322,6 +2331,18 @@
     "signIn": "Sign in"
   },
   "notifications": {
+    "titles": {
+      "ticketNew": "New support ticket: {name}",
+      "ticketAssigned": "A support ticket was assigned to you: {name}",
+      "ticketReply": "New reply on a support ticket",
+      "ticketReopened": "A support ticket was reopened",
+      "ticketClosed": "A support ticket was closed",
+      "contestAnnouncement": "New announcement in \"{name}\"",
+      "requestApproved": "Your request to join \"{name}\" was approved",
+      "requestRejected": "Your request to join \"{name}\" was declined",
+      "quotaCredits": "{name} has used 80% of this month's credits",
+      "quotaStorage": "{name} has used 80% of its data storage"
+    },
     "bell": "Notifications",
     "bellWithCount": "Notifications, {count} unread",
     "drawerTitle": "Notifications",

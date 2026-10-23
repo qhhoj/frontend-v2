@@ -13,10 +13,13 @@ import { useAnnouncementComposer } from './use-announcement-composer';
 
 const props = defineProps<{ contestKey: string; isPushedLive: boolean }>();
 const emit = defineEmits<{ posted: [announcement: Announcement] }>();
-const { title, description, post, submit } = useAnnouncementComposer(toRef(props, 'contestKey'), {
-  successText: () => translate('admin.contests.announcements.posted'),
-  onPosted: (created) => emit('posted', created),
-});
+const { title, description, post, errors, submit } = useAnnouncementComposer(
+  toRef(props, 'contestKey'),
+  {
+    successText: () => translate('admin.contests.announcements.posted'),
+    onPosted: (created) => emit('posted', created),
+  },
+);
 </script>
 
 <template>
@@ -35,7 +38,7 @@ const { title, description, post, submit } = useAnnouncementComposer(toRef(props
       input-id="announcement-title"
       :label="$t('admin.contests.announcements.titleLabel')"
       :hint="$t('admin.contests.announcements.titleHint')"
-      :error="post.fieldErrors.value.title"
+      :error="errors.title"
     >
       <template #default="{ id, describedBy, invalid }">
         <input
@@ -50,7 +53,7 @@ const { title, description, post, submit } = useAnnouncementComposer(toRef(props
     <AdminField
       input-id="announcement-body"
       :label="$t('admin.contests.announcements.bodyLabel')"
-      :error="post.fieldErrors.value.description"
+      :error="errors.description"
     >
       <template #default="{ id, describedBy, invalid }">
         <textarea

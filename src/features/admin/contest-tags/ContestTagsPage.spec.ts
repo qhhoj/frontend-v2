@@ -69,7 +69,7 @@ describe('contest tag catalogue screen', () => {
 
   it('shows the forbidden state to staff without the permission', async () => {
     mockApi({ ...staffViewer(['judge.add_contest']) });
-    const { wrapper } = await mountAndWaitFor('/admin/contest-tags', 'judge.change_contest_tag');
+    const { wrapper } = await mountAndWaitFor('/admin/contest-tags', 'Sửa thẻ kỳ thi');
     expect(wrapper.find('[data-testid="admin-forbidden"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="tag-create"]').exists()).toBe(false);
   });
