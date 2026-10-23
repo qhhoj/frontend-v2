@@ -220,7 +220,8 @@ describe('ProblemGeneralTab', () => {
       });
       const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
       expect(card(wrapper).get('[data-step="tests"]').text()).toBe('Chưa có test');
-      expect(card(wrapper).get('[data-step="statement"]').text()).toBe('Có đề bài');
+      expect(card(wrapper).find('[data-step="statement"]').exists()).toBe(false);
+      expect(card(wrapper).text()).toContain('Còn thiếu:');
       await openDialog(wrapper);
       expect(document.body.textContent).toContain('Bài chưa xong các bước sau');
       buttonLabelledIn(document.body, 'Vẫn công khai').click();

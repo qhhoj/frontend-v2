@@ -5,6 +5,7 @@
   "form": {
     "board": "Nhập gói Polygon",
     "drop": "Kéo gói .zip vào đây",
+    "notZip": "Gói phải là tệp .zip.",
     "pickedFile": "{name} · {size}",
     "chooseFile": "Chọn tệp",
     "code": "Mã bài",
@@ -47,6 +48,8 @@
   },
   "progress": {
     "title": "Đang nhập {code}",
+    "titleDone": "Đã nhập {code}",
+    "titleFailed": "Không nhập được {code}",
     "state": "Trạng thái",
     "runningHint": "trang hỏi lại mỗi 2 giây",
     "doneText": "Nhập xong. Mở bài để xem và chỉnh tiếp.",

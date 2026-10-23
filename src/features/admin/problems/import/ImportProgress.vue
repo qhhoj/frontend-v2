@@ -4,6 +4,7 @@ import type { ImportJob } from '@/api/types/problem-imports';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
 import { CARD, buttonClass } from '../../ui/controls';
+import { importErrorOf } from '../polygon/polygon-import-errors';
 import ImportStepList from './ImportStepList.vue';
 import type { ImportPhase, PollStop } from './import-job';
 import { useImportSteps } from './use-import-steps';
@@ -20,7 +21,17 @@ const props = defineProps<{
 const steps = useImportSteps('zip', toRef(props, 'job'));
 const failedStep = computed(() => props.job?.failedStep ?? null);
 const isFinished = computed(() => props.phase === 'done' || props.phase === 'failed');
-const failedText = computed(() => props.job?.error || '');
+const titleKey = computed(() => {
+  if (props.phase === 'done') return 'titleDone';
+  return props.phase === 'failed' ? 'titleFailed' : 'title';
+});
+/** The mapped text of the job's error code (cause and fix); the raw `error` only for a code with no text. */
+const failedText = computed(() => {
+  if (!props.job) return '';
+  if (!props.job.errorCode) return props.job.error || '';
+  const { title, fix } = importErrorOf(props.job.errorCode, props.job.errorParams);
+  return `${title}. ${fix}`;
+});
 </script>
 
 <template>
@@ -29,7 +40,7 @@ const failedText = computed(() => props.job?.error || '');
     aria-labelledby="import-progress-title"
   >
     <h2 id="import-progress-title" class="font-display text-base font-semibold">
-      {{ $t('admin.polygon.progress.title', { code }) }}
+      {{ $t(`admin.polygon.progress.${titleKey}`, { code }) }}
     </h2>
     <p v-if="job" class="text-sm text-muted">
       <template v-if="!isFinished">{{ $t('admin.polygon.progress.runningHint') }}</template>

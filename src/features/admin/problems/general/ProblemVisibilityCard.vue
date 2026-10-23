@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
-import { CircleAlert, CircleCheck, Globe, Lock } from 'lucide-vue-next';
+import { CircleAlert, CircleCheck, Globe, Lightbulb, Lock } from 'lucide-vue-next';
 import { updateProblem } from '@/api/problem-editing.api';
 import type { EditableProblem } from '@/api/types/problem-editing';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
@@ -52,6 +52,8 @@ const checks = computed(() =>
   ),
 );
 const missing = computed(() => checks.value.filter((step) => !step.isDone));
+/** Under "missing" only what is missing; once nothing is, the done chips sit under "ready". */
+const listedChecks = computed(() => (missing.value.length ? missing.value : checks.value));
 
 const isDialogOpen = ref(false);
 const isDateNow = ref(false);
@@ -99,6 +101,9 @@ function openDialog() {
         <AdminChip v-if="isPublic" tone="positive" :icon="Globe">
           {{ $t(`admin.problems.header.${shownTo}`) }}
         </AdminChip>
+        <AdminChip v-else-if="problem.editor?.suggester" tone="caution" :icon="Lightbulb">{{
+          $t('admin.problems.header.suggested')
+        }}</AdminChip>
         <AdminChip v-else :icon="Lock">{{ $t('admin.problems.header.private') }}</AdminChip>
         <AppButton
           v-if="canChange"
@@ -118,7 +123,7 @@ function openDialog() {
         $t(missing.length ? `${KEY}.missing` : `${KEY}.ready`)
       }}</span>
       <AdminChip
-        v-for="step in checks"
+        v-for="step in listedChecks"
         :key="step.id"
         :data-step="step.id"
         :tone="step.isDone ? 'positive' : 'caution'"

@@ -26,7 +26,8 @@
   "general": {
     "create": {
       "title": "Tạo bài tập",
-      "lead": "Không có quyền tạo bài thì bài được gửi dưới dạng đề xuất để nhân viên duyệt.",
+      "lead": "Chọn nơi đặt bài, nhập mã, tên và giới hạn. Phần còn lại chỉnh sau ở các tab của bài.",
+      "leadSuggest": "Không có quyền tạo bài thì bài được gửi dưới dạng đề xuất để nhân viên duyệt.",
       "createButton": "Tạo bài",
       "suggestButton": "Gửi đề xuất bài",
       "suggested": "Đã gửi đề xuất {code}.",
@@ -117,7 +118,8 @@
       "memory": "Từ 0 đến 1048576 KiB.",
       "points": "Từ 800 đến 3500.",
       "types": "Cần ít nhất một loại bài.",
-      "name": "Tên bài từ 1 đến 100 ký tự."
+      "name": "Tên bài từ 1 đến 100 ký tự.",
+      "languages": "Chọn ít nhất 1 ngôn ngữ"
     },
     "changeMessage": "Lý do",
     "changeMessagePlaceholder": "Không bắt buộc, lưu vào lịch sử",
@@ -324,13 +326,15 @@
       },
       "skipped": "Bỏ qua {count} cặp đã có trong danh sách.",
       "total": "Tổng điểm",
-      "totalHint": "Chia đều cho các test, phần dư cộng vào các test cuối. Sửa điểm từng test sau khi thêm.",
+      "totalHint": "Chia đều cho các test, phần dư cộng vào các test cuối. Sửa điểm từng test sau khi tạo.",
       "previewLabel": "Các test sẽ tạo",
       "unpaired": "{count} tệp chưa ghép được",
       "unpairedHint": "Các tệp này sẽ không thành test. Kiểm tra tên: input và output của một test phải cùng thư mục và cùng tên gốc.",
       "others": "{count} tệp khác (không phải input/output)",
       "apply": "Thêm {count} test",
+      "applyReplace": "Thay bằng {count} test",
       "applied": "Đã thêm {count} test. Bấm “Lưu cấu hình” để lưu.",
+      "appliedReplace": "Đã thay bằng {count} test. Bấm “Lưu cấu hình” để lưu.",
       "skip": "Bỏ qua, tự thêm test"
     },
     "config": {

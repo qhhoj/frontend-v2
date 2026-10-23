@@ -5,6 +5,7 @@
   "form": {
     "board": "Import a Polygon package",
     "drop": "Drop the .zip package here",
+    "notZip": "The package must be a .zip file.",
     "pickedFile": "{name} · {size}",
     "chooseFile": "Choose file",
     "code": "Problem code",
@@ -47,6 +48,8 @@
   },
   "progress": {
     "title": "Importing {code}",
+    "titleDone": "Imported {code}",
+    "titleFailed": "Could not import {code}",
     "state": "State",
     "runningHint": "the page asks again every 2 seconds",
     "doneText": "Import finished. Open the problem to check it and keep editing.",

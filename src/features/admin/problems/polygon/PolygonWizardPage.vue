@@ -5,6 +5,9 @@ import { useRoute, useRouter } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { usePermissions } from '@/stores/use-permissions';
+import { useSessionStore } from '@/stores/session.store';
+import { canUseAdmin } from '../../admin-access';
+import { ADMIN_SCREENS } from '../../admin-screens';
 import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import { CARD, buttonClass } from '../../ui/controls';
 import PolygonConfigureStep from './PolygonConfigureStep.vue';
@@ -29,6 +32,8 @@ const state = ref(initialWizardState(queryJob));
 const accountName = computed(() => status.data.value?.accountName ?? '');
 /** Every problem's history names every problem, so the server asks for `judge.edit_all_problem`; asked for once opened. */
 const { can } = usePermissions();
+const session = useSessionStore();
+const canImportZip = computed(() => canUseAdmin(session.user, ADMIN_SCREENS.problemImport));
 const isHistoryOpen = ref(false);
 const onHistoryToggle = (event: Event) =>
   (isHistoryOpen.value = (event.target as HTMLDetailsElement).open);
@@ -69,9 +74,12 @@ const LEAD_KEYS = {
       "
     >
       <template #actions>
-        <RouterLink :to="{ name: 'admin-problemImport' }" :class="buttonClass('secondary')">{{
-          $t('admin.polygonLink.wizard.zipFile')
-        }}</RouterLink>
+        <RouterLink
+          v-if="canImportZip"
+          :to="{ name: 'admin-problemImport' }"
+          :class="buttonClass('secondary')"
+          >{{ $t('admin.polygonLink.wizard.zipFile') }}</RouterLink
+        >
       </template>
     </AdminPageHeader>
     <WizardStepper :current="state.step" />

@@ -101,6 +101,10 @@ if (!canUseMode('create') && canUseMode('update')) form.value.mode = 'update';
 
 function chooseFile(file: File) {
   localErrors.value = {};
+  if (!file.name.toLowerCase().endsWith('.zip')) {
+    localErrors.value = { file: translate('admin.polygon.form.notZip') };
+    return;
+  }
   if (tooLargeFor(file, UPLOAD_LIMITS.archive)) {
     localErrors.value = {
       file: translate('admin.ui.tooLarge', { max: formatFileSize(UPLOAD_LIMITS.archive) }),

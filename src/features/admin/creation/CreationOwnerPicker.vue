@@ -54,8 +54,10 @@ watch(
     if (isLoading.value) return;
     if (!isReady.value)
       owner.value = initialOwner(options.value, requestedSlug.value, scope.value.site);
-    isReady.value = choiceCount.value > 0;
-    isBlocked.value = isOffered.value && !isReady.value;
+    // Not read back from `isReady`: a model the parent binds keeps its old value until the parent re-renders.
+    const hasChoice = choiceCount.value > 0;
+    isReady.value = hasChoice;
+    isBlocked.value = isOffered.value && !hasChoice;
   },
   { immediate: true },
 );

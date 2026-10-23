@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Building2, Database, Globe, Lock } from 'lucide-vue-next';
+import { Building2, Database, Globe, Lightbulb, Lock } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { NumberedPageMeta } from '@/api/client';
@@ -30,6 +30,8 @@ defineProps<{
   loading: boolean;
   error: unknown;
   filtered: boolean;
+  /** The list is the review queue: every private row is a suggestion (the list rows do not say so themselves). */
+  isSuggestedQueue: boolean;
 }>();
 const sort = defineModel<string>('sort', { required: true });
 const selected = defineModel<Set<string>>('selected', { required: true });
@@ -126,6 +128,9 @@ const menuItems = (code: string) =>
         <AdminChip v-if="row.isPublic" tone="positive" :icon="Globe">
           {{ $t('admin.problemList.status.public') }}
         </AdminChip>
+        <AdminChip v-else-if="isSuggestedQueue" tone="caution" :icon="Lightbulb">{{
+          $t('admin.problemList.status.suggested')
+        }}</AdminChip>
         <AdminChip v-else :icon="Lock">{{ $t('admin.problemList.status.private') }}</AdminChip>
         <AdminChip v-if="row.isOrganizationPrivate" tone="info" :icon="Building2">
           {{ $t('admin.problemList.orgPrivate') }}

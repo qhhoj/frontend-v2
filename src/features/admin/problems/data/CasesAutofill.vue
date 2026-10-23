@@ -26,10 +26,13 @@ const isAfterUpload = defineModel<boolean>('afterUpload', { default: false });
  * Shown inline (a toast would sit over the save bar it points to) while the list is still the one the autofill made; any
  * later change, a save or a discard replaces the list and hides it.
  */
-const applied = shallowRef<{ list: KeyedCase[]; count: number } | null>(null);
+const applied = shallowRef<{ list: KeyedCase[]; count: number; mode: AutofillMode } | null>(null);
 const appliedText = computed(() =>
   applied.value && applied.value.list === toRaw(cases.value)
-    ? translate('admin.problems.data.autofill.applied', { count: applied.value.count })
+    ? translate(
+        `admin.problems.data.autofill.${applied.value.mode === 'replace' ? 'appliedReplace' : 'applied'}`,
+        { count: applied.value.count },
+      )
     : '',
 );
 /** Replaced rows take their args-box flags with them, as a removed row does. */
@@ -37,7 +40,7 @@ function apply(rows: KeyedCase[], mode: AutofillMode) {
   if (mode === 'replace') cases.value.forEach((row) => emit('invalid', row.key, false));
   const list = mode === 'replace' ? rows : [...cases.value, ...rows];
   cases.value = list;
-  applied.value = { list: toRaw(list), count: rows.length };
+  applied.value = { list: toRaw(list), count: rows.length, mode };
 }
 </script>
 

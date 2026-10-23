@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { usePermissions } from '@/stores/use-permissions';
+import { useSessionStore } from '@/stores/session.store';
+import { canUseAdmin } from '../../admin-access';
+import { ADMIN_SCREENS } from '../../admin-screens';
 import { buttonClass } from '../../ui/controls';
 import AdminNotice from '../../ui/feedback/AdminNotice.vue';
 
-/** No key or secret saved: the list cannot be read. Settings for whoever may change them; the zip import always works. */
+/** No key or secret saved: the list cannot be read. Settings for whoever may change them, the zip import for whoever may use it. */
 const { can } = usePermissions();
+const session = useSessionStore();
+const canImportZip = computed(() => canUseAdmin(session.user, ADMIN_SCREENS.problemImport));
 </script>
 
 <template>
@@ -22,11 +28,16 @@ const { can } = usePermissions();
         <div class="mt-2 flex flex-wrap gap-2">
           <RouterLink
             v-if="can('judge.change_settings')"
-            :to="{ name: 'admin-settings', hash: '#settings-polygon' }"
+            :to="{
+              name: 'admin-settings',
+              query: { tab: 'integrations' },
+              hash: '#settings-polygon',
+            }"
             :class="buttonClass('secondary', 'sm')"
             >{{ $t('admin.polygonLink.notConnected.openSettings') }}</RouterLink
           >
           <RouterLink
+            v-if="canImportZip"
             :to="{ name: 'admin-problemImport' }"
             :class="buttonClass('secondary', 'sm')"
             >{{ $t('admin.polygonLink.wizard.zipInstead') }}</RouterLink
