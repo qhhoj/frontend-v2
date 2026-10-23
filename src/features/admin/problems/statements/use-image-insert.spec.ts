@@ -14,7 +14,12 @@ vi.mock('@/api/problem-editing.api', () => ({
     }),
 }));
 
-const draft = (description: string): StatementDraft => ({ name: 'Tên', description, exists: true });
+const draft = (description: string): StatementDraft => ({
+  name: 'Tên',
+  description,
+  exists: true,
+  storedDescription: description,
+});
 
 describe('useImageInsert', () => {
   it('puts the image into the language the upload started in, even when the viewer switched meanwhile', async () => {

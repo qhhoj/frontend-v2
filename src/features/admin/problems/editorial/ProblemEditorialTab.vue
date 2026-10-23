@@ -14,7 +14,7 @@ import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
 import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
-import { useDirtyForm } from '../../ui/form/dirty-form';
+import { normalizeNewlines, sentText, useDirtyForm } from '../../ui/form/dirty-form';
 import MarkdownField from '../../ui/MarkdownField.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import UsernameChips from '../../ui/UsernameChips.vue';
@@ -37,8 +37,10 @@ const { draft, dirtyCount, discard, commit } = useDirtyForm<EditorialForm>({
   isPublic: stored?.isPublic ?? false,
   publishOn: stored?.publishOn ?? null,
   authors: (stored?.authors ?? []).map(({ id, username }) => ({ id, username })),
-  content: stored?.content ?? '',
+  content: normalizeNewlines(stored?.content ?? ''),
 });
+/** The content as stored (maybe `\r\n`): sent back while the edit leaves it unchanged. */
+let storedContent = stored?.content ?? '';
 const contentError = computed(() => markdownError(draft.value.content));
 const savedAt = ref<Date | null>(null);
 
@@ -52,13 +54,16 @@ const mutation = useAdminMutation({
 async function save() {
   if (contentError.value || dirtyCount.value === 0) return;
   const sent = { ...draft.value, authors: [...draft.value.authors] };
+  const content = sentText(sent.content, storedContent);
   await mutation.run({
     isPublic: sent.isPublic,
     publishOn: sent.publishOn ?? new Date().toISOString(),
     authors: sent.authors.map((chip) => chip.id),
-    content: sent.content,
+    content,
   });
-  if (mutation.isDone.value) commit(sent);
+  if (!mutation.isDone.value) return;
+  storedContent = content;
+  commit(sent);
 }
 </script>
 

@@ -5,6 +5,8 @@ export interface SaveBarProps {
   savedAt?: Date | string | null;
   allowClean?: boolean;
   blockedReason?: string;
+  /** Unsaved changes this bar does not save but the page's leave guard counts, shown after the status ("Tiếng Việt: 1 thay đổi chưa lưu"). */
+  note?: string;
   saveLabel?: string;
   form?: string;
   variant?: 'page' | 'footer';

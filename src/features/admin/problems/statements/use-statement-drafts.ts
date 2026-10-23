@@ -11,6 +11,7 @@ import {
   initialSlotOf,
   isOriginalLocked,
   previewStyleFor,
+  sentDescription,
   STATEMENT_SLOTS,
   statementDraftOf,
   visibleStatementErrors,
@@ -28,13 +29,37 @@ const seedDrafts = (problem: EditableProblem): Drafts =>
 
 /** The text a slot is saved with: a translation goes to PUT, the original description to PATCH on the problem. */
 function saveSlot(code: string, target: StatementSlot, draft: StatementDraft): Promise<unknown> {
-  if (target === 'original') return updateProblem(code, { description: draft.description });
-  return putTranslation(code, target, { name: draft.name, description: draft.description });
+  const description = sentDescription(draft);
+  if (target === 'original') return updateProblem(code, { description });
+  return putTranslation(code, target, { name: draft.name, description });
 }
 
 /** How many of a slot's two texts (name, description) differ from what was last saved. */
 const changedFields = (draft: StatementDraft, saved: StatementDraft) =>
   Number(draft.name !== saved.name) + Number(draft.description !== saved.description);
+
+/**
+ * The one count of unsaved changes, per slot. The save bar counts the slot on screen (one slot saves at a time) and names the
+ * other slots' changes (`otherUnsaved`); the leave guard counts them all, so it never reports a change the bar hid.
+ */
+function useSlotChanges(drafts: Ref<Drafts>, saved: Ref<Drafts>, slot: Ref<StatementSlot>) {
+  const changesBySlot = computed(
+    () =>
+      Object.fromEntries(
+        STATEMENT_SLOTS.map((item) => [item, changedFields(drafts.value[item], saved.value[item])]),
+      ) as Record<StatementSlot, number>,
+  );
+  const dirtyCount = computed(() => changesBySlot.value[slot.value]);
+  const totalDirtyCount = computed(() =>
+    STATEMENT_SLOTS.reduce((total, item) => total + changesBySlot.value[item], 0),
+  );
+  const otherUnsaved = computed(() =>
+    STATEMENT_SLOTS.filter((item) => item !== slot.value && changesBySlot.value[item] > 0).map(
+      (item) => ({ slot: item, count: changesBySlot.value[item] }),
+    ),
+  );
+  return { changesBySlot, dirtyCount, totalDirtyCount, otherUnsaved };
+}
 
 /**
  * Whether saving the slot would write its description: the original always does (it is the description), a translation does
@@ -48,6 +73,7 @@ const isDescriptionWrite = (target: StatementSlot, drafts: Drafts, saved: Drafts
 /** After a save the slot's saved text is what was just written, and it is no longer missing. */
 function recordSaved(drafts: Ref<Drafts>, saved: Ref<Drafts>, target: StatementSlot) {
   drafts.value[target].exists = true;
+  drafts.value[target].storedDescription = sentDescription(drafts.value[target]);
   saved.value[target] = { ...drafts.value[target] };
 }
 
@@ -76,13 +102,10 @@ export function useStatementDrafts(problem: () => EditableProblem) {
       triedSlots.value.has(slot.value),
     ),
   );
-  /** The save bar counts the slot on screen (one slot saves at a time); the leave guard counts every slot. */
-  const dirtyCount = computed(() => changedFields(current.value, saved.value[slot.value]));
-  const totalDirtyCount = computed(() =>
-    STATEMENT_SLOTS.reduce(
-      (total, item) => total + changedFields(drafts.value[item], saved.value[item]),
-      0,
-    ),
+  const { changesBySlot, dirtyCount, totalDirtyCount, otherUnsaved } = useSlotChanges(
+    drafts,
+    saved,
+    slot,
   );
   const savedAt = ref<Date | null>(null);
 
@@ -118,8 +141,10 @@ export function useStatementDrafts(problem: () => EditableProblem) {
     drafts,
     current,
     isLocked,
+    changesBySlot,
     dirtyCount,
     totalDirtyCount,
+    otherUnsaved,
     savedAt,
     previewStyle,
     canFullMarkup,

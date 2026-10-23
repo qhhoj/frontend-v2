@@ -176,6 +176,8 @@
       "original": "Mô tả gốc"
     },
     "missing": "chưa có",
+    "unsaved": "chưa lưu",
+    "otherUnsaved": "{slot}: {count} thay đổi chưa lưu | {slot}: {count} thay đổi chưa lưu",
     "nameLabel": "Tên bài ({language})",
     "nameHint": "Tối đa 100 ký tự.",
     "contentLabel": "Nội dung (Markdown)",

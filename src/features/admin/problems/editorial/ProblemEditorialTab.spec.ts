@@ -49,6 +49,34 @@ describe('ProblemEditorialTab', () => {
     });
   });
 
+  it('treats CRLF content handed back as LF as unchanged and sends the stored text back', async () => {
+    const problem = editableProblem();
+    problem.editor!.solution = {
+      isPublic: false,
+      publishOn: '2026-10-08T06:00:00.000Z',
+      authors: [],
+      content: 'Dòng 1\r\nDòng 2',
+    };
+    const calls = mockApi({
+      ...staffViewer(['judge.edit_own_problem']),
+      ...problemEditorRoutes(problem),
+      'POST /problems/render-preview': ok({ html: '' }),
+      'PUT /problems/hcmus41c/editorial': { status: 204 },
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/editorial');
+    const save = () =>
+      wrapper.findAll('button').find((button) => button.text() === 'Lưu lời giải')!;
+    await wrapper.get('textarea').setValue('Dòng 1\nDòng 2');
+    expect(save().attributes('aria-disabled')).toBe('true');
+    await wrapper.get('#editorial-isPublic').setValue(true);
+    await save().trigger('click');
+    await flushPromises();
+    expect(calls.find((call) => call.method === 'PUT')?.body).toMatchObject({
+      isPublic: true,
+      content: 'Dòng 1\r\nDòng 2',
+    });
+  });
+
   it('marks the public problem pages stale after saving the editorial', async () => {
     mockApi({
       ...staffViewer(['judge.edit_own_problem']),
