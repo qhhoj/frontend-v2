@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { permissionLabels } from '../ui/permission-label';
 import AdminBit from './AdminBit.vue';
 
 const route = useRoute();
+/** The human names of the permissions the screen asks for; never the codenames. */
 const needed = computed(() => {
   const rule = route.meta.permission;
-  return typeof rule === 'string' ? [rule] : [...(rule ?? [])];
+  return permissionLabels(typeof rule === 'string' ? [rule] : [...(rule ?? [])]);
 });
 </script>
 
@@ -17,12 +19,18 @@ const needed = computed(() => {
   >
     <AdminBit placement="forbidden" />
     <h1 class="page-title">{{ $t('admin.shell.forbidden.title') }}</h1>
-    <p class="text-muted">{{ $t('admin.shell.forbidden.body', needed.length) }}</p>
-    <ul class="flex flex-wrap justify-center gap-2">
+    <p class="text-muted">
+      {{
+        needed.length > 0
+          ? $t('admin.shell.forbidden.body', needed.length)
+          : $t('admin.shell.forbidden.generic')
+      }}
+    </p>
+    <ul v-if="needed.length > 0" class="flex flex-wrap justify-center gap-2">
       <li
         v-for="permission in needed"
         :key="permission"
-        class="rounded-pill border border-line px-3 py-1 font-mono text-xs"
+        class="rounded-pill border border-line px-3 py-1 text-sm"
       >
         {{ permission }}
       </li>

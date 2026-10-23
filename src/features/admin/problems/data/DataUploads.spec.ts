@@ -5,7 +5,6 @@ import { mountApp } from '@/test/mount';
 import { confirmDialog, staffViewer } from '@/test/admin-routes';
 import { problemData, problemEditorRoutes } from '@/test/admin-fixtures/problems';
 
-type Mounted = Awaited<ReturnType<typeof mountApp>>;
 const EDIT = ['judge.edit_own_problem'];
 
 /** The shell and the data tab load lazily: wait until the checker box is on the page. */
@@ -20,12 +19,6 @@ const mountAdmin = async (path: string) => {
   );
   await flushPromises();
   return mounted;
-};
-
-const pick = async (input: ReturnType<Mounted['wrapper']['get']>, file: File) => {
-  Object.defineProperty(input.element, 'files', { value: [file], configurable: true });
-  await input.trigger('change');
-  await flushPromises();
 };
 
 describe('test data uploads', () => {
@@ -53,20 +46,25 @@ describe('test data uploads', () => {
     expect(wrapper.get('[data-testid="source-customChecker"]').text()).toContain('Chưa có');
   });
 
-  it('refuses a source file over 1 MiB on this side, without sending it', async () => {
-    const calls = mockApi({
+  it('offers no generator slot (the judge runs none) unless a file is stored, and then only to delete it', async () => {
+    mockApi({
       ...staffViewer(EDIT),
       ...problemEditorRoutes(),
-      'GET /problems/hcmus41c/data': ok(problemData()),
+      'GET /problems/hcmus41c/data': ok(problemData({ generator: null })),
     });
-    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data?view=advanced');
-    await pick(
-      wrapper.get('[data-testid="source-generator"] input[type="file"]'),
-      new File([new Uint8Array(1024 * 1024 + 1)], 'gen.cpp'),
-    );
-    expect(calls.some((call) => call.path.includes('/files/generator'))).toBe(false);
-    expect(wrapper.get('[data-testid="source-generator"]').text()).toContain(
-      'Tệp quá lớn (tối đa 1.0 MB).',
-    );
+    const none = await mountAdmin('/admin/problems/hcmus41c/data?view=advanced');
+    expect(none.wrapper.find('[data-testid="source-generator"]').exists()).toBe(false);
+    none.wrapper.unmount();
+
+    mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'GET /problems/hcmus41c/data': ok(problemData({ generator: 'gen.cpp' })),
+    });
+    const stored = await mountAdmin('/admin/problems/hcmus41c/data?view=advanced');
+    const row = stored.wrapper.get('[data-testid="source-generator"]');
+    expect(row.text()).toContain('gen.cpp');
+    expect(row.find('input[type="file"]').exists()).toBe(false);
+    expect(row.find('button[aria-label="Xóa gen.cpp"]').exists()).toBe(true);
   });
 });

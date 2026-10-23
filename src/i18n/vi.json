@@ -18,6 +18,7 @@
     "openMenuUnread": "Mở menu, {count} thông báo chưa đọc"
   },
   "pages": {
+    "problem": "Bài tập",
     "publicRanking": "Bảng xếp hạng công khai",
     "submissions": "Bài nộp",
     "submission": "Chi tiết bài nộp",
@@ -781,7 +782,10 @@
       "username_invalid_characters": "Chỉ dùng chữ cái, chữ số và dấu gạch dưới.",
       "email_invalid": "Nhập một địa chỉ email hợp lệ.",
       "organization_unavailable": "Trường này không nhận thành viên mới. Hãy chọn trường khác.",
-      "language_unknown": "Hãy chọn một ngôn ngữ trong danh sách."
+      "language_unknown": "Hãy chọn một ngôn ngữ trong danh sách.",
+      "unmapped": "Giá trị này chưa hợp lệ.",
+      "max_length": "Quá dài; hãy rút gọn.",
+      "min_length": "Quá ngắn."
     },
     "usernameHint": "Chữ cái, chữ số và dấu gạch dưới, tối đa 30 ký tự.",
     "usernameChecking": "Đang kiểm tra tên…",
@@ -970,7 +974,9 @@
     "statement_language_unmapped": "Mỗi đề không phải đề chính cần một ngôn ngữ trên QHHOJ hoặc Bỏ qua.",
     "statement_language_repeated": "Hai đề cùng một ngôn ngữ trên QHHOJ: chọn ngôn ngữ khác hoặc Bỏ qua.",
     "tutorial_language_required": "Gói có nhiều lời giải: chọn đề lấy lời giải.",
-    "too_many_testcases": "Bài có nhiều test hơn giới hạn của bạn."
+    "too_many_testcases": "Bài có nhiều test hơn giới hạn của bạn.",
+    "already_participating": "Người này đã có lượt tham gia đang diễn ra trong kỳ thi.",
+    "participation_has_submissions": "Lượt tham gia đã có bài nộp nên không xóa được."
   },
   "common": {
     "scrollHint": "Vuốt ngang để xem thêm cột →",
@@ -1565,7 +1571,10 @@
   "pager": {
     "previous": "Trang trước",
     "next": "Trang sau",
-    "position": "{page} / {last}"
+    "position": "{page} / {last}",
+    "outOfRange": "Trang {page} nằm ngoài danh sách, không có mục nào.",
+    "toFirst": "Về trang đầu",
+    "toLast": "Về trang cuối (trang {page})"
   },
   "vote": {
     "up": "Bình chọn lên",
@@ -2322,6 +2331,18 @@
     "signIn": "Đăng nhập"
   },
   "notifications": {
+    "titles": {
+      "ticketNew": "Phiếu hỗ trợ mới: {name}",
+      "ticketAssigned": "Bạn được giao một phiếu hỗ trợ: {name}",
+      "ticketReply": "Phiếu hỗ trợ có trả lời mới",
+      "ticketReopened": "Phiếu hỗ trợ đã được mở lại",
+      "ticketClosed": "Phiếu hỗ trợ đã được đóng",
+      "contestAnnouncement": "Thông báo mới trong \"{name}\"",
+      "requestApproved": "Yêu cầu tham gia \"{name}\" đã được duyệt",
+      "requestRejected": "Yêu cầu tham gia \"{name}\" đã bị từ chối",
+      "quotaCredits": "{name} đã dùng 80% tín dụng tháng này",
+      "quotaStorage": "{name} đã dùng 80% dung lượng dữ liệu"
+    },
     "bell": "Thông báo",
     "bellWithCount": "Thông báo, {count} chưa đọc",
     "drawerTitle": "Thông báo",

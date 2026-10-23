@@ -116,7 +116,8 @@
       "highTime": "Trên 5 giây cần quyền “Đặt giới hạn thời gian cao”.",
       "memory": "Từ 0 đến 1048576 KiB.",
       "points": "Từ 800 đến 3500.",
-      "types": "Cần ít nhất một loại bài."
+      "types": "Cần ít nhất một loại bài.",
+      "name": "Tên bài từ 1 đến 100 ký tự."
     },
     "changeMessage": "Lý do",
     "changeMessagePlaceholder": "Không bắt buộc, lưu vào lịch sử",

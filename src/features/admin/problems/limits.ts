@@ -6,7 +6,6 @@ const KIB = 1024;
 const MIB = 1024 * KIB;
 
 export const IMAGE_MAX_BYTES = 5 * MIB;
-export const SOURCE_MAX_BYTES = MIB;
 export const MAX_CASE_ARGS_BYTES = MIB;
 export const IMAGE_ACCEPT = 'image/png,image/jpeg,image/gif,image/svg+xml';
 /** A file input's `accept` for the extensions the backend lists (without the dot), e.g. `.zip,.docx`. */

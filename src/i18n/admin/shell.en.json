@@ -22,7 +22,8 @@
   "forbidden": {
     "title": "You do not have access to this section",
     "body": "This section needs this permission: | This section needs one of these permissions:",
-    "back": "Back to admin home"
+    "back": "Back to admin home",
+    "generic": "You need a suitable admin permission to open this section."
   },
   "dashboard": {
     "lead": "What is waiting, recent changes and your shortcuts.",

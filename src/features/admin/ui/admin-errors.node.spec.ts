@@ -1,6 +1,19 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { ApiError } from '@/api/client';
-import { failureTextOf, fieldErrorsOf, formatWait, isConflict, isNotFound } from './admin-errors';
+import { i18n } from '@/i18n';
+import {
+  adminIssueText,
+  failureTextOf,
+  fieldErrorsOf,
+  formatWait,
+  isConflict,
+  isNotFound,
+  specificIssueText,
+} from './admin-errors';
+
+afterEach(() => {
+  i18n.global.locale.value = 'vi';
+});
 
 describe('fieldErrorsOf', () => {
   it('turns issues into one text per field, with the SPA text when it has one', () => {
@@ -12,7 +25,7 @@ describe('fieldErrorsOf', () => {
     });
     expect(fieldErrorsOf(error)).toEqual({
       timeLimit: 'Giá trị quá lớn.',
-      'problems.2.points': 'points too big',
+      'problems.2.points': 'Giá trị này chưa hợp lệ.',
     });
   });
 
@@ -29,7 +42,7 @@ describe('fieldErrorsOf', () => {
       fields: { reason: ['Reserved for automatic contest-cheating bans.', 'second'] },
     });
     expect(fieldErrorsOf(error)).toEqual({
-      reason: 'Reserved for automatic contest-cheating bans.',
+      reason: 'Lý do này dành riêng cho các vụ cấm tự động do gian lận trong kỳ thi.',
     });
   });
 
@@ -134,5 +147,62 @@ describe('quota_exceeded', () => {
   it('falls back to the generic quota text when the details are missing or malformed', () => {
     expect(failureTextOf(refusal(undefined))).toBe(GENERIC);
     expect(failureTextOf(refusal({ meter: 'time', limit: 1, used: 1, needed: 1 }))).toBe(GENERIC);
+  });
+});
+
+const issue = (code: string, message: string, field = 'name') => ({ field, code, message });
+
+describe('adminIssueText (no raw English in the Vietnamese UI)', () => {
+  it('uses the SPA text of the issue code', () => {
+    expect(adminIssueText(issue('admin_cap', 'x'))).toBe('Mỗi người quản trị tối đa 3 tổ chức.');
+  });
+  it('maps a codeless English refusal by its message', () => {
+    expect(adminIssueText(issue('', 'Slug is taken.', 'slug'))).toBe('Đường dẫn (slug) này đã có.');
+    expect(adminIssueText(issue('', 'Unknown user.', 'user'))).toBe('Không có người dùng này.');
+    expect(adminIssueText(issue('', 'Every assignee must be an active user', 'assignee'))).toBe(
+      'Mọi người xử lý phải là tài khoản đang hoạt động.',
+    );
+  });
+  it('names the column of a CSV refusal', () => {
+    expect(adminIssueText(issue('', 'Missing the Full Name column', 'file'))).toBe(
+      'Tệp thiếu cột Full Name.',
+    );
+  });
+  it('falls back to a Vietnamese line for an unknown refusal, and shows the server text only in English', () => {
+    const unknown = issue('brand_new', 'username must be shorter than or equal to 150 characters');
+    expect(adminIssueText(unknown)).toBe('Giá trị này chưa hợp lệ.');
+    i18n.global.locale.value = 'en';
+    expect(adminIssueText(unknown)).toBe(
+      'username must be shorter than or equal to 150 characters',
+    );
+  });
+});
+
+describe('failureTextOf names the reason an issue gives', () => {
+  it('shows an issue on no field (the org admin cap) instead of the generic line', () => {
+    const error = new ApiError('validation_failed', 400, 'bad', {
+      issues: [issue('admin_cap', 'The admin has 3 organizations', '')],
+    });
+    expect(failureTextOf(error)).toBe('Mỗi người quản trị tối đa 3 tổ chức.');
+  });
+  it('shows the specific reason of a codeless refusal (the test generator)', () => {
+    const error = new ApiError('validation_failed', 400, 'bad', {
+      issues: [
+        issue('', 'The judge does not run test generators; delete the generator.', 'generator'),
+      ],
+    });
+    expect(failureTextOf(error)).toBe('Máy chấm không chạy bộ sinh test; hãy xóa bộ sinh test.');
+  });
+  it('keeps the usual line when the issues only say a value is off', () => {
+    const error = new ApiError('validation_failed', 400, 'bad', {
+      issues: [issue('is_length', 'name must be longer')],
+    });
+    expect(specificIssueText(error)).toBeNull();
+    expect(failureTextOf(error)).toBe('Dữ liệu chưa hợp lệ.');
+  });
+  it('words a participation clash by its code', () => {
+    expect(failureTextOf(new ApiError('already_participating', 409, 'x'))).toBe(
+      'Người này đã có lượt tham gia đang diễn ra trong kỳ thi.',
+    );
   });
 });

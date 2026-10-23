@@ -160,7 +160,7 @@ describe('ContestActionsTab', () => {
     (document.body.querySelector('#clone-key') as HTMLInputElement).value = 'hcmus-w41';
     document.body.querySelector('#clone-key')!.dispatchEvent(new Event('input'));
     await confirmDialog('Nhân bản');
-    expect(openDialog().textContent).toContain('That key is taken.');
+    expect(openDialog().textContent).toContain('Khóa này đã có.');
   });
 });
 

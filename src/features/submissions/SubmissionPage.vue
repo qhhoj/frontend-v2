@@ -59,7 +59,6 @@ const id = computed(() => String(route.params.id));
 const { submission: query, live, isLive, refollow } = useLiveSubmission(id);
 const row = query.data;
 const shortId = computed(() => submissionShortId(id.value));
-usePageTitle(() => translate('pages.submissionTitle', { id: shortId.value }));
 
 // The problem gives the points and the name; it may be unreadable for this viewer, then the row's own name stands in.
 /** Loading another user's code into the viewer's editor is surprising, so only the author may resubmit. */
@@ -106,6 +105,11 @@ const canResubmit = computed(
 
 const isNotFound = computed(
   () => query.error.value instanceof ApiError && query.error.value.code === 'not_found',
+);
+usePageTitle(() =>
+  isNotFound.value
+    ? translate('pages.notFound')
+    : translate('pages.submissionTitle', { id: shortId.value }),
 );
 const forbiddenKey = computed(() => forbiddenMessageKey(query.error.value));
 

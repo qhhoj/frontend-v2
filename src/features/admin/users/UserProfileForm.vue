@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/vue-query';
 import type { UserEdit } from '@/api/types/users-admin';
 import { updateUserByStaff } from '@/api/users-admin.api';
 import { failureTextOf } from '../ui/admin-errors';
+import type { FieldErrors } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
@@ -53,7 +54,12 @@ const save = useAdminMutation({
     void invalidateUserModeration(queryClient, props.user.username);
   },
 });
-const errors = save.fieldErrors;
+/** Set by `submit` when the admin's own password is missing: the round trip would only answer "too short". */
+const missingPassword = ref(false);
+const errors = computed<FieldErrors>(() => ({
+  ...(missingPassword.value ? { currentPassword: t('admin.ui.issues.password_required') } : {}),
+  ...save.fieldErrors.value,
+}));
 /** A refusal that names no field (a superuser target, a busy lock) is a line above the footer. */
 const refusal = computed(() =>
   save.failure.value && Object.keys(errors.value).length === 0
@@ -61,11 +67,13 @@ const refusal = computed(() =>
     : null,
 );
 function submit() {
-  if (dirtyCount.value > 0) void save.run(undefined);
+  missingPassword.value = isEmailChanged.value && adminPassword.value === '';
+  if (dirtyCount.value > 0 && !missingPassword.value) void save.run(undefined);
 }
 function discardAll() {
   discard();
   adminPassword.value = '';
+  missingPassword.value = false;
   save.reset();
 }
 defineExpose({

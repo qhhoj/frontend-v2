@@ -65,7 +65,9 @@ describe('useAuthAction', () => {
   it('falls back to the generic summary for an unknown issue on a field the form does not show', async () => {
     const action = mountForm(['first']);
     await action.run(
-      rejected(validation({ field: 'token', code: 'max_length', message: 'token is too long' })),
+      rejected(
+        validation({ field: 'token', code: 'brand_new_code', message: 'token is too long' }),
+      ),
     );
     expect(action.summary.value).toBe('Dữ liệu chưa hợp lệ.');
   });

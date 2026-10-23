@@ -130,3 +130,14 @@ describe('problem form', () => {
     });
   });
 });
+
+describe('checkProblemForm name', () => {
+  it('states the limit for an empty, blank or 101-character name and accepts 1 to 100', () => {
+    for (const name of ['', '   ', 'n'.repeat(101)])
+      expect(checkProblemForm({ ...seeded(), name }, nobodyCan).name).toBe(
+        'Tên bài từ 1 đến 100 ký tự.',
+      );
+    for (const name of ['n', 'n'.repeat(100)])
+      expect(checkProblemForm({ ...seeded(), name }, nobodyCan).name).toBeUndefined();
+  });
+});

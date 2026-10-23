@@ -27,3 +27,22 @@ export function pageFromQuery(value: unknown): number {
   const page = Number(Array.isArray(value) ? value[0] : value);
   return Number.isInteger(page) && page >= 1 && page <= MAX_PAGE ? page : 1;
 }
+
+/**
+ * Where to send a reader whose page holds no rows although earlier pages exist (an old or edited `?page=`): the last page
+ * when the total is known, else the first. Null when the page is the first or has rows.
+ */
+export function fallbackPageOf(meta: NumberedPageMeta, rowCount: number): number | null {
+  if (rowCount > 0 || meta.page <= 1) return null;
+  return 'total' in meta ? Math.min(meta.page - 1, lastPageOf(meta)) : 1;
+}
+
+/** `query` with the page key set to `page` (dropped for page 1), every other key kept. */
+export function queryWithPage<Value>(
+  query: Record<string, Value>,
+  queryKey: string,
+  page: number,
+): Record<string, Value | string> {
+  const kept = Object.fromEntries(Object.entries(query).filter(([key]) => key !== queryKey));
+  return page === 1 ? kept : { ...kept, [queryKey]: String(page) };
+}

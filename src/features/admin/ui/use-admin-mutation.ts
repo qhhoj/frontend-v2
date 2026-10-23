@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { ApiError } from '@/api/client';
-import { fieldErrorsOf } from './admin-errors';
+import { fieldErrorsOf, hasIssueText, isConflict } from './admin-errors';
 import type { FieldErrors } from './admin-errors';
 import { useAdminToast } from './feedback/use-admin-toast';
 
@@ -21,6 +21,13 @@ interface AdminMutationOptions<Vars, Result> {
   /** A success toast ("Đã lưu bài hcmus41c"), shown the moment the write succeeds. Omitted: no toast. */
   successText?: string | ((result: Result, vars: Vars) => string);
 }
+
+/** A clash the form already marks on the field ("Khóa này đã có."): the generic "state changed" page line would only repeat it. */
+const isExplainedByFields = (error: ApiError, fieldErrors: FieldErrors): boolean =>
+  isConflict(error) &&
+  Object.keys(fieldErrors).length > 0 &&
+  error.issues.length > 0 &&
+  error.issues.every((issue) => issue.field !== '' && hasIssueText(issue.code));
 
 /** One admin write: pending flag, per-field texts from `issues[]`, the failure for the page line, and cache invalidation. */
 export function useAdminMutation<Vars, Result>(options: AdminMutationOptions<Vars, Result>) {
@@ -65,8 +72,8 @@ export function useAdminMutation<Vars, Result>(options: AdminMutationOptions<Var
     } catch (error) {
       // A programming error (not an ApiError) must surface, not turn into a page line.
       if (!(error instanceof ApiError)) throw error;
-      failure.value = error;
       fieldErrors.value = fieldErrorsOf(error);
+      failure.value = isExplainedByFields(error, fieldErrors.value) ? null : error;
       return undefined;
     } finally {
       isPending.value = false;

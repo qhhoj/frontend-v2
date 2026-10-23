@@ -48,8 +48,15 @@ function knownIssueText({ field, code }: FieldIssue): string | null {
   return i18n.global.te(key, DEFAULT_LOCALE) ? translate(key) : null;
 }
 
-/** By code (B10); a code without text shows the backend's English message. */
-const issueText = (issue: FieldIssue): string => knownIssueText(issue) ?? issue.message;
+/** A refusal the interface has no text for: the backend's English message in the English UI, else a Vietnamese line. */
+const unmappedText = (message: string): string =>
+  i18n.global.locale.value !== DEFAULT_LOCALE && message
+    ? message
+    : translate('auth.issues.unmapped');
+
+/** By code (B10); a code without text never shows the backend's English in the Vietnamese UI. */
+const issueText = (issue: FieldIssue): string =>
+  knownIssueText(issue) ?? unmappedText(issue.message);
 
 /** Known issues on fields the form does not render: the one line that can still explain them. */
 export const hiddenIssueTexts = (error: unknown, visibleFields: readonly string[]): string[] =>
@@ -65,11 +72,14 @@ export function fieldErrorTexts(error: unknown): Record<string, string> {
   const messages: [string, string][] = error.issues.length
     ? error.issues.map((issue) => [issue.field, issueText(issue)])
     : Object.entries(error.fields).flatMap(([field, texts]) =>
-        texts.map((text): [string, string] => [field, text]),
+        texts.map((text): [string, string] => [field, unmappedText(text)]),
       );
   const joined = new Map<string, string>();
-  for (const [field, text] of messages)
-    joined.set(field, joined.has(field) ? `${joined.get(field)} ${text}` : text);
+  for (const [field, text] of messages) {
+    const earlier = joined.get(field);
+    if (earlier === undefined) joined.set(field, text);
+    else if (!earlier.includes(text)) joined.set(field, `${earlier} ${text}`);
+  }
   return Object.fromEntries(joined);
 }
 

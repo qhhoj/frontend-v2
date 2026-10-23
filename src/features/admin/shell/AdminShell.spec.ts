@@ -91,7 +91,8 @@ describe('AdminShell', () => {
     await waitForAdminShell(wrapper);
     expect(router.currentRoute.value.fullPath).toBe('/admin/similarity');
     const panel = wrapper.find('[data-testid="admin-forbidden"]');
-    expect(panel.text()).toContain('judge.moss_contest');
+    expect(panel.text()).toContain('Kiểm tra trùng lặp mã');
+    expect(panel.text()).not.toContain('judge.moss_contest');
     expect(wrapper.text()).not.toContain('Màn hình này chưa có bản vẽ');
     expect(calls.map((call) => call.path).sort()).toEqual(['/auth/me', '/profile']);
   });

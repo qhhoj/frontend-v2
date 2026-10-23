@@ -118,7 +118,16 @@
     "problem_unknown": "Không có bài nào mang mã này.",
     "organization_code_prefix": "Mã bài của tổ chức phải bắt đầu bằng tiền tố của tổ chức, kèm ít nhất một ký tự sau.",
     "organization_rights": "Bạn chỉ thêm hoặc bỏ được tổ chức mà bạn có quyền tạo bài.",
-    "site_problem_rights": "Cần quyền “Tạo bài” để đưa bài ra khỏi mọi tổ chức về trang chính."
+    "site_problem_rights": "Cần quyền “Tạo bài” để đưa bài ra khỏi mọi tổ chức về trang chính.",
+    "unmapped": "Giá trị này chưa hợp lệ.",
+    "slug_taken": "Đường dẫn (slug) này đã có.",
+    "user_unknown": "Không có người dùng này.",
+    "assignee_unknown": "Mọi người xử lý phải là tài khoản đang hoạt động.",
+    "generator_unsupported": "Máy chấm không chạy bộ sinh test; hãy xóa bộ sinh test.",
+    "nobigmath_unsupported": "Máy chấm chưa hỗ trợ nobigmath; hãy tắt tùy chọn này.",
+    "ranking_column_missing": "Tệp thiếu cột {column}.",
+    "ban_reason_reserved": "Lý do này dành riêng cho các vụ cấm tự động do gian lận trong kỳ thi.",
+    "ranking_row_columns": "Dòng {line} có {found} cột, trong khi tiêu đề có {expected} cột."
   },
   "uploading": "Đang tải lên…",
   "uploadBusy": "Đang tải lên. Hãy chọn lại tệp sau khi xong.",

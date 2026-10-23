@@ -99,13 +99,18 @@ describe('fieldErrorTexts', () => {
     });
   });
 
-  it('keeps the backend message for a code it has no text for', () => {
+  it('never shows the backend English for a code it has no text for, except in the English UI', () => {
+    const error = rejected([issue('username', 'brand_new_code', 'username is odd')]);
+    expect(fieldErrorTexts(error)).toEqual({ username: 'Giá trị này chưa hợp lệ.' });
+    i18n.global.locale.value = 'en';
+    expect(fieldErrorTexts(error)).toEqual({ username: 'username is odd' });
+  });
+
+  it('words a too-long value by its code', () => {
     const error = rejected([
       issue('username', 'max_length', 'username must be shorter than or equal to 30 characters'),
     ]);
-    expect(fieldErrorTexts(error)).toEqual({
-      username: 'username must be shorter than or equal to 30 characters',
-    });
+    expect(fieldErrorTexts(error)).toEqual({ username: 'Quá dài; hãy rút gọn.' });
   });
 
   it('reads the reset email, whose issue carries only the constraint name (ask A1)', () => {
@@ -115,7 +120,7 @@ describe('fieldErrorTexts', () => {
 
   it('falls back to the fields of an answer without issues', () => {
     const error = rejected([], { username: ['Username is taken.', 'Too long.'] });
-    expect(fieldErrorTexts(error)).toEqual({ username: 'Username is taken. Too long.' });
+    expect(fieldErrorTexts(error)).toEqual({ username: 'Giá trị này chưa hợp lệ.' });
   });
 
   it('does not let a field named like a prototype member break the result', () => {
@@ -136,7 +141,9 @@ describe('hiddenIssueTexts', () => {
   });
 
   it('skips unknown codes, whose English message is not worth a summary line', () => {
-    expect(hiddenIssueTexts(rejected([issue('token', 'max_length', 'too long')]), [])).toEqual([]);
+    expect(hiddenIssueTexts(rejected([issue('token', 'brand_new_code', 'too long')]), [])).toEqual(
+      [],
+    );
   });
 });
 

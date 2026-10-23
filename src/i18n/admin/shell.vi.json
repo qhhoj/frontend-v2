@@ -22,7 +22,8 @@
   "forbidden": {
     "title": "Bạn chưa có quyền mở mục này",
     "body": "Mục này cần quyền sau: | Mục này cần một trong các quyền sau:",
-    "back": "Về trang chủ quản trị"
+    "back": "Về trang chủ quản trị",
+    "generic": "Bạn cần quyền quản trị phù hợp để mở mục này."
   },
   "dashboard": {
     "lead": "Việc đang chờ, thay đổi gần đây và lối tắt của bạn.",

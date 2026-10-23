@@ -4,6 +4,7 @@ import {
   canSetVisible,
   changedContestFields,
   checkContestForm,
+  checkContestIdentity,
   emptyContestForm,
   GATED_CONTEST_FIELDS,
   toContestBody,
@@ -221,5 +222,22 @@ describe('contest form operations fields', () => {
         true,
       );
     });
+  });
+});
+
+describe('checkContestIdentity', () => {
+  it('accepts a key of lowercase letters, digits and underscores, 1 to 32, and a name of 1 to 100', () => {
+    expect(checkContestIdentity({ key: 'contest_01', name: 'Kỳ thi' })).toEqual({});
+    expect(checkContestIdentity({ key: 'a'.repeat(32), name: 'n'.repeat(100) })).toEqual({});
+  });
+  it('names the key rule for a key outside it', () => {
+    for (const key of ['Bad Key!', '', 'UPPER', 'a-b', 'a'.repeat(33)])
+      expect(checkContestIdentity({ key, name: 'ok' }).key, key).toBe(
+        'Khóa chỉ gồm chữ thường, số và dấu gạch dưới, 1 đến 32 ký tự.',
+      );
+  });
+  it('states the name limit for an empty or 101-character name', () => {
+    for (const name of ['', '  ', 'n'.repeat(101)])
+      expect(checkContestIdentity({ key: 'ok', name }).name).toBe('Tên kỳ thi từ 1 đến 100 ký tự.');
   });
 });

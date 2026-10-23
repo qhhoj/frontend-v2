@@ -16,10 +16,10 @@ import { useAnnouncementComposer } from '@/features/admin/contests/announcements
  * public look. Says who it reaches: the contestants when the contest pushes announcements, else nobody until it is turned on.
  */
 const props = defineProps<{ contest: ContestDetail }>();
-const { title, description, post, submit } = useAnnouncementComposer(
+const { title, description, post, errors, submit } = useAnnouncementComposer(
   computed(() => props.contest.key),
 );
-const hasFieldErrors = computed(() => Object.keys(post.fieldErrors.value).length > 0);
+const hasFieldErrors = computed(() => Object.keys(errors.value).length > 0);
 const isPushedLive = computed(() => props.contest.settings?.pushAnnouncements ?? false);
 </script>
 
@@ -42,7 +42,7 @@ const isPushedLive = computed(() => props.contest.settings?.pushAnnouncements ??
       <FormField
         input-id="contest-announcement-title"
         :label="$t('contests.announcements.compose.titleLabel')"
-        :error="post.fieldErrors.value.title"
+        :error="errors.title"
       >
         <TextInput
           v-model="title"
@@ -54,7 +54,7 @@ const isPushedLive = computed(() => props.contest.settings?.pushAnnouncements ??
         input-id="contest-announcement-body"
         :label="$t('contests.announcements.compose.bodyLabel')"
         :hint="$t('contests.announcements.compose.bodyHint')"
-        :error="post.fieldErrors.value.description"
+        :error="errors.description"
       >
         <TextArea v-model="description" name="description" rows="3" />
       </FormField>
