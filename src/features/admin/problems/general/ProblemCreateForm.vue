@@ -85,10 +85,8 @@ const errors = computed<FieldErrors>(() => ({
 /** The body, or null when a local check fails. Organization fields are set by the server, so they are never sent. */
 function checkedBody(): ProblemBody | null {
   localErrors.value = {
-  localErrors.value = {
     ...checkProblemForm(form.value, can, owner.value?.problemCodePrefix ?? ''),
     ...checkAllowedLanguages(form.value, can, defaults),
-  };
   };
   if (Object.keys(localErrors.value).length > 0) return null;
   return toProblemBody(form.value, can(EDIT_ALL_PROBLEM), defaults);
