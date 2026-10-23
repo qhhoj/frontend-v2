@@ -15,6 +15,7 @@ const ALL_KINDS: ContestActionKind[] = [
   'opensLater',
   'registrationClosed',
   'virtualDisallowed',
+  'endedForStaff',
 ];
 
 describe('join rules', () => {

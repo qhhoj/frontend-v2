@@ -23,7 +23,7 @@ const label = (group: string, value: string) =>
 </script>
 
 <template>
-  <div class="grid gap-3 sm:grid-cols-3">
+  <div class="contents">
     <AdminField
       input-id="participants-kind"
       :label="$t('admin.contests.participants.columns.kind')"

@@ -76,6 +76,14 @@ const {
   computed(() => running.value || (withVirtual.value && virtualRun.value !== null)),
 );
 
+/** The organisers hide the board from this viewer while the contest runs: the board answers 403 or shows only their row. */
+const isBoardHidden = computed(
+  () =>
+    contest.value !== undefined &&
+    contest.value.phase !== 'ended' &&
+    !contest.value.viewer.canSeeFullScoreboard,
+);
+
 const search = ref('');
 const locale = useLocaleStore();
 /** How this contest prints cells and scores; the podium and the table share it. */
@@ -224,12 +232,20 @@ async function goToMyRow() {
           </template>
         </PageHeader>
         <RankingFreezeNotice :contest="contest" :is-board-frozen="ranking?.frozen ?? false" />
+        <Notice
+          v-if="isBoardHidden"
+          role="status"
+          :title="$t('ranking.hiddenTitle')"
+          data-testid="ranking-hidden"
+        >
+          {{ $t('ranking.hiddenBody') }}
+        </Notice>
       </template>
     </QueryState>
     <QueryState
       v-if="contest && !isComparing"
       :loading="rankingPending"
-      :error="ranking ? null : rankingError"
+      :error="ranking || isBoardHidden ? null : rankingError"
       @retry="refetchRanking()"
     >
       <template #skeleton>
@@ -254,7 +270,7 @@ async function goToMyRow() {
           <RankingSkeleton :problem-count="problemCount" :has-time-column="skeletonHasTimeColumn" />
         </div>
       </template>
-      <Card v-if="!ranking?.rows.length" as="div">
+      <Card v-if="!ranking?.rows.length && !isBoardHidden" as="div">
         <EmptyState>{{ $t('ranking.empty') }}</EmptyState>
       </Card>
       <div v-else-if="ranking" :aria-busy="rankingStale" class="flex flex-col gap-5">

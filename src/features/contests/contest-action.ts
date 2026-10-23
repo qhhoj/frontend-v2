@@ -18,7 +18,8 @@ export type ContestActionKind =
   | 'finished'
   | 'opensLater'
   | 'registrationClosed'
-  | 'virtualDisallowed';
+  | 'virtualDisallowed'
+  | 'endedForStaff';
 export interface ActionFacts {
   isSignedIn: boolean;
   phase: ContestPhase;
@@ -65,8 +66,9 @@ function runningAction(facts: ActionFacts): ContestAction {
   return action('join', facts.requiresAccessCode);
 }
 
+/** The backend ends a spectating row with the contest, so "Theo dõi" after the end would change nothing: it is only said. */
 function endedAction(facts: ActionFacts): ContestAction {
-  if (facts.canSpectate) return action('spectate', newRowNeedsCode(facts));
+  if (facts.canSpectate) return action('endedForStaff');
   if (facts.disallowVirtual) return action('virtualDisallowed');
   return action('virtual', facts.requiresAccessCode && !facts.skipsAccessCode);
 }
@@ -138,6 +140,7 @@ const LIST_LABELS: Record<ContestActionKind, string> = {
   opensLater: 'contests.list.view',
   registrationClosed: 'contests.list.view',
   virtualDisallowed: 'contests.list.view',
+  endedForStaff: 'contests.list.view',
 };
 const LIST_BADGES: Partial<Record<ContestActionKind, string>> = {
   leave: 'contests.list.badges.inContest',

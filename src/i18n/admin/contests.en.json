@@ -148,7 +148,7 @@
       "hideProblemAuthors": "Hide problem authors",
       "showShortDisplay": "Show short display",
       "showSubmissionList": "Show submission list",
-      "showSubmissionListHint": "Public after the contest ends.",
+      "showSubmissionListHint": "Contestants see every submission and the stats during the contest (they must be able to see the ranking).",
       "pushLabel": "Also push over the live channel",
       "pushHint": "New announcements are also pushed to participants who have the contest open.",
       "scoreboardVisibility": "Scoreboard",
