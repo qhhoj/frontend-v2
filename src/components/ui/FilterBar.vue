@@ -49,25 +49,32 @@ watch(search, (text) => {
 });
 onBeforeUnmount(() => clearTimeout(timer));
 
+/** The text an Enter is waiting on: `exact` opens once the search has settled on it. Null: nothing waits. */
+let awaitedText: string | null = null;
+const settle = () => {
+  if (awaitedText === null || search.value.trim() !== awaitedText || !props.exact) return;
+  awaitedText = null;
+  void router.push(props.exact.to);
+};
+// Registered in setup, so it stops with the component and an unmounted bar never navigates.
+watch([() => props.exact, search], settle);
+const cancelAwaited = () => (awaitedText = null);
+onBeforeUnmount(cancelAwaited);
+
 /**
  * Enter opens the exact match for the text in the box. While the pause is still pending, `exact` was made from older text:
- * apply the typed text now and open once `exact` has followed it.
+ * apply the typed text now and open once `exact` follows it. The wait ends at the next key, the next Enter or unmount.
  */
 function openExact(event: KeyboardEvent) {
   event.preventDefault();
+  cancelAwaited();
   if (timer === undefined || typed.value.trim() === search.value.trim()) {
     if (props.exact) void router.push(props.exact.to);
     return;
   }
   clearTimeout(timer);
   timer = undefined;
-  const stop = watch(
-    () => props.exact,
-    (exact) => {
-      stop();
-      if (exact) void router.push(exact.to);
-    },
-  );
+  awaitedText = typed.value.trim();
   search.value = typed.value;
 }
 const removeChip = (key: string) => emit('remove', key);
@@ -88,6 +95,7 @@ const removeChip = (key: string) => emit('remove', key);
           :aria-label="searchLabel"
           :placeholder="searchLabel"
           :class="[INPUT, 'pl-9']"
+          @input="cancelAwaited"
           @keydown.enter="openExact"
         />
         <RouterLink

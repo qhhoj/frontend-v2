@@ -122,7 +122,7 @@ const attempt = () =>
         required
         @input="clearMissing('password')"
       />
-      <p class="-mt-1 flex justify-end text-sm">
+      <p class="flex justify-end text-sm">
         <RouterLink :to="{ name: 'forgot-password' }" :class="AUTH_LINK">{{
           $t('auth.forgot')
         }}</RouterLink>

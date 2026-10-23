@@ -8,6 +8,8 @@ const Blank = { render: () => h('div') };
 
 /** A list page: the search text lives in `search` (the URL's role), and the exact match follows it. */
 async function mountBar() {
+  /** False: the match for the settled text has not arrived (a lookup still running, or none exists). */
+  const isReady = ref(true);
   const router = createRouter({
     history: createMemoryHistory(),
     routes: [
@@ -20,7 +22,7 @@ async function mountBar() {
   const Host = defineComponent({
     setup: () => {
       const exact = computed(() =>
-        search.value
+        search.value && isReady.value
           ? { label: `Mở ${search.value}`, to: { path: '/open', query: { user: search.value } } }
           : null,
       );
@@ -34,7 +36,7 @@ async function mountBar() {
     },
   });
   const wrapper = mount(Host, { global: { plugins: [router] } });
-  return { wrapper, router, search };
+  return { wrapper, router, search, isReady };
 }
 
 describe('FilterBar exact match', () => {
@@ -63,5 +65,45 @@ describe('FilterBar exact match', () => {
     await input.trigger('keydown.enter');
     await flushPromises();
     expect(router.currentRoute.value.query.user).toBe('users_a');
+  });
+
+  it('opens a match that arrives after the search settled, once', async () => {
+    const { wrapper, router, isReady } = await mountBar();
+    isReady.value = false;
+    const input = wrapper.get('input');
+    await input.setValue('users_va');
+    await input.trigger('keydown.enter');
+    await flushPromises();
+    expect(router.currentRoute.value.path).toBe('/');
+    isReady.value = true;
+    await flushPromises();
+    expect(router.currentRoute.value.query.user).toBe('users_va');
+  });
+
+  it('never opens a match that arrives after the next keystroke', async () => {
+    const { wrapper, router, isReady } = await mountBar();
+    isReady.value = false;
+    const input = wrapper.get('input');
+    await input.setValue('nobody');
+    await input.trigger('keydown.enter');
+    await flushPromises();
+    await input.setValue('somebody');
+    isReady.value = true;
+    vi.advanceTimersByTime(300);
+    await flushPromises();
+    expect(router.currentRoute.value.path).toBe('/');
+  });
+
+  it('never opens a match that arrives after the bar is gone', async () => {
+    const { wrapper, router, isReady } = await mountBar();
+    isReady.value = false;
+    const input = wrapper.get('input');
+    await input.setValue('users_va');
+    await input.trigger('keydown.enter');
+    await flushPromises();
+    wrapper.unmount();
+    isReady.value = true;
+    await flushPromises();
+    expect(router.currentRoute.value.path).toBe('/');
   });
 });

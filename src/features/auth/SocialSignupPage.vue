@@ -140,7 +140,7 @@ async function submit() {
     </form>
     <template v-else>
       <AuthError :text="endText" />
-      <div class="flex flex-col items-center gap-2 text-center text-sm">
+      <div class="flex flex-col items-center gap-2 text-center text-sm touch:gap-6">
         <RouterLink :to="{ name: 'login' }" :class="AUTH_LINK">{{
           $t('auth.submitLogin')
         }}</RouterLink>
