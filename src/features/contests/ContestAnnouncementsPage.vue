@@ -5,6 +5,7 @@ import { ApiError } from '@/api/client';
 import { ANNOUNCEMENT_FIRST_PAGE, ANNOUNCEMENT_PAGE_SIZE } from '@/api/contests.api';
 import EmptyState from '@/components/EmptyState.vue';
 import Card from '@/components/ui/Card.vue';
+import Chip from '@/components/ui/Chip.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import SubmissionPager from '@/features/submissions/SubmissionPager.vue';
@@ -22,6 +23,7 @@ import ContestCompactHeader from './ContestCompactHeader.vue';
 import ContestNotFound from './ContestNotFound.vue';
 import ContestTabs from './ContestTabs.vue';
 import { useContestAnnouncementsQuery, useContestQuery } from './contests.queries';
+import { isAnnouncementStreamPaused } from './use-announcement-feed';
 
 const route = useRoute();
 const router = useRouter();
@@ -50,6 +52,10 @@ watch(
   },
   { immediate: true },
 );
+/** "Trực tiếp" claims a live stream: only while the contest runs and the stream is up (as on the contest page). */
+const isLive = computed(
+  () => contest.value?.phase === 'running' && !isAnnouncementStreamPaused(key.value),
+);
 const isMissing = computed(
   () => contestError.value instanceof ApiError && contestError.value.status === 404,
 );
@@ -66,6 +72,9 @@ const goTo = (next: number) =>
       <ContestTabs :contest-key="key" :phase="contest?.phase" />
       <ContestCompactHeader v-if="contest" :contest="contest" />
       <ContestAnnouncementComposer v-if="contest?.viewer.canEdit" :contest="contest" />
+      <div v-if="isLive" class="flex justify-end">
+        <Chip tone="success">{{ $t('contests.announcements.live') }}</Chip>
+      </div>
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
           <Card as="div" class="px-5">

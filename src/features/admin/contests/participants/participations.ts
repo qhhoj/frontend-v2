@@ -13,7 +13,9 @@ export function participationKindKey(virtual: number): {
   return { key: 'admin.contests.participants.kinds.virtual', params: { number: virtual } };
 }
 
-export function formatPenalty(seconds: number, locale: Locale): string {
+/** icpc counts the penalty in minutes, every other format in seconds (as `formatCumtime` of the ranking). */
+export function formatPenalty(cumtime: number, formatName: string, locale: Locale): string {
+  const seconds = formatName === 'icpc' ? cumtime * 60 : cumtime;
   if (seconds <= 0) return '–';
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);

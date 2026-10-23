@@ -40,7 +40,11 @@ describe('contestAction', () => {
       'registrationClosed',
     ],
     ['a running contest for an editor or tester', { canSpectate: true }, 'spectate'],
-    ['an ended contest for an editor or tester', { phase: 'ended', canSpectate: true }, 'spectate'],
+    [
+      'an ended contest for an editor or tester',
+      { phase: 'ended', canSpectate: true },
+      'endedForStaff',
+    ],
     ['an upcoming contest without registration', { phase: 'upcoming' }, 'opensLater'],
     [
       'an upcoming contest with registration open',
@@ -95,10 +99,6 @@ describe('contestAction', () => {
     // A tester spectates but still needs the code for a new row, running or upcoming.
     expect(contestAction(facts(coded)).needsAccessCode).toBe(true);
     expect(contestAction(facts({ ...coded, phase: 'upcoming' })).needsAccessCode).toBe(true);
-    expect(contestAction(facts({ ...coded, phase: 'ended' })).needsAccessCode).toBe(true);
-    expect(
-      contestAction(facts({ ...coded, phase: 'ended', skipsAccessCode: true })).needsAccessCode,
-    ).toBe(false);
   });
 });
 

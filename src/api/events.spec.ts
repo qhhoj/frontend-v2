@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { defineComponent, nextTick, ref } from 'vue';
 import type { Ref } from 'vue';
 import { FakeEventSource, latestEventSource } from '@/test/fake-event-source';
-import { isLiveStreamPaused, reconnectLiveStream, useLiveStream } from './events';
+import { RETRY_DELAYS_MS, isLiveStreamPaused, reconnectLiveStream, useLiveStream } from './events';
 import type { LiveStream, LiveStreamOptions, LiveTarget } from './events';
 
 type TicketRoute = '/events/tickets/{id}';
@@ -129,15 +129,86 @@ describe('useLiveStream: lifecycle', () => {
   });
 });
 
+const [FIRST_DELAY = 0, SECOND_DELAY = 0] = RETRY_DELAYS_MS;
+
 describe('useLiveStream: dropped connections', () => {
-  it('waits while the browser retries, and pauses once it gives up', () => {
+  it('gives up at once when the server refused the stream', () => {
     const onGiveUp = vi.fn();
     const { live } = hold(ref(ticket('t1')), { onGiveUp });
-    latestEventSource().fail(true);
-    expect(live.paused.value).toBe(false);
     latestEventSource().fail();
     expect(live.paused.value).toBe(true);
     expect(onGiveUp).toHaveBeenCalledOnce();
+  });
+
+  it('reopens after a network error with growing waits, then pauses once the retries are used up', () => {
+    vi.useFakeTimers();
+    try {
+      const onGiveUp = vi.fn();
+      const { live } = hold(ref(ticket('t1')), { onGiveUp });
+      for (const delay of RETRY_DELAYS_MS) {
+        const failed = latestEventSource();
+        failed.fail(true);
+        expect(live.paused.value).toBe(false);
+        vi.advanceTimersByTime(delay - 1);
+        expect(latestEventSource()).toBe(failed);
+        vi.advanceTimersByTime(1);
+        expect(latestEventSource()).not.toBe(failed);
+      }
+      latestEventSource().fail(true);
+      expect(live.paused.value).toBe(true);
+      expect(onGiveUp).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('restarts the retry count once a reopened connection is open', () => {
+    vi.useFakeTimers();
+    try {
+      const { live } = hold(ref(ticket('t1')));
+      for (let round = 0; round < RETRY_DELAYS_MS.length * 2; round += 1) {
+        latestEventSource().fail(true);
+        vi.advanceTimersByTime(FIRST_DELAY);
+        latestEventSource().emit('open', {});
+      }
+      expect(live.paused.value).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('refreshes the cached reads when a reopened connection opens, not on the first open', () => {
+    vi.useFakeTimers();
+    try {
+      const { invalidate } = hold(ref(ticket('t1')), { cacheKey: () => ['tickets'] });
+      latestEventSource().emit('open', {});
+      expect(invalidate).not.toHaveBeenCalled();
+      latestEventSource().fail(true);
+      vi.advanceTimersByTime(FIRST_DELAY);
+      latestEventSource().emit('open', {});
+      expect(invalidate).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('delivers frames from a reopened connection and stops reopening after close()', () => {
+    vi.useFakeTimers();
+    try {
+      const onMessage = vi.fn();
+      const { live } = hold(ref(ticket('t1')), { frames: { 'ticket-message': onMessage } });
+      latestEventSource().fail(true);
+      vi.advanceTimersByTime(FIRST_DELAY);
+      latestEventSource().emit('ticket-message', frame);
+      expect(onMessage).toHaveBeenCalledOnce();
+      const before = FakeEventSource.instances.length;
+      latestEventSource().fail(true);
+      live.close();
+      vi.advanceTimersByTime(SECOND_DELAY);
+      expect(FakeEventSource.instances).toHaveLength(before);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('reconnects with a new connection, clears the pause and refreshes the cached reads', async () => {

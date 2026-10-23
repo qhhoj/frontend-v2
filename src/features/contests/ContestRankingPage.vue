@@ -76,6 +76,22 @@ const {
   computed(() => running.value || (withVirtual.value && virtualRun.value !== null)),
 );
 
+/** The backend says the full board is closed to this viewer: it answers 403 or shows only their row. */
+const isBoardHidden = computed(
+  () => contest.value !== undefined && !contest.value.viewer.canSeeFullScoreboard,
+);
+/** When the board opens depends on the setting: never (H), after the viewer's own run (P), else after the contest. */
+const HIDDEN_BODY_KEYS = {
+  H: 'ranking.hiddenBody.always',
+  P: 'ranking.hiddenBody.afterParticipation',
+} as const;
+const hiddenBodyKey = computed(() => {
+  const visibility = contest.value?.scoreboardVisibility;
+  return visibility === 'H' || visibility === 'P'
+    ? HIDDEN_BODY_KEYS[visibility]
+    : 'ranking.hiddenBody.afterContest';
+});
+
 const search = ref('');
 const locale = useLocaleStore();
 /** How this contest prints cells and scores; the podium and the table share it. */
@@ -224,12 +240,20 @@ async function goToMyRow() {
           </template>
         </PageHeader>
         <RankingFreezeNotice :contest="contest" :is-board-frozen="ranking?.frozen ?? false" />
+        <Notice
+          v-if="isBoardHidden"
+          role="status"
+          :title="$t('ranking.hiddenTitle')"
+          data-testid="ranking-hidden"
+        >
+          {{ $t(hiddenBodyKey) }}
+        </Notice>
       </template>
     </QueryState>
     <QueryState
       v-if="contest && !isComparing"
       :loading="rankingPending"
-      :error="ranking ? null : rankingError"
+      :error="ranking || isBoardHidden ? null : rankingError"
       @retry="refetchRanking()"
     >
       <template #skeleton>
@@ -254,7 +278,7 @@ async function goToMyRow() {
           <RankingSkeleton :problem-count="problemCount" :has-time-column="skeletonHasTimeColumn" />
         </div>
       </template>
-      <Card v-if="!ranking?.rows.length" as="div">
+      <Card v-if="!ranking?.rows.length && !isBoardHidden" as="div">
         <EmptyState>{{ $t('ranking.empty') }}</EmptyState>
       </Card>
       <div v-else-if="ranking" :aria-busy="rankingStale" class="flex flex-col gap-5">

@@ -244,7 +244,9 @@ const showUser = (username: string) => change({ user: username, search: '', kind
           >{{ formatNumber(row.score, locale.locale) }}</span
         >
       </template>
-      <template #cell-penalty="{ row }">{{ formatPenalty(row.cumtime, locale.locale) }}</template>
+      <template #cell-penalty="{ row }">{{
+        formatPenalty(row.cumtime, contest.formatName, locale.locale)
+      }}</template>
       <template #cell-start="{ row }">
         <span class="font-mono text-meta tabular-nums">{{ formatInZone(row.realStart) }}</span>
       </template>

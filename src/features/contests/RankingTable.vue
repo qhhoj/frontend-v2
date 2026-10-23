@@ -212,6 +212,14 @@ const scoreHeaderKey = computed(() => {
         </tbody>
       </table>
     </ScrollRegion>
+    <p
+      v-if="!rows.length && ranking.rows.length"
+      role="status"
+      data-testid="ranking-no-match"
+      class="border-t border-line px-5 py-6 text-center text-muted"
+    >
+      {{ $t('ranking.noMatch') }}
+    </p>
     <ul
       v-if="penalty"
       class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-meta text-muted"

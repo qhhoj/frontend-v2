@@ -44,6 +44,7 @@ const TEXT_KEYS: Record<ContestActionKind, string> = {
   opensLater: 'contests.actions.opensAt',
   registrationClosed: 'contests.actions.registrationClosed',
   virtualDisallowed: 'contests.actions.virtualDisallowed',
+  endedForStaff: 'contests.actions.endedForStaff',
 };
 /** A notice shown above the button: the time is over, and the button continues as a spectator. */
 const NOTICE_KEYS: Partial<Record<ContestActionKind, string>> = {

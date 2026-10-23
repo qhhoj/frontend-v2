@@ -80,30 +80,60 @@ const parseFrame = (event: Event): object | null => {
   }
 };
 
+/** Waits before each reopen after a network error; once they are used up the stream gives up (the browser alone would retry forever). */
+export const RETRY_DELAYS_MS = [1000, 2000, 4000, 8000, 16000];
+
 /**
  * One EventSource on `/api/internal<path>`: each named event goes to its handler as parsed JSON (a malformed frame is dropped), and nothing after `close`.
- * While the connection drops the browser reconnects by itself, waiting the server's `retry: 3000`; `onGiveUp` fires once it stops for good.
+ * A network error closes the source and reopens it after the next of `RETRY_DELAYS_MS`; a connection that opens again restarts that count.
+ * `onGiveUp` fires once the retries are used up, or at once when the server refused the stream (the browser reports it closed).
+ * `onRecover` fires when a reopened connection opens: frames sent during the outage were missed.
  */
-function connect(path: string, handlers: RawHandlers, onGiveUp: () => void) {
-  const source = new EventSource(buildUrl(path));
+function connect(
+  path: string,
+  handlers: RawHandlers,
+  { onGiveUp, onRecover }: { onGiveUp: () => void; onRecover: () => void },
+) {
+  let source: EventSource;
   let isClosed = false;
-  for (const [name, handle] of Object.entries(handlers))
-    source.addEventListener(name, (event) => {
-      const data = parseFrame(event);
-      if (data && hasRequiredId(name, data) && !isClosed) handle(data);
+  let failures = 0;
+  let retryTimer: ReturnType<typeof setTimeout> | undefined;
+  const onError = (failed: EventSource) => {
+    if (isClosed || failed !== source) return;
+    const isRefused = failed.readyState === EventSource.CLOSED;
+    const delay = RETRY_DELAYS_MS[failures];
+    failed.close();
+    if (isRefused || delay === undefined) return onGiveUp();
+    failures += 1;
+    retryTimer = setTimeout(open, delay);
+  };
+  function open() {
+    const opened = new EventSource(buildUrl(path));
+    source = opened;
+    opened.addEventListener('open', () => {
+      if (failures > 0) onRecover();
+      failures = 0;
     });
-  source.addEventListener('error', () => {
-    if (!isClosed && source.readyState === EventSource.CLOSED) onGiveUp();
-  });
+    for (const [name, handle] of Object.entries(handlers))
+      opened.addEventListener(name, (event) => {
+        const data = parseFrame(event);
+        if (data && hasRequiredId(name, data) && !isClosed) handle(data);
+      });
+    opened.addEventListener('error', () => onError(opened));
+  }
+  open();
   return {
     close() {
       isClosed = true;
+      clearTimeout(retryTimer);
       source.close();
     },
   };
 }
 
-type HolderHooks = Pick<LiveStreamOptions<StreamPath>, 'onClose' | 'onGiveUp'>;
+type HolderHooks = Pick<LiveStreamOptions<StreamPath>, 'onClose' | 'onGiveUp'> & {
+  onRecover: () => void;
+};
 
 /** At most one open connection; while open it speaks for its path in the registry. */
 function createHolder(handlers: RawHandlers, owner: OpenStream, hooks: HolderHooks) {
@@ -114,7 +144,10 @@ function createHolder(handlers: RawHandlers, owner: OpenStream, hooks: HolderHoo
   };
   return {
     open(path: string) {
-      stream = { path, ...connect(path, handlers, giveUp) };
+      stream = {
+        path,
+        ...connect(path, handlers, { onGiveUp: giveUp, onRecover: hooks.onRecover }),
+      };
       openByPath.set(path, owner);
     },
     close: () => {
@@ -154,7 +187,14 @@ export function useLiveStream<Path extends StreamPath>(
     attempt.value += 1;
     void refresh();
   };
-  const holder = createHolder(handlersOf(options, refresh), { paused, reconnect }, options);
+  const holder = createHolder(
+    handlersOf(options, refresh),
+    { paused, reconnect },
+    {
+      ...options,
+      onRecover: () => void refresh(),
+    },
+  );
   /** A string, so a target rebuilt with the same path and viewer does not reopen the stream. */
   const openKey = computed(() => {
     const next = toValue(target);

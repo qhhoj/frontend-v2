@@ -254,6 +254,7 @@
       "continueSpectating": "Continue as spectator",
       "registrationClosed": "Registration for this contest is closed.",
       "virtualDisallowed": "The organizers do not allow virtual runs of this contest.",
+      "endedForStaff": "The contest has ended, so there is nothing left to spectate.",
       "virtualNote": "Virtual run: solve the set within {span} from your start. Results show on the board only with “Include virtual”.",
       "spectateNote": "You set this contest, so you enter as a spectator and score nothing.",
       "inContest": "You are in this contest",
@@ -1320,6 +1321,13 @@
     "official": "Official",
     "withVirtual": "Include virtual",
     "searchLabel": "Find a contestant",
+    "noMatch": "No contestant matches your search.",
+    "hiddenTitle": "The ranking is hidden",
+    "hiddenBody": {
+      "always": "The ranking of this contest is hidden.",
+      "afterParticipation": "The ranking opens once your participation ends.",
+      "afterContest": "The ranking opens once the contest ends."
+    },
     "frozenTitle": "The board is frozen",
     "frozenBody": "In the last {minutes} minute new results show \"?\" until they are revealed. | In the last {minutes} minutes new results show \"?\" until they are revealed.",
     "podium": "Top 3",
