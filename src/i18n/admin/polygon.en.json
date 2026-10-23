@@ -54,7 +54,6 @@
     "runningHint": "the page asks again every 2 seconds",
     "doneText": "Import finished. Open the problem to check it and keep editing.",
     "open": "Open {code}",
-    "failed": "The import failed. The system gives no further reason.",
     "stoppedAt": "Stopped at: {step}.",
     "failedSteps": {
       "checking": "checks before the import",

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import openapi from '@/api/generated/openapi.json';
 import { i18n } from '@/i18n';
-import { importErrorOf } from './polygon-import-errors';
-import type { ImportErrorCode } from './polygon-import-errors';
+import { importErrorOf } from './import-errors';
+import type { ImportErrorCode } from './import-errors';
 
 const CODES = openapi.components.schemas.PolygonImportErrorCode.enum as ImportErrorCode[];
 

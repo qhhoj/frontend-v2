@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Check, CircleHelp, Clock, LoaderCircle, TriangleAlert, X } from 'lucide-vue-next';
 import type { Component } from 'vue';
-import type { OutcomeKind } from './import-outcome';
+import type { OutcomeKind } from '../import/import-reading';
 
 /** The progress step's first row (option B): the outcome's mark, its title and one line under it. */
 defineProps<{ kind: OutcomeKind; title: string; line: string }>();

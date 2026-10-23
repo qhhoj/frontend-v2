@@ -12,7 +12,7 @@ import AdminChip from '../../ui/AdminChip.vue';
 import AdminUserLabel from '../../ui/AdminUserLabel.vue';
 import AdminDataTable from '../../ui/table/AdminDataTable.vue';
 import type { AdminColumn } from '../../ui/table/table-columns';
-import { importErrorOf } from './polygon-import-errors';
+import { importErrorOf } from '../import/import-errors';
 import { usePolygonSyncsQuery } from './polygon.queries';
 
 /**

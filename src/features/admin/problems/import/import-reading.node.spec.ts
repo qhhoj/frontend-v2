@@ -2,13 +2,12 @@ import { describe, expect, it } from 'vitest';
 import type { Schemas } from '@/api/schemas';
 import { importJob } from '@/test/admin-fixtures/polygon';
 import {
-  localEditsRowsOf,
   outcomeActionOf,
+  readImportJob,
   outcomeKindOf,
   queueLinesOf,
   runningLineOf,
-  summaryRowsOf,
-} from './import-outcome';
+} from './import-reading';
 
 const result = (attention: Schemas['ImportResultResponse']['attention'] = null) => ({
   problemId: 'p-1',
@@ -17,21 +16,6 @@ const result = (attention: Schemas['ImportResultResponse']['attention'] = null) 
   attention,
   localEdits: null,
 });
-const summary = (
-  overrides: Partial<Schemas['ImportSummaryResponse']> = {},
-): Schemas['ImportSummaryResponse'] => ({
-  checker: 'bridged',
-  polygonChecker: 'std::wcmp.cpp',
-  interactive: false,
-  checkerIgnored: false,
-  tests: 42,
-  cases: 42,
-  batches: 4,
-  timeLimit: { polygon: 1, applied: 1 },
-  memoryLimit: { polygon: 1048576, applied: 524288 },
-  ...overrides,
-});
-
 describe('outcomeKindOf', () => {
   it('leads with the phase of the job', () => {
     const job = importJob();
@@ -86,101 +70,6 @@ describe('runningLineOf', () => {
   });
 });
 
-describe('summaryRowsOf', () => {
-  it('maps the checker, counts the tests and notes a clamped limit beside its value', () => {
-    expect(summaryRowsOf(summary())).toEqual([
-      { key: 'checker', value: 'std::wcmp.cpp → Checker riêng của bài', note: null },
-      { key: 'tests', value: '42 test · 4 nhóm', note: null },
-      { key: 'time', value: '1.0s', note: null },
-      { key: 'memory', value: '512MB', note: 'Polygon: 1024MB, hạ theo mức tối đa' },
-    ]);
-  });
-
-  it('counts the judged cases apart when dependencies copy tests', () => {
-    expect(summaryRowsOf(summary({ cases: 50, batches: 0 }))[1]!.value).toBe(
-      '42 test · 50 lượt chấm',
-    );
-  });
-
-  it("says an interactive problem's checker runs on what the interactor wrote", () => {
-    const rows = summaryRowsOf(
-      summary({ interactive: true, timeLimit: { polygon: 0.5, applied: 1 } }),
-    );
-    expect(rows[0]).toEqual({
-      key: 'checker',
-      value:
-        'Bài tương tác: std::wcmp.cpp → Checker riêng của bài, chạy trên output của interactor',
-      note: null,
-    });
-    expect(rows[2]!.note).toBe('Polygon: 0.5s, nâng theo mức tối thiểu');
-  });
-
-  it('says the interactor alone judges when a sync kept a grader that does not run the checker', () => {
-    expect(
-      summaryRowsOf(summary({ interactive: true, checkerIgnored: true }), ['grader'])[0],
-    ).toEqual({
-      key: 'checker',
-      value: 'Bài tương tác: chỉ interactor chấm',
-      note: 'Checker của gói không chạy vì grader giữ bản sửa trên QHHOJ',
-    });
-  });
-
-  it('notes a kept checker of an interactive problem as kept, not mapped', () => {
-    expect(summaryRowsOf(summary({ interactive: true }), ['checker'])[0]).toEqual({
-      key: 'checker',
-      value: 'Bài tương tác: Checker riêng của bài, chạy trên output của interactor',
-      note: 'Giữ bản sửa trên QHHOJ · Polygon: std::wcmp.cpp',
-    });
-  });
-
-  it('names a site checker by its data-tab label', () => {
-    expect(summaryRowsOf(summary({ checker: 'standard', polygonChecker: null }))[0]!.value).toBe(
-      'So khớp đáp án (bỏ qua khoảng trắng thừa)',
-    );
-  });
-
-  it('says a limit and a checker a sync kept as edited on QHHOJ were kept, not clamped or mapped', () => {
-    const rows = summaryRowsOf(summary({ timeLimit: { polygon: 1, applied: 2 } }), [
-      'checker',
-      'timeLimit',
-      'memoryLimit',
-    ]);
-    expect(rows[0]).toEqual({
-      key: 'checker',
-      value: 'Checker riêng của bài',
-      note: 'Giữ bản sửa trên QHHOJ · Polygon: std::wcmp.cpp',
-    });
-    expect(rows[2]).toEqual({
-      key: 'time',
-      value: '2.0s',
-      note: 'Giữ bản sửa trên QHHOJ · Polygon: 1.0s',
-    });
-    expect(rows[3]!.note).toBe('Giữ bản sửa trên QHHOJ · Polygon: 1024MB');
-  });
-
-  it('leaves a kept limit equal to the package without a note', () => {
-    expect(summaryRowsOf(summary(), ['timeLimit'])[2]!.note).toBeNull();
-  });
-});
-
-describe('localEditsRowsOf', () => {
-  it('names the kept settings, then those taken from the package, in the data-tab order', () => {
-    expect(
-      localEditsRowsOf({ kept: ['checker', 'timeLimit'], updated: ['grader', 'partial'] }),
-    ).toEqual([
-      { kind: 'kept', names: 'giới hạn thời gian, checker' },
-      { kind: 'updated', names: 'chấm điểm từng phần, grader' },
-    ]);
-  });
-
-  it('has no row for an empty list', () => {
-    expect(localEditsRowsOf({ kept: [], updated: ['memoryLimit'] })).toEqual([
-      { kind: 'updated', names: 'giới hạn bộ nhớ' },
-    ]);
-    expect(localEditsRowsOf({ kept: [], updated: [] })).toEqual([]);
-  });
-});
-
 describe('outcomeActionOf', () => {
   const all = { retry: true, edit: true, sync: true };
   const failure = (
@@ -232,5 +121,71 @@ describe('outcomeActionOf', () => {
         outcomeActionOf(kind as never, none, all),
       ),
     ).toEqual([null, null, null, null]);
+  });
+});
+
+describe('readImportJob', () => {
+  const can = { retry: true, edit: true, sync: true };
+  const base = { code: 'kminmax', lastSeenAt: '2026-10-21T03:05:00Z', locale: 'vi' as const, can };
+  const read = (
+    job: ReturnType<typeof importJob> | null,
+    phase: Parameters<typeof readImportJob>[0]['phase'],
+    over: Partial<Parameters<typeof readImportJob>[0]> = {},
+  ) => readImportJob({ ...base, source: 'polygon', job, phase, stop: null, ...over });
+  const failedJob = (over = {}) =>
+    importJob({ state: 'failed', step: 'failed', failedStep: 'statements', ...over });
+
+  it('maps a failed job to its cause, fix, failed-step line and action for every source', () => {
+    const job = failedJob({ errorCode: 'polygon_unavailable', retryable: true });
+    for (const source of ['zip', 'polygon'] as const) {
+      const reading = read(job, 'failed', { source });
+      expect(reading.kind).toBe('failed');
+      expect(reading.cause).not.toBe('');
+      expect(reading.line).toContain('Dừng ở bước');
+    }
+    expect(read(job, 'failed').action).toBe('retry');
+  });
+
+  it('titles a zip import by how it ended, never "Đang nhập" after a failure', () => {
+    const title = (job: Parameters<typeof read>[0], phase: Parameters<typeof read>[1]) =>
+      read(job, phase, { source: 'zip' }).title;
+    expect(title(importJob({ state: 'active', step: 'statements' }), 'running')).toBe(
+      'Đang nhập kminmax',
+    );
+    expect(title(failedJob(), 'failed')).toBe('Không nhập được kminmax');
+    expect(title(importJob({ state: 'completed', result: result() }), 'done')).toBe(
+      'Đã nhập kminmax',
+    );
+  });
+
+  it('titles a sync as a sync, and an unnamed job before any answer without a code', () => {
+    const sync = importJob({ purpose: 'sync', state: 'active' });
+    expect(read(sync, 'running').title).toBe('Đang đồng bộ kminmax');
+    expect(read(null, null, { code: '' }).title).toBe('Đang hỏi trạng thái lượt nhập');
+  });
+
+  it('shows the converter words only when the code names nothing specific', () => {
+    const other = failedJob({ errorCode: 'checker_unsupported', error: 'wcmp failed' });
+    expect(read(other, 'failed').detail).toBe('wcmp failed');
+    const generic = failedJob({ errorCode: 'import_failed', error: 'boom' });
+    expect(read(generic, 'failed').detail).toBe('');
+    expect(read(failedJob({ errorCode: 'problem_code_taken', error: 'x' }), 'failed').detail).toBe(
+      '',
+    );
+  });
+
+  it('says a failed job with no code gives no reason, never "null"', () => {
+    const reading = read(failedJob({ error: null }), 'failed', { source: 'zip' });
+    expect(reading.cause + reading.fix + reading.detail).not.toContain('null');
+    expect(reading.fix).toContain('Hệ thống không cho biết thêm lý do');
+  });
+
+  it('reads a stop as its own line: the zip view has no "check again"', () => {
+    const job = importJob({ state: 'active' });
+    expect(read(job, 'running', { source: 'zip', stop: 'gaveUp' }).line).toContain('Tải lại trang');
+    expect(read(job, 'running', { stop: 'notFound' }).line).toContain(
+      'Không tìm thấy lượt nhập này',
+    );
+    expect(read(job, 'running', { stop: 'gaveUp' }).line).toContain('Lần cuối thấy');
   });
 });

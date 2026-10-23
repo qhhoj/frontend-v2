@@ -66,18 +66,20 @@ describe('ZipImportPage', () => {
     expect(calls.filter((call) => call.path === '/problems/imports/job-1')).toHaveLength(polls);
   });
 
-  it('shows the importer error, or a generic line when the error is null, never "null"', async () => {
+  it('renders a failed job: the heading says it failed, then the mapped cause and fix, never "null"', async () => {
     mockApi({
       ...staffViewer(PERMS),
       'GET /problems/meta': ok(problemEditingMeta()),
       'POST /problems/imports': { status: 202, body: { data: { jobId: 'job-1' } } },
-      'GET /problems/imports/job-1': job('failed', { error: null }),
+      'GET /problems/imports/job-1': job('failed', {
+        error: null,
+        errorCode: 'problem_code_taken',
+      }),
     });
     const { wrapper } = await mountApp('/admin/problems/import');
     await start(wrapper);
-    expect(wrapper.get('[role="alert"]').text()).toContain(
-      'Không nhập được. Hệ thống không cho biết thêm lý do.',
-    );
+    expect(wrapper.get('#import-progress-title').text()).toBe('Không nhập được hcmus41c');
+    expect(wrapper.get('[role="alert"]').text()).toContain('Mã bài đã có');
     expect(wrapper.text()).not.toContain('null');
   });
 

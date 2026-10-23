@@ -54,7 +54,6 @@
     "runningHint": "trang hỏi lại mỗi 2 giây",
     "doneText": "Nhập xong. Mở bài để xem và chỉnh tiếp.",
     "open": "Mở {code}",
-    "failed": "Không nhập được. Hệ thống không cho biết thêm lý do.",
     "stoppedAt": "Dừng ở bước: {step}.",
     "failedSteps": {
       "checking": "kiểm tra trước khi nhập",
