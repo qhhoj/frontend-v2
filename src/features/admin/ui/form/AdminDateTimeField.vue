@@ -47,7 +47,16 @@ const text = ref(render(model.value));
 const isUnreadable = ref(false);
 /** True from the first keystroke that does not read as a date. */
 const isTextUnreadable = ref(false);
-reportUnreadableDate(isTextUnreadable);
+/** The box says what the model says, with no error. */
+function showModel() {
+  text.value = render(model.value);
+  clearUnreadable();
+}
+function clearUnreadable() {
+  isUnreadable.value = false;
+  isTextUnreadable.value = false;
+}
+reportUnreadableDate(isTextUnreadable, showModel);
 const zone = computed(() =>
   zoneLabel(props.timeZone, model.value ? new Date(model.value) : new Date()),
 );
@@ -63,8 +72,7 @@ const shownError = computed(
 watch(model, (iso) => {
   const typed = parse(text.value);
   if (!typed.ok || typed.iso !== iso) text.value = render(iso);
-  isUnreadable.value = false;
-  isTextUnreadable.value = false;
+  clearUnreadable();
 });
 
 function onInput() {
@@ -84,10 +92,10 @@ function onBlur() {
 function setNow() {
   const now = new Date();
   now.setSeconds(0, 0);
-  model.value = now.toISOString();
-  text.value = render(model.value);
-  isUnreadable.value = false;
-  isTextUnreadable.value = false;
+  const iso = now.toISOString();
+  model.value = iso;
+  text.value = render(iso);
+  clearUnreadable();
 }
 </script>
 

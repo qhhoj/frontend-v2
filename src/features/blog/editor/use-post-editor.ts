@@ -100,10 +100,15 @@ function usePostWriter(
 ) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  /** The navigation a save causes is no loss: the leave guard stays quiet while it runs. */
+  /**
+   * The navigation a save causes is no loss: the leave guard stays quiet from the save until the saved post is loaded as the
+   * new baseline (`usePostEditor` clears it), or until the navigation is refused.
+   */
   const navigate = (go: () => Promise<unknown>) => {
     isLeavingAfterSave.value = true;
-    void go().finally(() => (isLeavingAfterSave.value = false));
+    void go().then((failure) => {
+      if (failure) isLeavingAfterSave.value = false;
+    });
   };
   return useAdminMutation({
     mutate: () => {
@@ -135,6 +140,7 @@ export function usePostEditor(postId: () => string | null, organization: Ref<str
   const isPostLive = computed(() => (post.value ? isLive(post.value) : false));
   const { mode, fieldsFor } = usePublishMode(form, baseline, isPostLive);
   const isLeavingAfterSave = ref(false);
+  watch(baseline, () => (isLeavingAfterSave.value = false));
   const writer = usePostWriter(
     postId,
     state,

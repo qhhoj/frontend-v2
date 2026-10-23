@@ -73,9 +73,11 @@ describe('AdminDateTimeField', () => {
   describe('telling the form about unreadable text', () => {
     /** A form that owns the save: it renders whether a save would be refused. */
     const isShown = ref(true);
+    let resetForm = () => undefined as void;
     const Form = defineComponent({
       setup() {
-        const { hasUnreadableDate } = provideDateValidity();
+        const { hasUnreadableDate, resetDates } = provideDateValidity();
+        resetForm = resetDates;
         return () =>
           h('div', [
             isShown.value ? h(AdminDateTimeField, { modelValue: null, label: 'Từ' }) : null,
@@ -112,6 +114,19 @@ describe('AdminDateTimeField', () => {
       const wrapper = mountForm();
       await wrapper.get('input').setValue('abc');
       await wrapper.get('input').setValue('');
+      expect(wrapper.get('output').text()).toBe('ok');
+    });
+
+    it('shows the model again with no error when the form resets, even if the model did not change', async () => {
+      const wrapper = mountForm();
+      await wrapper.get('input').setValue('abc');
+      await wrapper.get('input').trigger('blur');
+      expect(wrapper.get('output').text()).toBe('refused');
+      resetForm();
+      await wrapper.vm.$nextTick();
+      await wrapper.vm.$nextTick();
+      expect(wrapper.get('input').element.value).toBe('');
+      expect(wrapper.get('input').attributes('aria-invalid')).toBe('false');
       expect(wrapper.get('output').text()).toBe('ok');
     });
 

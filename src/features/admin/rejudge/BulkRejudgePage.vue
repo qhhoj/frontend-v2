@@ -24,7 +24,7 @@ import type { RejudgeOutcome } from './use-bulk-rejudge';
 const filter = ref<RejudgeFilter>(filterFromQuery(useRoute().query));
 const errors = ref<FieldErrors>({});
 /** A date box with unreadable text would otherwise leave that bound out, and the batch would reach the whole site. */
-const { hasUnreadableDate } = provideDateValidity();
+const { hasUnreadableDate, resetDates } = provideDateValidity();
 const outcome = ref<RejudgeOutcome | null>(null);
 const dialogs = useTemplateRef('dialogs');
 const metaQuery = useProblemMetaQuery();
@@ -45,6 +45,7 @@ function ask(action: 'rejudge' | 'rescore') {
 function resetFilter() {
   filter.value = emptyRejudgeFilter();
   errors.value = {};
+  resetDates();
 }
 </script>
 

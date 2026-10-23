@@ -34,7 +34,7 @@ export function useContestForm(contest: () => EditableContest) {
   const isDirty = computed(() => dirtyCount.value > 0);
   const savedAt = ref<Date | null>(null);
   /** True while a time box holds text that is not a date: the save is refused, never sent without it. */
-  const { hasUnreadableDate } = provideDateValidity();
+  const { hasUnreadableDate, resetDates } = provideDateValidity();
 
   function reseed(saved: EditableContest) {
     seed.value = toContestForm(saved);
@@ -63,6 +63,7 @@ export function useContestForm(contest: () => EditableContest) {
   function discard() {
     form.value = cloneValue(seed.value);
     mutation.reset();
+    resetDates();
   }
 
   watch(contest, (next) => {

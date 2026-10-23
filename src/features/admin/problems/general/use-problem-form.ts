@@ -47,7 +47,7 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
   const changeMessage = ref('');
   const savedAt = ref<Date | null>(null);
   /** True while a date box holds text that is not a date: the save is refused, never sent without it. */
-  const { hasUnreadableDate } = provideDateValidity();
+  const { hasUnreadableDate, resetDates } = provideDateValidity();
 
   const mutation = useAdminMutation({
     mutate: (code: string) =>
@@ -73,6 +73,7 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
   function discard() {
     form.value = cloneForm(seed.value);
     changeMessage.value = '';
+    resetDates();
   }
 
   async function save() {

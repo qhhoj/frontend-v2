@@ -44,7 +44,11 @@ const { draft, dirtyCount, discard, commit } = useDirtyForm<EditorialForm>({
 let storedContent = stored?.content ?? '';
 const contentError = computed(() => markdownError(draft.value.content));
 const savedAt = ref<Date | null>(null);
-const { hasUnreadableDate } = provideDateValidity();
+const { hasUnreadableDate, resetDates } = provideDateValidity();
+const discardAll = () => {
+  discard();
+  resetDates();
+};
 
 const mutation = useAdminMutation({
   mutate: (body: EditorialDraftBody) => putEditorial(props.problem.code, body),
@@ -113,7 +117,7 @@ async function save() {
       :pending="mutation.isPending.value"
       :saved-at="savedAt"
       :save-label="$t('admin.problems.editorial.save')"
-      @discard="discard"
+      @discard="discardAll"
     />
     <AdminLeaveGuard :dirty-count="dirtyCount" />
   </form>
