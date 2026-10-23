@@ -128,6 +128,78 @@ describe('ProblemStatementsTab', () => {
     expect(calls.find((call) => call.method === 'PUT')?.body).toMatchObject({ name: 'Tên mới' });
   });
 
+  it('lets a missing English translation leave untouched, and counts a typed title in the bar and the guard', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      ...PREVIEW,
+      'GET /problems/hcmus41c/data': ok(problemData()),
+    });
+    const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/statements');
+    await wrapper.get('[data-slot="en"]').trigger('click');
+    expect(buttonLabelled(wrapper, 'Lưu bản dịch tiếng Anh').attributes('aria-disabled')).toBe(
+      'true',
+    );
+    await wrapper.get('#statement-name').setValue('Constrained shortest path');
+    expect(
+      buttonLabelled(wrapper, 'Lưu bản dịch tiếng Anh').attributes('aria-disabled'),
+    ).toBeUndefined();
+    expect(wrapper.get('[data-testid="statement-save-bar"]').text()).toContain(
+      '1 thay đổi chưa lưu',
+    );
+    await wrapper.get('a[href="/admin/problems/hcmus41c/data"]').trigger('click');
+    await flushPromises();
+    expect(openDialog().textContent).toContain('1 thay đổi chưa lưu');
+    await cancelDialog('Ở lại');
+    await buttonLabelled(wrapper, 'Hủy thay đổi').trigger('click');
+    await wrapper.get('a[href="/admin/problems/hcmus41c/data"]').trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c/data');
+  });
+
+  it('treats legacy CRLF text that the textarea hands back as LF as unchanged', async () => {
+    const legacy = editableProblem();
+    legacy.editor!.translations[0]!.description = 'Dòng 1\r\nDòng 2';
+    mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(legacy),
+      ...PREVIEW,
+      'GET /problems/hcmus41c/data': ok(problemData()),
+    });
+    const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/statements');
+    await wrapper.get('textarea').setValue('Dòng 1\nDòng 2');
+    expect(buttonLabelled(wrapper, 'Lưu bản dịch tiếng Việt').attributes('aria-disabled')).toBe(
+      'true',
+    );
+    await wrapper.get('[data-slot="en"]').trigger('click');
+    await wrapper.get('a[href="/admin/problems/hcmus41c/data"]').trigger('click');
+    await flushPromises();
+    expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c/data');
+  });
+
+  it('shows on another language a change still unsaved in the one left, as the leave guard counts it', async () => {
+    mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      ...PREVIEW,
+      'GET /problems/hcmus41c/data': ok(problemData()),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/statements');
+    await wrapper.get('textarea').setValue('Đang sửa');
+    await wrapper.get('[data-slot="en"]').trigger('click');
+    const bar = wrapper.get('[data-testid="statement-save-bar"]');
+    expect(bar.text()).toContain('Tiếng Việt: 1 thay đổi chưa lưu');
+    expect(buttonLabelled(wrapper, 'Lưu bản dịch tiếng Anh').attributes('aria-disabled')).toBe(
+      'true',
+    );
+    expect(wrapper.get('[data-slot="vi"]').text()).toContain('chưa lưu');
+    await wrapper.get('#statement-name').setValue('Constrained shortest path');
+    expect(bar.text()).toContain('1 thay đổi chưa lưu · Tiếng Việt: 1 thay đổi chưa lưu');
+    await wrapper.get('a[href="/admin/problems/hcmus41c/data"]').trigger('click');
+    await flushPromises();
+    expect(openDialog().textContent).toContain('2 thay đổi chưa lưu');
+  });
+
   it('asks before a tab switch with an unsaved statement; Stay keeps the draft, Leave goes', async () => {
     mockApi({
       ...staffViewer(EDIT),

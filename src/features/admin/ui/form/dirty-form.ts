@@ -18,6 +18,12 @@ export function isSameValue(left: unknown, right: unknown): boolean {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
+/**
+ * Line breaks as a `<textarea>` hands them back (`\n`). Legacy text stored with `\r\n` seeded as is would differ from the
+ * box's value after any keystroke, so a form counts a change nobody can see: seed multi-line API text through this.
+ */
+export const normalizeNewlines = (text: string): string => text.replace(/\r\n?/g, '\n');
+
 /** How many top-level fields differ: the "3 thay đổi chưa lưu" count. */
 export function countChanges(current: object, baseline: object): number {
   const now = current as Record<string, unknown>;

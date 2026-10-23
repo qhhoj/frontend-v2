@@ -14,7 +14,7 @@ import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
 import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
-import { useDirtyForm } from '../../ui/form/dirty-form';
+import { normalizeNewlines, useDirtyForm } from '../../ui/form/dirty-form';
 import MarkdownField from '../../ui/MarkdownField.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import UsernameChips from '../../ui/UsernameChips.vue';
@@ -37,7 +37,7 @@ const { draft, dirtyCount, discard, commit } = useDirtyForm<EditorialForm>({
   isPublic: stored?.isPublic ?? false,
   publishOn: stored?.publishOn ?? null,
   authors: (stored?.authors ?? []).map(({ id, username }) => ({ id, username })),
-  content: stored?.content ?? '',
+  content: normalizeNewlines(stored?.content ?? ''),
 });
 const contentError = computed(() => markdownError(draft.value.content));
 const savedAt = ref<Date | null>(null);

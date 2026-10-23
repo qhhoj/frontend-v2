@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { EditableProblem, ProblemEditingMeta } from '@/api/types/problem-editing';
 import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
@@ -18,13 +19,16 @@ import { FULL_MARKUP_PERMISSION, useStatementDrafts } from './use-statement-draf
 /** One language at a time (segmented control), name + Markdown with a live preview, and a per-language save in the bar. */
 const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
 const root = ref<HTMLElement>();
+const { t } = useI18n();
 const {
   slot,
   drafts,
   current,
   isLocked,
+  changesBySlot,
   dirtyCount,
   totalDirtyCount,
+  otherUnsaved,
   savedAt,
   previewStyle,
   canFullMarkup,
@@ -43,6 +47,24 @@ const slotName = computed(() => `admin.problems.statements.slots.${slot.value}`)
 const lockText = computed(() =>
   isLocked.value ? needsPermissionText(FULL_MARKUP_PERMISSION) : undefined,
 );
+/**
+ * The bar adds the other slots' changes to its own count, so its numbers sum to the leave guard's:
+ * "1 thay đổi chưa lưu · Tiếng Việt: 1 thay đổi chưa lưu".
+ */
+const unsavedText = computed(() => {
+  const shown = dirtyCount.value > 0 ? [t('form.saveBar.unsaved', dirtyCount.value)] : [];
+  const others = otherUnsaved.value.map(({ slot: item, count }) =>
+    t(
+      'admin.problems.statements.otherUnsaved',
+      {
+        slot: t(`admin.problems.statements.slots.${item}`),
+        count,
+      },
+      count,
+    ),
+  );
+  return [...shown, ...others].join(' · ');
+});
 const SEGMENT =
   'inline-flex min-h-8 items-center gap-1.5 rounded-pill px-3 text-sm font-semibold whitespace-nowrap text-muted hover:text-content pointer-coarse:min-h-10 aria-checked:bg-accent-soft aria-checked:text-accent-soft-text';
 </script>
@@ -68,6 +90,14 @@ const SEGMENT =
           {{ $t(`admin.problems.statements.slots.${item}`) }}
           <span v-if="item !== 'original' && !drafts[item].exists" class="text-xs font-normal">
             ({{ $t('admin.problems.statements.missing') }})
+          </span>
+          <span
+            v-if="changesBySlot[item] > 0"
+            data-unsaved
+            class="inline-flex items-center gap-1 text-xs font-normal"
+          >
+            <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-accent" />
+            {{ $t('admin.problems.statements.unsaved') }}
           </span>
         </button>
       </div>
@@ -133,7 +163,11 @@ const SEGMENT =
       :blocked-reason="lockText"
       :save-label="$t(`admin.problems.statements.save.${slot}`)"
       @discard="discard"
-    />
+    >
+      <template v-if="!lockText && otherUnsaved.length" #status>
+        <span class="font-semibold">{{ unsavedText }}</span>
+      </template>
+    </AdminSaveBar>
     <AdminLeaveGuard :dirty-count="totalDirtyCount" />
   </form>
 </template>

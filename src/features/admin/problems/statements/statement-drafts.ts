@@ -1,6 +1,7 @@
 import type { PreviewStyle } from '@/api/types/admin-common';
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../../ui/admin-errors';
+import { normalizeNewlines } from '../../ui/form/dirty-form';
 import {
   DISALLOWED_STATEMENT_CHARACTERS,
   MARKDOWN_MAX_LENGTH,
@@ -20,16 +21,25 @@ export interface StatementDraft {
 
 /**
  * A translation's draft, or the original description (`original`: always exists, its name is on the general tab). A missing
- * translation starts with the problem's name, so writing it never means typing the title again.
+ * translation starts with the problem's name, so writing it never means typing the title again. Descriptions come with the
+ * textarea's line breaks, so legacy `\r\n` text is not a change.
  */
 export function statementDraftOf(problem: EditableProblem, slot: StatementSlot): StatementDraft {
   const editor = problem.editor!;
   if (slot === 'original') {
-    return { name: editor.baseName, description: editor.description, exists: true };
+    return {
+      name: editor.baseName,
+      description: normalizeNewlines(editor.description),
+      exists: true,
+    };
   }
   const translation = editor.translations.find((candidate) => candidate.language === slot);
   if (!translation) return { name: editor.baseName, description: '', exists: false };
-  return { name: translation.name, description: translation.description, exists: true };
+  return {
+    name: translation.name,
+    description: normalizeNewlines(translation.description),
+    exists: true,
+  };
 }
 
 /** The slot the tab opens on: the Vietnamese translation when there is one, else the base statement (never an empty "chưa có"). */

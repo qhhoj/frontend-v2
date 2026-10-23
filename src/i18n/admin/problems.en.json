@@ -176,6 +176,8 @@
       "original": "Original description"
     },
     "missing": "missing",
+    "unsaved": "unsaved",
+    "otherUnsaved": "{slot}: {count} unsaved change | {slot}: {count} unsaved changes",
     "nameLabel": "Name ({language})",
     "nameHint": "Up to 100 characters.",
     "contentLabel": "Content (Markdown)",

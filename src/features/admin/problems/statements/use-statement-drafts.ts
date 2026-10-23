@@ -37,6 +37,29 @@ const changedFields = (draft: StatementDraft, saved: StatementDraft) =>
   Number(draft.name !== saved.name) + Number(draft.description !== saved.description);
 
 /**
+ * The one count of unsaved changes, per slot. The save bar counts the slot on screen (one slot saves at a time) and names the
+ * other slots' changes (`otherUnsaved`); the leave guard counts them all, so it never reports a change the bar hid.
+ */
+function useSlotChanges(drafts: Ref<Drafts>, saved: Ref<Drafts>, slot: Ref<StatementSlot>) {
+  const changesBySlot = computed(
+    () =>
+      Object.fromEntries(
+        STATEMENT_SLOTS.map((item) => [item, changedFields(drafts.value[item], saved.value[item])]),
+      ) as Record<StatementSlot, number>,
+  );
+  const dirtyCount = computed(() => changesBySlot.value[slot.value]);
+  const totalDirtyCount = computed(() =>
+    STATEMENT_SLOTS.reduce((total, item) => total + changesBySlot.value[item], 0),
+  );
+  const otherUnsaved = computed(() =>
+    STATEMENT_SLOTS.filter((item) => item !== slot.value && changesBySlot.value[item] > 0).map(
+      (item) => ({ slot: item, count: changesBySlot.value[item] }),
+    ),
+  );
+  return { changesBySlot, dirtyCount, totalDirtyCount, otherUnsaved };
+}
+
+/**
  * Whether saving the slot would write its description: the original always does (it is the description), a translation does
  * when the text changed or the translation is new. A full-markup problem's description needs the full-markup permission.
  */
@@ -76,13 +99,10 @@ export function useStatementDrafts(problem: () => EditableProblem) {
       triedSlots.value.has(slot.value),
     ),
   );
-  /** The save bar counts the slot on screen (one slot saves at a time); the leave guard counts every slot. */
-  const dirtyCount = computed(() => changedFields(current.value, saved.value[slot.value]));
-  const totalDirtyCount = computed(() =>
-    STATEMENT_SLOTS.reduce(
-      (total, item) => total + changedFields(drafts.value[item], saved.value[item]),
-      0,
-    ),
+  const { changesBySlot, dirtyCount, totalDirtyCount, otherUnsaved } = useSlotChanges(
+    drafts,
+    saved,
+    slot,
   );
   const savedAt = ref<Date | null>(null);
 
@@ -118,8 +138,10 @@ export function useStatementDrafts(problem: () => EditableProblem) {
     drafts,
     current,
     isLocked,
+    changesBySlot,
     dirtyCount,
     totalDirtyCount,
+    otherUnsaved,
     savedAt,
     previewStyle,
     canFullMarkup,
