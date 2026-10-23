@@ -77,3 +77,10 @@ function undo(toast: Toast) {
     </TransitionGroup>
   </div>
 </template>
+
+<style>
+/* A save bar (page or footer) sits at the bottom edge: the toasts stand above it so its buttons stay clickable. */
+body:has([data-variant]) [data-testid='admin-toasts'] {
+  bottom: 5.5rem;
+}
+</style>

@@ -8,6 +8,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import FormField from '@/components/ui/FormField.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
+import AdminLeaveGuard from '@/features/admin/ui/form/AdminLeaveGuard.vue';
 import { hasPermission } from '@/lib/permissions';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { usePageTitle } from '@/router/page-title';
@@ -191,5 +192,6 @@ const fixedAuthor = computed(() =>
         />
       </form>
     </QueryState>
+    <AdminLeaveGuard :dirty-count="editor.hasUnsavedChanges.value ? 1 : 0" />
   </div>
 </template>

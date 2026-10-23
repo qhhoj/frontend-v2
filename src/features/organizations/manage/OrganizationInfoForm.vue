@@ -8,6 +8,7 @@ import SaveBar from '@/components/ui/SaveBar.vue';
 import TextInput from '@/components/ui/TextInput.vue';
 import Card from '@/components/ui/Card.vue';
 import { useOrganizationEditor } from '@/features/admin/organizations/use-organization-editor';
+import AdminLeaveGuard from '@/features/admin/ui/form/AdminLeaveGuard.vue';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import MarkdownField from '@/features/admin/ui/MarkdownField.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
@@ -185,5 +186,6 @@ function reset() {
         />
       </form>
     </Card>
+    <AdminLeaveGuard :dirty-count="editor.dirtyCount.value" />
   </section>
 </template>

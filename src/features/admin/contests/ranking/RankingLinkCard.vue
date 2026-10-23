@@ -17,6 +17,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { failureTextOf } from '../../ui/admin-errors';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
+import { provideDateValidity } from '../../ui/form/date-validity';
 import { CARD, INPUT, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { expiryPreview, publicRankingUrl, toLinkPatch } from './ranking-link';
@@ -38,6 +39,7 @@ const statusName = useId();
 const expiryName = useId();
 const isRegenerateOpen = ref(false);
 const formError = ref('');
+const { hasUnreadableDate } = provideDateValidity();
 
 const blankForm = (): LinkForm => ({
   status: 'public',
@@ -92,6 +94,10 @@ const regenerate = useAdminMutation({
 
 /** A form the backend would refuse is said here and not sent. */
 async function saveLink() {
+  if (hasUnreadableDate.value) {
+    formError.value = translate('admin.form.dateTime.invalid');
+    return;
+  }
   const patch = toLinkPatch(form.value);
   if ('error' in patch) {
     formError.value = patch.error;

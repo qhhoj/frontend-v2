@@ -11,6 +11,7 @@ import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { CARD, buttonClass } from '../../ui/controls';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
+import { provideDateValidity } from '../../ui/form/date-validity';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
 import { checkContestForm, emptyContestForm, toContestBody } from '../contest-form';
@@ -41,6 +42,7 @@ const ownerBlockedText = computed(() => {
 const localErrors = computed(() => checkContestForm(form.value));
 /** Errors show once a save was tried, not while the first field is still being typed. */
 const hasTried = ref(false);
+const { hasUnreadableDate } = provideDateValidity();
 const mutation = useAdminMutation({
   mutate: (body: ContestBody) =>
     owner.value ? createOrganizationContest(owner.value.slug, body) : createContest(body),
@@ -59,7 +61,7 @@ const shownErrors = computed(() => ({
 /** Nothing is sent while a local check fails; the create body keeps out every group the account may not set. */
 async function create() {
   hasTried.value = true;
-  if (Object.keys(localErrors.value).length === 0 && isOwnerReady.value)
+  if (Object.keys(localErrors.value).length === 0 && !hasUnreadableDate.value && isOwnerReady.value)
     await mutation.run(toContestBody(form.value, can, Boolean(owner.value)));
 }
 </script>

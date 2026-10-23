@@ -2,7 +2,7 @@
 import { Ellipsis } from 'lucide-vue-next';
 import Menu from 'primevue/menu';
 import type { MenuItem } from 'primevue/menuitem';
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import type { OrganizationDetail } from '@/api/types/organizations';
@@ -50,6 +50,18 @@ function leave() {
 const lock = useOfficialLock();
 const menu = ref<InstanceType<typeof Menu>>();
 const isMenuOpen = ref(false);
+/**
+ * The menu popup that held focus is gone when the dialog closes, so PrimeVue has no opener to return to. Cancel and Escape
+ * put focus back on the ⋯ button; after a confirm the button may be gone, and the dialog's own `returnFocusTo` decides.
+ */
+const root = ref<HTMLElement>();
+watch(isLeaveOpen, async (isOpen) => {
+  if (isOpen) return;
+  await nextTick();
+  const trigger = root.value?.querySelector('button');
+  if (trigger && (!document.activeElement || document.activeElement === document.body))
+    trigger.focus();
+});
 /** Each try starts clean: an earlier failure is not shown again. */
 function openLeave() {
   membership.reset();
@@ -73,7 +85,7 @@ const body = computed(() => {
 </script>
 
 <template>
-  <div data-testid="organization-menu">
+  <div ref="root" data-testid="organization-menu">
     <IconButton
       tone="secondary"
       :label="$t('orgMembership.menu')"

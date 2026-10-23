@@ -7,6 +7,7 @@ import { translate } from '@/i18n';
 import AdminField from '../../ui/AdminField.vue';
 import { failureTextOf, fieldErrorsOf } from '../../ui/admin-errors';
 import { INPUT } from '../../ui/controls';
+import { provideDateValidity } from '../../ui/form/date-validity';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 
@@ -17,6 +18,7 @@ const emit = defineEmits<{ added: [username: string] }>();
 const username = ref('');
 const kind = ref<AddParticipationBody['kind']>('live');
 const start = ref<string | null>(null);
+const { hasUnreadableDate } = provideDateValidity();
 
 const mutation = useAdminMutation({
   mutate: () =>
@@ -52,7 +54,7 @@ watch(visible, (isOpen) => {
     :title="$t('admin.contestOps.participants.addTitle')"
     :confirm-label="$t('admin.contestOps.participants.add')"
     :busy="mutation.isPending.value"
-    :can-confirm="username.trim().length > 0"
+    :can-confirm="username.trim().length > 0 && !hasUnreadableDate"
     :width="520"
     @confirm="mutation.run(undefined)"
   >

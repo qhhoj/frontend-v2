@@ -96,9 +96,15 @@ function usePostWriter(
   postId: () => string | null,
   { form, baseline, reset }: ReturnType<typeof usePostFormState>,
   body: () => PostCreateBody,
+  isLeavingAfterSave: Ref<boolean>,
 ) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  /** The navigation a save causes is no loss: the leave guard stays quiet while it runs. */
+  const navigate = (go: () => Promise<unknown>) => {
+    isLeavingAfterSave.value = true;
+    void go().finally(() => (isLeavingAfterSave.value = false));
+  };
   return useAdminMutation({
     mutate: () => {
       const id = postId();
@@ -108,9 +114,9 @@ function usePostWriter(
     onDone: (saved: PostDetail) => {
       void queryClient.invalidateQueries({ queryKey: ['posts'] });
       void queryClient.invalidateQueries({ queryKey: ['organizations', 'posts'] });
-      if (isLive(saved)) void router.push({ name: 'post', params: { id: saved.id } });
+      if (isLive(saved)) navigate(() => router.push({ name: 'post', params: { id: saved.id } }));
       else if (postId() === null)
-        void router.replace({ name: 'post-edit', params: { id: saved.id } });
+        navigate(() => router.replace({ name: 'post-edit', params: { id: saved.id } }));
       else reset(saved);
     },
   });
@@ -128,8 +134,12 @@ export function usePostEditor(postId: () => string | null, organization: Ref<str
   const { form, baseline } = state;
   const isPostLive = computed(() => (post.value ? isLive(post.value) : false));
   const { mode, fieldsFor } = usePublishMode(form, baseline, isPostLive);
-  const writer = usePostWriter(postId, state, () =>
-    createBodyOf(form, rights.value, organization.value),
+  const isLeavingAfterSave = ref(false);
+  const writer = usePostWriter(
+    postId,
+    state,
+    () => createBodyOf(form, rights.value, organization.value),
+    isLeavingAfterSave,
   );
   const clientErrors = ref<FieldErrors>({});
   const isNothingToSave = ref(false);
@@ -150,6 +160,8 @@ export function usePostEditor(postId: () => string | null, organization: Ref<str
   const isDirty = computed(() =>
     baseline.value ? hasChanges() : form.title !== '' || form.content !== '',
   );
+  /** What the leave guard asks about: unsaved text, except while a save navigates away. */
+  const hasUnsavedChanges = computed(() => isDirty.value && !isLeavingAfterSave.value);
   const errors = computed(() => ({ ...writer.fieldErrors.value, ...clientErrors.value }));
   return {
     query,
@@ -159,6 +171,7 @@ export function usePostEditor(postId: () => string | null, organization: Ref<str
     rights,
     errors,
     isDirty,
+    hasUnsavedChanges,
     isPostLive,
     isNothingToSave,
     writer,

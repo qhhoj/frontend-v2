@@ -290,10 +290,15 @@ function languageTimeErrors(form: ProblemForm, can: (permission: string) => bool
 export function checkProblemForm(
   form: ProblemForm,
   can: (permission: string) => boolean,
+  /** The organization prefix the code starts with: a code that is only the prefix is still empty. */
+  codePrefix = '',
 ): FieldErrors {
   const errors: FieldErrors = {};
-  if (!PROBLEM_CODE_PATTERN.test(form.code))
+  if (form.code === codePrefix)
+    errors.code = translate('admin.problems.general.errors.codeRequired');
+  else if (!PROBLEM_CODE_PATTERN.test(form.code))
     errors.code = translate('admin.problems.general.errors.code');
+  if (!form.name.trim()) errors.name = translate('admin.problems.general.errors.nameRequired');
   const timeError = timeLimitError(form, can);
   if (timeError) errors.timeLimit = timeError;
   Object.assign(errors, languageTimeErrors(form, can));

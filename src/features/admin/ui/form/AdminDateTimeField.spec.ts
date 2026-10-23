@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { defineComponent, h, ref } from 'vue';
 import { mountComponent } from '@/test/mount';
 import AdminDateTimeField from './AdminDateTimeField.vue';
+import { provideDateValidity } from './date-validity';
 
 const mountField = (modelValue: string | null) =>
   mountComponent(AdminDateTimeField, { props: { modelValue, label: 'Bắt đầu' } });
@@ -65,6 +67,61 @@ describe('AdminDateTimeField', () => {
       await input.trigger('blur');
       expect(wrapper.emitted('update:modelValue')).toBeUndefined();
       expect(input.attributes('aria-invalid')).toBe('true');
+    });
+  });
+
+  describe('telling the form about unreadable text', () => {
+    /** A form that owns the save: it renders whether a save would be refused. */
+    const isShown = ref(true);
+    const Form = defineComponent({
+      setup() {
+        const { hasUnreadableDate } = provideDateValidity();
+        return () =>
+          h('div', [
+            isShown.value ? h(AdminDateTimeField, { modelValue: null, label: 'Từ' }) : null,
+            h('output', hasUnreadableDate.value ? 'refused' : 'ok'),
+          ]);
+      },
+    });
+    const mountForm = () => mountComponent(Form);
+
+    it('flags the form from the first unreadable keystroke and clears it when the text reads', async () => {
+      const wrapper = mountForm();
+      await wrapper.get('input').setValue('abc');
+      expect(wrapper.get('output').text()).toBe('refused');
+      await wrapper.get('input').setValue('09/10/2026 08:30');
+      expect(wrapper.get('output').text()).toBe('ok');
+    });
+
+    it('stays flagged after blur and shows the error under the box', async () => {
+      const wrapper = mountForm();
+      await wrapper.get('input').setValue('abc');
+      await wrapper.get('input').trigger('blur');
+      expect(wrapper.get('output').text()).toBe('refused');
+      expect(wrapper.get('input').attributes('aria-invalid')).toBe('true');
+    });
+
+    it('says why on Enter, before the form submits', async () => {
+      const wrapper = mountForm();
+      await wrapper.get('input').setValue('abc');
+      await wrapper.get('input').trigger('keydown', { key: 'Enter' });
+      expect(wrapper.text()).toContain('dd/mm/yyyy hh:mm');
+    });
+
+    it('treats an emptied box as a readable "no date"', async () => {
+      const wrapper = mountForm();
+      await wrapper.get('input').setValue('abc');
+      await wrapper.get('input').setValue('');
+      expect(wrapper.get('output').text()).toBe('ok');
+    });
+
+    it('stops blocking the form once the field is gone', async () => {
+      isShown.value = true;
+      const wrapper = mountForm();
+      await wrapper.get('input').setValue('abc');
+      isShown.value = false;
+      await wrapper.vm.$nextTick();
+      expect(wrapper.get('output').text()).toBe('ok');
     });
   });
 });

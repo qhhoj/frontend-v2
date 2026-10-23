@@ -55,11 +55,12 @@ const leavesForm = (to: RouteLocationNormalized, from: RouteLocationNormalized) 
   to.query.org !== from.query.org || organizationPanelOf(to.query) !== 'info';
 const queryGuard = useQueryLeaveGuard(() => dirtyCount.value > 0, leavesForm);
 
-/** An empty box is no limit (`null`); a typed count is a whole number. */
+/** An empty box is no limit (`null`); a typed count is a whole number. `v-model` on a number box hands back a number. */
 const slotsText = computed({
   get: () => (form.slots === null ? '' : String(form.slots)),
-  set: (text: string) => {
-    form.slots = text.trim() === '' ? null : Number(text);
+  set: (value: string | number) => {
+    const text = String(value).trim();
+    form.slots = text === '' ? null : Number(text);
   },
 });
 

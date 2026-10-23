@@ -5,6 +5,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { translate } from '@/i18n';
 import { formatInZone } from '../../ui/form/site-time';
 import { failureTextOf } from '../../ui/admin-errors';
+import { provideDateValidity } from '../../ui/form/date-validity';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
 import { participationKindKey } from './participations';
 import type { ParticipationActions } from './use-participation-actions';
@@ -39,6 +40,7 @@ const kindText = computed(() => {
 });
 
 const start = ref<string | null>(null);
+const { hasUnreadableDate } = provideDateValidity();
 watch(isMoveOpen, (shown) => {
   if (shown) start.value = row.value?.realStart ?? null;
 });
@@ -55,9 +57,9 @@ const statusCell = () =>
     :title="$t('admin.contestOps.participants.moveStartTitle', { username })"
     :confirm-label="$t('admin.ui.save')"
     :busy="moveStart.isPending.value"
-    :can-confirm="Boolean(start)"
+    :can-confirm="Boolean(start) && !hasUnreadableDate"
     :width="520"
-    @confirm="row && start && moveStart.run({ row, start })"
+    @confirm="row && start && !hasUnreadableDate && moveStart.run({ row, start })"
   >
     <div class="flex flex-col gap-4">
       <p class="m-0 text-muted">{{ $t('admin.contestOps.participants.moveStartBody') }}</p>

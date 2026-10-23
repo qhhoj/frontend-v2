@@ -73,6 +73,18 @@ describe('problem form', () => {
     expect(Object.keys(errors).sort()).toEqual(['code', 'points', 'typeIds']);
   });
 
+  it('asks for a code and a name; an organization prefix alone is no code', () => {
+    const empty = { ...seeded(), code: '', name: '  ' };
+    expect(Object.keys(checkProblemForm(empty, nobodyCan))).toEqual(
+      expect.arrayContaining(['code', 'name']),
+    );
+    const prefixOnly = checkProblemForm({ ...seeded(), code: 'vx_alpha_' }, nobodyCan, 'vx_alpha_');
+    expect(prefixOnly.code).toBe('Nhập mã bài.');
+    expect(
+      checkProblemForm({ ...seeded(), code: 'vx_alpha_p1' }, nobodyCan, 'vx_alpha_').code,
+    ).toBe(undefined);
+  });
+
   it('never sends a staff-only field from a viewer without judge.edit_all_problem, even when filled', () => {
     const defaults = emptyProblemForm(meta);
     const filled: ProblemForm = {
