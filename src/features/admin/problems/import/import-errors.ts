@@ -1,5 +1,6 @@
 import type { Schemas } from '@/api/schemas';
 import { DEFAULT_LOCALE, i18n, translate } from '@/i18n';
+import { POLYGON_OPTION_CODES } from '../../ui/refusal-catalog';
 
 export type ImportErrorCode = Schemas['PolygonImportErrorCode'];
 type Param = string | number | string[];
@@ -21,11 +22,7 @@ export interface ImportErrorText {
 }
 
 const KINDS: Partial<Record<ImportErrorCode, ImportErrorKind>> = {
-  statement_language_required: 'options',
-  statement_language_unmapped: 'options',
-  statement_language_repeated: 'options',
-  tutorial_language_required: 'options',
-  too_many_testcases: 'options',
+  ...Object.fromEntries(POLYGON_OPTION_CODES.map((code) => [code, 'options' as const])),
   problem_code_taken: 'target',
   problem_not_found: 'target',
   problem_not_importable: 'target',

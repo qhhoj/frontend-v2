@@ -1,8 +1,9 @@
-import { ref } from 'vue';
+import { computed, ref, toValue } from 'vue';
+import type { MaybeRefOrGetter } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { ApiError } from '@/api/client';
-import { fieldErrorsOf } from './admin-errors';
-import type { FieldErrors } from './admin-errors';
+import { readRefusal } from './admin-errors';
+import type { FieldErrors, ReadOptions } from './admin-errors';
 import { useAdminToast } from './feedback/use-admin-toast';
 
 /** The public features whose caches an admin write may refresh (their query keys start with these roots). */
@@ -20,15 +21,24 @@ interface AdminMutationOptions<Vars, Result> {
   onDone?: (result: Result, vars: Vars) => void;
   /** A success toast ("Đã lưu bài hcmus41c"), shown the moment the write succeeds. Omitted: no toast. */
   successText?: string | ((result: Result, vars: Vars) => string);
+  /** What the caller renders; default nothing (every reason goes to the line). */
+  rendered?: MaybeRefOrGetter<ReadOptions>;
 }
 
-/** One admin write: pending flag, per-field texts from `issues[]`, the failure for the page line, and cache invalidation. */
+/** Every path a refusal names: all of them count as rendered for the legacy `fieldErrors`. */
+const namedPaths = (error: ApiError): string[] =>
+  error.issues.length > 0 ? error.issues.map((issue) => issue.field) : Object.keys(error.fields);
+
+/** One admin write: pending flag, the failure and its `refusal` (field texts for the rendered paths, the page line for the rest), and cache invalidation. */
 export function useAdminMutation<Vars, Result>(options: AdminMutationOptions<Vars, Result>) {
   const queryClient = useQueryClient();
   const isPending = ref(false);
   const isDone = ref(false);
   const fieldErrors = ref<FieldErrors>({});
   const failure = ref<ApiError | null>(null);
+  const refusal = computed(() =>
+    failure.value ? readRefusal(failure.value, toValue(options.rendered)) : null,
+  );
   const toast = options.successText === undefined ? null : useAdminToast();
 
   function reset() {
@@ -65,7 +75,7 @@ export function useAdminMutation<Vars, Result>(options: AdminMutationOptions<Var
     } catch (error) {
       // A programming error (not an ApiError) must surface, not turn into a page line.
       if (!(error instanceof ApiError)) throw error;
-      fieldErrors.value = fieldErrorsOf(error);
+      fieldErrors.value = readRefusal(error, { paths: namedPaths(error) }).fields;
       failure.value = error;
       return undefined;
     } finally {
@@ -73,5 +83,5 @@ export function useAdminMutation<Vars, Result>(options: AdminMutationOptions<Var
     }
   }
 
-  return { run, isPending, isDone, fieldErrors, failure, reset };
+  return { run, isPending, isDone, fieldErrors, failure, reset, refusal };
 }

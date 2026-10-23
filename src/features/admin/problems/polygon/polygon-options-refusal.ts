@@ -1,5 +1,7 @@
 import { ApiError } from '@/api/client';
-import { translate } from '@/i18n';
+import { CODE_ENTRIES, POLYGON_OPTION_CODES, optionsFieldOf } from '../../ui/refusal-catalog';
+
+const isOptionCode = (code: string) => (POLYGON_OPTION_CODES as readonly string[]).includes(code);
 
 /**
  * A refusal of the import's options that the server finds before queueing (400, `params` as a job's `errorParams`):
@@ -11,57 +13,26 @@ export interface OptionsRefusal {
   text: string;
 }
 
-const OPTION_CODES = new Set([
-  'statement_language_required',
-  'statement_language_unmapped',
-  'statement_language_repeated',
-  'tutorial_language_required',
-  'too_many_testcases',
-]);
-
 type Params = Record<string, unknown>;
 const paramsOf = (error: ApiError): Params => {
   const params = error.extra.params;
   return params && typeof params === 'object' ? (params as Params) : {};
 };
-/** A param as text: a list joined, a string or number as it is; anything else (absent, malformed) as empty. */
-const textOf = (value: unknown): string => {
-  if (Array.isArray(value)) return value.map(textOf).join(', ');
-  return typeof value === 'string' || typeof value === 'number' ? String(value) : '';
-};
 
-/** The language field a refusal (or a sync failure) with this code and params belongs under; null for the page line. */
-export function optionsFieldOf(code: string, params: Params): string | null {
-  switch (code) {
-    case 'statement_language_required':
-      return 'main';
-    case 'statement_language_unmapped':
-      return `other:${textOf(params.language)}`;
-    case 'statement_language_repeated':
-      return 'others';
-    case 'tutorial_language_required':
-      return 'tutorial';
-    default:
-      return null;
-  }
-}
+export { optionsFieldOf };
 
 /** A refusal of the options as its code and params (the shape of a sync failure), or null for any other failure. */
 export function optionsFailureOf(error: unknown): { code: string; params: Params } | null {
-  if (!(error instanceof ApiError) || !OPTION_CODES.has(error.code)) return null;
+  if (!(error instanceof ApiError) || !isOptionCode(error.code)) return null;
   return { code: error.code, params: paramsOf(error) };
 }
 
 /** The refusal as the configure step shows it, or null when the failure is not about the options. */
 export function optionsRefusalOf(error: unknown): OptionsRefusal | null {
   const failure = optionsFailureOf(error);
-  if (!failure) return null;
-  const { code, params } = failure;
-  const text = translate(`admin.polygonLink.configure.refusal.${code}`, {
-    languages: textOf(params.languages),
-    language: textOf(params.language),
-    count: textOf(params.count),
-    limit: textOf(params.limit),
-  });
-  return { field: optionsFieldOf(code, params), text };
+  if (!failure || !(error instanceof ApiError)) return null;
+  return {
+    field: optionsFieldOf(failure.code, failure.params),
+    text: CODE_ENTRIES[failure.code]!.text(error),
+  };
 }

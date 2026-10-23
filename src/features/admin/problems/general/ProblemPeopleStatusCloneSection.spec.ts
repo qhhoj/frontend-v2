@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import { fail, mockApi, ok } from '@/test/mock-api';
+import { fail, issue, mockApi, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
@@ -83,10 +83,10 @@ describe('problem people, status and clone', () => {
     mockApi({
       ...staffViewer(['judge.edit_own_problem', 'judge.clone_problem']),
       ...problemEditorRoutes(),
-      // The backend answers a taken code with `fields.code` only (English text, no issue code).
+      // A taken code is an issue on `code` with its own issue code.
       'POST /problems/hcmus41c/clone': () =>
         isTaken
-          ? fail(400, 'validation_failed', { code: ['That code is taken.'] })
+          ? fail(400, 'validation_failed', undefined, [issue('code', 'code_taken', 'taken')])
           : ok(editableProblem({ code: 'hcmus41c_copy' })),
       'GET /problems/hcmus41c_copy': ok(editableProblem({ code: 'hcmus41c_copy' })),
       'GET /problems/hcmus41c_copy/data': ok(problemData()),

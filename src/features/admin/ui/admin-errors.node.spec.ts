@@ -8,8 +8,10 @@ import {
   formatWait,
   isConflict,
   isNotFound,
+  readRefusal,
   specificIssueText,
 } from './admin-errors';
+import { IMPORT_REFUSALS } from './refusal-catalog';
 
 afterEach(() => {
   i18n.global.locale.value = 'vi';
@@ -204,5 +206,129 @@ describe('failureTextOf names the reason an issue gives', () => {
     expect(failureTextOf(new ApiError('already_participating', 409, 'x'))).toBe(
       'Người này đã có lượt tham gia đang diễn ra trong kỳ thi.',
     );
+  });
+});
+
+describe('readRefusal', () => {
+  const refused = (code: string, status: number, issues: ReturnType<typeof issue>[], extra = {}) =>
+    new ApiError(code, status, 'x', { issues, ...extra });
+
+  it('R1: a reason on a rendered path is the field text and leaves no page line', () => {
+    const taken = refused('conflict', 409, [issue('key_taken', 'This key is taken.', 'key')]);
+    expect(readRefusal(taken, { paths: ['key'] })).toEqual({
+      fields: { key: 'Khóa này đã có.' },
+      line: null,
+    });
+    expect(readRefusal(taken).line).toBe('Khóa này đã có.');
+  });
+
+  it('R2: a reason on an unrendered path goes to the line (a quota on storage)', () => {
+    const quota = refused('quota_exceeded', 403, [issue('quota_exceeded', 'x', 'storage')], {
+      extra: { details: { meter: 'credits', limit: 200, used: 194, needed: 10 } },
+    });
+    const read = readRefusal(quota, { paths: ['code'] });
+    expect(read.fields).toEqual({});
+    expect(read.line).toContain('cần 10, còn lại 6');
+  });
+
+  it('R3: an alias names the rendered path (a bulk row on the username box)', () => {
+    const error = refused('validation_failed', 400, [issue('max_length', 'm', 'users.0.username')]);
+    const read = readRefusal(error, {
+      paths: ['username'],
+      aliases: { 'users.*.username': 'username' },
+    });
+    expect(read).toEqual({ fields: { username: 'Quá dài.' }, line: null });
+  });
+
+  it('R4: a pattern matches one segment, and the longest rendered ancestor takes the rest', () => {
+    const error = refused('validation_failed', 400, [
+      issue('max_length', 'm', 'cases.2.input'),
+      issue('max', 'm', 'organizations.0'),
+      issue('max', 'm', 'cases.2.input.deep.too'),
+    ]);
+    const read = readRefusal(error, { paths: ['cases.*.input', 'organizations'] });
+    expect(read.fields).toEqual({
+      'cases.2.input': 'Quá dài.',
+      organizations: 'Giá trị quá lớn.',
+    });
+    expect(read.line).toBeNull();
+    expect(readRefusal(error, { paths: ['cases.*'] }).fields).not.toHaveProperty('organizations');
+  });
+
+  it('R5: two reasons on one path show the first', () => {
+    const error = refused('validation_failed', 400, [
+      issue('matches', 'a', 'code'),
+      issue('max_length', 'b', 'code'),
+    ]);
+    expect(readRefusal(error, { paths: ['code'] }).fields).toEqual({
+      code: 'Định dạng chưa đúng.',
+    });
+  });
+
+  it('R6: unrouted specific and generic reasons make one line, each text once', () => {
+    const error = refused('validation_failed', 400, [
+      issue('admin_cap', 'x', ''),
+      issue('admin_cap', 'x', 'organizations'),
+      issue('max', 'y', 'points'),
+    ]);
+    expect(readRefusal(error).line).toBe(
+      'Mỗi người quản trị tối đa 3 tổ chức. Dữ liệu chưa hợp lệ.',
+    );
+    expect(readRefusal(error, { paths: ['organizations'] }).line).toBe(
+      'Mỗi người quản trị tối đa 3 tổ chức. Dữ liệu chưa hợp lệ.',
+    );
+  });
+
+  it('R7: a wrapper with no reasons reads as its own code text', () => {
+    expect(readRefusal(new ApiError('conflict', 409, 'x'), { paths: ['key'] })).toEqual({
+      fields: {},
+      line: failureTextOf(new ApiError('conflict', 409, 'x')),
+    });
+  });
+
+  it('R8: a code of its own words the line and ignores the issues behind it', () => {
+    const error = refused('already_participating', 409, [issue('max', 'm', 'user')]);
+    expect(readRefusal(error).line).toBe(
+      'Người này đã có lượt tham gia đang diễn ra trong kỳ thi.',
+    );
+  });
+
+  it('R9: a rate limit words the wait, or the import wording through the catalog', () => {
+    const limited = new ApiError('rate_limited', 429, 'x', { retryAfterSeconds: 42 });
+    expect(readRefusal(limited).line).toBe('Bạn thao tác quá nhanh. Thử lại sau 42 giây.');
+    expect(readRefusal(limited, { catalog: IMPORT_REFUSALS }).line).toBe(
+      'Tối đa 10 lượt nhập mỗi giờ. Thử lại sau 42 giây.',
+    );
+    expect(readRefusal(new ApiError('conflict', 409, 'x', { retryAfterSeconds: 5 })).line).toMatch(
+      / Thử lại sau 5 giây\.$/u,
+    );
+  });
+
+  it('R10: a Polygon options refusal sits under its field, else on the line with the language names', () => {
+    const error = new ApiError('statement_language_unmapped', 400, 'x', {
+      extra: { params: { language: 'russian' } },
+    });
+    expect(readRefusal(error, { paths: ['other:russian'] })).toEqual({
+      fields: { 'other:russian': 'Chọn ngôn ngữ trên QHHOJ hoặc Bỏ qua cho đề russian.' },
+      line: null,
+    });
+    const required = new ApiError('statement_language_required', 400, 'x', {
+      extra: { params: { languages: ['english', 'russian'] } },
+    });
+    expect(readRefusal(required).line).toBe('Chọn đề chính trong số: english, russian.');
+  });
+
+  it('R11: with nothing rendered the line is never null and failureTextOf is that line', () => {
+    const error = refused('validation_failed', 400, [issue('max', 'm', 'points')]);
+    expect(readRefusal(error).line).toBe(failureTextOf(error));
+    expect(failureTextOf(new ApiError('validation_failed', 400, 'x'))).toBe('Dữ liệu chưa hợp lệ.');
+  });
+
+  it('R12: anything that is not an ApiError reads as the generic line', () => {
+    expect(readRefusal(new TypeError('x'), { paths: ['a'] })).toEqual({
+      fields: {},
+      line: failureTextOf(null),
+    });
+    expect(failureTextOf(undefined)).not.toBe('');
   });
 });

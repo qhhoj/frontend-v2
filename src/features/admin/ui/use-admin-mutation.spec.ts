@@ -5,6 +5,7 @@ import { defineComponent, h } from 'vue';
 import { ApiError } from '@/api/client';
 import { mountComponent } from '@/test/mount';
 import { useAdminMutation } from './use-admin-mutation';
+import type { ReadOptions } from './admin-errors';
 import type { AdminQueryKey } from './use-admin-mutation';
 import { adminToasts, dismissToast } from './feedback/admin-toasts';
 
@@ -13,6 +14,7 @@ const host = (
   invalidates: (vars: { name: string }) => AdminQueryKey[] = (vars) => [
     ['admin', 'thing', vars.name],
   ],
+  rendered?: ReadOptions,
 ) => {
   let api!: ReturnType<typeof useAdminMutation<{ name: string }, string>>;
   let invalidate!: ReturnType<typeof vi.spyOn>;
@@ -20,7 +22,7 @@ const host = (
     defineComponent({
       setup() {
         invalidate = vi.spyOn(useQueryClient(), 'invalidateQueries');
-        api = useAdminMutation({ mutate, invalidates });
+        api = useAdminMutation({ mutate, invalidates, rendered });
         return () => h('div');
       },
     }),
@@ -57,15 +59,19 @@ describe('useAdminMutation', () => {
     expect(order).toEqual(['success', 'done']);
   });
 
-  it('turns a validation failure into field texts and resolves undefined', async () => {
-    const { api } = host(() =>
-      Promise.reject(
-        new ApiError('validation_failed', 400, 'bad', {
-          issues: [{ field: 'name', code: 'max_length', message: 'm' }],
-        }),
-      ),
+  it('reads a validation failure into field texts for the rendered paths and resolves undefined', async () => {
+    const { api } = host(
+      () =>
+        Promise.reject(
+          new ApiError('validation_failed', 400, 'bad', {
+            issues: [{ field: 'name', code: 'max_length', message: 'm' }],
+          }),
+        ),
+      undefined,
+      { paths: ['name'] },
     );
     await expect(api().run({ name: 'a' })).resolves.toBeUndefined();
+    expect(api().refusal.value).toEqual({ fields: { name: 'Quá dài.' }, line: null });
     expect(api().fieldErrors.value).toEqual({ name: 'Quá dài.' });
     expect(api().failure.value?.code).toBe('validation_failed');
     expect(api().isDone.value).toBe(false);
@@ -80,8 +86,10 @@ describe('useAdminMutation', () => {
     });
     await api().run({ name: 'a' });
     expect(api().failure.value?.code).toBe('conflict');
+    expect(api().refusal.value?.line).not.toBeNull();
     await api().run({ name: 'a' });
     expect(api().failure.value).toBeNull();
+    expect(api().refusal.value).toBeNull();
   });
 
   it('sends nothing for a second run while the first is pending, and settles once', async () => {

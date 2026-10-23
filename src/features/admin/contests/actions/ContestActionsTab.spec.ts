@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import type { mountApp } from '@/test/mount';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
-import { fail, mockApi, ok, sequence } from '@/test/mock-api';
+import { fail, issue, mockApi, ok, sequence } from '@/test/mock-api';
 import { confirmDialog, openDialog, staffViewer } from '@/test/admin-routes';
 import {
   contestActions,
@@ -150,9 +150,7 @@ describe('ContestActionsTab', () => {
     mockApi({
       ...staffViewer(['judge.edit_own_contest', 'judge.clone_contest']),
       ...routes({
-        'POST /contests/hcmus-w41/clone': fail(400, 'validation_failed', {
-          key: ['That key is taken.'],
-        }),
+        'POST /contests/hcmus-w41/clone': fail(400, 'validation_failed', undefined, [issue('key', 'key_taken', 'taken')]),
       }),
     });
     const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT);
