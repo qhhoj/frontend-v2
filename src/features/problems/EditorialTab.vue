@@ -41,7 +41,7 @@ watch(
         data-testid="editorial-meta"
         class="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted"
       >
-        <span>
+        <span v-if="editorial.authors.length > 0">
           {{ $t('problem.authors') }}
           <template v-for="(author, index) in editorial.authors" :key="author.id"
             ><template v-if="index">, </template

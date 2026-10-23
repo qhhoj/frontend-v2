@@ -147,6 +147,17 @@ async function saveAll() {
   if (saved.length > 0) savedAt.value = new Date();
 }
 
+/** A link with `#settings-<block id>` (and `?tab=`) lands on that block once the settings have loaded. */
+watch(
+  isLoading,
+  async (loading) => {
+    if (loading || !route.hash) return;
+    await nextTick();
+    document.getElementById(route.hash.slice(1))?.scrollIntoView({ block: 'start' });
+  },
+  { immediate: true },
+);
+
 /** A refusal is shown on its block: open that block's tab and bring the block into view. */
 async function showRefusedBlock(id: string) {
   const tab = pageBlocks.value.find((block) => block.id === id)!.tab;

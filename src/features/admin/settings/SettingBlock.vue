@@ -141,6 +141,7 @@ defineExpose({ save, discard: discardEdits });
 
 <template>
   <section
+    :id="`settings-${block.id}`"
     :data-block="block.id"
     :aria-labelledby="headingId"
     :class="[CARD, 'flex min-w-0 flex-col']"

@@ -16,7 +16,8 @@ const props = defineProps<{
   /** A fixed id, so another element (an avatar tile) can be a `<label for>` of the same file input. */
   inputId?: string;
 }>();
-const emit = defineEmits<{ picked: [file: File] }>();
+/** `attempt`: any pick, before the checks, so a consumer can retire the answer to the previous one. */
+const emit = defineEmits<{ picked: [file: File]; attempt: [] }>();
 const generatedId = useId();
 const id = props.inputId ?? generatedId;
 const refusal = ref('');
@@ -29,6 +30,7 @@ function onChange(event: Event) {
   refusal.value = '';
   isBusyNoticeShown.value = false;
   if (!file) return;
+  emit('attempt');
   if (props.isPending) {
     isBusyNoticeShown.value = true;
     return;
@@ -39,6 +41,13 @@ function onChange(event: Event) {
   }
   emit('picked', file);
 }
+
+/** Forgets the last refusal, for a consumer whose state moved on (the file it was about is gone). */
+function clear() {
+  refusal.value = '';
+  isBusyNoticeShown.value = false;
+}
+defineExpose({ clear });
 </script>
 
 <template>

@@ -178,6 +178,9 @@ function setLanguageAllowed(languageId: string, isAllowed: boolean) {
           <LanguageLabel :language="language" />
         </label>
       </div>
+      <p v-if="errors.allowedLanguages" class="text-sm text-negative" role="alert">
+        {{ errors.allowedLanguages }}
+      </p>
       <p v-if="isStaffLocked" :id="allowedLanguagesLockId" class="text-xs text-muted">
         {{ lockNotice(isStaffLocked) }}
       </p>

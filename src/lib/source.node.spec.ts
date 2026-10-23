@@ -76,6 +76,9 @@ describe('readSourceFile', () => {
       text: `// chào 😀\n${lines.join('\n')}`,
     });
   });
+  it('rejects an empty file so the editor keeps its text', async () => {
+    expect(await readSourceFile(new File([], 'a.py'))).toEqual({ ok: false, reason: 'empty' });
+  });
   it('rejects a binary file', async () => {
     const result = await readSourceFile(new File([new Uint8Array([1, 0, 2])], 'a.bin'));
     expect(result).toEqual({ ok: false, reason: 'notText' });

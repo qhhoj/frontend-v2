@@ -139,6 +139,7 @@ const resultText = computed(() =>
       :loading="!isAuthorUnknown && isPending && !lookupError"
       :error="isAuthorUnknown ? null : (error ?? lookupError)"
       :filtered="isFiltered"
+      :is-suggested-queue="filters.status === 'suggested'"
       @retry="retry"
       @clear-filters="clearFilters"
       @delete="askDelete"

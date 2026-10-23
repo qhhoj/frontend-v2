@@ -14,7 +14,13 @@ import {
   PROBLEM_INDEX_KEY,
   PUBLIC_PROBLEMS_KEY,
 } from '../problem-editing.queries';
-import { changedProblemFields, checkProblemForm, cloneForm, toProblemForm } from './problem-form';
+import {
+  changedProblemFields,
+  checkAllowedLanguages,
+  checkProblemForm,
+  cloneForm,
+  toProblemForm,
+} from './problem-form';
 import type { ProblemForm } from './problem-form';
 
 /** The form the user edits, and the seed it is compared with: what the server last said. */
@@ -77,7 +83,10 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
   }
 
   async function save() {
-    localErrors.value = checkProblemForm(form.value, can);
+    localErrors.value = {
+      ...checkProblemForm(form.value, can),
+      ...checkAllowedLanguages(form.value, can),
+    };
     if (Object.keys(localErrors.value).length === 0 && isDirty.value && !hasUnreadableDate.value) {
       await mutation.run(problem().code);
     }

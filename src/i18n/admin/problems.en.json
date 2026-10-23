@@ -26,7 +26,8 @@
   "general": {
     "create": {
       "title": "Create problem",
-      "lead": "Without the right to add problems, the problem is sent as a suggestion for staff to review.",
+      "lead": "Pick where the problem lives, then give its code, name and limits. The rest is set on the problem's tabs.",
+      "leadSuggest": "Without the right to add problems, the problem is sent as a suggestion for staff to review.",
       "createButton": "Create problem",
       "suggestButton": "Send suggestion",
       "suggested": "Suggestion for {code} sent.",
@@ -117,7 +118,8 @@
       "memory": "From 0 to 1048576 KiB.",
       "points": "From 800 to 3500.",
       "types": "At least one problem type is needed.",
-      "name": "The name must be 1 to 100 characters."
+      "name": "The name must be 1 to 100 characters.",
+      "languages": "Choose at least 1 language"
     },
     "changeMessage": "Reason",
     "changeMessagePlaceholder": "Optional, kept in the history",
@@ -330,7 +332,9 @@
       "unpairedHint": "These files will not become tests. Check their names: a test's input and output must share a folder and a base name.",
       "others": "{count} other files (not input/output)",
       "apply": "Add {count} tests",
+      "applyReplace": "Replace with {count} tests",
       "applied": "Added {count} tests. Press “Save configuration” to save.",
+      "appliedReplace": "Replaced with {count} tests. Press “Save configuration” to save.",
       "skip": "Skip, add tests by hand"
     },
     "config": {

@@ -35,9 +35,14 @@ const fileName = computed(() => shownUrl.value.split('/').pop() ?? '');
 const keepsFile = computed(() => props.currentUrl !== undefined);
 const canRemove = computed(() => keepsFile.value && !!shownUrl.value && !props.lockedBy);
 const isConfirmShown = ref(false);
+const picker = ref<{ clear: () => void } | null>(null);
+/** A removed file takes the answers to its uploads with it. */
 async function removeFile() {
   await upload.removal.run(undefined);
-  if (!upload.removal.failure.value) isConfirmShown.value = false;
+  if (upload.removal.failure.value) return;
+  isConfirmShown.value = false;
+  upload.mutation.reset();
+  picker.value?.clear();
 }
 const buttonKey = computed(() =>
   keepsFile.value && shownUrl.value
@@ -94,11 +99,13 @@ const buttonKey = computed(() =>
     <p v-if="lockedBy" class="text-sm text-muted">{{ needsPermissionText(lockedBy) }}</p>
     <UploadButton
       v-else
+      ref="picker"
       class="mt-auto"
       :label="$t(buttonKey)"
       :accept="accept"
       :max-bytes="maxBytes"
       :is-pending="upload.mutation.isPending.value"
+      @attempt="upload.mutation.reset"
       @picked="upload.mutation.run"
     />
     <AdminStatus

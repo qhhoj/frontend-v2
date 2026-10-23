@@ -14,6 +14,7 @@ import type {
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { PROBLEM_CODE_PATTERN } from '../problem-code';
+import { EDIT_ALL_PROBLEM } from './field-lock';
 
 /** The backend's problem name rule: 1 to this many characters. */
 export const PROBLEM_NAME_MAX = 100;
@@ -314,4 +315,14 @@ export function checkProblemForm(
     errors.points = translate('admin.problems.general.errors.points');
   if (form.typeIds.length === 0) errors.typeIds = translate('admin.problems.general.errors.types');
   return errors;
+}
+
+/** The editor's extra check: a problem keeps at least one language to submit in. Only a viewer who can change the list is stopped by it (the others never send it). */
+export function checkAllowedLanguages(
+  form: ProblemForm,
+  can: (permission: string) => boolean,
+): FieldErrors {
+  return can(EDIT_ALL_PROBLEM) && form.allowedLanguages.length === 0
+    ? { allowedLanguages: translate('admin.problems.general.errors.languages') }
+    : {};
 }

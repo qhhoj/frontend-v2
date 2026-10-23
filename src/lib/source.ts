@@ -31,10 +31,11 @@ function decodeText(bytes: Uint8Array) {
 }
 
 export type SourceFileResult =
-  { ok: true; text: string } | { ok: false; reason: 'tooLarge' | 'notText' | 'tooLong' };
+  { ok: true; text: string } | { ok: false; reason: 'empty' | 'tooLarge' | 'notText' | 'tooLong' };
 
 /** A source file as editor text: the one place a file's encoding and line endings are settled (always LF). */
 export async function readSourceFile(file: File): Promise<SourceFileResult> {
+  if (file.size === 0) return { ok: false, reason: 'empty' };
   if (file.size > MAX_SOURCE_BYTES) return { ok: false, reason: 'tooLarge' };
   const text = normalizeNewlines(decodeText(new Uint8Array(await file.arrayBuffer())));
   if (text.includes('\u0000')) return { ok: false, reason: 'notText' };

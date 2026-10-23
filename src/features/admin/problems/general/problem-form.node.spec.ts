@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { editableProblem, LANG_PY3, problemEditingMeta } from '@/test/admin-fixtures/problems';
 import {
   changedProblemFields,
+  checkAllowedLanguages,
   checkProblemForm,
   emptyProblemForm,
   STAFF_ONLY_FIELDS,
@@ -55,6 +56,16 @@ describe('problem form', () => {
     expect(checkProblemForm(high, nobodyCan).timeLimit).toBe(
       'Trên 5 giây cần quyền “Đặt giới hạn thời gian cao”.',
     );
+  });
+
+  it('refuses an empty allowed-languages list from a viewer who may change it', () => {
+    const none = { ...seeded(), allowedLanguages: [] };
+    const canEditAll = (permission: string) => permission === 'judge.edit_all_problem';
+    expect(checkAllowedLanguages(none, canEditAll).allowedLanguages).toBe(
+      'Chọn ít nhất 1 ngôn ngữ',
+    );
+    expect(checkAllowedLanguages(seeded(), canEditAll)).toEqual({});
+    expect(checkAllowedLanguages(none, nobodyCan)).toEqual({});
   });
 
   it('compares lists by value, so reordering a type list is a change and an equal copy is not', () => {

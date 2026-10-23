@@ -199,7 +199,11 @@ const CELL = 'border-b border-line px-2 py-1.5';
           :aria-disabled="!canApply || undefined"
           data-testid="autofill-apply"
         >
-          {{ $t('admin.problems.data.autofill.apply', { count: pairs.length }) }}
+          {{
+            $t(`admin.problems.data.autofill.${mode === 'replace' ? 'applyReplace' : 'apply'}`, {
+              count: pairs.length,
+            })
+          }}
         </button>
       </div>
     </form>
