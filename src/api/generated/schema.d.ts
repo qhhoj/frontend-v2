@@ -10326,7 +10326,7 @@ export interface components {
             label: string;
         };
         /** @enum {string} */
-        PolygonImportErrorCode: "catalog_missing" | "checker_unsupported" | "generation_failed" | "generation_no_judge" | "generation_timeout" | "import_failed" | "imported_needs_attention" | "package_incomplete" | "package_invalid" | "package_needs_full" | "polygon_already_linked" | "polygon_clock_skew" | "polygon_failed" | "polygon_not_connected" | "polygon_package_too_large" | "polygon_package_unavailable" | "polygon_unauthorized" | "polygon_unavailable" | "problem_changed" | "problem_code_taken" | "problem_not_found" | "problem_not_importable" | "problem_unlinked" | "requester_forbidden" | "statement_language_repeated" | "statement_language_required" | "statement_language_unmapped" | "storage_full" | "too_many_testcases" | "tutorial_language_required";
+        PolygonImportErrorCode: "catalog_missing" | "checker_unsupported" | "generation_failed" | "generation_no_judge" | "generation_timeout" | "import_failed" | "imported_needs_attention" | "package_incomplete" | "package_invalid" | "package_needs_full" | "polygon_already_linked" | "polygon_clock_skew" | "polygon_failed" | "polygon_not_connected" | "polygon_package_too_large" | "polygon_package_unavailable" | "polygon_run_count_unsupported" | "polygon_unauthorized" | "polygon_unavailable" | "problem_changed" | "problem_code_taken" | "problem_not_found" | "problem_not_importable" | "problem_unlinked" | "requester_forbidden" | "statement_language_repeated" | "statement_language_required" | "statement_language_unmapped" | "storage_full" | "too_many_testcases" | "tutorial_language_required";
         PolygonLatestPackageResponse: {
             /**
              * Format: date-time

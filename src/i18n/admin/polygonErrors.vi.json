@@ -67,6 +67,10 @@
     "title": "Checker của gói không chạy được",
     "fix": "Đổi checker trên Polygon, dựng gói mới rồi nhập lại."
   },
+  "polygon_run_count_unsupported": {
+    "title": "Bài chạy lời giải không đúng một lần trên mỗi test",
+    "fix": "QHHOJ chưa hỗ trợ kiểu bài này. Hãy chọn bài khác hoặc sửa bài trên Polygon để lời giải chạy đúng một lần mỗi test."
+  },
   "generation_failed": {
     "title": "Sinh test trên judge lỗi",
     "fix": "Kiểm tra generator và lời giải chính trên Polygon, hoặc dùng gói full."
