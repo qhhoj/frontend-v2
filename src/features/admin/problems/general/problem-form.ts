@@ -255,7 +255,7 @@ const requiredProblemFields = (form: ProblemForm): RequiredPart<ProblemBody> => 
   code: form.code,
   groupId: form.groupId,
   memoryLimit: form.memoryLimit,
-  name: form.name,
+  name: form.name.trim(),
   points: form.points,
   timeLimit: form.timeLimit,
   typeIds: form.typeIds,
