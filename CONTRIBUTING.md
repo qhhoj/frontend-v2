@@ -113,7 +113,7 @@ There is no browser test suite in this repo. UI journeys are checked by agent-ru
 
 `src/api/generated/` is machine-written from the backend's `openapi.json` (never edit it): `npm run api:gen` copies the backend document (`OPENAPI_SPEC`, default `../backend-v2/openapi.json`), records the backend commit in `openapi.source` and regenerates `schema.d.ts`. `npm run api:check` (part of CI and `npm run check`) fails when `schema.d.ts` is not what the snapshot generates; `npm run api:check -- --backend` also compares the snapshot with the sibling backend checkout and skips when there is none.
 
-The `API drift` workflow checks out `qhhoj/backend-v2` `main` (a public repository) and runs the same `--backend` comparison on pull requests, pushes to `main`, daily and on demand. It always runs; it is a required check on `main`. When it fails: pull the backend, run `npm run api:gen`, fix the typecheck, open a `chore: sync api schema` PR.
+The `API drift` workflow checks out the latest `qhhoj/backend-v2` release tag (`gh api repos/qhhoj/backend-v2/releases/latest`; the backend deploys only on a release; public repository) and runs the same `--backend` comparison on pull requests, pushes to `main`, daily and on demand. It always runs; it is a required check on `main`. When it fails: if the PR needs unreleased backend changes, merge it after that backend release X exists and its deploy has run (check the backend Deploy workflow; the check proves the release exists, not that it is deployed: the deploy can wait up to 6 h for a running contest, and a manual dispatch can ship any ref); otherwise check out the release tag in `../backend-v2`, run `npm run api:gen`, fix the typecheck, open a `chore: sync api schema` PR.
 
 ## Releasing
 

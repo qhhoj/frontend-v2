@@ -1,7 +1,9 @@
 name: API drift
 
-# The snapshot in src/api/generated must be the document backend main serves. Red here means:
-# pull the backend, run `npm run api:gen`, fix the typecheck, open a `chore: sync api schema` PR.
+# The snapshot in src/api/generated must be the document the DEPLOYED backend serves: its latest GitHub release
+# (the backend deploys only on a release; backend main may hold unreleased changes the live API would refuse).
+# Red here means: check out the backend release tag, run `npm run api:gen`, fix the typecheck, open a
+# `chore: sync api schema` PR. A PR that needs unreleased backend changes waits for that release.
 on:
   pull_request:
   push:
@@ -15,10 +17,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: latest backend release
+        id: release
+        env: { GH_TOKEN: '${{ github.token }}' }
+        shell: bash -eo pipefail {0}
+        run: |
+          tag=$(gh api repos/qhhoj/backend-v2/releases/latest --jq .tag_name)
+          test -n "$tag" || { echo "::error::no backend release found"; exit 1; }
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
         with:
           repository: qhhoj/backend-v2
-          ref: main
+          ref: ${{ steps.release.outputs.tag }}
           path: backend
       - uses: actions/setup-node@v4
         with:
@@ -27,7 +37,11 @@ jobs:
       - run: npm ci
       - name: backend checkout has the contract
         run: test -f backend/openapi.json
-      - name: snapshot equals backend main
+      - name: snapshot equals the latest backend release
+        env: { TAG: '${{ steps.release.outputs.tag }}' }
         run: |
-          echo "snapshot taken from backend $(cat src/api/generated/openapi.source); backend main is now $(git -C backend rev-parse HEAD)"
-          OPENAPI_SPEC=backend/openapi.json npm run api:check -- --backend
+          echo "snapshot taken from backend $(cat src/api/generated/openapi.source); latest release $TAG is $(git -C backend rev-parse HEAD)"
+          OPENAPI_SPEC=backend/openapi.json npm run api:check -- --backend || {
+            echo "::error::src/api/generated is not backend release $TAG. If this PR needs backend changes not yet released, merge it after the backend release X containing them exists and its deploy has run (check the backend Deploy workflow). Otherwise check out $TAG in ../backend-v2, run npm run api:gen and commit."
+            exit 1
+          }
