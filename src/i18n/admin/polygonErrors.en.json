@@ -68,7 +68,7 @@
     "fix": "Change the checker on Polygon, build a new package, then import again."
   },
   "polygon_run_count_unsupported": {
-    "title": "The problem runs the solution other than once per test",
+    "title": "The problem runs the solution other than exactly once per test",
     "fix": "QHHOJ does not support that yet. Pick another problem, or change it on Polygon so the solution runs exactly once per test."
   },
   "generation_failed": {

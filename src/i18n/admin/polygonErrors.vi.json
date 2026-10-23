@@ -68,7 +68,7 @@
     "fix": "Đổi checker trên Polygon, dựng gói mới rồi nhập lại."
   },
   "polygon_run_count_unsupported": {
-    "title": "Bài chạy lời giải nhiều hơn một lần trên mỗi test",
+    "title": "Bài chạy lời giải không đúng một lần trên mỗi test",
     "fix": "QHHOJ chưa hỗ trợ kiểu bài này. Hãy chọn bài khác hoặc sửa bài trên Polygon để lời giải chạy đúng một lần mỗi test."
   },
   "generation_failed": {
