@@ -137,6 +137,7 @@
     "fromPolygon": "Taken from the Polygon package",
     "taken": {
       "statements": "Statements, translations and the tutorial",
+      "statementsNoTutorial": "Statements and translations",
       "tests": "Tests and point groups",
       "checker": "Checker or interactor",
       "limits": "Time and memory limits and partial scoring"

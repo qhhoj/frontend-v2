@@ -53,6 +53,8 @@ const statements = props.problem.statements;
 const languages = ref(props.draft?.languages ?? defaultLanguageChoice(statements));
 /** The form of the start in flight, handed to the progress step with its job. */
 const sentForm = ref<ImportForm | null>(null);
+/** The form's "import the tutorial" box: the source card words what a sync takes by it. */
+const isTutorialImported = ref(true);
 /** The update body waiting for the overwrite confirmation. */
 const pending = ref<PolygonImportBody | null>(null);
 const isConfirmOpen = computed({
@@ -143,6 +145,7 @@ const refusal = computed(() => {
         :server-errors="fieldErrors"
         :submit-label-of="submitLabelOf"
         @start="start"
+        @tutorial-change="isTutorialImported = $event"
       >
         <template #target="{ mode, code }">
           <PolygonUpdateTarget v-if="mode === 'update'" :code="code" />
@@ -170,7 +173,11 @@ const refusal = computed(() => {
           />
         </template>
         <template #before-actions>
-          <PolygonSourcePanel :problem="problem" class="xl:hidden" />
+          <PolygonSourcePanel
+            :problem="problem"
+            :import-tutorial="isTutorialImported"
+            class="xl:hidden"
+          />
         </template>
         <template #actions>
           <button type="button" :class="buttonClass('ghost')" @click="emit('back')">
@@ -181,7 +188,7 @@ const refusal = computed(() => {
       <AdminStatus v-if="refusal" kind="refused" :text="refusal" />
     </div>
     <div class="hidden xl:sticky xl:top-4 xl:block">
-      <PolygonSourcePanel :problem="problem" />
+      <PolygonSourcePanel :problem="problem" :import-tutorial="isTutorialImported" />
     </div>
     <PolygonOverwriteConfirm
       v-if="pending"

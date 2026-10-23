@@ -6,7 +6,11 @@ import PackageStatePill from './PackageStatePill.vue';
 import PackageTypePill from './PackageTypePill.vue';
 
 /** Step 2's side card: the picked Polygon problem, what each sync takes from the package and what QHHOJ keeps. */
-defineProps<{ problem: PolygonProblem }>();
+defineProps<{
+  problem: PolygonProblem;
+  /** False: the package tutorial is not taken, so the statements line leaves the editorial out. */
+  importTutorial?: boolean;
+}>();
 const FROM_PACKAGE = ['statements', 'tests', 'checker', 'limits'] as const;
 const locale = useLocaleStore();
 </script>
@@ -52,7 +56,11 @@ const locale = useLocaleStore();
       </h3>
       <ul class="flex list-disc flex-col gap-1 pl-5 text-sm">
         <li v-for="item in FROM_PACKAGE" :key="item">
-          {{ $t(`admin.polygonLink.source.taken.${item}`) }}
+          {{
+            $t(
+              `admin.polygonLink.source.taken.${item === 'statements' && importTutorial === false ? 'statementsNoTutorial' : item}`,
+            )
+          }}
         </li>
       </ul>
     </div>

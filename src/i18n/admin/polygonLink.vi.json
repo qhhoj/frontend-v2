@@ -137,6 +137,7 @@
     "fromPolygon": "Lấy từ gói Polygon",
     "taken": {
       "statements": "Đề bài, bản dịch và lời giải",
+      "statementsNoTutorial": "Đề bài và bản dịch",
       "tests": "Test và nhóm test theo điểm",
       "checker": "Checker hoặc interactor",
       "limits": "Giới hạn thời gian, bộ nhớ và chấm từng phần"

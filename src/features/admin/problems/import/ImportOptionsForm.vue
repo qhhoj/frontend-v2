@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronRight, FileArchive } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import type { ImportOptions } from '@/api/types/problem-imports';
 import { formatFileSize } from '@/lib/format';
 import { translate } from '@/i18n';
@@ -59,9 +59,18 @@ const props = withDefaults(
 /** `form` is the form as submitted (a copy), for a caller that refills it later. */
 const emit = defineEmits<{
   start: [submission: { options: ImportOptions; file: File | null; form: ImportForm }];
+  /** The "import the tutorial" box as it stands, for a caller that words its text by it. */
+  tutorialChange: [isImported: boolean];
 }>();
 
 const form = ref<ImportForm>({ ...emptyImportForm(), ...props.initial });
+watch(
+  () => form.value.importTutorial,
+  (isImported) => emit('tutorialChange', isImported),
+  {
+    immediate: true,
+  },
+);
 const localErrors = ref<FieldErrors>({});
 const errorOf = (field: string) => localErrors.value[field] ?? props.serverErrors[field];
 const isOwnerReady = ref(false);
@@ -231,6 +240,7 @@ function submit() {
           </AdminField>
 
           <AdminField
+            v-if="form.importTutorial !== false"
             v-slot="{ id }"
             :label="$t('admin.polygon.form.solutionLanguage')"
             :error="errorOf('tutorialLanguage')"
