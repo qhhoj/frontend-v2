@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import type { Schemas } from '@/api/schemas';
 import { TriangleAlert } from 'lucide-vue-next';
-import { summaryRowsOf } from './import-outcome';
+import { summaryRowsOf } from './polygon-summary';
 
 /**
  * "Khác gì so với Polygon": what the conversion made of the package, a clamp noted beside the value it changed, and a

@@ -9,7 +9,7 @@ import { useAdminMutation } from '../../ui/use-admin-mutation';
 import ImportCheckbox from '../import/ImportCheckbox.vue';
 import { importRefusalText } from '../import/import-refusal';
 import PolygonLanguageFields from './PolygonLanguageFields.vue';
-import type { ImportErrorText } from './polygon-import-errors';
+import type { ImportErrorText } from '../import/import-errors';
 import {
   isLanguageFieldDrawn,
   repeatedLanguageErrors,

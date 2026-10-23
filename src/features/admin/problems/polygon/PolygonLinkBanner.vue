@@ -9,8 +9,8 @@ import type { NoticeTone } from '@/components/ui/Notice.vue';
 import { translate } from '@/i18n';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
-import { queueLinesOf, runningLineOf } from './import-outcome';
-import type { ImportErrorText } from './polygon-import-errors';
+import { queueLinesOf, runningLineOf } from '../import/import-reading';
+import type { ImportErrorText } from '../import/import-errors';
 import type { BannerKind } from './polygon-link';
 
 /**

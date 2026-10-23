@@ -6,9 +6,6 @@ import type { PolygonImportBody } from '@/api/types/polygon';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import Notice from '@/components/ui/Notice.vue';
-import { translate } from '@/i18n';
-import { formatDuration } from '@/lib/format';
-import { formatClock, formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
 import { SYNC_POLYGON } from '../../admin-screens';
@@ -16,15 +13,13 @@ import AdminStatus from '../../ui/AdminStatus.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import ImportStepList from '../import/ImportStepList.vue';
 import { importRefusalText } from '../import/import-refusal';
+import { readImportJob } from '../import/import-reading';
 import { useImportJob } from '../import/use-import-job';
 import { useImportSteps } from '../import/use-import-steps';
 import ImportOutcomeHeader from './ImportOutcomeHeader.vue';
 import ImportStepBar from './ImportStepBar.vue';
 import ImportSummaryTable from './ImportSummaryTable.vue';
 import LocalEditsList from './LocalEditsList.vue';
-import { outcomeActionOf, outcomeKindOf, queueLinesOf, runningLineOf } from './import-outcome';
-import type { OutcomeKind } from './import-outcome';
-import { importErrorOf } from './polygon-import-errors';
 
 /**
  * Step 3 (progress option B): the outcome first (header, one segment per step), then its cause and fix or the
@@ -44,78 +39,25 @@ const locale = useLocaleStore();
 const { canAny } = usePermissions();
 const { job, phase, failure: pollFailure, stop, recheck } = useImportJob(toRef(props, 'jobId'));
 const steps = useImportSteps('polygon', job);
-const kind = computed(() => outcomeKindOf(phase.value, job.value, stop.value));
 const code = computed(() => job.value?.result?.code ?? job.value?.code ?? props.body?.code ?? '');
-const error = computed(() =>
-  importErrorOf(job.value?.errorCode ?? null, job.value?.errorParams ?? null),
-);
-const attention = computed(() =>
-  importErrorOf('imported_needs_attention', job.value?.result?.attention?.params ?? null),
-);
-/** The converter's own words: the only specifics of a refused package or checker. */
-const detail = computed(() =>
-  error.value.kind === 'other' && job.value?.errorCode !== 'import_failed'
-    ? (job.value?.error ?? '')
-    : '',
-);
-const action = computed(() =>
-  outcomeActionOf(
-    kind.value,
-    {
-      retryable: job.value?.retryable ?? false,
-      kind: error.value.kind,
-      isSync: job.value?.purpose === 'sync',
-    },
-    { retry: !!props.body, edit: props.canEdit, sync: canAny(SYNC_POLYGON) },
-  ),
-);
-
 /** When the job was last seen: the "Chưa rõ trạng thái" line says how old its step is. */
 const lastSeenAt = ref(new Date().toISOString());
 watch(job, () => (lastSeenAt.value = new Date().toISOString()));
-
+const reading = computed(() =>
+  readImportJob({
+    source: 'polygon',
+    job: job.value,
+    phase: phase.value,
+    stop: stop.value,
+    code: code.value,
+    lastSeenAt: lastSeenAt.value,
+    locale: locale.locale,
+    can: { retry: !!props.body, edit: props.canEdit, sync: canAny(SYNC_POLYGON) },
+  }),
+);
 const KEY = 'admin.polygonLink.progress';
-/** Kinds that can come before any answer (after a reload), when nothing names the problem yet. */
-const UNNAMED: ReadonlySet<OutcomeKind> = new Set(['waiting', 'lost', 'gone']);
-const title = computed(() => {
-  if (!code.value && UNNAMED.has(kind.value))
-    return translate(`${KEY}.outcome.unnamed.${kind.value}`);
-  const verb = job.value?.purpose === 'sync' ? 'sync' : 'import';
-  return translate(`${KEY}.outcome.${verb}.${kind.value}`, { code: code.value });
-});
-function finishedLine() {
-  const { createdAt, finishedAt } = job.value ?? {};
-  if (!createdAt || !finishedAt) return '';
-  const seconds = (Date.parse(finishedAt) - Date.parse(createdAt)) / 1000;
-  const date = formatDate(finishedAt, 'datetime', locale.locale);
-  return translate(`${KEY}.finished`, { date, duration: formatDuration(seconds) });
-}
-function failedLine() {
-  const step = job.value?.failedStep;
-  if (!step) return '';
-  const name = translate(`admin.polygon.progress.failedSteps.${step}`);
-  return translate('admin.polygon.progress.stoppedAt', { step: name });
-}
-function lastSeenLine() {
-  if (!job.value) return '';
-  const time = formatClock(lastSeenAt.value);
-  return translate(`${KEY}.lastSeen`, { step: runningLineOf(job.value), time });
-}
-const LINES: Partial<Record<OutcomeKind, () => string>> = {
-  queued: () => queueLinesOf(job.value?.queuePosition ?? null).place,
-  running: () => (job.value ? runningLineOf(job.value) : ''),
-  done: finishedLine,
-  attention: () => attention.value.title,
-  failed: failedLine,
-  lost: lastSeenLine,
-  gone: () => (stop.value ? translate(`admin.polygon.progress.stopped.${stop.value}`) : ''),
-};
-const line = computed(() => LINES[kind.value]?.() ?? '');
-const hint = computed(() => {
-  if (kind.value === 'queued') return queueLinesOf(job.value?.queuePosition ?? null).ahead;
-  if (kind.value !== 'running') return '';
-  return translate(`${KEY}.hint.${job.value?.step === 'generating' ? 'generating' : 'running'}`);
-});
+const kind = computed(() => reading.value.kind);
+const action = computed(() => reading.value.action);
 
 const retry = useAdminMutation({
   mutate: (body: PolygonImportBody) => startPolygonLinkImport(body),
@@ -146,18 +88,18 @@ const syncOptionsTo = computed(() => ({
       aria-live="polite"
       data-testid="import-outcome"
     >
-      <ImportOutcomeHeader :kind="kind" :title="title" :line="line" />
+      <ImportOutcomeHeader :kind="kind" :title="reading.title" :line="reading.line" />
       <ImportStepBar :steps="steps" :attention="kind === 'attention'" />
-      <p v-if="hint" class="text-meta text-muted">{{ hint }}</p>
+      <p v-if="reading.hint" class="text-meta text-muted">{{ reading.hint }}</p>
 
       <div v-if="kind === 'failed'" class="flex flex-col gap-1" data-testid="import-failure">
-        <p class="font-semibold">{{ error.title }}</p>
-        <p class="text-sm">{{ error.fix }}</p>
-        <p v-if="detail" class="font-mono text-meta break-words text-muted">
-          {{ $t(`${KEY}.serverSays`, { text: detail }) }}
+        <p class="font-semibold">{{ reading.cause }}</p>
+        <p class="text-sm">{{ reading.fix }}</p>
+        <p v-if="reading.detail" class="font-mono text-meta break-words text-muted">
+          {{ $t(`${KEY}.serverSays`, { text: reading.detail }) }}
         </p>
       </div>
-      <p v-else-if="kind === 'attention'" class="text-sm">{{ attention.fix }}</p>
+      <p v-else-if="kind === 'attention'" class="text-sm">{{ reading.fix }}</p>
       <ImportSummaryTable
         v-else-if="kind === 'done' && job?.result?.summary"
         :summary="job.result.summary"

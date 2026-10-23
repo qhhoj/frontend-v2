@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue';
 import type { Schemas } from '@/api/schemas';
-import { localEditsRowsOf } from './import-outcome';
+import { localEditsRowsOf } from './polygon-summary';
 
 /**
  * "Thiết lập chấm": what a sync did with the limits, partial scoring, checker and grader — kept as edited on QHHOJ,

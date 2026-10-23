@@ -27,7 +27,7 @@ import LocalEditsList from './LocalEditsList.vue';
 import PolygonLinkBanner from './PolygonLinkBanner.vue';
 import PolygonLinkOptionsDrawer from './PolygonLinkOptionsDrawer.vue';
 import PolygonSyncHistory from './PolygonSyncHistory.vue';
-import { importErrorOf } from './polygon-import-errors';
+import { importErrorOf } from '../import/import-errors';
 import { bannerActionOf, bannerKindOf } from './polygon-link';
 import type { BannerKind } from './polygon-link';
 import { linkOptionsLineOf } from './polygon-link-options';
