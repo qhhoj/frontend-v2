@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue';
+import { computed, nextTick, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import { translate } from '@/i18n';
@@ -20,10 +20,26 @@ const afterSignIn = useAfterSignIn();
 const preloadAfterSignIn = usePreloadAfterSignIn();
 const form = reactive({ username: '', password: '' });
 const formElement = ref<HTMLFormElement | null>(null);
-const { pending, error, fieldErrors, summary, dismiss, run } = useAuthAction(formElement, [
-  'username',
-  'password',
-]);
+const {
+  pending,
+  error,
+  fieldErrors: serverFieldErrors,
+  summary,
+  dismiss,
+  run,
+  focusFirstInvalid,
+} = useAuthAction(formElement, ['username', 'password']);
+/** Empty fields are caught here, in Vietnamese, instead of by the browser's own (English) validation bubble. */
+const missing = ref<Record<string, string>>({});
+const fieldErrors = computed(() => ({ ...serverFieldErrors.value, ...missing.value }));
+const clearMissing = (name: string) => {
+  delete missing.value[name];
+  dismiss(name);
+};
+const findMissing = () => ({
+  ...(form.username.trim() ? {} : { username: translate('auth.usernameRequired') }),
+  ...(form.password ? {} : { password: translate('auth.passwordRequired') }),
+});
 
 /** Messages other pages hand over through `?notice=`; any other value is ignored. */
 const NOTICES = new Map([['password-reset', 'auth.notice.passwordReset']]);
@@ -42,7 +58,15 @@ const notActivated = computed(() =>
 );
 const LINK = 'font-semibold text-accent-text underline';
 
-const submit = () =>
+const submit = async () => {
+  missing.value = findMissing();
+  if (Object.keys(missing.value).length) {
+    await nextTick();
+    return focusFirstInvalid();
+  }
+  await attempt();
+};
+const attempt = () =>
   run(async () => {
     preloadAfterSignIn();
     await session.login({ ...form });
@@ -60,7 +84,13 @@ const submit = () =>
         }}</RouterLink></span
       >
     </template>
-    <form ref="formElement" method="post" class="flex flex-col gap-4" @submit.prevent="submit">
+    <form
+      ref="formElement"
+      method="post"
+      novalidate
+      class="flex flex-col gap-4"
+      @submit.prevent="submit"
+    >
       <AuthNotice v-if="notice" dismissible @dismiss="noticeDismissed = true">{{
         notice
       }}</AuthNotice>
@@ -79,7 +109,7 @@ const submit = () =>
         required
         spellcheck="false"
         autocapitalize="none"
-        @input="dismiss('username')"
+        @input="clearMissing('username')"
       />
       <AuthField
         v-model="form.password"
@@ -90,7 +120,7 @@ const submit = () =>
         :error="fieldErrors.password"
         placeholder="••••••••"
         required
-        @input="dismiss('password')"
+        @input="clearMissing('password')"
       />
       <p class="-mt-1 flex justify-end text-sm">
         <RouterLink :to="{ name: 'forgot-password' }" class="text-accent-text underline">{{

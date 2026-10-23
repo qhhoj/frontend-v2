@@ -74,10 +74,32 @@ function installGateSync(router: Router) {
   onGateRequired(() => void syncToGate());
 }
 
+/**
+ * The session ended without the viewer asking (expired, or signed out in another tab): apply the navigation rules to the
+ * page they are on, so a page that needs a session sends them to sign-in and brings them back (`redirect`) afterwards.
+ */
+export function installLostSessionRedirect(router: Router) {
+  let watching = false;
+  // The store needs the app's pinia, which exists only once the first navigation starts.
+  router.beforeEach(() => {
+    if (watching) return;
+    watching = true;
+    const session = useSessionStore();
+    watch(
+      () => session.sessionLostCount,
+      async () => {
+        const target = await resolveNavigation(router.currentRoute.value, session);
+        if (target !== true) await router.replace(target);
+      },
+    );
+  });
+}
+
 export function createAppRouter(history: RouterHistory = createWebHistory()): Router {
   const router = createRouter({ history, routes, scrollBehavior: scrollOnNavigation });
   installNavigationLoading(router);
   installGateSync(router);
+  installLostSessionRedirect(router);
   trackFirstPage(router);
   const titleDocument = () => {
     if (typeof document === 'undefined') return; // hook can fire after the DOM is torn down

@@ -10,6 +10,7 @@ import {
   stopImpersonation,
 } from '@/api/auth.api';
 import { ApiError, onCsrfFailed, onUnauthorized, setCsrfToken } from '@/api/client';
+import { openSessionChannel } from './session-channel';
 import type {
   LoginBody,
   SessionResponse,
@@ -45,6 +46,8 @@ export const useSessionStore = defineStore('session', () => {
   const impersonatorId = ref<string | null>(null);
   /** While the second factor is pending: the account name and the factors it can use. */
   const twoFactor = ref<TwoFactorPending | null>(null);
+  /** Counts the times the session ended without the viewer asking (expired, or signed out in another tab): the router re-runs its guards on each. */
+  const sessionLostCount = ref(0);
   const isStaff = computed(() => user.value?.isStaff ?? false);
   let loading: Promise<void> | null = null;
   /** The sign-out request still in flight: a later login or reload waits for it, so it cannot end the new session. */
@@ -98,6 +101,7 @@ export const useSessionStore = defineStore('session', () => {
   function logout() {
     signingOut = endServerSession();
     apply(null);
+    channel.announceSignedOut();
     return Promise.resolve();
   }
 
@@ -128,6 +132,7 @@ export const useSessionStore = defineStore('session', () => {
   async function logoutEverywhere() {
     await logoutAllSessions();
     apply(null);
+    channel.announceSignedOut();
   }
 
   /** Back to the staff account that started viewing as this user. */
@@ -147,9 +152,17 @@ export const useSessionStore = defineStore('session', () => {
     return user.value?.id === senderId;
   }
 
+  /** Signed out without the viewer asking: forget the session here and let the router move the viewer off a page that needs it. */
+  function loseSession() {
+    if (status.value !== 'authenticated' && status.value !== 'partial') return;
+    apply(null);
+    sessionLostCount.value += 1;
+  }
+
+  const channel = openSessionChannel(loseSession);
   onCsrfFailed(reloadForResend);
-  /** A protected request answered 401: the session expired, so the viewer is signed out here (guards redirect on the next navigation). */
-  onUnauthorized(() => apply(null));
+  /** A protected request answered 401: the session expired. */
+  onUnauthorized(loseSession);
 
   return {
     status,
@@ -158,6 +171,7 @@ export const useSessionStore = defineStore('session', () => {
     impersonatorId,
     twoFactor,
     isStaff,
+    sessionLostCount,
     ensureLoaded,
     refresh,
     forgetSession,
