@@ -375,7 +375,8 @@
       "flags": {
         "ignoreZeroPointBatches": "0-point groups left out",
         "ignoreZeroPointCases": "0-point tests left out",
-        "appendMainSolution": "main solution added"
+        "appendMainSolution": "main solution added",
+        "skipTutorial": "package tutorial skipped"
       }
     },
     "drawer": {

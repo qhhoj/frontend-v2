@@ -52,6 +52,7 @@ const flags = ref({
   ignoreZeroPointBatches: props.link.options.ignoreZeroPointBatches,
   ignoreZeroPointCases: props.link.options.ignoreZeroPointCases,
   appendMainSolution: props.link.options.appendMainSolution,
+  importTutorial: props.link.options.importTutorial,
 });
 
 const save = useAdminMutation({
@@ -108,6 +109,11 @@ const submit = () => repeatedLanguages(languages.value).length === 0 && save.run
         v-model="flags.ignoreZeroPointCases"
         :label="$t('admin.polygon.form.ignoreCases')"
         :description="$t('admin.polygon.form.ignoreCasesHint')"
+      />
+      <ImportCheckbox
+        v-model="flags.importTutorial"
+        :label="$t('admin.polygon.form.importTutorial')"
+        :description="$t('admin.polygon.form.importTutorialHint')"
       />
       <ImportCheckbox
         v-model="flags.appendMainSolution"

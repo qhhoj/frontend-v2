@@ -273,6 +273,11 @@ function submit() {
             :description="$t('admin.polygon.form.ignoreCasesHint')"
           />
           <ImportCheckbox
+            v-model="form.importTutorial"
+            :label="$t('admin.polygon.form.importTutorial')"
+            :description="$t('admin.polygon.form.importTutorialHint')"
+          />
+          <ImportCheckbox
             v-model="form.appendMainSolution"
             :label="$t('admin.polygon.form.appendSolution')"
             :description="$t('admin.polygon.form.appendSolutionHint')"

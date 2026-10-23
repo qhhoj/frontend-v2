@@ -87,6 +87,7 @@ const bodyOf = (options: ImportOptions): PolygonImportBody => ({
   ignoreZeroPointBatches: options.ignoreZeroPointBatches ?? false,
   ignoreZeroPointCases: options.ignoreZeroPointCases ?? false,
   appendMainSolution: options.appendMainSolution ?? false,
+  importTutorial: options.importTutorial ?? true,
   autoSync: autoSync.value,
 });
 

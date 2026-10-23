@@ -375,7 +375,8 @@
       "flags": {
         "ignoreZeroPointBatches": "bỏ nhóm 0 điểm",
         "ignoreZeroPointCases": "bỏ test 0 điểm",
-        "appendMainSolution": "thêm lời giải chính"
+        "appendMainSolution": "thêm lời giải chính",
+        "skipTutorial": "bỏ lời giải của gói"
       }
     },
     "drawer": {

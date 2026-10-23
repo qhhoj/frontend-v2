@@ -16,6 +16,7 @@ const options = (overrides: Partial<Options> = {}): Options => ({
   ignoreZeroPointBatches: false,
   ignoreZeroPointCases: false,
   appendMainSolution: false,
+  importTutorial: true,
   maxCases: 100,
   ...overrides,
 });
@@ -23,6 +24,7 @@ const flags = {
   ignoreZeroPointBatches: true,
   ignoreZeroPointCases: false,
   appendMainSolution: false,
+  importTutorial: true,
 };
 
 describe('linkStatementsOf', () => {
@@ -153,6 +155,10 @@ describe('linkOptionsLineOf', () => {
     ).toBe(
       'vietnamese (chính) · english → en · russian: bỏ qua · lời giải từ vietnamese · bỏ test 0 điểm',
     );
+  });
+
+  it('names a skipped package tutorial', () => {
+    expect(linkOptionsLineOf(options({ importTutorial: false }))).toContain('bỏ lời giải của gói');
   });
 
   it('says when nothing was chosen', () => {

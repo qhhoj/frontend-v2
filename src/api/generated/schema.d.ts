@@ -10368,6 +10368,11 @@ export interface components {
              * @default false
              */
             ignoreZeroPointCases: boolean;
+            /**
+             * @description Import the package statement's tutorial as the editorial.
+             * @default true
+             */
+            importTutorial: boolean;
             /** @description The problem page address, `https://polygon.codeforces.com/p…/owner/name`. */
             link: string;
             /** @description Polygon language of the statement stored as the base statement. */
@@ -10393,6 +10398,8 @@ export interface components {
             appendMainSolution: boolean;
             ignoreZeroPointBatches: boolean;
             ignoreZeroPointCases: boolean;
+            /** @description Whether the package statement's tutorial becomes the editorial. */
+            importTutorial: boolean;
             mainStatementLanguage: string | null;
             /** @description Testcase limit of the user who linked the problem; a sync of more tests fails with `too_many_testcases`. Not editable. */
             maxCases: number;
@@ -13026,6 +13033,7 @@ export interface components {
             autoSync?: boolean;
             ignoreZeroPointBatches?: boolean;
             ignoreZeroPointCases?: boolean;
+            importTutorial?: boolean;
             /** @description Polygon language of the statement stored as the base statement; null lets a single-statement package decide. */
             mainStatementLanguage?: string | null;
             /** @description The whole mapping `<polygon language>=<en|vi|skip>`, as the import takes it; replaces the saved one. */
@@ -24158,6 +24166,8 @@ export interface operations {
                 ignoreZeroPointBatches?: boolean;
                 /** @description Skip cases worth zero points. */
                 ignoreZeroPointCases?: boolean;
+                /** @description Import the package statement's tutorial as the editorial. */
+                importTutorial?: boolean;
                 /** @description Polygon language of the statement stored as the base statement. */
                 mainStatementLanguage?: string;
                 /** @description `create` (default) makes a new problem; `update` replaces the data and statement of an existing one. */

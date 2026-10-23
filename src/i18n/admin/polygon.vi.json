@@ -30,6 +30,7 @@
     "languageMapInvalid": "Không hợp lệ: {pairs}",
     "ignoreBatches": "Bỏ qua nhóm test 0 điểm",
     "ignoreCases": "Bỏ qua test 0 điểm",
+    "importTutorial": "Nhập phần lời giải (tutorial) của gói",
     "appendSolution": "Thêm lời giải chính vào bài",
     "submit": "Bắt đầu nhập",
     "submitNeedsFile": "Chọn gói .zip để bắt đầu.",
@@ -43,6 +44,7 @@
     "typesHint": "Để trống: dạng bài mặc định.",
     "ignoreBatchesHint": "Không chấm nhóm test 0 điểm (thường là ví dụ); ví dụ vẫn hiện trong đề.",
     "ignoreCasesHint": "Không chấm các test lẻ 0 điểm.",
+    "importTutorialHint": "Dùng phần lời giải viết trên Polygon làm lời giải của bài.",
     "appendSolutionHint": "Đăng code lời giải chính cùng lời giải; người giải sẽ thấy.",
     "codeUpdate": "Bài sẽ cập nhật"
   },
