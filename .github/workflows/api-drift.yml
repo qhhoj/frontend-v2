@@ -20,7 +20,11 @@ jobs:
       - name: latest backend release
         id: release
         env: { GH_TOKEN: '${{ github.token }}' }
-        run: echo "tag=$(gh api repos/qhhoj/backend-v2/releases/latest --jq .tag_name)" >> "$GITHUB_OUTPUT"
+        shell: bash -eo pipefail {0}
+        run: |
+          tag=$(gh api repos/qhhoj/backend-v2/releases/latest --jq .tag_name)
+          test -n "$tag" || { echo "::error::no backend release found"; exit 1; }
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
         with:
           repository: qhhoj/backend-v2
@@ -38,6 +42,6 @@ jobs:
         run: |
           echo "snapshot taken from backend $(cat src/api/generated/openapi.source); latest release $TAG is $(git -C backend rev-parse HEAD)"
           OPENAPI_SPEC=backend/openapi.json npm run api:check -- --backend || {
-            echo "::error::src/api/generated is not backend release $TAG. If this PR needs backend changes not yet released, merge it after the backend release that contains them is deployed. Otherwise check out $TAG in ../backend-v2, run npm run api:gen and commit."
+            echo "::error::src/api/generated is not backend release $TAG. If this PR needs backend changes not yet released, merge it after the backend release X containing them exists and its deploy has run (check the backend Deploy workflow). Otherwise check out $TAG in ../backend-v2, run npm run api:gen and commit."
             exit 1
           }
