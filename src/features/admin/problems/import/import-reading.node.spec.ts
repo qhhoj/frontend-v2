@@ -1,13 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Schemas } from '@/api/schemas';
 import { importJob } from '@/test/admin-fixtures/polygon';
-import {
-  outcomeActionOf,
-  readImportJob,
-  outcomeKindOf,
-  queueLinesOf,
-  runningLineOf,
-} from './import-reading';
+import { outcomeActionOf, readImportJob, queueLinesOf, runningLineOf } from './import-reading';
 
 const result = (attention: Schemas['ImportResultResponse']['attention'] = null) => ({
   problemId: 'p-1',
@@ -16,29 +10,6 @@ const result = (attention: Schemas['ImportResultResponse']['attention'] = null) 
   attention,
   localEdits: null,
 });
-describe('outcomeKindOf', () => {
-  it('leads with the phase of the job', () => {
-    const job = importJob();
-    expect(outcomeKindOf(null, null, null)).toBe('waiting');
-    expect(outcomeKindOf('queued', job, null)).toBe('queued');
-    expect(outcomeKindOf('running', job, null)).toBe('running');
-    expect(outcomeKindOf('failed', job, null)).toBe('failed');
-    expect(outcomeKindOf('done', importJob({ result: result() }), null)).toBe('done');
-  });
-
-  it('reads a completed job that carries attention as imported but needing a look', () => {
-    const attention = { code: 'imported_needs_attention' as const, params: {}, message: 'x' };
-    expect(outcomeKindOf('done', importJob({ result: result(attention) }), null)).toBe('attention');
-  });
-
-  it('puts a stop first: given up can be checked again, the others cannot be followed', () => {
-    const job = importJob({ state: 'active' });
-    expect(outcomeKindOf('running', job, 'gaveUp')).toBe('lost');
-    expect(outcomeKindOf('running', job, 'notFound')).toBe('gone');
-    expect(outcomeKindOf(null, null, 'forbidden')).toBe('gone');
-  });
-});
-
 describe('queueLinesOf', () => {
   it('names the place and how many jobs are ahead', () => {
     expect(queueLinesOf(1)).toEqual({
@@ -187,5 +158,31 @@ describe('readImportJob', () => {
       'Không tìm thấy lượt nhập này',
     );
     expect(read(job, 'running', { stop: 'gaveUp' }).line).toContain('Lần cuối thấy');
+  });
+
+  it('reads the kind: the phase leads, attention is a done job needing a look, a stop outranks the job', () => {
+    const attention = { code: 'imported_needs_attention' as const, params: {}, message: 'x' };
+    const kinds = [
+      read(null, null),
+      read(importJob(), 'queued'),
+      read(importJob(), 'running'),
+      read(failedJob(), 'failed'),
+      read(importJob({ result: result() }), 'done'),
+      read(importJob({ result: result(attention) }), 'done'),
+      read(importJob(), 'running', { stop: 'gaveUp' }),
+      read(importJob(), 'running', { stop: 'notFound' }),
+      read(null, null, { stop: 'forbidden' }),
+    ].map((reading) => reading.kind);
+    expect(kinds).toEqual([
+      'waiting',
+      'queued',
+      'running',
+      'failed',
+      'done',
+      'attention',
+      'lost',
+      'gone',
+      'gone',
+    ]);
   });
 });
