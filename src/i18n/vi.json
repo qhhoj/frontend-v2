@@ -2337,9 +2337,9 @@
       "ticketReply": "Phiếu hỗ trợ có trả lời mới",
       "ticketReopened": "Phiếu hỗ trợ đã được mở lại",
       "ticketClosed": "Phiếu hỗ trợ đã được đóng",
-      "contestAnnouncement": "Thông báo mới trong \"{name}\"",
-      "requestApproved": "Yêu cầu tham gia \"{name}\" đã được duyệt",
-      "requestRejected": "Yêu cầu tham gia \"{name}\" đã bị từ chối",
+      "contestAnnouncement": "Thông báo mới trong “{name}”",
+      "requestApproved": "Yêu cầu tham gia “{name}” đã được duyệt",
+      "requestRejected": "Yêu cầu tham gia “{name}” đã bị từ chối",
       "quotaCredits": "{name} đã dùng 80% tín dụng tháng này",
       "quotaStorage": "{name} đã dùng 80% dung lượng dữ liệu"
     },

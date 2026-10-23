@@ -36,7 +36,7 @@ export function useAnnouncementComposer(
   function submit() {
     localErrors.value = checkAnnouncementDraft({ title: title.value });
     if (Object.keys(localErrors.value).length > 0) return undefined;
-    return post.run({ title: title.value, description: description.value });
+    return post.run({ title: title.value.trim(), description: description.value });
   }
   return { title, description, post, errors, submit };
 }

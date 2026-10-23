@@ -10,7 +10,7 @@ import { iconButtonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { useKeepDataAnswer } from './problem-data.queries';
 
-/** A stored source file of the problem, with its delete button: the judge runs no test generators, so none can be uploaded. */
+/** A stored source file of the problem, with its delete button: the judge does not grade init.yml generators, so none can be uploaded. */
 const props = defineProps<{
   code: string;
   kind: SourceFileKind;

@@ -101,7 +101,7 @@ describe('fieldErrorTexts', () => {
 
   it('never shows the backend English for a code it has no text for, except in the English UI', () => {
     const error = rejected([issue('username', 'brand_new_code', 'username is odd')]);
-    expect(fieldErrorTexts(error)).toEqual({ username: 'Giá trị này chưa hợp lệ.' });
+    expect(fieldErrorTexts(error)).toEqual({ username: 'Giá trị này chưa hợp lệ. Quá dài.' });
     i18n.global.locale.value = 'en';
     expect(fieldErrorTexts(error)).toEqual({ username: 'username is odd' });
   });
@@ -120,7 +120,7 @@ describe('fieldErrorTexts', () => {
 
   it('falls back to the fields of an answer without issues', () => {
     const error = rejected([], { username: ['Username is taken.', 'Too long.'] });
-    expect(fieldErrorTexts(error)).toEqual({ username: 'Giá trị này chưa hợp lệ.' });
+    expect(fieldErrorTexts(error)).toEqual({ username: 'Giá trị này chưa hợp lệ. Quá dài.' });
   });
 
   it('does not let a field named like a prototype member break the result', () => {

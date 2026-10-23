@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useQueryClient } from '@tanstack/vue-query';
 import type { UserEdit } from '@/api/types/users-admin';
@@ -66,6 +66,9 @@ const refusal = computed(() =>
     ? failureTextOf(save.failure.value)
     : null,
 );
+watch(adminPassword, (typed) => {
+  if (typed !== '') missingPassword.value = false;
+});
 function submit() {
   missingPassword.value = isEmailChanged.value && adminPassword.value === '';
   if (dirtyCount.value > 0 && !missingPassword.value) void save.run(undefined);

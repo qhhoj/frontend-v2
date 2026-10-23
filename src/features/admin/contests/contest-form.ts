@@ -539,7 +539,7 @@ export function toContestBody(
 /** Typed from the generated body: a required member the backend adds is a compile error here until it is listed. */
 const requiredContestFields = (form: ContestForm): RequiredPart<ContestBody> => ({
   key: form.key,
-  name: form.name,
+  name: form.name.trim(),
   startTime: form.startTime,
   endTime: form.endTime,
 });

@@ -48,6 +48,9 @@ const CODE_BY_MESSAGE: Readonly<Record<string, string>> = {
   'The judge does not support nobigmath; turn it off.': 'nobigmath_unsupported',
   'That key is taken.': 'key_taken',
   'That code is taken.': 'code_taken',
+  'Not an IANA time zone.': 'time_zone_invalid',
+  'Bad zone.': 'time_zone_invalid',
+  'Too long.': 'max_length',
   'Reserved for automatic contest-cheating bans.': 'ban_reason_reserved',
 };
 /** English refusals that carry a value (a CSV column or line); each named group becomes a parameter of the text. */
@@ -82,8 +85,21 @@ function knownIssueOf(issue: FieldIssue): KnownIssue | null {
 export function adminIssueText(issue: FieldIssue): string {
   const known = knownIssueOf(issue);
   if (known) return i18n.global.t(`admin.ui.issues.${known.code}`, known.params);
-  const isEnglish = currentLocale() !== DEFAULT_LOCALE;
-  return isEnglish && issue.message ? issue.message : i18n.global.t('admin.ui.issues.unmapped');
+  return unmappedMessageText(issue.message);
+}
+
+/**
+ * The text of a server message the SPA has no code for: a message already in Vietnamese (it has non-ASCII letters) as it
+ * is; an English one in the English UI as it is; any other English one a Vietnamese line.
+ */
+export function unmappedMessageText(message: string): string {
+  const code = CODE_BY_MESSAGE[message];
+  if (code) return i18n.global.t(`admin.ui.issues.${code}`);
+  const isVietnamese = /[^\x00-\x7F]/u.test(message);
+  const isEnglishUi = currentLocale() !== DEFAULT_LOCALE;
+  return isVietnamese || (isEnglishUi && message)
+    ? message
+    : i18n.global.t('admin.ui.issues.unmapped');
 }
 
 /** Whether the SPA has a text for this issue: its code, or the English message it stands for. */

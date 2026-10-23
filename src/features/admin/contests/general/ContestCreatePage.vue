@@ -61,6 +61,8 @@ const mutation = useAdminMutation({
     void router.push({ name: 'admin-contestProblems', params: { key: created.key } });
   },
 });
+/** A refusal already written under a field ("Khóa này đã có.") needs no second line. */
+const hasServerFieldErrors = computed(() => Object.keys(mutation.fieldErrors.value).length > 0);
 const shownErrors = computed(() => ({
   ...(hasTried.value ? localErrors.value : {}),
   ...mutation.fieldErrors.value,
@@ -95,7 +97,7 @@ async function create() {
         </div>
       </div>
       <AdminStatus
-        v-if="mutation.failure.value"
+        v-if="mutation.failure.value && !hasServerFieldErrors"
         kind="refused"
         :text="failureTextOf(mutation.failure.value)"
       />

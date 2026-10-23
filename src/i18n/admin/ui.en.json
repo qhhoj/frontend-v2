@@ -127,7 +127,8 @@
     "nobigmath_unsupported": "The judge does not support nobigmath; turn it off.",
     "ranking_column_missing": "The file has no {column} column.",
     "ban_reason_reserved": "This reason is reserved for automatic contest-cheating bans.",
-    "ranking_row_columns": "Line {line} has {found} columns; the header has {expected}."
+    "ranking_row_columns": "Line {line} has {found} columns; the header has {expected}.",
+    "time_zone_invalid": "Not a valid time zone. Pick one from the list (for example Asia/Ho_Chi_Minh)."
   },
   "uploading": "Uploading…",
   "uploadBusy": "Still uploading. Choose the file again when it finishes.",

@@ -127,7 +127,8 @@
     "nobigmath_unsupported": "Máy chấm chưa hỗ trợ nobigmath; hãy tắt tùy chọn này.",
     "ranking_column_missing": "Tệp thiếu cột {column}.",
     "ban_reason_reserved": "Lý do này dành riêng cho các vụ cấm tự động do gian lận trong kỳ thi.",
-    "ranking_row_columns": "Dòng {line} có {found} cột, trong khi tiêu đề có {expected} cột."
+    "ranking_row_columns": "Dòng {line} có {found} cột, trong khi tiêu đề có {expected} cột.",
+    "time_zone_invalid": "Múi giờ không hợp lệ. Hãy chọn một múi giờ trong danh sách (ví dụ Asia/Ho_Chi_Minh)."
   },
   "uploading": "Đang tải lên…",
   "uploadBusy": "Đang tải lên. Hãy chọn lại tệp sau khi xong.",
