@@ -1312,7 +1312,7 @@ export interface paths {
          * Sign in with a username and password
          * @description Public. Verifies the credentials and opens a browser session: the `qhhoj_session` cookie is set and any session the browser already held is replaced. Send the returned `csrfToken` in the `X-CSRF-Token` header on every later non-GET request.
          *     When the account has TOTP or a security key, `twoFactorRequired` is true and `user` is null until the second factor is passed. When the password appears in a known breach, `passwordChangeRequired` is true and only the password change works.
-         *     Failed attempts are limited per IP and per account from that IP (10 in 15 minutes, then 429 `rate_limited`), so failures from elsewhere never lock the owner out. Errors: 401 `invalid_credentials`, 403 `banned` (carries the ban reason), 403 `account_not_activated`.
+         *     Failed attempts are limited per IP and per account from that IP (10 in 15 minutes, then 429 `rate_limited`), so failures from elsewhere never lock the owner out. Errors: 401 `invalid_credentials`, 403 `banned` (carries the ban reason), 403 `account_not_activated`, 403 `account_disabled` (deactivated by staff).
          */
         post: operations["AuthController_login"];
         delete?: never;
@@ -1473,7 +1473,7 @@ export interface paths {
         };
         /**
          * Finish a social sign-in
-         * @description Public. The provider redirects the browser here. Always answers with a 302 to the site: to `/` (or `/login/2fa` when a second factor is pending) after signing in, to `/register/social?token=...` when a new account must be completed with `POST /auth/social/complete`, or to `/login?error=<code>` with `oauth_state`, `oauth_failed`, `email_unverified`, `banned` or `account_not_activated`.
+         * @description Public. The provider redirects the browser here. Always answers with a 302 to the site: to `/` (or `/login/2fa` when a second factor is pending) after signing in, to `/register/social?token=...` when a new account must be completed with `POST /auth/social/complete`, or to `/login?error=<code>` with `oauth_state`, `oauth_failed`, `email_unverified`, `banned`, `account_not_activated` or `account_disabled`.
          *     A verified email that matches exactly one active account links the provider to it. The state is single use.
          */
         get: operations["SocialController_callback"];
