@@ -8862,7 +8862,7 @@ export interface components {
             visible?: boolean;
         };
         CreateProblemDto: {
-            /** @description Ids of languages solutions may use; defaults to the languages flagged for new problems. */
+            /** @description Ids of languages solutions may use, at least one when given; defaults to the languages flagged for new problems. */
             allowedLanguages?: string[];
             /** @description Whether checker feedback is shown to submitters. Needs `judge.edit_all_problem`. */
             allowViewFeedback?: boolean;
@@ -13057,7 +13057,7 @@ export interface components {
             visible?: boolean;
         };
         UpdateProblemDto: {
-            /** @description Ids of languages solutions may use; defaults to the languages flagged for new problems. */
+            /** @description Ids of languages solutions may use, at least one when given; defaults to the languages flagged for new problems. */
             allowedLanguages?: string[];
             /** @description Whether checker feedback is shown to submitters. Needs `judge.edit_all_problem`. */
             allowViewFeedback?: boolean;
