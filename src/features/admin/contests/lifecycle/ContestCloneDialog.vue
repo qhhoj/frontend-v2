@@ -8,6 +8,7 @@ import { translate } from '@/i18n';
 import AdminField from '../../ui/AdminField.vue';
 import { failureTextOf, fieldErrorsOf } from '../../ui/admin-errors';
 import { INPUT } from '../../ui/controls';
+import { provideDateValidity } from '../../ui/form/date-validity';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
 import { formatInZone } from '../../ui/form/site-time';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
@@ -25,6 +26,7 @@ const newKey = ref('');
 const startTime = ref<string | null>(null);
 const localKeyError = ref('');
 const startError = ref('');
+const { hasUnreadableDate } = provideDateValidity();
 const KEY = 'admin.contests.actions.clone';
 
 const mutation = useAdminMutation({
@@ -72,6 +74,7 @@ function confirm() {
   const required = translate('admin.contests.general.errors.required');
   localKeyError.value = newKey.value.trim() ? '' : required;
   startError.value = startTime.value ? '' : required;
+  if (hasUnreadableDate.value) startError.value = translate('admin.form.dateTime.invalid');
   if (!localKeyError.value && !startError.value) void mutation.run(undefined);
 }
 </script>

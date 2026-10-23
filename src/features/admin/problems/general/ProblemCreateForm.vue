@@ -78,7 +78,7 @@ const errors = computed<FieldErrors>(() => ({
 
 /** The body, or null when a local check fails. Organization fields are set by the server, so they are never sent. */
 function checkedBody(): ProblemBody | null {
-  localErrors.value = checkProblemForm(form.value, can);
+  localErrors.value = checkProblemForm(form.value, can, owner.value?.problemCodePrefix ?? '');
   if (Object.keys(localErrors.value).length > 0) return null;
   return toProblemBody(form.value, can(EDIT_ALL_PROBLEM), defaults);
 }
@@ -249,6 +249,7 @@ watch(
           {{ $t('admin.problems.general.create.suggestButton') }}
         </button>
       </div>
+      <p class="text-sm text-muted">{{ $t('admin.problems.general.create.required') }}</p>
       <p v-if="!isOwnerBlocked" class="text-sm text-muted">
         {{ $t('admin.creation.problem.nextNote') }}
       </p>

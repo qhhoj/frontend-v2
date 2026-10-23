@@ -12,6 +12,7 @@ import AdminStatus from '../../ui/AdminStatus.vue';
 import { CARD } from '../../ui/controls';
 import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
+import { provideDateValidity } from '../../ui/form/date-validity';
 import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
 import { normalizeNewlines, sentText, useDirtyForm } from '../../ui/form/dirty-form';
@@ -43,6 +44,11 @@ const { draft, dirtyCount, discard, commit } = useDirtyForm<EditorialForm>({
 let storedContent = stored?.content ?? '';
 const contentError = computed(() => markdownError(draft.value.content));
 const savedAt = ref<Date | null>(null);
+const { hasUnreadableDate, resetDates } = provideDateValidity();
+const discardAll = () => {
+  discard();
+  resetDates();
+};
 
 const mutation = useAdminMutation({
   mutate: (body: EditorialDraftBody) => putEditorial(props.problem.code, body),
@@ -52,7 +58,7 @@ const mutation = useAdminMutation({
 });
 
 async function save() {
-  if (contentError.value || dirtyCount.value === 0) return;
+  if (contentError.value || hasUnreadableDate.value || dirtyCount.value === 0) return;
   const sent = { ...draft.value, authors: [...draft.value.authors] };
   const content = sentText(sent.content, storedContent);
   await mutation.run({
@@ -111,7 +117,7 @@ async function save() {
       :pending="mutation.isPending.value"
       :saved-at="savedAt"
       :save-label="$t('admin.problems.editorial.save')"
-      @discard="discard"
+      @discard="discardAll"
     />
     <AdminLeaveGuard :dirty-count="dirtyCount" />
   </form>

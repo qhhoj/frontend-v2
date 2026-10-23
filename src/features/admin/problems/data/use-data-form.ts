@@ -5,16 +5,12 @@ import type { ProblemData, ProblemDataBody } from '@/api/types/problem-data';
 import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
 import type { FieldErrors } from '../../ui/admin-errors';
-import { countChanges } from '../../ui/form/dirty-form';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { problemDataKey, useProblemDataQuery } from './problem-data.queries';
 import { configErrors } from './checker-config';
-import { checkDataForm, dataSnapshot, toDataBody, toDataForm } from './test-cases';
+import { checkDataForm, countDataChanges, toDataBody, toDataForm } from './test-cases';
 import type { DataForm } from './test-cases';
 import { useInvalidArgs } from './use-invalid-args';
-
-/** What a save would send, as a plain object: row keys left out, so two forms compare by their values. */
-const sentShape = (form: DataForm) => JSON.parse(dataSnapshot(form)) as object;
 
 /**
  * The data tab's form: seeded from the query, saved as a whole. A clean form follows the server (a Polygon sync, an
@@ -29,9 +25,7 @@ export function useDataForm(code: () => string) {
   const saved = ref<ProblemData | null>(null);
   const savedAt = ref<Date | null>(null);
   const dirtyCount = computed(() =>
-    form.value && saved.value
-      ? countChanges(sentShape(form.value), sentShape(toDataForm(saved.value)))
-      : 0,
+    form.value && saved.value ? countDataChanges(form.value, toDataForm(saved.value)) : 0,
   );
   const errors = computed<FieldErrors>(() =>
     form.value ? { ...checkDataForm(form.value), ...configErrors(form.value) } : {},
@@ -59,8 +53,7 @@ export function useDataForm(code: () => string) {
   });
   /** Whether the server's configuration differs from the one the form was seeded from (row keys and non-form fields aside). */
   const isNewConfig = (data: ProblemData) =>
-    !saved.value ||
-    countChanges(sentShape(toDataForm(data)), sentShape(toDataForm(saved.value))) > 0;
+    !saved.value || countDataChanges(toDataForm(data), toDataForm(saved.value)) > 0;
   /** Nothing typed: no change, and no args box holding text that does not parse. */
   const isClean = () => dirtyCount.value === 0 && badRowNumbers.value.length === 0;
   watch(

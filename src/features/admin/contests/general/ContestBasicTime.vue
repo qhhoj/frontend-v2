@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { spanMessage } from '@/lib/contest-time';
 import { buttonClass } from '../../ui/controls';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
+import { useDateReset } from '../../ui/form/date-validity';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import type { ContestForm } from '../contest-form';
@@ -19,10 +20,12 @@ const QUICK_MINUTES = [15, 45, 90, 120] as const;
 const start = timeModel(form, 'startTime');
 const end = timeModel(form, 'endTime');
 
+const resetDates = useDateReset();
 function lastFor(minutes: number) {
   const startMs = Date.parse(form.value.startTime);
   if (Number.isFinite(startMs))
     form.value.endTime = new Date(startMs + minutes * 60_000).toISOString();
+  resetDates();
 }
 /** "Kéo dài 45 phút." under the end, once the window reads. */
 const lengthHint = computed(() => {

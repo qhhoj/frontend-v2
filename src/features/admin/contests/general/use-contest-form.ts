@@ -4,6 +4,7 @@ import { updateContest } from '@/api/contest-editing.api';
 import type { ContestPatch, EditableContest } from '@/api/types/contest-editing';
 import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { provideDateValidity } from '../../ui/form/date-validity';
 import { cloneValue } from '../../ui/form/dirty-form';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { changedContestFields, checkContestForm, toContestForm } from '../contest-form';
@@ -32,6 +33,8 @@ export function useContestForm(contest: () => EditableContest) {
   const dirtyCount = computed(() => Object.keys(pendingPatch.value).length);
   const isDirty = computed(() => dirtyCount.value > 0);
   const savedAt = ref<Date | null>(null);
+  /** True while a time box holds text that is not a date: the save is refused, never sent without it. */
+  const { hasUnreadableDate, resetDates } = provideDateValidity();
 
   function reseed(saved: EditableContest) {
     seed.value = toContestForm(saved);
@@ -51,7 +54,7 @@ export function useContestForm(contest: () => EditableContest) {
   });
 
   async function save() {
-    if (hasKeys(localErrors.value)) return;
+    if (hasKeys(localErrors.value) || hasUnreadableDate.value) return;
     const patch = changedContestFields(seed.value, form.value);
     if (hasKeys(patch)) await mutation.run(patch);
   }
@@ -60,6 +63,7 @@ export function useContestForm(contest: () => EditableContest) {
   function discard() {
     form.value = cloneValue(seed.value);
     mutation.reset();
+    resetDates();
   }
 
   watch(contest, (next) => {

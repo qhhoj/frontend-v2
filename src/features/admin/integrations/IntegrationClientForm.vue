@@ -9,6 +9,7 @@ import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { BUTTON, INPUT } from '../ui/controls';
+import { provideDateValidity } from '../ui/form/date-validity';
 import AdminDateTimeField from '../ui/form/AdminDateTimeField.vue';
 import AdminSaveBar from '../ui/form/AdminSaveBar.vue';
 import { useAdminMutation } from '../ui/use-admin-mutation';
@@ -24,6 +25,7 @@ const cidrs = ref('');
 const actsAs = ref('');
 /** An ISO instant, or null for a key that lasts until revoked. */
 const expires = ref<string | null>(null);
+const { hasUnreadableDate } = provideDateValidity();
 const create = useAdminMutation<void, CreatedIntegrationClient>({
   mutate: () =>
     createIntegrationClient({
@@ -59,7 +61,7 @@ const pageFailure = computed(() =>
     : null,
 );
 function submit() {
-  if (!props.isLocked) void create.run();
+  if (!props.isLocked && !hasUnreadableDate.value) void create.run();
 }
 </script>
 

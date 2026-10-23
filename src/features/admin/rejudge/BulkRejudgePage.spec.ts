@@ -49,6 +49,22 @@ const openConfirm = async (wrapper: Wrapper) => {
 };
 
 describe('BulkRejudgePage', () => {
+  it('opens no confirm and counts nothing while a date box holds text that is not a date', async () => {
+    const calls = mockApi(routes(answer(counted(27), queued(27))));
+    const { wrapper } = await mountRejudge();
+    await wrapper.get('#rejudge-dateFrom').setValue('2026-10-23 20:00');
+    await wrapper.get('#rejudge-dateFrom').trigger('blur');
+    await clickRejudge(wrapper);
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(posts(calls)).toEqual([]);
+    expect(wrapper.get('#rejudge-dateFrom').attributes('aria-invalid')).toBe('true');
+
+    await wrapper.get('#rejudge-dateFrom').setValue('23/10/2026 20:00');
+    await wrapper.get('#rejudge-problem').setValue('hcmus41c');
+    await clickRejudge(wrapper);
+    expect(posts(calls)).toHaveLength(1);
+  });
+
   it('counts with a dry run when the confirm opens, resets nothing, then queues after the confirm', async () => {
     const calls = mockApi(routes(answer(counted(128), queued(128))));
     const { wrapper, queryClient } = await mountRejudge();

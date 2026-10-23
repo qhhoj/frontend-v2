@@ -7,6 +7,7 @@ import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
 import { useViewerId } from '@/stores/use-viewer-id';
 import type { FieldErrors } from '../../ui/admin-errors';
+import { provideDateValidity } from '../../ui/form/date-validity';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import {
   editableProblemKey,
@@ -45,6 +46,8 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
   /** Why this save is made: the revision comment, never stored on the problem; cleared after each save. */
   const changeMessage = ref('');
   const savedAt = ref<Date | null>(null);
+  /** True while a date box holds text that is not a date: the save is refused, never sent without it. */
+  const { hasUnreadableDate, resetDates } = provideDateValidity();
 
   const mutation = useAdminMutation({
     mutate: (code: string) =>
@@ -70,11 +73,12 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
   function discard() {
     form.value = cloneForm(seed.value);
     changeMessage.value = '';
+    resetDates();
   }
 
   async function save() {
     localErrors.value = checkProblemForm(form.value, can);
-    if (Object.keys(localErrors.value).length === 0 && isDirty.value) {
+    if (Object.keys(localErrors.value).length === 0 && isDirty.value && !hasUnreadableDate.value) {
       await mutation.run(problem().code);
     }
   }

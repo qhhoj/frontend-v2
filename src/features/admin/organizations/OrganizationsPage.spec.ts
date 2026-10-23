@@ -132,6 +132,22 @@ describe('OrganizationsPage', () => {
     expect(wrapper.find('[data-testid="delete-organization"]').exists()).toBe(false);
   });
 
+  it('takes a typed seat count: the bar counts one change and the PATCH carries slots', async () => {
+    const calls = mockApi(routes({ 'PATCH /organizations/lhp': ok({ ...detail, slots: 5 }) }));
+    const { wrapper } = await mountScreen('/admin/organizations?org=lhp', (mounted) =>
+      mounted.find('#org-slots').exists(),
+    );
+    await vi.waitFor(() => {
+      if (!wrapper.get<HTMLInputElement>('#org-slots').element.value) throw new Error('no detail');
+    });
+    await wrapper.get('#org-slots').setValue('5');
+    await flushPromises();
+    expect(wrapper.text()).toContain('1 thay đổi chưa lưu');
+    await wrapper.get('form').trigger('submit');
+    await flushPromises();
+    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ slots: 5 });
+  });
+
   it('deletes only once the address is typed, then leaves the editor', async () => {
     const calls = mockApi(
       routes(

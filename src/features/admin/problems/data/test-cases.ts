@@ -8,6 +8,7 @@ import type {
 import { translate } from '@/i18n';
 import { FILE_NAME_MAX_LENGTH, GENERATOR_ARGS_MAX_LENGTH, MAX_CASE_ARGS_BYTES } from '../limits';
 import type { FieldErrors } from '../../ui/admin-errors';
+import { countChanges } from '../../ui/form/dirty-form';
 
 export const ARCHIVE_PREVIEW_COUNT = 10;
 /** What the mass-testcases permission raises the hard limit to. */
@@ -94,6 +95,18 @@ function caseErrors(row: KeyedCase, index: number): FieldErrors {
 /** The unsaved-change snapshot of a form: what a save would send, row keys left out. */
 export const dataSnapshot = (form: DataForm) =>
   JSON.stringify({ ...form, cases: form.cases.map(caseBody) });
+
+/** What a save would send, as a plain object: row keys left out, so two forms compare by their values. */
+const sentShape = (form: DataForm) => JSON.parse(dataSnapshot(form)) as Record<string, unknown>;
+
+/** A rule and its arguments are one choice (picking Testlib writes both), so each pair counts as one change. */
+function pairedShape(form: DataForm): object {
+  const { checkerArgsText, graderArgsText, checker, grader, ...rest } = sentShape(form);
+  return { ...rest, checker: [checker, checkerArgsText], grader: [grader, graderArgsText] };
+}
+/** How many settings differ between two forms: the "2 thay đổi chưa lưu" count. */
+export const countDataChanges = (current: DataForm, baseline: DataForm) =>
+  countChanges(pairedShape(current), pairedShape(baseline));
 
 export function toDataForm(data: ProblemData): DataForm {
   return {

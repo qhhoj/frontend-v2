@@ -3,13 +3,15 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AdminField from '../AdminField.vue';
 import { INPUT, buttonClass } from '../controls';
+import { reportUnreadableDate } from './date-validity';
 import { SITE_TIME_ZONE, formatInZone, parseInZone, zoneLabel } from './site-time';
 
 /**
  * A date and time typed and shown in the site's time zone as `dd/mm/yyyy hh:mm`, with the zone ("GMT+7") inside the box
  * and a "Bây giờ" shortcut. The model is an ISO instant (UTC) or null, the value the API sends and takes.
  * With `dateOnly` the box takes `dd/mm/yyyy` alone (the model is the instant that day starts, and there is no "Bây giờ").
- * Text that does not read as a date leaves the model alone and says so when the box loses focus.
+ * Text that does not read as a date leaves the model alone, says so when the box loses focus (or Enter is pressed), and tells
+ * the form above at once (`provideDateValidity`), which refuses to save or confirm while any of its date fields is unreadable.
  */
 const model = defineModel<string | null>({ required: true });
 const props = withDefaults(
@@ -41,7 +43,20 @@ const render = (iso: string | null) =>
   formatInZone(iso, props.timeZone, props.dateOnly ? 'date' : 'datetime');
 const parse = (value: string) => parseInZone(value, props.timeZone, props.dateOnly);
 const text = ref(render(model.value));
+/** Shown under the box after blur or Enter. */
 const isUnreadable = ref(false);
+/** True from the first keystroke that does not read as a date. */
+const isTextUnreadable = ref(false);
+/** The box says what the model says, with no error. */
+function showModel() {
+  text.value = render(model.value);
+  clearUnreadable();
+}
+function clearUnreadable() {
+  isUnreadable.value = false;
+  isTextUnreadable.value = false;
+}
+reportUnreadableDate(isTextUnreadable, showModel);
 const zone = computed(() =>
   zoneLabel(props.timeZone, model.value ? new Date(model.value) : new Date()),
 );
@@ -57,11 +72,12 @@ const shownError = computed(
 watch(model, (iso) => {
   const typed = parse(text.value);
   if (!typed.ok || typed.iso !== iso) text.value = render(iso);
-  isUnreadable.value = false;
+  clearUnreadable();
 });
 
 function onInput() {
   const typed = parse(text.value);
+  isTextUnreadable.value = !typed.ok;
   if (typed.ok) {
     isUnreadable.value = false;
     if (typed.iso !== model.value) model.value = typed.iso;
@@ -70,12 +86,16 @@ function onInput() {
 function onBlur() {
   const typed = parse(text.value);
   isUnreadable.value = !typed.ok;
+  isTextUnreadable.value = !typed.ok;
   if (typed.ok) text.value = render(typed.iso);
 }
 function setNow() {
   const now = new Date();
   now.setSeconds(0, 0);
-  model.value = now.toISOString();
+  const iso = now.toISOString();
+  model.value = iso;
+  text.value = render(iso);
+  clearUnreadable();
 }
 </script>
 
@@ -106,6 +126,7 @@ function setNow() {
           :class="[INPUT, 'pr-16 font-mono tabular-nums']"
           @input="onInput"
           @blur="onBlur"
+          @keydown.enter="onBlur"
         />
         <span
           aria-hidden="true"

@@ -5,6 +5,7 @@ import {
   checkDataForm,
   addCase,
   caseCount,
+  countDataChanges,
   listWarnings,
   moveCase,
   removeCase,
@@ -149,5 +150,18 @@ describe('test data form', () => {
       generatorArgs: 'g'.repeat(1000),
     }));
     expect(checkDataForm(form).cases).toBe('Tổng tham số của các test quá 1 MiB; hãy rút ngắn.');
+  });
+});
+
+describe('countDataChanges', () => {
+  it('counts a rule and its arguments as one change, so choosing Testlib is 1', () => {
+    const saved = toDataForm(problemData());
+    const edited = toDataForm(problemData());
+    edited.checker = 'bridged';
+    edited.checkerArgsText = '{"type":"testlib"}';
+    expect(countDataChanges(edited, saved)).toBe(1);
+    edited.unicode = !edited.unicode;
+    expect(countDataChanges(edited, saved)).toBe(2);
+    expect(countDataChanges(saved, saved)).toBe(0);
   });
 });

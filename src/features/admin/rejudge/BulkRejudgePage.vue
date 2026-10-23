@@ -5,6 +5,7 @@ import { useProblemMetaQuery } from '@/features/problems/problems.queries';
 import { translate } from '@/i18n';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import type { FieldErrors } from '../ui/admin-errors';
+import { provideDateValidity } from '../ui/form/date-validity';
 import BatchActionDialogs from './BatchActionDialogs.vue';
 import RecentBatches from './RecentBatches.vue';
 import RejudgeFilterForm from './RejudgeFilterForm.vue';
@@ -22,6 +23,8 @@ import type { RejudgeOutcome } from './use-bulk-rejudge';
 /** A link from a contest or a problem prefills the scope (`?contest=…&problem=…`). */
 const filter = ref<RejudgeFilter>(filterFromQuery(useRoute().query));
 const errors = ref<FieldErrors>({});
+/** A date box with unreadable text would otherwise leave that bound out, and the batch would reach the whole site. */
+const { hasUnreadableDate, resetDates } = provideDateValidity();
 const outcome = ref<RejudgeOutcome | null>(null);
 const dialogs = useTemplateRef('dialogs');
 const metaQuery = useProblemMetaQuery();
@@ -32,8 +35,9 @@ const confirmLine = computed(() => {
   return translate('admin.rejudge.confirm.line', { ...text });
 });
 
-/** A filter with errors opens no dialog and sends nothing; a good one opens the dialog, which counts at once (a dry run). */
+/** A filter with errors or an unreadable date box opens no dialog and sends nothing; a good one opens the dialog, which counts at once (a dry run). */
 function ask(action: 'rejudge' | 'rescore') {
+  if (hasUnreadableDate.value) return;
   errors.value = checkRejudgeFilter(filter.value);
   if (Object.keys(errors.value).length === 0) dialogs.value?.open(action);
 }
@@ -41,6 +45,7 @@ function ask(action: 'rejudge' | 'rescore') {
 function resetFilter() {
   filter.value = emptyRejudgeFilter();
   errors.value = {};
+  resetDates();
 }
 </script>
 

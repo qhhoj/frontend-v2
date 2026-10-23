@@ -112,6 +112,8 @@ function keepFocusAbove() {
   <div
     ref="bar"
     :data-variant="variant"
+    :data-save-bar="variant"
+    :data-phone-hidden="(hideIdleOnPhone && isIdle) || undefined"
     class="flex flex-wrap items-center gap-x-3 gap-y-2"
     :class="[
       { 'max-sm:hidden': hideIdleOnPhone && isIdle },

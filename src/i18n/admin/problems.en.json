@@ -109,6 +109,8 @@
       "feedbackHint": "The checker's message for each test."
     },
     "errors": {
+      "codeRequired": "Enter the problem code.",
+      "nameRequired": "Enter the problem name.",
       "code": "Lowercase letters, digits, underscore, 1 to 32 characters.",
       "timeLimit": "From 0.01 to 60 seconds.",
       "highTime": "Over 5 seconds needs the “Set a high time limit” permission.",

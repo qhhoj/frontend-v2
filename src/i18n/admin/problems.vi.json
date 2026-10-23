@@ -109,6 +109,8 @@
       "feedbackHint": "Thông điệp từ checker cho từng test."
     },
     "errors": {
+      "codeRequired": "Nhập mã bài.",
+      "nameRequired": "Nhập tên bài.",
       "code": "Chữ thường, số, gạch dưới, 1 đến 32 ký tự.",
       "timeLimit": "Từ 0,01 đến 60 giây.",
       "highTime": "Trên 5 giây cần quyền “Đặt giới hạn thời gian cao”.",
