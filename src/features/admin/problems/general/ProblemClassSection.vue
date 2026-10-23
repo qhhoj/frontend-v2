@@ -114,7 +114,7 @@ function setLanguageAllowed(languageId: string, isAllowed: boolean) {
           {{ typeNameOf(typeId) }}
           <button
             type="button"
-            class="inline-flex size-8 items-center justify-center rounded-pill text-muted hover:bg-surface-hover hover:text-content pointer-coarse:size-11"
+            class="inline-flex size-8 items-center justify-center rounded-pill text-muted hover:bg-surface-hover hover:text-content touch:size-11"
             :aria-label="$t('admin.ui.removeChip', { name: typeNameOf(typeId) })"
             @click="removeType(typeId)"
           >

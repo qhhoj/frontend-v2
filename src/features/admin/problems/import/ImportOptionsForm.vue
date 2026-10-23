@@ -177,7 +177,7 @@ function submit() {
           <label
             v-for="mode in IMPORT_MODES"
             :key="mode"
-            class="flex min-h-9 flex-wrap items-center gap-2 pointer-coarse:min-h-11"
+            class="flex min-h-9 flex-wrap items-center gap-2 touch:min-h-11"
           >
             <input
               v-model="form.mode"

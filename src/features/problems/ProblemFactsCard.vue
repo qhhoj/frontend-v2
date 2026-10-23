@@ -140,7 +140,7 @@ const status = computed(() => viewerStatusOf(props.problem.viewerStatus));
         type="button"
         :aria-expanded="typesShown"
         aria-controls="problem-types"
-        class="min-h-8 self-start text-sm font-semibold text-accent-text hover:underline pointer-coarse:min-h-11"
+        class="min-h-8 self-start text-sm font-semibold text-accent-text hover:underline touch:min-h-11"
         @click="typesShown = !typesShown"
       >
         {{ $t(typesShown ? 'problem.rail.facts.hideTypes' : 'problem.rail.facts.showTypes') }}

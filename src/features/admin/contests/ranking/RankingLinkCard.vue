@@ -157,12 +157,12 @@ async function saveLink() {
           <legend class="font-semibold">
             {{ $t('admin.contests.ranking.link.statusLegend') }}
           </legend>
-          <label class="flex min-h-9 items-center gap-2 pointer-coarse:min-h-11"
+          <label class="flex min-h-9 items-center gap-2 touch:min-h-11"
             ><input v-model="form.status" type="radio" value="public" :name="statusName" />{{
               $t('admin.contests.ranking.link.statusPublic')
             }}</label
           >
-          <label class="flex min-h-9 items-center gap-2 pointer-coarse:min-h-11"
+          <label class="flex min-h-9 items-center gap-2 touch:min-h-11"
             ><input v-model="form.status" type="radio" value="private" :name="statusName" />{{
               $t('admin.contests.ranking.link.statusPrivate')
             }}</label
@@ -173,22 +173,22 @@ async function saveLink() {
           <legend class="font-semibold">
             {{ $t('admin.contests.ranking.link.expiryLegend') }}
           </legend>
-          <label class="flex min-h-9 items-center gap-2 pointer-coarse:min-h-11"
+          <label class="flex min-h-9 items-center gap-2 touch:min-h-11"
             ><input v-model="form.expiryMode" type="radio" value="U" :name="expiryName" />{{
               $t('admin.contests.ranking.link.expiryNone')
             }}</label
           >
-          <label class="flex min-h-9 items-center gap-2 pointer-coarse:min-h-11"
+          <label class="flex min-h-9 items-center gap-2 touch:min-h-11"
             ><input v-model="form.expiryMode" type="radio" value="M" :name="expiryName" />{{
               $t('admin.contests.ranking.link.expiryMinutes')
             }}</label
           >
-          <label class="flex min-h-9 items-center gap-2 pointer-coarse:min-h-11"
+          <label class="flex min-h-9 items-center gap-2 touch:min-h-11"
             ><input v-model="form.expiryMode" type="radio" value="D" :name="expiryName" />{{
               $t('admin.contests.ranking.link.expiryDays')
             }}</label
           >
-          <label class="flex min-h-9 items-center gap-2 pointer-coarse:min-h-11"
+          <label class="flex min-h-9 items-center gap-2 touch:min-h-11"
             ><input v-model="form.expiryMode" type="radio" value="A" :name="expiryName" />{{
               $t('admin.contests.ranking.link.expiryAt')
             }}</label

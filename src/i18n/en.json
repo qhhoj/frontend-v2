@@ -397,7 +397,7 @@
   "impersonation": {
     "region": "Viewing as another user",
     "title": "Viewing as another user.",
-    "body": "Viewing as {username} · everything you do is done as this account.",
+    "body": "You are {username}: everything you do is done as this account.",
     "stop": "Stop viewing"
   },
   "account": {

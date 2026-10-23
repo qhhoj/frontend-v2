@@ -120,7 +120,9 @@ useFocusFallback(
             formatDate(row.deletedAt, 'datetime', locale.locale)
           }}</span>
         </template>
-        <template #cell-deletedBy="{ row }">{{ actorName(row.deletedBy) }}</template>
+        <template #cell-deletedBy="{ row }">
+          <span class="whitespace-nowrap">{{ actorName(row.deletedBy) }}</span>
+        </template>
         <template #actions="{ row }">
           <template v-if="!row.isPurged">
             <button

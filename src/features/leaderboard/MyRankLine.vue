@@ -33,7 +33,7 @@ const findMe = async () => {
     ·
     <button
       type="button"
-      class="inline-flex items-center font-semibold text-accent-text hover:underline pointer-coarse:-my-3 pointer-coarse:min-h-11"
+      class="inline-flex items-center font-semibold text-accent-text hover:underline touch:-my-3 touch:min-h-11"
       :aria-label="$t('leaderboard.findMe')"
       @click="findMe"
     >

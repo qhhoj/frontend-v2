@@ -38,7 +38,7 @@ const props = defineProps<{
 /** At most this many point-losing tests open by themselves; the others are a tap or the table away. */
 const OPEN_LOSSES_MAX = 3;
 const TILE =
-  'flex size-8 items-center justify-center rounded-skeleton font-mono text-caption font-bold pointer-coarse:size-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';
+  'flex size-8 items-center justify-center rounded-skeleton font-mono text-caption font-bold touch:size-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';
 const OPEN_TILE = 'ring-2 ring-content ring-offset-2 ring-offset-surface-solid';
 const locale = useLocaleStore();
 

@@ -34,6 +34,7 @@
   "detail": {
     "byline": "{creator} · mở {date}",
     "close": "Đóng phiếu",
+    "closePanel": "Ẩn chi tiết phiếu",
     "reopen": "Mở lại phiếu",
     "closeAfterReply": "Đóng phiếu sau khi gửi",
     "claim": "Nhận phiếu",

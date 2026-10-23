@@ -20,7 +20,9 @@ const locale = useLocaleStore();
 
 const count = (value: number, fractionDigits = 0) =>
   formatNumber(value, locale.locale, fractionDigits);
-const rankOf = (rank: number | null) => (rank === null ? '—' : `#${count(rank)}`);
+/** A banned account is out of the ranking, whatever rank the API still carries. */
+const isBanned = computed(() => props.user.displayRank === 'banned');
+const rankOf = (rank: number | null) => (rank === null || isBanned.value ? '—' : `#${count(rank)}`);
 
 const tiles = computed<StatTile[]>(() => [
   {

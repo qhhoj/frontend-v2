@@ -66,7 +66,7 @@ watch(isExpanded, async (expanded) => {
       @fullscreen="emit('fullscreen')"
     />
     <!-- Mounted per expand, so a standing alert is announced again on reopening: accepted, a reopen is a new look at the form. -->
-    <div class="flex min-h-0 flex-1 flex-col px-4 pb-3">
+    <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 pb-3">
       <SubmitForm :problem="problem" :form="form" layout="sheet" />
     </div>
   </section>

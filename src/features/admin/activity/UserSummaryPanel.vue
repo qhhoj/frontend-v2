@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query';
 import { X } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 import { deleteUserActivity, fetchActivitySummary } from '@/api/activity-admin.api';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -9,6 +9,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
+import { useRevealOnMount } from '@/lib/use-reveal-on-mount';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AdminStatus from '../ui/AdminStatus.vue';
@@ -20,6 +21,8 @@ import DailyBars from './DailyBars.vue';
 
 const props = defineProps<{ username: string; days: number }>();
 const emit = defineEmits<{ deleted: []; close: [] }>();
+const panel = useTemplateRef<HTMLElement>('panel');
+useRevealOnMount(panel);
 const locale = useLocaleStore();
 const viewer = useViewerId();
 
@@ -69,7 +72,11 @@ const tops = computed(() =>
 </script>
 
 <template>
-  <section data-testid="user-summary" :class="[CARD, 'relative min-w-0 @container']">
+  <section
+    ref="panel"
+    data-testid="user-summary"
+    :class="[CARD, 'relative min-w-0 scroll-mt-20 @container']"
+  >
     <button
       type="button"
       :class="[iconButtonClass('ghost', 'sm'), 'absolute top-3 right-3']"

@@ -10,6 +10,9 @@
 @import './themes/glass-dark.css';
 @import './themes/glass-light.css';
 
+/* Phones and touch screens: a coarse pointer, or a viewport up to 640 px (a phone held either way is never wider than that in portrait). */
+@custom-variant touch (@media (pointer: coarse), (max-width: 40rem));
+
 /* Only semantic names exist: Tailwind's palette, fonts, radii and shadows are dropped. */
 @theme {
   --color-*: initial;

@@ -18,7 +18,7 @@ const MARK_CLASS = {
       v-for="(step, index) in WIZARD_STEPS"
       :key="step"
       :aria-current="stepStatusOf(step, current) === 'current' ? 'step' : undefined"
-      class="flex min-h-9 items-center gap-2 rounded-pill border px-3 text-sm font-semibold pointer-coarse:min-h-11"
+      class="flex min-h-9 items-center gap-2 rounded-pill border px-3 text-sm font-semibold touch:min-h-11"
       :class="
         stepStatusOf(step, current) === 'current'
           ? 'border-accent text-accent-text'

@@ -13,6 +13,7 @@ import AuthLayout from './AuthLayout.vue';
 import SocialButtons from './SocialButtons.vue';
 import { useAfterSignIn, usePreloadAfterSignIn } from './use-after-sign-in';
 import { useAuthAction } from './use-auth-action';
+import { AUTH_LINK } from './auth-link';
 
 const session = useSessionStore();
 const route = useRoute();
@@ -56,7 +57,6 @@ const notActivated = computed(() =>
     ? error.value instanceof ApiError && error.value.code === 'account_not_activated'
     : route.query.error === 'account_not_activated',
 );
-const LINK = 'font-semibold text-accent-text underline';
 
 const submit = async () => {
   missing.value = findMissing();
@@ -79,7 +79,7 @@ const attempt = () =>
     <template #header-end>
       <span class="flex items-center gap-1"
         ><span class="text-muted max-sm:hidden">{{ $t('auth.noAccountPrompt') }}</span>
-        <RouterLink :to="{ name: 'register' }" :class="LINK">{{
+        <RouterLink :to="{ name: 'register' }" :class="AUTH_LINK">{{
           $t('account.register')
         }}</RouterLink></span
       >
@@ -95,7 +95,7 @@ const attempt = () =>
         notice
       }}</AuthNotice>
       <AuthError :text="errorText">
-        <RouterLink v-if="notActivated" :to="{ name: 'activate-resend' }" :class="LINK">{{
+        <RouterLink v-if="notActivated" :to="{ name: 'activate-resend' }" :class="AUTH_LINK">{{
           $t('auth.resendLink')
         }}</RouterLink>
       </AuthError>
@@ -123,7 +123,7 @@ const attempt = () =>
         @input="clearMissing('password')"
       />
       <p class="-mt-1 flex justify-end text-sm">
-        <RouterLink :to="{ name: 'forgot-password' }" class="text-accent-text underline">{{
+        <RouterLink :to="{ name: 'forgot-password' }" :class="AUTH_LINK">{{
           $t('auth.forgot')
         }}</RouterLink>
       </p>
@@ -131,7 +131,7 @@ const attempt = () =>
       <SocialButtons />
       <p class="text-center text-sm text-muted">
         {{ $t('auth.noAccountPrompt') }}
-        <RouterLink :to="{ name: 'register' }" :class="LINK">{{
+        <RouterLink :to="{ name: 'register' }" :class="AUTH_LINK">{{
           $t('account.register')
         }}</RouterLink>
       </p>

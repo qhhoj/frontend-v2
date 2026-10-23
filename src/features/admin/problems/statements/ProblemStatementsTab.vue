@@ -65,7 +65,7 @@ const otherUnsavedText = computed(() => {
   return others.join(' · ') || undefined;
 });
 const SEGMENT =
-  'inline-flex min-h-8 items-center gap-1.5 rounded-pill px-3 text-sm font-semibold whitespace-nowrap text-muted hover:text-content pointer-coarse:min-h-10 aria-checked:bg-accent-soft aria-checked:text-accent-soft-text';
+  'inline-flex min-h-8 items-center gap-1.5 rounded-pill px-3 text-sm font-semibold whitespace-nowrap text-muted hover:text-content touch:min-h-10 aria-checked:bg-accent-soft aria-checked:text-accent-soft-text';
 </script>
 
 <template>

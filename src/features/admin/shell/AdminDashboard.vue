@@ -54,6 +54,6 @@ const actions = computed(() =>
     </PageHeader>
     <OverviewTiles />
     <RecentScreens />
-    <RecentChangesCard class="max-w-4xl" />
+    <RecentChangesCard />
   </div>
 </template>

@@ -206,6 +206,13 @@ describe('relative times', () => {
     expect(formatRelative('2026-10-08T07:00:00Z', now, 'vi')).toBe('3 giờ trước');
   });
 
+  it('reads a time a few seconds ahead of the clock as now, and a real future time as the future', () => {
+    const now = Date.parse('2026-10-08T10:00:00Z');
+    expect(formatRelative('2026-10-08T10:00:04Z', now, 'vi')).toBe('bây giờ');
+    expect(formatRelative('2026-10-08T10:00:04Z', now, 'en')).toBe('now');
+    expect(formatRelative('2026-10-08T10:05:00Z', now, 'en')).toBe('in 5 minutes');
+  });
+
   it('writes a compact age: a number and a unit within a week, the short date after', () => {
     const now = Date.parse('2026-10-08T10:00:00Z');
     expect(formatAgoCompact('2026-10-08T09:58:30Z', now, 'vi')).toBe('1 phút');

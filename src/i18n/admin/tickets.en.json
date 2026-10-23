@@ -34,6 +34,7 @@
   "detail": {
     "byline": "{creator} · opened {date}",
     "close": "Close ticket",
+    "closePanel": "Hide ticket details",
     "reopen": "Reopen ticket",
     "closeAfterReply": "Close the ticket after sending",
     "claim": "Take ticket",

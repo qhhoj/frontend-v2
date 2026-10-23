@@ -79,10 +79,11 @@ const LAYOUTS = {
     header: 'contents',
   },
   sheet: {
-    form: 'flex min-h-0 flex-1 flex-col gap-3',
+    form: 'flex min-h-min flex-1 flex-col gap-3',
     languageRow: 'grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-y-1',
     versionsLink: 'col-span-2 justify-self-start',
-    body: 'flex min-h-0 flex-1 flex-col',
+    // A short viewport (a phone in landscape) scrolls the sheet instead of squeezing the editor to one line.
+    body: 'flex min-h-40 flex-1 flex-col',
     editor: 'min-h-0 flex-1 overflow-auto rounded-cell',
     editorMinLines: 6,
     editorFill: '',

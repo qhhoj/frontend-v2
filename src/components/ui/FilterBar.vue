@@ -49,10 +49,26 @@ watch(search, (text) => {
 });
 onBeforeUnmount(() => clearTimeout(timer));
 
+/**
+ * Enter opens the exact match for the text in the box. While the pause is still pending, `exact` was made from older text:
+ * apply the typed text now and open once `exact` has followed it.
+ */
 function openExact(event: KeyboardEvent) {
-  if (!props.exact) return;
   event.preventDefault();
-  void router.push(props.exact.to);
+  if (timer === undefined || typed.value.trim() === search.value.trim()) {
+    if (props.exact) void router.push(props.exact.to);
+    return;
+  }
+  clearTimeout(timer);
+  timer = undefined;
+  const stop = watch(
+    () => props.exact,
+    (exact) => {
+      stop();
+      if (exact) void router.push(exact.to);
+    },
+  );
+  search.value = typed.value;
 }
 const removeChip = (key: string) => emit('remove', key);
 </script>

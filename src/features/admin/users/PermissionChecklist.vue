@@ -58,7 +58,7 @@ const toggle = (code: string, on: boolean) => {
         <label
           v-for="item in group.items"
           :key="item.codename"
-          class="flex min-h-10 items-center gap-3 rounded-cell px-2 hover:bg-surface-hover pointer-coarse:min-h-11"
+          class="flex min-h-10 items-center gap-3 rounded-cell px-2 hover:bg-surface-hover touch:min-h-11"
         >
           <input
             v-if="!readonly && (item.category !== 'other' || selected.includes(item.codename))"

@@ -38,6 +38,7 @@
     "rejudge_submission": "Rejudge submissions",
     "reject_submission": "Reject submissions",
     "rejudge_submission_lot": "Rejudge many submissions",
+    "change_submission": "Override submission scores",
     "spam_submission": "Submit without rate limits",
     "view_all_submission": "See every submission",
     "resubmit_other": "Resubmit others' code",

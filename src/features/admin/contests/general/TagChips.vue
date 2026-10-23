@@ -40,7 +40,7 @@ const remove = (tag: string) => (tags.value = tags.value.filter((item) => item !
         <button
           v-if="!lockedBy"
           type="button"
-          class="inline-flex size-6 items-center justify-center rounded-full text-muted hover:bg-surface-hover hover:text-content pointer-coarse:size-9"
+          class="inline-flex size-6 items-center justify-center rounded-full text-muted hover:bg-surface-hover hover:text-content touch:size-9"
           :aria-label="$t('admin.ui.removeChip', { name: tag })"
           @click="remove(tag)"
         >

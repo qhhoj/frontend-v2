@@ -397,7 +397,7 @@
   "impersonation": {
     "region": "Đang xem dưới tên người khác",
     "title": "Đang xem dưới tên người khác.",
-    "body": "Đang xem dưới tên {username} · mọi thao tác được thực hiện như tài khoản này.",
+    "body": "Bạn là {username}: mọi thao tác được thực hiện như tài khoản này.",
     "stop": "Dừng xem"
   },
   "account": {
