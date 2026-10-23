@@ -65,3 +65,10 @@ export function showToast(input: ToastInput): number {
   resumeToast(toast.id);
   return toast.id;
 }
+
+/** Closes every toast and cancels every timer (a spec calls this through `resetToastHost`). */
+export function clearToasts() {
+  for (const toast of [...toasts]) dismissToast(toast.id);
+  for (const timer of timers.values()) clearTimeout(timer);
+  timers.clear();
+}
