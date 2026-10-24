@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import { defineComponent, h, ref } from 'vue';
+import { computed, defineComponent, h, ref } from 'vue';
 import type { VNode } from 'vue';
 import { NO_FILTERS } from '@/features/problems/use-problem-filters';
 import { useProblemListQuery } from '@/features/problems/problems.queries';
@@ -9,6 +9,7 @@ import { sessionUser, signedOut } from '@/test/fixtures';
 import { mockApi, page } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
 import { useSessionStore } from '@/stores/session.store';
+import { useViewerId } from '@/stores/use-viewer-id';
 import { useAccountCacheSync } from './use-account-cache';
 
 const CACHED_KEY = ['problems', 'list', { page: 1 }];
@@ -68,21 +69,22 @@ describe('account cache sync', () => {
     expect(isCached()).toBe(false);
   });
 
-  it('fetches a mounted query that has no viewer in its key again as the new viewer', async () => {
+  it('reads a mounted viewer-keyed query once for the new viewer, not twice', async () => {
     const viewer = sessionUser({ id: '0192a000-0000-7000-8000-00000000000d' });
     mockApi({ 'GET /auth/me': signedOut });
-    let reads = 0;
-    const wrapper = mountWithSync(() => {
-      const { data } = useQuery({
-        queryKey: ['site', 'probe'],
-        queryFn: () => `${(reads += 1)}:${useSessionStore().user?.id ?? 'anonymous'}`,
+    const reads: string[] = [];
+    mountWithSync(() => {
+      const viewerId = useViewerId();
+      useQuery({
+        queryKey: computed(() => ['probe', viewerId.value]),
+        queryFn: () => reads.push(viewerId.value),
       });
-      return () => h('p', data.value ?? '');
+      return () => null;
     });
     await flushPromises();
     useSessionStore().$patch({ status: 'authenticated', user: viewer });
     await flushPromises();
-    expect(wrapper.text()).toBe(`2:${viewer.id}`);
+    expect(reads).toEqual(['anonymous', viewer.id]);
   });
 
   it('shows a mounted problem list as the new viewer sees it', async () => {
