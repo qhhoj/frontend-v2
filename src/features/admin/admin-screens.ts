@@ -89,7 +89,7 @@ export const ADMIN_SCREENS = {
       'judge.abort_any_submission',
     ],
   },
-  // Plan 8f-2 screens
+  // Site-wide screens
   judges: { path: '/admin/judges', permission: 'judge.change_judge' },
   judgeNew: { path: '/admin/judges/new', permission: 'judge.change_judge' },
   // Backend `LanguagesAdminController`: list and update need `change_language`, create needs `add_language`.

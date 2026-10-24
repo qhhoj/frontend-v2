@@ -4,7 +4,7 @@ import type { StateKind } from '@/mascot/state-bits';
 
 /**
  * REPLACEABLE HOOK: the Bit of every state of the organization "Bài tập" and "Hạn mức" tabs and of the problem page's
- * archive notice (plan VNOI F4). Page-sized states name a `StateKind` (drawn by StatePanel); inline notices name a kind.
+ * archive notice. Page-sized states name a `StateKind` (drawn by StatePanel); inline notices name a kind.
  */
 export const ORG_BITS = {
   listEmpty: 'empty',
