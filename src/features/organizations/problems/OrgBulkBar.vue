@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppButton from '@/components/ui/AppButton.vue';
 
-/** The sticky bar of board M7A while rows are ticked; the count is announced politely when it changes. */
+/** The sticky bar while rows are ticked; the count is announced politely when it changes. */
 defineProps<{ count: number; isPending: boolean }>();
 const emit = defineEmits<{ archive: []; unarchive: []; tag: []; clear: [] }>();
 </script>

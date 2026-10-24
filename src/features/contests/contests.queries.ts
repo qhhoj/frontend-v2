@@ -19,7 +19,7 @@ import { keepPreviousForSameViewer } from './keep-previous-for-viewer';
 /** Every account-owned key carries the viewer id at this index: `['contests', <scope>, viewerId, ...]`. */
 const VIEWER_KEY_INDEX = 2;
 
-/** No ranking event exists yet (backend ask B4): a running board is re-read on this interval. */
+/** No ranking event exists yet (the backend sends none): a running board is re-read on this interval. */
 export const RANKING_POLL_MS = 30_000;
 /** Low-power mode (`data-low-power` on <html>) re-reads half as often. */
 export const LOW_POWER_RANKING_POLL_MS = 60_000;

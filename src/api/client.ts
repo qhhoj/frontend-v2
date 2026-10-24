@@ -18,7 +18,7 @@ export type FieldIssue = Schemas['FieldIssueResponse'];
 
 /**
  * A failed request: the backend's `{ error: { code, message, fields?, issues?, ...extra } }`, or `network_error` / `invalid_response`.
- * `extra` holds the members `AppError` merges next to `code` and `message` (`banReason` of a banned login, B8).
+ * `extra` holds the members `AppError` merges next to `code` and `message` (`banReason` of a banned login).
  */
 export interface ApiErrorDetails {
   fields?: Record<string, string[]>;

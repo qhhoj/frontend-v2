@@ -6,7 +6,8 @@ import { join, relative } from 'node:path';
 
 const srcDir = new URL('../src/', import.meta.url).pathname;
 const readme = new URL('../README.md', import.meta.url).pathname;
-const PLAN_CODE = /\b(?:[PQ]-\d{2}|Cells [A-Z]|E4|B\d{2}|[Pp]lan (?:8f-2|F\d|VNOI F\d))\b/;
+const PLAN_CODE =
+  /\b(?:[PQ]-\d{2}|Cells [A-Z]|E4|B\d{1,2}|M\d[A-Z]|[MN]\d\/[MN]\d|[Pp]lan (?:\d+f-\d|F\d|VNOI F\d))\b/;
 const isSource = (name) => /\.(?:ts|vue|css)$/.test(name);
 
 const sourceFiles = (dir) =>

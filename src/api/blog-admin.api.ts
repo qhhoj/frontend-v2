@@ -9,7 +9,7 @@ export type PostFlagPatch = Pick<
 >;
 
 /**
- * B1: hiding is an edit (`visible: false`): the post leaves every list but stays reachable by its link for authors and staff;
+ * Hiding is an edit (`visible: false`): the post leaves every list but stays reachable by its link for authors and staff;
  * showing a post whose publish time is ahead puts it in the scheduled queue. Pinning and marking global need `pin_post`
  * and `mark_global_post`. Sent alone by `edit_all_post`, a flag skips the write limit.
  */

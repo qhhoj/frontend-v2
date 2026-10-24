@@ -23,7 +23,7 @@ const locale = useLocaleStore();
 const code = computed(() => String(route.params.code));
 const { data: problem, isPending, error, refetch } = useProblemQuery(code, toRef(locale, 'locale'));
 
-/** The viewer's current participation holds this problem: the page gains the contest's problem rail (M5B). */
+/** The viewer's current participation holds this problem: the page gains the contest's problem rail. */
 const contestKey = computed(() => problem.value?.contest?.contestKey ?? null);
 /** Two columns only once the rail has its rows; while the contest loads or fails the statement keeps the full width. */
 const { contest, entries: railEntries } = useProblemRail(contestKey, () => code.value);

@@ -52,7 +52,7 @@ export function useNotificationsQuery(
   });
 }
 
-/** The banner's row: the newest unread `high` notification (B1: a filter on the list, no route of its own). */
+/** The banner's row: the newest unread `high` notification (a filter on the list, no route of its own). */
 export const useHighPriorityQuery = () => useNotificationsQuery(HIGH_PRIORITY_QUERY);
 
 export function useInvalidateNotifications() {

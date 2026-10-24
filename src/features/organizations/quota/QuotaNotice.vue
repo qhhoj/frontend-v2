@@ -8,7 +8,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { ORG_BITS } from '../org-bits';
 import { quotaNoticeOf } from './quota-text';
 
-/** Board M7A's banner: healthy, 80 % warning (with warn or enforce wording) or the blocking notice. */
+/** The banner: healthy, 80 % warning (with warn or enforce wording) or the blocking notice. */
 const props = defineProps<{ usage: OrganizationUsage }>();
 const state = computed(() => quotaNoticeOf(props.usage));
 const locale = useLocaleStore();

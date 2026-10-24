@@ -4,7 +4,7 @@ import type { NotificationState } from '@/api/types/notifications';
 import { KIND_GROUPS } from './notification-kinds';
 import type { KindGroup } from './notification-kinds';
 
-/** `?kind=` is one of the four chips of the "Loại" rail (requires VNOI backend B1 ask: the `kind` query); anything else is no kind filter. */
+/** `?kind=` is one of the four chips of the "Loại" rail (the `kind` query); anything else is no kind filter. */
 export function kindGroupFromQuery(value: unknown): KindGroup | null {
   const text = Array.isArray(value) ? value[0] : value;
   return KIND_GROUPS.find((group) => group === text) ?? null;

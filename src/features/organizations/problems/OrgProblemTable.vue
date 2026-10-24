@@ -11,7 +11,7 @@ import OrgSelectBox from './OrgSelectBox.vue';
 import OrgProblemTags from './OrgProblemTags.vue';
 
 /**
- * The rows of board M7A; administrators also get a selection box per row and the two row actions. A row the viewer may
+ * The table rows; administrators also get a selection box per row and the two row actions. A row the viewer may
  * edit (`canEdit`, whatever their organization role) gets a pencil to the problem's editor. Under 640 px the rows
  * are cards (`OrgProblemCardList`), so the name keeps the full width; only one of the two layouts is rendered. The tags and
  * date columns need the table itself to be 48rem wide (the tag catalogue narrows the card on a laptop); below that the

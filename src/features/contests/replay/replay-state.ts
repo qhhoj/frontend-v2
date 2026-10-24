@@ -11,7 +11,7 @@ export interface ReplayStateInput {
   load: ReplayLoad | undefined;
 }
 
-/** Codes the gate answers with, by the panel they show (B5 Task 9 gate order). */
+/** Codes the gate answers with, by the panel they show (gate order). */
 const PANEL_OF_CODE: Record<string, ReplayPanelState> = {
   replay_not_ready: 'notReady',
   contest_not_ended: 'notEnded',

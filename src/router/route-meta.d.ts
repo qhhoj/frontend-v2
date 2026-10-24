@@ -13,7 +13,7 @@ declare module 'vue-router' {
     adminArea?: boolean;
     /** Reachable while the second factor is pending. */
     allowPartial?: boolean;
-    /** `'auth'`: the page draws its own top bar (only a route that renders `AuthLayout`). `'admin'`: AppShell renders AdminShell instead of the site header (plan 8f-1). */
+    /** `'auth'`: the page draws its own top bar (only a route that renders `AuthLayout`). `'admin'`: AppShell renders AdminShell instead of the site header. */
     layout?: 'auth' | 'admin';
     /** A public page only holders of this right may open; anyone else (signed out too) gets the not-found page, its existence unrevealed (the profile's comments). */
     notFoundWithout?: PermissionRule;

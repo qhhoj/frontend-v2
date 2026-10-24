@@ -1,6 +1,6 @@
 import { apiGet, apiGetPage, apiSend } from './typed';
 
-/** M1/N1: no admin read; the public `/site` is cached privately for 60 s, so revalidate. */
+/** No admin read; the public `/site` is cached privately for 60 s, so revalidate. */
 export const fetchSiteForAdmin = () => apiGet('/site', { cache: 'no-cache' });
 
 export const putConfig = (key: string, value: string) =>

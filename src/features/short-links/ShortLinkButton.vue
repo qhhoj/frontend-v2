@@ -10,7 +10,7 @@ import { displayUrl } from './short-link-path';
 import { SHORT_LINK_BITS } from './short-link-bits';
 import { useShortLink } from './use-short-link';
 
-/** Board M9A: "Sao chép liên kết ngắn" in a header's action row; full width on a phone. Signed-out viewers cannot create links. */
+/** "Sao chép liên kết ngắn" in a header's action row; full width on a phone. Signed-out viewers cannot create links. */
 const props = defineProps<{
   path: string;
   /** A 40 px round icon button (a card header); its notices open as a small panel below it. */

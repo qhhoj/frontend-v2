@@ -5,7 +5,7 @@ import type { ContestActionKind } from './contest-action';
 export const hasRules = (rules: string): boolean => rules.trim() !== '';
 
 /**
- * backend (B3 Task 4): acceptance is stored on every new row: a registration, a first live join (no row yet) and every virtual
+ * backend: acceptance is stored on every new row: a registration, a first live join (no row yet) and every virtual
  * join. Joining a registered row, re-entering and spectating create nothing to accept.
  */
 export function needsRulesAcceptance(

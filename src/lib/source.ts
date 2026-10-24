@@ -95,7 +95,7 @@ const issueKey = ({ field, code }: FieldIssue) => ISSUE_KEYS[`${field}.${code}`]
 
 /**
  * The one place a refused submit (text or file) becomes a message: issue codes first, then the distinct top-level codes
- * (B9: `banned_from_problem`, `contest_submission_limit`, `unfinished_submission_limit`, `rate_limited`, `conflict`,
+ * (`banned_from_problem`, `contest_submission_limit`, `unfinished_submission_limit`, `rate_limited`, `conflict`,
  * `file_too_large`) through `errors.<code>`. A new backend code needs a row here or an `errors.*` message, nothing else.
  */
 export function submitErrorKey(error: unknown): { key: string; params?: Record<string, unknown> } {

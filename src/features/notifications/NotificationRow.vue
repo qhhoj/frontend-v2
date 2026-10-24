@@ -10,7 +10,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { kindIcon } from './notification-kinds';
 import { localizedTitle } from './notification-title';
 
-/** One inbox row (M1B): the row opens its target; the check button marks it read without leaving. */
+/** One inbox row: the row opens its target; the check button marks it read without leaving. */
 const props = defineProps<{ item: NotificationItem; isStale: boolean; canMarkRead: boolean }>();
 const emit = defineEmits<{ open: [item: NotificationItem]; markRead: [item: NotificationItem] }>();
 const locale = useLocaleStore();

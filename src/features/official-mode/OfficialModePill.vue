@@ -5,7 +5,7 @@ import { useNow } from '@/lib/use-now';
 import { useOfficialMode } from './official-mode.queries';
 import { remainingText } from './official-until';
 
-/** M1B: "Thi chính thức · còn 1:12:40" beside the logo while the mode is on; the countdown needs `officialModeEndsAt` (requires VNOI backend B8 ask), else just the label. */
+/** "Thi chính thức · còn 1:12:40" beside the logo while the mode is on; the countdown needs `officialModeEndsAt`, else just the label. */
 const mode = useOfficialMode();
 const now = useNow();
 const remaining = computed(() =>

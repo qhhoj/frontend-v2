@@ -21,7 +21,7 @@ export const problemTag = (overrides: Partial<ProblemTag> = {}): ProblemTag => (
   color: 'tag-1',
   ...overrides,
 });
-/** The catalogue of board M7A, first three tags. */
+/** The catalogue, first three tags. */
 export const TAGS: ProblemTag[] = [
   problemTag(),
   problemTag({ id: f4Id(702), slug: 'dt', name: 'Đồ thị', color: 'tag-2' }),
@@ -39,7 +39,7 @@ export const orgProblem = (overrides: Partial<OrganizationProblem> = {}): Organi
   updatedAt: '2026-10-08T09:30:00Z',
   ...overrides,
 });
-/** Four live rows as board M7A draws them. */
+/** Four live rows as the page draws them. */
 export const ORG_PROBLEMS: OrganizationProblem[] = [
   orgProblem(),
   orgProblem({ code: 'lhp_tree', name: 'Trò chơi trên cây', points: 200, tags: [TAGS[1]!] }),

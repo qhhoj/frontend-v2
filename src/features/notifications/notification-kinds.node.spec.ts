@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { isTicketKind, kindsOfGroup } from './notification-kinds';
 
-describe('kind groups (the "Loại" chips; the lists feed the `kind` query, requires VNOI backend B1 ask)', () => {
+describe('kind groups (the "Loại" chips; the lists feed the `kind` query)', () => {
   it('maps each chip to the backend kinds it stands for and no kind to two chips', () => {
     expect(kindsOfGroup('ticket')).toEqual(['ticket-new', 'ticket-message', 'ticket-status']);
     expect(kindsOfGroup('contest')).toEqual(['contest-announcement']);

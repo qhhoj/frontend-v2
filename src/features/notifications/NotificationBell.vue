@@ -26,7 +26,7 @@ import { unreadBadge } from './use-notification-alerts';
 import { useOpenNotification } from './use-open-notification';
 
 /**
- * M1B: the bell beside the user menu (from `md`; a phone reaches notifications from the menu sheet); its drawer shows the
+ * The bell beside the user menu (from `md`; a phone reaches notifications from the menu sheet); its drawer shows the
  * latest five rows. The live stream and the arrival announcements are the header's (`useNotificationAlerts`).
  */
 const session = useSessionStore();

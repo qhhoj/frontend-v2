@@ -44,7 +44,7 @@ describe('NotificationsPage', () => {
     ).toBe('page');
   });
 
-  it("filters by kind chip: sends the chip's kinds, keeps the state and names the chip when empty (requires VNOI backend B1 ask)", async () => {
+  it("filters by kind chip: sends the chip's kinds, keeps the state and names the chip when empty", async () => {
     const calls = mockApi(routesWith({ 'GET /notifications': page([], { pageSize: 20 }) }));
     const { wrapper } = await mountApp('/notifications?state=unread&kind=organization');
     expect(listCalls(calls)[0]!.query.getAll('kind')).toEqual(['organization-request-decided']);

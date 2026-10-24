@@ -49,7 +49,7 @@ function forbiddenTitle(side: DiffSide) {
     ? translate('sourceDiff.forbiddenTitleNamed', { id, user })
     : translate('sourceDiff.forbiddenTitle', { id });
 }
-/** Board M6C: when the other side is the viewer's own, say so (the board's "still yours" line). */
+/** When the other side is the viewer's own, say so (the board's "still yours" line). */
 function forbiddenBody(side: DiffSide) {
   const other = otherSide(side);
   const isOtherOwn = sides[other].detail.data.value?.user?.id === viewerId.value;

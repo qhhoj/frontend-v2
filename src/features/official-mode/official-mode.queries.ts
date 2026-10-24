@@ -30,7 +30,7 @@ export function useOfficialMode() {
   /** The site notice reads `/site` for everyone into the same cache: the mode still applies to signed-in viewers only. */
   const isActive = computed(() => session.user !== null && site.data.value?.officialMode === true);
   const isSuperuser = computed(() => session.user?.isSuperuser ?? false);
-  /** Requires VNOI backend B8 ask: `SiteResponse.officialModeEndsAt` (ISO instant or null). */
+  /** Needs `SiteResponse.officialModeEndsAt` (ISO instant or null). */
   const endsAt = computed(() => site.data.value?.officialModeEndsAt ?? null);
   return {
     isActive,
