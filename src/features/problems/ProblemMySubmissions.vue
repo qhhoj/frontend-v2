@@ -12,7 +12,7 @@ import VerdictBadge from '@/components/VerdictBadge.vue';
 import { GLOBAL_SCOPE } from '@/features/submissions/list/submission-scope';
 import { useScopedSubmissionListQuery } from '@/features/submissions/submissions.queries';
 import type { SubmissionFilters } from '@/features/submissions/use-submission-filters';
-import { formatNumber } from '@/lib/format';
+import { formatNumber, scoreBelowFull } from '@/lib/format';
 import { formatAgoCompact } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { submissionVerdictOf } from '@/lib/verdicts';
@@ -65,7 +65,8 @@ function scoreParts(submission: SubmissionListItem) {
       : max === null
         ? t('problem.rail.mine.contestUnit')
         : t('submission.contest.outOf', { max: maxText });
-  return { value: points === null ? NO_SCORE : format(points), outOf, scale };
+  const value = points === null ? NO_SCORE : format(scoreBelowFull(points, max, digits));
+  return { value, outOf, scale };
 }
 const rows = computed(() =>
   latest.value.map((submission) => ({ submission, score: scoreParts(submission) })),

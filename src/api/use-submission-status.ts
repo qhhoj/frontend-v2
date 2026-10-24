@@ -82,9 +82,13 @@ function followSubmission(id: string, state: SubmissionLiveState, hooks: FollowH
   return { apply, rereadRow };
 }
 
-/** Follows one submission over SSE; once finished it reads the stored row (result and points live in REST) and refreshes the list, detail and stats. */
+/**
+ * Follows one submission over SSE; once finished it reads the stored row (result and points live in REST) and refreshes the list, detail and stats.
+ * `viewer` is the account the tab is signed in as: another one reopens the stream, which the server authorised for the previous one.
+ */
 export function useSubmissionStatus(
   submissionId: Ref<string | null>,
+  viewer: Ref<string>,
 ): Readonly<SubmissionLiveState> {
   const queryClient = useQueryClient();
   const state = reactive<SubmissionLiveState>(idle());
@@ -108,7 +112,11 @@ export function useSubmissionStatus(
   const apply = (event: SubmissionProgressEvent | SubmissionStateEvent) => followed?.apply(event);
   const target = () =>
     submissionId.value
-      ? { route: '/events/submissions/{id}' as const, params: { id: submissionId.value } }
+      ? {
+          route: '/events/submissions/{id}' as const,
+          params: { id: submissionId.value },
+          viewer: viewer.value,
+        }
       : null;
   const live = useLiveStream(target, {
     frames: {

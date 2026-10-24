@@ -1,6 +1,6 @@
 import type { SubmissionListItem } from '@/api/types/submissions';
 import { FINISHED_STATUSES } from '@/api/types/submissions';
-import { formatCaseMemory, formatCaseTime, formatNumber } from '@/lib/format';
+import { formatCaseMemory, formatCaseTime, formatNumber, scoreBelowFull } from '@/lib/format';
 import type { Locale } from '@/i18n';
 import { ringFraction } from '@/lib/grading';
 
@@ -13,8 +13,9 @@ export const isFinished = (row: SubmissionListItem) => FINISHED_STATUSES.include
 /** "738.46 / 1000" ("738.46/1000" when `tight`), or just the score where the problem's max points are unknown (an older backend). Empty when the row has no score. */
 export function scoreText(row: SubmissionListItem, locale: Locale, tight = false): string {
   if (row.points === null) return '';
-  const score = formatNumber(row.points, locale, POINT_FRACTION_DIGITS, false);
   const max: number | undefined = row.problem?.points;
+  const shown = scoreBelowFull(row.points, max, POINT_FRACTION_DIGITS);
+  const score = formatNumber(shown, locale, POINT_FRACTION_DIGITS, false);
   return max === undefined
     ? score
     : `${score}${tight ? '/' : ' / '}${formatNumber(max, locale, POINT_FRACTION_DIGITS, false)}`;

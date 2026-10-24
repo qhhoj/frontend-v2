@@ -10,11 +10,14 @@ import { useSubmissionStatus } from './use-submission-status';
 const row = (status: string, result: string | null, currentTestcase = 0) =>
   ok({ id: 'abc', status, result, currentTestcase });
 
-function follow(id: Ref<string | null>) {
+function follow(id: Ref<string | null>, viewer: Ref<string> = ref('viewer-a')) {
   const queryClient = new QueryClient();
   const invalidate = vi.spyOn(queryClient, 'invalidateQueries');
   const wrapper = mount(
-    defineComponent({ setup: () => ({ live: useSubmissionStatus(id) }), render: () => null }),
+    defineComponent({
+      setup: () => ({ live: useSubmissionStatus(id, viewer) }),
+      render: () => null,
+    }),
     { global: { plugins: [[VueQueryPlugin, { queryClient }]] } },
   );
   return {
@@ -27,6 +30,17 @@ function follow(id: Ref<string | null>) {
 
 describe('useSubmissionStatus', () => {
   beforeEach(installFakeEventSource);
+
+  it('reopens the stream when another account takes over the tab', async () => {
+    const viewer = ref('viewer-a');
+    follow(ref('abc'), viewer);
+    const first = latestEventSource();
+    viewer.value = 'viewer-b';
+    await nextTick();
+    expect(first.closed).toBe(true);
+    expect(latestEventSource()).not.toBe(first);
+    expect(latestEventSource().url).toBe('/api/internal/events/submissions/abc');
+  });
 
   it('reports progress from the stream', async () => {
     const { live } = follow(ref('abc'));

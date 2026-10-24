@@ -42,13 +42,23 @@ export function createStaleChunkReloader(
   };
 }
 
+/** The destination as a full URL on this site, or null when it would lead to another one. */
+function sameOriginUrl(href: string): string | null {
+  if (href.startsWith('//')) return null;
+  const url = new URL(href, window.location.origin);
+  return url.origin === window.location.origin ? url.href : null;
+}
+
 /**
- * A failed navigation reloads its destination (the router error carries it). A failed preload outside a navigation
- * reloads the current page; it runs one task later, so the navigation error of the same failure wins.
+ * A failed navigation reloads its destination (the router error carries it), only when it stays on this site.
+ * A failed preload outside a navigation reloads the current page; it runs one task later, so the navigation error
+ * of the same failure wins.
  */
 export function installStaleChunkReload(router: Router, reloader: StaleChunkReloader): void {
   router.onError((error, to) => {
-    if (isDynamicImportFailure(error)) reloader.reload(router.resolve(to.fullPath).href);
+    if (!isDynamicImportFailure(error)) return;
+    const target = sameOriginUrl(router.resolve(to.fullPath).href);
+    if (target) reloader.reload(target);
   });
   window.addEventListener('vite:preloadError', () => {
     setTimeout(() => reloader.reload(window.location.href), 0);

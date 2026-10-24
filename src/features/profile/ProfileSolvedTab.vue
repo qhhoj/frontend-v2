@@ -7,7 +7,7 @@ import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import { useSolvedQuery } from '@/features/users/users.queries';
 import { useLocaleStore } from '@/stores/locale.store';
-import { formatNumber } from '@/lib/format';
+import { formatNumber, scoreBelowFull } from '@/lib/format';
 import ProfileTabSkeleton from './ProfileTabSkeleton.vue';
 
 /** The problems a user has solved, grouped by tag; each row shows the points earned of the maximum. */
@@ -66,9 +66,9 @@ const isFullScore = (points: number, total: number) => points >= total;
                     : 'bg-partial-bg-2'
                 "
               >
-                {{ formatNumber(problem.points, locale.locale, 1) }}/{{
-                  formatNumber(problem.total, locale.locale, 1)
-                }}
+                {{
+                  formatNumber(scoreBelowFull(problem.points, problem.total, 1), locale.locale, 1)
+                }}/{{ formatNumber(problem.total, locale.locale, 1) }}
               </span>
             </li>
           </ul>

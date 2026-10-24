@@ -4,12 +4,15 @@ import type { Ref } from 'vue';
 import { FINISHED_STATUSES, IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import { useLiveSubmission } from '@/features/submissions/use-live-submission';
 import { translate } from '@/i18n';
-import { formatNumber } from '@/lib/format';
+import { formatNumber, scoreBelowFull } from '@/lib/format';
 import { ringProgress } from '@/lib/grading';
 import { PARTIAL_CODE, submissionVerdictOf, verdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import { firstFailedTest, scoreOnScale } from './submit-result';
 import type { ScoreScale } from './submit-result';
+
+/** Site points keep up to two decimals. */
+const SITE_DIGITS = 2;
 
 /**
  * The viewer's latest submission on this problem, followed live for as long as the page lives (closing the dock
@@ -42,11 +45,13 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
       ? row.value.points / max
       : null;
   });
-  const format = (points: number) => {
+  /** "99.99 / 100": on the site scale a score short of the maximum never reads as it; contest points follow the contest's precision. */
+  const scoreText = (score: number, max: number) => {
     const precision = scale.value.contest?.precision;
-    return precision === undefined
-      ? formatNumber(points, locale.locale, 2, false)
-      : formatNumber(points, locale.locale, precision);
+    if (precision !== undefined)
+      return `${formatNumber(score, locale.locale, precision)} / ${formatNumber(max, locale.locale, precision)}`;
+    const format = (points: number) => formatNumber(points, locale.locale, SITE_DIGITS, false);
+    return `${format(scoreBelowFull(score, max, SITE_DIGITS))} / ${format(max)}`;
   };
   /** While grading: "Đang chấm · test 4". Finished: the score and where it failed ("0 / 1000 · lỗi ở test 1"); the ring
    *  carries the verdict code, so the text never repeats it (M-12). */
@@ -61,7 +66,7 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
     if (row.value.points !== null) {
       const { points, contest } = row.value;
       const { score, max } = scoreOnScale({ points, contest }, scale.value);
-      parts.push(`${format(score)} / ${format(max)}`);
+      parts.push(scoreText(score, max));
     }
     if (failed) parts.push(translate('submit.result.failedAt', { test: failed }));
     return parts.length ? parts.join(' · ') : translate(verdict.value.labelKey);

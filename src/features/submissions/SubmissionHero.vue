@@ -11,7 +11,7 @@ import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
 import { translate } from '@/i18n';
-import { formatNumber } from '@/lib/format';
+import { formatNumber, scoreBelowFull } from '@/lib/format';
 import { provisionalPoints, ringProgress } from '@/lib/grading';
 import { PARTIAL_CODE, verdictOfCode, type Verdict } from '@/lib/verdicts';
 import { BIT_MOODS } from '@/mascot/bit-moods';
@@ -55,7 +55,9 @@ const score = computed(() => {
     return props.problemPoints === null
       ? NO_VALUE
       : format(provisionalPoints(props.problemPoints, props.submission));
-  return props.submission.points === null ? NO_VALUE : format(props.submission.points);
+  return props.submission.points === null
+    ? NO_VALUE
+    : format(scoreBelowFull(props.submission.points, props.problemPoints, SCORE_FRACTION_DIGITS));
 });
 const maxScore = computed(() =>
   !isProvisional.value && props.submission.points !== null && props.problemPoints !== null

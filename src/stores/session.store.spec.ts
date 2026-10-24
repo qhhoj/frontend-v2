@@ -202,4 +202,28 @@ describe('useSessionStore', () => {
     expect(session.impersonatorId).toBeNull();
     expect(session.user?.username).toBe('admin');
   });
+
+  it('drops a session waiting for its second factor when another tab signs out', async () => {
+    mockApi({ 'GET /auth/me': ok(partialSession()) });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    expect(session.status).toBe('partial');
+    const otherTab = new BroadcastChannel('qhhoj-session');
+    otherTab.postMessage({ userId: null });
+    otherTab.close();
+    await vi.waitFor(() => expect(session.status).toBe('anonymous'));
+  });
+
+  it('re-reads the session when another tab signs in as someone else', async () => {
+    const other = sessionUser({ id: '0192a000-0000-7000-8000-0000000000f2', username: 'user_02' });
+    mockApi({ 'GET /auth/me': signedOut });
+    const session = useSessionStore();
+    await session.ensureLoaded();
+    mockApi({ 'GET /auth/me': signedIn({ user: other }) });
+    const otherTab = new BroadcastChannel('qhhoj-session');
+    otherTab.postMessage({ userId: other.id });
+    otherTab.close();
+    await vi.waitFor(() => expect(session.user?.id).toBe(other.id));
+    expect(session.status).toBe('authenticated');
+  });
 });

@@ -46,7 +46,10 @@ export function useAnnouncementFeed(key: Ref<string>, isStreaming: Ref<boolean>)
     const item = first?.items.find((announcement) => announcement.id === id);
     if (item) message.value = translate('contests.announcements.arrived', { title: item.title });
   }
-  const live = useLiveStream(() => (isStreaming.value ? announcementStream(key.value) : null), {
+  /** Reopened for another account (impersonation): the server authorised the stream for the viewer who opened it. */
+  const target = () =>
+    isStreaming.value ? { ...announcementStream(key.value), viewer: viewerId.value } : null;
+  const live = useLiveStream(target, {
     frames: { announcement: (frame) => void onAnnouncement(frame.announcementId) },
     cacheKey: listKey,
   });

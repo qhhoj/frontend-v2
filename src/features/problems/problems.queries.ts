@@ -1,8 +1,9 @@
-import { keepPreviousData, useQuery } from '@tanstack/vue-query';
+import { useQuery } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import type { MaybeRefOrGetter, Ref } from 'vue';
 import { fetchEditorial, fetchProblem, fetchProblemMeta, fetchProblems } from '@/api/problems.api';
 import type { StatementLanguage } from '@/api/types/problems';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { toApiFilters } from './use-problem-filters';
 import type { ProblemFilters } from './use-problem-filters';
@@ -18,14 +19,28 @@ export const useProblemMetaQuery = (options: { enabled?: MaybeRefOrGetter<boolea
 
 export const PROBLEM_PAGE_SIZE = 50;
 
-/** One numbered page of the list; the previous page stays on screen while the next loads. */
+/** Every problem key carries the viewer id at this index: `['problems', <kind>, viewerId, ...]`. */
+const VIEWER_KEY_INDEX = 2;
+
+/**
+ * One numbered page of the list, per viewer (each row carries the viewer's own solved mark); the previous page
+ * stays on screen while the next loads, but never one another viewer loaded.
+ */
 export const useProblemListQuery = (
   filters: Ref<ProblemFilters>,
   lang: Ref<StatementLanguage>,
   page: Ref<number>,
-) =>
-  useQuery({
-    queryKey: computed(() => ['problems', 'list', filters.value, lang.value, page.value]),
+) => {
+  const viewerId = useViewerId();
+  return useQuery({
+    queryKey: computed(() => [
+      'problems',
+      'list',
+      viewerId.value,
+      filters.value,
+      lang.value,
+      page.value,
+    ]),
     queryFn: () =>
       fetchProblems({
         ...toApiFilters(filters.value),
@@ -35,10 +50,10 @@ export const useProblemListQuery = (
         pageSize: PROBLEM_PAGE_SIZE,
       }),
     /** The table stays mounted (and focused) while a new page, sort or filter loads. */
-    placeholderData: keepPreviousData,
+    placeholderData: computed(() => keepPreviousForSameViewer(VIEWER_KEY_INDEX, viewerId.value)),
   });
+};
 
-const VIEWER_KEY_INDEX = 2;
 const CODE_KEY_INDEX = 3;
 
 /**

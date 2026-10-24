@@ -46,7 +46,7 @@ export const useSessionStore = defineStore('session', () => {
   const impersonatorId = ref<string | null>(null);
   /** While the second factor is pending: the account name and the factors it can use. */
   const twoFactor = ref<TwoFactorPending | null>(null);
-  /** Counts the times the session ended without the viewer asking (expired, or signed out in another tab): the router re-runs its guards on each. */
+  /** Counts the times the session ended or changed without the viewer asking (expired, or another tab signed out or in as someone else): the router re-runs its guards on each. */
   const sessionLostCount = ref(0);
   const isStaff = computed(() => user.value?.isStaff ?? false);
   let loading: Promise<void> | null = null;
@@ -63,45 +63,58 @@ export const useSessionStore = defineStore('session', () => {
     status.value = fields.status;
   }
 
+  /**
+   * A change this tab made (sign-in, sign-out, impersonation, a reload): the other tabs hear the new account, if it is
+   * another one. A session waiting for its second factor is not announced: the other tabs meet that gate themselves.
+   */
+  function applyOwn(session: SessionResponse | null) {
+    const previousId = user.value?.id ?? null;
+    apply(session);
+    const userId = user.value?.id ?? null;
+    if (userId !== previousId && status.value !== 'partial') channel.announce(userId);
+  }
+
   /** 401 means signed out; any other failure leaves the status unknown and is rethrown. */
-  async function loadSession() {
+  async function loadSession(applySession: typeof apply = apply) {
     try {
-      apply(await fetchSession());
+      applySession(await fetchSession());
     } catch (error) {
       if (!(error instanceof ApiError && error.code === 'unauthorized')) throw error;
-      apply(null);
+      applySession(null);
     }
   }
 
   /** Waits for a sign-out in flight, so the reload cannot bring back the session it is ending. */
-  async function refresh() {
+  async function reload(applySession: typeof apply = apply) {
     await signingOut;
-    await loadSession();
+    await loadSession(applySession);
   }
 
-  /** The first caller loads `/auth/me`; concurrent callers share it; later callers return at once. */
+  /** Reloads after a change the server made for this tab (second factor, password, security keys), and tells the other tabs. */
+  const refresh = () => reload(applyOwn);
+
+  /** The first caller loads `/auth/me`; concurrent callers share it; later callers return at once. Nothing changed, so nothing is announced. */
   function ensureLoaded(): Promise<void> {
     if (status.value !== 'unknown') return Promise.resolve();
-    loading ??= refresh().finally(() => (loading = null));
+    loading ??= reload().finally(() => (loading = null));
     return loading;
   }
 
   const login = async (body: LoginBody) => {
     await signingOut;
-    apply(await loginRequest(body));
+    applyOwn(await loginRequest(body));
   };
 
   /** Finishing a social signup opens the session like a password login does. */
   const completeSocialSignup = async (body: SocialCompleteBody) => {
     await signingOut;
-    apply(await completeSocialSignupRequest(body));
+    applyOwn(await completeSocialSignupRequest(body));
   };
 
   /** Ends the session here at once, without waiting for the server (it may be unreachable, and the viewer need not wait for it). */
   function logout() {
     signingOut = endServerSession();
-    apply(null);
-    channel.announceSignedOut();
+    applyOwn(null);
     return Promise.resolve();
   }
 
@@ -131,15 +144,14 @@ export const useSessionStore = defineStore('session', () => {
   /** Every session of the account ends, this one included (the server clears the cookie). Rethrows, so the page can say it failed. */
   async function logoutEverywhere() {
     await logoutAllSessions();
-    apply(null);
-    channel.announceSignedOut();
+    applyOwn(null);
   }
 
   /** Back to the staff account that started viewing as this user. */
-  const stopImpersonating = async () => apply(await stopImpersonation());
+  const stopImpersonating = async () => applyOwn(await stopImpersonation());
 
   /** Superuser: view the site as another account; the cache of the staff account is dropped by `useAccountCacheSync` when the user changes. Rethrows, so the caller can say why it was refused. */
-  const startImpersonating = async (userId: string) => apply(await startImpersonation(userId));
+  const startImpersonating = async (userId: string) => applyOwn(await startImpersonation(userId));
 
   /**
    * A write refused with `csrf_failed`: reload the session, and allow the resend only when it still belongs to the account that sent the
@@ -159,7 +171,25 @@ export const useSessionStore = defineStore('session', () => {
     sessionLostCount.value += 1;
   }
 
-  const channel = openSessionChannel(loseSession);
+  /**
+   * Another tab announced its account. Signed out: the cookie is gone, so forget the session at once, with no request.
+   * Another account: re-read who the cookie now belongs to (the answer, not the message, is the truth) and let the
+   * router re-check the page. Not re-announced, so two tabs never echo an old change back at each other.
+   */
+  function followOtherTab(userId: string | null) {
+    // First: a tab waiting for its second factor has no user either, and must still drop the session.
+    if (userId === null) return loseSession();
+    if (userId === user.value?.id) return;
+    void rereadForOtherTab();
+  }
+
+  async function rereadForOtherTab() {
+    const previousId = user.value?.id ?? null;
+    await reload().catch(() => undefined); // offline: the next request tells
+    if ((user.value?.id ?? null) !== previousId) sessionLostCount.value += 1;
+  }
+
+  const channel = openSessionChannel(followOtherTab);
   onCsrfFailed(reloadForResend);
   /** A protected request answered 401: the session expired. */
   onUnauthorized(loseSession);

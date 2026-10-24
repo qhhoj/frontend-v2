@@ -26,6 +26,19 @@ export const formatNumber = (
     useGrouping,
   }).format(value);
 
+/**
+ * The score to print with at most `fractionDigits` decimals out of `max`: a score short of `max` stays short of it once
+ * rounded (99.995 of 100 prints 99.99, never 100). Without a known `max` it is the score itself.
+ */
+export const scoreBelowFull = (
+  points: number,
+  max: number | null | undefined,
+  fractionDigits: number,
+): number =>
+  max === null || max === undefined || points >= max
+    ? points
+    : Math.min(points, max - 10 ** -fractionDigits);
+
 /** A problem's points as the old site showed them: `1500p` when tests score partially, else `1500`. */
 export const formatProblemPoints = (points: number, partial: boolean, locale: Locale) =>
   `${formatNumber(points, locale, 2, false)}${partial ? 'p' : ''}`;
