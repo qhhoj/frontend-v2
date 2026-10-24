@@ -18,7 +18,7 @@ const openOnPhone = async (path: string) => {
   return app;
 };
 
-describe('phone menu (P-01 A)', () => {
+describe('phone menu', () => {
   it('holds sign-in and register for a visitor, and switches the language', async () => {
     mockApi({ ...blogListRoutes, ...anonymousViewer });
     const { wrapper } = await openOnPhone('/blog');

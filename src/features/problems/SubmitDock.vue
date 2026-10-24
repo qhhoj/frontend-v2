@@ -16,9 +16,9 @@ import {
 const BODY_ID = 'submit-dock-body';
 const RAIL_SUBMIT_BUTTON = '[data-testid="rail-submit"] button';
 /**
- * Where the rail stacks under the statement (`usesSheet`: phones, tablets) a bottom sheet, beside it the pinned dock; both share the form state the page owns. P-02 B: the
+ * Where the rail stacks under the statement (`usesSheet`: phones, tablets) a bottom sheet, beside it the pinned dock; both share the form state the page owns. The
  * dock shows only once opened (the rail's "Nộp bài"), and closes away entirely; after a submit it carries the live
- * result strip (Q-01 B).
+ * result strip.
  */
 const props = defineProps<{
   problem: ProblemDetail;

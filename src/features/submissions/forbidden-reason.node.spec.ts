@@ -3,7 +3,7 @@ import { ApiError } from '@/api/client';
 import { forbiddenMessageKey, forbiddenReasonKey } from './forbidden-reason';
 
 describe('forbiddenReasonKey', () => {
-  it('maps each B18 reason code to its own text key and anything else to null', () => {
+  it('maps each reason code to its own text key and anything else to null', () => {
     for (const code of ['solve_first', 'contest_running', 'hidden'])
       expect(forbiddenReasonKey(new ApiError(code, 403, 'x'))).toBe(`submission.forbidden.${code}`);
     expect(forbiddenReasonKey(new ApiError('forbidden', 403, 'x'))).toBeNull();

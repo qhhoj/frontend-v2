@@ -38,7 +38,7 @@ const solvedCounts = computed(() => solvedSummary(problems.value));
 const isCrowned = computed(() => props.contest.phase === 'ended' && solvedCounts.value.solved > 0);
 /**
  * The attempt cap under the problem's name, with what the viewer has left once they have a result; null when the
- * problem has no cap (most do not, so no column of ∞ for it, P-23).
+ * problem has no cap (most do not, so no column of ∞ for it).
  */
 const capLineOf = (problem: ContestProblem): string | null => {
   const cap = problem.maxSubmissions;
@@ -51,7 +51,7 @@ const capLineOf = (problem: ContestProblem): string | null => {
 const capLines = computed(
   () => new Map(problems.value.map((problem) => [problem.problemId, capLineOf(problem)])),
 );
-/** A phone row's meta: code, attempt cap, limits, points; each a whole fact (M-13). */
+/** A phone row's meta: code, attempt cap, limits, points; each a whole fact. */
 const phoneFacts = (problem: ContestProblem) =>
   [
     problem.code,

@@ -368,7 +368,7 @@ describe('submission page layout below xl', () => {
   });
 });
 
-describe('submission page of a contest submission (P-14 B)', () => {
+describe('submission page of a contest submission', () => {
   const contest = contestDetail({
     formatName: 'ioi',
     problems: [contestProblem(0, { code: 'duongdi', partial: true }), contestProblem(1)],

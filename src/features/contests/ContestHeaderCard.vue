@@ -20,7 +20,7 @@ import PhasePill from './PhasePill.vue';
 
 /**
  * `run`: the viewer's running participation here. The contest bar then carries the clock, so a phone drops the big
- * countdown (P-17 A); a virtual run's countdown counts the run's own time (P-19).
+ * countdown; a virtual run's countdown counts the run's own time.
  */
 const props = defineProps<{ contest: ContestDetail; run?: ParticipationSummary | null }>();
 const virtualRun = computed(() => (props.run && props.run.virtual > 0 ? props.run : null));
@@ -38,7 +38,7 @@ const lengthSpan = computed(() =>
 const elapsedSpan = computed(() =>
   phase.value === 'running' ? spanMessage((now.value - startMs.value) / 1000) : null,
 );
-/** The viewer's own rating change once the contest's ratings are applied (P-22, Q-06 A). */
+/** The viewer's own rating change once the contest's ratings are applied. */
 const ratingChange = computed(() => props.contest.viewer.ratingChange);
 const ratingChangeTone = computed(() => {
   const delta = ratingChange.value?.delta;

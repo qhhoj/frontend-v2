@@ -41,7 +41,7 @@ const props = defineProps<{
   isLive: boolean;
   /** Only the author resubmits; never to a deleted problem. */
   canResubmit: boolean;
-  /** A judged contest submission (P-14 B, Q-10 A): the contest points lead, the problem's score moves to the line below. */
+  /** A judged contest submission: the contest points lead, the problem's score moves to the line below. */
   contestScore?: { points: string; max: string } | null;
 }>();
 const locale = useLocaleStore();

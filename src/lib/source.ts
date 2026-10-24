@@ -57,7 +57,7 @@ const extensionOfName = (name: string) => {
 export const acceptedExtension = ({ extension }: Pick<Language, 'extension'>) =>
   `.${dotless(extension)}`;
 
-/** `fileSizeLimit` is in MB and 0 means uploads are off (B17); 0 here too. */
+/** `fileSizeLimit` is in MB and 0 means uploads are off; 0 here too. */
 export const uploadCapBytes = ({ fileSizeLimit }: Pick<Language, 'fileSizeLimit'>) =>
   fileSizeLimit > 0 ? Math.min(fileSizeLimit * BYTES_PER_MEGABYTE, MAX_UPLOAD_BYTES) : 0;
 
@@ -78,7 +78,7 @@ export function checkUploadFile(
   return { ok: true };
 }
 
-/** `<field>.<issue code>` of the submit routes (B10) to a message. A code the table does not know falls through to the top-level code. */
+/** `<field>.<issue code>` of the submit routes to a message. A code the table does not know falls through to the top-level code. */
 const ISSUE_KEYS: Readonly<Record<string, string>> = {
   'file.file_wrong_extension': 'submit.errors.fileWrongExtension',
   'file.scratch_project_invalid': 'submit.errors.scratchInvalid',

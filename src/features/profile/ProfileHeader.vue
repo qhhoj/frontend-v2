@@ -109,7 +109,7 @@ const joinedDate = computed(() => formatDate(props.user.dateJoined, 'date', loca
       </p>
     </div>
     <div data-testid="rating-box" :class="RATING_BOX_CLASSES">
-      <!-- Q-03 B: without a rating the box leads with the problems solved, a number a new student can raise every day. -->
+      <!-- Without a rating the box leads with the problems solved, a number a new student can raise every day. -->
       <template v-if="user.rating === null">
         <p class="text-sm text-muted">{{ $t('profile.solvedLead') }}</p>
         <p data-testid="rating-figure" class="font-display text-stat leading-10 font-semibold">

@@ -5,7 +5,7 @@ import { countdownView } from './contest-time';
 export type Translate = (key: string, named: Record<string, number>, plural: number) => string;
 
 /**
- * Days and hours in words, the one wording of P-18: `13 ngày 21 giờ`, or `13 ng 21 g` (`short`) in a ranking cell,
+ * Days and hours in words, the one wording everywhere: `13 ngày 21 giờ`, or `13 ng 21 g` (`short`) in a ranking cell,
  * where there is no room. A whole number of days drops the hours.
  */
 export function daysHoursText(
@@ -25,7 +25,7 @@ export function daysHoursText(
 }
 
 /**
- * Time left, one way for every countdown (P-18): days and hours from 48 hours, `HH:MM:SS` below. Ranking cells use
+ * Time left, one way for every countdown: days and hours from 48 hours, `HH:MM:SS` below. Ranking cells use
  * the same wording from 100 hours instead (ranking-cells.ts): their `H:MM:SS` fits the cell up to 99:59:59.
  */
 export function useCountdownText() {

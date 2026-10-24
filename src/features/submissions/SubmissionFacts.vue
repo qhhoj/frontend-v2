@@ -18,7 +18,7 @@ defineProps<{
   submission: SubmissionDetail;
   /** The problem's name when it is readable; the row's own name is the fallback. */
   problemName: string | null;
-  /** In the viewer's contest (P-14 B): a "Kỳ thi" row, the contest letter, and the minute of the run. */
+  /** In the viewer's contest: a "Kỳ thi" row, the contest letter, and the minute of the run. */
   inContest?: SubmissionInContest | null;
 }>();
 const locale = useLocaleStore();

@@ -49,7 +49,7 @@ function knownIssueText({ field, code }: FieldIssue): string | null {
   return i18n.global.te(key, DEFAULT_LOCALE) ? translate(key) : null;
 }
 
-/** By code (B10); a code without text never shows the backend's English in the Vietnamese UI. */
+/** By code; a code without text never shows the backend's English in the Vietnamese UI. */
 const issueText = (issue: FieldIssue): string =>
   knownIssueText(issue) ?? unmappedMessageText(issue.message);
 

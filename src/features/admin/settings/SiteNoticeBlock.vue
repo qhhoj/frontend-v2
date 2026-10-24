@@ -19,7 +19,7 @@ import type { BlockSaveOutcome } from './settings-page';
 const NOTICE_MAX = 20_000;
 
 /**
- * The site notice (`top_notification`, plain text above every page) as a block of the settings page (P-34): it reports
+ * The site notice (`top_notification`, plain text above every page) as a block of the settings page: it reports
  * whether it changed and saves through the page's one save bar like any setting block. An emptied box takes the notice down.
  */
 const props = defineProps<{ current: string | null; shown?: boolean }>();

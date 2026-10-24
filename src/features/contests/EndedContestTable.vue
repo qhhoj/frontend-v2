@@ -27,7 +27,7 @@ import ViewerBadge from './ViewerBadge.vue';
 
 defineProps<{
   contests: ContestListItem[];
-  /** The list is one organization's: its name is not repeated on every row, and editors get a pencil (P-32). */
+  /** The list is one organization's: its name is not repeated on every row, and editors get a pencil. */
   isOrganizationScoped?: boolean;
 }>();
 const locale = useLocaleStore();
@@ -39,7 +39,7 @@ const whenText = (contest: ContestListItem) => {
   const lengthSeconds = (Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000;
   return `${formatDate(contest.startTime, 'short', locale.locale)} · ${spanText(spanMessage(lengthSeconds))}`;
 };
-/** P-04 B: a phone gets compact rows: name, then format · date · length · contestants (the format first, so it is never
+/** A phone gets compact rows: name, then format · date · length · contestants (the format first, so it is never
  * the fact cut off), and the action at the end. */
 const isCompact = useMediaQuery(COMPACT_LIST_QUERY);
 const compactFacts = (contest: ContestListItem) => {

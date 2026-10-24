@@ -68,7 +68,7 @@ function pairSamples(root: HTMLElement) {
 }
 
 /**
- * Adds a copy button to every `pre` in backend-sanitized HTML (samples have no structured form yet, backend ask B22).
+ * Adds a copy button to every `pre` in backend-sanitized HTML (samples have no structured form yet).
  * Right after a title row the button joins that row (right-aligned, no extra line above the box); otherwise a bar
  * sits above the block. Either way it is a sibling above the block, never inside it: the button covers no sample
  * text and its focus ring is not cut by the block's scroll box. `v-html` replaces the whole subtree when `html`

@@ -63,7 +63,7 @@ export const showsCumtime = (formatName: ContestFormatName) => !NO_CUMTIME_FORMA
 
 /**
  * From 100 hours a cell's clock (`2735:36:42`, or `2735:36` on penalty boards) no longer reads at a glance, nor fits
- * the cell: it says `113 ng 23 g` instead (P-18). Below that, `H:MM:SS` fits up to 99:59:59.
+ * the cell: it says `113 ng 23 g` instead. Below that, `H:MM:SS` fits up to 99:59:59.
  */
 const LONG_CELL_SECONDS = 100 * 3600;
 /** A cell's solve time: shown short, and in full words for screen readers. */
@@ -86,7 +86,7 @@ function cellElapsed(
 
 /**
  * icpc counts minutes, every other format seconds (backend: libs/contests/src/formats). A total in seconds says days
- * and hours from 100 hours, as the cells do (P-18).
+ * and hours from 100 hours, as the cells do.
  */
 export const formatCumtime = (formatName: ContestFormatName, cumtime: number, locale: Locale) =>
   formatName === 'icpc' ? String(cumtime) : cellElapsed(cumtime, formatElapsed, locale).shown;
@@ -227,7 +227,7 @@ export function rankingCell(
   context: RankingContext,
 ): RankingCellView {
   if (!cell) return EMPTY;
-  // A first solve needs a time to be first by (Cells A); ioi16 can name one with time 0.
+  // A first solve needs a time to be first by; ioi16 can name one with time 0.
   const isFirst = problem.firstSolve === participationId && context.showsTime;
   return isPenaltyFormat(context.formatName)
     ? penaltyCell(cell, problem, isFirst, context)

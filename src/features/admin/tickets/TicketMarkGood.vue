@@ -6,7 +6,7 @@ import { TOGGLE } from '../ui/controls';
 
 /**
  * "Đánh dấu đóng góp tốt": a pressed toggle, with a "?" that explains what it does (contribution points for the sender),
- * since the label alone does not say (P-31).
+ * since the label alone does not say.
  */
 defineProps<{ isContributive: boolean; busy: boolean }>();
 defineEmits<{ toggle: [] }>();

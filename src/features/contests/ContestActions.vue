@@ -73,7 +73,7 @@ const ownKind = computed<ParticipationKind>(() => {
   if (ownRun.value) return participationKind(ownRun.value.virtual);
   return props.contest.phase === 'ended' ? 'virtual' : 'live';
 });
-/** A virtual run of another contest still going: joining here would end it, so the viewer is asked first (P-19). */
+/** A virtual run of another contest still going: joining here would end it, so the viewer is asked first. */
 const replacedRun = computed(() => {
   const run = props.current;
   return run && run.contest.key !== props.contest.key && run.participation.virtual > 0 ? run : null;

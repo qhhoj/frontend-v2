@@ -76,7 +76,7 @@ const problemQuery = useProblemQuery(
 const problemName = computed(
   () => problemQuery.data.value?.name ?? row.value?.problem?.name ?? null,
 );
-/** A contest submission (P-14 B): the page belongs to "Kỳ thi" and scores in contest points; the next problem and the run minute only for the viewer's own submission in their running run. */
+/** A contest submission: the page belongs to "Kỳ thi" and scores in contest points; the next problem and the run minute only for the viewer's own submission in their running run. */
 const inContest = useSubmissionContest(row, isOwn);
 useNavSection(() => (inContest.value ? '/contests' : null));
 const contestScore = useContestScore(row, inContest);

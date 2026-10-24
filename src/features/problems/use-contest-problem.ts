@@ -7,7 +7,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import type { ScoreScale } from './submit-result';
 
 /**
- * This problem as the viewer's contest lists it (P-15): its contest points and the context of the viewer's own cell. Null
+ * This problem as the viewer's contest lists it: its contest points and the context of the viewer's own cell. Null
  * outside a contest; the facts card and the limit strip then show the site-wide numbers.
  */
 export function useContestProblem(
@@ -32,7 +32,7 @@ export function useContestProblem(
 }
 
 /**
- * What a score on this problem is out of (Q-10 A): the contest's points and decimals inside the viewer's contest, else the
+ * What a score on this problem is out of: the contest's points and decimals inside the viewer's contest, else the
  * problem's own. The result strip and the rail's "Bài nộp của tôi" both score on it.
  */
 export function useScoreScale(

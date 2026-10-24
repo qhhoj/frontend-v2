@@ -47,7 +47,7 @@ const EDIT_SCREEN_OF_PAGE: Record<string, ContestEditScreen> = {
   'contest-announcements': 'contestAnnouncements',
   'contest-ranking': 'contestRanking',
 };
-/** Editors' "Quản lý": the admin editor's tab that matches the page they are on (P-20 A). */
+/** Editors' "Quản lý": the admin editor's tab that matches the page they are on. */
 const manageTarget = computed(() =>
   contest.value
     ? contestEditTarget(

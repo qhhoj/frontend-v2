@@ -4,7 +4,7 @@ import { useCurrentContest } from '@/features/contests/bar/use-current-contest';
 import { useSessionStore } from '@/stores/session.store';
 
 /**
- * P-08 (Q-04 C): a signed-in viewer who opens the bare site list lands on their own submissions ("Của tôi"); a visitor, or a
+ * A signed-in viewer who opens the bare site list lands on their own submissions ("Của tôi"); a visitor, or a
  * viewer taking part in a running contest, keeps the site feed. Decided once per visit, so turning "Của tôi" off stays off,
  * and never over a filter the viewer picked meanwhile. When the session cannot be read the feed is kept. `isDeciding` holds
  * the list until then, so the feed is not fetched only to be replaced.

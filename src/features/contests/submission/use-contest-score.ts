@@ -9,7 +9,7 @@ import type { SubmissionInContest } from './submission-contest';
 const SCORED_STATUSES: readonly SubmissionStatus[] = ['D', 'CE'];
 
 /**
- * The hero's contest score (Q-10 A): `35` of `100` contest points, at the contest's precision, once the submission is
+ * The hero's contest score: `35` of `100` contest points, at the contest's precision, once the submission is
  * judged; null otherwise (the problem's own score leads then).
  */
 export function useContestScore(

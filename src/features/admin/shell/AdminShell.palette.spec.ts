@@ -61,7 +61,7 @@ describe('admin search palette', () => {
       (call) =>
         !['/auth/me', '/profile', '/tickets/summary'].includes(call.path) && !isSetterCount(call),
     );
-    // A setter also handles the tickets about their problems (P-31), so the ticket index is asked too.
+    // A setter also handles the tickets about their problems, so the ticket index is asked too.
     expect(searched.map((call) => call.path).sort()).toEqual(['/problems', '/tickets']);
     const problemSearch = searched.find((call) => call.path === '/problems')!;
     expect(problemSearch.query.get('visibility')).toBe('all');

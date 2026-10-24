@@ -252,7 +252,7 @@ describe('problem page inside a contest', () => {
       ...problemPageRoutes(inContest),
       'GET /contests/r42': ok(solved),
       'GET /contests/r42/announcements': page([]),
-      // A submission made in the contest scores its own contest points in the rail (Q-10 A).
+      // A submission made in the contest scores its own contest points in the rail.
       'GET /submissions': page([
         submissionItem({
           points: 1600,

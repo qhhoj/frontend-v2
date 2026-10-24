@@ -51,7 +51,7 @@ const notice = computed(() => {
 });
 /** Once an attempt has failed, its own message replaces the social-callback error that brought the viewer here. */
 const errorText = computed(() => (error.value ? summary.value : queryErrorText(route.query.error)));
-/** A pending account, from this attempt or from the OAuth callback, can ask for its activation mail again (B16). */
+/** A pending account, from this attempt or from the OAuth callback, can ask for its activation mail again. */
 const notActivated = computed(() =>
   error.value
     ? error.value instanceof ApiError && error.value.code === 'account_not_activated'

@@ -20,7 +20,7 @@ import { useSessionStore } from '@/stores/session.store';
 import { useAccountLinks } from './account-links';
 
 /**
- * P-01 A: the phone header's menu. A sheet drops from the top with what the desktop row shows beside the navigation:
+ * The phone header's menu. A sheet drops from the top with what the desktop row shows beside the navigation:
  * the language, the light/dark mode (the rest of the look is one link away), the official-mode pill and the account
  * (who is signed in, then its pages in the desktop menu's order and sign-out, or sign-in and register), and for a
  * signed-in viewer the notifications with their unread count, which a dot on the menu button signals too. Any

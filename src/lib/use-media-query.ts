@@ -5,7 +5,7 @@ import type { MaybeRefOrGetter } from 'vue';
 export const PHONE_QUERY = '(max-width: 767.98px)';
 /** From Tailwind's `lg` breakpoint up: the leaderboard shows every number column. */
 export const WIDE_QUERY = '(min-width: 1024px)';
-/** Public lists swap their table for compact rows (P-04 B): below Tailwind's `sm` breakpoint. */
+/** Public lists swap their table for compact rows: below Tailwind's `sm` breakpoint. */
 export const COMPACT_LIST_BELOW_PX = 640;
 export const COMPACT_LIST_QUERY = `(max-width: ${COMPACT_LIST_BELOW_PX - 0.02}px)`;
 

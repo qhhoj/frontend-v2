@@ -12,7 +12,7 @@ withDefaults(defineProps<{ errors?: { organizationId?: string } }>(), {
   errors: () => ({}),
 });
 const organizationId = defineModel<string>('organizationId', { required: true });
-/** Not shown (P-13): `undefined` until the languages load, then C++17, so the account starts with the ruled default. */
+/** Not shown: `undefined` until the languages load, then C++17, so the account starts with the ruled default. */
 const languageId = defineModel<string | undefined>('languageId');
 const schools = useOpenOrganizationsQuery();
 const meta = useProblemMetaQuery();
@@ -33,7 +33,7 @@ watch(
 </script>
 
 <template>
-  <!-- One full row of the signup grid. P-13: no language picker here; new accounts start at C++17 (set above), changed later in the settings or by the submit box, which remembers the last one. -->
+  <!-- One full row of the signup grid. No language picker here; new accounts start at C++17 (set above), changed later in the settings or by the submit box, which remembers the last one. -->
   <div class="sm:col-span-2">
     <QueryState
       :loading="schools.isPending.value"

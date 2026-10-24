@@ -8,7 +8,7 @@ export const SOCIAL_PROVIDER_LABELS = {
 } as const;
 export type SocialProvider = keyof typeof SOCIAL_PROVIDER_LABELS;
 
-/** B12: the backend lists the providers it has enabled; a slug without a label here is dropped, duplicates collapse, its order stays. */
+/** The backend lists the providers it has enabled; a slug without a label here is dropped, duplicates collapse, its order stays. */
 export const knownSocialProviders = (slugs: readonly string[]): SocialProvider[] =>
   [...new Set(slugs)].filter((slug): slug is SocialProvider =>
     Object.hasOwn(SOCIAL_PROVIDER_LABELS, slug),

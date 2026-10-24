@@ -11,7 +11,7 @@ import { buttonClass } from '../ui/controls';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 
 /**
- * "Nhận phiếu" / "Trả phiếu" (P-31): one click makes the viewer the ticket's handler, so two people never answer the same
+ * "Nhận phiếu" / "Trả phiếu": one click makes the viewer the ticket's handler, so two people never answer the same
  * ticket. A ticket someone else handles names them instead; reassigning it is the "Xử lý" section's job. A 409 (someone
  * claimed first, or the ticket closed) reloads the ticket beside its message.
  */

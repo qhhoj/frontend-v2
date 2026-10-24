@@ -6,7 +6,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { useSiteCountsQuery } from './auth.queries';
 
 /**
- * The auth shell's brand panel (P-13 A): the left half from xl, a band over the form below it. The top bar carries the
+ * The auth shell's brand panel: the left half from xl, a band over the form below it. The top bar carries the
  * wordmark, so the panel holds only Bit, the headline and the counts. Decoration next to a working form: no `QueryState`, no registered
  * wait; a block holds the counts line while it loads, a failure leaves the line empty.
  */

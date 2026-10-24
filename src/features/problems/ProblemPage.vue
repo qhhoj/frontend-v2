@@ -27,7 +27,7 @@ const { data: problem, isPending, error, refetch } = useProblemQuery(code, toRef
 const contestKey = computed(() => problem.value?.contest?.contestKey ?? null);
 /** Two columns only once the rail has its rows; while the contest loads or fails the statement keeps the full width. */
 const { contest, entries: railEntries } = useProblemRail(contestKey, () => code.value);
-/** A problem solved inside the viewer's contest belongs to "Kỳ thi" in the nav (P-15). */
+/** A problem solved inside the viewer's contest belongs to "Kỳ thi" in the nav. */
 useNavSection(() => (contestKey.value ? '/contests' : null));
 
 const isNotFound = computed(

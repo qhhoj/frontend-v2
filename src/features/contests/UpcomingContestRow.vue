@@ -14,7 +14,7 @@ import { endClockLabel } from './contest-clock';
 import { useSpanText } from './use-span-text';
 import ViewerBadge from './ViewerBadge.vue';
 
-/** `withEdit`: an organization's list, where its administrators get a pencil on the contests they edit (P-32). */
+/** `withEdit`: an organization's list, where its administrators get a pencil on the contests they edit. */
 const props = defineProps<{ contest: ContestListItem; withEdit?: boolean }>();
 const locale = useLocaleStore();
 const spanText = useSpanText();

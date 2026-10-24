@@ -5,7 +5,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { useCountdownText } from '@/lib/use-countdown-text';
 import { useNow } from '@/lib/use-now';
 
-/** P-19: joining a contest while a virtual run of another one goes on ends that run; the viewer chooses first. */
+/** Joining a contest while a virtual run of another one goes on ends that run; the viewer chooses first. */
 const props = defineProps<{
   contestName: string;
   replaced: CurrentParticipation;

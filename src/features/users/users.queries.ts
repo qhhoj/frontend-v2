@@ -27,7 +27,7 @@ export const useUserPageQuery = (username: MaybeRefOrGetter<string>) => {
   });
 };
 
-/** Hidden or frozen contests read differently per viewer (E4). */
+/** Hidden or frozen contests read differently per viewer. */
 export const useRatingHistoryQuery = (username: MaybeRefOrGetter<string>) => {
   const viewer = useViewerId();
   return useQuery({

@@ -291,7 +291,7 @@ describe('org bulk actions', () => {
     expect(wrapper.find('[data-testid="org-bulk-bar"]').exists()).toBe(false);
   });
 
-  describe('creating from the tab (P-32 B)', () => {
+  describe('creating from the tab', () => {
     const CREATOR_STATE = { ...ADMIN_STATE, canCreateProblem: true };
 
     it('offers a problem creator "Tạo bài tập" for this organization above the list', async () => {

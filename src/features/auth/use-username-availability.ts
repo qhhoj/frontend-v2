@@ -67,7 +67,7 @@ function statusOf(
 }
 
 /**
- * B11: once the viewer pauses, a well-formed username is asked at `GET /auth/username-available` (30 per 10 minutes
+ * Once the viewer pauses, a well-formed username is asked at `GET /auth/username-available` (30 per 10 minutes
  * per IP). `checking` from the keystroke until the answer, then the confirmed answer for the exact current text;
  * `idle` for a malformed or empty text, after an error, and for good after a 429. Registration stays the authority,
  * so nothing here may block a submit.

@@ -9,7 +9,7 @@ import { CHECK_CHIP } from '../ui/controls';
 import { isMineOnly, withMineOnly } from './ticket-queue';
 
 /**
- * The two one-click views of the queue (P-31): "Phiếu của tôi" (tickets the viewer handles) and, for problem setters and contest organisers,
+ * The two one-click views of the queue: "Phiếu của tôi" (tickets the viewer handles) and, for problem setters and contest organisers,
  * "Về bài của tôi" (tickets about the problems and contests they make), each with its open count.
  */
 const props = defineProps<{ filters: TicketListQuery }>();

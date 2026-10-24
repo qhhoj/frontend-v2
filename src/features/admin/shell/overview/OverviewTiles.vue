@@ -7,7 +7,7 @@ import { isMakerOf } from './admin-overview.queries';
 import OverviewTile from './OverviewTile.vue';
 import { JUDGING_STAFF, useOverviewTiles } from './use-overview-tiles';
 
-/** The dashboard's figures, the ones that need attention first, so the first row is what waits (P-33). */
+/** The dashboard's figures, the ones that need attention first, so the first row is what waits. */
 const { can, canAny } = usePermissions();
 const tiles = useOverviewTiles();
 const hasTiles = computed(

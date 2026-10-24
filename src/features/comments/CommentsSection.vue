@@ -41,7 +41,7 @@ const props = withDefaults(
     pageKey: string;
     contestKey?: string | null;
     placeholderKey?: string;
-    /** P-02: a page without comments shows one "Bình luận (0)" row that opens the section (the problem page). */
+    /** A page without comments shows one "Bình luận (0)" row that opens the section (the problem page). */
     foldWhenEmpty?: boolean;
   }>(),
   { contestKey: null, placeholderKey: undefined, foldWhenEmpty: false },

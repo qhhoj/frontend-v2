@@ -25,7 +25,7 @@ const SHOWN = 3;
 const CLOCK_TICK_MS = 60_000;
 const NO_SCORE = '–';
 /**
- * The signed-in viewer's last three submissions to this problem. Each scores on its own submission's scale (Q-10 A): the
+ * The signed-in viewer's last three submissions to this problem. Each scores on its own submission's scale: the
  * contest's points, labelled like the submission page, when it was made in a contest, else the problem's, labelled too.
  * `scale` is the viewer's contest, which alone says what a contest row is out of.
  */

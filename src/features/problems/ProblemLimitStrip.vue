@@ -12,7 +12,7 @@ import { useContestProblem } from './use-contest-problem';
 import { viewerStatusOf } from './viewer-status';
 
 /**
- * P-03 A: where the rail is not beside the statement (phones, tablets), the limits and the viewer's status sit under the
+ * Where the rail is not beside the statement (phones, tablets), the limits and the viewer's status sit under the
  * title as chips, with one line of links (PDF, editorial) and the solve counts, so nobody scrolls past the statement for them.
  * The chips use the limit colours of the facts card. Inside the viewer's contest, like the facts card, the points are the
  * contest's and the status is the viewer's own cell; the site-wide solve counts are left out.

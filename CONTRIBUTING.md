@@ -48,7 +48,7 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 - Components use the semantic utilities from `src/theme/styles.css` only (`bg-surface`, `text-content`, `text-muted`, `border-line`, `rounded-card`, `font-display`, ...). Tailwind's own palette, fonts and radii are removed
 - No colour literals outside `src/theme/themes/*.css` (specs excepted): `npm run lint:tokens` fails on them. Bit's sprite palettes in `src/mascot/bit-sprite.ts` are the only exception (sprite colours, like an image asset); `lint:tokens` skips that one file
 - Classes picked at runtime come from a static `Record<..., string>` map (Tailwind must see the full class names)
-- Card: `GlassCard` (frosted in the Glass themes, a flat hairline card in Clay: the theme decides); user-written HTML (posts, comments, about pages) goes in `UserContent`, which contains it (see decisions)
+- Card: `Card` (frosted in the Glass themes, a flat hairline card in Clay: the theme decides); user-written HTML (posts, comments, about pages) goes in `UserContent`, which contains it (see decisions)
 - Overlays (menus, popovers) are opaque `bg-surface-solid`
 - PrimeVue is unstyled; its look lives in `src/theme/primevue-preset.ts` with the same utilities
 - Screens are built only from an approved mock-up; others get logic and plain placeholder markup

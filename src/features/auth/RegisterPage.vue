@@ -22,7 +22,7 @@ import { AUTH_LINK } from './auth-link';
 /** RegisterA, then CheckEmail after a send, or Activation's "registration unavailable" card when the mailer is down. */
 type Phase = 'form' | 'sent' | 'mailUnavailable';
 
-/** `languageId` stays unset until `SignupChoices` sets C++17 (no field, P-13); `chosenIds` drops an empty school. A language issue lands in the summary. */
+/** `languageId` stays unset until `SignupChoices` sets C++17 (no field); `chosenIds` drops an empty school. A language issue lands in the summary. */
 const form = reactive({
   username: '',
   email: '',

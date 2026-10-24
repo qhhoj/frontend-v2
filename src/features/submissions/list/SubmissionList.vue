@@ -81,7 +81,7 @@ const shownColumns = computed(() => {
   return isOwnList.value ? columns.filter((key) => key !== 'user') : columns;
 });
 const picks = useDiffPicks();
-/** Q-04 C: the rows' compare boxes wait behind "So sánh"; turning it off drops the picks. */
+/** The rows' compare boxes wait behind "So sánh"; turning it off drops the picks. */
 const isComparing = ref(false);
 const toggleCompare = () => {
   isComparing.value = !isComparing.value;

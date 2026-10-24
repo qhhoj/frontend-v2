@@ -21,7 +21,7 @@ const isFreezeNearEnd = computed(
 /** Stripes in the theme's line and surface tokens, as the approved mock draws the frozen stretch. */
 const FREEZE_HATCH =
   'repeating-linear-gradient(45deg, var(--color-line-strong) 0 4px, var(--color-surface-hover) 4px 8px)';
-/** The contest's two ends, written once under the bar (P-23), with dates when they fall on different days (P-18). */
+/** The contest's two ends, written once under the bar, with dates when they fall on different days. */
 const labels = computed(() => timelineLabels(props.contest, locale.locale));
 const freezeClock = computed(() => {
   const from = freezeStart(props.contest);

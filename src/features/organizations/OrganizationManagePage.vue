@@ -11,7 +11,7 @@ import { useOrganization } from './use-organization';
 
 /**
  * "Quản lý" (variant A): legacy `EditOrganization`, the join requests and `KickUserWidgetView` for the organization's own
- * administrators, who need no staff permission. What waits comes first (P-32 B): the join requests, at a readable
+ * administrators, who need no staff permission. What waits comes first: the join requests, at a readable
  * width with their bulk approve, then the members, the folded profile form, and the history.
  */
 const router = useRouter();

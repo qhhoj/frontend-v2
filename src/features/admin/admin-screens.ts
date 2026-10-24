@@ -109,7 +109,7 @@ export const ADMIN_SCREENS = {
   commentReports: { path: '/admin/comments/reports', permission: 'judge.change_comment' },
   comments: { path: '/admin/comments', permission: 'judge.change_comment' },
   commentLocks: { path: '/admin/comments/locks', permission: 'judge.change_comment' },
-  /** Problem setters and contest organisers handle the tickets about their problems and contests here too (P-31). */
+  /** Problem setters and contest organisers handle the tickets about their problems and contests here too. */
   tickets: { path: '/admin/tickets', permission: [TICKET_STAFF, PROBLEM_EDIT, CONTEST_EDIT_OWN] },
   cannedReplies: { path: '/admin/tickets/canned', permission: TICKET_STAFF },
   activity: { path: '/admin/activity', permission: 'judge.can_see_user_activity' },

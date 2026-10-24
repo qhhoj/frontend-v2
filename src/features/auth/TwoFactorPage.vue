@@ -24,7 +24,7 @@ import { AUTH_LINK } from './auth-link';
 const session = useSessionStore();
 const router = useRouter();
 const afterSignIn = useAfterSignIn();
-/** B14; a partial session without the member is treated like `methods: []`: sign in again. */
+/** A partial session without the member is treated like `methods: []`: sign in again. */
 const methods = computed(() => session.twoFactor?.methods ?? []);
 const username = computed(() => session.twoFactor?.username ?? '');
 const hasCode = computed(() => methods.value.includes('totp'));

@@ -16,7 +16,7 @@ export interface RailScore {
 }
 
 /**
- * A row's score on its own submission's scale (Q-10 A): a submission made in a contest counts the contest's
+ * A row's score on its own submission's scale: a submission made in a contest counts the contest's
  * points, as the scoreboard does; any other counts the problem's. The contest's maximum and decimals are known only for
  * the viewer's own contest, as the rail makes no request for another one. A contest that holds no points for the row
  * (the problem left it) leaves the problem's score, as the submission page does.

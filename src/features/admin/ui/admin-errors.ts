@@ -120,7 +120,7 @@ const fromFields = (fields: Record<string, string[]>): FieldErrors =>
       ]),
   );
 
-/** Issues carry codes (B10); some refusals (the reserved ban reason) send only `fields`. */
+/** Issues carry codes; some refusals (the reserved ban reason) send only `fields`. */
 export function fieldErrorsOf(error: unknown): FieldErrors {
   if (!(error instanceof ApiError)) return {};
   return error.issues.length > 0 ? fromIssues(error.issues) : fromFields(error.fields);

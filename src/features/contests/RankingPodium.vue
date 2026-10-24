@@ -10,7 +10,7 @@ import { formatCumtime, isPenaltyFormat, solvedCount } from '@/lib/ranking-cells
 import type { RankingContext } from '@/lib/ranking-cells';
 
 /**
- * One card split into a cell per podium rank (P-24 B). From lg up the cells sit side by side between hairlines, a tied
+ * One card split into a cell per podium rank. From lg up the cells sit side by side between hairlines, a tied
  * rank stacking its names in one cell; below lg every person is a 46 px row of one list. DOM order is rank order in
  * both layouts, and names wrap at word breaks instead of being cut. A mass tie shows its first names and links the rest
  * to the board.

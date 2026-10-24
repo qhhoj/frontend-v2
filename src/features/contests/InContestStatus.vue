@@ -8,9 +8,9 @@ import { formatClock } from '@/lib/format-date';
 import type { ParticipationKind } from './bar/current-contest';
 
 /**
- * The hero's line while the viewer takes part (P-17 A): who they are here and since when, then leaving as a text link.
+ * The hero's line while the viewer takes part: who they are here and since when, then leaving as a text link.
  * The note that used to stand under a red button is in the confirm dialog, worded per participation (live, virtual,
- * spectating). A virtual run also points at its board ("Gồm thi ảo") (P-19).
+ * spectating). A virtual run also points at its board ("Gồm thi ảo").
  */
 const props = defineProps<{
   contest: ContestDetail;

@@ -10,7 +10,7 @@ import VerdictDistributionBar from './VerdictDistributionBar.vue';
 
 /**
  * Today's numbers in one slim line ("1.284 đã chấm hôm nay · 61% chấp nhận · 2 chờ · 1/1 máy chấm"), the live pill, and
- * the bar of today's verdicts. A phone keeps the queue and the judges only, without the bar (P-08). `pending` shows
+ * the bar of today's verdicts. A phone keeps the queue and the judges only, without the bar. `pending` shows
  * placeholders while the first answer loads; the live pill never waits for it.
  */
 const props = defineProps<{

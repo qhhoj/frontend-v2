@@ -77,7 +77,7 @@ const screenRoute = (id: AdminScreenId): RouteRecordRaw => {
 export const adminRoutes: RouteRecordRaw[] = [
   ...(Object.keys(ADMIN_SCREENS) as AdminScreenId[]).map(screenRoute),
   { path: '/admin/problems/:code', redirect: { name: 'admin-problemGeneral' } },
-  // "Cấu hình thô" became the settings page's "Văn bản công khai" tab (P-34).
+  // "Cấu hình thô" became the settings page's "Văn bản công khai" tab.
   { path: '/admin/config', redirect: { name: 'admin-settings', query: { tab: 'public' } } },
   { path: '/admin/contests/:key', redirect: { name: 'admin-contestGeneral' } },
   {

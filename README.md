@@ -46,7 +46,10 @@ src/
   theme/                    tokens, one CSS file per theme, registry, theme store, PrimeVue preset
   i18n/                     vi.json (default), en.json
   lib/                      pure helpers (verdicts, rating tiers, formats, dates, ranking cells)
-  components/               shared UI
+  components/               shared UI parts
+  components/ui/            the Clay kit (AppButton, Card, DataTable, ...): see its README
+  mascot/                   Bit, the pixel mascot: sprites, moods, placements
+  assets/languages/         language logos and their licences
   features/<area>/          pages, their parts, <area>.queries.ts
   features/shell/           app shell, theme menu, account sync
   test/                     Vitest setup, mount and API mocks, fixtures
@@ -74,6 +77,9 @@ Data flow: page -> `features/<area>/<area>.queries.ts` (vue-query) -> `api/<area
 | What `lint:dates` bans, or an exempt file                    | `scripts/date-format-calls.mjs` (`BANNED`, `ALLOWED` with a reason), run by `scripts/check-date-format.mjs`                                                                              |
 | Verdict colours and labels, rating tiers                     | `src/lib/verdicts.ts`, `src/lib/rating-tiers.ts`                                                                                                                                         |
 | Ranking cell rules                                           | `src/lib/ranking-cells.ts`                                                                                                                                                               |
+| Ranking table, columns, skeleton                             | `src/features/contests/RankingTable.vue`, `ranking-columns.ts`, `RankingSkeleton.vue`                                                                                                    |
+| Public profile page (own settings form: next row)            | `src/features/profile/` (data: `src/features/users/users.queries.ts`, `src/api/users.api.ts`)                                                                                            |
+| Own profile settings form                                    | `src/features/account/profile/` (`/profile` calls in `src/api/profile.api.ts`)                                                                                                           |
 | Replay board rules (order, ties, ghosts, first solves, feed) | `src/features/contests/replay/replay-board.ts`, `replay-timeline.ts`                                                                                                                     |
 | Replay states and the Bit each one shows                     | `src/features/contests/replay/replay-state.ts`, `replay-bits.ts`                                                                                                                         |
 | Ghost import, preview and delete (staff)                     | `src/features/admin/contests/ghosts/`                                                                                                                                                    |
@@ -133,7 +139,7 @@ Plan F5 adds two site screens: short links (`src/features/admin/short-links/`, `
 
 Plan VNOI F4 adds `problems/lifecycle/` (the "Đã xóa" tab and the danger-zone delete), `problems/package/` (the full package download on the Data tab) and `organizations/quotas/` (the staff quota overview) under `src/features/admin/`; the public organization tabs "Bài tập" and "Hạn mức" live in `src/features/organizations/problems/` and `src/features/organizations/quota/`, their Bit placements in `src/features/organizations/org-bits.ts`.
 
-To add a screen: add its entry to `ADMIN_SCREENS`, add one `SCREEN_COMPONENTS` line for it, add `admin.shell.screens.<id>` (nav title) and the area's i18n files, put the nav item in `shell/admin-nav.ts` if it has one, and add a skeleton with a `data-skeleton-region` sized to the loaded content.
+To add a screen: import the parts from `src/components/ui/` (see its README), not `Admin*` wrappers; existing admin pages are allow-listed in `scripts/wrapper-imports.mjs`, so do not copy their imports. Then add its entry to `ADMIN_SCREENS`, add one `SCREEN_COMPONENTS` line for it, add `admin.shell.screens.<id>` (nav title) and the area's i18n files, put the nav item in `shell/admin-nav.ts` if it has one, and add a skeleton with a `data-skeleton-region` sized to the loaded content.
 
 ## More
 

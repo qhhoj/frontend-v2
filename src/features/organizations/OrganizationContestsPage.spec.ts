@@ -45,7 +45,7 @@ async function mountTab(viewer: typeof ADMIN_STATE, contests: ReturnType<typeof 
   return mounted.wrapper;
 }
 
-describe('OrganizationContestsPage (P-32 B)', () => {
+describe('OrganizationContestsPage', () => {
   it('offers a contest creator "Tạo kỳ thi" for this organization and a pencil on the contests they edit', async () => {
     const wrapper = await mountTab({ ...ADMIN_STATE, canCreateContest: true }, [
       EDITABLE,

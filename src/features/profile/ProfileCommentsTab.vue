@@ -11,7 +11,7 @@ import RecentCommentRow from '@/features/community/RecentCommentRow.vue';
 import { useUserCommentsQuery } from '@/features/users/users.queries';
 import ProfileTabSkeleton from './ProfileTabSkeleton.vue';
 
-/** Staff only: the router sends anyone without `USER_COMMENTS_PERMISSION` to the not-found page (Q-05 A). */
+/** Staff only: the router sends anyone without `USER_COMMENTS_PERMISSION` to the not-found page. */
 const route = useRoute();
 const username = computed(() => String(route.params.username));
 const { data, error, isPending, hasNextPage, isFetchingNextPage, fetchNextPage, refetch } =

@@ -18,7 +18,7 @@ import type { MembershipState } from './membership-state';
 import { useMembership } from './use-membership';
 
 /**
- * The header's one way in (P-10): sign in, join, or ask to join (the reason in a dialog), and the pending request. A member or
+ * The header's one way in: sign in, join, or ask to join (the reason in a dialog), and the pending request. A member or
  * an administrator has nothing here: their chip sits by the name and leaving is in the ⋯ menu. Joining says so in a toast; a
  * failure stays here, next to the button.
  */

@@ -24,7 +24,7 @@ const LABEL = 'admin.shell.overview';
 const ABOUT_MINE_QUEUE = { scope: 'all', open: '1', about: 'mine' };
 
 /**
- * The dashboard's figures for this viewer (P-33), the ones that need attention first (the order settles once every figure
+ * The dashboard's figures for this viewer, the ones that need attention first (the order settles once every figure
  * has loaded, see `useFrozenTileOrder`). Each tile links to its filtered list; a figure the viewer cannot act on is left
  * out, and its query never runs.
  */

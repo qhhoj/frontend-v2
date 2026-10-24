@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * A meta line of short facts ("sum · AC 92% · 100 điểm"): each fact stays whole, the line wraps only at the spaces between
- * facts, so a unit never lands alone on the next line (P-04 B, M-13).
+ * facts, so a unit never lands alone on the next line.
  */
 defineProps<{ facts: readonly string[] }>();
 </script>

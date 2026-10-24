@@ -26,7 +26,7 @@ useAccountThemeSync();
 useAccountAppearanceSync();
 useAccountBitRoamSync();
 const route = useRoute();
-/** While the viewer takes part in a contest, every public page carries its bar (P-15 B). */
+/** While the viewer takes part in a contest, every public page carries its bar. */
 const { current: currentContest } = useCurrentContest(
   () => route.meta.layout !== 'admin' && route.meta.layout !== 'auth',
 );

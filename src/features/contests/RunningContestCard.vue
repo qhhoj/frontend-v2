@@ -18,8 +18,8 @@ import PhasePill from './PhasePill.vue';
 import { useSpanText } from './use-span-text';
 import ViewerBadge from './ViewerBadge.vue';
 
-/** `wide`: the only running contest spans the column, with the time left and the button in a right-hand column (P-26). */
-/** `withEdit`: an organization's list, where its administrators get a pencil on the contests they edit (P-32). */
+/** `wide`: the only running contest spans the column, with the time left and the button in a right-hand column. */
+/** `withEdit`: an organization's list, where its administrators get a pencil on the contests they edit. */
 const props = defineProps<{ contest: ContestListItem; wide?: boolean; withEdit?: boolean }>();
 const locale = useLocaleStore();
 const spanText = useSpanText();
@@ -101,7 +101,7 @@ const perParticipation = computed(() =>
     >
       <div class="flex items-center gap-2 font-semibold" :class="wide && 'md:text-title'">
         <InlineBit kind="contest" />
-        <!-- The hero's and the bar's clock (P-18): days and hours from 48 h, HH:MM:SS below. -->
+        <!-- The hero's and the bar's clock: days and hours from 48 h, HH:MM:SS below. -->
         <i18n-t keypath="contests.list.timeLeft" tag="p">
           <template #span><CountdownTimer :until="contest.endTime" /></template>
         </i18n-t>

@@ -50,7 +50,7 @@ const { data: current } = useCurrentParticipationQuery(needsCurrent);
 const virtualRun = computed(() =>
   contest.value?.phase === 'ended' ? virtualRunOf(current.value, key.value, now.value) : null,
 );
-/** A live virtual run opens the board with its virtual row (P-19); `?virtual=0` keeps the official board. */
+/** A live virtual run opens the board with its virtual row; `?virtual=0` keeps the official board. */
 const withVirtual = computed(() => {
   const asked = route.query.virtual;
   return asked === '1' || (asked !== '0' && virtualRun.value !== null);
@@ -109,11 +109,11 @@ const rows = computed(() => {
   return needle ? all.filter((row) => row.user.username.toLocaleLowerCase().includes(needle)) : all;
 });
 const PODIUM_SKELETON_CELLS = 3;
-/** The format is known before the board is, so the skeleton can have the penalty column the table will have. */
 /** The board's own problem list once it is known (a cached board), else the contest's: the skeleton has the table's column count. */
 const problemCount = computed(
   () => ranking.value?.problems.length ?? contest.value?.problems?.length ?? 0,
 );
+/** The format is known before the board is, so the skeleton can have the penalty column the table will have. */
 const skeletonHasTimeColumn = computed(
   () =>
     contest.value !== undefined &&

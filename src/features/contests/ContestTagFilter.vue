@@ -22,7 +22,7 @@ const SKELETON_CHIPS = 5;
 </script>
 
 <template>
-  <!-- A site without tags shows no chip row at all (P-26): no empty box under the title. -->
+  <!-- A site without tags shows no chip row at all: no empty box under the title. -->
   <div
     v-if="hasFailed || isLoading || tags.length || state === 'unknown'"
     data-testid="tag-filter"

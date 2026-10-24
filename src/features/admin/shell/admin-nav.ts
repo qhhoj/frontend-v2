@@ -42,7 +42,7 @@ export interface AdminNavItem extends AdminAccess {
   /** Further sections the item stands for (the comments item: every comment and the locked pages beside the reports). */
   alsoPaths: readonly string[];
 }
-/** P-35 A: by object, the rare screens under "Công cụ" (last, folded until opened). Breadcrumbs read the same groups. */
+/** By object, the rare screens under "Công cụ" (last, folded until opened). Breadcrumbs read the same groups. */
 export interface AdminNavGroup {
   id: 'problems' | 'contests' | 'judging' | 'community' | 'users' | 'system' | 'tools';
   labelKey: string;
