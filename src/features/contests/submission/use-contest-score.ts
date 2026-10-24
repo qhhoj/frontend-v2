@@ -1,7 +1,7 @@
 import { computed } from 'vue';
 import type { Ref } from 'vue';
 import type { SubmissionDetail, SubmissionStatus } from '@/api/types/submissions';
-import { formatNumber } from '@/lib/format';
+import { formatNumber, scoreBelowFull } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import type { SubmissionInContest } from './submission-contest';
 
@@ -25,6 +25,7 @@ export function useContestScore(
     const { contest, problem } = inContest.value;
     const format = (value: number) =>
       formatNumber(value, locale.locale, contest.pointsPrecision, false);
-    return { points: format(points), max: format(problem.points) };
+    const shown = scoreBelowFull(points, problem.points, contest.pointsPrecision);
+    return { points: format(shown), max: format(problem.points) };
   });
 }

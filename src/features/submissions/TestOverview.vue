@@ -13,6 +13,7 @@ import {
   caseTitle,
   earnedTone,
   formatCasePoints,
+  formatEarnedPoints,
   formatPoints,
   reasonParts,
   scoreConversion,
@@ -44,6 +45,8 @@ const PERCENT = 100;
 const NO_VALUE = '—';
 const locale = useLocaleStore();
 const format = (value: number) => formatPoints(value, locale.locale);
+/** Earned points never read as `max` while short of it. */
+const formatEarned = (value: number, max: number) => formatEarnedPoints(value, max, locale.locale);
 const EARNED_TONE_CLASSES = {
   full: 'text-verdict-ac',
   none: 'text-verdict-wa',
@@ -87,7 +90,7 @@ function rowReason(row: OverviewRow): string {
 }
 
 const earnedText = (row: OverviewRow) =>
-  props.running ? NO_VALUE : `${format(row.earned)} / ${format(row.max)}`;
+  props.running ? NO_VALUE : `${formatEarned(row.earned, row.max)} / ${format(row.max)}`;
 const conversion = computed(() =>
   props.running
     ? null
@@ -97,7 +100,7 @@ const scoreText = computed(() => {
   if (props.running || props.points === null) return NO_VALUE;
   return props.problemPoints === null
     ? format(props.points)
-    : `${format(props.points)} / ${format(props.problemPoints)}`;
+    : `${formatEarned(props.points, props.problemPoints)} / ${format(props.problemPoints)}`;
 });
 const totalText = computed(() =>
   conversion.value
@@ -108,11 +111,11 @@ const explanation = computed(() => {
   if (!conversion.value || props.points === null || props.problemPoints === null) return null;
   const values = {
     count: props.cases?.length ?? 0,
-    parts: rows.value.map((row) => format(row.earned)).join(' + '),
+    parts: rows.value.map((row) => formatEarned(row.earned, row.max)).join(' + '),
     cases: formatCasePoints(props.casePoints, props.caseTotal, locale.locale),
-    percent: format(conversion.value.share * PERCENT),
+    percent: formatEarned(conversion.value.share * PERCENT, PERCENT),
     max: format(props.problemPoints),
-    points: format(props.points),
+    points: formatEarned(props.points, props.problemPoints),
   };
   return translate(
     hasBatches.value ? 'submission.overview.explainMin' : 'submission.overview.explainSum',

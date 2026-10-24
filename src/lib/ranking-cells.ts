@@ -7,7 +7,7 @@ import type {
 import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
 import { daysHoursOf } from './contest-time';
-import { formatElapsed, formatElapsedSeconds, formatNumber } from './format';
+import { formatElapsed, formatElapsedSeconds, formatNumber, scoreBelowFull } from './format';
 import { daysHoursText } from './use-countdown-text';
 import type { Translate } from './use-countdown-text';
 
@@ -198,8 +198,9 @@ function partialCell(
   cell: ProblemCell,
   context: RankingContext,
 ): RankingCellView {
+  const shown = scoreBelowFull(points, problem.points, context.pointsPrecision);
   return {
-    ...scoredCell(points, cell, 'partial', context),
+    ...scoredCell(shown, cell, 'partial', context),
     partialStep: Math.min(3, Math.ceil((points / problem.points) * 3)) as 1 | 2 | 3,
   };
 }

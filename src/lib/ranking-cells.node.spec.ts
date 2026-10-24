@@ -250,9 +250,9 @@ describe('points precision and locale', () => {
   });
 
   it('keeps a score that only rounds to the full score partial', () => {
-    expect(rankingCell({ points: 99.5, time: 0 }, problem(), 'me', context('ioi', 0)).kind).toBe(
-      'partial',
-    );
+    expect(
+      rankingCell({ points: 99.5, time: 0 }, problem(), 'me', context('ioi', 0)),
+    ).toMatchObject({ kind: 'partial', text: '99' });
     expect(rankingCell({ points: 99.96, time: 0 }, problem(), 'me', context('ioi', 1)).kind).toBe(
       'partial',
     );

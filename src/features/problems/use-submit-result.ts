@@ -45,11 +45,13 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
       ? row.value.points / max
       : null;
   });
-  /** "99.99 / 100": on the site scale a score short of the maximum never reads as it; contest points follow the contest's precision. */
+  /** "99.99 / 100": a score short of the maximum never reads as it, on the site scale or at the contest's precision. */
   const scoreText = (score: number, max: number) => {
     const precision = scale.value.contest?.precision;
-    if (precision !== undefined)
-      return `${formatNumber(score, locale.locale, precision)} / ${formatNumber(max, locale.locale, precision)}`;
+    if (precision !== undefined) {
+      const formatContest = (points: number) => formatNumber(points, locale.locale, precision);
+      return `${formatContest(scoreBelowFull(score, max, precision))} / ${formatContest(max)}`;
+    }
     const format = (points: number) => formatNumber(points, locale.locale, SITE_DIGITS, false);
     return `${format(scoreBelowFull(score, max, SITE_DIGITS))} / ${format(max)}`;
   };

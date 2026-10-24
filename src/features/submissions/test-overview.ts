@@ -32,9 +32,12 @@ export interface OverviewRow {
 const POINT_FRACTION_DIGITS = 2;
 export const formatPoints = (value: number, locale: Locale) =>
   formatNumber(value, locale, POINT_FRACTION_DIGITS, false);
+/** Earned points of `max`; short of it they stay short once rounded (`scoreBelowFull`). */
+export const formatEarnedPoints = (points: number, max: number, locale: Locale) =>
+  formatPoints(scoreBelowFull(points, max, POINT_FRACTION_DIGITS), locale);
 /** Earned out of possible points, e.g. `0,5/1`. */
 export const formatCasePoints = (points: number, total: number, locale: Locale) =>
-  `${formatPoints(scoreBelowFull(points, total, POINT_FRACTION_DIGITS), locale)}/${formatPoints(total, locale)}`;
+  `${formatEarnedPoints(points, total, locale)}/${formatPoints(total, locale)}`;
 /** A test's tile or square title: "Test 3: Sai kết quả, 0/1". */
 export const caseTitle = (testCase: SubmissionCase, locale: Locale) =>
   translate('submission.overview.testTitle', {
