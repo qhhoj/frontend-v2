@@ -9,6 +9,8 @@ on:
     - cron: '23 3 * * *'
   workflow_dispatch:
 
+# Third-party actions are pinned by commit SHA (the comment names the tag). `npm ci --ignore-scripts`: no dependency's
+# install script runs (none is needed: vue-demi's postinstall only re-selects the Vue 3 build it ships by default).
 env:
   BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
@@ -22,7 +24,7 @@ jobs:
       code: ${{ steps.diff.outputs.code }}
       scripts: ${{ steps.scripts.outputs.scripts }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
       - id: diff
@@ -45,15 +47,15 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - run: bash scripts/deploy/ci-scripts.test.sh
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         if: needs.changes.outputs.scripts == 'true'
         with:
           node-version: 22
           cache: npm
       - if: needs.changes.outputs.scripts == 'true'
-        run: npm ci && npm run test:scripts
+        run: npm ci --ignore-scripts && npm run test:scripts
 
   # lint, typecheck and test run in parallel; each skips (a pass) on docs-only pushes.
   lint:
@@ -62,12 +64,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npm run lint
 
   typecheck:
@@ -76,15 +78,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npm run api:check
       # vue-tsc --build is incremental: the newest build info for these dependencies and configs skips unchanged files.
-      - uses: actions/cache@v4
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: .tsbuild
           key: tsbuild-${{ hashFiles('package-lock.json', 'tsconfig*.json') }}-${{ github.sha }}
@@ -103,14 +105,14 @@ jobs:
       matrix:
         shard: ${{ fromJSON(github.event_name == 'pull_request' && '[1]' || '[1, 2, 3]') }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: ${{ github.event_name != 'pull_request' && 1 || 0 }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - name: unit tests
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -118,9 +120,30 @@ jobs:
         run: |
           if [ -n "$BASE_SHA" ]; then npm test -- --changed "$BASE_SHA" --passWithNoTests && npm run test:scanners; else npm test -- --shard="$SHARD"; fi
 
-  # The required status check: green when lint, typecheck and test passed or were skipped.
+  # Contract with backend-v2: every inline script of the built index.html (what deploys) has its hash in the CSP of
+  # backend main's deploy/nginx/qhhoj.conf. A changed pre-paint script needs its hash merged there first.
+  csp:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx vite build
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          repository: qhhoj/backend-v2
+          ref: main
+          path: backend
+          sparse-checkout: deploy/nginx
+      - run: node scripts/deploy/check-csp-hash.mjs dist/index.html backend/deploy/nginx/qhhoj.conf
+
+  # The required status check: green when lint, typecheck, test and csp passed or were skipped.
   check:
-    needs: [changes, lint, typecheck, test]
+    needs: [changes, lint, typecheck, test, csp]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5

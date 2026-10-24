@@ -1,22 +1,14 @@
 # Builds dist/ and deploys it with qhhoj-deploy on the production host (releases/sha-<12> + current symlink).
-# Runs on every push to main (a squash-merged PR) once CI has passed on that commit; by hand for any ref.
+# Runs on every push to main (a squash-merged PR) once CI has passed on that commit; by hand (from main only) for a
+# commit on main. resolve-ref.sh refuses any other target, and CI must have passed on it.
+# Two jobs: `build` checks the target out and builds it without any secret; `deploy` (environment production, which
+# holds the SSH key) checks out only main's own commit for its scripts and ships the built artifact.
 name: deploy
 on:
   push: { branches: [main] }
   workflow_dispatch:
     inputs:
-      ref:
-        {
-          description: 'Branch, tag or SHA (empty: the selected branch head)',
-          type: string,
-          default: '',
-        }
-      force:
-        {
-          description: 'Deploy without waiting for CI on the commit',
-          type: boolean,
-          default: false,
-        }
+      ref: { description: 'SHA or tag on main (empty: the main head)', type: string, default: '' }
 # One deploy at a time. A newer run replaces a pending older one; a running deploy is never cancelled.
 concurrency:
   group: deploy-frontend
@@ -25,24 +17,28 @@ permissions:
   contents: read
   actions: read
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-24.04
     timeout-minutes: 150
-    environment: production
+    outputs:
+      tag: ${{ steps.ref.outputs.tag }}
     steps:
+      - name: Run from main only
+        run: test "$GITHUB_REF" = refs/heads/main || { echo "deploy runs from main, not $GITHUB_REF" >&2; exit 1; }
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with: { fetch-depth: 0 }
       - id: ref
         env: { REF: '${{ inputs.ref || github.sha }}' }
         run: bash scripts/deploy/resolve-ref.sh "$REF" >> "$GITHUB_OUTPUT"
-      - run: git checkout --detach "${{ steps.ref.outputs.sha }}"
       - name: Wait for CI on this commit
-        if: ${{ !inputs.force }}
-        env: { GH_TOKEN: '${{ github.token }}' }
-        run: bash scripts/deploy/wait-for-ci.sh "${{ steps.ref.outputs.sha }}" ci.yml 120
+        env: { GH_TOKEN: '${{ github.token }}', SHA: '${{ steps.ref.outputs.sha }}' }
+        run: bash scripts/deploy/wait-for-ci.sh "$SHA" ci.yml 120
+      - env: { SHA: '${{ steps.ref.outputs.sha }}' }
+        run: git checkout --detach "$SHA"
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with: { node-version: 22, cache: npm }
-      - run: npm ci
+      # No dependency install script runs (none is needed for the build).
+      - run: npm ci --ignore-scripts
       - run: npm run build
         env: { GIT_SHA: '${{ steps.ref.outputs.sha }}' }
       - name: Package
@@ -50,6 +46,22 @@ jobs:
         run: |
           tar -czf "frontend-dist-$TAG.tar.gz" -C dist .
           sha256sum "frontend-dist-$TAG.tar.gz" > "frontend-dist-$TAG.tar.gz.sha256"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: frontend-dist
+          path: frontend-dist-*.tar.gz*
+          retention-days: 7
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 380
+    environment: production
+    steps:
+      # main's own commit (github.sha), never the deploy target: only main's scripts see the key
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with: { ref: '${{ github.sha }}' }
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with: { name: frontend-dist }
       - name: SSH key
         env:
           KEY: ${{ secrets.DEPLOY_SSH_KEY }}
@@ -58,10 +70,12 @@ jobs:
           install -d -m 700 ~/.ssh
           printf '%s\n' "$KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
           printf '%s\n' "$KNOWN" > ~/.ssh/known_hosts
+      # rsync, not scp (SFTP on OpenSSH 9): the host's dispatcher (backend-v2 deploy/qhhoj-deploy-serve) accepts only
+      # `sudo qhhoj-deploy ...` and a write-only rsync to exactly this incoming path.
       - name: Deploy
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          TAG: ${{ steps.ref.outputs.tag }}
+          TAG: ${{ needs.build.outputs.tag }}
         run: |
-          scp "frontend-dist-$TAG.tar.gz" "frontend-dist-$TAG.tar.gz.sha256" "deploy@$DEPLOY_HOST:/var/lib/qhhoj-deploy/incoming/"
+          rsync "frontend-dist-$TAG.tar.gz" "frontend-dist-$TAG.tar.gz.sha256" "deploy@$DEPLOY_HOST:/var/lib/qhhoj-deploy/incoming/"
           bash scripts/deploy/remote-deploy.sh frontend "$TAG"
