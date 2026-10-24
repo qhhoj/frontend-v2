@@ -184,7 +184,7 @@
       "key": "Không đổi được sau khi tạo.",
       "timeLimit": "Để trống nếu mọi người thi cùng khung giờ.",
       "pointsPrecision": "Từ 0 đến 10.",
-      "scoreboardCacheTimeout": "0 là tắt cache. Tối đa 86400.",
+      "scoreboardCacheTimeout": "0 chỉ giữ bảng 5 giây. Tối đa 86400.",
       "accessCodeSet": "Đang có mã (lưu dạng băm). Nhập mã mới để thay; để trống để giữ.",
       "accessCodeNone": "Chưa có mã. Nhập để đặt.",
       "rankingCodeSet": "Đã đặt mã. Nhập mã mới để thay; để trống để giữ.",

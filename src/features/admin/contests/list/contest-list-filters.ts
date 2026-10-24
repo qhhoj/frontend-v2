@@ -4,6 +4,7 @@ import { isTagSlug } from '@/features/contests/tag-chips';
 import { valuesOf } from '@/features/problems/use-problem-filters';
 import { pageFromQuery } from '@/lib/paging';
 import { CONTEST_PHASE_FILTERS, SEARCH_MAX_LENGTH } from '../../search/index-search';
+import { SITE_TIME_ZONE, parseInZone } from '../../ui/form/site-time';
 import type { ContestPhaseFilter } from '../../search/index-search';
 
 /** Which of the editable contests the staff list shows: every one, those the viewer works on, or hidden ones. */
@@ -79,8 +80,12 @@ export function contestFilterQueryOf(
   return next;
 }
 
-/** Local midnight of a `YYYY-MM-DD` date, as the ISO instant the backend compares start times with. */
-const startOfDay = (date: string) => new Date(`${date}T00:00:00`).toISOString();
+/** Midnight of a `YYYY-MM-DD` date in the site time zone, like every admin date, as the ISO instant the backend compares start times with. */
+function startOfDay(date: string): string | undefined {
+  const [year, month, day] = date.split('-');
+  const parsed = parseInZone(`${day}/${month}/${year}`, SITE_TIME_ZONE, true);
+  return (parsed.ok && parsed.iso) || undefined;
+}
 const RATED_QUERY: Record<ContestRatedFilter, boolean | undefined> = {
   '': undefined,
   yes: true,
