@@ -80,7 +80,9 @@ export const organizationUsage = (
   unlimited: false,
   credits: quotaMeter(164, 200),
   storage: quotaMeter(410 * MIB, 512 * MIB),
-  quota: { monthlyCredits: null, storageBytes: null },
+  judging: quotaMeter(0, 36_000_000),
+  topProblems: [],
+  quota: { monthlyCredits: null, storageBytes: null, judgingMs: null },
   recent: [
     creditEntry(),
     creditEntry({
@@ -108,6 +110,8 @@ export const usageRow = (overrides: Partial<UsageOverviewRow> = {}): UsageOvervi
   creditsLimit: 200,
   storageUsed: 410 * MIB,
   storageLimit: 512 * MIB,
+  judgingUsed: 0,
+  judgingLimit: 36_000_000,
   unlimited: false,
   ...overrides,
 });

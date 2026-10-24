@@ -135,6 +135,10 @@ describe('isLanguageFieldDrawn', () => {
     const skipped = { ...choice, others: { ...choice.others, english: 'skip' as const } };
     expect(isLanguageFieldDrawn('tutorial', THREE, skipped)).toBe(false);
   });
+
+  it('does not draw the tutorial when it is not imported', () => {
+    expect(isLanguageFieldDrawn('tutorial', THREE, choice, false)).toBe(false);
+  });
 });
 
 describe('withEveryStatement', () => {

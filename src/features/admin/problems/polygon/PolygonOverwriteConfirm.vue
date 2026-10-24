@@ -1,14 +1,24 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { ArrowRight } from 'lucide-vue-next';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import type { PolygonProblem } from '@/api/types/polygon';
 import { packageRevisionOf } from './polygon-preview';
 
 /** An update import's confirmation, as the panel's "Đồng bộ và ghi đè": what the package replaces in `code` and what is kept. */
-defineProps<{ code: string; problem: PolygonProblem; busy: boolean }>();
+const props = defineProps<{
+  code: string;
+  problem: PolygonProblem;
+  busy: boolean;
+  /** False: the editorial is not touched, so it is not listed as replaced. */
+  importTutorial?: boolean;
+}>();
 const visible = defineModel<boolean>('visible', { required: true });
 const emit = defineEmits<{ confirm: [] }>();
-const ITEMS = ['statements', 'tutorial', 'tests', 'checker', 'link'] as const;
+const ALL_ITEMS = ['statements', 'tutorial', 'tests', 'checker', 'link'] as const;
+const items = computed(() =>
+  ALL_ITEMS.filter((item) => item !== 'tutorial' || props.importTutorial !== false),
+);
 </script>
 
 <template>
@@ -25,7 +35,7 @@ const ITEMS = ['statements', 'tutorial', 'tests', 'checker', 'link'] as const;
       <div class="flex flex-col gap-1.5">
         <p class="font-semibold">{{ $t('admin.polygonLink.configure.confirm.replaced') }}</p>
         <ul class="flex flex-col gap-1.5">
-          <li v-for="item in ITEMS" :key="item" class="flex items-start gap-2">
+          <li v-for="item in items" :key="item" class="flex items-start gap-2">
             <ArrowRight aria-hidden="true" class="mt-0.5 size-3.5 shrink-0" :stroke-width="1.75" />
             <span class="[overflow-wrap:anywhere]">{{
               $t(`admin.polygonLink.configure.confirm.items.${item}`, {

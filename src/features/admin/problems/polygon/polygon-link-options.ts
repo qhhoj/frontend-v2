@@ -13,7 +13,7 @@ type Statement = PolygonProblem['statements'][number];
 /** The flags the drawer edits beside the languages. */
 export type LinkFlags = Pick<
   Options,
-  'ignoreZeroPointBatches' | 'ignoreZeroPointCases' | 'appendMainSolution'
+  'ignoreZeroPointBatches' | 'ignoreZeroPointCases' | 'appendMainSolution' | 'importTutorial'
 >;
 /** The PATCH body of the link's saved options; `maxCases` is not editable, `autoSync` has its own switch. */
 export type LinkOptionsBody = LinkFlags &
@@ -110,6 +110,7 @@ export const linkOptionsBodyOf = (choice: LanguageChoice, flags: LinkFlags): Lin
   ignoreZeroPointBatches: flags.ignoreZeroPointBatches,
   ignoreZeroPointCases: flags.ignoreZeroPointCases,
   appendMainSolution: flags.appendMainSolution,
+  importTutorial: flags.importTutorial,
 });
 
 const KEY = 'admin.polygonLink.panel.options';
@@ -131,6 +132,7 @@ export function linkOptionsLineOf(options: Options): string {
       ? [translate(`${KEY}.tutorial`, { language: options.tutorialLanguage })]
       : []),
     ...FLAGS.filter((flag) => options[flag]).map((flag) => translate(`${KEY}.flags.${flag}`)),
+    ...(options.importTutorial === false ? [translate(`${KEY}.flags.skipTutorial`)] : []),
   ];
   return parts.length > 0 ? parts.join(' · ') : translate(`${KEY}.defaults`);
 }

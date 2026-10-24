@@ -35,13 +35,13 @@ const routes = () => ({
   ...staffViewer(EDIT),
   [`GET ${OVERVIEW}`]: page([usageRow(), usageRow({ slug: 'ntt', name: 'NTT', creditsUsed: 10 })]),
   'GET /organizations/lhp/usage': ok(
-    organizationUsage({ quota: { monthlyCredits: 300, storageBytes: null } }),
+    organizationUsage({ quota: { monthlyCredits: 300, storageBytes: null, judgingMs: null } }),
   ),
 });
 
 describe('QuotaOverviewPage', () => {
   it('keeps typed values when the usage refetches under the open dialog', async () => {
-    const quota = { monthlyCredits: 300, storageBytes: null };
+    const quota = { monthlyCredits: 300, storageBytes: null, judgingMs: null };
     const calls = mockApi({
       ...routes(),
       'GET /organizations/lhp/usage': sequence(
