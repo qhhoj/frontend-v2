@@ -11,7 +11,7 @@ import PhoneMenu from './PhoneMenu.vue';
 import UserMenu from './UserMenu.vue';
 
 /**
- * One row at every width. On a phone (P-01 A) it is 56 px: the logo, the navigation strip and a menu button whose sheet
+ * One row at every width. On a phone it is 56 px: the logo, the navigation strip and a menu button whose sheet
  * holds notifications, the language, the mode, the official-mode pill and the account (M-05: the bell moved there, so the
  * strip shows more items). The header owns the notification stream and announcements for both layouts.
  */

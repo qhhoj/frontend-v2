@@ -258,7 +258,7 @@ it('moves the URL to the current name when an old, renamed username is opened', 
   await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/users/ngoc_anh?tab=x'));
 });
 
-it('leads the rating box with the problems solved until the user has a rating (Q-03 B)', async () => {
+it('leads the rating box with the problems solved until the user has a rating', async () => {
   mockApi({ ...anonymousViewer, ...profileRoutes(userPage({ problemCount: 1234 })) });
   const rated = await mountApp('/users/user_01');
   await flushPromises();

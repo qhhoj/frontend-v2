@@ -6,7 +6,7 @@ import VerdictBadge from '@/components/VerdictBadge.vue';
 import { submissionVerdictOf } from '@/lib/verdicts';
 import { submissionShortId } from './submission-short-id';
 
-/** One side's card above the diff (board M6C: side, short id, verdict, author, problem and language). The detail may be missing (forbidden). */
+/** One side's card above the diff (side, short id, verdict, author, problem and language). The detail may be missing (forbidden). */
 defineProps<{ label: string; id: string; detail: SubmissionDetail | undefined }>();
 </script>
 

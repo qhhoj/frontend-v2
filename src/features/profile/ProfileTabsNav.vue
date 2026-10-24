@@ -21,7 +21,7 @@ const tabOf = (route: string, key: string): PillTab => ({
   label: t(`profile.tabs.${key}`),
   to: { name: route, params: { username: props.username } },
 });
-/** P-07 A: the user's submissions are one tap away, on the site list filtered to them, with their count. */
+/** The user's submissions are one tap away, on the site list filtered to them, with their count. */
 const submissionsTab = computed<PillTab>(() => {
   const count = user.value?.submissionCount;
   const text = count == null ? null : formatNumber(count, locale.locale);

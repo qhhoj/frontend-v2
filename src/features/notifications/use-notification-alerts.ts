@@ -42,7 +42,7 @@ export function useNotificationAlerts() {
     (count, before) => {
       const hasRisen = count !== undefined && before !== undefined && count > before;
       announceArrivals(hasRisen ? count - before : 0);
-      // Contest announcements are `high` and send no nudge (B1): only the polled count tells the banner and the lists.
+      // Contest announcements are `high` and send no nudge: only the polled count tells the banner and the lists.
       if (hasRisen) void invalidateLists();
     },
   );

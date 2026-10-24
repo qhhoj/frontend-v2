@@ -14,7 +14,7 @@ import RecentScreens from './recent/RecentScreens.vue';
 
 /**
  * The admin home (pages/admin.md, "Dashboard"): the greeting with the one staff Bit and the quick actions, what waits for
- * staff, this account's shortcuts as one chip row, then the five newest changes as sentences (P-33). The sidebar lists every
+ * staff, this account's shortcuts as one chip row, then the five newest changes as sentences. The sidebar lists every
  * screen, so this page does not.
  */
 const session = useSessionStore();

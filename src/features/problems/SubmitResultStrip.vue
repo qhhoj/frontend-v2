@@ -4,7 +4,7 @@ import VerdictRing from '@/features/submissions/VerdictRing.vue';
 import type { SubmitResult } from './use-submit-result';
 
 /**
- * Q-01 B: the strip on top of the submit form (dock, sheet, full screen): a small ring with the verdict, the score and the failing test, and a link to
+ * The strip on top of the submit form (dock, sheet, full screen): a small ring with the verdict, the score and the failing test, and a link to
  * the full result. Screen readers hear the final result once, not every test.
  */
 const props = defineProps<{ result: SubmitResult; submissionId: string }>();

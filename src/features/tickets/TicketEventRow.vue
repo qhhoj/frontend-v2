@@ -8,7 +8,7 @@ import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { eventTextKey } from './ticket-thread';
 
-/** One state change between the messages (M8C divider row). */
+/** One state change between the messages (divider row). */
 const props = defineProps<{ event: TicketTimelineEvent }>();
 const ICONS: Readonly<Record<TicketTimelineType, Component>> = {
   closed: Lock,

@@ -59,7 +59,7 @@ describe('register page', () => {
     expect(document.activeElement).toBe(document.getElementById('main'));
   });
 
-  it('sends the school the viewer chose, and asks for no language (P-13: C++17 is set without a field)', async () => {
+  it('sends the school the viewer chose, and asks for no language (C++17 is set without a field)', async () => {
     const calls = register();
     const { wrapper } = await mountApp('/register');
     expect(wrapper.find('select[name="languageId"]').exists()).toBe(false);

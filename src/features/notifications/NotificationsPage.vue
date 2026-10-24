@@ -29,12 +29,12 @@ import {
 } from './notifications.queries';
 import { useOpenNotification } from './use-open-notification';
 
-/** M1B page: a status rail (chips on a phone), the inbox grouped by day, "Đánh dấu tất cả đã đọc". */
+/** Page: a status rail (chips on a phone), the inbox grouped by day, "Đánh dấu tất cả đã đọc". */
 const route = useRoute();
 const locale = useLocaleStore();
 const state = computed(() => stateFromQuery(route.query.state));
 const group = computed(() => kindGroupFromQuery(route.query.kind));
-/** `kind` is the repeatable query of the B1 ask (requires VNOI backend B1 ask). */
+/** `kind` is the repeatable query of the backend ask. */
 const query = computed(() => ({
   state: state.value,
   page: pageFromQuery(route.query.page),

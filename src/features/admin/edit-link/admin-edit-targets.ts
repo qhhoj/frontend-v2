@@ -14,7 +14,7 @@ type Viewer = AdminViewer | null;
 const EDIT_ANY_ORGANIZATION = 'judge.edit_all_organization';
 const open = (user: Viewer, screen: AdminScreenId) => canUseAdmin(user, ADMIN_SCREENS[screen]);
 
-/** The public problem page's tabs, each with the editor tab that edits what is on screen (Q-09 A). */
+/** The public problem page's tabs, each with the editor tab that edits what is on screen. */
 const PROBLEM_SECTION_SCREENS = {
   statement: 'problemStatements',
   editorial: 'problemEditorial',

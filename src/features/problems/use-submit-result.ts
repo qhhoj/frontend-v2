@@ -12,7 +12,7 @@ import { firstFailedTest, scoreOnScale } from './submit-result';
 import type { ScoreScale } from './submit-result';
 
 /**
- * Q-01 B: the viewer's latest submission on this problem, followed live for as long as the page lives (closing the dock
+ * The viewer's latest submission on this problem, followed live for as long as the page lives (closing the dock
  * does not stop it), and what the result strip says about it: "0 / 1000 · WA test 1". `scale` is what the score is out of:
  * the problem's points, or the contest's inside the viewer's contest.
  */

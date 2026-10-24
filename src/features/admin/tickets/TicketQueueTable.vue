@@ -19,7 +19,7 @@ import { queueLocation } from './ticket-queue';
 
 /**
  * The rows as the server returned them: the status is the server's filter, so nothing is filtered here. "Xử lý" shows who
- * handles each ticket (P-31). With a ticket open beside the list (`narrow`) it shrinks to avatars, the message count
+ * handles each ticket. With a ticket open beside the list (`narrow`) it shrinks to avatars, the message count
  * steps aside, "Gần nhất" turns relative (the full time in its title), and the status chip goes when the status filter
  * already says it.
  */

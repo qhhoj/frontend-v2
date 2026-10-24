@@ -4,7 +4,7 @@ import { toolbarControlClass } from '@/components/toolbar-classes';
 
 /**
  * "Bộ lọc nâng cao" ("Bộ lọc" on phones): opens the panel `panelId`; `count` is how many filters only the panel shows.
- * `phoneCount` counts them below sm, where the panel also holds filters the chip row hides there (the language, P-08).
+ * `phoneCount` counts them below sm, where the panel also holds filters the chip row hides there (the language).
  */
 const props = defineProps<{ open: boolean; count: number; phoneCount?: number; panelId: string }>();
 defineEmits<{ toggle: [] }>();

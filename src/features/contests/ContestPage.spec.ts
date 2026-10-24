@@ -232,7 +232,7 @@ describe('contest page rules card', () => {
   });
 });
 
-describe('contest page while it runs (P-23)', () => {
+describe('contest page while it runs', () => {
   const ruled = (phase: 'running' | 'upcoming') =>
     contestDetail({ phase, rules: RULES_MARKDOWN, rulesHtml: RULES_HTML, rulesRevision: 2 });
   const asideHeadings = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>

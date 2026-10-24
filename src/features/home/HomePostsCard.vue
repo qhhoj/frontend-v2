@@ -12,7 +12,7 @@ import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 
 /**
- * P-05 A: the school's newest posts on the signed-in home, in the right column. The feed already lists pinned posts
+ * The school's newest posts on the signed-in home, in the right column. The feed already lists pinned posts
  * first (rules, exam calendars), so the first three are the ones a student must not miss. A compact sibling of the
  * guests' `NewPostsCard`: titles and bylines only, no scores or excerpts.
  */

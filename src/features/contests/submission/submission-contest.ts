@@ -1,6 +1,6 @@
 import type { ContestDetail, ContestProblem, ParticipationSummary } from '@/api/types/contests';
 
-/** What the result page shows of a submission's contest (P-14 B). */
+/** What the result page shows of a submission's contest. */
 export interface SubmissionInContest {
   contest: Pick<ContestDetail, 'key' | 'name' | 'pointsPrecision'>;
   problem: ContestProblem;

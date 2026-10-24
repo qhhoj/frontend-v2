@@ -127,7 +127,7 @@ describe('ranking cells, vnoj', () => {
   });
 });
 
-describe('ranking cells, points formats (Cells A)', () => {
+describe('ranking cells, points formats', () => {
   it('puts the time under full points and marks the first full solve with a star', () => {
     expect(rankingCell({ points: 100, time: 492 }, problem(), 'me', timedDefault)).toEqual({
       kind: 'solved',
@@ -281,7 +281,7 @@ describe('ranking cells, zero-point problem', () => {
   });
 });
 
-describe('ranking cells past 99 hours (P-18)', () => {
+describe('ranking cells past 99 hours', () => {
   const LONG = 113 * 86_400 + 23 * 3600 + 36 * 60;
   const vi = { ...timedDefault, locale: 'vi' as const };
   const timeOf = (time: number, board: RankingContext = timedDefault) =>

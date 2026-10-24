@@ -12,7 +12,7 @@ import { useOrganizationPostsQuery } from './organizations.queries';
 
 /**
  * The about tab shows the organization's two newest posts; the posts tab lists the rest. Without posts the card is left out
- * (P-10), unless `keepsEmpty` (an administrator, who writes them from the posts tab it links to).
+ *, unless `keepsEmpty` (an administrator, who writes them from the posts tab it links to).
  */
 const props = defineProps<{ keepsEmpty: boolean }>();
 const RECENT_POST_COUNT = 2;

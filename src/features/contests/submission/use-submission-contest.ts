@@ -7,7 +7,7 @@ import { isDuringRun, nextProblem } from './submission-contest';
 import type { SubmissionInContest } from './submission-contest';
 
 /**
- * The contest a submission was made in (P-14 B), from the detail's `contest` and the contest's problem list; null
+ * The contest a submission was made in, from the detail's `contest` and the contest's problem list; null
  * outside a contest or when the contest's problems are not readable. The run minute is the API's (the submitter's own
  * submission within its run); the next problem comes only for the viewer's own submission in their running run.
  */

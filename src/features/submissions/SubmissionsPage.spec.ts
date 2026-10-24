@@ -233,7 +233,7 @@ describe('picking two submissions to compare', () => {
   ]);
   const boxOf = (wrapper: Awaited<ReturnType<typeof openList>>['wrapper'], id: string) =>
     wrapper.get(`[data-id="${id}"] input[type="checkbox"]`);
-  /** Q-04 C: the boxes wait behind "So sánh". */
+  /** The boxes wait behind "So sánh". */
   async function openComparing() {
     const mounted = await openList();
     expect(mounted.wrapper.find('[data-id] input[type="checkbox"]').exists()).toBe(false);

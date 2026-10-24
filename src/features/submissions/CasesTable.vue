@@ -20,7 +20,7 @@ import { formatCasePoints, pendingPositions } from './test-overview';
 const props = defineProps<{
   cases: SubmissionCase[] | null;
   batches: SubmissionBatch[] | null;
-  /** B21: the problem's test count, null when the viewer may not see case results. */
+  /** The problem's test count, null when the viewer may not see case results. */
   totalCases: number | null;
   /** The row is being graded live: the tests not graded yet are listed as waiting and results arrive by themselves. */
   running: boolean;

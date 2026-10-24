@@ -39,7 +39,7 @@ async function mountLoaded(props: Record<string, unknown> = {}) {
 }
 
 describe('SignupChoices', () => {
-  it('offers the open schools in a searchable list, and no language picker (P-13)', async () => {
+  it('offers the open schools in a searchable list, and no language picker', async () => {
     mockRegisterApi({
       'GET /organizations': page([
         organizationItem({ id: 'org-a', name: 'THPT A' }),

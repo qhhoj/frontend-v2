@@ -14,7 +14,7 @@ withDefaults(
     width?: 'narrow' | 'medium' | 'wide' | 'double';
     /** The boards centre the heading of the cards with a badge. */
     centered?: boolean;
-    /** P-13 A: sign-in, sign-up and the forgotten password split the page with the brand panel from xl (the two-column signup needs the room), a band above the form below it. */
+    /** Sign-in, sign-up and the forgotten password split the page with the brand panel from xl (the two-column signup needs the room), a band above the form below it. */
     brand?: boolean;
   }>(),
   { lead: undefined, leadRole: undefined, width: 'narrow', centered: false, brand: false },

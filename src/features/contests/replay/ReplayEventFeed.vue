@@ -10,7 +10,7 @@ import type { RankingContext } from '@/lib/ranking-cells';
 import { feedTextOf } from './replay-timeline';
 import type { TimelineEntry } from './replay-timeline';
 
-/** M2B "Vừa xảy ra": the latest events at the clock. Not a live region: it changes four times a second while playing. */
+/** "Vừa xảy ra": the latest events at the clock. Not a live region: it changes four times a second while playing. */
 const props = defineProps<{
   entries: TimelineEntry[];
   problems: ReplayProblem[];

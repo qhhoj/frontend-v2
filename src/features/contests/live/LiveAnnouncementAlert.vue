@@ -15,7 +15,7 @@ import { alertedAnnouncement } from './announcement-alert';
 import { useStreamedContest } from './use-streamed-contest';
 
 /**
- * P-16: the announcements of the contest the viewer is in reach every page. The app shell owns that contest's stream (its
+ * The announcements of the contest the viewer is in reach every page. The app shell owns that contest's stream (its
  * contest pages leave it to the shell, `useStreamedContest`) and shows the newest unread announcement in a polite live
  * region: a toast at the bottom right on a computer, a one-row banner under the contest bar on a phone. It goes once read
  * (the Announcements tab marks it) or closed; a close is kept in storage like the read mark.

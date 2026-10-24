@@ -3,7 +3,7 @@ import type { ComputedRef, Ref } from 'vue';
 
 export const REPLAY_SPEEDS = [1, 10, 60, 300] as const;
 export type ReplaySpeed = (typeof REPLAY_SPEEDS)[number];
-/** The speed M2B shows pressed. */
+/** The speed shown pressed. */
 export const DEFAULT_REPLAY_SPEED: ReplaySpeed = 10;
 /** Four board updates a second are enough even at x300. The clock moves by the real time between ticks, not by this. */
 export const PLAYER_TICK_MS = 250;

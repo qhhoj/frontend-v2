@@ -12,7 +12,7 @@ import { failureTextOf } from '@/features/admin/ui/admin-errors';
 import { useAnnouncementComposer } from '@/features/admin/contests/announcements/use-announcement-composer';
 
 /**
- * The organisers' composer at the top of the public Announcements tab (P-20 A): the admin composer's draft and post, in the
+ * The organisers' composer at the top of the public Announcements tab: the admin composer's draft and post, in the
  * public look. Says who it reaches: the contestants when the contest pushes announcements, else nobody until it is turned on.
  */
 const props = defineProps<{ contest: ContestDetail }>();

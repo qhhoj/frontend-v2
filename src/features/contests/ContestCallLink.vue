@@ -2,7 +2,7 @@
 import AppButton from '@/components/ui/AppButton.vue';
 
 /**
- * `compact`: the button inside a row (the ended-contest table's "Xem", the end of a phone row in P-04 B): small, 44 px on
+ * `compact`: the button inside a row (the ended-contest table's "Xem", the end of a phone row on a phone): small, 44 px on
  * touch, and above the row's whole-row link (`relative`). The cards keep the wide button.
  */
 defineProps<{

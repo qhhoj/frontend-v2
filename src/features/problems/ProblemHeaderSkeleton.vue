@@ -16,7 +16,7 @@ defineProps<{ stripClass: string }>();
     <div data-skeleton-region="title" class="mt-1 page-title">
       <SkeletonBlock text class="w-3/4" />
     </div>
-    <!-- the limit strip (P-03), below the rail's breakpoint -->
+    <!-- the limit strip, below the rail's breakpoint -->
     <div data-skeleton-region="strip" :class="['mt-3 flex flex-wrap gap-1.5', stripClass]">
       <SkeletonBlock v-for="index in STRIP_CHIPS" :key="index" pill class="h-7 w-20" />
     </div>

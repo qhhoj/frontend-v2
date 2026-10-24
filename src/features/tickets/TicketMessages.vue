@@ -14,7 +14,7 @@ import TicketEventRow from './TicketEventRow.vue';
 import { TICKET_BITS } from './ticket-bits';
 import { endsClosed, eventCount, threadRows } from './ticket-thread';
 
-/** The thread (M8C): messages and state changes by time. Counts are announced by the page's own region, not here. */
+/** The thread: messages and state changes by time. Counts are announced by the page's own region, not here. */
 const props = defineProps<{ ticket: TicketDetail; isLive: boolean }>();
 const locale = useLocaleStore();
 const rows = computed(() => threadRows(props.ticket.timeline, props.ticket.can.markGood));

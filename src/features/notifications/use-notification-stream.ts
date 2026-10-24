@@ -8,7 +8,7 @@ import { notificationsKey } from './notifications.queries';
 const SETTLE_MS = 1000;
 
 /**
- * The tab's one `/events/user` stream (B1 C5, ids only). Opens for a signed-in viewer, reopens for the next account,
+ * The tab's one `/events/user` stream (ids only). Opens for a signed-in viewer, reopens for the next account,
  * closes on sign-out and unmount. A refused stream stays closed: the 60 s poll carries on.
  */
 export function useNotificationStream() {

@@ -5,7 +5,7 @@ import type {
   TicketTimelineType,
 } from '@/api/types/tickets';
 
-/** @uiOnly one row of the drawn thread (M8C). */
+/** @uiOnly one row of the drawn thread. */
 export type ThreadRow =
   | { kind: 'message'; key: string; message: TicketMessage }
   | { kind: 'event'; key: string; event: TicketTimelineEvent }
@@ -21,7 +21,7 @@ const TYPE_KEYS: Readonly<Record<TicketTimelineType, string>> = {
   'unmarked-good': 'unmarkedGood',
 };
 
-/** M8C: "Đóng góp tốt" rows are staff-only; the backend sends them to everyone. */
+/** "Đóng góp tốt" rows are staff-only; the backend sends them to everyone. */
 const isShown = (entry: TicketTimelineEntry, canSeeGood: boolean) =>
   canSeeGood || entry.event === null || !GOOD_TYPES.includes(entry.event.type);
 
@@ -56,7 +56,7 @@ export function threadRows(
 export const eventCount = (timeline: readonly TicketTimelineEntry[], canSeeGood: boolean) =>
   timeline.filter((entry) => entry.event !== null && isShown(entry, canSeeGood)).length;
 
-/** M8C "Chỉ có sự kiện": the thread ends on a close with nothing written after it. */
+/** "Chỉ có sự kiện": the thread ends on a close with nothing written after it. */
 export const endsClosed = (rows: readonly ThreadRow[]): boolean => {
   const last = rows.at(-1);
   return last?.kind === 'event' && last.event.type === 'closed';

@@ -22,7 +22,7 @@ const list = ref<HTMLElement | null>(null);
 /** The browse link never leaves, so it is where focus goes when the list has no row left to hold it. */
 const browseLink = ref<{ $el: HTMLElement } | null>(null);
 const announcement = ref('');
-/** Official contest: the order and the leave buttons are locked (B8 locks organization order and leave). */
+/** Official contest: the order and the leave buttons are locked (organization order and leave too). */
 const lock = useOfficialLock();
 const describedBy = computed(() => (lock.isLocked.value ? lock.noteId : undefined));
 /** Rows follow the chosen id order; an id the server no longer lists (after a reload) shows no row. */

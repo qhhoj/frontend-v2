@@ -48,7 +48,7 @@ const route = useRoute();
 const session = useSessionStore();
 const isSignedIn = computed(() => session.status === 'authenticated');
 const usesSheet = useMediaQuery(() => props.layout.stacked);
-/** P-02 B: dock and sheet start closed, so the statement is what the viewer sees first. */
+/** Dock and sheet start closed, so the statement is what the viewer sees first. */
 const submitOpen = ref(false);
 // An anonymous viewer would only get a 401 for the fetch, so it is not started.
 const resubmitId = computed(() =>

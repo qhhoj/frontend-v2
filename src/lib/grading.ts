@@ -17,7 +17,7 @@ export type RingProgress =
   | { mode: 'cases'; graded: number; total: number; fraction: number }
   | { mode: 'points'; fraction: number };
 
-/** Graded tests of the total when the viewer sees the cases and their count (`totalCases`, B21), else the share of points. */
+/** Graded tests of the total when the viewer sees the cases and their count (`totalCases`), else the share of points. */
 export function ringProgress(
   row: Pick<SubmissionDetail, 'cases' | 'totalCases' | 'casePoints' | 'caseTotal'>,
 ): RingProgress {

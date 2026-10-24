@@ -69,7 +69,7 @@ export const formatFileSize = (bytes: number) =>
     ? `${(Math.floor((bytes / BYTES_PER_MEGABYTE) * 10) / 10).toFixed(1)} MB`
     : `${Math.round(bytes / 1024)} KB`;
 
-/** `H:MM:SS` since the contest start: the time line of a points cell (Cells A). */
+/** `H:MM:SS` since the contest start: the time line of a points cell. */
 export function formatElapsedSeconds(totalSeconds: number): string {
   const seconds = Math.max(0, Math.floor(totalSeconds));
   return `${Math.floor(seconds / 3600)}:${pad(Math.floor((seconds % 3600) / 60))}:${pad(seconds % 60)}`;

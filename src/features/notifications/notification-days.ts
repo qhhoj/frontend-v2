@@ -9,7 +9,7 @@ export interface DayGroup {
 const isSameLocalDay = (first: Date, second: Date) =>
   first.toDateString() === second.toDateString();
 
-/** M1B: "Hôm nay" then "Trước đó", by the viewer's local day of the last activity; server order kept, empty groups left out. */
+/** "Hôm nay" then "Trước đó", by the viewer's local day of the last activity; server order kept, empty groups left out. */
 export function groupByDay(items: readonly NotificationItem[], now: Date): DayGroup[] {
   const isToday = (item: NotificationItem) => isSameLocalDay(new Date(item.lastActivityAt), now);
   const groups: DayGroup[] = [

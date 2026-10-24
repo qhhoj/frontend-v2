@@ -8,7 +8,7 @@ import { useI18n } from 'vue-i18n';
 import { useRenderPreview } from './use-render-preview';
 
 const text = defineModel<string>({ required: true });
-/** `previewStyle`: the problem style to preview with, or `'flatpage'` for a static page (plan 8f-2). */
+/** `previewStyle`: the problem style to preview with, or `'flatpage'` for a static page. */
 const props = defineProps<{
   label: string;
   previewStyle: PreviewSource;

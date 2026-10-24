@@ -21,7 +21,7 @@ import { membershipState } from './membership-state';
 import { joinModeKey, slotsLine } from './organization-facts';
 
 /**
- * The compact title row of the header band (P-10): a small logo; the name with the viewer's standing as a chip, the edit pencil
+ * The compact title row of the header band: a small logo; the name with the viewer's standing as a chip, the edit pencil
  * and the short-link icon; the facts on two lines at most on a phone (standing, then how to join, shorter words there); and on the right either
  * the way in (`MembershipPanel`) or, for a member, the ⋯ menu that holds "Rời tổ chức". `rank` is null while unknown.
  */

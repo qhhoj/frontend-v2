@@ -37,7 +37,7 @@ const hasNonHeaderSort = computed(
 const setSort = (value: string) =>
   emit('update', { sort: value !== DEFAULT_SORT && isProblemSort(value) ? value : null });
 
-/** P-04: a phone keeps search and sort in sight; the other filters and the random pick wait behind "Bộ lọc". */
+/** A phone keeps search and sort in sight; the other filters and the random pick wait behind "Bộ lọc". */
 const isCompact = useMediaQuery(COMPACT_LIST_QUERY);
 const isPanelOpen = ref(false);
 const panelId = useId();

@@ -150,7 +150,7 @@ describe('TicketQueuePage', () => {
     expect(FakeEventSource.instances.every((source) => source.closed)).toBe(true);
   });
 
-  describe('handling (P-31)', () => {
+  describe('handling', () => {
     const HANDLER = { assign: true, editNotes: true, markGood: true, claim: true };
     const ME = { id: STAFF_ID, username: 'bitcoder', rating: null };
     const unhandled = ticketDetail({ id: 't-1', assignees: [], can: HANDLER });

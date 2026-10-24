@@ -8,7 +8,7 @@ import ProblemPointsPicker from './ProblemPointsPicker.vue';
 import ProblemTypePicker from './ProblemTypePicker.vue';
 import type { ProblemFilters } from './use-problem-filters';
 
-/** The problem list's filters besides search and sort: inline on a wide screen, behind "Bộ lọc" on a phone (P-04). */
+/** The problem list's filters besides search and sort: inline on a wide screen, behind "Bộ lọc" on a phone. */
 const props = defineProps<{
   filters: ProblemFilters;
   types: CatalogItem[];

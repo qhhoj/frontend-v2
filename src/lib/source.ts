@@ -57,7 +57,7 @@ const extensionOfName = (name: string) => {
 export const acceptedExtension = ({ extension }: Pick<Language, 'extension'>) =>
   `.${dotless(extension)}`;
 
-/** `fileSizeLimit` is in MB and 0 means uploads are off (B17); 0 here too. */
+/** `fileSizeLimit` is in MB and 0 means uploads are off; 0 here too. */
 export const uploadCapBytes = ({ fileSizeLimit }: Pick<Language, 'fileSizeLimit'>) =>
   fileSizeLimit > 0 ? Math.min(fileSizeLimit * BYTES_PER_MEGABYTE, MAX_UPLOAD_BYTES) : 0;
 
@@ -78,7 +78,7 @@ export function checkUploadFile(
   return { ok: true };
 }
 
-/** `<field>.<issue code>` of the submit routes (B10) to a message. A code the table does not know falls through to the top-level code. */
+/** `<field>.<issue code>` of the submit routes to a message. A code the table does not know falls through to the top-level code. */
 const ISSUE_KEYS: Readonly<Record<string, string>> = {
   'file.file_wrong_extension': 'submit.errors.fileWrongExtension',
   'file.scratch_project_invalid': 'submit.errors.scratchInvalid',
@@ -95,7 +95,7 @@ const issueKey = ({ field, code }: FieldIssue) => ISSUE_KEYS[`${field}.${code}`]
 
 /**
  * The one place a refused submit (text or file) becomes a message: issue codes first, then the distinct top-level codes
- * (B9: `banned_from_problem`, `contest_submission_limit`, `unfinished_submission_limit`, `rate_limited`, `conflict`,
+ * (`banned_from_problem`, `contest_submission_limit`, `unfinished_submission_limit`, `rate_limited`, `conflict`,
  * `file_too_large`) through `errors.<code>`. A new backend code needs a row here or an `errors.*` message, nothing else.
  */
 export function submitErrorKey(error: unknown): { key: string; params?: Record<string, unknown> } {

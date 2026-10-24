@@ -31,7 +31,7 @@ vi.mock('@/features/account/profile.queries', () => ({
   useProfileQuery: () => ({ data: profileData }),
 }));
 /** The submit requests only: the router's own `/auth/me` is in `calls` too. */
-/** The result strip reads the new submission (Q-01 B). */
+/** The result strip reads the new submission. */
 const submittedRow = { 'GET /submissions/sub-9': ok(submissionDetail({ id: 'sub-9' })) };
 const submitCalls = (calls: ApiCall[]) => calls.filter((call) => call.path.includes('/submit'));
 
@@ -184,7 +184,7 @@ describe('submitting text', () => {
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['users', 'page'] });
     invalidate.mockRestore();
   });
-  it("scores the result on the contest's points inside the viewer's contest (Q-10 A)", async () => {
+  it("scores the result on the contest's points inside the viewer's contest", async () => {
     mockApi({
       ...anonymousViewer,
       'POST /problems/duongdi/submit': ok({ id: 'sub-9' }),
@@ -298,7 +298,7 @@ describe('file mode requests and messages', () => {
   });
 });
 
-describe('contest attempts (B19)', () => {
+describe('contest attempts', () => {
   it('blocks submit at 0 attempts left and says so, and allows it with attempts left or no cap', () => {
     const spent = mountForm(problemDetail({ contest: { contestKey: 'r42', attemptsLeft: 0 } }));
     spent.form.source.value = 'x';

@@ -11,7 +11,7 @@ export const BAN_REASON_MAX_LENGTH = 4096;
 export type UserPageStaff = Schemas['UserPageStaffResponse'];
 
 export type LeaderboardSort = NonNullable<QueryOf<'/users'>['sort']>;
-/** The board's columns: backend USER_SORTS (users/leaderboards/dto/leaderboard.dto.ts) minus `contributionPoints`, which the board does not show yet. */
+/** The board's columns: backend USER_SORTS (users/leaderboards/dto/leaderboard.dto.ts), the same list: every sort is a board column. */
 export const LEADERBOARD_SORTS = [
   'rating',
   'performancePoints',

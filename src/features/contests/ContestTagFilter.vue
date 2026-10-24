@@ -14,7 +14,7 @@ defineProps<{
   hasFailed: boolean;
 }>();
 const emit = defineEmits<{ select: [tag: string | null] }>();
-/** 44 px: these chips are buttons (M4A: 26 px chips are only for display). */
+/** 44 px: these chips are buttons (26 px chips are only for display). */
 const CHIP =
   'inline-flex min-h-11 items-center rounded-pill border px-4 text-sm font-semibold whitespace-nowrap hover:bg-surface-hover';
 const PRESSED = 'border-current ring-1 ring-current ring-inset';
@@ -22,7 +22,7 @@ const SKELETON_CHIPS = 5;
 </script>
 
 <template>
-  <!-- A site without tags shows no chip row at all (P-26): no empty box under the title. -->
+  <!-- A site without tags shows no chip row at all: no empty box under the title. -->
   <div
     v-if="hasFailed || isLoading || tags.length || state === 'unknown'"
     data-testid="tag-filter"

@@ -10,7 +10,7 @@ import { formatClock, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 
-/** `virtualRun`: the viewer's running virtual run of this ended contest; the big clock counts its time left (P-19). */
+/** `virtualRun`: the viewer's running virtual run of this ended contest; the big clock counts its time left. */
 const props = defineProps<{ contest: ContestDetail; virtualRun?: ParticipationSummary | null }>();
 const emit = defineEmits<{ elapsed: [] }>();
 const locale = useLocaleStore();
@@ -25,7 +25,7 @@ watch(
   () => target.value?.at,
   () => emit('elapsed'),
 );
-/** Days and hours (`28 ngày 14 giờ`, P-18) are longer than a clock: one line at the stat size instead of the hero's. */
+/** Days and hours (`28 ngày 14 giờ`) are longer than a clock: one line at the stat size instead of the hero's. */
 const isLong = (until: string) => Date.parse(until) - now.value >= LONG_COUNTDOWN_SECONDS * 1000;
 const sizeOf = (until: string) => (isLong(until) ? 'text-stat' : 'text-stat md:text-hero');
 const instantLabel = (instant: string) => formatDate(instant, 'datetime', locale.locale);

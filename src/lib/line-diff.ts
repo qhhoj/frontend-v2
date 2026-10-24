@@ -1,6 +1,6 @@
 import { diffArrays, diffWordsWithSpace } from 'diff';
 
-/** Either side above this many lines is refused before any diff runs (board M6C). */
+/** Either side above this many lines is refused before any diff runs. */
 export const MAX_DIFF_LINES = 5000;
 /** Edit distance (added plus removed lines) beyond which the diff gives up: the work grows with size times this, so it stays under about 100 ms. */
 export const MAX_EDIT_LINES = 1000;

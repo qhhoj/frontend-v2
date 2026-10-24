@@ -20,7 +20,7 @@ import { viewerStatusOf } from './viewer-status';
 /**
  * Limits, solve counts, the viewer's status and the problem types (hideable). Keep `ProblemRailSkeleton.vue` in step.
  * Inside the viewer's contest (`contest` lists the problem) the site-wide numbers make no sense: the card shows the
- * contest's points and the viewer's own cell ("Của bạn") instead (P-15).
+ * contest's points and the viewer's own cell ("Của bạn") instead.
  * `narrow` hides what the limit strip under the title already says when the rail is not beside the statement: the facts
  * grid, and the whole card when the problem has no types.
  */

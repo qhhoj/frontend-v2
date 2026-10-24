@@ -1,7 +1,7 @@
 import type { BitKind } from '@/mascot/bit-frames';
 import type { BitMood } from '@/mascot/bit-moods';
 
-/** Which Bit each ticket placement of plan F1 shows; components never name a kind themselves. */
+/** Which Bit each ticket placement shows; components never name a kind themselves. */
 export const TICKET_BITS = {
   /** "Chỉ hiện 200 sự kiện gần nhất". */
   cap: 'staff',

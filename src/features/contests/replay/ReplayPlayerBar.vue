@@ -9,7 +9,7 @@ import { REPLAY_SPEEDS } from './use-replay-player';
 import type { ReplaySpeed } from './use-replay-player';
 
 /**
- * M2B player: play/pause, clock, speeds, the scrub track with first-solve dots, the legend. The rows have fixed heights at
+ * Player: play/pause, clock, speeds, the scrub track with first-solve dots, the legend. The rows have fixed heights at
  * every width (row 1 wraps the speeds under play + clock at 375 px), so the skeleton can mirror them.
  */
 const props = defineProps<{

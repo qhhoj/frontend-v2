@@ -9,11 +9,11 @@ import { localizedTitle } from './notification-title';
 import { useHighPriorityQuery } from './notifications.queries';
 import { useOpenNotification } from './use-open-notification';
 
-/** M1B: the newest unread important notification above the content until it is read. */
+/** The newest unread important notification above the content until it is read. */
 const query = useHighPriorityQuery();
 const opener = useOpenNotification();
 const item = computed(() => query.data.value?.items[0] ?? null);
-/** M1B: "Xem phiếu" on a ticket notification, plain "Xem" otherwise. */
+/** "Xem phiếu" on a ticket notification, plain "Xem" otherwise. */
 const openLabelKey = computed(() =>
   item.value !== null && isTicketKind(item.value.kind)
     ? 'notifications.banner.openTicket'

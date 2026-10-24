@@ -11,7 +11,7 @@ import { useUnreadAnnouncementCount } from '../announcement-seen';
 import { participationKind } from './current-contest';
 
 /**
- * P-15 B: the one contest bar under the site header on every page while the viewer takes part in a contest. It answers
+ * The one contest bar under the site header on every page while the viewer takes part in a contest. It answers
  * "how long is left", "where do I go back to" and "is there news" without leaving the statement. 48 px, 40 px on a phone,
  * where the status is its dot and only the ranking and the announcements stay as links (M-02, M-06); on a coarse pointer the bar
  * is 44 px and its links fill it, so each is a 44 px target (D-17). On the contest's

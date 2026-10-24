@@ -4,7 +4,7 @@ import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { ORG_BITS } from '../org-bits';
 import { useArchivedInQuery } from './org-problems.queries';
 
-/** Board M7A's notice above a problem one of the viewer's organizations archived; archiving never hides it from them. */
+/** The notice above a problem one of the viewer's organizations archived; archiving never hides it from them. */
 const props = defineProps<{ code: string; organizationIds: string[] }>();
 const { data } = useArchivedInQuery(
   () => props.code,

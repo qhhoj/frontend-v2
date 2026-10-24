@@ -16,7 +16,7 @@ import type { BoardRow } from './replay-board';
 import { elapsedSeconds } from './virtual-run';
 import { useReplayView } from './use-replay-view';
 
-/** The viewer's running virtual row merged into the replay at the same elapsed time (spec 3.3, M2B "So sánh hai bảng"). */
+/** The viewer's running virtual row merged into the replay at the same elapsed time (spec 3.3, "So sánh hai bảng"). */
 const props = defineProps<{ contest: ContestDetail; participation: ParticipationSummary }>();
 const PODIUM_RANK = 3;
 const session = useSessionStore();

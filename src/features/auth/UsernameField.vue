@@ -17,7 +17,7 @@ const problem = computed(() => {
   const found = usernameProblem(model.value);
   return found ? translate(PROBLEM_KEYS[found]) : undefined;
 });
-/** B11 as drawn on RegisterA: checking, free (green) or taken (red, invalid); never a gate. */
+/** Checking, free (green) or taken (red, invalid); never a gate. */
 const { status } = useUsernameAvailability(model);
 const TONES = {
   idle: undefined,
@@ -59,7 +59,7 @@ const hintId = useId();
         :class="[line.colour, status === 'checking' && 'motion-safe:animate-spin']"
       />
     </template>
-    <!-- One line under the field (P-13), so it is as tall as its neighbour in the two-column form: the format hint
+    <!-- One line under the field, so it is as tall as its neighbour in the two-column form: the format hint
          until there is an answer, then the answer. The live region is always rendered, so only answers are announced. -->
     <div class="grid min-h-5 text-meta">
       <p

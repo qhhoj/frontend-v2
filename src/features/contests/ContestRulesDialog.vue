@@ -11,7 +11,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { EXTRAS_BITS } from './contest-extras-bits';
 
 /**
- * M3A: the contest rules (rendered by the backend, shown through UserContent), one box to tick and the action button,
+ * The contest rules (rendered by the backend, shown through UserContent), one box to tick and the action button,
  * `aria-disabled` until the box is ticked. The tick lives only while the dialog is open.
  */
 const props = defineProps<{
@@ -33,7 +33,7 @@ const locale = useLocaleStore();
 const isTicked = ref(false);
 const boxId = useId();
 const SKELETON_LINES = 4;
-/** M3A draws the rules dialog 520 px wide. */
+/** The rules dialog is 520 px wide. */
 const RULES_DIALOG_WIDTH = 520;
 /** Rules whose rendered text is empty for good (everything sanitised away) must not block accepting forever. */
 const isLoading = computed(() => props.rulesHtml === '' && props.isRefreshing);

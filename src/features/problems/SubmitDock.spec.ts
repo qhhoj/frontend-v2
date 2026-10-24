@@ -16,7 +16,7 @@ vi.mock('@/components/code-editor-cm', () => {
 
 const dockOf = (wrapper: VueWrapper) => wrapper.get('section[aria-label="Nộp bài"]');
 const railCard = (wrapper: VueWrapper) => wrapper.get('[data-testid="rail-submit"]');
-/** P-02 B: the rail's one button opens the dock. */
+/** The rail's one button opens the dock. */
 async function openDock(wrapper: VueWrapper) {
   await railCard(wrapper).get('button').trigger('click');
   await flushPromises();
@@ -59,7 +59,7 @@ describe('anonymous viewer', () => {
   });
 });
 
-describe('one way in (P-02 B)', () => {
+describe('one way in', () => {
   it('shows no dock on load; the rail button opens it, the close button removes it', async () => {
     mockApi(signedInRoutes());
     const { wrapper } = await openProblem();
@@ -85,7 +85,7 @@ describe('one way in (P-02 B)', () => {
   });
 });
 
-describe('after a submit (Q-01 B)', () => {
+describe('after a submit', () => {
   it('stays on the problem and shows the result with a link to the full page', async () => {
     mockApi({
       ...signedInRoutes(),

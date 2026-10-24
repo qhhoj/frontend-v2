@@ -40,7 +40,7 @@ const run = computed(() =>
   current.value?.contest.key === key.value ? current.value.participation : null,
 );
 /**
- * While the contest runs, or the viewer's virtual run of it does, the page keeps to the contest (P-23): no comments,
+ * While the contest runs, or the viewer's virtual run of it does, the page keeps to the contest: no comments,
  * where solutions could be discussed, and the announcements first.
  */
 const isUnderway = computed(

@@ -4,7 +4,7 @@ import type { NotificationItem } from '@/api/types/notifications';
 import NotificationRow from './NotificationRow.vue';
 import { groupByDay } from './notification-days';
 
-/** The rows grouped "Hôm nay" / "Trước đó" (M1B); shared by the drawer and the page. */
+/** The rows grouped "Hôm nay" / "Trước đó"; shared by the drawer and the page. */
 const props = defineProps<{
   items: NotificationItem[];
   canMarkRead: boolean;

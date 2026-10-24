@@ -18,7 +18,7 @@ import ProblemStatusMark from './ProblemStatusMark.vue';
 import ProblemTierMark from './ProblemTierMark.vue';
 
 /**
- * The problem list: the kit `DataTable` (48 px rows) on a computer, and on a phone (P-04 B) compact rows instead of a table
+ * The problem list: the kit `DataTable` (48 px rows) on a computer, and on a phone compact rows instead of a table
  * that scrolls sideways. Sorting is by the column headers; a third click on one returns to the default order. An empty list
  * under filters offers to clear them.
  */
@@ -142,7 +142,7 @@ const pointsText = (problem: ProblemListItem) =>
     <template #cell-acRate="{ row }">{{ formatNumber(row.acRate, locale.locale, 1) }}%</template>
     <template #cell-userCount="{ row }">{{ formatNumber(row.userCount, locale.locale) }}</template>
 
-    <!-- P-04 B: below `sm` a row is a compact list row. -->
+    <!-- Below `sm` a row is a compact list row. -->
     <template #card="{ row }">
       <CompactListRow :to="target(row.code)" :title="row.name">
         <template v-if="signedIn" #lead><ProblemStatusMark :status="row.viewerStatus" /></template>

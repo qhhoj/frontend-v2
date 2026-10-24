@@ -2,7 +2,7 @@
 import type { RouteLocationRaw } from 'vue-router';
 
 /**
- * P-04 B: one row of a public list on a phone (below `sm`), where the desktop table would scroll sideways. A list is a `<ul>`
+ * One row of a public list on a phone (below `sm`), where the desktop table would scroll sideways. A list is a `<ul>`
  * of these inside one card: an optional `lead` column (solved mark, rank), the title on up to two lines with a `meta` line
  * under it (a `FactLine`, which wraps between facts), and a `trail` column on the right (points, a small button). The title link covers the whole row; a control in `trail`
  * takes `relative` to stay clickable above it.

@@ -7,7 +7,7 @@ import { DIFF_INLINE_BITS } from './diff-bits';
 import { diffRoute, MAX_DIFF_PICKS } from './diff-picks';
 import { submissionShortId } from './submission-short-id';
 
-/** Shown once a row is picked (board M6C): what is picked, "Bỏ chọn", and the compare link once two are picked. */
+/** Shown once a row is picked: what is picked, "Bỏ chọn", and the compare link once two are picked. */
 const props = defineProps<{ picked: readonly string[] }>();
 defineEmits<{ clear: [] }>();
 const pair = computed(() => {

@@ -18,7 +18,7 @@ import OrganizationSettingsSection from './OrganizationSettingsSection.vue';
 
 /**
  * Legacy `OrganizationForm` for the organization's own administrators: logo, name, address, about and join mode, in a two-column
- * settings card (section title left, controls right), folded until opened (P-32: the join requests come first, the
+ * settings card (section title left, controls right), folded until opened (the join requests come first, the
  * profile is edited rarely), then the save bar. The heading sits above the fold, so heading navigation finds it closed;
  * the fold stays open while edits are unsaved, so the save bar cannot be hidden with changes pending: save stays aria-disabled until something changed. The staff
  * fields (short name, places, unlisted) stay on the admin editor, linked for `judge.edit_all_organization` holders.

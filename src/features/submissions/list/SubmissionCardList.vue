@@ -20,7 +20,7 @@ import TestStrip from './TestStrip.vue';
 
 /**
  * From md, the list's roomy rows as cards: score ring; problem, then submitter and age, then the per-test strip; verdict and
- * time, memory and language in a fixed-width right column, so every card's strip has the same width. Below md (P-08) a
+ * time, memory and language in a fixed-width right column, so every card's strip has the same width. Below md a
  * ledger of 56 px rows in one card: ring, problem over "user · run time · language · age", and the verdict code. `columns`
  * hides what the table would hide. A row without `testSummary` (hidden from this viewer, or an older backend) has no strip.
  */

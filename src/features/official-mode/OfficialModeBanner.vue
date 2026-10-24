@@ -8,7 +8,7 @@ import { useNow } from '@/lib/use-now';
 import { useOfficialMode, useRefetchWhenOfficialModeEnds } from './official-mode.queries';
 import { untilText } from './official-until';
 
-/** M1B warning card: "Chế độ thi chính thức đến 11:30 hôm nay" (`officialModeEndsAt`, requires VNOI backend B8 ask; plain title when null) and what is locked; a superuser is told they are exempt. */
+/** Warning card: "Chế độ thi chính thức đến 11:30 hôm nay" (`officialModeEndsAt`; plain title when null) and what is locked; a superuser is told they are exempt. */
 const mode = useOfficialMode();
 useRefetchWhenOfficialModeEnds();
 const locale = useLocaleStore();

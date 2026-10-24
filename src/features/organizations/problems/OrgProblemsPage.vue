@@ -38,7 +38,7 @@ const canRead = computed(() =>
   Boolean(organization.value?.viewer?.isMember || organization.value?.viewer?.canAdminister),
 );
 const isAdmin = computed(() => organization.value?.viewer?.canAdminister === true);
-/** "Tạo bài tập" for whoever may create problems for the organization (P-32 B), above the list and in its empty state. */
+/** "Tạo bài tập" for whoever may create problems for the organization, above the list and in its empty state. */
 const canCreate = computed(() => organization.value?.viewer?.canCreateProblem === true);
 const createTarget = computed(() => ({
   name: 'admin-problemNew',

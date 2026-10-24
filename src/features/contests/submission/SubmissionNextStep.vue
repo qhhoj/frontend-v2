@@ -2,7 +2,7 @@
 import { ChevronRight } from 'lucide-vue-next';
 import type { ContestProblem } from '@/api/types/contests';
 
-/** Under the result in the viewer's running contest (P-14 B): the next problem one click away. */
+/** Under the result in the viewer's running contest: the next problem one click away. */
 defineProps<{ next: ContestProblem }>();
 </script>
 

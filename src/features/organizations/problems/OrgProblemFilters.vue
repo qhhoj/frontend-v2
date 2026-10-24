@@ -9,7 +9,7 @@ import { ARCHIVE_FILTERS } from './org-problem-filters';
 import type { OrgProblemFilters } from './org-problems.queries';
 import { TAG_DOT_CLASSES } from './org-tag-classes';
 
-/** Tag chips, the archive switch and the search box of board M7A; every change goes to the URL through `change`. */
+/** Tag chips, the archive switch and the search box; every change goes to the URL through `change`. */
 const props = defineProps<{
   filters: OrgProblemFilters;
   tags: ProblemTag[];

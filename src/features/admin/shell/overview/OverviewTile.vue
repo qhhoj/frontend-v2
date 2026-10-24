@@ -9,7 +9,7 @@ import { CARD } from '../../ui/controls';
 /**
  * One figure on the dashboard, linking to its filtered list: `value` null is not loaded yet. A `needsAttention` figure gets
  * a caution border, the accent figure and a "Cần xử lý" chip, so the state never rests on colour alone. `linkText` says
- * where the tile goes ("Xem 3 phiếu →"), so it reads as a link (P-33).
+ * where the tile goes ("Xem 3 phiếu →"), so it reads as a link.
  */
 const props = defineProps<{
   icon: Component;

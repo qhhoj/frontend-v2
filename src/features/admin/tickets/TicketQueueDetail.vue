@@ -24,7 +24,7 @@ import TicketHandlingSection from './TicketHandlingSection.vue';
 import TicketMarkGood from './TicketMarkGood.vue';
 
 /**
- * The open ticket beside the list (P-31): claim, close and "good contribution" in the header, the folded "Xử lý"
+ * The open ticket beside the list: claim, close and "good contribution" in the header, the folded "Xử lý"
  * section, the thread, and the reply box kept at the bottom of the screen while the thread scrolls (from tablet width;
  * on a phone it would hide the thread). Pinned, the box is one compact row until used, the page's scroll padding keeps
  * focused fields above it, and opening a ticket scrolls its newest message into view above it. Mounted (keyed) once

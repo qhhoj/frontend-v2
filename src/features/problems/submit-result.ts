@@ -11,7 +11,7 @@ export function firstFailedTest(cases: readonly SubmissionCase[] | null): number
 }
 
 /**
- * What the strip's score is out of: the problem's points, or inside the viewer's contest the contest's (Q-10 A), written
+ * What the strip's score is out of: the problem's points, or inside the viewer's contest the contest's, written
  * with the contest's decimals. The key tells the rail whether a row was submitted in that contest.
  */
 export interface ScoreScale {

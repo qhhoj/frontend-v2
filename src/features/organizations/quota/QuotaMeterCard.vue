@@ -6,7 +6,7 @@ import ProgressBar from '@/components/ui/ProgressBar.vue';
 import type { ProgressTone } from '@/components/ui/ProgressBar.vue';
 import { meterPercent } from '@/lib/quota';
 
-/** One meter of board M7A: the numbers, the percentage and a bar; colour follows the state but the numbers say it all. */
+/** One meter: the numbers, the percentage and a bar; colour follows the state but the numbers say it all. */
 const props = defineProps<{
   label: string;
   meter: QuotaMeter;

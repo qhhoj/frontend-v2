@@ -10,7 +10,7 @@ import SubmitSignInLink from './SubmitSignInLink.vue';
 const DOCK_EDITOR = '#submit-dock-body textarea, #submit-dock-body [contenteditable="true"]';
 
 /**
- * P-02 B: the one way into the submit flow beside the statement (a phone uses the sheet's bar instead). No dock shows on
+ * The one way into the submit flow beside the statement (a phone uses the sheet's bar instead). No dock shows on
  * load; the button opens it at the bottom of the page with the editor focused. The `context` slot takes what a caller
  * adds about where the submission goes (a contest's name, its points).
  */

@@ -134,7 +134,7 @@ const LIST_LABELS: Record<ContestActionKind, string> = {
   register: 'contests.list.viewAndRegister',
   registered: 'contests.list.view',
   spectate: 'contests.list.view',
-  // The row only opens the page, where "Bắt đầu thi ảo" is the real button (P-26).
+  // The row only opens the page, where "Bắt đầu thi ảo" is the real button.
   virtual: 'contests.list.view',
   finished: 'contests.list.view',
   opensLater: 'contests.list.view',

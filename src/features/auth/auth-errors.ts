@@ -4,7 +4,7 @@ import { DEFAULT_LOCALE, i18n, translate } from '@/i18n';
 import { unmappedMessageText } from '@/features/admin/ui/admin-errors';
 import { errorMessageKey } from '@/i18n/error-message';
 
-/** B8: the moderator's reason is a member of the `banned` error; the English message is never parsed. */
+/** The moderator's reason is a member of the `banned` error; the English message is never parsed. */
 export function banReason(error: unknown): string | null {
   if (!(error instanceof ApiError) || error.code !== 'banned') return null;
   const reason = error.extra.banReason;
@@ -49,7 +49,7 @@ function knownIssueText({ field, code }: FieldIssue): string | null {
   return i18n.global.te(key, DEFAULT_LOCALE) ? translate(key) : null;
 }
 
-/** By code (B10); a code without text never shows the backend's English in the Vietnamese UI. */
+/** By code; a code without text never shows the backend's English in the Vietnamese UI. */
 const issueText = (issue: FieldIssue): string =>
   knownIssueText(issue) ?? unmappedMessageText(issue.message);
 

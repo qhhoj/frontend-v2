@@ -16,7 +16,7 @@ import OrgTagDialog from './OrgTagDialog.vue';
 import { orgFailureText } from './org-problem-errors';
 import { useOrgTagActions } from './use-org-tag-actions';
 
-/** Board M7A's side card: the organization's tags (max 100) with add, edit and delete for its administrators. */
+/** The side card: the organization's tags (max 100) with add, edit and delete for its administrators. */
 const MAX_TAGS = 100;
 const props = defineProps<{
   slug: string;

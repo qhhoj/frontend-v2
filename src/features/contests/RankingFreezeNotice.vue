@@ -12,7 +12,7 @@ import { isFrozenAt, phaseAt } from '@/lib/contest-time';
 import { useNow } from '@/lib/use-now';
 
 /**
- * The ranking freeze, said for the moment it is read (P-22, Q-07 A). While the contest runs: the last minutes show "?".
+ * The ranking freeze, said for the moment it is read. While the contest runs: the last minutes show "?".
  * After the end the board stays frozen until the organisers publish it, so the notice says who is waited for, and editors
  * (who see the live board) get "Công bố kết quả": the existing unfreeze (`frozenLastMinutes: 0`), which rescores and opens
  * the board to everyone.

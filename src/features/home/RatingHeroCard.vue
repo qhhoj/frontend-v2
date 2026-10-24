@@ -34,7 +34,7 @@ const delta = computed(() =>
 );
 const tier = computed(() => ratingTier(user.value?.rating ?? null));
 const greeting = greetingKey(new Date().getHours());
-/** Q-03 B: an unrated student leads with the problems solved, a number that can grow every day; the rating once there is one. */
+/** An unrated student leads with the problems solved, a number that can grow every day; the rating once there is one. */
 const isRated = computed(() => tier.value !== null);
 /** The chart's box: a fixed 48 px band, at most 240 px wide, on the right of the card. */
 const CHART = { width: 240, height: 48 } as const;

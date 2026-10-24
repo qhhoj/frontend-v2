@@ -16,7 +16,7 @@ const KIND_ICONS: Readonly<Record<string, Component>> = {
 export const kindIcon = (kind: string): Component =>
   Object.hasOwn(KIND_ICONS, kind) ? KIND_ICONS[kind]! : Bell;
 
-/** The "Loại" chips of the `/notifications` rail (M1B): each is a fixed list of backend kinds. */
+/** The "Loại" chips of the `/notifications` rail: each is a fixed list of backend kinds. */
 export const KIND_GROUPS = ['ticket', 'contest', 'organization', 'other'] as const;
 export type KindGroup = (typeof KIND_GROUPS)[number];
 const GROUP_KINDS: Readonly<Record<KindGroup, readonly NotificationKind[]>> = {
@@ -25,7 +25,7 @@ const GROUP_KINDS: Readonly<Record<KindGroup, readonly NotificationKind[]>> = {
   organization: ['organization-request-decided'],
   other: ['quota-warning'],
 };
-/** The value of the `kind` query (requires VNOI backend B1 ask: repeatable `kind` on `GET /notifications`). */
+/** The value of the `kind` query (repeatable `kind` on `GET /notifications`). */
 export const kindsOfGroup = (group: KindGroup): NotificationKind[] => [...GROUP_KINDS[group]];
 export const isTicketKind = (kind: string): boolean =>
   GROUP_KINDS.ticket.some((ticketKind) => ticketKind === kind);

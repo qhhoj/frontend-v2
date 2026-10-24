@@ -13,7 +13,7 @@ import { useOrganization } from './use-organization';
 
 /**
  * The organization's contests: the /contests groups, narrowed by the API to this organization. Whoever may create contests
- * for it gets "Tạo kỳ thi" (P-32 B), also in the empty state; the rows carry a pencil on the contests the viewer edits.
+ * for it gets "Tạo kỳ thi", also in the empty state; the rows carry a pencil on the contests the viewer edits.
  */
 const { slug, query: organizationQuery } = useOrganization();
 const organizationId = computed(() => organizationQuery.data.value?.id);

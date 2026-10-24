@@ -36,7 +36,7 @@ export function useSubmitForm(
 
   const length = computed(() => codePointCount(source.value));
   const tooLong = computed(() => length.value > MAX_SOURCE_LENGTH);
-  /** B19: `null` means the contest sets no cap. */
+  /** `null` means the contest sets no cap. */
   const attemptsLeft = computed(() => problem.value.contest?.attemptsLeft ?? null);
   const hasInput = computed(() =>
     fileMode.value ? chosenFile.value !== null : length.value > 0 && !tooLong.value,

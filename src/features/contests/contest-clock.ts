@@ -20,7 +20,7 @@ export const isOneDay = (times: ContestTimes): boolean =>
 
 /**
  * The two ends of a timeline: clocks when the contest starts and ends on one day, else the full datetime of each end
- * (`15/10/2026 11:27` ─── `15/11/2026 11:27`), so two equal clocks on different days never read as one instant (P-18).
+ * (`15/10/2026 11:27` ─── `15/11/2026 11:27`), so two equal clocks on different days never read as one instant.
  */
 export function timelineLabels(
   times: ContestTimes,

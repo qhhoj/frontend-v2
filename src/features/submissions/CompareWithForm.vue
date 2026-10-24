@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router';
 import { diffRoute, parseSubmissionRef } from './diff-picks';
 
 /**
- * "So sánh với bài khác…" (board M6C) at the foot of the source card: a disclosure button that opens and closes the input.
+ * "So sánh với bài khác…" at the foot of the source card: a disclosure button that opens and closes the input.
  * The other submission goes left, this one stays right.
  */
 const props = defineProps<{ currentId: string }>();

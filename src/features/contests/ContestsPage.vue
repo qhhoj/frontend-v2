@@ -30,7 +30,7 @@ const ratedChoice = computed({
 const { data: tags, isPending: isTagsPending, isError: hasTagsFailed } = useContestTagsQuery();
 const catalogue = computed(() => (tags.value ? catalogueBySlug(tags.value) : undefined));
 const tagState = computed(() => tagFilterState(filters.value.tag, catalogue.value));
-/** An unknown tag is not sent: the groups list every contest and the row says why (M4A). */
+/** An unknown tag is not sent: the groups list every contest and the row says why. */
 const listFilters = computed(() =>
   tagState.value === 'unknown' ? { ...filters.value, tag: null } : filters.value,
 );

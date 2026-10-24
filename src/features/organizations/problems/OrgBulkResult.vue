@@ -5,7 +5,7 @@ import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { ORG_BITS } from '../org-bits';
 import { isFullSuccess, rowTextKey } from './bulk-outcome';
 
-/** Board M7A's result card: one line per code and the n/m summary, announced once. */
+/** The result card: one line per code and the n/m summary, announced once. */
 const props = defineProps<{ result: BulkProblemsResult; action: BulkBody['action'] }>();
 const total = computed(() => props.result.results.length);
 const isFull = computed(() => isFullSuccess(props.result));

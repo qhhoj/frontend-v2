@@ -15,7 +15,7 @@ import { useRecentChangesQuery } from './audit.queries';
 import { useAuditLinkOf } from './use-audit-link';
 
 /**
- * The dashboard's activity feed (P-33): the five newest changes as short sentences ("bitcoder đã sửa bài tập trash_02"),
+ * The dashboard's activity feed: the five newest changes as short sentences ("bitcoder đã sửa bài tập trash_02"),
  * for viewers who may open the change log, where the field names and notes are. An object link is 40 px tall; on a
  * coarse pointer its `::after` reaches 2 px past it, for a 44 px hit area.
  */

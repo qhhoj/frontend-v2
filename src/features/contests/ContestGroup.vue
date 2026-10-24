@@ -49,7 +49,7 @@ const shownContests = computed(() =>
     (contest) => props.phase !== 'running' || phaseAt(contest, now.value) === 'running',
   ),
 );
-/** One running contest spans the column; two columns only from two on (P-26). */
+/** One running contest spans the column; two columns only from two on. */
 const isSoleRunning = computed(() => shownContests.value.length === 1);
 const hasRunEnded = computed(() => shownContests.value.length < contests.value.length);
 /** Then the server is asked once for the list without it. */

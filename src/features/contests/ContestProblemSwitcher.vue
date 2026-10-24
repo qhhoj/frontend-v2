@@ -2,7 +2,7 @@
 import type { SwitcherEntry, SwitcherStatus } from './problem-switcher';
 
 /**
- * M5B: the contest's problems beside the statement, while the viewer's participation holds this one. The page decides when
+ * The contest's problems beside the statement, while the viewer's participation holds this one. The page decides when
  * it is ready (`useProblemRail`). Below `lg` the contest bar above already names the contest: the strip is the chips alone.
  */
 defineProps<{ contestKey: string; contestName: string; entries: SwitcherEntry[] }>();

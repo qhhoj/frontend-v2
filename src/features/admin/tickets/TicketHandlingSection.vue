@@ -14,7 +14,7 @@ import { TICKET_ASSIGNEES_MAX, assigneeNamesOf, handlingPatchOf } from './ticket
 import type { HandlingDraft } from './ticket-queue';
 
 /**
- * "Xử lý" (P-31): handlers, internal notes, title and linked problem in one fold with one save, which sends only the
+ * "Xử lý": handlers, internal notes, title and linked problem in one fold with one save, which sends only the
  * fields that changed. Folded by default; the summary line names the handlers.
  */
 const props = defineProps<{ ticket: TicketDetail }>();

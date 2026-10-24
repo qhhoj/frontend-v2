@@ -75,12 +75,12 @@ const POINTS_LEGEND = [
   'ranking.legend.zeroPoints',
   'ranking.legend.notAttempted',
 ] as const;
-/** Points boards put the cumulative time under the score (Cells A); penalty boards keep Solved and Penalty. */
+/** Points boards put the cumulative time under the score; penalty boards keep Solved and Penalty. */
 const hasCombinedScore = computed(
   () => !penalty.value && props.context.showsTime && showsCumtime(props.context.formatName),
 );
 const hasTimeColumn = computed(() => penalty.value && showsCumtime(props.context.formatName));
-/** Rated contests carry each row's rating change once the ratings are applied (P-22, Q-06 A). */
+/** Rated contests carry each row's rating change once the ratings are applied. */
 const hasRatingColumn = computed(() => props.ranking.rows.some((row) => row.ratingChange));
 const minWidth = computed(
   () =>

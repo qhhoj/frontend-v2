@@ -26,7 +26,7 @@ import { EDIT_ALL_PROBLEM } from './field-lock';
 /**
  * "Hiện cho thí sinh", the first card of the Basic view: the status, one button that publishes or hides the saved problem
  * on its own (the form's other edits stay unsaved), and while private the setup steps as done/missing chips. Publishing
- * with steps missing asks first (Q-13 B: a warning, never a block — external judging and output-only problems are valid).
+ * with steps missing asks first (a warning, never a block — external judging and output-only problems are valid).
  */
 const props = defineProps<{ problem: EditableProblem }>();
 const { can } = usePermissions();

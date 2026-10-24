@@ -28,7 +28,7 @@ const parseUsageMonth = (month: string): [year: number, monthNumber: number] => 
   return [year ?? 1970, monthNumber ?? 1];
 };
 
-/** The usage month `YYYY-MM` (site time zone, from the server) as a month name without the year ("tháng 10", board M7A); the one place besides the contest day tile that spells a month, and no zone shifts it. */
+/** The usage month `YYYY-MM` (site time zone, from the server) as a month name without the year ("tháng 10"); the one place besides the contest day tile that spells a month, and no zone shifts it. */
 export function monthLabel(month: string, locale: Locale): string {
   const [year, monthNumber] = parseUsageMonth(month);
   return formatMonthName(year, monthNumber, locale);
@@ -36,7 +36,7 @@ export function monthLabel(month: string, locale: Locale): string {
 
 /**
  * The day the quota resets, the first of the month after `month`, as a `short` date ("01/11", "11/01" in English; December's
- * reset reads "01/01/2027" once the year is not the current one), built in UTC so no zone shifts it (board M7A's "cho đến 01/11").
+ * reset reads "01/01/2027" once the year is not the current one), built in UTC so no zone shifts it ("cho đến 01/11").
  */
 export function nextMonthStart(month: string, locale: Locale): string {
   const [year, monthNumber] = parseUsageMonth(month);

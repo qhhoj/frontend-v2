@@ -75,7 +75,7 @@ export interface NavCount {
   needsAction: boolean;
 }
 
-/** The nav items that carry a count badge, and which count: every queue item (P-35). */
+/** The nav items that carry a count badge, and which count: every queue item. */
 export function useNavCounts() {
   const counts = useAdminCounts();
   // The shell mounts once per admin visit, so this is the one poll.

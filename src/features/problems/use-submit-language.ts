@@ -29,7 +29,7 @@ export function useSubmitLanguage(problem: Ref<ProblemDetail>, onSwitch: () => v
       problem.value.allowedLanguages.find((candidate) => candidate.id === languageId.value) ?? null,
   );
   const fileMode = computed(() => language.value?.fileOnly ?? false);
-  /** B17: a file-only language with `fileSizeLimit` 0 takes no upload at all. */
+  /** A file-only language with `fileSizeLimit` 0 takes no upload at all. */
   const uploadsOff = computed(
     () => fileMode.value && language.value !== null && uploadCapBytes(language.value) === 0,
   );

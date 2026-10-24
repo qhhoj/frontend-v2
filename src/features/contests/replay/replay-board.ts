@@ -52,7 +52,7 @@ export interface ReplayBoard {
   rows: BoardRow[];
 }
 
-/** Inside a tie: real rows, then the viewer's virtual row (spec 3.3), then ghosts (B5: real before ghost). */
+/** Inside a tie: real rows, then the viewer's virtual row (spec 3.3), then ghosts (real before ghost). */
 const KIND_ORDER: Record<BoardRowKind, number> = { real: 0, virtual: 1, ghost: 2 };
 
 function realTracks(replay: LoadedReplay): ReplayTrack[] {

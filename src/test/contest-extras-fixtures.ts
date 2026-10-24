@@ -18,7 +18,7 @@ export const contestTag = (overrides: Partial<ContestTag> = {}): ContestTag => (
   ...overrides,
 });
 
-/** The M4A board's catalogue: one tag per colour, in display order. */
+/** The catalogue: one tag per colour, in display order. */
 export const TAG_CATALOGUE: ContestTag[] = [
   contestTag({ slug: 'olympic', name: 'Olympic', color: 'tag-1', order: 1 }),
   contestTag({ slug: 'thi-thu', name: 'Thi thử', color: 'tag-2', order: 2 }),

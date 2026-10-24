@@ -7,7 +7,7 @@ import type { AdminTab } from '../ui/AdminTabs.vue';
 import { useAdminCounts } from '../shell/overview/admin-overview.queries';
 
 /**
- * One "Bình luận" page with three tabs (P-35): the reports queue first, every comment, and the locked pages. Each tab keeps
+ * One "Bình luận" page with three tabs: the reports queue first, every comment, and the locked pages. Each tab keeps
  * its own route, so links and the back button still work; the open reports count rides on the first tab like the nav badge.
  */
 defineProps<{ lead: string }>();

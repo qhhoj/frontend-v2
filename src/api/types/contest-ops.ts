@@ -9,7 +9,7 @@ export type BalloonState = Schemas['BalloonState'];
 export type BalloonQuery = Required<QueryOf<'/contests/{key}/balloons'>>;
 /** One delivery target: a team's participation and a problem. */
 export type BalloonRef = Pick<Balloon, 'participationId' | 'problemId'>;
-/** @uiOnly the two queue counts B6 adds to the page meta (`pendingTotal`, `deliveredTotal`); the paginated envelope documents a generic meta, so they are read by name at run time. */
+/** @uiOnly the two queue counts the backend adds to the page meta (`pendingTotal`, `deliveredTotal`); the paginated envelope documents a generic meta, so they are read by name at run time. */
 export type BalloonCounts = { pendingTotal: number | null; deliveredTotal: number | null };
 /** @uiOnly one page of the queue as the balloon screen reads it: the rows, the row total and the queue counts. */
 export type BalloonPage = { items: Balloon[]; total: number; counts: BalloonCounts };
