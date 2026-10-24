@@ -39,9 +39,9 @@ describe('staff contest list filters', () => {
     });
   });
 
-  it('sends a date as the local midnight that starts it', () => {
+  it('sends a date as the midnight that starts it in the site time zone, not the browser one', () => {
     const query = contestListQueryOf(filtersFromQuery({ from: '2026-05-04' }));
-    expect(new Date(query.startFrom!).getTime()).toBe(new Date(2026, 4, 4).getTime());
+    expect(query.startFrom).toBe('2026-05-03T17:00:00.000Z');
     expect(query.startBefore).toBeUndefined();
   });
 

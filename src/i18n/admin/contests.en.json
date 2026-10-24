@@ -184,7 +184,7 @@
       "key": "Cannot change after creation.",
       "timeLimit": "Leave empty if everyone takes the contest in the same window.",
       "pointsPrecision": "From 0 to 10.",
-      "scoreboardCacheTimeout": "0 turns the cache off. At most 86400.",
+      "scoreboardCacheTimeout": "At least 5 (a smaller value, 0 too, means 5). At most 86400.",
       "accessCodeSet": "A code is set (stored hashed). Type a new one to replace it; leave empty to keep it.",
       "accessCodeNone": "No code yet. Type one to set it.",
       "rankingCodeSet": "A code is set. Type a new one to replace it; leave empty to keep it.",

@@ -646,6 +646,7 @@ export const submissionDetail = (overrides: Partial<SubmissionDetail> = {}): Sub
   externalRun: null,
   lockedAfter: null,
   sourceAccess: 'granted',
+  waitingReason: null,
   ...overrides,
 });
 
