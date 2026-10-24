@@ -39,6 +39,15 @@ export const scoreBelowFull = (
     ? points
     : Math.min(points, max - 10 ** -fractionDigits);
 
+/**
+ * A score known to fall short of a maximum the caller does not have (its cases did): cut, not rounded, to `fractionDigits`,
+ * so it never prints as that maximum (999.999 prints 999.9 at one decimal). The `toFixed` drops float noise first.
+ */
+export const scoreCut = (points: number, fractionDigits: number): number => {
+  const scale = 10 ** fractionDigits;
+  return Math.floor(Number((points * scale).toFixed(6))) / scale;
+};
+
 /** A problem's points as the old site showed them: `1500p` when tests score partially, else `1500`. */
 export const formatProblemPoints = (points: number, partial: boolean, locale: Locale) =>
   `${formatNumber(points, locale, 2, false)}${partial ? 'p' : ''}`;
