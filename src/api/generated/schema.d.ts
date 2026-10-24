@@ -1455,7 +1455,7 @@ export interface paths {
         /**
          * Create an account
          * @description Public. Creates an inactive account and mails an activation link (valid 7 days); the account cannot sign in until it is activated. Optionally joins an open, listed organization and sets the default language.
-         *     Limited to 5 attempts per IP per hour, every attempt counts. Errors: 400 `validation_failed` with per-field issues (`username_taken`, `email_taken`, `language_unknown`, `organization_unavailable`, password policy or breached password), 503 `mail_unavailable` when the activation mail cannot be sent (nothing is created then), 429 `rate_limited`. Returns 204.
+         *     Limited to 5 attempts per IP per hour, every attempt counts. Errors: 400 `validation_failed` with per-field issues (`username_taken`, `email_taken`, `language_unknown`, `organization_unavailable`, `organization_full` (the organization reached its `slots`), password policy or breached password), 503 `mail_unavailable` when the activation mail cannot be sent (nothing is created then), 429 `rate_limited`. Returns 204.
          */
         post: operations["RegistrationController_register"];
         delete?: never;
@@ -11579,7 +11579,7 @@ export interface components {
          * @description Setting key.
          * @enum {string}
          */
-        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "externalJudge.apiToken" | "externalJudge.baseUrl" | "externalJudge.maxInFlight" | "externalJudge.maxWaitMinutes" | "mail.from" | "mail.smtpUrl" | "organization.adminRoleId" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "polygon.accountName" | "polygon.apiKey" | "polygon.apiSecret" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultJudgingMs" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
+        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "auth.sessionMaxDays" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "externalJudge.apiToken" | "externalJudge.baseUrl" | "externalJudge.maxInFlight" | "externalJudge.maxWaitMinutes" | "mail.from" | "mail.smtpUrl" | "organization.adminRoleId" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "polygon.accountName" | "polygon.apiKey" | "polygon.apiSecret" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultJudgingMs" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
         SettingResponse: {
             /** @description Any JSON value; its shape is the setting definition. */
             default: unknown;
@@ -12129,7 +12129,7 @@ export interface components {
             user: components["schemas"]["UserSummaryResponse"] | null;
             /** @description Which actions the caller may use on this submission. */
             viewer: components["schemas"]["SubmissionViewerResponse"];
-            /** @description Why a queued submission is not being judged: `waiting_for_capable_judge` once a Judge refused it as unsupported (it stays queued until a Judge that can grade it is connected; the missing feature is not reported yet); null otherwise. */
+            /** @description Why a queued submission is not being judged: `waiting_for_problem_data`, `waiting_for_judge_runtime` or `waiting_for_judge_sandbox` while a Judge could not run it for that transient reason (it is retried with a backoff, and ends Internal Error after about 30 minutes); `waiting_for_capable_judge` once a Judge refused it as unsupported (it stays queued until a Judge that can grade it is connected; the missing feature is not reported yet); null otherwise. */
             waitingReason: components["schemas"]["SubmissionWaitingReason"] | null;
         };
         SubmissionExternalRunResponse: {
@@ -12349,10 +12349,10 @@ export interface components {
             canRejudge: boolean;
         };
         /**
-         * @description Why a queued submission is not being judged: `waiting_for_capable_judge` once a Judge refused it as unsupported (it stays queued until a Judge that can grade it is connected; the missing feature is not reported yet); null otherwise.
+         * @description Why a queued submission is not being judged: `waiting_for_problem_data`, `waiting_for_judge_runtime` or `waiting_for_judge_sandbox` while a Judge could not run it for that transient reason (it is retried with a backoff, and ends Internal Error after about 30 minutes); `waiting_for_capable_judge` once a Judge refused it as unsupported (it stays queued until a Judge that can grade it is connected; the missing feature is not reported yet); null otherwise.
          * @enum {string}
          */
-        SubmissionWaitingReason: "waiting_for_capable_judge";
+        SubmissionWaitingReason: "waiting_for_capable_judge" | "waiting_for_judge_runtime" | "waiting_for_judge_sandbox" | "waiting_for_problem_data";
         SubmitDto: {
             /** @description Name of the judge to use (legacy `judge-id`); problem editors only. */
             judgeId?: string;
