@@ -13,18 +13,20 @@ import { highlightMarkdownBlocks } from './markdown-code-highlight';
  */
 const props = defineProps<{ html: string }>();
 const root = ref<HTMLElement | null>(null);
-/** A link that opens a new tab gets no handle on this page and sends no referrer, whatever the author wrote. */
-const isolateNewTabLinks = (container: HTMLElement) => {
-  for (const link of container.querySelectorAll<HTMLAnchorElement>('a[target]'))
-    link.relList.add('noopener', 'noreferrer');
+/** Every author link is marked user content for search engines; one that opens a new tab also gets no handle on this page and sends no referrer. */
+const markLinks = (container: HTMLElement) => {
+  for (const link of container.querySelectorAll<HTMLAnchorElement>('a[href]')) {
+    link.relList.add('nofollow', 'ugc');
+    if (link.hasAttribute('target')) link.relList.add('noopener', 'noreferrer');
+  }
 };
 /**
- * After each render (`v-html` swaps the whole subtree when `html` changes): new-tab links are isolated and
+ * After each render (`v-html` swaps the whole subtree when `html` changes): links are marked and
  * fenced code gets colours.
  */
 const afterRender = () => {
   if (!root.value) return;
-  isolateNewTabLinks(root.value);
+  markLinks(root.value);
   void highlightMarkdownBlocks(root.value);
 };
 onMounted(afterRender);

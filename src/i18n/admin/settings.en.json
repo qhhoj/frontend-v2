@@ -34,6 +34,10 @@
       "title": "Sign in with Facebook",
       "help": "Turns on social sign-in: both a client id and a client secret are needed."
     },
+    "session": {
+      "title": "Sign-in length",
+      "help": "Most days a sign-in lasts, however often it is used. It also ends after 14 days unused; the user then signs in again."
+    },
     "pwned": {
       "title": "Leaked password check",
       "help": "The Have I Been Pwned range API address. Leave empty to turn the check off."
@@ -85,6 +89,7 @@
       "smtpUrl": "SMTP URL"
     },
     "auth": {
+      "sessionMaxDays": "Days before signing in again",
       "pwnedApiUrl": "API URL"
     },
     "pdf": {
@@ -141,6 +146,7 @@
       "smtpUrl": "smtp:// or smtps://, credentials percent-encoded. Never shown again."
     },
     "auth": {
+      "sessionMaxDays": "An integer from 1 to 365.",
       "pwnedApiUrl": "Empty or https. The live server does not accept internal addresses."
     },
     "pdf": {

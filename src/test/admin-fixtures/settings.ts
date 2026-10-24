@@ -27,7 +27,7 @@ export function setting(
   };
 }
 
-/** The 17 registry keys with the board's values (the pdf and similarity numbers are the board's). */
+/** The registry keys with the board's values (the pdf and similarity numbers are the board's). */
 export const ALL_SETTINGS: Setting[] = [
   setting('site.timeZone', 'Asia/Ho_Chi_Minh'),
   setting('contest.officialMode', false),
@@ -39,6 +39,7 @@ export const ALL_SETTINGS: Setting[] = [
   setting('mail.from', 'QHHOJ <no-reply@qhhoj.example>'),
   setting('mail.smtpUrl', { set: true }, { default: { set: false } }),
   setting('auth.pwnedApiUrl', ''),
+  setting('auth.sessionMaxDays', 30),
   setting(
     'auth.google',
     { enabled: true, clientId: '1048000000001', clientSecret: { set: true } },

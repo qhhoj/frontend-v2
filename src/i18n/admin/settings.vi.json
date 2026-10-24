@@ -34,6 +34,10 @@
       "title": "Đăng nhập bằng Facebook",
       "help": "Bật đăng nhập mạng xã hội: cần cả mã khách và bí mật khách."
     },
+    "session": {
+      "title": "Thời hạn đăng nhập",
+      "help": "Số ngày tối đa một lần đăng nhập còn hiệu lực, dù dùng thường xuyên đến đâu. Phiên cũng hết sau 14 ngày không dùng; người dùng phải đăng nhập lại."
+    },
     "pwned": {
       "title": "Kiểm tra mật khẩu bị lộ",
       "help": "Địa chỉ API dải của Have I Been Pwned. Để trống để tắt kiểm tra."
@@ -85,6 +89,7 @@
       "smtpUrl": "URL SMTP"
     },
     "auth": {
+      "sessionMaxDays": "Số ngày trước khi phải đăng nhập lại",
       "pwnedApiUrl": "URL API"
     },
     "pdf": {
@@ -141,6 +146,7 @@
       "smtpUrl": "smtp:// hoặc smtps://, thông tin đăng nhập mã hóa phần trăm. Không bao giờ hiện lại."
     },
     "auth": {
+      "sessionMaxDays": "Số nguyên từ 1 đến 365.",
       "pwnedApiUrl": "Để trống hoặc https. Máy chủ thật không nhận địa chỉ nội bộ."
     },
     "pdf": {

@@ -24,6 +24,7 @@ export const SETTING_KINDS: Record<SettingKey, SettingKind> = {
   'mail.from': { kind: 'text' },
   'mail.smtpUrl': { kind: 'secretText' },
   'auth.pwnedApiUrl': { kind: 'url' },
+  'auth.sessionMaxDays': { kind: 'integer', min: 1, max: 365 },
   'auth.google': { kind: 'oauth' },
   'auth.github': { kind: 'oauth' },
   'auth.facebook': { kind: 'oauth' },
@@ -75,6 +76,7 @@ export const SETTING_BLOCKS: SettingBlockSpec[] = [
   { id: 'google', tab: 'accounts', keys: ['auth.google'] },
   { id: 'github', tab: 'accounts', keys: ['auth.github'] },
   { id: 'facebook', tab: 'accounts', keys: ['auth.facebook'] },
+  { id: 'session', tab: 'accounts', keys: ['auth.sessionMaxDays'] },
   { id: 'pwned', tab: 'accounts', keys: ['auth.pwnedApiUrl'] },
   {
     id: 'polygon',

@@ -102,11 +102,14 @@ describe('UserContent highlighting', () => {
 });
 
 describe('UserContent links', () => {
-  it('opens a link in a new tab without handing that tab this page', async () => {
+  it('marks author links as user content and isolates new-tab ones', async () => {
     const content = mountComponent(UserContent, {
-      props: { html: '<p><a href="https://example.com" target="_blank" rel="nofollow">x</a></p>' },
+      props: {
+        html: '<p><a href="https://a.example" target="_blank" rel="nofollow">a</a> <a href="https://b.example">b</a></p>',
+      },
     });
     await flushPromises();
-    expect(content.get('a').attributes('rel')).toBe('nofollow noopener noreferrer');
+    const rels = content.findAll('a').map((link) => link.attributes('rel'));
+    expect(rels).toEqual(['nofollow ugc noopener noreferrer', 'nofollow ugc']);
   });
 });
