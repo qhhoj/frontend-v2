@@ -34,15 +34,17 @@ export function tutorialCandidates(statements: Statement[], choice: LanguageChoi
 /**
  * Whether `PolygonLanguageFields` draws the field an error is keyed by (`main`, `others`, `other:<language>`, `tutorial`):
  * none for fewer than two statements, a statement's select only when the choice has it, the tutorial's only for two or
- * more candidates. An error for a field it does not draw belongs on the page line.
+ * more candidates and only while the tutorial is imported. An error for a field it does not draw belongs on the page line.
  */
 export function isLanguageFieldDrawn(
   field: string,
   statements: Statement[],
   choice: LanguageChoice,
+  importTutorial = true,
 ): boolean {
   if (statements.length < 2) return false;
-  if (field === 'tutorial') return tutorialCandidates(statements, choice).length > 1;
+  if (field === 'tutorial')
+    return importTutorial && tutorialCandidates(statements, choice).length > 1;
   if (field.startsWith('other:')) return Object.hasOwn(choice.others, field.slice('other:'.length));
   return field === 'main' || field === 'others';
 }

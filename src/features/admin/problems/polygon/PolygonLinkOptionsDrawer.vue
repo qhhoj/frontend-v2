@@ -52,6 +52,7 @@ const flags = ref({
   ignoreZeroPointBatches: props.link.options.ignoreZeroPointBatches,
   ignoreZeroPointCases: props.link.options.ignoreZeroPointCases,
   appendMainSolution: props.link.options.appendMainSolution,
+  importTutorial: props.link.options.importTutorial,
 });
 
 const save = useAdminMutation({
@@ -82,7 +83,11 @@ const fieldErrors = computed(() => {
 const pageRefusal = computed(() => {
   const field = refusal.value?.field;
   if (!save.failure.value) return null;
-  if (field && isLanguageFieldDrawn(field, statements.value, languages.value)) return null;
+  if (
+    field &&
+    isLanguageFieldDrawn(field, statements.value, languages.value, flags.value.importTutorial)
+  )
+    return null;
   return refusal.value?.text ?? importRefusalText(save.failure.value);
 });
 const submit = () => repeatedLanguages(languages.value).length === 0 && save.run(undefined);
@@ -95,6 +100,7 @@ const submit = () => repeatedLanguages(languages.value).length === 0 && save.run
       :model-value="languages"
       :statements="statements"
       :errors="fieldErrors"
+      :import-tutorial="flags.importTutorial"
       @update:model-value="choose"
     />
     <p v-else class="text-sm text-muted">{{ $t('admin.polygonLink.panel.drawer.noLanguages') }}</p>
@@ -108,6 +114,11 @@ const submit = () => repeatedLanguages(languages.value).length === 0 && save.run
         v-model="flags.ignoreZeroPointCases"
         :label="$t('admin.polygon.form.ignoreCases')"
         :description="$t('admin.polygon.form.ignoreCasesHint')"
+      />
+      <ImportCheckbox
+        v-model="flags.importTutorial"
+        :label="$t('admin.polygon.form.importTutorial')"
+        :description="$t('admin.polygon.form.importTutorialHint')"
       />
       <ImportCheckbox
         v-model="flags.appendMainSolution"

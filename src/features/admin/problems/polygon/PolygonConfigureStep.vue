@@ -53,6 +53,8 @@ const statements = props.problem.statements;
 const languages = ref(props.draft?.languages ?? defaultLanguageChoice(statements));
 /** The form of the start in flight, handed to the progress step with its job. */
 const sentForm = ref<ImportForm | null>(null);
+/** The form's "import the tutorial" box: the source card words what a sync takes by it. */
+const isTutorialImported = ref(true);
 /** The update body waiting for the overwrite confirmation. */
 const pending = ref<PolygonImportBody | null>(null);
 const isConfirmOpen = computed({
@@ -87,6 +89,7 @@ const bodyOf = (options: ImportOptions): PolygonImportBody => ({
   ignoreZeroPointBatches: options.ignoreZeroPointBatches ?? false,
   ignoreZeroPointCases: options.ignoreZeroPointCases ?? false,
   appendMainSolution: options.appendMainSolution ?? false,
+  importTutorial: options.importTutorial ?? true,
   autoSync: autoSync.value,
 });
 
@@ -118,7 +121,14 @@ const refusal = computed(() => {
   if (!failure.value || IMPORT_FORM_FIELDS.some((field) => field in fieldErrors.value)) return null;
   const options = optionsRefusal.value;
   if (!options) return importRefusalText(failure.value);
-  const isDrawn = options.field && isLanguageFieldDrawn(options.field, statements, languages.value);
+  const isDrawn =
+    options.field &&
+    isLanguageFieldDrawn(
+      options.field,
+      statements,
+      languages.value,
+      sentForm.value?.importTutorial,
+    );
   return isDrawn ? null : options.text;
 });
 </script>
@@ -135,13 +145,15 @@ const refusal = computed(() => {
         :server-errors="fieldErrors"
         :submit-label-of="submitLabelOf"
         @start="start"
+        @tutorial-change="isTutorialImported = $event"
       >
         <template #target="{ mode, code }">
           <PolygonUpdateTarget v-if="mode === 'update'" :code="code" />
         </template>
-        <template #languages>
+        <template #languages="{ importTutorial }">
           <PolygonLanguageFields
             v-model="languages"
+            :import-tutorial="importTutorial"
             :statements="statements"
             :errors="languageErrors"
           />
@@ -161,7 +173,11 @@ const refusal = computed(() => {
           />
         </template>
         <template #before-actions>
-          <PolygonSourcePanel :problem="problem" class="xl:hidden" />
+          <PolygonSourcePanel
+            :problem="problem"
+            :import-tutorial="isTutorialImported"
+            class="xl:hidden"
+          />
         </template>
         <template #actions>
           <button type="button" :class="buttonClass('ghost')" @click="emit('back')">
@@ -172,7 +188,7 @@ const refusal = computed(() => {
       <AdminStatus v-if="refusal" kind="refused" :text="refusal" />
     </div>
     <div class="hidden xl:sticky xl:top-4 xl:block">
-      <PolygonSourcePanel :problem="problem" />
+      <PolygonSourcePanel :problem="problem" :import-tutorial="isTutorialImported" />
     </div>
     <PolygonOverwriteConfirm
       v-if="pending"
@@ -180,6 +196,7 @@ const refusal = computed(() => {
       :code="pending.code"
       :problem="problem"
       :busy="isPending"
+      :import-tutorial="pending.importTutorial"
       @confirm="confirmUpdate"
     />
   </div>

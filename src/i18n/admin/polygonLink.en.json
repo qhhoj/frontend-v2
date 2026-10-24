@@ -137,6 +137,7 @@
     "fromPolygon": "Taken from the Polygon package",
     "taken": {
       "statements": "Statements, translations and the tutorial",
+      "statementsNoTutorial": "Statements and translations",
       "tests": "Tests and point groups",
       "checker": "Checker or interactor",
       "limits": "Time and memory limits and partial scoring"
@@ -315,6 +316,8 @@
       "confirm": "Sync and overwrite",
       "overwrites": "The sync overwrites on QHHOJ: statements and translations, the tutorial, tests. Limits, partial scoring, checker and grader also come from the package, except those edited on QHHOJ since the last import: they are kept.",
       "lost": "Edits to statements, the tutorial and tests on QHHOJ since the last import are lost; copy them to Polygon first if you need them.",
+      "overwritesKeepEditorial": "The sync overwrites on QHHOJ: statements and translations, tests. The editorial is kept. Limits, partial scoring, checker and grader also come from the package, except those edited on QHHOJ since the last import: they are kept.",
+      "lostKeepEditorial": "Edits to statements and tests on QHHOJ since the last import are lost; copy them to Polygon first if you need them.",
       "kept": "Kept: code, points, group, types, authors, curators, allowed languages, Unicode, nobigmath, output limit and prefix.",
       "overwriteLocal": {
         "label": "Also overwrite settings edited on QHHOJ",
@@ -375,7 +378,8 @@
       "flags": {
         "ignoreZeroPointBatches": "0-point groups left out",
         "ignoreZeroPointCases": "0-point tests left out",
-        "appendMainSolution": "main solution added"
+        "appendMainSolution": "main solution added",
+        "skipTutorial": "package tutorial skipped"
       }
     },
     "drawer": {

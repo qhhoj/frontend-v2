@@ -137,6 +137,7 @@
     "fromPolygon": "Lấy từ gói Polygon",
     "taken": {
       "statements": "Đề bài, bản dịch và lời giải",
+      "statementsNoTutorial": "Đề bài và bản dịch",
       "tests": "Test và nhóm test theo điểm",
       "checker": "Checker hoặc interactor",
       "limits": "Giới hạn thời gian, bộ nhớ và chấm từng phần"
@@ -315,6 +316,8 @@
       "confirm": "Đồng bộ và ghi đè",
       "overwrites": "Đồng bộ sẽ ghi đè trên QHHOJ: đề bài và bản dịch, lời giải, test. Giới hạn, chấm điểm từng phần, checker và grader cũng lấy theo gói, trừ mục đã sửa trên QHHOJ từ lần nhập trước: mục đó được giữ.",
       "lost": "Sửa đổi đề bài, lời giải và test trên QHHOJ từ lần nhập trước sẽ mất; hãy chép sang Polygon trước nếu cần giữ.",
+      "overwritesKeepEditorial": "Đồng bộ sẽ ghi đè trên QHHOJ: đề bài và bản dịch, test. Lời giải được giữ nguyên. Giới hạn, chấm điểm từng phần, checker và grader cũng lấy theo gói, trừ mục đã sửa trên QHHOJ từ lần nhập trước: mục đó được giữ.",
+      "lostKeepEditorial": "Sửa đổi đề bài và test trên QHHOJ từ lần nhập trước sẽ mất; hãy chép sang Polygon trước nếu cần giữ.",
       "kept": "Giữ nguyên: mã bài, điểm, nhóm, dạng bài, tác giả, người duyệt, ngôn ngữ được nộp, Unicode, nobigmath, giới hạn và cắt output.",
       "overwriteLocal": {
         "label": "Ghi đè cả thiết lập đã sửa trên QHHOJ",
@@ -375,7 +378,8 @@
       "flags": {
         "ignoreZeroPointBatches": "bỏ nhóm 0 điểm",
         "ignoreZeroPointCases": "bỏ test 0 điểm",
-        "appendMainSolution": "thêm lời giải chính"
+        "appendMainSolution": "thêm lời giải chính",
+        "skipTutorial": "bỏ lời giải của gói"
       }
     },
     "drawer": {

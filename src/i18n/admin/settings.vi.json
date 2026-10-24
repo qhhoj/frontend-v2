@@ -103,6 +103,7 @@
       "enforce": "Chế độ hạn mức",
       "defaultMonthlyCredits": "Tín chỉ mỗi tháng (mặc định)",
       "defaultStorageBytes": "Dung lượng dữ liệu test (byte, mặc định)",
+      "defaultJudgingMs": "Mili giây chấm mỗi tháng (mặc định)",
       "cost": {
         "problem": "Tín chỉ để tạo hoặc nhân bản bài",
         "contest": "Tín chỉ để tạo hoặc nhân bản kỳ thi",
@@ -154,6 +155,7 @@
     "quota": {
       "defaultMonthlyCredits": "Từ 0 đến 1 000 000.",
       "defaultStorageBytes": "Từ 0 đến 1 099 511 627 776 (mặc định 512 MiB).",
+      "defaultJudgingMs": "Từ 0 đến 36 000 000 000 (mặc định 36 000 000 = 10 giờ).",
       "cost": {
         "problem": "Từ 0 đến 1000.",
         "contest": "Từ 0 đến 1000.",

@@ -44,6 +44,7 @@ export const polygonLinkState = (
     autoSync: false,
     options: {
       appendMainSolution: false,
+      importTutorial: true,
       ignoreZeroPointBatches: false,
       ignoreZeroPointCases: false,
       mainStatementLanguage: null,

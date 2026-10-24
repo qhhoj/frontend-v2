@@ -19,6 +19,8 @@ import type { LanguageChoice, SiteLanguageChoice } from './polygon-languages';
 const props = defineProps<{
   statements: PolygonProblem['statements'];
   errors: Record<string, string>;
+  /** False hides the tutorial choice: no tutorial is imported, so none is asked for. */
+  importTutorial?: boolean;
 }>();
 const choice = defineModel<LanguageChoice>({ required: true });
 const languages = computed(() => props.statements.map(({ language }) => language));
@@ -105,7 +107,7 @@ const statementLabel = ({ language, title }: PolygonProblem['statements'][number
       </fieldset>
 
       <FormField
-        v-if="tutorials.length > 1"
+        v-if="importTutorial !== false && tutorials.length > 1"
         scale="admin"
         :label="$t('admin.polygonLink.configure.languages.tutorial')"
         :hint="
@@ -125,7 +127,11 @@ const statementLabel = ({ language, title }: PolygonProblem['statements'][number
           </option>
         </SelectField>
       </FormField>
-      <p v-else class="text-sm text-muted" data-testid="polygon-tutorial-line">
+      <p
+        v-else-if="importTutorial !== false"
+        class="text-sm text-muted"
+        data-testid="polygon-tutorial-line"
+      >
         {{
           tutorials.length === 1
             ? $t('admin.polygonLink.configure.languages.tutorialOne', { language: tutorials[0] })

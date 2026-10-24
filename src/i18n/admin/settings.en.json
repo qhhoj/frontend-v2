@@ -103,6 +103,7 @@
       "enforce": "Quota mode",
       "defaultMonthlyCredits": "Monthly credits (default)",
       "defaultStorageBytes": "Test-data bytes (default)",
+      "defaultJudgingMs": "Judging milliseconds per month (default)",
       "cost": {
         "problem": "Credits to create or clone a problem",
         "contest": "Credits to create or clone a contest",
@@ -154,6 +155,7 @@
     "quota": {
       "defaultMonthlyCredits": "From 0 to 1 000 000.",
       "defaultStorageBytes": "From 0 to 1 099 511 627 776 (default 512 MiB).",
+      "defaultJudgingMs": "From 0 to 36 000 000 000 (default 36 000 000 = 10 h).",
       "cost": {
         "problem": "From 0 to 1000.",
         "contest": "From 0 to 1000.",

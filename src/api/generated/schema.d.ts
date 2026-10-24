@@ -4240,9 +4240,10 @@ export interface paths {
         /**
          * Change the quota of an organization
          * @description Requires `judge.edit_all_organization`. Sets the monthly credits cap, the
-         *     storage cap in bytes, or the unlimited flag; `null` clears a cap so the
-         *     site default applies again, and omitted fields stay as they are. The
-         *     change is logged. Returns the updated usage.
+         *     monthly judging cap in milliseconds, the storage cap in bytes, or the
+         *     unlimited flag; `null` clears a cap so the site default applies again,
+         *     and omitted fields stay as they are. The change is logged. Returns the
+         *     updated usage.
          */
         patch: operations["OrganizationUsageController_updateQuota"];
         trace?: never;
@@ -4401,9 +4402,11 @@ export interface paths {
         };
         /**
          * Get the quota usage of an organization
-         * @description Organization administrators only. Returns the current month's credits and
-         *     storage against the organization's limits, whether quotas are enforced,
-         *     and the most recent credit entries with the users who spent them.
+         * @description Organization administrators only. Returns the current month's credits,
+         *     judging milliseconds and storage against the organization's limits,
+         *     whether quotas are enforced, the most recent credit entries with the users
+         *     who spent them, and the five problems that used the most judging time this
+         *     month.
          */
         get: operations["OrganizationUsageController_one"];
         put?: never;
@@ -4447,9 +4450,10 @@ export interface paths {
         /**
          * List quota usage of all organizations
          * @description Requires `judge.edit_all_organization`. Returns one row per organization
-         *     for the current month: credits used and their limit, storage used and its
-         *     limit, and whether it is unlimited. Sort by `name` (default) or `credits`;
-         *     paged with `page` and `pageSize`.
+         *     for the current month: credits used and their limit, judging milliseconds
+         *     used and their limit, storage used and its limit, and whether it is
+         *     unlimited. Sort by `name` (default), `credits` or `judging`; paged with
+         *     `page` and `pageSize`.
          */
         get: operations["OrganizationUsageController_overview"];
         put?: never;
@@ -5362,7 +5366,8 @@ export interface paths {
          * Sync a linked problem from Polygon
          * @description Needs `judge.sync_polygon_problem` and write access to the problem's test
          *     data. Queues the import job in sync mode on the newest READY package:
-         *     statement, tutorial and tests are overwritten; code, points, group, types,
+         *     statement, tutorial (unless the link's `importTutorial` is false: the
+         *     editorial then stays as it is) and tests are overwritten; code, points, group, types,
          *     authors, curators and allowed languages are kept. The time and memory
          *     limits, partial scoring, checker (type, arguments, source) and grader
          *     settings come from the package too, except each one edited on QHHOJ since
@@ -10179,6 +10184,8 @@ export interface components {
             credits: components["schemas"]["QuotaMeterResponse"];
             /** @description Whether limits are enforced by refusing actions. */
             enforcing: boolean;
+            /** @description Judging milliseconds used this month (site time zone) against the limit. */
+            judging: components["schemas"]["QuotaMeterResponse"];
             /** @description `YYYY-MM` in the site time zone. */
             month: string;
             /** @description The organization. */
@@ -10189,11 +10196,13 @@ export interface components {
             recent: components["schemas"]["CreditEntryResponse"][];
             /** @description Problem data storage in bytes against the limit. */
             storage: components["schemas"]["QuotaMeterResponse"];
+            /** @description Up to five problems that used the most judging time this month, heaviest first. */
+            topProblems: components["schemas"]["UsageTopProblemResponse"][];
             /** @description Promotion: the limits below are reported but not applied, and the meters are never near or over. */
             unlimited: boolean;
         };
         /** @enum {string} */
-        OrganizationUsageSort: "credits" | "name";
+        OrganizationUsageSort: "credits" | "judging" | "name";
         OrganizationViewerResponse: {
             /** @description The viewer is an admin or holds judge.edit_all_organization. */
             canAdminister: boolean;
@@ -10368,6 +10377,11 @@ export interface components {
              * @default false
              */
             ignoreZeroPointCases: boolean;
+            /**
+             * @description Import the package statement's tutorial as the editorial.
+             * @default true
+             */
+            importTutorial: boolean;
             /** @description The problem page address, `https://polygon.codeforces.com/p…/owner/name`. */
             link: string;
             /** @description Polygon language of the statement stored as the base statement. */
@@ -10393,6 +10407,8 @@ export interface components {
             appendMainSolution: boolean;
             ignoreZeroPointBatches: boolean;
             ignoreZeroPointCases: boolean;
+            /** @description Whether the package statement's tutorial becomes the editorial. */
+            importTutorial: boolean;
             mainStatementLanguage: string | null;
             /** @description Testcase limit of the user who linked the problem; a sync of more tests fails with `too_many_testcases`. Not editable. */
             maxCases: number;
@@ -11151,7 +11167,10 @@ export interface components {
             isOver: boolean;
             /** @description Amount allowed, in the same unit. */
             limit: number;
-            /** @description Amount used: credits for the credit meter, bytes for the storage meter. */
+            /**
+             * @description Amount used: credits for the credit meter, milliseconds for the judging
+             *     meter, bytes for the storage meter.
+             */
             used: number;
         };
         RandomProblemResponse: {
@@ -11560,7 +11579,7 @@ export interface components {
          * @description Setting key.
          * @enum {string}
          */
-        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "externalJudge.apiToken" | "externalJudge.baseUrl" | "externalJudge.maxInFlight" | "externalJudge.maxWaitMinutes" | "mail.from" | "mail.smtpUrl" | "organization.adminRoleId" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "polygon.accountName" | "polygon.apiKey" | "polygon.apiSecret" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
+        SettingKey: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "externalJudge.apiToken" | "externalJudge.baseUrl" | "externalJudge.maxInFlight" | "externalJudge.maxWaitMinutes" | "mail.from" | "mail.smtpUrl" | "organization.adminRoleId" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "polygon.accountName" | "polygon.apiKey" | "polygon.apiSecret" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultJudgingMs" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
         SettingResponse: {
             /** @description Any JSON value; its shape is the setting definition. */
             default: unknown;
@@ -13026,6 +13045,7 @@ export interface components {
             autoSync?: boolean;
             ignoreZeroPointBatches?: boolean;
             ignoreZeroPointCases?: boolean;
+            importTutorial?: boolean;
             /** @description Polygon language of the statement stored as the base statement; null lets a single-statement package decide. */
             mainStatementLanguage?: string | null;
             /** @description The whole mapping `<polygon language>=<en|vi|skip>`, as the import takes it; replaces the saved one. */
@@ -13153,6 +13173,11 @@ export interface components {
         };
         UpdateQuotaDto: {
             /**
+             * @description Judging milliseconds per month, 0 to 36000000000 (10000 h); null clears
+             *     the cap so the site default applies.
+             */
+            quotaJudgingMs?: number | null;
+            /**
              * @description Credits per month, 0 to 1000000; null clears the cap so the site default
              *     applies.
              */
@@ -13246,6 +13271,10 @@ export interface components {
             creditsLimit: number;
             /** @description Credits used this month. */
             creditsUsed: number;
+            /** @description Judging milliseconds allowed per month. */
+            judgingLimit: number;
+            /** @description Judging milliseconds used this month. */
+            judgingUsed: number;
             /** @description Month of the figures, YYYY-MM. */
             month: string;
             /** @description Name of the organization. */
@@ -13260,10 +13289,22 @@ export interface components {
             unlimited: boolean;
         };
         UsageQuotaResponse: {
+            /** @description Staff-set judging milliseconds per month; null for the site default. */
+            judgingMs: number | null;
             /** @description Staff-set monthly credits; null for the site default. */
             monthlyCredits: number | null;
             /** @description Staff-set storage cap in bytes; null for the site default. */
             storageBytes: number | null;
+        };
+        UsageTopProblemResponse: {
+            /** @description Code of the problem. */
+            code: string;
+            /** @description Judging milliseconds charged this month. */
+            ms: number;
+            /** @description Name of the problem. */
+            name: string;
+            /** @description Grading runs charged this month. */
+            runs: number;
         };
         UserAccessResponse: {
             /** @description Whether you may change this access: only a superuser grants or revokes, and never on their own account. */
@@ -21896,7 +21937,7 @@ export interface operations {
                 page?: number;
                 /** @description Rows per page, 1 to 100. */
                 pageSize?: number;
-                /** @description Order of the rows: by name or by credits used. */
+                /** @description Order of the rows: by name, by credits used or by judging time used. */
                 sort?: components["schemas"]["OrganizationUsageSort"];
             };
             header?: never;
@@ -24158,6 +24199,8 @@ export interface operations {
                 ignoreZeroPointBatches?: boolean;
                 /** @description Skip cases worth zero points. */
                 ignoreZeroPointCases?: boolean;
+                /** @description Import the package statement's tutorial as the editorial. */
+                importTutorial?: boolean;
                 /** @description Polygon language of the statement stored as the base statement. */
                 mainStatementLanguage?: string;
                 /** @description `create` (default) makes a new problem; `update` replaces the data and statement of an existing one. */

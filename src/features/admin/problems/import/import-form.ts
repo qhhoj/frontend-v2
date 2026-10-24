@@ -38,6 +38,7 @@ export interface ImportForm {
   ignoreZeroPointBatches: boolean;
   ignoreZeroPointCases: boolean;
   appendMainSolution: boolean;
+  importTutorial: boolean;
 }
 
 /** The fields `ImportOptionsForm` renders an error under; an issue on any other field (`storage` of a quota refusal) needs the page line. */
@@ -71,6 +72,7 @@ export const emptyImportForm = (): ImportForm => ({
   ignoreZeroPointBatches: false,
   ignoreZeroPointCases: false,
   appendMainSolution: false,
+  importTutorial: true,
 });
 
 const isPointsInRange = (text: string) => {
@@ -176,6 +178,7 @@ export function toImportOptions(form: ImportForm): ImportOptions {
     ignoreZeroPointBatches: form.ignoreZeroPointBatches,
     ignoreZeroPointCases: form.ignoreZeroPointCases,
     appendMainSolution: form.appendMainSolution,
+    importTutorial: form.importTutorial,
   };
 }
 
