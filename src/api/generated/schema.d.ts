@@ -10212,7 +10212,7 @@ export interface components {
             canCreateProblem: boolean;
             /** @description The viewer belongs to the organization. */
             isMember: boolean;
-            /** @description The viewer's pending join request (Task 6), else null. */
+            /** @description The viewer's pending join request, else null. */
             pendingRequestId: string | null;
         };
         /**
@@ -12129,6 +12129,8 @@ export interface components {
             user: components["schemas"]["UserSummaryResponse"] | null;
             /** @description Which actions the caller may use on this submission. */
             viewer: components["schemas"]["SubmissionViewerResponse"];
+            /** @description Why a queued submission is not being judged: `waiting_for_capable_judge` once a Judge refused it as unsupported (it stays queued until a Judge that can grade it is connected; the missing feature is not reported yet); null otherwise. */
+            waitingReason: components["schemas"]["SubmissionWaitingReason"] | null;
         };
         SubmissionExternalRunResponse: {
             /** @description The external judge's OJ. */
@@ -12346,6 +12348,11 @@ export interface components {
             /** @description Whether `POST /submissions/{id}/rejudge` is allowed. */
             canRejudge: boolean;
         };
+        /**
+         * @description Why a queued submission is not being judged: `waiting_for_capable_judge` once a Judge refused it as unsupported (it stays queued until a Judge that can grade it is connected; the missing feature is not reported yet); null otherwise.
+         * @enum {string}
+         */
+        SubmissionWaitingReason: "waiting_for_capable_judge";
         SubmitDto: {
             /** @description Name of the judge to use (legacy `judge-id`); problem editors only. */
             judgeId?: string;
