@@ -119,8 +119,10 @@ describe('fieldErrorTexts', () => {
   });
 
   it('falls back to the fields of an answer without issues', () => {
-    const error = rejected([], { username: ['Username is taken.', 'Too long.'] });
-    expect(fieldErrorTexts(error)).toEqual({ username: 'Giá trị này chưa hợp lệ. Quá dài.' });
+    const error = rejected([], { username: ['Username is taken.', 'Unknown user.'] });
+    expect(fieldErrorTexts(error)).toEqual({
+      username: 'Giá trị này chưa hợp lệ. Không có người dùng này.',
+    });
   });
 
   it('does not let a field named like a prototype member break the result', () => {

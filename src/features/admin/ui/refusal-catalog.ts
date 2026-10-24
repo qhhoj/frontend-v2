@@ -23,12 +23,12 @@ const textOf = (value: unknown): string => {
   return typeof value === 'string' || typeof value === 'number' ? String(value) : '';
 };
 
-const paramsOf = (refusal: ApiError): Params => {
+export const paramsOf = (refusal: ApiError): Params => {
   const params = refusal.extra.params;
   return params && typeof params === 'object' ? (params as Params) : {};
 };
 
-const currentLocale = (): Locale => {
+export const currentLocale = (): Locale => {
   const locale = i18n.global.locale.value;
   return isLocale(locale) ? locale : DEFAULT_LOCALE;
 };
@@ -92,7 +92,7 @@ const rateLimitedText = (refusal: ApiError): string =>
     ? translate(errorMessageKey(refusal))
     : translate('admin.ui.rateLimitedWait', { wait: formatWait(refusal.retryAfterSeconds) });
 
-const optionEntry: CodeEntry = {
+export const optionEntry: CodeEntry = {
   text: (refusal) =>
     translate(`admin.polygonLink.configure.refusal.${refusal.code}`, {
       languages: textOf(paramsOf(refusal).languages),

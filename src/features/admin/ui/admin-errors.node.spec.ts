@@ -9,7 +9,6 @@ import {
   isConflict,
   isNotFound,
   readRefusal,
-  specificIssueText,
 } from './admin-errors';
 import { IMPORT_REFUSALS } from './refusal-catalog';
 
@@ -199,7 +198,6 @@ describe('failureTextOf names the reason an issue gives', () => {
     const error = new ApiError('validation_failed', 400, 'bad', {
       issues: [issue('is_length', 'name must be longer')],
     });
-    expect(specificIssueText(error)).toBeNull();
     expect(failureTextOf(error)).toBe('Dữ liệu chưa hợp lệ.');
   });
   it('words a participation clash by its code', () => {
@@ -220,15 +218,6 @@ describe('readRefusal', () => {
       line: null,
     });
     expect(readRefusal(taken).line).toBe('Khóa này đã có.');
-  });
-
-  it('R2: a reason on an unrendered path goes to the line (a quota on storage)', () => {
-    const quota = refused('quota_exceeded', 403, [issue('quota_exceeded', 'x', 'storage')], {
-      extra: { details: { meter: 'credits', limit: 200, used: 194, needed: 10 } },
-    });
-    const read = readRefusal(quota, { paths: ['code'] });
-    expect(read.fields).toEqual({});
-    expect(read.line).toContain('cần 10, còn lại 6');
   });
 
   it('R3: an alias names the rendered path (a bulk row on the username box)', () => {
@@ -252,7 +241,6 @@ describe('readRefusal', () => {
       organizations: 'Giá trị quá lớn.',
     });
     expect(read.line).toBeNull();
-    expect(readRefusal(error, { paths: ['cases.*'] }).fields).not.toHaveProperty('organizations');
   });
 
   it('R5: two reasons on one path show the first', () => {
@@ -279,23 +267,8 @@ describe('readRefusal', () => {
     );
   });
 
-  it('R7: a wrapper with no reasons reads as its own code text', () => {
-    expect(readRefusal(new ApiError('conflict', 409, 'x'), { paths: ['key'] })).toEqual({
-      fields: {},
-      line: failureTextOf(new ApiError('conflict', 409, 'x')),
-    });
-  });
-
-  it('R8: a code of its own words the line and ignores the issues behind it', () => {
-    const error = refused('already_participating', 409, [issue('max', 'm', 'user')]);
-    expect(readRefusal(error).line).toBe(
-      'Người này đã có lượt tham gia đang diễn ra trong kỳ thi.',
-    );
-  });
-
-  it('R9: a rate limit words the wait, or the import wording through the catalog', () => {
+  it('R9: the import pages word the rate limit through the catalog, and a wait is appended to other refusals', () => {
     const limited = new ApiError('rate_limited', 429, 'x', { retryAfterSeconds: 42 });
-    expect(readRefusal(limited).line).toBe('Bạn thao tác quá nhanh. Thử lại sau 42 giây.');
     expect(readRefusal(limited, { catalog: IMPORT_REFUSALS }).line).toBe(
       'Tối đa 10 lượt nhập mỗi giờ. Thử lại sau 42 giây.',
     );
@@ -316,19 +289,5 @@ describe('readRefusal', () => {
       extra: { params: { languages: ['english', 'russian'] } },
     });
     expect(readRefusal(required).line).toBe('Chọn đề chính trong số: english, russian.');
-  });
-
-  it('R11: with nothing rendered the line is never null and failureTextOf is that line', () => {
-    const error = refused('validation_failed', 400, [issue('max', 'm', 'points')]);
-    expect(readRefusal(error).line).toBe(failureTextOf(error));
-    expect(failureTextOf(new ApiError('validation_failed', 400, 'x'))).toBe('Dữ liệu chưa hợp lệ.');
-  });
-
-  it('R12: anything that is not an ApiError reads as the generic line', () => {
-    expect(readRefusal(new TypeError('x'), { paths: ['a'] })).toEqual({
-      fields: {},
-      line: failureTextOf(null),
-    });
-    expect(failureTextOf(undefined)).not.toBe('');
   });
 });

@@ -150,7 +150,9 @@ describe('ContestActionsTab', () => {
     mockApi({
       ...staffViewer(['judge.edit_own_contest', 'judge.clone_contest']),
       ...routes({
-        'POST /contests/hcmus-w41/clone': fail(400, 'validation_failed', undefined, [issue('key', 'key_taken', 'taken')]),
+        'POST /contests/hcmus-w41/clone': fail(400, 'validation_failed', undefined, [
+          issue('key', 'key_taken', 'taken'),
+        ]),
       }),
     });
     const { wrapper } = await mountAndWaitFor('/admin/contests/hcmus-w41/actions', TAB_TEXT);

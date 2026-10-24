@@ -319,7 +319,9 @@ describe('one save bar for every tab', () => {
   it('saves the other blocks past a refused one and opens the refused block’s tab', async () => {
     const calls = mockApi(
       routes({
-        'PATCH /admin/settings/site.timeZone': invalid(issue('value', 'time_zone_invalid', 'Bad zone.')),
+        'PATCH /admin/settings/site.timeZone': invalid(
+          issue('value', 'time_zone_invalid', 'Bad zone.'),
+        ),
         'PATCH /admin/settings/similarity.minPercent': ok(setting('similarity.minPercent', 70)),
       }),
     );

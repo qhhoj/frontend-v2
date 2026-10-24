@@ -37,8 +37,8 @@ describe('serverFieldErrors', () => {
   });
 
   it('words a known English message for a field the form does not know in Vietnamese', () => {
-    expect(serverFieldErrors(fieldsError({ unknownField: ['Too long.'] }))).toEqual({
-      unknownField: 'Quá dài.',
+    expect(serverFieldErrors(fieldsError({ unknownField: ['Unknown user.'] }))).toEqual({
+      unknownField: 'Không có người dùng này.',
     });
   });
 });

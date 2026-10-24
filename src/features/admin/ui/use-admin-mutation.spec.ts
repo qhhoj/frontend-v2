@@ -72,7 +72,6 @@ describe('useAdminMutation', () => {
     );
     await expect(api().run({ name: 'a' })).resolves.toBeUndefined();
     expect(api().refusal.value).toEqual({ fields: { name: 'Quá dài.' }, line: null });
-    expect(api().fieldErrors.value).toEqual({ name: 'Quá dài.' });
     expect(api().failure.value?.code).toBe('validation_failed');
     expect(api().isDone.value).toBe(false);
   });

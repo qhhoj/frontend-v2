@@ -1,18 +1,12 @@
 import { ApiError } from '@/api/client';
 import type { FieldIssue } from '@/api/client';
-import { DEFAULT_LOCALE, i18n, isLocale, translate } from '@/i18n';
-import type { Locale } from '@/i18n';
+import { DEFAULT_LOCALE, i18n, translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
 import { formatWait } from './format-wait';
-import { CODE_ENTRIES } from './refusal-catalog';
+import { CODE_ENTRIES, currentLocale } from './refusal-catalog';
 import type { CodeEntry } from './refusal-catalog';
 
 export type FieldErrors = Record<string, string>;
-
-const currentLocale = (): Locale => {
-  const locale = i18n.global.locale.value;
-  return isLocale(locale) ? locale : DEFAULT_LOCALE;
-};
 
 /** The class-validator codes: they say a value is off, not why, so a page line prefers the specific refusal beside them. */
 const GENERIC_VALIDATOR_CODES: ReadonlySet<string> = new Set([
@@ -99,15 +93,6 @@ export function unmappedMessageText(message: string): string {
 
 /** Whether the SPA has a text for this issue: its code, or the English message it stands for. */
 export const isKnownIssue = (issue: FieldIssue): boolean => knownIssueOf(issue) !== null;
-
-/** The first refusal in `error.issues` that names a reason (not just "value is off") the SPA has a text for; null when none. */
-export function specificIssueText(error: unknown): string | null {
-  if (!(error instanceof ApiError)) return null;
-  const issue = error.issues.find(
-    (item) => !GENERIC_VALIDATOR_CODES.has(item.code) && knownIssueOf(item) !== null,
-  );
-  return issue ? adminIssueText(issue) : null;
-}
 
 /** Whether the SPA has a text for this backend issue code. */
 export const hasIssueText = (code: string): boolean =>
@@ -268,9 +253,6 @@ export function readRefusal(error: unknown, options: ReadOptions = {}): Refusal 
 /** `readRefusal(error).line` for callers that render no field. Never null for a failure. */
 export const failureTextOf = (error: unknown): string =>
   readRefusal(error).line ?? translate('errors.generic');
-
-/** The text of one issue outside a refusal (the per-row issues of bulk user creation). The catalog applies: no English in the vi UI. */
-export const issueText = (issue: FieldIssue): string => adminIssueText(issue);
 
 /**
  * The record does not exist. Every backend 404 carries code `not_found` (AppError and the filter's HttpException map)
