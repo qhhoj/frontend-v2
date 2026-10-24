@@ -2,16 +2,21 @@ import { useQueryClient } from '@tanstack/vue-query';
 import type { QueryClient } from '@tanstack/vue-query';
 import { watch } from 'vue';
 import { useSessionStore } from '@/stores/session.store';
+import { useViewerId } from '@/stores/use-viewer-id';
 
 /**
  * Drops every answer of the previous account and tells the mounted queries: `clear()` alone empties the cache
- * without notifying their observers, which keep showing what they hold. Unmounted entries go, mounted ones restart
- * empty and fetch again as the new viewer.
+ * without notifying their observers, which keep showing what they hold. Unmounted entries go. A mounted query keyed
+ * on the new viewer is already fetching its own answer; every other mounted one (a key with no viewer) restarts
+ * empty and fetches again as the new viewer.
  */
-function dropAccountData(queryClient: QueryClient) {
+function dropAccountData(queryClient: QueryClient, viewerId: string) {
   queryClient.getMutationCache().clear();
   queryClient.removeQueries({ type: 'inactive' });
-  void queryClient.resetQueries({ type: 'active' });
+  void queryClient.resetQueries({
+    type: 'active',
+    predicate: (query) => !query.queryKey.includes(viewerId),
+  });
 }
 
 /**
@@ -24,10 +29,12 @@ function dropAccountData(queryClient: QueryClient) {
 export function useAccountCacheSync() {
   const session = useSessionStore();
   const queryClient = useQueryClient();
+  const viewerId = useViewerId();
   watch(
     () => [session.status, session.user?.id] as const,
     ([, userId], [previousStatus, previousUserId]) => {
-      if (previousStatus !== 'unknown' && userId !== previousUserId) dropAccountData(queryClient);
+      if (previousStatus !== 'unknown' && userId !== previousUserId)
+        dropAccountData(queryClient, viewerId.value);
     },
     { flush: 'post' },
   );

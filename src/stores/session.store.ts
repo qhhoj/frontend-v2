@@ -177,8 +177,9 @@ export const useSessionStore = defineStore('session', () => {
    * router re-check the page. Not re-announced, so two tabs never echo an old change back at each other.
    */
   function followOtherTab(userId: string | null) {
-    if (userId === (user.value?.id ?? null)) return;
+    // First: a tab waiting for its second factor has no user either, and must still drop the session.
     if (userId === null) return loseSession();
+    if (userId === user.value?.id) return;
     void rereadForOtherTab();
   }
 

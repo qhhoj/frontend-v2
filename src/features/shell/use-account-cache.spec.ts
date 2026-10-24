@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/vue-query';
+import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { defineComponent, h, ref } from 'vue';
@@ -66,6 +66,23 @@ describe('account cache sync', () => {
     session.$patch({ status: 'anonymous', user: null });
     await flushPromises();
     expect(isCached()).toBe(false);
+  });
+
+  it('fetches a mounted query that has no viewer in its key again as the new viewer', async () => {
+    const viewer = sessionUser({ id: '0192a000-0000-7000-8000-00000000000d' });
+    mockApi({ 'GET /auth/me': signedOut });
+    let reads = 0;
+    const wrapper = mountWithSync(() => {
+      const { data } = useQuery({
+        queryKey: ['site', 'probe'],
+        queryFn: () => `${(reads += 1)}:${useSessionStore().user?.id ?? 'anonymous'}`,
+      });
+      return () => h('p', data.value ?? '');
+    });
+    await flushPromises();
+    useSessionStore().$patch({ status: 'authenticated', user: viewer });
+    await flushPromises();
+    expect(wrapper.text()).toBe(`2:${viewer.id}`);
   });
 
   it('shows a mounted problem list as the new viewer sees it', async () => {
