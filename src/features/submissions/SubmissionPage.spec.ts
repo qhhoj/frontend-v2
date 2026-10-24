@@ -96,7 +96,8 @@ describe('submission page', () => {
   });
 
   it('shows the final points and drops the grading line when the stream says done, with one final read of the row', async () => {
-    const final = () => ok(submissionDetail({ status: 'D', result: 'AC', points: 1600 }));
+    const final = () =>
+      ok(submissionDetail({ status: 'D', result: 'AC', points: 1600, casePoints: 20 }));
     const calls = mockApi({
       ...signedInViewer(),
       ...problemPageRoutes(),
@@ -263,7 +264,7 @@ describe('submission page', () => {
   });
 
   it('never announces a bare final status while the final read is on its way, and shows no provisional score beside the final verdict', async () => {
-    const final = ok(submissionDetail({ status: 'D', result: 'AC', points: 1600 }));
+    const final = ok(submissionDetail({ status: 'D', result: 'AC', points: 1600, casePoints: 20 }));
     let rowReads = 0;
     let releaseFinalRead = () => {};
     mockApi({
@@ -322,7 +323,9 @@ describe('submission page', () => {
       ...signedInViewer(),
       ...problemPageRoutes(),
       ...submissionPageRoutes(grading()),
-      ...submissionPageRoutes(submissionDetail({ id: 'sub-2', result: 'AC', points: 1600 })),
+      ...submissionPageRoutes(
+        submissionDetail({ id: 'sub-2', result: 'AC', points: 1600, casePoints: 20 }),
+      ),
     });
     const { wrapper, router } = await openSubmission('sub-1');
     const firstStream = latestEventSource();
