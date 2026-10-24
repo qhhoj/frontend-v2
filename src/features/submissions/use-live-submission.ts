@@ -2,6 +2,7 @@ import { computed, nextTick, onScopeDispose, ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useSubmissionStatus } from '@/api/use-submission-status';
 import { IN_PROGRESS_STATUSES } from '@/api/types/submissions';
+import { useViewerId } from '@/stores/use-viewer-id';
 import { useSubmissionQuery } from './submissions.queries';
 
 /** Test-case events come in bursts; the row is read once after the burst. */
@@ -23,7 +24,7 @@ export function useLiveSubmission(id: Ref<string>) {
     const inProgress = status !== undefined && IN_PROGRESS_STATUSES.includes(status);
     return inProgress && !isPausedForRefollow.value ? id.value : null;
   });
-  const live = useSubmissionStatus(followedId);
+  const live = useSubmissionStatus(followedId, useViewerId());
   const isLive = computed(() => followedId.value !== null && !live.done && !live.stale);
 
   let debounceTimer: ReturnType<typeof setTimeout> | undefined;

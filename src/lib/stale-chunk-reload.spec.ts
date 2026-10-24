@@ -80,6 +80,7 @@ describe('installStaleChunkReload', () => {
       routes: [
         { path: '/', component: { render: () => null } },
         { path: '/orgs', component: () => Promise.reject(error) },
+        { path: '/:rest(.*)*', component: () => Promise.reject(error) },
       ],
     });
     return router;
@@ -93,7 +94,18 @@ describe('installStaleChunkReload', () => {
       createStaleChunkReloader(() => memoryStorage(), 'abc', load),
     );
     await router.push('/orgs?tab=1').catch(() => undefined);
-    expect(load).toHaveBeenCalledExactlyOnceWith('/orgs?tab=1');
+    expect(load).toHaveBeenCalledExactlyOnceWith(`${window.location.origin}/orgs?tab=1`);
+  });
+
+  it('never reloads a destination on another site', async () => {
+    const load = vi.fn();
+    const router = failingRouter(new Error('Failed to fetch dynamically imported module: /a.js'));
+    installStaleChunkReload(
+      router,
+      createStaleChunkReloader(() => memoryStorage(), 'abc', load),
+    );
+    await router.push('//elsewhere.example/x').catch(() => undefined);
+    expect(load).not.toHaveBeenCalled();
   });
 
   it('leaves other navigation errors alone', async () => {

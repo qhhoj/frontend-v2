@@ -6,6 +6,20 @@ import { stubMatchMedia } from './match-media';
 import { resetToastHost } from '@/features/admin/ui/feedback/use-admin-toast';
 import { takeUnmatchedRequests } from './mock-api';
 
+/**
+ * BroadcastChannel reaches every test file running in this process: each file gets its own channel names, and every
+ * channel a test opened (the session store's included) is closed after it, so a store never hears another test's tabs.
+ */
+const openChannels: BroadcastChannel[] = [];
+const channelScope = crypto.randomUUID();
+const NativeBroadcastChannel = globalThis.BroadcastChannel;
+globalThis.BroadcastChannel = class extends NativeBroadcastChannel {
+  constructor(name: string) {
+    super(`${channelScope}:${name}`);
+    openChannels.push(this);
+  }
+};
+
 beforeEach(() => {
   installFakeEventSource(); // jsdom has no EventSource; pages with a live feed open one on mount
   stubMatchMedia();
@@ -24,6 +38,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  openChannels.splice(0).forEach((channel) => channel.close());
   const unmatched = takeUnmatchedRequests();
   resetToastHost(); // rendered outside any app, so the auto-unmount does not reach it
   localStorage.clear();

@@ -3,6 +3,7 @@ import type { Ref } from 'vue';
 import { useLiveStream } from '@/api/events';
 import type { SubmissionFeedEvent, SubmissionListItem } from '@/api/types/submissions';
 import { createSettleWindow } from '@/lib/settle-window';
+import { useViewerId } from '@/stores/use-viewer-id';
 import { createFrameSummary } from './frame-summary';
 import { useAnnouncer, useListFilterKey, useNewRowBaseline } from './live-list-state';
 import { createListPasses } from './live-passes';
@@ -44,7 +45,11 @@ function useSettledFeed(
     settler.cancel();
   };
   const onFrame = (frame: SubmissionFeedEvent) => frames.add(frame) && settler.add();
-  const feed = useLiveStream(() => (enabled.value ? { route: '/events/submissions' } : null), {
+  const viewer = useViewerId();
+  /** Reopened for another account: the server authorised the feed for the viewer who opened it. */
+  const target = () =>
+    enabled.value ? { route: '/events/submissions' as const, viewer: viewer.value } : null;
+  const feed = useLiveStream(target, {
     frames: { queued: onFrame, processing: onFrame, 'grading-begin': onFrame, done: onFrame },
     onClose: forgetPendingWork,
   });

@@ -13,12 +13,22 @@ import { highlightMarkdownBlocks } from './markdown-code-highlight';
  */
 const props = defineProps<{ html: string }>();
 const root = ref<HTMLElement | null>(null);
-/** Fenced code gets colours after each render; `v-html` swaps the whole subtree when `html` changes. */
-const highlight = () => {
-  if (root.value) void highlightMarkdownBlocks(root.value);
+/** A link that opens a new tab gets no handle on this page and sends no referrer, whatever the author wrote. */
+const isolateNewTabLinks = (container: HTMLElement) => {
+  for (const link of container.querySelectorAll<HTMLAnchorElement>('a[target]'))
+    link.relList.add('noopener', 'noreferrer');
 };
-onMounted(highlight);
-watch(() => props.html, highlight, { flush: 'post' });
+/**
+ * After each render (`v-html` swaps the whole subtree when `html` changes): new-tab links are isolated and
+ * fenced code gets colours.
+ */
+const afterRender = () => {
+  if (!root.value) return;
+  isolateNewTabLinks(root.value);
+  void highlightMarkdownBlocks(root.value);
+};
+onMounted(afterRender);
+watch(() => props.html, afterRender, { flush: 'post' });
 </script>
 
 <template>

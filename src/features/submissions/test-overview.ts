@@ -1,6 +1,6 @@
 import type { CaseStatus, SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
 import { translate, type Locale } from '@/i18n';
-import { formatNumber } from '@/lib/format';
+import { formatNumber, scoreBelowFull } from '@/lib/format';
 import { BLOCK_TONE_CLASSES, PARTIAL_CODE, caseVerdictOf, isPartial } from '@/lib/verdicts';
 
 /** The case status of a test the judge did not run because an earlier test of its subtask failed. */
@@ -34,7 +34,7 @@ export const formatPoints = (value: number, locale: Locale) =>
   formatNumber(value, locale, POINT_FRACTION_DIGITS, false);
 /** Earned out of possible points, e.g. `0,5/1`. */
 export const formatCasePoints = (points: number, total: number, locale: Locale) =>
-  `${formatPoints(points, locale)}/${formatPoints(total, locale)}`;
+  `${formatPoints(scoreBelowFull(points, total, POINT_FRACTION_DIGITS), locale)}/${formatPoints(total, locale)}`;
 /** A test's tile or square title: "Test 3: Sai kết quả, 0/1". */
 export const caseTitle = (testCase: SubmissionCase, locale: Locale) =>
   translate('submission.overview.testTitle', {

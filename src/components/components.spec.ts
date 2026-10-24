@@ -100,3 +100,13 @@ describe('UserContent highlighting', () => {
     expect(content.find('code').text()).toBe('return 1;');
   });
 });
+
+describe('UserContent links', () => {
+  it('opens a link in a new tab without handing that tab this page', async () => {
+    const content = mountComponent(UserContent, {
+      props: { html: '<p><a href="https://example.com" target="_blank" rel="nofollow">x</a></p>' },
+    });
+    await flushPromises();
+    expect(content.get('a').attributes('rel')).toBe('nofollow noopener noreferrer');
+  });
+});
