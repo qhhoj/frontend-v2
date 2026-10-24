@@ -120,20 +120,26 @@ jobs:
         run: |
           if [ -n "$BASE_SHA" ]; then npm test -- --changed "$BASE_SHA" --passWithNoTests && npm run test:scanners; else npm test -- --shard="$SHARD"; fi
 
-  # Contract with backend-v2: every inline script of index.html has its hash in the CSP of backend main's
-  # deploy/nginx/qhhoj.conf. A changed pre-paint script needs its hash merged there first.
+  # Contract with backend-v2: every inline script of the built index.html (what deploys) has its hash in the CSP of
+  # backend main's deploy/nginx/qhhoj.conf. A changed pre-paint script needs its hash merged there first.
   csp:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx vite build
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           repository: qhhoj/backend-v2
           ref: main
           path: backend
           sparse-checkout: deploy/nginx
-      - run: node scripts/deploy/check-csp-hash.mjs index.html backend/deploy/nginx/qhhoj.conf
+      - run: node scripts/deploy/check-csp-hash.mjs dist/index.html backend/deploy/nginx/qhhoj.conf
 
   # The required status check: green when lint, typecheck, test and csp passed or were skipped.
   check:

@@ -1,6 +1,6 @@
-// Contract with backend-v2's nginx CSP: every inline <script> of index.html must have its 'sha256-...' source in the
-// SPA's Content-Security-Policy(-Report-Only) header in backend-v2 deploy/nginx/qhhoj.conf.
-// Usage: node scripts/deploy/check-csp-hash.mjs <index.html> <qhhoj.conf>
+// Contract with backend-v2's nginx CSP: every inline <script> of the built index.html must have its 'sha256-...' source
+// in a Content-Security-Policy(-Report-Only) header line of backend-v2 deploy/nginx/qhhoj.conf (comments do not count).
+// Usage: node scripts/deploy/check-csp-hash.mjs <dist/index.html> <qhhoj.conf>
 // A changed inline script lands its new hash in backend-v2 first (keeping the old one until this repo deploys).
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -19,8 +19,11 @@ const inlineScripts = [
   .map(([, , body]) => body);
 const hashSource = (body) =>
   `'sha256-${createHash('sha256').update(body, 'utf8').digest('base64')}'`;
-const conf = readFileSync(confPath, 'utf8');
-const missing = inlineScripts.map(hashSource).filter((source) => !conf.includes(source));
+const cspHeaders = readFileSync(confPath, 'utf8')
+  .split('\n')
+  .filter((line) => /^\s*add_header\s+Content-Security-Policy/.test(line))
+  .join('\n');
+const missing = inlineScripts.map(hashSource).filter((source) => !cspHeaders.includes(source));
 
 if (missing.length) {
   console.error(
