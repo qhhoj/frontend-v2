@@ -405,6 +405,8 @@
     "login": "Đăng nhập",
     "register": "Đăng ký",
     "logout": "Đăng xuất",
+    "logoutFailed": "Đăng xuất chưa hoàn tất: bạn vẫn đang đăng nhập.",
+    "logoutRetry": "Thử lại",
     "menu": "Tài khoản của {username}",
     "profile": "Hồ sơ của tôi",
     "settings": "Cài đặt",
@@ -1342,7 +1344,6 @@
     "columns": {
       "rank": "Hạng",
       "user": "Thí sinh",
-      "solved": "Giải",
       "penalty": "Phạt",
       "score": "Điểm",
       "scoreTime": "Điểm · giờ",
@@ -1369,7 +1370,6 @@
       "pointsAt": "{points} điểm, lúc {time}",
       "firstPointsAt": "Giải đầu tiên: {points} điểm, lúc {time}"
     },
-    "solvedCount": "{count} bài",
     "empty": "Chưa có thí sinh.",
     "disqualified": "Bị loại",
     "refreshFailed": "Không cập nhật được bảng, đang thử lại.",

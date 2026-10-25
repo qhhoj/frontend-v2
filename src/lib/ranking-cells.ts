@@ -1,9 +1,4 @@
-import type {
-  ContestFormatName,
-  ProblemCell,
-  RankingProblem,
-  RankingRow,
-} from '@/api/types/contests';
+import type { ContestFormatName, ProblemCell, RankingProblem } from '@/api/types/contests';
 import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
 import { daysHoursOf } from './contest-time';
@@ -103,7 +98,7 @@ const pointsText = (points: number, { pointsPrecision, locale }: RankingContext)
 /** The backend stores points at 3 decimals; sums are compared there so float noise (0.1 + 0.2) is not a shortfall. */
 const STORED_POINTS_DIGITS = 3;
 
-/** A row's total on a points board: short of the problems' sum stays short once rounded (like the cells), never printing as full. */
+/** A row's total, on every board the score the backend ranks by: short of the problems' sum stays short once rounded (like the cells), never printing as full. */
 export function totalScoreText(
   score: number,
   problems: readonly RankingProblem[],
@@ -167,9 +162,8 @@ function penaltyCell(
 ): RankingCellView {
   const { wrong, pending } = READ_TRIES[context.formatName]!(cell);
   const points = Number(cell.points ?? 0);
-  // icpc scores 0 or the problem's points; vnoj can score part of them and is solved only at full points.
-  const solved = context.formatName === 'icpc' ? points > 0 : isFullPoints(points, problem);
-  if (solved) return solvedPenaltyCell(cell, wrong, isFirst, context.locale);
+  // Solved only at full points (backend `isSolvedCell`): a partial contest problem gives part of them on icpc too.
+  if (isFullPoints(points, problem)) return solvedPenaltyCell(cell, wrong, isFirst, context.locale);
   if (pending > 0)
     return {
       kind: 'pending',
@@ -256,19 +250,3 @@ export function rankingCell(
     ? penaltyCell(cell, problem, isFirst, context)
     : pointsCell(cell, problem, isFirst, context);
 }
-
-/** Problems the row has solved in full (frozen cells carry 0 points, so they never count). */
-export const solvedCount = (
-  row: Pick<RankingRow, 'cells' | 'participationId'>,
-  problems: RankingProblem[],
-  context: RankingContext,
-) =>
-  problems.filter((problem) => {
-    const { kind } = rankingCell(
-      row.cells[problem.problemId],
-      problem,
-      row.participationId,
-      context,
-    );
-    return kind === 'solved' || kind === 'first-solve';
-  }).length;

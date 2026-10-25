@@ -4,8 +4,7 @@ import { computed } from 'vue';
 import type { RankingProblem, RankingRow } from '@/api/types/contests';
 import UserName from '@/components/UserName.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
-import { translate } from '@/i18n';
-import { formatCumtime, isPenaltyFormat, solvedCount, totalScoreText } from '@/lib/ranking-cells';
+import { formatCumtime, isPenaltyFormat, totalScoreText } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 
 /**
@@ -43,11 +42,11 @@ const groups = computed(() => {
     hiddenCount: Math.max(rows.length - NAMES_PER_RANK, 0),
   }));
 });
+/** The score the backend ranks by; penalty boards add the penalty time, their tie-break. */
 const scoreOf = (row: RankingRow) => {
-  if (!isPenaltyFormat(props.context.formatName))
-    return totalScoreText(row.score, props.problems, props.context);
-  const solved = solvedCount(row, props.problems, props.context);
-  return `${translate('ranking.solvedCount', { count: solved }, solved)} · ${formatCumtime(props.context.formatName, row.cumtime, props.context.locale)}`;
+  const score = totalScoreText(row.score, props.problems, props.context);
+  if (!isPenaltyFormat(props.context.formatName)) return score;
+  return `${score} · ${formatCumtime(props.context.formatName, row.cumtime, props.context.locale)}`;
 };
 </script>
 

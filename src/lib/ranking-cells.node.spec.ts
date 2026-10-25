@@ -1,13 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { RankingContext } from './ranking-cells';
 import type { ContestFormatName, RankingProblem } from '@/api/types/contests';
-import {
-  formatCumtime,
-  rankingCell,
-  showsCellTime,
-  solvedCount,
-  totalScoreText,
-} from './ranking-cells';
+import { formatCumtime, rankingCell, showsCellTime, totalScoreText } from './ranking-cells';
 
 const problem = (overrides: Partial<RankingProblem> = {}): RankingProblem => ({
   problemId: 'p1',
@@ -35,9 +29,19 @@ const timedDefault = context('default');
 
 describe('ranking cells, icpc', () => {
   it('counts wrong tries before the solve', () => {
-    expect(rankingCell({ time: 1860, points: 1, tries: 2 }, problem(), 'me', icpc)).toMatchObject({
-      text: '+1',
-      time: '0:31',
+    expect(rankingCell({ time: 1860, points: 100, tries: 2 }, problem(), 'me', icpc)).toMatchObject(
+      {
+        kind: 'solved',
+        text: '+1',
+        time: '0:31',
+      },
+    );
+  });
+
+  it('shows partial points of a partial contest problem, not a solve', () => {
+    expect(rankingCell({ time: 60, points: 30, tries: 1 }, problem(), 'me', icpc)).toMatchObject({
+      kind: 'partial',
+      text: '30',
     });
   });
 
@@ -203,21 +207,6 @@ describe('ranking helpers', () => {
     expect(formatCumtime('vnoj', 3_540, 'en')).toBe('0:59');
     expect(formatCumtime('ioi', 7_260, 'en')).toBe('2:01');
   });
-
-  it('counts solved problems from the cells, frozen and partial ones excluded', () => {
-    const cells = {
-      p1: { points: 1, tries: 1, time: 60 },
-      p2: { points: 0, tries: 2, time: null, pending: true },
-      p3: { points: 0, tries: 1, time: null },
-    };
-    const problems = ['p1', 'p2', 'p3'].map((problemId) => problem({ problemId, points: 1 }));
-    expect(solvedCount({ cells, participationId: 'me' }, problems, icpc)).toBe(1);
-    const vnojCells = {
-      p1: { points: 1, penalty: 0, time: 60, pending: 0 },
-      p2: { points: 0.5, penalty: 0, time: 60, pending: 0 },
-    };
-    expect(solvedCount({ cells: vnojCells, participationId: 'me' }, problems, vnoj)).toBe(1);
-  });
 });
 
 describe('ranking cells, vnoj partial points', () => {
@@ -262,13 +251,6 @@ describe('points precision and locale', () => {
     expect(rankingCell({ points: 99.96, time: 0 }, problem(), 'me', context('ioi', 1)).kind).toBe(
       'partial',
     );
-    expect(
-      solvedCount(
-        { participationId: 'me', cells: { p1: { points: 99.5, time: 0 } } },
-        [problem()],
-        context('ioi', 0),
-      ),
-    ).toBe(0);
   });
 });
 
@@ -298,7 +280,7 @@ describe('ranking cells past 99 hours', () => {
     expect(cell.time).toBe('113 ng 23 g');
     expect(cell.labelParams.time).toBe('113 ngày 23 giờ');
     expect(timeOf(LONG)).toBe('113d 23h');
-    expect(rankingCell({ time: LONG, points: 1, tries: 1 }, problem(), 'me', icpc).time).toBe(
+    expect(rankingCell({ time: LONG, points: 100, tries: 1 }, problem(), 'me', icpc).time).toBe(
       '113d 23h',
     );
   });
@@ -315,7 +297,7 @@ describe('ranking cells past 99 hours', () => {
     expect(timeOf(100 * 3600, vi)).toBe('4 ng 4 g');
     expect(timeOf(5 * 86_400, vi)).toBe('5 ng');
     expect(
-      rankingCell({ time: 100 * 3600 - 60, points: 1, tries: 1 }, problem(), 'me', icpc).time,
+      rankingCell({ time: 100 * 3600 - 60, points: 100, tries: 1 }, problem(), 'me', icpc).time,
     ).toBe('99:59');
   });
 });

@@ -1,13 +1,7 @@
 import { computed } from 'vue';
 import type { Ref } from 'vue';
 import type { RankingProblem } from '@/api/types/contests';
-import {
-  formatCumtime,
-  isPenaltyFormat,
-  rankingCell,
-  solvedCount,
-  totalScoreText,
-} from '@/lib/ranking-cells';
+import { formatCumtime, rankingCell, totalScoreText } from '@/lib/ranking-cells';
 import type { RankingCellView, RankingContext } from '@/lib/ranking-cells';
 import type { BoardRow, ReplayBoard } from './replay-board';
 
@@ -29,15 +23,12 @@ function buildRowCells(
   problems: RankingProblem[],
   context: RankingContext,
 ): ReplayRowCells {
-  const score = isPenaltyFormat(context.formatName)
-    ? String(solvedCount({ cells: row.cells, participationId: row.id }, problems, context))
-    : totalScoreText(row.score, problems, context);
   return {
     cells: problems.map((problem) => ({
       problemId: problem.problemId,
       view: rankingCell(row.cells[problem.problemId], problem, row.id, context),
     })),
-    score,
+    score: totalScoreText(row.score, problems, context),
     cumtime: formatCumtime(context.formatName, row.cumtime, context.locale),
     source: { revision: row.revision, context },
   };

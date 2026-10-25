@@ -43,10 +43,9 @@ const hasCombinedScore = computed(
   () => !penalty.value && props.context.showsTime && showsCumtime(props.context.formatName),
 );
 const hasTimeColumn = computed(() => penalty.value && showsCumtime(props.context.formatName));
-const scoreHeaderKey = computed(() => {
-  if (penalty.value) return 'ranking.columns.solved';
-  return hasCombinedScore.value ? 'ranking.columns.scoreTime' : 'ranking.columns.score';
-});
+const scoreHeaderKey = computed(() =>
+  hasCombinedScore.value ? 'ranking.columns.scoreTime' : 'ranking.columns.score',
+);
 
 const isViewerRow = (row: BoardRow) =>
   row.kind !== 'ghost' && row.userId !== null && row.userId === props.viewerId;

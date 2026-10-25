@@ -8,6 +8,7 @@ import InlineBit from '@/components/InlineBit.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { OTP_LENGTH, normalizeBackupCode } from '@/lib/otp';
 import { useSessionStore } from '@/stores/session.store';
+import { useLogout } from './use-logout';
 import AuthBadge from './AuthBadge.vue';
 import AuthError from './AuthError.vue';
 import AuthField from './AuthField.vue';
@@ -110,10 +111,7 @@ function switchTo(next: SecondFactorMode) {
 }
 
 /** The guard keeps a partial session on this page, so without this a viewer who lost every factor could not leave. */
-async function signOut() {
-  await session.logout();
-  await router.push({ name: 'login' });
-}
+const signOut = useLogout(() => router.push({ name: 'login' }));
 </script>
 
 <template>

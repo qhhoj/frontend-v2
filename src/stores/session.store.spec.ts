@@ -31,30 +31,12 @@ describe('useSessionStore', () => {
     expect(session.status).toBe('anonymous');
   });
 
-  it('logs out locally even when the request fails', async () => {
-    mockApi({ 'GET /auth/me': signedIn(), 'POST /auth/logout': fail(500, 'internal_error') });
+  it('stays signed in and rejects when the sign-out request fails, since the session still works', async () => {
+    mockApi({ 'GET /auth/me': signedIn(), 'POST /auth/logout': fail(502, 'http_error') });
     const session = useSessionStore();
     await session.ensureLoaded();
-    await session.logout();
-    expect(session.status).toBe('anonymous');
-  });
-
-  it('signs out at once, without waiting for the server to answer', async () => {
-    const calls = mockApi({ 'GET /auth/me': signedIn(), 'POST /auth/logout': noContent() });
-    const session = useSessionStore();
-    await session.ensureLoaded();
-    let answered = false;
-    const realFetch = globalThis.fetch;
-    vi.stubGlobal('fetch', async (...args: Parameters<typeof fetch>) => {
-      const response = await realFetch(...args);
-      await new Promise((resolve) => setTimeout(resolve, 50));
-      answered = true;
-      return response;
-    });
-    await session.logout();
-    expect(session.status).toBe('anonymous');
-    expect(answered).toBe(false);
-    expect(calls.at(-1)!.path).toBe('/auth/logout');
+    await expect(session.logout()).rejects.toMatchObject({ status: 502 });
+    expect(session.status).toBe('authenticated');
   });
 
   it('holds a login back until the sign-out request has finished', async () => {

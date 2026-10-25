@@ -114,6 +114,7 @@ async function send(
   const isForm = body instanceof FormData;
   if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
   if (method !== 'GET' && csrfToken) headers['X-CSRF-Token'] = csrfToken;
+  const sentAt = Date.now();
   try {
     const response = await fetch(buildUrl(path, query), {
       method,
@@ -123,7 +124,7 @@ async function send(
       signal,
       cache,
     });
-    syncServerClock(response.headers, cache);
+    syncServerClock(response.headers, cache, sentAt);
     return response;
   } catch (error) {
     if ((error as { name?: string }).name === 'AbortError') throw error;

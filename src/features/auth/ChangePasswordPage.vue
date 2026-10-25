@@ -7,6 +7,7 @@ import InlineBit from '@/components/InlineBit.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { safeRedirect } from '@/router/safe-redirect';
 import { useSessionStore } from '@/stores/session.store';
+import { useLogout } from './use-logout';
 import AuthLayout from './AuthLayout.vue';
 import AuthNotice from './AuthNotice.vue';
 import ChangePasswordForm from './ChangePasswordForm.vue';
@@ -26,11 +27,8 @@ async function reloadSession() {
 /** Back to where the guard took the viewer from. */
 const returnToPage = () => router.push(safeRedirect(route.query.redirect));
 
-/** Not `useLogout`: it first sends a viewer on an account page home, a page this screen then leaves at once. */
-async function signOut() {
-  await session.logout();
-  await router.push({ name: 'login' });
-}
+/** Straight to sign-in: the default first sends a viewer on an account page home, a page this screen then leaves at once. */
+const signOut = useLogout(() => router.push({ name: 'login' }));
 </script>
 
 <template>

@@ -15,7 +15,6 @@ import {
   isPenaltyFormat,
   rankingCell,
   showsCumtime,
-  solvedCount,
   totalScoreText,
 } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
@@ -75,7 +74,7 @@ const POINTS_LEGEND = [
   'ranking.legend.zeroPoints',
   'ranking.legend.notAttempted',
 ] as const;
-/** Points boards put the cumulative time under the score; penalty boards keep Solved and Penalty. */
+/** Points boards put the cumulative time under the score; penalty boards keep Score and Penalty. */
 const hasCombinedScore = computed(
   () => !penalty.value && props.context.showsTime && showsCumtime(props.context.formatName),
 );
@@ -86,10 +85,9 @@ const minWidth = computed(
   () =>
     `${tableMinWidthRem(props.ranking.problems.length, hasTimeColumn.value) + (hasRatingColumn.value ? RATING_COLUMN_REM : 0)}rem`,
 );
-const scoreHeaderKey = computed(() => {
-  if (penalty.value) return 'ranking.columns.solved';
-  return hasCombinedScore.value ? 'ranking.columns.scoreTime' : 'ranking.columns.score';
-});
+const scoreHeaderKey = computed(() =>
+  hasCombinedScore.value ? 'ranking.columns.scoreTime' : 'ranking.columns.score',
+);
 </script>
 
 <template>
@@ -170,11 +168,7 @@ const scoreHeaderKey = computed(() => {
             </th>
             <td class="font-bold">
               <template v-if="row.isDisqualified">—</template>
-              <template v-else>{{
-                penalty
-                  ? solvedCount(row, ranking.problems, context)
-                  : totalScoreText(row.score, ranking.problems, context)
-              }}</template>
+              <template v-else>{{ totalScoreText(row.score, ranking.problems, context) }}</template>
               <small
                 v-if="hasCombinedScore && !row.isDisqualified"
                 class="block text-tiny font-medium text-muted"
