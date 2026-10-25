@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { updateContest } from '@/api/contest-editing.api';
 import type { ContestPatch, EditableContest } from '@/api/types/contest-editing';
@@ -6,6 +6,7 @@ import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { provideDateValidity } from '../../ui/form/date-validity';
 import { cloneValue } from '../../ui/form/dirty-form';
+import { useSeededDraft } from '../../ui/form/seeded-draft';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { changedContestFields, checkContestForm, toContestForm } from '../contest-form';
 import type { ContestForm } from '../contest-form';
@@ -36,13 +37,18 @@ export function useContestForm(contest: () => EditableContest) {
   /** True while a time box holds text that is not a date: the save is refused, never sent without it. */
   const { hasUnreadableDate, resetDates } = provideDateValidity();
 
-  function reseed(saved: EditableContest) {
-    seed.value = toContestForm(saved);
-    form.value = toContestForm(saved);
-  }
+  const { target, reseed } = useSeededDraft(contest, {
+    idOf: (stored) => stored.key,
+    routeParam: 'key',
+    isDirty: () => isDirty.value,
+    refill: (stored) => {
+      seed.value = toContestForm(stored);
+      form.value = toContestForm(stored);
+    },
+  });
 
   const mutation = useAdminMutation({
-    mutate: (patch: ContestPatch) => updateContest(contest().key, patch),
+    mutate: ({ key, patch }: { key: string; patch: ContestPatch }) => updateContest(key, patch),
     invalidates: () => [PUBLIC_CONTESTS_KEY, CONTEST_INDEX_KEY],
     successText: (saved: EditableContest) =>
       translate('admin.contests.general.saved', { key: saved.key }),
@@ -53,10 +59,12 @@ export function useContestForm(contest: () => EditableContest) {
     },
   });
 
+  /** The PATCH goes to the contest the form was filled from, and nowhere while the page shows another one. */
   async function save() {
-    if (hasKeys(localErrors.value) || hasUnreadableDate.value) return;
+    const key = target();
+    if (!key || hasKeys(localErrors.value) || hasUnreadableDate.value) return;
     const patch = changedContestFields(seed.value, form.value);
-    if (hasKeys(patch)) await mutation.run(patch);
+    if (hasKeys(patch)) await mutation.run({ key, patch });
   }
 
   /** Puts the form back to the last saved contest. */
@@ -65,10 +73,6 @@ export function useContestForm(contest: () => EditableContest) {
     mutation.reset();
     resetDates();
   }
-
-  watch(contest, (next) => {
-    if (!isDirty.value) reseed(next);
-  });
 
   const errors = computed(() => ({ ...localErrors.value, ...mutation.fieldErrors.value }));
 

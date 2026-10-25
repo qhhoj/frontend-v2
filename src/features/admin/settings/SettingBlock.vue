@@ -48,16 +48,20 @@ const isDraftAtDefault = (setting: Setting) =>
 const resetToDefault = (setting: Setting) => (drafts[setting.key] = defaultDraftOf(setting));
 
 const drafts = reactive<Drafts>({});
-const storedJsonByKey = new Map<SettingKey, string>();
+/** The stored copy each key's draft was last filled from. */
+const filledFrom = new Map<SettingKey, Setting>();
 const notice = ref<{ tone: 'done' | 'refused'; text: string } | null>(null);
 const isSaving = ref(false);
 
+/** A key whose stored value changed is refilled only while its draft still equals the copy it was filled from. */
 function seedChangedDrafts(settings: Setting[]) {
   for (const setting of settings) {
-    const storedJson = JSON.stringify(setting.value);
-    if (storedJsonByKey.get(setting.key) === storedJson) continue;
-    storedJsonByKey.set(setting.key, storedJson);
-    drafts[setting.key] = draftOf(setting);
+    const previous = filledFrom.get(setting.key);
+    if (previous && JSON.stringify(previous.value) === JSON.stringify(setting.value)) continue;
+    filledFrom.set(setting.key, setting);
+    const draft = drafts[setting.key];
+    if (!previous || !draft || isSameValue(draft, draftOf(previous)))
+      drafts[setting.key] = draftOf(setting);
   }
 }
 watch(() => props.block.settings, seedChangedDrafts, { immediate: true });

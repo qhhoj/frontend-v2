@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
-import type { mountApp } from '@/test/mount';
+import type { VueWrapper } from '@vue/test-utils';
+import { mountComponent } from '@/test/mount';
 import { fail, invalid, issue, mockApi, ok, page } from '@/test/mock-api';
 import { invalidatedKeys, seedCache } from '@/test/cache-probe';
 import { staffViewer } from '@/test/admin-routes';
@@ -12,6 +13,7 @@ import {
 } from '@/test/admin-fixtures/contests';
 import { mountAndWaitFor } from '@/test/admin-contest-mount';
 import { needsPermissionText } from '../../ui/permission-text';
+import ContestGeneralTab from './ContestGeneralTab.vue';
 
 const EDIT = ['judge.edit_own_contest'];
 /** A heading only the Basic view has. */
@@ -21,7 +23,7 @@ const STALE_AFTER_WRITE = [
   ['admin', 'index', 'contests', 'probe'],
 ];
 const SWITCH = '[data-testid="contest-visibility"] [role="switch"]';
-const save = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) => {
+const save = async (wrapper: Pick<VueWrapper, 'findAll'>) => {
   await wrapper
     .findAll('button')
     .find((button) => button.text() === 'Lưu')!
@@ -311,5 +313,33 @@ describe('ContestGeneralTab', () => {
     await wrapper.get('#contest-timeLimit').setValue('');
     await save(wrapper);
     expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ timeLimit: null });
+  });
+
+  it('keeps a draft on the contest it was filled from: another contest refills the form, and a save goes only where the route points', async () => {
+    const contestA = editableContest({ key: 'contest_a', name: 'Contest A' });
+    const contestB = editableContest({ key: 'contest_b', name: 'Contest B' });
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      'PATCH /contests/contest_a': ok(contestA),
+      'PATCH /contests/contest_b': ok(contestB),
+    });
+    const wrapper = mountComponent(ContestGeneralTab, { props: { contest: contestA } });
+    await wrapper.vm.$router.push('/admin/contests/contest_a/general');
+    await flushPromises();
+    await wrapper.get('#contest-name').setValue('Contest A (renamed)');
+
+    // The same tab handed another contest (no remount): its form, never A's edit.
+    await wrapper.setProps({ contest: contestB } as never);
+    expect((wrapper.get('#contest-name').element as HTMLInputElement).value).toBe('Contest B');
+    await wrapper.get('#contest-name').setValue('Contest B (renamed)');
+    await save(wrapper);
+    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+
+    await wrapper.vm.$router.push('/admin/contests/contest_b/general');
+    await save(wrapper);
+    const patches = calls.filter((call) => call.method === 'PATCH');
+    expect(patches.map((call) => [call.path, call.body])).toEqual([
+      ['/contests/contest_b', { name: 'Contest B (renamed)' }],
+    ]);
   });
 });

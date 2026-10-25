@@ -283,4 +283,19 @@ describe('ProblemGeneralTab', () => {
     expect(router.currentRoute.value.query.view).toBe('advanced');
     expect(wrapper.get('#problem-source').attributes('aria-invalid')).toBe('true');
   });
+
+  it('refuses a limit box holding text the browser cannot read instead of sending it', async () => {
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...problemEditorRoutes(),
+      'PATCH /problems/hcmus41c': ok(editableProblem()),
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
+    // A browser reads unparseable text ("256m") in a number box as ''.
+    await wrapper.get('#problem-memoryLimit').setValue('');
+    await buttonLabelled(wrapper, 'Lưu').trigger('click');
+    await flushPromises();
+    expect(wrapper.text()).toContain('Từ 0 đến 1048576 KiB.');
+    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+  });
 });

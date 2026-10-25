@@ -8,8 +8,8 @@ import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import type { ContestForm } from '../contest-form';
 import ContestTimeline from './ContestTimeline.vue';
-import { numberBoxValue } from '../../ui/form/number-box';
-import { numberOrNaN, textOf, timeModel } from './input-values';
+import { numberBoxValue, requiredNumberValue } from '../../ui/form/number-box';
+import { timeModel } from './input-values';
 import { usePermissionLocks } from './permission-locks';
 
 /** When the contest runs: a timeline over the start, end, registration, freeze and judging lock, all in the site zone. */
@@ -77,7 +77,7 @@ const isLockLocked = computed(() => Boolean(lockedBy('judge.lock_contest')));
           :class="[INPUT, 'font-mono tabular-nums']"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
-          @input="form.frozenLastMinutes = numberOrNaN(textOf($event))"
+          @input="form.frozenLastMinutes = requiredNumberValue($event)"
         />
       </template>
     </AdminField>

@@ -8,6 +8,7 @@ import { usePermissions } from '@/stores/use-permissions';
 import { useViewerId } from '@/stores/use-viewer-id';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { provideDateValidity } from '../../ui/form/date-validity';
+import { useSeededDraft } from '../../ui/form/seeded-draft';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import {
   editableProblemKey,
@@ -32,12 +33,16 @@ function useFormSeed(problem: () => EditableProblem, meta: () => ProblemEditingM
   );
   const isDirty = computed(() => dirtyCount.value > 0);
   // A clean form follows the server: the seed and the form move together, so a later save never sends the old values back.
-  watch(problem, (next) => {
-    if (isDirty.value) return;
-    seed.value = toProblemForm(next, meta());
-    form.value = cloneForm(seed.value);
+  const { target, reseed } = useSeededDraft(problem, {
+    idOf: (stored) => stored.code,
+    routeParam: 'code',
+    isDirty: () => isDirty.value,
+    refill: (stored) => {
+      seed.value = toProblemForm(stored, meta());
+      form.value = cloneForm(seed.value);
+    },
   });
-  return { seed, form, dirtyCount, isDirty };
+  return { seed, form, dirtyCount, isDirty, target, reseed };
 }
 
 /** The general tab's form: seeded from the detail, PATCHes only what changed, re-seeded from the answer. */
@@ -47,7 +52,7 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
   const queryClient = useQueryClient();
   const viewer = useViewerId();
   const { can } = usePermissions();
-  const { seed, form, dirtyCount, isDirty } = useFormSeed(problem, meta);
+  const { seed, form, dirtyCount, isDirty, target, reseed } = useFormSeed(problem, meta);
   const localErrors = ref<FieldErrors>({});
   /** Why this save is made: the revision comment, never stored on the problem; cleared after each save. */
   const changeMessage = ref('');
@@ -67,8 +72,7 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
     onSuccess: () => (savedAt.value = new Date()),
     onDone: (saved: EditableProblem, code: string) => {
       queryClient.setQueryData(editableProblemKey(saved.code, viewer.value), saved);
-      seed.value = toProblemForm(saved, meta());
-      form.value = cloneForm(seed.value);
+      reseed(saved);
       changeMessage.value = '';
       if (saved.code !== code)
         void router.replace({ name: route.name!, params: { code: saved.code } });
@@ -87,8 +91,15 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
       ...checkProblemForm(form.value, can),
       ...checkAllowedLanguages(form.value, can, seed.value),
     };
-    if (Object.keys(localErrors.value).length === 0 && isDirty.value && !hasUnreadableDate.value) {
-      await mutation.run(problem().code);
+    // The PATCH goes to the problem the form was filled from, and nowhere while the page shows another one.
+    const code = target();
+    if (
+      code &&
+      Object.keys(localErrors.value).length === 0 &&
+      isDirty.value &&
+      !hasUnreadableDate.value
+    ) {
+      await mutation.run(code);
     }
   }
 

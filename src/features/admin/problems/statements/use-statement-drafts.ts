@@ -4,6 +4,7 @@ import { putTranslation, updateProblem } from '@/api/problem-editing.api';
 import type { EditableProblem } from '@/api/types/problem-editing';
 import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
+import { useSeededDraft } from '../../ui/form/seeded-draft';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { PUBLIC_PROBLEMS_KEY } from '../problem-editing.queries';
 import {
@@ -21,6 +22,11 @@ import type { StatementDraft, StatementSlot } from './statement-drafts';
 export const FULL_MARKUP_PERMISSION = 'judge.problem_full_markup';
 
 type Drafts = Record<StatementSlot, StatementDraft>;
+/** One slot's save, to the problem the drafts were filled from. */
+interface SlotSave {
+  code: string;
+  target: StatementSlot;
+}
 
 const seedDrafts = (problem: EditableProblem): Drafts =>
   Object.fromEntries(
@@ -108,16 +114,26 @@ export function useStatementDrafts(problem: () => EditableProblem) {
     slot,
   );
   const savedAt = ref<Date | null>(null);
+  /** Every slot follows the problem on screen; a newer copy of it only while no slot is edited. */
+  const { target: seededCode } = useSeededDraft(problem, {
+    idOf: (stored) => stored.code,
+    routeParam: 'code',
+    isDirty: () => totalDirtyCount.value > 0,
+    refill: (stored) => {
+      drafts.value = seedDrafts(stored);
+      saved.value = seedDrafts(stored);
+    },
+  });
 
   const saveMutation = useAdminMutation({
-    mutate: (target: StatementSlot) => saveSlot(problem().code, target, drafts.value[target]),
-    invalidates: () => [['admin', 'problem', problem().code], PUBLIC_PROBLEMS_KEY],
-    successText: (_saved: unknown, target: StatementSlot) =>
+    mutate: ({ code, target }: SlotSave) => saveSlot(code, target, drafts.value[target]),
+    invalidates: ({ code }: SlotSave) => [['admin', 'problem', code], PUBLIC_PROBLEMS_KEY],
+    successText: (_saved: unknown, { target }: SlotSave) =>
       translate('admin.problems.statements.savedToast', {
         slot: translate(`admin.problems.statements.slots.${target}`),
       }),
     onSuccess: () => (savedAt.value = new Date()),
-    onDone: (_saved: unknown, target: StatementSlot) => {
+    onDone: (_saved: unknown, { target }: SlotSave) => {
       recordSaved(drafts, saved, target);
       triedSlots.value.delete(target);
     },
@@ -126,8 +142,10 @@ export function useStatementDrafts(problem: () => EditableProblem) {
   async function save() {
     triedSlots.value.add(slot.value);
     if (isLocked.value || Object.keys(errors.value).length > 0) return;
-    if (dirtyCount.value === 0) return;
-    await saveMutation.run(slot.value);
+    // The slot goes to the problem it was filled from, and nowhere while the page shows another one.
+    const code = seededCode();
+    if (dirtyCount.value === 0 || !code) return;
+    await saveMutation.run({ code, target: slot.value });
   }
 
   /** Puts the slot on screen back to its last saved text. */
