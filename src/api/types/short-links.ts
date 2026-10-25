@@ -3,6 +3,8 @@ import type { JsonBodyOf, QueryOf } from '../typed';
 
 /** backend: short-links/dto/short-link.response.ts (ShortLinkResponse) */
 export type ShortLink = Schemas['ShortLinkResponse'];
+/** backend: short-links/dto (CreatedShortLinkResponse): what `POST /short-links` returns, without the list-only counters */
+export type CreatedShortLink = Schemas['CreatedShortLinkResponse'];
 /** backend: short-links/dto (CreateShortLinkDto); `code` and `expiresAt` need judge.manage_short_link */
 export type CreateShortLinkBody = JsonBodyOf<'/short-links', 'post'>;
 /** backend: short-links/dto (list query: scope, page, pageSize) */

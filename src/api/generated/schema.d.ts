@@ -4704,7 +4704,9 @@ export interface paths {
          *     edit. Authors can only be changed with `judge.edit_all_post`, and the flag
          *     and staff fields follow the permissions listed for creating. A revision
          *     records the difference. Hiding or showing a post alone with
-         *     `judge.edit_all_post` skips the write limit and the contest lock.
+         *     `judge.edit_all_post` skips the write limit and the contest lock. A post
+         *     that a `judge.edit_all_post` holder other than its authors hid becomes
+         *     visible again only through `judge.edit_all_post` (403 otherwise).
          */
         patch: operations["BlogEditingController_edit"];
         trace?: never;
@@ -5518,7 +5520,9 @@ export interface paths {
          *     `judge_unavailable` if it is offline or lacks the language). When the
          *     caller's current contest lists the problem, the submission counts as a
          *     contest submission, subject to the contest's attempt cap (403
-         *     `contest_submission_limit`). Other errors: 403 `banned_from_problem`, 429
+         *     `contest_submission_limit`); a spectator who is not contest staff (author,
+         *     curator, tester or contest editor) cannot submit to it until the contest
+         *     ends (403 `spectator_cannot_submit`). Other errors: 403 `banned_from_problem`, 429
          *     `rate_limited` (20 per minute per user) and 429
          *     `unfinished_submission_limit` (2 unfinished submissions, waived by
          *     `judge.spam_submission`). Queues the submission for judging and returns its
@@ -5601,9 +5605,11 @@ export interface paths {
          * Create or replace a statement translation
          * @description Needs edit rights on the problem. Stores the name and markdown description
          *     for `lang` (`en` or `vi`) and re-renders it. Problems in full-markup mode
-         *     need `judge.problem_full_markup` to change the text. Sending the stored text
-         *     again changes nothing. Answers 204 and invalidates the cached PDF
-         *     statements.
+         *     need `judge.problem_full_markup` to change the text. The text renders
+         *     unsanitized only on a full-markup problem and only when its writer holds
+         *     `judge.problem_full_markup`. Sending the stored text again changes nothing,
+         *     except that a writer holding `judge.problem_full_markup` takes it over.
+         *     Answers 204 and invalidates the cached PDF statements.
          */
         put: operations["ProblemEditingController_putTranslation"];
         post?: never;
@@ -6071,7 +6077,7 @@ export interface paths {
         /**
          * Create a short link
          * @description Signed-in callers only. Shortens a site path to `/s/<code>`; only problems, contests (and their announcements, submissions, stats and ranking tabs), blog posts, users and organizations are allowed, otherwise 400 `validation_failed` on `path`. Without `code` and `expiresAt` the link is automatic and idempotent: the same path always returns the same link, and users get 20 new links per day (429 `rate_limited`).
-         *     Choosing a `code` or an `expiresAt` needs `judge.manage_short_link` (403 `forbidden` otherwise), and staff have no daily quota. A taken code gives 409 `conflict`; a reserved code or a past expiry gives 400.
+         *     Choosing a `code` or an `expiresAt` needs `judge.manage_short_link` (403 `forbidden` otherwise), and staff have no daily quota. A taken code gives 409 `conflict`; a reserved code or a past expiry gives 400. The answer carries the link without its visit stats; the list has them.
          */
         post: operations["ShortLinksController_create"];
         delete?: never;
@@ -6213,7 +6219,7 @@ export interface paths {
         };
         /**
          * Get the site shell data
-         * @description Public. Returns what the web app needs on every load: the public misc config key/values, and whether official contest mode is on with its end time. Cached privately for 60 seconds.
+         * @description Public. Returns what the web app needs on every load: the public misc config key/values, whether official contest mode is on with its end time, and the site time zone. Cached privately for 60 seconds.
          */
         get: operations["SiteController_site"];
         put?: never;
@@ -8717,6 +8723,19 @@ export interface components {
             /** @description The registered judge. */
             judge: components["schemas"]["JudgeResponse"];
         };
+        CreatedShortLinkResponse: {
+            /** @description The code in `/s/<code>`. */
+            code: string;
+            /**
+             * Format: date-time
+             * @description When the link stops working; null if it never expires.
+             */
+            expiresAt: string | null;
+            /** @description Made for anyone by path (idempotent) rather than chosen by staff. */
+            isAuto: boolean;
+            /** @description Site path the link redirects to. */
+            path: string;
+        };
         CreatedUserResponse: {
             /** @description A generated password, shown only in this response; null when the row gave one, sent an invite or was rejected. */
             generatedPassword: string | null;
@@ -8881,14 +8900,14 @@ export interface components {
             curators?: string[];
             /** @description Publication date (ISO 8601 with offset); null clears it. */
             date?: string | null;
-            /** @description Statement in markdown. Rendered with the problem style, or as raw HTML when `isFullMarkup` is set. */
+            /** @description Statement in markdown. Rendered with the problem style, or as raw HTML when `isFullMarkup` is set and its writer holds `judge.problem_full_markup`. */
             description?: string;
             /**
              * Format: uuid
              * @description Problem group id.
              */
             groupId: string;
-            /** @description Whether the statement may contain unsanitized HTML. Changing it needs `judge.problem_full_markup`. */
+            /** @description Whether the statement may contain unsanitized HTML. Changing it needs `judge.problem_full_markup`. Only text written by a holder of `judge.problem_full_markup` renders unsanitized; other text stays sanitized. */
             isFullMarkup?: boolean;
             /** @description Whether test data is managed outside the site, turning the data editor off. Changing it needs `judge.change_manually_managed`. */
             isManuallyManaged?: boolean;
@@ -11846,6 +11865,8 @@ export interface components {
              * @description The ISO 8601 UTC instant the mode switches itself off, or `null` when the mode is off or has no end time. Same cache as `officialMode`.
              */
             officialModeEndsAt: string | null;
+            /** @description The site's time zone (setting `site.timeZone`, an IANA name such as `Asia/Ho_Chi_Minh`): the one zone the app reads and types site dates in (contest times in the admin, day boundaries). */
+            timeZone: string;
         };
         SocialCompleteDto: {
             /**
@@ -13100,14 +13121,14 @@ export interface components {
             curators?: string[];
             /** @description Publication date (ISO 8601 with offset); null clears it. */
             date?: string | null;
-            /** @description Statement in markdown. Rendered with the problem style, or as raw HTML when `isFullMarkup` is set. */
+            /** @description Statement in markdown. Rendered with the problem style, or as raw HTML when `isFullMarkup` is set and its writer holds `judge.problem_full_markup`. */
             description?: string;
             /**
              * Format: uuid
              * @description Problem group id.
              */
             groupId?: string;
-            /** @description Whether the statement may contain unsanitized HTML. Changing it needs `judge.problem_full_markup`. */
+            /** @description Whether the statement may contain unsanitized HTML. Changing it needs `judge.problem_full_markup`. Only text written by a holder of `judge.problem_full_markup` renders unsanitized; other text stays sanitized. */
             isFullMarkup?: boolean;
             /** @description Whether test data is managed outside the site, turning the data editor off. Changing it needs `judge.change_manually_managed`. */
             isManuallyManaged?: boolean;
@@ -24913,7 +24934,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["ShortLinkResponse"];
+                        data: components["schemas"]["CreatedShortLinkResponse"];
                     };
                 };
             };

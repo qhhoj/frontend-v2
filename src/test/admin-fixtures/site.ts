@@ -4,6 +4,7 @@ import type { SiteData } from '../../api/types/site-admin';
 export const siteData = (): SiteData => ({
   officialMode: false,
   officialModeEndsAt: null,
+  timeZone: 'Asia/Ho_Chi_Minh',
   config: {
     announcement: '<p>Bảo trì lúc 13:00</p>',
     footer: '<small>© QHHOJ</small>',
