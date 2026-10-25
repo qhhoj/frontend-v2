@@ -30,7 +30,6 @@ const MARKS: Record<OutcomeKind, { icon: Component; tint: string; spin?: boolean
         :is="MARKS[kind].icon"
         class="size-5"
         :class="MARKS[kind].spin && 'motion-safe:animate-spin'"
-        :stroke-width="2"
       />
     </span>
     <div class="flex min-w-0 flex-col gap-0.5">

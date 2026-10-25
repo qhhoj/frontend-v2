@@ -59,7 +59,7 @@ const hasCount = computed(() => typeof props.value === 'number' && props.value >
         class="mt-auto inline-flex items-center gap-1 pt-1 text-sm font-semibold text-accent-text"
       >
         {{ hasCount ? linkText : $t('admin.shell.overview.links.open') }}
-        <ArrowRight aria-hidden="true" class="size-3.5" :stroke-width="2" />
+        <ArrowRight aria-hidden="true" class="size-3.5" />
       </span>
     </RouterLink>
   </li>

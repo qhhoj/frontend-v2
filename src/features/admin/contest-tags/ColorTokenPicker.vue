@@ -24,12 +24,7 @@ const name = useId();
         ]"
       >
         <input v-model="color" type="radio" :name="name" :value="key" class="sr-only" />
-        <Check
-          v-if="color === key"
-          aria-hidden="true"
-          class="-ml-0.5 size-3.5 shrink-0"
-          :stroke-width="2"
-        />
+        <Check v-if="color === key" aria-hidden="true" class="-ml-0.5 size-3.5 shrink-0" />
         <span>{{ sample || $t('admin.contestTags.sample') }}</span>
         <span class="font-mono text-tiny font-normal">{{ key }}</span>
       </label>
