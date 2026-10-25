@@ -98,7 +98,7 @@ const goTo = (next: number) => (page.value = next);
         <span v-else class="text-muted">{{ $t('admin.activity.table.guest') }}</span>
         <time
           :datetime="row.at"
-          class="font-mono text-xs whitespace-nowrap text-muted tabular-nums"
+          class="font-mono text-caption leading-4 whitespace-nowrap text-muted tabular-nums"
         >
           {{ formatDate(row.at, 'datetimeSeconds', locale.locale) }}
         </time>
@@ -109,7 +109,7 @@ const goTo = (next: number) => (page.value = next);
         <span class="break-all md:truncate" :title="`${row.method} ${row.path}`">
           <span class="text-muted">{{ row.method }}</span> {{ row.path }}
         </span>
-        <ActivityIp :ip="row.ip" class="text-xs text-muted" />
+        <ActivityIp :ip="row.ip" class="text-caption leading-4 text-muted" />
       </div>
     </template>
     <template #cell-status="{ row }">

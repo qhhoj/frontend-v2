@@ -61,7 +61,7 @@ export const primeVuePreset: PrimeVuePTOptions = {
   popover: {
     root: {
       class:
-        'z-50 mt-2 rounded-row border border-line-strong bg-surface-solid p-4 text-content shadow-float',
+        'z-overlay mt-2 rounded-row border border-line-strong bg-surface-solid p-4 text-content shadow-float',
     },
   },
   dialog: {
@@ -80,6 +80,6 @@ export const primeVuePreset: PrimeVuePTOptions = {
     /** A dialog taller than the screen (root capped at 100dvh - 2rem) scrolls here, so the header (close button) and footer stay on screen. */
     content: { class: 'min-h-0 overflow-y-auto px-6 py-4' },
     footer: { class: 'flex shrink-0 justify-end gap-2.5 px-6 pb-5' },
-    mask: { class: 'fixed inset-0 z-50 flex items-center justify-center bg-ground/70 p-4' },
+    mask: { class: 'fixed inset-0 z-overlay flex items-center justify-center bg-ground/70 p-4' },
   },
 };

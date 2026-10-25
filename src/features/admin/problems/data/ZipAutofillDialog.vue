@@ -53,7 +53,8 @@ function apply() {
   emit('apply', casesFromPairs(pairs.value, shares.value), mode.value);
   visible.value = false;
 }
-const HEAD = 'border-b border-line px-2 py-1.5 text-left text-xs font-semibold text-muted';
+const HEAD =
+  'border-b border-line px-2 py-1.5 text-left text-caption leading-4 font-semibold text-muted';
 const CELL = 'border-b border-line px-2 py-1.5';
 </script>
 
@@ -166,7 +167,7 @@ const CELL = 'border-b border-line px-2 py-1.5';
           />
           {{ $t('admin.problems.data.autofill.unpaired', { count: pairing.unpaired.length }) }}
         </h3>
-        <p class="text-xs text-muted">
+        <p class="text-caption leading-4 text-muted">
           {{ $t('admin.problems.data.autofill.unpairedHint') }}
         </p>
         <ul class="flex flex-wrap gap-1.5">

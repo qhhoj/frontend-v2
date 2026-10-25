@@ -110,10 +110,13 @@ function onScrub(event: Event) {
         @input="onScrub"
       />
     </div>
-    <div aria-hidden="true" class="flex justify-between font-mono text-xs text-muted tabular-nums">
+    <div
+      aria-hidden="true"
+      class="flex justify-between font-mono text-caption leading-4 text-muted tabular-nums"
+    >
       <span>00:00</span>
       <span>{{ total }}</span>
     </div>
-    <p class="text-xs text-muted">{{ $t('replay.player.marksLegend') }}</p>
+    <p class="text-caption leading-4 text-muted">{{ $t('replay.player.marksLegend') }}</p>
   </Card>
 </template>

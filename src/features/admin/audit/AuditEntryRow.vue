@@ -58,15 +58,18 @@ const objectName = computed(() => props.entry.object.label ?? shortId(props.entr
           :class="{ 'line-through': entry.object.deleted }"
           >{{ objectName }}</span
         >
-        <span v-if="entry.object.deleted" class="text-xs text-muted">{{
+        <span v-if="entry.object.deleted" class="text-caption leading-4 text-muted">{{
           $t('admin.audit.deleted')
         }}</span>
       </p>
-      <p v-if="entry.changedFields.length > 0" class="text-xs break-words text-muted">
+      <p
+        v-if="entry.changedFields.length > 0"
+        class="text-caption leading-4 break-words text-muted"
+      >
         {{ $t('admin.audit.fields') }}
         <span class="font-mono">{{ entry.changedFields.join(', ') }}</span>
       </p>
-      <p v-if="entry.comment" class="text-xs text-muted">{{ entry.comment }}</p>
+      <p v-if="entry.comment" class="text-caption leading-4 text-muted">{{ entry.comment }}</p>
     </div>
   </li>
 </template>

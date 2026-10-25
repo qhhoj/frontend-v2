@@ -96,7 +96,7 @@ const isFailed = (run: PolygonSyncRun) => run.result === 'failed';
       <span class="text-muted">
         · {{ $t(`admin.polygonLink.packageType.short.${row.packageType}`) }}</span
       >
-      <span v-if="row.packageCreatedAt" class="block text-xs text-muted">
+      <span v-if="row.packageCreatedAt" class="block text-caption leading-4 text-muted">
         {{ $t('admin.polygonLink.history.builtAt', { date: dateText(row.packageCreatedAt) }) }}
       </span>
     </template>

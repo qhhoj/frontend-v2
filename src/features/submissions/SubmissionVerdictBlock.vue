@@ -5,7 +5,8 @@ import BitLoop from '@/components/BitLoop.vue';
 import { translate } from '@/i18n';
 import { BLOCK_TONE_CLASSES, blockToneOf, submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
-import { NO_VALUE, gradingPercent, isFinished, scoreText } from './submission-row';
+import { gradingPercent, isFinished, scoreText } from './submission-row';
+import { NO_VALUE } from '@/lib/format';
 
 /**
  * The left block of a submission row: the verdict code on a solid fill over the score ("738.46 / 1000"). A row still being

@@ -11,7 +11,7 @@ defineProps<{ tag: Pick<ProblemTag, 'name' | 'color'> }>();
 
 <template>
   <span
-    class="inline-flex max-w-full items-center rounded-pill px-2.5 py-0.5 text-xs font-semibold [overflow-wrap:anywhere]"
+    class="inline-flex max-w-full items-center rounded-pill px-2.5 py-0.5 text-caption leading-4 font-semibold [overflow-wrap:anywhere]"
     :class="TAG_CHIP_CLASSES[tag.color]"
     >{{ tag.name }}</span
   >

@@ -113,7 +113,7 @@ const TAB_BASE =
   'inline-flex items-center gap-2 text-sm whitespace-nowrap text-muted hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text aria-selected:border-accent aria-selected:bg-accent-soft aria-selected:text-accent-soft-text';
 const COUNT = {
   pill: 'inline-flex min-w-5 items-center justify-center rounded-pill px-1.5 text-tiny font-semibold tabular-nums',
-  underline: 'rounded-pill px-2 font-mono text-xs tabular-nums',
+  underline: 'rounded-pill px-2 font-mono text-caption leading-4 tabular-nums',
 };
 const COUNT_TONE = {
   pill: { neutral: 'bg-surface-hover text-content', accent: 'bg-accent text-on-accent' },

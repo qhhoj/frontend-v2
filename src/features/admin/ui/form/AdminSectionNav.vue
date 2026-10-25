@@ -65,7 +65,7 @@ onBeforeUnmount(() => observer?.disconnect());
     :aria-label="$t('admin.form.section.onThisPage')"
     class="sticky top-16 flex flex-col gap-0.5 text-meta"
   >
-    <p class="px-2.5 pb-2 text-xs font-semibold tracking-wide text-muted uppercase">
+    <p class="px-2.5 pb-2 text-caption leading-4 font-semibold tracking-wide text-muted uppercase">
       {{ $t('admin.form.section.onThisPage') }}
     </p>
     <a

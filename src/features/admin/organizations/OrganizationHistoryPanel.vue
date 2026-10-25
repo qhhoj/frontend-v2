@@ -62,9 +62,11 @@ const ACTION_TONE: Record<string, ChipTone> = {
               <span v-else class="text-muted">{{
                 $t('admin.organizations.history.goneEditor')
               }}</span>
-              <time :datetime="revision.at" class="ml-auto font-mono text-xs text-muted">{{
-                formatDate(revision.at, 'datetime', locale.locale)
-              }}</time>
+              <time
+                :datetime="revision.at"
+                class="ml-auto font-mono text-caption leading-4 text-muted"
+                >{{ formatDate(revision.at, 'datetime', locale.locale) }}</time
+              >
             </div>
             <dl class="flex flex-col gap-1.5">
               <div
@@ -77,16 +79,16 @@ const ACTION_TONE: Record<string, ChipTone> = {
                   <span
                     v-for="(text, index) in change.removed"
                     :key="`removed-${index}`"
-                    class="rounded-row bg-verdict-wa-bg px-2 py-0.5 font-mono text-xs break-words whitespace-pre-wrap text-verdict-wa"
+                    class="rounded-row bg-verdict-wa-bg px-2 py-0.5 font-mono text-caption leading-4 break-words whitespace-pre-wrap text-verdict-wa"
                     >− {{ text }}</span
                   >
                   <span
                     v-for="(text, index) in change.added"
                     :key="`added-${index}`"
-                    class="rounded-row bg-verdict-ac-bg px-2 py-0.5 font-mono text-xs break-words whitespace-pre-wrap text-verdict-ac"
+                    class="rounded-row bg-verdict-ac-bg px-2 py-0.5 font-mono text-caption leading-4 break-words whitespace-pre-wrap text-verdict-ac"
                     >+ {{ text }}</span
                   >
-                  <span v-if="change.hidden > 0" class="text-xs text-muted">{{
+                  <span v-if="change.hidden > 0" class="text-caption leading-4 text-muted">{{
                     $t('admin.organizations.history.moreLines', { n: change.hidden })
                   }}</span>
                 </dd>

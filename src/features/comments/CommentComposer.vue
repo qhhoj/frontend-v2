@@ -149,7 +149,7 @@ function submit() {
       >
         <CommentPreview :text="text" :is-active="tab === 'preview'" />
       </div>
-      <p :id="`${id}-help`" class="mt-1.5 text-xs text-muted">
+      <p :id="`${id}-help`" class="mt-1.5 text-caption leading-4 text-muted">
         {{ $t(mode === 'edit' ? 'comments.composer.editHint' : 'comments.composer.markdownHelp') }}
       </p>
     </div>

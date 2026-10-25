@@ -49,7 +49,7 @@ function setOptionalNumber(field: 'points' | 'outputPrefix' | 'outputLimit', eve
 <template>
   <tr>
     <th scope="row" :class="[CELL, 'sticky left-0 z-10 bg-surface text-left']">
-      <p class="mb-1 font-mono text-xs font-semibold tabular-nums">
+      <p class="mb-1 font-mono text-caption leading-4 font-semibold tabular-nums">
         {{ $t('admin.problems.data.cases.rowLabel', { row: rowNumber }) }}
       </p>
       <div class="flex gap-0.5">
@@ -203,7 +203,7 @@ function setOptionalNumber(field: 'points' | 'outputPrefix' | 'outputLimit', eve
       </details>
     </td>
     <td :class="CELL">
-      <ul class="flex max-w-56 flex-col gap-1 text-xs text-negative">
+      <ul class="flex max-w-56 flex-col gap-1 text-caption leading-4 text-negative">
         <li v-for="message in messages" :key="message">{{ message }}</li>
       </ul>
     </td>

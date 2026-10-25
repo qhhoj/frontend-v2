@@ -181,7 +181,11 @@ function setLanguageAllowed(languageId: string, isAllowed: boolean) {
       <p v-if="errors.allowedLanguages" class="text-sm text-negative" role="alert">
         {{ errors.allowedLanguages }}
       </p>
-      <p v-if="isStaffLocked" :id="allowedLanguagesLockId" class="text-xs text-muted">
+      <p
+        v-if="isStaffLocked"
+        :id="allowedLanguagesLockId"
+        class="text-caption leading-4 text-muted"
+      >
         {{ lockNotice(isStaffLocked) }}
       </p>
     </fieldset>

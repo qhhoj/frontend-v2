@@ -55,7 +55,7 @@ const lineClass = (line: number): string => {
       <span class="text-sm text-muted">{{ factsText }}</span>
       <RouterLink
         :to="`/submissions/${source.submissionId}`"
-        class="font-mono text-xs underline min-h-11 inline-flex items-center"
+        class="font-mono text-caption leading-4 underline min-h-11 inline-flex items-center"
       >
         {{ shortId(source.submissionId) }}
       </RouterLink>

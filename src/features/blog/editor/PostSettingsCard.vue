@@ -43,7 +43,7 @@ const chosenOrganization = computed({
 const MODES: PublishMode[] = ['draft', 'public', 'scheduled'];
 const SEGMENT =
   'inline-flex min-h-10 items-center rounded-pill px-4 text-sm font-semibold text-muted has-[:checked]:bg-accent-soft has-[:checked]:text-accent-soft-text has-[:focus-visible]:outline-2';
-const LABEL = 'text-xs font-bold tracking-wide text-muted uppercase';
+const LABEL = 'text-caption leading-4 font-bold tracking-wide text-muted uppercase';
 </script>
 
 <template>
@@ -95,7 +95,9 @@ const LABEL = 'text-xs font-bold tracking-wide text-muted uppercase';
         <input v-model="mode" type="radio" :value="value" class="mt-1 accent-accent" />
         <span class="flex flex-col">
           <span class="font-semibold">{{ $t(`postEditor.mode.${value}`) }}</span>
-          <span class="text-xs text-muted">{{ $t(`postEditor.modeHint.${value}`) }}</span>
+          <span class="text-caption leading-4 text-muted">{{
+            $t(`postEditor.modeHint.${value}`)
+          }}</span>
         </span>
       </label>
     </fieldset>

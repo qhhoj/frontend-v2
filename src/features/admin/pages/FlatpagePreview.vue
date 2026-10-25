@@ -72,6 +72,6 @@ const CHIP_TONES = {
     <p v-if="preview.failure.value" role="alert" class="text-sm text-negative">
       {{ failureTextOf(preview.failure.value) }}
     </p>
-    <p class="text-xs text-muted">{{ $t('admin.pages.preview.hint') }}</p>
+    <p class="text-caption leading-4 text-muted">{{ $t('admin.pages.preview.hint') }}</p>
   </section>
 </template>

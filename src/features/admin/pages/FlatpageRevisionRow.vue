@@ -23,7 +23,7 @@ const lines = computed(() => changeLinesOf(props.revision.changes));
 <template>
   <tbody data-testid="revision" class="contents">
     <tr class="border-t border-line align-top">
-      <td class="px-3 py-2 font-mono text-xs whitespace-nowrap">
+      <td class="px-3 py-2 font-mono text-caption leading-4 whitespace-nowrap">
         {{ formatDate(revision.at, 'datetime', localeStore.locale) }}
       </td>
       <td class="px-3 py-2">

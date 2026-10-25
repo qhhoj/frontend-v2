@@ -153,10 +153,10 @@ const remove = (chipId: string) => (chips.value = chips.value.filter((chip) => c
     <p v-if="lookupError || error" :id="`${id}-error`" class="text-sm text-negative">
       {{ lookupError || error }}
     </p>
-    <p v-if="isChipsFull" :id="`${id}-full`" class="text-xs text-muted">
+    <p v-if="isChipsFull" :id="`${id}-full`" class="text-caption leading-4 text-muted">
       {{ $t('admin.ui.maxReached', { max }) }}
     </p>
-    <p v-if="lockedBy" :id="`${id}-locked`" class="text-xs text-muted">
+    <p v-if="lockedBy" :id="`${id}-locked`" class="text-caption leading-4 text-muted">
       {{ needsPermissionText(lockedBy) }}
     </p>
   </div>

@@ -78,7 +78,9 @@ async function apply(action: MarkdownAction) {
         >
           <component :is="tool.icon" aria-hidden="true" class="size-4" />
         </IconButton>
-        <span class="ml-auto hidden pr-2 text-xs text-muted sm:inline">Markdown · LaTeX</span>
+        <span class="ml-auto hidden pr-2 text-caption leading-4 text-muted sm:inline"
+          >Markdown · LaTeX</span
+        >
       </div>
       <div class="grid md:grid-cols-2 md:divide-x md:divide-line">
         <textarea
@@ -102,7 +104,7 @@ async function apply(action: MarkdownAction) {
       </div>
     </div>
     <p v-if="error" :id="`${id}-error`" class="text-sm text-negative">{{ error }}</p>
-    <p v-if="preview.isRateLimited.value" class="text-xs text-negative">
+    <p v-if="preview.isRateLimited.value" class="text-caption leading-4 text-negative">
       {{ $t('admin.ui.previewRateLimited') }}
     </p>
     <p v-if="preview.failure.value" class="text-sm text-negative">

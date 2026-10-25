@@ -7,7 +7,7 @@ withDefaults(defineProps<{ verdict: Verdict; size?: 'md' | 'sm' }>(), { size: 'm
 
 <template>
   <span
-    class="inline-flex shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold"
+    class="inline-flex shrink-0 items-center justify-center rounded-full font-mono text-caption leading-4 font-bold"
     :class="[VERDICT_TONE_CLASSES[verdict.tone], size === 'md' ? 'size-10' : 'h-7 min-w-7 px-2']"
     :title="$t(verdict.labelKey)"
   >

@@ -31,7 +31,7 @@ const groups = computed(() =>
     >
       <span
         :id="`${listboxId}-${group.id}`"
-        class="px-3 pb-1 text-xs font-bold tracking-wide text-muted uppercase"
+        class="px-3 pb-1 text-caption leading-4 font-bold tracking-wide text-muted uppercase"
       >
         {{ $t(`admin.shell.search.groups.${group.id}`) }}
       </span>
@@ -47,7 +47,9 @@ const groups = computed(() =>
         @click="emit('choose', entry)"
       >
         <HighlightedText :text="entry.label" :query="term" class="font-semibold" />
-        <span v-if="entry.detail" class="font-mono text-xs text-muted">{{ entry.detail }}</span>
+        <span v-if="entry.detail" class="font-mono text-caption leading-4 text-muted">{{
+          entry.detail
+        }}</span>
       </div>
     </div>
   </div>

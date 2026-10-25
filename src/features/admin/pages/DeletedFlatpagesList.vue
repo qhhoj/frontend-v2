@@ -49,7 +49,7 @@ const items = computed(() => query.data.value?.items ?? []);
             @click="emit('open', item.id)"
           >
             <span class="truncate font-mono text-sm">{{ item.url }}</span>
-            <span class="text-xs text-muted">
+            <span class="text-caption leading-4 text-muted">
               {{
                 $t('admin.pages.deleted.at', {
                   time: formatDate(item.deletedAt, 'datetime', locale.locale),

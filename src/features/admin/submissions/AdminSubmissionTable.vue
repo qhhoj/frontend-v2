@@ -135,7 +135,9 @@ const menuItems = (row: SubmissionListItem): RowMenuItem[] => [
         <div class="max-w-[65%] min-w-0 shrink-0">
           <SubmissionProblemName :problem="row.problem" />
         </div>
-        <span class="min-w-0 truncate font-mono text-xs text-muted">{{ row.problem.code }}</span>
+        <span class="min-w-0 truncate font-mono text-caption leading-4 text-muted">{{
+          row.problem.code
+        }}</span>
       </div>
       <span v-else class="text-muted">—</span>
     </template>

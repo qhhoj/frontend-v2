@@ -40,7 +40,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
       <BitLoop v-else kind="writing" class="[--bit-px:5px]" />
     </RouterLink>
     <div class="flex flex-1 flex-col gap-2 p-4 sm:px-5">
-      <p class="text-xs font-bold tracking-wide text-accent-text uppercase">
+      <p class="text-caption leading-4 font-bold tracking-wide text-accent-text uppercase">
         {{ $t('blog.pinnedLabel') }}
       </p>
       <h2

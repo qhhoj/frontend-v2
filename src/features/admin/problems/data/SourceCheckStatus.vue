@@ -23,7 +23,7 @@ const KIND = { pending: 'queued', ok: 'done', error: 'refused', unavailable: 'qu
         {{ t(`${key}.${shown.status === 'error' ? 'log' : 'reason'}`) }}
       </summary>
       <pre
-        class="mt-2 max-h-64 overflow-auto rounded-cell border border-line bg-surface-strong p-3 font-mono text-xs whitespace-pre-wrap"
+        class="mt-2 max-h-64 overflow-auto rounded-cell border border-line bg-surface-strong p-3 font-mono text-caption leading-4 whitespace-pre-wrap"
         >{{ shown.log }}</pre>
     </details>
   </div>

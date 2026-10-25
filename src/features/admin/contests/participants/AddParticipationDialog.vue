@@ -81,21 +81,11 @@ watch(visible, (isOpen) => {
           {{ $t('admin.contestOps.participants.kindLabel') }}
         </legend>
         <label class="flex min-h-11 items-center gap-2">
-          <input
-            v-model="kind"
-            type="radio"
-            value="live"
-            class="size-4 accent-[var(--qh-accent)]"
-          />
+          <input v-model="kind" type="radio" value="live" class="size-4 accent-accent" />
           {{ $t('admin.contestOps.participants.kindLive') }}
         </label>
         <label class="flex min-h-11 items-center gap-2">
-          <input
-            v-model="kind"
-            type="radio"
-            value="virtual"
-            class="size-4 accent-[var(--qh-accent)]"
-          />
+          <input v-model="kind" type="radio" value="virtual" class="size-4 accent-accent" />
           {{ $t('admin.contestOps.participants.kindVirtual') }}
         </label>
       </fieldset>

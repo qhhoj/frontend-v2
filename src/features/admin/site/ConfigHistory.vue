@@ -48,11 +48,11 @@ const hasMore = () =>
               v-if="valueOf(revision.changes.value?.[side]) !== null"
               class="flex flex-col gap-0.5"
             >
-              <span class="text-xs font-semibold text-muted">{{
+              <span class="text-caption leading-4 font-semibold text-muted">{{
                 $t(`admin.site.config.history.${side}`)
               }}</span>
               <pre
-                class="max-h-32 overflow-auto rounded-row bg-surface-strong px-2 py-1 font-mono text-xs break-words whitespace-pre-wrap"
+                class="max-h-32 overflow-auto rounded-row bg-surface-strong px-2 py-1 font-mono text-caption leading-4 break-words whitespace-pre-wrap"
                 >{{
                   valueOf(revision.changes.value?.[side]) ||
                   $t('admin.site.config.history.emptyValue')

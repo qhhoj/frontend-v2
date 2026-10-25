@@ -77,7 +77,9 @@ const menuItems = computed<RowMenuItem[]>(() => [
     <header class="flex items-start justify-between gap-3">
       <div class="flex min-w-0 flex-col gap-0.5">
         <h3 class="m-0 text-base font-semibold break-words">{{ announcement.title }}</h3>
-        <time class="text-xs text-muted" :datetime="announcement.createdAt">{{ when }}</time>
+        <time class="text-caption leading-4 text-muted" :datetime="announcement.createdAt">{{
+          when
+        }}</time>
       </div>
       <div v-if="!isEditing" class="flex shrink-0 items-center gap-1">
         <button type="button" :class="buttonClass('ghost', 'sm')" @click="isEditing = true">

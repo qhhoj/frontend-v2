@@ -15,7 +15,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
       <SkeletonBlock class="size-12 shrink-0" />
       <div class="flex min-w-0 flex-1 flex-col gap-1">
         <div class="font-bold"><SkeletonBlock text class="w-2/3" /></div>
-        <div class="text-xs"><SkeletonBlock text class="w-16" /></div>
+        <div class="text-caption leading-4"><SkeletonBlock text class="w-16" /></div>
       </div>
     </div>
     <div class="grid grid-cols-2 gap-2">

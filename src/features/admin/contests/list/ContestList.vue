@@ -233,7 +233,7 @@ const resultRows = computed(() =>
         <RouterLink :to="editTo(row)" class="block font-semibold text-accent-text hover:underline"
           ><HighlightedText :text="row.name" :query="filters.q"
         /></RouterLink>
-        <span class="block font-mono text-xs text-muted"
+        <span class="block font-mono text-caption leading-4 text-muted"
           ><HighlightedText :text="row.key" :query="filters.q"
         /></span>
       </template>

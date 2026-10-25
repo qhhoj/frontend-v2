@@ -80,7 +80,7 @@ function leave(organization: ProfileOrganization) {
         </span>
         <span class="flex min-w-0 flex-1 flex-col gap-1">
           <strong class="font-semibold">{{ organization.name }}</strong>
-          <span class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="flex flex-wrap items-center gap-2 text-caption leading-4">
             <span class="font-mono text-muted">{{ organization.shortName }}</span>
             <span
               v-if="index === 0"

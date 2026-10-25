@@ -19,6 +19,7 @@ import {
   scoreConversion,
   type OverviewRow,
 } from './test-overview';
+import { NO_VALUE } from '@/lib/format';
 
 /**
  * The foot of the result card (`CasesTable.vue`'s `footer` slot): with subtasks, one row each, one square per test filled by its
@@ -42,7 +43,6 @@ const props = defineProps<{
 }>();
 
 const PERCENT = 100;
-const NO_VALUE = '—';
 const locale = useLocaleStore();
 const format = (value: number) => formatPoints(value, locale.locale);
 /** Earned points never read as `max` while short of it. */

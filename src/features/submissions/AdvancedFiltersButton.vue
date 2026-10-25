@@ -22,9 +22,13 @@ defineEmits<{ toggle: [] }>();
     <SlidersHorizontal class="size-4" aria-hidden="true" />
     <span class="sm:hidden">{{ $t('submissions.quick.filters') }}</span>
     <span class="max-sm:hidden">{{ $t('submissions.quick.advanced') }}</span>
-    <span v-if="(props.phoneCount ?? count) > 0" class="font-mono text-xs tabular-nums sm:hidden">{{
-      props.phoneCount ?? count
+    <span
+      v-if="(props.phoneCount ?? count) > 0"
+      class="font-mono text-caption leading-4 tabular-nums sm:hidden"
+      >{{ props.phoneCount ?? count }}</span
+    >
+    <span v-if="count" class="font-mono text-caption leading-4 tabular-nums max-sm:hidden">{{
+      count
     }}</span>
-    <span v-if="count" class="font-mono text-xs tabular-nums max-sm:hidden">{{ count }}</span>
   </button>
 </template>

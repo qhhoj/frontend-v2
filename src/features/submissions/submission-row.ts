@@ -1,10 +1,15 @@
 import type { SubmissionListItem } from '@/api/types/submissions';
 import { FINISHED_STATUSES } from '@/api/types/submissions';
-import { formatCaseMemory, formatCaseTime, formatNumber, scoreBelowFull } from '@/lib/format';
+import {
+  NO_VALUE,
+  formatCaseMemory,
+  formatCaseTime,
+  formatNumber,
+  scoreBelowFull,
+} from '@/lib/format';
 import type { Locale } from '@/i18n';
 import { ringFraction } from '@/lib/grading';
 
-export const NO_VALUE = '—';
 const PERCENT = 100;
 const POINT_FRACTION_DIGITS = 2;
 

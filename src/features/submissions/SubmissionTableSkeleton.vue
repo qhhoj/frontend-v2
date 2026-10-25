@@ -65,10 +65,12 @@ const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[k
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
           <div v-if="isShown('problem')"><SkeletonBlock text class="w-32" /></div>
           <div class="text-meta"><SkeletonBlock text class="w-28" /></div>
-          <div v-if="isShown('when') || isShown('language')" class="text-xs">
+          <div v-if="isShown('when') || isShown('language')" class="text-caption leading-4">
             <SkeletonBlock text class="w-24" />
           </div>
-          <div v-if="isShown('cost')" class="text-xs"><SkeletonBlock text class="w-28" /></div>
+          <div v-if="isShown('cost')" class="text-caption leading-4">
+            <SkeletonBlock text class="w-28" />
+          </div>
         </div>
         <div class="flex shrink-0 flex-col items-center">
           <SkeletonBlock v-if="hasPickColumn" round class="size-11" />

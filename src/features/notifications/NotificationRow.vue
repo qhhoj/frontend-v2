@@ -54,7 +54,7 @@ const hasChips = computed(() => !props.isStale);
         </span>
         <span
           v-if="hasChips && item.count > 1"
-          class="rounded-pill bg-surface-hover px-2 text-xs font-semibold text-content"
+          class="rounded-pill bg-surface-hover px-2 text-caption leading-4 font-semibold text-content"
         >
           {{ $t('notifications.merged', { count: item.count }) }}
         </span>
@@ -63,7 +63,9 @@ const hasChips = computed(() => !props.isStale);
         </Chip>
       </span>
       <span class="line-clamp-2 text-sm text-muted">{{ body }}</span>
-      <time :datetime="item.lastActivityAt" class="text-xs text-muted">{{ when }}</time>
+      <time :datetime="item.lastActivityAt" class="text-caption leading-4 text-muted">{{
+        when
+      }}</time>
     </button>
     <IconButton
       v-if="canMarkRead && item.unread"

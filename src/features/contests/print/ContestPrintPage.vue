@@ -127,7 +127,7 @@ const CHIP =
             data-testid="print-doc"
           >
             <header class="mb-2 border-b-2 border-line-strong pb-4 text-center">
-              <p class="text-xs tracking-widest text-muted uppercase">
+              <p class="text-caption leading-4 tracking-widest text-muted uppercase">
                 {{ $t('contests.print.kicker', { count: problems.length }, problems.length) }}
               </p>
               <h1 class="mt-1 page-title">

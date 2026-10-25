@@ -55,7 +55,7 @@ const ROW =
     <div
       v-if="limits.length > 0"
       aria-hidden="true"
-      :class="[ROW, 'hidden text-xs font-semibold text-muted sm:grid']"
+      :class="[ROW, 'hidden text-caption leading-4 font-semibold text-muted sm:grid']"
     >
       <span>{{ $t('admin.problems.general.limits.languageColumn') }}</span>
       <span>{{ $t('admin.problems.general.limits.timeColumn') }}</span>
@@ -93,7 +93,7 @@ const ROW =
             <X aria-hidden="true" class="size-4" :stroke-width="1.75" />
           </button>
         </span>
-        <label class="flex flex-col gap-1 text-xs font-semibold text-muted">
+        <label class="flex flex-col gap-1 text-caption leading-4 font-semibold text-muted">
           <span class="sm:sr-only">{{ $t('admin.problems.general.limits.timeColumn') }}</span>
           <input
             :id="`language-limit-time-${index}`"
@@ -118,7 +118,7 @@ const ROW =
             {{ timeErrorOf(index) }}
           </span>
         </label>
-        <label class="flex flex-col gap-1 text-xs font-semibold text-muted">
+        <label class="flex flex-col gap-1 text-caption leading-4 font-semibold text-muted">
           <span class="sm:sr-only">{{ $t('admin.problems.general.limits.memoryColumn') }}</span>
           <input
             v-model.number="limit.memoryLimit"

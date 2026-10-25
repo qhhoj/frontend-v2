@@ -54,7 +54,7 @@ const verb = computed(() => (props.isPublic ? 'publish' : 'unpublish'));
   >
     <div class="flex flex-col gap-4 text-sm">
       <p>{{ $t(`admin.problemList.bulk.${verb}Body`) }}</p>
-      <p class="font-mono text-xs break-words text-muted">{{ codes.join(', ') }}</p>
+      <p class="font-mono text-caption leading-4 break-words text-muted">{{ codes.join(', ') }}</p>
       <label v-if="canSetDate" class="flex min-h-11 items-center gap-3">
         <input v-model="setDateToNow" type="checkbox" class="size-5" />
         {{ $t('admin.problemList.bulk.setDateToNow') }}

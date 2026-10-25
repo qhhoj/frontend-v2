@@ -145,7 +145,7 @@ const HEAD = 'px-2 py-2 text-meta font-semibold text-muted';
                   <span class="flex items-center gap-3">
                     <input
                       type="checkbox"
-                      class="size-4 accent-[var(--qh-accent)]"
+                      class="size-4 accent-accent"
                       :checked="selection.isAllSelected.value"
                       :indeterminate="selection.isSomeSelected.value"
                       :aria-label="$t('admin.contests.bulk.selectPage')"
@@ -199,7 +199,7 @@ const HEAD = 'px-2 py-2 text-meta font-semibold text-muted';
             {{ $t('admin.contests.problems.empty') }}
           </p>
         </div>
-        <ul class="m-0 flex list-none flex-col gap-1 p-0 text-xs text-muted">
+        <ul class="m-0 flex list-none flex-col gap-1 p-0 text-caption leading-4 text-muted">
           <li>{{ $t('admin.contests.problems.orderLine') }}</li>
           <li v-if="showLimits">{{ $t('admin.contests.problems.prefixLine') }}</li>
           <li v-if="!hasLimits">

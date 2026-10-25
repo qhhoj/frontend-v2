@@ -60,7 +60,11 @@ const ARROW =
         <ChevronDown aria-hidden="true" class="size-5" />
       </button>
     </div>
-    <p v-if="vote.errorKey.value" role="alert" class="max-w-40 text-center text-xs text-negative">
+    <p
+      v-if="vote.errorKey.value"
+      role="alert"
+      class="max-w-40 text-center text-caption leading-4 text-negative"
+    >
       {{ $t(vote.errorKey.value) }}
     </p>
   </div>

@@ -103,7 +103,9 @@ defineExpose({ save, discard });
       </div>
     </div>
     <div v-if="trimmed" class="flex flex-col gap-1.5">
-      <span class="text-xs font-semibold text-muted">{{ $t('admin.site.notice.preview') }}</span>
+      <span class="text-caption leading-4 font-semibold text-muted">{{
+        $t('admin.site.notice.preview')
+      }}</span>
       <Notice tone="info">
         <span class="block whitespace-pre-line">{{ trimmed }}</span>
       </Notice>

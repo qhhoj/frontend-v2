@@ -20,7 +20,7 @@ const groups = computed(() => groupByDay(props.items, new Date()));
     <section v-for="group in groups" :key="group.key" :aria-labelledby="`${baseId}-${group.key}`">
       <h2
         :id="`${baseId}-${group.key}`"
-        class="text-xs font-semibold tracking-wider text-muted uppercase"
+        class="text-caption leading-4 font-semibold tracking-wider text-muted uppercase"
       >
         {{ $t(`notifications.${group.key}`) }}
       </h2>

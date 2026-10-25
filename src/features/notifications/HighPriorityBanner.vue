@@ -33,7 +33,7 @@ const session = useSessionStore();
       class="page-gutter pt-4"
     >
       <SettingsNotice tone="info" :bit="NOTIFICATION_BITS.banner">
-        <strong class="block text-xs tracking-wider uppercase">{{
+        <strong class="block text-caption leading-4 tracking-wider uppercase">{{
           $t('notifications.banner.label')
         }}</strong>
         <span class="block font-semibold">{{ localizedTitle(item) }}</span>

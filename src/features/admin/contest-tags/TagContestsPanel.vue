@@ -123,7 +123,7 @@ const resultRows = computed(() =>
         <label class="flex min-h-10 items-center gap-3 text-sm font-semibold">
           <input
             type="checkbox"
-            class="size-4 accent-[var(--qh-accent)]"
+            class="size-4 accent-accent"
             :checked="selection.isAllSelected.value"
             :indeterminate="selection.isSomeSelected.value"
             @change="selection.toggleAll(checked($event))"
@@ -139,7 +139,7 @@ const resultRows = computed(() =>
             >
               <input
                 type="checkbox"
-                class="size-4 shrink-0 accent-[var(--qh-accent)]"
+                class="size-4 shrink-0 accent-accent"
                 :checked="selection.isSelected(contest.key)"
                 @change="selection.toggle(contest.key, checked($event))"
               />

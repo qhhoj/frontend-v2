@@ -95,7 +95,7 @@ const percentOf = (count: number) =>
         <summary class="w-fit cursor-pointer text-accent-text">
           {{ $t('admin.languages.table.showJudges') }}
         </summary>
-        <ul class="mt-1 font-mono text-xs">
+        <ul class="mt-1 font-mono text-caption leading-4">
           <li v-for="version in row.versions" :key="version.judge">
             <RouterLink :to="{ name: 'admin-judges' }" class="hover:underline">{{
               version.judge

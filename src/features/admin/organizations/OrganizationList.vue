@@ -166,7 +166,7 @@ const number = (value: number) => formatNumber(value, locale.locale);
           :class="row.slug === selected ? 'text-accent-text' : 'hover:text-accent-text'"
         >
           <span class="font-semibold"><HighlightedText :text="row.name" :query="search" /></span>
-          <span class="font-mono text-xs text-muted"
+          <span class="font-mono text-caption leading-4 text-muted"
             ><HighlightedText :text="`${row.slug} · ${row.shortName}`" :query="search"
           /></span>
         </RouterLink>

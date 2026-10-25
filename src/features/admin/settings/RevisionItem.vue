@@ -48,7 +48,7 @@ const lineText = (field: string, text: string) => (field === 'value' ? text : `$
         {{ lineText(line.field, line.after) }}
       </p>
     </div>
-    <p v-if="hasSealedSide" class="text-xs text-muted">
+    <p v-if="hasSealedSide" class="text-caption leading-4 text-muted">
       {{ t('admin.settings.revisions.secretNote') }}
     </p>
     <button
@@ -60,7 +60,7 @@ const lineText = (field: string, text: string) => (field === 'value' ? text : `$
     >
       {{ restoreLabel }}
     </button>
-    <p v-else-if="isWholeSecret" class="text-xs text-muted">
+    <p v-else-if="isWholeSecret" class="text-caption leading-4 text-muted">
       {{ t('admin.settings.revisions.notRestorable') }}
     </p>
   </article>

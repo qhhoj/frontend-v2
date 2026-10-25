@@ -49,7 +49,7 @@ const locale = useLocaleStore();
               {{ oj }}
             </li>
           </ul>
-          <p v-if="query.data.value.checkedAt" class="mt-3 text-xs text-muted">
+          <p v-if="query.data.value.checkedAt" class="mt-3 text-caption leading-4 text-muted">
             {{
               $t('externalJudge.status.checkedAt', {
                 time: formatDate(query.data.value.checkedAt, 'datetime', locale.locale),

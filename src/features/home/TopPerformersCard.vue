@@ -43,7 +43,7 @@ const performers = computed(() => (home.value?.topPerformers ?? []).slice(0, PER
         <UserAvatar :username="entry.username" :size="28" />
         <div class="flex min-w-0 flex-1 flex-col">
           <UserName :username="entry.username" :rating="entry.rating" class="truncate" />
-          <span v-if="entry.organization" class="truncate text-xs text-muted">
+          <span v-if="entry.organization" class="truncate text-caption leading-4 text-muted">
             {{ entry.organization.shortName }}
           </span>
         </div>

@@ -60,7 +60,7 @@ watch(
       <input
         :id="id"
         v-model="suffix"
-        class="min-h-[var(--qa-control,2.25rem)] w-full min-w-0 bg-transparent px-3 font-mono text-content outline-none"
+        class="min-h-(--qa-control) w-full min-w-0 bg-transparent px-3 font-mono text-content outline-none"
         autocomplete="off"
         autocapitalize="off"
         spellcheck="false"

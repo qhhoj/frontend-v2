@@ -38,7 +38,7 @@ const verb = computed(() => (props.isVisible ? 'show' : 'hide'));
   >
     <div class="flex flex-col gap-3 text-sm">
       <p>{{ $t(`admin.contests.list.bulk.${verb}Body`) }}</p>
-      <p class="font-mono text-xs break-words text-muted">{{ keys.join(', ') }}</p>
+      <p class="font-mono text-caption leading-4 break-words text-muted">{{ keys.join(', ') }}</p>
     </div>
     <template #error>
       <p v-if="mutation.failure.value" role="alert" class="text-sm text-negative">

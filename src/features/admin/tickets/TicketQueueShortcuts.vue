@@ -23,7 +23,7 @@ const setMine = (isOn: boolean) => emit('show', withMineOnly(props.filters, user
 const setAboutMine = (isOn: boolean) =>
   emit('show', { ...props.filters, aboutMine: isOn || undefined, page: 1 });
 const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
-const COUNT = 'rounded-pill bg-surface-strong px-1.5 font-mono text-xs tabular-nums';
+const COUNT = 'rounded-pill bg-surface-strong px-1.5 font-mono text-caption leading-4 tabular-nums';
 </script>
 
 <template>
@@ -31,7 +31,7 @@ const COUNT = 'rounded-pill bg-surface-strong px-1.5 font-mono text-xs tabular-n
     <input
       type="checkbox"
       name="mine"
-      class="size-4 accent-[var(--qh-accent)]"
+      class="size-4 accent-accent"
       :checked="isMine"
       @change="setMine(checkedOf($event))"
     />
@@ -48,7 +48,7 @@ const COUNT = 'rounded-pill bg-surface-strong px-1.5 font-mono text-xs tabular-n
     <input
       type="checkbox"
       name="aboutMine"
-      class="size-4 accent-[var(--qh-accent)]"
+      class="size-4 accent-accent"
       :checked="filters.aboutMine === true"
       @change="setAboutMine(checkedOf($event))"
     />

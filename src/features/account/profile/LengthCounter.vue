@@ -11,7 +11,7 @@ const over = computed(() => props.used > props.max);
 
 <template>
   <span
-    class="font-mono text-xs tabular-nums"
+    class="font-mono text-caption leading-4 tabular-nums"
     :class="over ? 'font-semibold text-negative' : 'text-muted'"
   >
     {{ formatNumber(used, locale.locale) }} / {{ formatNumber(max, locale.locale) }}

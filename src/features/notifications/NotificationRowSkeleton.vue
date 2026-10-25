@@ -11,7 +11,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
     <span class="flex min-h-11 min-w-0 flex-1 flex-col gap-1 px-1">
       <span class="block"><SkeletonBlock text class="w-3/4" /></span>
       <span class="text-sm"><SkeletonBlock text class="w-full" /></span>
-      <span class="text-xs"><SkeletonBlock text class="w-16" /></span>
+      <span class="text-caption leading-4"><SkeletonBlock text class="w-16" /></span>
     </span>
     <SkeletonBlock round class="size-11 shrink-0" />
   </li>

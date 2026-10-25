@@ -47,7 +47,9 @@ const LINK =
       <div
         class="flex flex-col items-start justify-center gap-1 px-4 py-3 xl:flex-row xl:items-center xl:justify-between"
       >
-        <span class="text-xs text-muted">{{ $t('admin.contests.general.rail.phase') }}</span>
+        <span class="text-caption leading-4 text-muted">{{
+          $t('admin.contests.general.rail.phase')
+        }}</span>
         <ContestPhaseChip :phase="contest.phase" />
       </div>
       <ContestVisibilitySwitch
@@ -55,11 +57,13 @@ const LINK =
         class="px-4 py-3 max-sm:order-last max-sm:col-span-2"
       />
       <div v-for="stat in stats" :key="stat.key" class="flex flex-col px-4 py-3">
-        <span class="text-xs text-muted">{{ $t(`admin.contests.general.rail.${stat.key}`) }}</span>
+        <span class="text-caption leading-4 text-muted">{{
+          $t(`admin.contests.general.rail.${stat.key}`)
+        }}</span>
         <span class="font-display text-section leading-7 font-semibold tabular-nums">{{
           stat.value
         }}</span>
-        <span v-if="stat.note" class="text-xs text-muted">
+        <span v-if="stat.note" class="text-caption leading-4 text-muted">
           {{ $t(`admin.contests.general.rail.${stat.note.key}`, { count: stat.note.count }) }}
         </span>
       </div>
@@ -69,7 +73,9 @@ const LINK =
       :class="[CARD, 'hidden flex-col p-2 xl:flex']"
       :aria-label="$t('admin.form.section.jumpTo')"
     >
-      <p class="m-0 px-2 pt-1 pb-1.5 text-xs font-semibold tracking-wide text-muted uppercase">
+      <p
+        class="m-0 px-2 pt-1 pb-1.5 text-caption leading-4 font-semibold tracking-wide text-muted uppercase"
+      >
         {{ $t('admin.form.section.jumpTo') }}
       </p>
       <button

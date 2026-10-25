@@ -50,7 +50,9 @@ defineProps<{ errors: FieldErrors }>();
         data-testid="contest-balloon-staff"
         :label="$t('admin.contestRules.fields.balloonStaff')"
       />
-      <p class="text-xs text-muted">{{ $t('admin.contestRules.hints.balloonStaff') }}</p>
+      <p class="text-caption leading-4 text-muted">
+        {{ $t('admin.contestRules.hints.balloonStaff') }}
+      </p>
     </div>
   </AdminFormSection>
 </template>

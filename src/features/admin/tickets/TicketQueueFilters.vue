@@ -130,14 +130,14 @@ const reset = () =>
         <input
           type="checkbox"
           name="awaiting"
-          class="size-4 accent-[var(--qh-accent)]"
+          class="size-4 accent-accent"
           :checked="filters.awaiting === true"
           @change="setAwaiting(($event.target as HTMLInputElement).checked)"
         />
         {{ $t('admin.tickets.filters.awaiting') }}
         <span
           v-if="summary.data.value?.awaitingStaff"
-          class="rounded-pill bg-surface-strong px-1.5 font-mono text-xs tabular-nums"
+          class="rounded-pill bg-surface-strong px-1.5 font-mono text-caption leading-4 tabular-nums"
           >{{ summary.data.value.awaitingStaff }}</span
         >
       </label>
@@ -145,7 +145,7 @@ const reset = () =>
         <input
           type="checkbox"
           name="own"
-          class="size-4 accent-[var(--qh-accent)]"
+          class="size-4 accent-accent"
           :checked="filters.own"
           @change="setOwn(($event.target as HTMLInputElement).checked)"
         />

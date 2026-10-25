@@ -92,7 +92,9 @@ function confirmDelete() {
       <ul v-else class="flex flex-col gap-1">
         <li v-for="tag in tags" :key="tag.id" class="flex items-center gap-2">
           <OrgTagChip :tag="tag" />
-          <span class="min-w-0 truncate font-mono text-xs text-muted">{{ tag.slug }}</span>
+          <span class="min-w-0 truncate font-mono text-caption leading-4 text-muted">{{
+            tag.slug
+          }}</span>
           <IconButton
             class="ml-auto shrink-0"
             :label="$t('orgProblems.tags.editLabel', { name: tag.name })"

@@ -128,7 +128,9 @@ function openDelete(close: () => void) {
             <Trash2 aria-hidden="true" class="size-4" :stroke-width="1.75" />
             <span class="flex flex-col">
               {{ $t('admin.ui.row.remove') }}
-              <span v-if="deleteBlock" class="text-xs text-muted">{{ deleteBlock }}</span>
+              <span v-if="deleteBlock" class="text-caption leading-4 text-muted">{{
+                deleteBlock
+              }}</span>
             </span>
           </button>
         </template>

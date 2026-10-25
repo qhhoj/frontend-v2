@@ -52,7 +52,9 @@ const toggle = (code: string, on: boolean) => {
     </p>
     <div class="flex flex-col gap-4" data-testid="permission-checklist">
       <fieldset v-for="group in groups" :key="group.category" class="flex flex-col gap-1">
-        <legend class="mb-1 text-xs font-semibold tracking-wide text-muted uppercase">
+        <legend
+          class="mb-1 text-caption leading-4 font-semibold tracking-wide text-muted uppercase"
+        >
           {{ $t(`admin.users.access.categories.${group.category}`) }}
         </legend>
         <label

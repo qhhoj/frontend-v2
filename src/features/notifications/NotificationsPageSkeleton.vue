@@ -9,7 +9,7 @@ const PAGE_SKELETON_ROWS = 6;
 <template>
   <div class="flex flex-col gap-4">
     <section data-skeleton-region="notification-day">
-      <h2 class="text-xs font-semibold tracking-wider text-muted uppercase">
+      <h2 class="text-caption leading-4 font-semibold tracking-wider text-muted uppercase">
         <SkeletonBlock text class="w-16" />
       </h2>
       <ul class="m-0 list-none p-0">

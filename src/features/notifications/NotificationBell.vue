@@ -72,7 +72,7 @@ const drawerPt = computed(() => ({
   },
   content: { class: 'flex-1 overflow-y-auto px-5 py-3' },
   footer: { class: 'px-5 pt-3 pb-5' },
-  mask: { class: 'fixed inset-0 z-50 flex justify-end bg-ground/70' },
+  mask: { class: 'fixed inset-0 z-overlay flex justify-end bg-ground/70' },
 }));
 </script>
 
@@ -94,7 +94,7 @@ const drawerPt = computed(() => ({
         v-if="badge"
         aria-hidden="true"
         data-testid="notification-badge"
-        class="absolute -top-1 -right-1 min-w-5 rounded-pill bg-accent px-1.5 text-center text-xs leading-5 font-bold text-on-accent"
+        class="absolute -top-1 -right-1 min-w-5 rounded-pill bg-accent px-1.5 text-center text-caption leading-5 font-bold text-on-accent"
       >
         {{ badge }}
       </span>

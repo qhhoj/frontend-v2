@@ -110,7 +110,7 @@ useFocusFallback(
       >
         <template #cell-problem="{ row }">
           <span class="block font-semibold">{{ row.name }}</span>
-          <span class="block font-mono text-xs text-muted">{{ row.code }}</span>
+          <span class="block font-mono text-caption leading-4 text-muted">{{ row.code }}</span>
         </template>
         <template #cell-grace="{ row }">
           <AdminChip :tone="graceToneOf(row)">{{ graceText(row) }}</AdminChip>

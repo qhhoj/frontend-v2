@@ -55,7 +55,7 @@ const toggle = (id: string) =>
           <label class="flex min-h-10 cursor-pointer items-center gap-2.5 px-1 text-sm">
             <input
               type="checkbox"
-              class="size-4 accent-[var(--qh-accent)]"
+              class="size-4 accent-accent"
               :checked="selected.includes(type.id)"
               @change="toggle(type.id)"
             />

@@ -38,7 +38,7 @@ const show = (value: number) => formatNumber(value, locale.locale);
     </div>
     <p
       data-testid="site-counts"
-      class="min-h-5 font-mono text-xs text-muted tabular-nums xl:text-sm"
+      class="min-h-5 font-mono text-caption leading-4 text-muted tabular-nums xl:text-sm"
     >
       <SkeletonBlock v-if="isPending" text class="w-40" />
       <template v-else-if="counts">{{

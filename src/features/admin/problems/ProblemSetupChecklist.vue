@@ -109,7 +109,7 @@ const linkOf = (step: SetupStep) => ({
       >
         <span
           aria-hidden="true"
-          class="flex size-6 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold"
+          class="flex size-6 shrink-0 items-center justify-center rounded-full border-2 text-caption leading-4 font-bold"
           :class="
             step.isDone
               ? 'border-positive bg-positive text-on-accent'

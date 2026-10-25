@@ -9,7 +9,7 @@ import Card from '@/components/ui/Card.vue';
       <div class="flex items-center justify-between gap-3">
         <h3 class="font-display text-[22px] font-bold">{{ $t('appearance.previewTitle') }}</h3>
         <span
-          class="rounded-pill bg-verdict-ac-bg px-3 py-1 font-mono text-xs font-semibold text-verdict-ac"
+          class="rounded-pill bg-verdict-ac-bg px-3 py-1 font-mono text-caption leading-4 font-semibold text-verdict-ac"
         >
           AC
         </span>

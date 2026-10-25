@@ -115,17 +115,17 @@ function submit() {
       <label
         v-for="scope in INTEGRATION_SCOPES"
         :key="scope"
-        class="flex min-h-[var(--qa-control,2.25rem)] items-start gap-3 py-1"
+        class="flex min-h-(--qa-control) items-start gap-3 py-1"
       >
         <input
           v-model="scopes"
           type="checkbox"
-          class="mt-0.5 size-4 accent-[var(--qh-accent)]"
+          class="mt-0.5 size-4 accent-accent"
           :value="scope"
         />
         <span class="flex flex-col">
           <span>{{ $t(`admin.integrations.form.scope.${SCOPE_KEYS[scope]}`) }}</span>
-          <code class="font-mono text-xs text-muted">{{ scope }}</code>
+          <code class="font-mono text-caption leading-4 text-muted">{{ scope }}</code>
         </span>
       </label>
       <p v-if="create.fieldErrors.value.scopes" class="text-sm text-negative">

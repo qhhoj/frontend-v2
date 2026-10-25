@@ -87,13 +87,16 @@ const SEGMENT =
           @click="slot = item"
         >
           {{ $t(`admin.problems.statements.slots.${item}`) }}
-          <span v-if="item !== 'original' && !drafts[item].exists" class="text-xs font-normal">
+          <span
+            v-if="item !== 'original' && !drafts[item].exists"
+            class="text-caption leading-4 font-normal"
+          >
             ({{ $t('admin.problems.statements.missing') }})
           </span>
           <span
             v-if="changesBySlot[item] > 0"
             data-unsaved
-            class="inline-flex items-center gap-1 text-xs font-normal"
+            class="inline-flex items-center gap-1 text-caption leading-4 font-normal"
           >
             <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-accent" />
             {{ $t('admin.problems.statements.unsaved') }}

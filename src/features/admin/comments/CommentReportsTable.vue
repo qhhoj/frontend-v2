@@ -141,7 +141,7 @@ const rowName = (item: CommentReportQueueItem) =>
             class="max-w-full truncate"
           />
           <span v-if="report.note" class="text-muted">“{{ report.note }}”</span>
-          <span v-if="report.status !== 'open'" class="text-xs text-muted">
+          <span v-if="report.status !== 'open'" class="text-caption leading-4 text-muted">
             {{ $t(`admin.comments.outcome.${report.status}`) }}
             <template v-if="report.settledBy">
               · {{ $t('admin.comments.settledBy', { name: report.settledBy.username }) }}
@@ -152,7 +152,7 @@ const rowName = (item: CommentReportQueueItem) =>
     </template>
     <template #cell-page="{ row }">
       <CommentPlace :item="row" />
-      <span class="block text-xs text-muted">
+      <span class="block text-caption leading-4 text-muted">
         {{ when(row) }} ·
         {{ $t('admin.comments.reporters', { count: row.reporterCount }, row.reporterCount) }}
       </span>

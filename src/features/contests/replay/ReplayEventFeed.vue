@@ -51,7 +51,9 @@ const lines = computed(() =>
         :key="line.key"
         class="flex flex-col gap-0.5 border-t border-line pt-2.5 first:border-t-0 first:pt-0"
       >
-        <span class="font-mono text-xs text-muted tabular-nums">{{ line.clock }}</span>
+        <span class="font-mono text-caption leading-4 text-muted tabular-nums">{{
+          line.clock
+        }}</span>
         <span class="flex flex-wrap items-center gap-1.5" :class="line.isGhost && 'text-muted'">
           <Ghost v-if="line.isGhost" class="size-3.5 shrink-0" aria-hidden="true" />
           <span v-if="line.announceGhost" class="sr-only">{{ $t('replay.table.ghost') }}</span>

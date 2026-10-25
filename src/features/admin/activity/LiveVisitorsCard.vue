@@ -50,7 +50,9 @@ const numberOf = (value: number) => formatNumber(value, locale.locale);
             :key="tile.key"
             class="rounded-cell border border-line bg-surface-solid px-3 py-2"
           >
-            <dt class="text-xs text-muted">{{ $t(`admin.activity.live.${tile.key}`) }}</dt>
+            <dt class="text-caption leading-4 text-muted">
+              {{ $t(`admin.activity.live.${tile.key}`) }}
+            </dt>
             <dd class="m-0 font-mono text-subtitle leading-7 font-semibold tabular-nums">
               {{ numberOf(tile.value) }}
             </dd>
@@ -67,7 +69,10 @@ const numberOf = (value: number) => formatNumber(value, locale.locale);
               :rating="entry.user.rating"
               class="max-w-full"
             />
-            <time :datetime="entry.lastSeenAt" class="font-mono text-xs text-muted tabular-nums">
+            <time
+              :datetime="entry.lastSeenAt"
+              class="font-mono text-caption leading-4 text-muted tabular-nums"
+            >
               {{ formatDate(entry.lastSeenAt, 'datetime', locale.locale) }}
             </time>
           </li>

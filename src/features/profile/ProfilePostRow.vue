@@ -22,7 +22,7 @@ const locale = useLocaleStore();
       </RouterLink>
     </h2>
     <UserContent :html="post.summaryHtml" class="line-clamp-2 text-sm text-muted" />
-    <p class="text-xs text-muted">
+    <p class="text-caption leading-4 text-muted">
       {{
         $t('profileTabs.postLine', {
           date: formatDate(post.publishOn, 'date', locale.locale),

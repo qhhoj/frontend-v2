@@ -7,7 +7,7 @@
 // So is `uppercase` on a table header cell or header recipe (scripts/table-header-case.mjs).
 // So is a raw `<h1` outside PageHeader (scripts/page-headings.mjs).
 // So is a hairline border (`border-line`, `border-line-strong`) on a form control (scripts/control-borders.mjs).
-// So are arbitrary sizes, radii and z-indexes (`text-[13px]`, `rounded-[3px]`, `z-[5]`): use the named steps (scripts/arbitrary-utilities.mjs).
+// So are arbitrary sizes, radii and z-indexes (`text-[13px]`, `rounded-[3px]`, `z-[5]`, `z-50`) and the arbitrary token wrappers `accent-[var(--qh-accent)]` and `min-h-[var(--qa-control)]`: use the named steps (scripts/arbitrary-utilities.mjs).
 // The exemptions are Bit's sprite palettes (src/mascot/bit-sprite.ts) and the avatar's sprite data (src/mascot/avatar/avatar-sprites.ts):
 // image-like data that Bit keeps in every theme.
 import { readdirSync, readFileSync } from 'node:fs';
@@ -50,13 +50,13 @@ const perLine = (find) => (source, rel) =>
 /** Each check reads a whole file and answers `{ line, text }` offences; the first group that has any is reported. */
 const CHECKS = [
   {
-    message: `Arbitrary size/radius/z-index classes (use text-tiny|caption|meta|sm|base|title|subtitle|section|display|page|stat|hero|score, rounded-<role>, z-<layer>; docs/design-language.md):`,
+    message: `Arbitrary size/radius/z-index classes, z-50, accent-[var(...)] and h-[var(--qa-...)] (use text-tiny|caption|meta|sm|base|title|subtitle|section|display|page|stat|hero|score, rounded-<role>, z-<layer>; docs/design-language.md):`,
     find: perLine((line, rel) =>
       arbitraryUtilities(line).filter((name) => !(ALLOWED[rel] ?? []).includes(name)),
     ),
   },
   {
-    message: `Stock classes that skip the named scales: the theme resets rounded-lg and shadow-md (they render nothing), and text-lg...text-9xl bypass the type scale (use rounded-cell|row|card|pill|skeleton|control, shadow-glow|float, text-subtitle|section|display|page|stat|hero|score):`,
+    message: `Stock classes that skip the named scales: the theme resets rounded-lg and shadow-md (they render nothing), and text-xs, text-lg...text-9xl bypass the type scale (use text-caption (add leading-4 for its 16 px line), rounded-cell|row|card|pill|skeleton|control, shadow-glow|float, text-subtitle|section|display|page|stat|hero|score):`,
     find: perLine(stockUtilities),
   },
   {

@@ -46,7 +46,9 @@ const verb = computed(() => (props.disqualified ? 'disqualify' : 'reinstate'));
   >
     <div class="flex flex-col gap-3 text-sm">
       <p>{{ $t(`admin.contests.participants.bulk.${verb}Body`) }}</p>
-      <p class="font-mono text-xs break-words text-muted">{{ usernames.join(', ') }}</p>
+      <p class="font-mono text-caption leading-4 break-words text-muted">
+        {{ usernames.join(', ') }}
+      </p>
     </div>
     <template #error>
       <p v-if="mutation.failure.value" role="alert" class="text-sm text-negative">

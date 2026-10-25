@@ -178,7 +178,7 @@ onBeforeUnmount(() => {
       v-if="isLowPower && !isEditorReady"
       :id="hintId"
       data-testid="editor-tab-hint"
-      class="border-t border-line px-3 py-2 font-body text-xs text-muted"
+      class="border-t border-line px-3 py-2 font-body text-caption leading-4 text-muted"
     >
       {{ $t('lowPower.editorHint') }}
     </p>

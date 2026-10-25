@@ -46,7 +46,7 @@ const openable = computed(() =>
     >
       <History aria-hidden="true" class="size-3.5 shrink-0 text-muted" :stroke-width="1.75" />
       <span class="truncate font-semibold">{{ $t(entry.titleKey) }}</span>
-      <span v-if="entry.detail" class="truncate font-mono text-xs text-muted">{{
+      <span v-if="entry.detail" class="truncate font-mono text-caption leading-4 text-muted">{{
         entry.detail
       }}</span>
     </RouterLink>

@@ -135,7 +135,11 @@ function reset() {
                     :aria-invalid="invalid ? 'true' : undefined"
                   />
                 </div>
-                <p v-if="isSlugChanged" role="status" class="flex items-start gap-1.5 text-xs">
+                <p
+                  v-if="isSlugChanged"
+                  role="status"
+                  class="flex items-start gap-1.5 text-caption leading-4"
+                >
                   <TriangleAlert
                     class="mt-0.5 size-3.5 shrink-0 text-caution-strong"
                     aria-hidden="true"

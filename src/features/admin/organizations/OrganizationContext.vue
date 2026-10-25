@@ -65,7 +65,9 @@ const recalculation = useOrganizationWrite<string, void>({
         :key="stat.key"
         class="rounded-cell border border-line bg-surface-solid px-3 py-2"
       >
-        <dt class="text-xs text-muted">{{ $t(`admin.organizations.context.${stat.key}`) }}</dt>
+        <dt class="text-caption leading-4 text-muted">
+          {{ $t(`admin.organizations.context.${stat.key}`) }}
+        </dt>
         <dd
           class="m-0 text-base font-semibold whitespace-nowrap tabular-nums"
           :class="[stat.isAlert && 'text-negative', !stat.datetime && 'font-mono']"

@@ -58,7 +58,7 @@ const stateText = computed(() => translate(isVisible.value ? `${KEY}.onState` : 
       :locked-by="lockedBy"
       :aria-busy="mutation.isPending.value || undefined"
     />
-    <p v-if="mutation.failure.value" role="alert" class="m-0 text-xs text-negative">
+    <p v-if="mutation.failure.value" role="alert" class="m-0 text-caption leading-4 text-negative">
       {{ failureTextOf(mutation.failure.value) }}
     </p>
   </div>

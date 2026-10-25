@@ -25,7 +25,7 @@ const isHelpOpen = ref(false);
       v-model="model"
       type="checkbox"
       class="mt-0.5 size-5 shrink-0"
-      :class="tone === 'danger' ? 'accent-negative' : 'accent-[var(--qh-accent)]'"
+      :class="tone === 'danger' ? 'accent-negative' : 'accent-accent'"
       :aria-describedby="description ? `${id}-description` : undefined"
     />
     <div class="flex min-w-0 flex-col">

@@ -6,7 +6,7 @@ import VerdictLabel from '@/components/VerdictLabel.vue';
 import { translate } from '@/i18n';
 import CaseDetails from './CaseDetails.vue';
 import { caseDetails, type CaseDetail } from './case-details';
-import { formatCaseMemory, formatCaseTime } from '@/lib/format';
+import { NO_VALUE, formatCaseMemory, formatCaseTime } from '@/lib/format';
 import { PARTIAL_CODE, caseVerdictOf, type Verdict } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import { formatCasePoints, pendingPositions } from './test-overview';
@@ -33,7 +33,6 @@ const props = defineProps<{
 }>();
 
 const locale = useLocaleStore();
-const NO_VALUE = '—';
 const COLUMN_KEYS = ['test', 'result', 'time', 'memory', 'points'] as const;
 
 interface GradedRow {

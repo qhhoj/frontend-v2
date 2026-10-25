@@ -56,13 +56,13 @@ const lowPowerOptions = computed(() =>
       <!-- ModeChoice's two groups (Style, Mode) name themselves. -->
       <ModeChoice />
       <div>
-        <p class="mb-2 text-xs font-medium tracking-wider text-muted uppercase">
+        <p class="mb-2 text-caption leading-4 font-medium tracking-wider text-muted uppercase">
           {{ $t('appearance.accentTitle') }}
         </p>
         <AccentChoice />
       </div>
       <div>
-        <p class="mb-2 text-xs font-medium tracking-wider text-muted uppercase">
+        <p class="mb-2 text-caption leading-4 font-medium tracking-wider text-muted uppercase">
           {{ $t('appearance.glass') }}
         </p>
         <SegmentedChoice
@@ -80,7 +80,7 @@ const lowPowerOptions = computed(() =>
         </p>
       </div>
       <div>
-        <p class="mb-2 text-xs font-medium tracking-wider text-muted uppercase">
+        <p class="mb-2 text-caption leading-4 font-medium tracking-wider text-muted uppercase">
           {{ $t('lowPower.title') }}
         </p>
         <SegmentedChoice

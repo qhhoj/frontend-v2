@@ -145,7 +145,7 @@ function restoreFailureText(failure: ApiError): string {
         </button>
       </span>
     </nav>
-    <p class="text-xs text-muted">{{ t('admin.settings.revisions.footnote') }}</p>
+    <p class="text-caption leading-4 text-muted">{{ t('admin.settings.revisions.footnote') }}</p>
     <ConfirmDialog
       v-model:visible="isConfirmOpen"
       :title="t('admin.settings.revisions.confirmTitle')"

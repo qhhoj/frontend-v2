@@ -145,7 +145,10 @@ const commit = () => setRange(draftMin.value, draftMax.value);
           @change="commit"
         />
       </div>
-      <p class="flex justify-between text-xs text-muted tabular-nums" aria-hidden="true">
+      <p
+        class="flex justify-between text-caption leading-4 text-muted tabular-nums"
+        aria-hidden="true"
+      >
         <span>{{ SLIDER.min }}</span
         ><span>{{ SLIDER.max }}</span>
       </p>

@@ -83,7 +83,7 @@ const onMinPercentChange = (event: Event) => {
           :aria-describedby="`${minPercentInputId}-hint`"
           @change="onMinPercentChange"
         />
-        <p :id="`${minPercentInputId}-hint`" class="text-xs text-muted">
+        <p :id="`${minPercentInputId}-hint`" class="text-caption leading-4 text-muted">
           {{
             $t('admin.similarity.pairs.filters.minPercentHint', {
               fraction: filter.minPercent === null ? '' : filter.minPercent / 100,

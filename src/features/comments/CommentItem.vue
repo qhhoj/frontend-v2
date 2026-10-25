@@ -171,7 +171,7 @@ const TEXT_BUTTON =
           <button
             v-if="comment.revisions"
             type="button"
-            class="text-xs text-muted underline decoration-dotted hover:text-content"
+            class="text-caption leading-4 text-muted underline decoration-dotted hover:text-content"
             :aria-label="$t('comments.editedLabel', { count: comment.revisions })"
             @click="emit('history')"
           >
@@ -183,7 +183,7 @@ const TEXT_BUTTON =
           <template v-if="comment.hidden">
             <span
               data-testid="comment-hidden-badge"
-              class="rounded-pill bg-content px-2 text-xs font-semibold text-ground"
+              class="rounded-pill bg-content px-2 text-caption leading-4 font-semibold text-ground"
               >{{ $t('comments.hidden.badge') }}</span
             >
             <span v-if="hiderName" class="text-sm text-muted">{{
@@ -192,7 +192,7 @@ const TEXT_BUTTON =
           </template>
           <a
             :href="`#${anchor}`"
-            class="font-mono text-xs text-muted hover:underline"
+            class="font-mono text-caption leading-4 text-muted hover:underline"
             :aria-label="$t('comments.permalink', { number: entry.number })"
           >
             #{{ entry.number }}
@@ -249,7 +249,10 @@ const TEXT_BUTTON =
         >
           {{ $t('comments.action.reply') }}
         </button>
-        <span v-else-if="isPastReplyWindow && !comment.deleted" class="px-2.5 text-xs text-muted">
+        <span
+          v-else-if="isPastReplyWindow && !comment.deleted"
+          class="px-2.5 text-caption leading-4 text-muted"
+        >
           {{ $t('comments.tooOld') }}
         </span>
         <template v-if="isPhone && actions.length">

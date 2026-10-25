@@ -53,7 +53,7 @@ const label = computed(() => {
   >
     <span
       aria-hidden="true"
-      class="flex size-8 items-center justify-center rounded-full bg-surface-solid font-mono text-tiny font-bold tabular-nums md:size-11 md:text-xs"
+      class="flex size-8 items-center justify-center rounded-full bg-surface-solid font-mono text-tiny font-bold tabular-nums md:size-11 md:text-caption md:leading-4"
       :style="{ color: `var(${colour})` }"
       >{{ fraction === null ? verdict.code : `${percent}%` }}</span
     >

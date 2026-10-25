@@ -83,8 +83,8 @@ const scopeText = (scope: IntegrationScope) =>
   >
     <template #cell-name="{ row }">
       <span class="block font-semibold">{{ row.name }}</span>
-      <span class="block font-mono text-xs text-muted">{{ row.keyPrefix }}…</span>
-      <span class="block text-xs text-muted">{{
+      <span class="block font-mono text-caption leading-4 text-muted">{{ row.keyPrefix }}…</span>
+      <span class="block text-caption leading-4 text-muted">{{
         $t('admin.integrations.table.actsAsUser', { username: row.actsAs.username })
       }}</span>
     </template>
@@ -102,14 +102,16 @@ const scopeText = (scope: IntegrationScope) =>
       <span class="block text-muted">{{
         row.lastUsedAt ? dateOf(row.lastUsedAt) : $t('admin.integrations.table.never')
       }}</span>
-      <span class="block text-xs">{{
+      <span class="block text-caption leading-4">{{
         $t('admin.integrations.table.expiresOn', {
           date: row.expiresAt ? dateOf(row.expiresAt) : $t('admin.integrations.table.noExpiry'),
         })
       }}</span>
     </template>
     <template #cell-cidrs="{ row }">
-      <span class="font-mono text-xs break-all">{{ row.allowedCidrs.join(', ') }}</span>
+      <span class="font-mono text-caption leading-4 break-all">{{
+        row.allowedCidrs.join(', ')
+      }}</span>
     </template>
     <template #actions="{ row }">
       <button

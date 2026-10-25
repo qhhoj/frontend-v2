@@ -22,7 +22,7 @@ defineProps<{ row: OrganizationProblem }>();
   />
   <span
     v-if="row.isArchived"
-    class="ml-2 inline-block rounded-pill bg-surface-hover px-2 py-0.5 text-xs font-semibold whitespace-nowrap text-content"
+    class="ml-2 inline-block rounded-pill bg-surface-hover px-2 py-0.5 text-caption leading-4 font-semibold whitespace-nowrap text-content"
     >{{ $t('orgProblems.archivedChip') }}</span
   >
 </template>

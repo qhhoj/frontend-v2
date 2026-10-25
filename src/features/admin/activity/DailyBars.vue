@@ -39,7 +39,7 @@ const lastDay = computed(() => props.daily.at(-1)?.day ?? '');
         <title>{{ bar.label }}</title>
       </rect>
     </svg>
-    <figcaption class="flex justify-between font-mono text-xs text-muted">
+    <figcaption class="flex justify-between font-mono text-caption leading-4 text-muted">
       <span>{{ firstDay }}</span>
       <span>{{ lastDay }}</span>
     </figcaption>

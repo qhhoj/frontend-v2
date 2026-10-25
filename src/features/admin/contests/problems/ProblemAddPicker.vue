@@ -97,7 +97,7 @@ async function submit() {
         >
           <span class="font-mono font-semibold">{{ problem.code }}</span>
           <span class="min-w-0 flex-1 truncate">{{ problem.name }}</span>
-          <span v-if="listedIds.includes(problem.id)" class="text-xs text-muted">
+          <span v-if="listedIds.includes(problem.id)" class="text-caption leading-4 text-muted">
             {{ $t('admin.contests.problems.listed') }}
           </span>
         </button>

@@ -67,7 +67,7 @@ const tiles = computed<StatTile[]>(() => [
       >
         <dt class="text-sm text-muted">{{ tile.label }}</dt>
         <dd class="font-display text-display leading-8 font-semibold">{{ tile.value }}</dd>
-        <dd v-if="tile.hint" class="text-xs text-muted">{{ tile.hint }}</dd>
+        <dd v-if="tile.hint" class="text-caption leading-4 text-muted">{{ tile.hint }}</dd>
       </div>
     </dl>
   </Card>

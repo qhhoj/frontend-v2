@@ -32,7 +32,7 @@ function commitPosition(event: Event) {
   input.value = String(props.position);
 }
 const CELL = 'px-2 py-3 max-md:p-0';
-const CAPTION = 'block text-xs text-muted md:hidden';
+const CAPTION = 'block text-caption leading-4 text-muted md:hidden';
 const ICON_BUTTON = iconButtonClass('ghost', 'sm');
 </script>
 
@@ -44,7 +44,7 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
       <div class="flex items-start gap-3">
         <input
           type="checkbox"
-          class="mt-0.5 size-4 shrink-0 accent-[var(--qh-accent)]"
+          class="mt-0.5 size-4 shrink-0 accent-accent"
           :checked="isSelected"
           :aria-label="$t('admin.contests.bulk.selectRow', { name: row.code })"
           @change="emit('select', checked($event))"
@@ -52,14 +52,16 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
         <span class="font-semibold">{{ label }}</span>
         <div class="min-w-0 md:hidden">
           <div class="font-semibold">{{ row.name }}</div>
-          <div class="font-mono text-xs text-muted">{{ row.code }}</div>
+          <div class="font-mono text-caption leading-4 text-muted">{{ row.code }}</div>
         </div>
       </div>
     </td>
     <td :class="CELL" class="max-md:col-span-full">
       <div class="max-md:hidden">
         <div class="font-semibold">{{ row.name }}</div>
-        <div data-testid="code" class="font-mono text-xs text-muted">{{ row.code }}</div>
+        <div data-testid="code" class="font-mono text-caption leading-4 text-muted">
+          {{ row.code }}
+        </div>
       </div>
       <p v-if="issue" class="text-sm text-negative">{{ issue }}</p>
     </td>
@@ -79,7 +81,7 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
         <input
           v-model="row.partial"
           type="checkbox"
-          class="size-4 accent-[var(--qh-accent)]"
+          class="size-4 accent-accent"
           :aria-label="$t('admin.contests.problems.partialFor', { code: row.code })"
         />
         <span class="text-sm md:hidden">{{ $t('admin.contests.problems.columns.partial') }}</span>
@@ -90,7 +92,7 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
         <input
           v-model="row.isPretested"
           type="checkbox"
-          class="size-4 accent-[var(--qh-accent)]"
+          class="size-4 accent-accent"
           :aria-label="$t('admin.contests.problems.pretestFor', { code: row.code })"
         />
         <span class="text-sm md:hidden">{{ $t('admin.contests.problems.columns.pretest') }}</span>

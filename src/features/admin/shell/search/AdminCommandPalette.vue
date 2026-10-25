@@ -124,7 +124,7 @@ const status = computed(() => {
           @keydown="onKeydown"
         />
       </div>
-      <p role="status" class="text-xs text-muted">{{ status }}</p>
+      <p role="status" class="text-caption leading-4 text-muted">{{ status }}</p>
       <!-- Focusable so a keyboard user can scroll it; the combobox keeps the selection. -->
       <div
         role="region"
@@ -145,7 +145,9 @@ const status = computed(() => {
           {{ $t('admin.shell.search.emptyAdvice') }}
         </EmptyState>
       </div>
-      <p class="hidden text-xs text-muted sm:block">{{ $t('admin.shell.search.keys') }}</p>
+      <p class="hidden text-caption leading-4 text-muted sm:block">
+        {{ $t('admin.shell.search.keys') }}
+      </p>
     </div>
   </Dialog>
 </template>

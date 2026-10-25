@@ -148,7 +148,7 @@ const removeChip = (key: string) => emit('remove', key);
       <li v-for="chip in chips" :key="chip.key">
         <button
           type="button"
-          class="inline-flex h-(--qa-chip) items-center gap-1 rounded-pill border border-line-strong bg-surface-solid pr-1.5 pl-2.5 text-xs font-semibold hover:bg-surface-hover"
+          class="inline-flex h-(--qa-chip) items-center gap-1 rounded-pill border border-line-strong bg-surface-solid pr-1.5 pl-2.5 text-caption leading-4 font-semibold hover:bg-surface-hover"
           :aria-label="$t('common.table.removeFilter', { label: chip.label })"
           @click="removeChip(chip.key)"
         >

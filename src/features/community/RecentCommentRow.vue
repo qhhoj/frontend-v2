@@ -34,7 +34,7 @@ const target = computed(() => commentRoute(props.comment.page, props.comment.id)
       <span v-else class="font-semibold">{{ comment.page.title }}</span>
     </p>
     <p class="line-clamp-2 text-sm text-muted [overflow-wrap:anywhere]">{{ excerpt }}</p>
-    <p class="text-xs text-muted">
+    <p class="text-caption leading-4 text-muted">
       {{ formatAgo(comment.createdAt, now, locale.locale) }} · {{ signedScore(comment.score) }}
     </p>
   </article>

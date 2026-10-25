@@ -34,7 +34,7 @@ const remove = (tag: string) => (tags.value = tags.value.filter((item) => item !
       <li
         v-for="tag in tags"
         :key="tag"
-        class="inline-flex min-h-[var(--qa-chip,1.5rem)] items-center gap-0.5 rounded-pill border border-line-strong bg-surface-solid pl-2.5 text-xs font-semibold"
+        class="inline-flex min-h-(--qa-chip) items-center gap-0.5 rounded-pill border border-line-strong bg-surface-solid pl-2.5 text-caption leading-4 font-semibold"
       >
         <span>{{ tag }}</span>
         <button
@@ -60,7 +60,7 @@ const remove = (tag: string) => (tags.value = tags.value.filter((item) => item !
       @keydown.enter.prevent="add"
     />
     <p v-if="error" :id="`${id}-error`" class="text-sm text-negative">{{ error }}</p>
-    <p v-if="lockedBy" class="text-xs text-muted">
+    <p v-if="lockedBy" class="text-caption leading-4 text-muted">
       {{ needsPermissionText(lockedBy) }}
     </p>
   </div>

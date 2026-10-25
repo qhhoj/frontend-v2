@@ -44,7 +44,7 @@ const hiddenCount = computed(() => props.data.archiveFiles.length - previewFiles
           ><span class="font-mono">{{ file }}</span></AdminChip
         >
       </li>
-      <li v-if="hiddenCount > 0" class="self-center text-xs text-muted">
+      <li v-if="hiddenCount > 0" class="self-center text-caption leading-4 text-muted">
         {{ $t('admin.problems.data.archive.more', { count: hiddenCount }) }}
       </li>
     </ul>
@@ -60,7 +60,7 @@ const hiddenCount = computed(() => props.data.archiveFiles.length - previewFiles
         {{ $t('admin.problems.data.archive.viewInit') }}
       </button>
     </div>
-    <p class="text-xs text-muted">{{ $t('admin.problems.data.archive.note') }}</p>
+    <p class="text-caption leading-4 text-muted">{{ $t('admin.problems.data.archive.note') }}</p>
     <slot name="summary" />
     <InitYamlDialog v-model:visible="isInitShown" :code="code" />
   </AdminFormSection>

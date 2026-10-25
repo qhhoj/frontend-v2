@@ -1,9 +1,10 @@
 // Arbitrary values that bypass the named tokens (docs/design-language.md): `text-[13px]`, `rounded-[3px]`, `z-[1200]`.
+// Also `z-50` (the overlay step is z-overlay), `accent-[var(--qh-accent)]` (accent-accent) and `h-[var(--qa-...)]` (min-h-(--qa-...)): the same value through a named token.
 // Use the steps instead: text-tiny|caption|meta|sm|base|title|subtitle|section|display|page|stat|hero, rounded-cell|row|card|pill|control, z-sticky|savebar|header|bit|overlay|toast.
 import { classTokens, utilityOf } from './class-tokens.mjs';
 
 const ARBITRARY =
-  /^(?:text-\[[\d.]+(?:px|r?em)\](?:\/\S+)?|rounded(?:-[a-z]{1,2})?-\[[^\]]+\]|z-\[[^\]]+\])$/;
+  /^(?:text-\[[\d.]+(?:px|r?em)\](?:\/\S+)?|rounded(?:-[a-z]{1,2})?-\[[^\]]+\]|z-\[[^\]]+\]|z-50|accent-\[var\([^\]]+\)\]|(?:min-)?h-\[var\(--qa-[^\]]+\)\])$/;
 
 /**
  * Known exceptions, by file (path under src/) and class. Display sizes off the scale wait for the PageHeader and

@@ -116,7 +116,7 @@ function add() {
       <option v-for="owner in addable" :key="owner.id" :value="owner.id">{{ owner.name }}</option>
     </select>
     <p v-if="error" :id="`${id}-error`" class="text-sm text-negative">{{ error }}</p>
-    <p v-else :id="`${id}-hint`" class="text-xs text-muted">
+    <p v-else :id="`${id}-hint`" class="text-caption leading-4 text-muted">
       {{ $t('admin.problems.people.orgMoveHint') }}
     </p>
     <Notice v-if="isSiteMoveRefused" tone="warning" compact data-testid="organization-site-notice">

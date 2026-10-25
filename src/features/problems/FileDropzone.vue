@@ -67,7 +67,7 @@ function removeFile() {
         <span class="font-semibold">{{
           $t('submit.file.choose', { extension: acceptedExtension(language) })
         }}</span>
-        <span class="text-xs text-muted">{{
+        <span class="text-caption leading-4 text-muted">{{
           $t('submit.file.limit', { size: formatFileSize(uploadCapBytes(language)) })
         }}</span>
       </label>
@@ -78,7 +78,9 @@ function removeFile() {
     >
       <FileText class="size-5 shrink-0 text-muted" aria-hidden="true" />
       <span class="min-w-0 flex-1 truncate" :title="file.name">{{ file.name }}</span>
-      <span class="shrink-0 font-mono text-xs text-muted">{{ formatFileSize(file.size) }}</span>
+      <span class="shrink-0 font-mono text-caption leading-4 text-muted">{{
+        formatFileSize(file.size)
+      }}</span>
       <IconButton :label="$t('submit.file.remove')" class="shrink-0" @click="removeFile">
         <X class="size-4" aria-hidden="true" />
       </IconButton>

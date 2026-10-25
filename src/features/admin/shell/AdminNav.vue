@@ -25,7 +25,7 @@ const holdsCurrent = (navGroup: AdminNavGroup) => navGroup.items.some((item) => 
 const ITEM_CLASS =
   'flex min-h-(--qa-control) items-center gap-2.5 rounded-cell px-2.5 text-sm hover:bg-surface-hover aria-[current=page]:bg-accent-soft aria-[current=page]:font-semibold aria-[current=page]:text-accent-soft-text';
 const GROUP_CLASS =
-  'flex min-h-8 w-full items-center justify-between rounded-cell px-2.5 text-xs font-semibold tracking-wider text-muted uppercase touch:min-h-11';
+  'flex min-h-8 w-full items-center justify-between rounded-cell px-2.5 text-caption leading-4 font-semibold tracking-wider text-muted uppercase touch:min-h-11';
 </script>
 
 <template>
@@ -80,7 +80,7 @@ const GROUP_CLASS =
             <span
               v-if="counts[item.id]?.value"
               data-testid="admin-nav-count"
-              class="rounded-pill px-2 py-0.5 font-mono text-xs font-semibold tabular-nums"
+              class="rounded-pill px-2 py-0.5 font-mono text-caption leading-4 font-semibold tabular-nums"
               :class="
                 counts[item.id]?.needsAction
                   ? 'bg-verdict-tle-bg text-verdict-tle'

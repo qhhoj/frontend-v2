@@ -18,6 +18,7 @@ describe('stockUtilities', () => {
     `'md:text-2xl leading-tight'`,
     `\`\${size} text-9xl\``,
     `'text-xl/7'`,
+    `class="text-xs text-muted"`,
   ])('flags a stock class in %s', (line) => {
     expect(found(line)).toHaveLength(1);
   });
@@ -33,7 +34,7 @@ describe('stockUtilities', () => {
     `// rounded-lg is reset by the theme`,
     ` * 'rounded-lg' in a doc comment`,
     `const rounded = 1;`,
-    `class="text-tiny text-caption text-meta text-sm text-base text-title text-xs"`,
+    `class="text-tiny text-caption text-meta text-sm text-base text-title"`,
     `class="text-subtitle text-section text-display text-page text-stat text-hero text-score"`,
     `class="text-muted text-content text-xlarge"`,
     `// text-lg is a stock step`,

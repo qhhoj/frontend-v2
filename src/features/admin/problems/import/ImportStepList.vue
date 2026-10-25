@@ -35,7 +35,7 @@ const labelKey = (key: string, status: StepStatus) =>
     >
       <span
         aria-hidden="true"
-        class="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold"
+        class="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-caption leading-4 font-bold"
         :class="MARK_CLASS[step.status]"
       >
         <Check v-if="step.status === 'done'" class="size-4" />

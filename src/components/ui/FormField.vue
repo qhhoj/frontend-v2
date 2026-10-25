@@ -65,7 +65,7 @@ provide(FIELD_CONTROL, control);
       v-else-if="hint"
       :id="hintId"
       class="text-muted"
-      :class="scale === 'admin' ? 'text-xs' : 'text-meta'"
+      :class="scale === 'admin' ? 'text-caption leading-4' : 'text-meta'"
     >
       {{ hint }}
     </p>

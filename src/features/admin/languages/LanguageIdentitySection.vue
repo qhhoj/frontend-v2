@@ -41,7 +41,9 @@ const form = defineModel<LanguageForm>('form', { required: true });
           <span class="font-mono">{{ form.key }}</span>
           <AdminChip>{{ $t('admin.languages.form.sealed') }}</AdminChip>
         </div>
-        <p class="text-xs text-muted">{{ $t('admin.languages.form.hints.sealed') }}</p>
+        <p class="text-caption leading-4 text-muted">
+          {{ $t('admin.languages.form.hints.sealed') }}
+        </p>
       </div>
       <AdminField
         v-slot="{ id, describedBy, invalid }"

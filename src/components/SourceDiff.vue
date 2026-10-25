@@ -200,11 +200,11 @@ const phoneToneOf = (line: PhoneLine) => (line.kind === 'same' ? 'text-muted' : 
                     >{{ part.text }}</span
                   ><span
                     v-if="row.isMoved && row[side]"
-                    class="ml-2 rounded-pill border border-line px-2 font-body text-xs text-muted"
+                    class="ml-2 rounded-pill border border-line px-2 font-body text-caption leading-4 text-muted"
                     >{{ $t('sourceDiff.moved') }}</span
                   ><span
                     v-if="row.isWhitespaceOnly && side === 'right'"
-                    class="ml-2 rounded-pill border border-line px-2 font-body text-xs text-muted"
+                    class="ml-2 rounded-pill border border-line px-2 font-body text-caption leading-4 text-muted"
                     >{{ $t('sourceDiff.whitespaceOnly') }}</span
                   >
                 </td>
@@ -277,11 +277,11 @@ const phoneToneOf = (line: PhoneLine) => (line.kind === 'same' ? 'text-muted' : 
                   >{{ part.text }}</span
                 ><span
                   v-if="line.isMoved"
-                  class="ml-2 rounded-pill border border-line px-2 font-body text-xs text-muted"
+                  class="ml-2 rounded-pill border border-line px-2 font-body text-caption leading-4 text-muted"
                   >{{ $t('sourceDiff.moved') }}</span
                 ><span
                   v-if="line.isWhitespaceOnly"
-                  class="ml-2 rounded-pill border border-line px-2 font-body text-xs text-muted"
+                  class="ml-2 rounded-pill border border-line px-2 font-body text-caption leading-4 text-muted"
                   >{{ $t('sourceDiff.whitespaceOnly') }}</span
                 >
               </td>

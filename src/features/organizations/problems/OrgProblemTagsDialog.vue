@@ -46,7 +46,7 @@ const save = () =>
         <input v-model="checked" type="checkbox" class="size-5" :value="tag.id" />
         <OrgTagChip :tag="tag" />
       </label>
-      <p class="text-xs text-muted">{{ $t('orgProblems.tagsDialog.limit') }}</p>
+      <p class="text-caption leading-4 text-muted">{{ $t('orgProblems.tagsDialog.limit') }}</p>
     </fieldset>
     <template #error>
       <p v-if="failureText" role="alert" class="text-sm text-negative">{{ failureText }}</p>
