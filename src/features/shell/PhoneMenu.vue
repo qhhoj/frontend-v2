@@ -69,7 +69,7 @@ const drawerPt = computed(() => ({
   },
   content: { class: 'flex flex-col gap-4 overflow-y-auto px-4 py-3' },
   footer: { class: 'px-4 pb-4' },
-  mask: { class: 'page-gutter fixed inset-0 z-50 flex items-start bg-ground/70 py-2' },
+  mask: { class: 'page-gutter fixed inset-0 z-overlay flex items-start bg-ground/70 py-2' },
 }));
 </script>
 

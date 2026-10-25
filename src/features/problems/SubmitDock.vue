@@ -59,7 +59,7 @@ function onPanelEscape(event: KeyboardEvent) {
     role="dialog"
     aria-modal="true"
     tabindex="-1"
-    class="fixed inset-0 z-50 flex flex-col bg-surface-solid pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] outline-none"
+    class="fixed inset-0 z-overlay flex flex-col bg-surface-solid pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] outline-none"
     @keydown.esc="onPanelEscape"
   >
     <div class="min-h-0 flex-1 px-4 py-3">

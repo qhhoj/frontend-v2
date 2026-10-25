@@ -41,7 +41,7 @@ const { current: currentContest } = useCurrentContest(
     <BackgroundBlobs class="print:hidden" />
     <a
       href="#main"
-      class="sr-only print:hidden focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-pill focus:bg-surface-solid focus:px-4 focus:py-2"
+      class="sr-only print:hidden focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-overlay focus:rounded-pill focus:bg-surface-solid focus:px-4 focus:py-2"
     >
       {{ $t('app.skipToContent') }}
     </a>
