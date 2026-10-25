@@ -311,7 +311,7 @@ describe('contest actions with rules', () => {
     const { wrapper } = await mountApp('/contests/r42');
     await buttonNamed(wrapper, 'Vào thi').trigger('click');
     await flushPromises();
-    expect(dialog()!.querySelector('[role="alert"]')!.textContent).toContain('Hãy chọn ô đồng ý');
+    expect(dialog()!.textContent).toContain('Thể lệ vừa được cập nhật, vui lòng đọc lại');
     expect(
       calls.filter((call) => call.path === '/contests/r42' && call.method === 'GET').length,
     ).toBeGreaterThanOrEqual(2);

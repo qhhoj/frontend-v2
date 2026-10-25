@@ -39,12 +39,11 @@ const RULES_DIALOG_WIDTH = 520;
 /** Rules whose rendered text is empty for good (everything sanitised away) must not block accepting forever. */
 const isLoading = computed(() => props.rulesHtml === '' && props.isRefreshing);
 const canAccept = computed(() => isTicked.value && !isLoading.value);
-const isNotRecorded = computed(
-  () => props.error instanceof ApiError && props.error.code === 'rules_not_accepted',
-);
-
+/** Both codes mean the text on screen is not the one to accept: the page reloads it and the box is unticked. */
 const isChanged = computed(
-  () => props.error instanceof ApiError && props.error.code === 'rules_changed',
+  () =>
+    props.error instanceof ApiError &&
+    (props.error.code === 'rules_changed' || props.error.code === 'rules_not_accepted'),
 );
 
 watch(visible, (isOpen) => {
@@ -116,9 +115,7 @@ function accept() {
       <p v-else-if="error" role="alert" class="flex items-center gap-2.5 text-verdict-wa">
         <InlineBit :kind="EXTRAS_BITS.rulesRefused" />
         <span>
-          <strong>{{
-            $t(isNotRecorded ? 'joinRules.notRecordedTitle' : 'joinRules.refusedTitle')
-          }}</strong>
+          <strong>{{ $t('joinRules.refusedTitle') }}</strong>
           {{ $t(errorMessageKey(error)) }}
         </span>
       </p>

@@ -2544,7 +2544,6 @@
     "agree": "I have read the rules of this contest and agree to follow them.",
     "tickHint": "Tick the box to enable the button.",
     "refusedTitle": "Could not register",
-    "notRecordedTitle": "Your agreement was not recorded",
     "changed": "The rules were just updated, please read them again.",
     "cardTitle": "Rules",
     "revision": "revision {revision}",
