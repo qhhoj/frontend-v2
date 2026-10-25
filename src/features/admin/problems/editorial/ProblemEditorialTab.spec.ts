@@ -49,6 +49,38 @@ describe('ProblemEditorialTab', () => {
     });
   });
 
+  it('shows an editorial changed elsewhere while the form is clean, and saves on top of it', async () => {
+    const problem = editableProblem();
+    const solution = (isPublic: boolean) => ({
+      isPublic,
+      publishOn: '2026-10-08T06:00:00.000Z',
+      authors: [],
+      content: 'Lời giải',
+    });
+    problem.editor!.solution = solution(false);
+    const calls = mockApi({
+      ...staffViewer(['judge.edit_own_problem']),
+      ...problemEditorRoutes(problem),
+      'GET /problems/hcmus41c': () => ok(problem),
+      'POST /problems/render-preview': ok({ html: '' }),
+      'PUT /problems/hcmus41c/editorial': { status: 204 },
+    });
+    const { wrapper, queryClient } = await mountAdmin('/admin/problems/hcmus41c/editorial');
+    problem.editor!.solution = solution(true);
+    await queryClient.invalidateQueries({ queryKey: ['admin', 'problem'] });
+    await flushPromises();
+    await wrapper.get('textarea').setValue('Lời giải mới');
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Lưu lời giải')!
+      .trigger('click');
+    await flushPromises();
+    expect(calls.find((call) => call.method === 'PUT')?.body).toMatchObject({
+      isPublic: true,
+      content: 'Lời giải mới',
+    });
+  });
+
   it('treats CRLF content handed back as LF as unchanged and sends the stored text back', async () => {
     const problem = editableProblem();
     problem.editor!.solution = {

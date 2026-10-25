@@ -125,6 +125,25 @@ describe('FlatpagesPage', () => {
     expect(calls.find((call) => call.method === 'PATCH')?.path).toBe('/admin/site/pages/fp-3');
   });
 
+  it('shows a newer saved copy in a clean form, and keeps typed text over it', async () => {
+    let stored = flatpage();
+    mockApi(routes({ 'GET /admin/site/pages/fp-1': () => ok(stored) }));
+    const { wrapper, queryClient } = await mountPages('/admin/pages?page=fp-1');
+    const refetch = async () => {
+      await queryClient.invalidateQueries({ queryKey: ['admin', 'flatpage'] });
+      await flushPromises();
+    };
+    stored = flatpage({ title: 'Do admin khác sửa' });
+    await refetch();
+    expect((wrapper.get('#page-title').element as HTMLInputElement).value).toBe(
+      'Do admin khác sửa',
+    );
+    await wrapper.get('#page-title').setValue('Đang gõ dở');
+    stored = flatpage({ title: 'Lần sửa thứ ba' });
+    await refetch();
+    expect((wrapper.get('#page-title').element as HTMLInputElement).value).toBe('Đang gõ dở');
+  });
+
   it('deletes after confirming, and hides delete without its permission', async () => {
     const calls = mockApi(routes({ 'DELETE /admin/site/pages/fp-1': { status: 204 } }));
     const { wrapper } = await mountPages('/admin/pages?page=fp-1');
