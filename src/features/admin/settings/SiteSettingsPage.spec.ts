@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { fail, invalid, issue, mockApi, noContent, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
@@ -15,6 +15,7 @@ import { ALL_SETTINGS, setting, settingRevision } from '@/test/admin-fixtures/se
 const scrollIntoView = vi.fn();
 Element.prototype.scrollIntoView = scrollIntoView;
 
+const COLD_MOUNT_TIMEOUT_MS = 60_000;
 const PERMS = ['judge.change_settings'];
 const routes = (extra = {}) => ({
   ...staffViewer(PERMS),
@@ -58,6 +59,12 @@ const clickIn = async (scope: ReturnType<typeof block>, text: string) => {
     .trigger('click');
   await flushPromises();
 };
+
+/** The first mount loads the admin shell and every screen module (seconds on a loaded machine): do it once here, not inside the first test's limit. */
+beforeAll(async () => {
+  mockApi(routes());
+  (await mountSettings()).wrapper.unmount();
+}, COLD_MOUNT_TIMEOUT_MS);
 
 describe('SiteSettingsPage', () => {
   it('saves both keys of a block that changed, in order', async () => {

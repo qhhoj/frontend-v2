@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { serverNow } from '@/lib/server-clock';
 import { Building2, EyeOff, Hourglass, Lock, LockKeyhole, TrendingUp } from 'lucide-vue-next';
 import type { Component } from 'vue';
 import { computed } from 'vue';
@@ -21,7 +22,7 @@ const flags = computed<Flag[]>(() => {
     [contest.isPrivate, { key: 'private', tone: 'neutral', icon: Lock }],
     [contest.isOrganizationPrivate, { key: 'organization', tone: 'neutral', icon: Building2 }],
     [
-      lockedAfter != null && Date.parse(lockedAfter) <= Date.now(),
+      lockedAfter != null && Date.parse(lockedAfter) <= serverNow(),
       { key: 'locked', tone: 'neutral', icon: LockKeyhole },
     ],
     [contest.isRated, { key: 'rated', tone: 'info', icon: TrendingUp }],

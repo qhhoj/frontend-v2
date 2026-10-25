@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { serverNow } from '@/lib/server-clock';
 import { computed, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
@@ -55,7 +56,7 @@ const isMissing = computed(() => error.value instanceof ApiError && error.value.
 let catchUpTimer: ReturnType<typeof setTimeout> | undefined;
 /** The server still reports the phase the clock has left behind. */
 const serverLagsClock = () =>
-  contest.value !== undefined && phaseAt(contest.value, Date.now()) !== contest.value.phase;
+  contest.value !== undefined && phaseAt(contest.value, serverNow()) !== contest.value.phase;
 
 function onCountdownElapsed() {
   void refetch();

@@ -1,3 +1,4 @@
+import { serverNow } from '@/lib/server-clock';
 import { computed, onScopeDispose, ref, watch } from 'vue';
 import { useCurrentContest } from '../bar/use-current-contest';
 
@@ -17,7 +18,7 @@ export function useStreamedContest() {
     () => current.value?.contest.endTime,
     (endTime) => {
       clearTimeout(endTimer);
-      const msLeft = endTime ? Date.parse(endTime) - Date.now() : 0;
+      const msLeft = endTime ? Date.parse(endTime) - serverNow() : 0;
       hasEnded.value = msLeft <= 0;
       if (msLeft > 0 && msLeft < MAX_TIMEOUT_MS)
         endTimer = setTimeout(() => (hasEnded.value = true), msLeft);

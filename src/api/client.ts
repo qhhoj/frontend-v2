@@ -1,3 +1,4 @@
+import { syncServerClock } from '@/lib/server-clock';
 import type { Schemas } from './schemas';
 
 export const API_BASE = '/api/internal';
@@ -114,7 +115,7 @@ async function send(
   if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
   if (method !== 'GET' && csrfToken) headers['X-CSRF-Token'] = csrfToken;
   try {
-    return await fetch(buildUrl(path, query), {
+    const response = await fetch(buildUrl(path, query), {
       method,
       headers,
       credentials: 'same-origin',
@@ -122,6 +123,8 @@ async function send(
       signal,
       cache,
     });
+    syncServerClock(response.headers, cache);
+    return response;
   } catch (error) {
     if ((error as { name?: string }).name === 'AbortError') throw error;
     throw new ApiError('network_error', 0, 'Network error');

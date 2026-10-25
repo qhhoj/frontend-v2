@@ -9,7 +9,6 @@ import { medalClass } from '@/lib/medal';
 import { useMotionAllowed } from '@/lib/use-motion-allowed';
 import type { Ranking, RankingProblem, RankingRow } from '@/api/types/contests';
 import ScrollRegion from '@/components/ScrollRegion.vue';
-import { formatNumber } from '@/lib/format';
 import { deltaToneClass, formatDelta } from '@/lib/rating-delta';
 import {
   formatCumtime,
@@ -17,6 +16,7 @@ import {
   rankingCell,
   showsCumtime,
   solvedCount,
+  totalScoreText,
 } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import RankingCell from './RankingCell.vue';
@@ -173,7 +173,7 @@ const scoreHeaderKey = computed(() => {
               <template v-else>{{
                 penalty
                   ? solvedCount(row, ranking.problems, context)
-                  : formatNumber(row.score, context.locale, context.pointsPrecision)
+                  : totalScoreText(row.score, ranking.problems, context)
               }}</template>
               <small
                 v-if="hasCombinedScore && !row.isDisqualified"

@@ -17,3 +17,11 @@ export function writeStorage(key: string, value: string, area: Area = 'local'): 
     // Unavailable storage: the choice lasts for this page only.
   }
 }
+
+export function removeStorage(key: string, area: Area = 'local'): void {
+  try {
+    storageOf(area).removeItem(key);
+  } catch {
+    // Unavailable storage: nothing was kept.
+  }
+}

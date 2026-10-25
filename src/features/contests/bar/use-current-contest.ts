@@ -1,3 +1,4 @@
+import { serverNow } from '@/lib/server-clock';
 import { computed, onScopeDispose, ref, watch } from 'vue';
 import { useSessionStore } from '@/stores/session.store';
 import { useCurrentParticipationQuery } from '../contests.queries';
@@ -15,17 +16,17 @@ export function useCurrentContest(isAsked: () => boolean = () => true) {
   const isEnabled = computed(() => isAsked() && session.status === 'authenticated');
   const { data, isPending, dataUpdatedAt } = useCurrentParticipationQuery(isEnabled);
   /** Re-read when the answer changes and when its end passes; the computed below reads the clock only through it. */
-  const checkedAt = ref(Date.now());
+  const checkedAt = ref(serverNow());
   let endTimer: ReturnType<typeof setTimeout> | undefined;
   watch(
     // Every answer re-reads the clock, even one equal to the last (an end past the timer's reach).
     [() => data.value?.participation.endTime, dataUpdatedAt],
     ([endTime]) => {
       clearTimeout(endTimer);
-      checkedAt.value = Date.now();
+      checkedAt.value = serverNow();
       const msLeft = endTime ? Date.parse(endTime) - checkedAt.value : 0;
       if (msLeft > 0 && msLeft < MAX_TIMEOUT_MS)
-        endTimer = setTimeout(() => (checkedAt.value = Date.now()), msLeft + 1);
+        endTimer = setTimeout(() => (checkedAt.value = serverNow()), msLeft + 1);
     },
     { immediate: true },
   );

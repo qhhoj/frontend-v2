@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { RankingContext } from './ranking-cells';
 import type { ContestFormatName, RankingProblem } from '@/api/types/contests';
-import { formatCumtime, rankingCell, showsCellTime, solvedCount } from './ranking-cells';
+import {
+  formatCumtime,
+  rankingCell,
+  showsCellTime,
+  solvedCount,
+  totalScoreText,
+} from './ranking-cells';
 
 const problem = (overrides: Partial<RankingProblem> = {}): RankingProblem => ({
   problemId: 'p1',
@@ -311,5 +317,17 @@ describe('ranking cells past 99 hours', () => {
     expect(
       rankingCell({ time: 100 * 3600 - 60, points: 1, tries: 1 }, problem(), 'me', icpc).time,
     ).toBe('99:59');
+  });
+});
+
+describe('row total', () => {
+  const problems = [problem({ points: 60 }), problem({ problemId: 'p2', points: 40 })];
+
+  it('stays short of the full total once rounded, and rounds an ordinary total as before', () => {
+    expect(totalScoreText(99.999, problems, context('default', 0))).toBe('99');
+    expect(totalScoreText(100, problems, context('default', 0))).toBe('100');
+    const tenths = [problem({ points: 0.1 }), problem({ problemId: 'p2', points: 0.2 })];
+    expect(totalScoreText(0.3, tenths, context('default', 1))).toBe('0.3');
+    expect(totalScoreText(54.6, problems, context('default', 0))).toBe('55');
   });
 });

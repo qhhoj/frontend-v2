@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { serverNow } from '@/lib/server-clock';
 import { CARD_VARIANTS } from '@/components/ui/Card.variants';
 import type { ContestListItem } from '@/api/types/contests';
 import CompactListRow from '@/components/CompactListRow.vue';
@@ -33,7 +34,7 @@ defineProps<{
 const locale = useLocaleStore();
 const spanText = useSpanText();
 /** Ended rows do not change with the clock, so each render reads it once. */
-const callOf = (contest: ContestListItem) => listCallToAction(contest, Date.now());
+const callOf = (contest: ContestListItem) => listCallToAction(contest, serverNow());
 /** The start date and the length, in one cell: `04/10 · 4 giờ`. */
 const whenText = (contest: ContestListItem) => {
   const lengthSeconds = (Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000;

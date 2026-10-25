@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue';
 import type { RouteLocationNormalizedLoaded } from 'vue-router';
-import { readStorage, writeStorage } from '@/lib/storage';
+import { readStorage, removeStorage, writeStorage } from '@/lib/storage';
 import { useViewerId } from '@/stores/use-viewer-id';
 
 /** One admin page the viewer opened: its path, its screen title and the record it was about (a code, a key). */
@@ -70,9 +70,21 @@ export function visitOf(route: RouteLocationNormalizedLoaded): RecentVisit | nul
   return { path: route.path, titleKey: route.meta.titleKey, detail: detail ?? null };
 }
 
-const storageKey = (viewerId: string) => `qhhoj.admin.recent.${viewerId}`;
+const STORAGE_PREFIX = 'qhhoj.admin.recent.';
+const storageKey = (viewerId: string) => `${STORAGE_PREFIX}${viewerId}`;
 /** Per account (an impersonating staff member keeps their own list), kept in this browser only. */
 const lists = ref<Record<string, RecentScreen[]>>({});
+
+/** Nobody is signed in (sign-out, or a session that expired while the browser was closed): every account's list goes, so a shared browser keeps no trail of admin pages. */
+export function forgetAllRecentScreens() {
+  lists.value = {};
+  try {
+    const keys = Object.keys(localStorage).filter((key) => key.startsWith(STORAGE_PREFIX));
+    keys.forEach((key) => removeStorage(key));
+  } catch {
+    // Unavailable storage: nothing was kept.
+  }
+}
 
 export function useRecentScreens() {
   const viewerId = useViewerId();
