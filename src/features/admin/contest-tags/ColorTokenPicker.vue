@@ -19,7 +19,7 @@ const name = useId();
         :key="key"
         :data-color="key"
         :class="[
-          'inline-flex min-h-[var(--qa-control,2.25rem)] cursor-pointer items-center gap-1.5 rounded-pill border px-3 text-sm font-semibold has-[:checked]:ring-2 has-[:checked]:ring-current has-[:checked]:ring-offset-2 has-[:checked]:ring-offset-surface-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus',
+          'inline-flex min-h-(--qa-control) cursor-pointer items-center gap-1.5 rounded-pill border px-3 text-sm font-semibold has-[:checked]:ring-2 has-[:checked]:ring-current has-[:checked]:ring-offset-2 has-[:checked]:ring-offset-surface-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus',
           TAG_COLOR_CLASSES[key],
         ]"
       >

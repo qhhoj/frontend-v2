@@ -115,7 +115,7 @@ function submit() {
       <label
         v-for="scope in INTEGRATION_SCOPES"
         :key="scope"
-        class="flex min-h-[var(--qa-control,2.25rem)] items-start gap-3 py-1"
+        class="flex min-h-(--qa-control) items-start gap-3 py-1"
       >
         <input
           v-model="scopes"
