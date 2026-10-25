@@ -18,6 +18,7 @@ import AdminBulkBar from '@/features/admin/ui/table/AdminBulkBar.vue';
 import DataTableCheckbox from './DataTableCheckbox.vue';
 import { ariaSortOf, hiddenClass, nextSort, rangeOf, stickyOffsets } from './DataTableColumns';
 import type { DataTableColumn } from './DataTableColumns';
+import { NO_VALUE } from '@/lib/format';
 
 /**
  * The list table: a card with an optional toolbar, sortable headers, optional row selection with the bulk bar in place of
@@ -140,7 +141,9 @@ function toggleDetails(key: string) {
 /** The default cell: a string or number field of the row; anything else needs a `cell-<key>` slot. */
 const cellText = (row: Row, key: string) => {
   const value = (row as Record<string, unknown>)[key];
-  return typeof value === 'string' || typeof value === 'number' ? String(value) || '—' : '—';
+  return typeof value === 'string' || typeof value === 'number'
+    ? String(value) || NO_VALUE
+    : NO_VALUE;
 };
 /**
  * Numbers and `mono` values stay on one line, so their column is as wide as the value. A text column may break anywhere

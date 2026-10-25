@@ -10,8 +10,9 @@ import SubmissionProblemName from './SubmissionProblemName.vue';
 import SubmissionSourceLink from './SubmissionSourceLink.vue';
 import SubmissionVerdictBlock from './SubmissionVerdictBlock.vue';
 import type { ColumnKey } from './submission-table-cells';
-import { NO_VALUE, costText } from './submission-row';
+import { costText } from './submission-row';
 import { useRowOpen } from './row-open';
+import { NO_VALUE } from '@/lib/format';
 
 /**
  * The submissions list for a narrow card (a phone, a tablet beside the filter rail): the verdict block, then up to four lines:

@@ -3,7 +3,7 @@ import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import { computed } from 'vue';
 import type { RatingHistoryEntry } from '@/api/types/users';
 import Card from '@/components/ui/Card.vue';
-import { signedScore } from '@/lib/format';
+import { NO_VALUE, signedScore } from '@/lib/format';
 import { recentContests } from './recent-contests';
 import type { RecentContestRow } from './recent-contests';
 
@@ -12,9 +12,8 @@ const props = defineProps<{ history: RatingHistoryEntry[] }>();
 const RECENT_COUNT = 5;
 const rows = computed(() => recentContests(props.history, RECENT_COUNT));
 
-const DASH = '—';
-const orDash = (value: number | null) => (value === null ? DASH : String(Math.round(value)));
-const deltaText = (delta: number | null) => (delta === null ? DASH : signedScore(delta));
+const orDash = (value: number | null) => (value === null ? NO_VALUE : String(Math.round(value)));
+const deltaText = (delta: number | null) => (delta === null ? NO_VALUE : signedScore(delta));
 const deltaClass = (delta: number | null) =>
   delta === null || delta === 0 ? 'text-muted' : delta > 0 ? 'text-positive' : 'text-negative';
 const rowKey = (row: RecentContestRow, index: number) => row.key ?? `hidden-${index}`;

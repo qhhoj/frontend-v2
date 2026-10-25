@@ -8,8 +8,8 @@ import { formatClock, formatDate, formatRelative } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import DeletedProblemChip from './DeletedProblemChip.vue';
+import { NO_VALUE } from '@/lib/format';
 
-const NO_VALUE = '—';
 /** "3 minutes ago" only needs a fresh clock once a minute. */
 const CLOCK_REFRESH_MS = 60_000;
 

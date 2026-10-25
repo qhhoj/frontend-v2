@@ -24,9 +24,10 @@ import {
   fullColumnClass,
 } from './submission-table-cells';
 import type { ColumnKey, ColumnSlot } from './submission-table-cells';
-import { NO_VALUE, costText } from './submission-row';
+import { costText } from './submission-row';
 import { useRowOpen } from './row-open';
 import { useIsNarrow } from './use-card-compact';
+import { NO_VALUE } from '@/lib/format';
 
 /** Keep `SubmissionTableSkeleton.vue` in step: same card, header cells and row classes. */
 const props = withDefaults(

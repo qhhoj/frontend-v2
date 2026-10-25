@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { SubmissionStats } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { formatNumber } from '@/lib/format';
+import { NO_VALUE, formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import LiveToggle from './LiveToggle.vue';
 import VerdictDistributionBar from './VerdictDistributionBar.vue';
@@ -20,7 +20,6 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ 'update:live': [live: boolean] }>();
 const locale = useLocaleStore();
-const NO_VALUE = '—';
 const PERCENT = 100;
 
 const hasNoJudge = computed(

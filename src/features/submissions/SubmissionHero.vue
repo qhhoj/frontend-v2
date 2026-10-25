@@ -11,7 +11,7 @@ import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
 import { translate } from '@/i18n';
-import { formatNumber, scoreBelowFull } from '@/lib/format';
+import { NO_VALUE, formatNumber, scoreBelowFull } from '@/lib/format';
 import { provisionalPoints, ringProgress } from '@/lib/grading';
 import { PARTIAL_CODE, verdictOfCode, type Verdict } from '@/lib/verdicts';
 import { BIT_MOODS } from '@/mascot/bit-moods';
@@ -22,7 +22,6 @@ import VerdictRing from './VerdictRing.vue';
 
 /** Two decimals like the problem header; no digit grouping, scores are read as plain numbers. */
 const SCORE_FRACTION_DIGITS = 2;
-const NO_VALUE = '—';
 
 /**
  * The score card: the 128 px ring, the verdict, the score and the Bit mascot, then the failing test, passed count, time,

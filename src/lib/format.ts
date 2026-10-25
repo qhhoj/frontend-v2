@@ -1,6 +1,8 @@
 import type { Locale } from '@/i18n';
 
 export const INTL_LOCALES: Record<Locale, string> = { vi: 'vi-VN', en: 'en-US' };
+/** The one text for a missing value in a cell or fact (an em dash). */
+export const NO_VALUE = '—';
 const pad = (value: number) => String(value).padStart(2, '0');
 
 /** `HH:MM:SS`; hours are not wrapped into days (a 14-day contest shows 335:59:59). */

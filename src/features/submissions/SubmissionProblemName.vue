@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SubmissionListItem } from '@/api/types/submissions';
 import DeletedProblemChip from './DeletedProblemChip.vue';
-import { NO_VALUE } from './submission-row';
+import { NO_VALUE } from '@/lib/format';
 
 /** The problem of a row as one truncating line: contest letter, name (a link unless deleted), and with `showCode` the code after it in muted mono (otherwise on hover only). */
 defineProps<{ problem: SubmissionListItem['problem']; label?: string; showCode?: boolean }>();

@@ -4,7 +4,7 @@ import LanguageIcon from '@/components/language/LanguageIcon.vue';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import UserLink from '@/components/UserLink.vue';
 import { translate } from '@/i18n';
-import { formatCaseMemory, formatCaseTime } from '@/lib/format';
+import { NO_VALUE, formatCaseMemory, formatCaseTime } from '@/lib/format';
 import { formatAgoCompact, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { VERDICT_TONE_CLASSES, submissionVerdictOf } from '@/lib/verdicts';
@@ -14,7 +14,7 @@ import SubmissionProblemName from '../SubmissionProblemName.vue';
 import SubmissionSourceLink from '../SubmissionSourceLink.vue';
 import { useRowOpen } from '../row-open';
 import type { ColumnKey } from '../submission-table-cells';
-import { NO_VALUE, isFinished } from '../submission-row';
+import { isFinished } from '../submission-row';
 import ScoreRing from './ScoreRing.vue';
 import TestStrip from './TestStrip.vue';
 
