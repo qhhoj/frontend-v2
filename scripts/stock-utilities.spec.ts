@@ -18,6 +18,7 @@ describe('stockUtilities', () => {
     `'md:text-2xl leading-tight'`,
     `\`\${size} text-9xl\``,
     `'text-xl/7'`,
+    `class="text-xs text-muted"`,
   ])('flags a stock class in %s', (line) => {
     expect(found(line)).toHaveLength(1);
   });

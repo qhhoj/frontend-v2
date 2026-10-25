@@ -16,12 +16,15 @@ describe('arbitraryUtilities', () => {
     [`class="fixed z-[1200]"`, ['z-[1200]']],
     [`\`x \${y} !text-[11px]\``, ['!text-[11px]']],
     [`class="text-[13px]/5 z-[5]!"`, ['text-[13px]/5', 'z-[5]!']],
+    [`'fixed inset-0 z-50'`, ['z-50']],
+    [`class="size-4 accent-[var(--qh-accent)]"`, ['accent-[var(--qh-accent)]']],
+    [`'min-h-[var(--qa-control,2.25rem)] flex'`, ['min-h-[var(--qa-control,2.25rem)]']],
   ])('flags %s', (line, expected) => {
     expect(found(line)).toEqual(expected);
   });
 
   it.each([
-    `class="text-meta text-caption text-tiny text-sm text-title rounded-card rounded-control z-toast"`,
+    `class="text-meta text-caption text-tiny text-sm text-title rounded-card rounded-control z-toast z-overlay accent-accent min-h-(--qa-control)"`,
     `class="text-[var(--x)] leading-[1.75] w-[13px] z-10"`,
     `// text-[13px] is gone`,
     ` * 'rounded-[3px]' in a doc comment`,
