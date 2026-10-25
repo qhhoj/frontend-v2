@@ -64,6 +64,27 @@ describe('QuotaOverviewPage', () => {
     expect(openDialog().querySelector<HTMLInputElement>('#quota-credits')!.value).toBe('450');
   });
 
+  it('shows a newer stored override in an untouched dialog', async () => {
+    const quota = (monthlyCredits: number) => ({
+      monthlyCredits,
+      storageBytes: null,
+      judgingMs: null,
+    });
+    mockApi({
+      ...routes(),
+      'GET /organizations/lhp/usage': sequence(
+        ok(organizationUsage({ quota: quota(300) })),
+        ok(organizationUsage({ quota: quota(500) })),
+      ),
+    });
+    const { wrapper, queryClient } = await mountOverview();
+    await buttonNamed(wrapper, 'Sửa hạn mức THPT chuyên Lê Hồng Phong').trigger('click');
+    await flushPromises();
+    await queryClient.invalidateQueries({ queryKey: ['admin'] });
+    await flushPromises();
+    expect(openDialog().querySelector<HTMLInputElement>('#quota-credits')!.value).toBe('500');
+  });
+
   it('prefills the overrides and PATCHes only what changed', async () => {
     const calls = mockApi({
       ...routes(),

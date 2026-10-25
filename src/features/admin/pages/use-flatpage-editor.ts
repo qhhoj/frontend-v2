@@ -35,7 +35,10 @@ interface SaveRequest {
   patch: Partial<FlatpageBody>;
 }
 
-/** The form follows the page on screen: blank for a new page, the saved copy once it has loaded, blank again for a page not loaded yet. */
+/**
+ * The form follows the page on screen: blank for a new page, the saved copy once it has loaded, blank again for a page not loaded yet.
+ * A clean form (it still equals the copy it was last filled from) also follows a newer saved copy, so a later save never sends old text back.
+ */
 function useFollowingForm(pageId: () => string | null, page: Ref<FlatpageAdmin | undefined>) {
   const form = reactive<FlatpageBody>({ ...BLANK_FORM });
   let syncedId: string | null = null;
@@ -44,11 +47,14 @@ function useFollowingForm(pageId: () => string | null, page: Ref<FlatpageAdmin |
     syncedId = id;
     Object.assign(form, body);
   }
+  const isCleanAgainst = (previous: FlatpageAdmin | undefined, id: string) =>
+    previous?.id === id && Object.keys(changedFlatpageFields(bodyOf(previous), form)).length === 0;
 
-  watch([pageId, page], ([id, loaded]) => {
+  watch([pageId, page], ([id, loaded], [, previous]) => {
     if (id === null) return fillForm(BLANK_FORM, null);
     if (loaded?.id === id && syncedId !== id) return fillForm(bodyOf(loaded), id);
-    if (syncedId !== id) Object.assign(form, BLANK_FORM);
+    if (syncedId !== id) return void Object.assign(form, BLANK_FORM);
+    if (loaded?.id === id && isCleanAgainst(previous, id)) fillForm(bodyOf(loaded), id);
   });
 
   return form;

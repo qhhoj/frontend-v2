@@ -7,6 +7,7 @@ import { useViewerId } from '@/stores/use-viewer-id';
 export const editableProblemKey = (code: string, viewer: string) =>
   ['admin', 'problem', code, viewer] as const;
 
+/** Never add placeholderData or keepPreviousData: the keyed tab bodies rely on it so a save cannot land on another problem (COR-27). */
 export function useEditableProblemQuery(code: MaybeRefOrGetter<string>) {
   const viewer = useViewerId();
   return useQuery({

@@ -41,6 +41,12 @@ watch([visible, () => props.slug, isLoaded], ([isOpen]) => {
   if (isOpen) form.value = { ...original.value };
   errors.value = {};
 });
+/** A newer stored value reaches a form nobody has edited; an edited form keeps what was typed. */
+watch(original, (next, previous) => {
+  if (visible.value && Object.keys(quotaBodyOf(form.value, previous)).length === 0) {
+    form.value = { ...next };
+  }
+});
 const save = useAdminMutation({
   mutate: (body: ReturnType<typeof quotaBodyOf>) => updateOrganizationQuota(props.slug ?? '', body),
   invalidates: () => [USAGE_OVERVIEW_KEY, USAGE_DETAIL_KEY],
