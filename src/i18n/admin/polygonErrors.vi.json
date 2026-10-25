@@ -107,6 +107,10 @@
     "title": "Bài thay đổi trong lúc chờ",
     "fix": "Test hoặc nội dung bài vừa được sửa. Thử lại để nhập theo bản mới."
   },
+  "problem_in_running_contest": {
+    "title": "Bài đang dùng trong một kỳ thi đang chạy",
+    "fix": "Đồng bộ tự động sẽ chờ đến khi kỳ thi kết thúc, tối đa một tuần, rồi báo lỗi. Muốn cập nhật ngay, chạy đồng bộ thủ công cho cùng gói."
+  },
   "problem_unlinked": {
     "title": "Bài đã hủy liên kết",
     "fix": "Bài không còn liên kết với Polygon khi lượt đồng bộ chạy."
