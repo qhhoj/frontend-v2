@@ -8673,6 +8673,7 @@
           "polygon_unavailable",
           "problem_changed",
           "problem_code_taken",
+          "problem_in_running_contest",
           "problem_not_found",
           "problem_not_importable",
           "problem_unlinked",
@@ -13106,6 +13107,21 @@
         ],
         "type": "object"
       },
+      "SocialLinksResponse": {
+        "properties": {
+          "providers": {
+            "description": "Slugs of the providers linked to the account (a legacy provider v2 does not support keeps its stored name).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "providers"
+        ],
+        "type": "object"
+      },
       "SocialProvidersResponse": {
         "properties": {
           "providers": {
@@ -15270,7 +15286,8 @@
             "type": "array"
           },
           "notes": {
-            "description": "Every reader sees it; `can.editNotes` says who may change it.",
+            "description": "Staff-only internal notes: set for those who may edit them (`can.editNotes`: staff and assignees), null for every other reader.",
+            "nullable": true,
             "type": "string"
           },
           "timeline": {
@@ -17179,6 +17196,13 @@
             },
             "type": "array"
           },
+          "socialProviders": {
+            "description": "Slugs of the social sign-in providers linked to the account (removed through `DELETE social-links`).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "username": {
             "type": "string"
           }
@@ -17198,6 +17222,7 @@
           "notes",
           "inContest",
           "hasTwoFactor",
+          "socialProviders",
           "isActive",
           "isStaff",
           "isSuperuser",
@@ -17932,7 +17957,7 @@
     },
     "/api/internal/admin/discord-webhooks": {
       "get": {
-        "description": "Requires `judge.change_settings`. One row for `default` and each event:\nthe masked target of its own URL (host and last 4 characters; the URL\nitself is never returned), and whether it falls back to `default`.",
+        "description": "Requires `judge.change_settings` and a superuser, like every route\nhere (403 `superuser_only` on `key` otherwise). One row for `default` and\neach event: the masked target of its own URL (host and last 4 characters;\nthe URL itself is never returned), and whether it falls back to `default`.",
         "operationId": "DiscordWebhooksAdminController_list",
         "parameters": [],
         "responses": {
@@ -17985,7 +18010,7 @@
     },
     "/api/internal/admin/discord-webhooks/{event}": {
       "delete": {
-        "description": "Requires `judge.change_settings`. Removes the URL of `default` or one\nevent, keeping the others; an event without its own URL then uses\n`default`. Returns every row.",
+        "description": "Requires `judge.change_settings`, a superuser and a browser session.\nRemoves the URL of `default` or one\nevent, keeping the others; an event without its own URL then uses\n`default`. Returns every row.",
         "operationId": "DiscordWebhooksAdminController_remove",
         "parameters": [
           {
@@ -18046,7 +18071,7 @@
         ]
       },
       "put": {
-        "description": "Requires `judge.change_settings`. Sets the URL of `default` or one event,\nkeeping the others, as a revision of the `discord.webhooks` setting.\nReturns every row. 400 `validation_failed` for a URL the setting refuses.",
+        "description": "Requires `judge.change_settings`, a superuser and a browser session (API\ntokens are refused). Sets the URL of `default` or one event,\nkeeping the others, as a revision of the `discord.webhooks` setting.\nReturns every row. 400 `validation_failed` for a URL the setting refuses.",
         "operationId": "DiscordWebhooksAdminController_set",
         "parameters": [
           {
@@ -18119,7 +18144,7 @@
     },
     "/api/internal/admin/discord-webhooks/{event}/test": {
       "post": {
-        "description": "Requires `judge.change_settings`. Queues a test embed for the event, sent\nto its own URL or else `default` like a real one; delivery happens in the\nbackground, so a bad URL shows in Discord (or the worker log), not here.\n409 `webhook_unset` when neither has a URL. Returns 204.",
+        "description": "Requires `judge.change_settings`, a superuser and a browser session.\nQueues a test embed for the event, sent\nto its own URL or else `default` like a real one; delivery happens in the\nbackground, so a bad URL shows in Discord (or the worker log), not here.\n409 `webhook_unset` when neither has a URL. Returns 204.",
         "operationId": "DiscordWebhooksAdminController_test",
         "parameters": [
           {
@@ -19376,7 +19401,7 @@
     },
     "/api/internal/admin/settings": {
       "get": {
-        "description": "Requires `judge.change_settings`. Returns every registered setting with its description, current value, default and whether it differs from the default. Secret parts (keys, passwords) are never returned; they read `{set: boolean}`.",
+        "description": "Requires `judge.change_settings`. Returns every registered setting with its description, current value, default and whether it differs from the default; the superuser-only keys (see `PATCH`) only to a superuser. Secret parts (keys, passwords) are never returned; they read `{set: boolean}`.",
         "operationId": "SettingsController_list",
         "parameters": [],
         "responses": {
@@ -19429,7 +19454,7 @@
     },
     "/api/internal/admin/settings/{key}": {
       "patch": {
-        "description": "Requires `judge.change_settings`. Sets the value of one setting and records a revision with the acting user. Object-valued settings are merged into the stored value. `null` is refused. Errors: 400 `validation_failed` on `value` when it does not fit the setting, 404 `not_found` for an unknown key.",
+        "description": "Requires `judge.change_settings` and a browser session (API tokens are refused); `mail.smtpUrl`, `organization.adminRoleId`, every `auth.*` key, `discord.webhooks`, `polygon.apiKey`, `polygon.apiSecret`, `polygon.accountName`, `externalJudge.baseUrl` and `externalJudge.apiToken` also need a superuser, to read as well. Sets the value of one setting and records a revision with the acting user. Object-valued settings are merged into the stored value. `null` is refused. Errors: 400 `validation_failed` on `value` when it does not fit the setting, 403 `superuser_only` on `key` for a superuser-only key, 404 `not_found` for an unknown key.",
         "operationId": "SettingsController_update",
         "parameters": [
           {
@@ -19500,7 +19525,7 @@
     },
     "/api/internal/admin/settings/{key}/revisions": {
       "get": {
-        "description": "Requires `judge.change_settings`. Returns the change history of one setting, newest first, with the values before and after, the changed fields and the acting user. Paged, default 20 per page (max 100). 404 `not_found` for an unknown key.",
+        "description": "Requires `judge.change_settings`; the superuser-only keys of `PATCH` also need a superuser. Returns the change history of one setting, newest first, with the values before and after, the changed fields and the acting user. Paged, default 20 per page (max 100). Errors: 403 `superuser_only` on `key` for a superuser-only key, 404 `not_found` for an unknown key.",
         "operationId": "SettingsController_revisions",
         "parameters": [
           {
@@ -19593,7 +19618,7 @@
     },
     "/api/internal/admin/settings/{key}/revisions/{revisionId}/restore": {
       "post": {
-        "description": "Requires `judge.change_settings`. Writes the value the setting had before the given revision, as a new revision. Secret values are not stored in revisions, so they are never restored. Errors: 404 `not_found` for an unknown setting or revision, 409 `secret_unrestorable` when the revision has nothing restorable because the value is secret.",
+        "description": "Requires `judge.change_settings` and a browser session; the superuser-only keys of `PATCH` also need a superuser. Writes the value the setting had before the given revision, as a new revision. Secret values are not stored in revisions, so they are never restored. Errors: 403 `superuser_only` on `key` for a superuser-only key, 404 `not_found` for an unknown setting or revision, 409 `secret_unrestorable` when the revision has nothing restorable because the value is secret.",
         "operationId": "SettingsController_restore",
         "parameters": [
           {
@@ -21382,7 +21407,7 @@
         ]
       },
       "patch": {
-        "description": "Requires `judge.change_profile` and a browser session; changing `email` or `isActive` also needs `auth.change_user` (403 `forbidden`, issue `email_not_editable` or `activation_not_editable`), and an `email` change also your own `currentPassword` (400 `validation_failed` issue `password_required`, 400 `invalid_credentials`) and spends the credential budget shared with password sets (10 per admin per hour). An e-mail change keeps the user's sessions and reset links already sent: to recover a hijacked account, set a password. Not on yourself. Absent fields stay unchanged, `null` is refused; every check runs before the first write (a write that loses a race keeps the earlier ones, all audited). `organizations` replaces the whole ordered list (staff bypass the open-organization cap); deactivating signs the user out everywhere and revokes the API token. Every change is recorded as a `user` revision `staff_edit`.\nErrors: 400 `validation_failed` with issues `email_invalid`, `password_required`, `email_taken`, `organization_unknown`, `organization_admin_member` (the user administers a dropped organization); 403 `forbidden` for yourself or a superuser unless you are one; 404 `not_found`; 409 `conflict` with issue `user_banned` (a banned account keeps its rank and unlisting and is reactivated by unbanning), or when the memberships changed meanwhile or the e-mail is being registered.",
+        "description": "Requires `judge.change_profile` and a browser session; changing `email` or `isActive` also needs `auth.change_user` (403 `forbidden`, issue `email_not_editable` or `activation_not_editable`), and an `email` change also your own `currentPassword` (400 `validation_failed` issue `password_required`, 400 `invalid_credentials`) and spends the credential budget shared with password sets (10 per admin per hour). An e-mail change removes the user's social sign-in links (they were granted for the old address) but keeps their sessions and reset links already sent: to recover a hijacked account, set a password. Not on yourself. Absent fields stay unchanged, `null` is refused; every check runs before the first write (a write that loses a race keeps the earlier ones, all audited). `organizations` replaces the whole ordered list (staff bypass the open-organization cap); deactivating signs the user out everywhere and revokes the API token and the contest feed keys the user minted. Every change is recorded as a `user` revision `staff_edit`.\nErrors: 400 `validation_failed` with issues `email_invalid`, `password_required`, `email_taken`, `organization_unknown`, `organization_admin_member` (the user administers a dropped organization); 403 `forbidden` for yourself or a superuser unless you are one; 404 `not_found`; 409 `conflict` with issue `user_banned` (a banned account keeps its rank and unlisting and is reactivated by unbanning), or when the memberships changed meanwhile or the e-mail is being registered.",
         "operationId": "UserEditingController_update",
         "parameters": [
           {
@@ -21515,6 +21540,51 @@
           }
         },
         "summary": "Rename a user",
+        "tags": [
+          "Admin: users"
+        ]
+      }
+    },
+    "/api/internal/admin/users/{username}/social-links": {
+      "delete": {
+        "description": "Requires `auth.change_user` and a browser session. No Google, GitHub or Facebook identity signs in to the account any more (a provider can link again only through a verified e-mail matching the account's current one). Sessions already open stay: set a password to end them. Recorded as a `user` revision `staff_remove_social_links`.\nErrors: 403 `forbidden` for yourself or a superuser unless you are one, 404 `not_found`. Returns 204.",
+        "operationId": "UserEditingController_removeSocialLinks",
+        "parameters": [
+          {
+            "description": "Username of the account; an unknown name gives 404.",
+            "in": "path",
+            "name": "username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Remove a user's social sign-in links",
         "tags": [
           "Admin: users"
         ]
@@ -22784,6 +22854,111 @@
         ]
       }
     },
+    "/api/internal/auth/social/links": {
+      "get": {
+        "description": "Browser session only, not while impersonating. Returns the slugs of the providers that sign in to this account.",
+        "operationId": "SocialLinksController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SocialLinksResponse"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "List your social sign-in links",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/internal/auth/social/links/{provider}": {
+      "delete": {
+        "description": "Browser session only, not while impersonating. Requires the current password in the body (400 `invalid_credentials`, then 429 `rate_limited`, sharing the budget of other password confirmations). The provider no longer signs in to this account; sessions already open stay until you sign out everywhere.\nErrors: 409 `conflict` with issue `password_unusable` when the account has no password yet (set one with the reset form first, so the account keeps a way to sign in), 404 `not_found` when no such link exists. Returns 204.",
+        "operationId": "SocialLinksController_unlink",
+        "parameters": [
+          {
+            "description": "Provider slug from `GET /auth/social/links`.",
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurrentPasswordDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`).",
+            "headers": {
+              "Retry-After": {
+                "description": "Whole seconds to wait before retrying; sent with 429 and 503.",
+                "schema": {
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Remove a social sign-in link",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/api/internal/auth/social/providers": {
       "get": {
         "description": "Public. Returns the slugs of the OAuth providers that are configured, for the login page buttons.",
@@ -22836,7 +23011,7 @@
     },
     "/api/internal/auth/social/{provider}/callback": {
       "get": {
-        "description": "Public. The provider redirects the browser here. Always answers with a 302 to the site: to `/` (or `/login/2fa` when a second factor is pending) after signing in, to `/register/social?token=...` when a new account must be completed with `POST /auth/social/complete`, or to `/login?error=<code>` with `oauth_state`, `oauth_failed`, `email_unverified`, `banned`, `account_not_activated` or `account_disabled`.\nA verified email that matches exactly one active account links the provider to it. The state is single use.",
+        "description": "Public. The provider redirects the browser here. Always answers with a 302 to the site: to `/` (or `/login/2fa` when a second factor is pending) after signing in, to `/register/social?token=...` when a new account must be completed with `POST /auth/social/complete`, or to `/login?error=<code>` with `oauth_state`, `oauth_failed`, `email_unverified`, `banned`, `account_not_activated` or `account_disabled`.\nA verified email that matches exactly one active account links the provider to it and ends that account's other sessions and API token; when it was never signed in to, its password also stops working (set one with the reset form). The state is single use.",
         "operationId": "SocialController_callback",
         "parameters": [
           {
@@ -24889,7 +25064,7 @@
     },
     "/api/internal/contests/{key}": {
       "delete": {
-        "description": "Contest editors only, with the key typed again in `confirm` (400\n`confirmation_mismatch` otherwise). Only a hidden contest without ratings\nor pending final submissions can be deleted (409 `contest_not_deletable`).\nIts participations, announcements, ranking link, ghosts, balloons, feed\nkeys, replay and official ranking are deleted; its submissions are kept\noutside any contest. Returns 204.",
+        "description": "Contest editors only, with the key typed again in `confirm` (400\n`confirmation_mismatch` otherwise). Only a hidden contest without ratings\nor pending final submissions can be deleted, and one with live or virtual\nparticipations only with `judge.edit_all_contest` (409\n`contest_not_deletable`).\nIts participations, announcements, ranking link, ghosts, balloons, feed\nkeys, replay and official ranking are deleted; its submissions are kept\noutside any contest. Returns 204.",
         "operationId": "ContestEditingController_remove",
         "parameters": [
           {
@@ -30952,7 +31127,7 @@
         ]
       },
       "patch": {
-        "description": "Organization administrators only. Changes the fields sent (null is refused\nfor `slots`); `about` is re-rendered, `adminIds` is the whole new admin\nlist and must not be empty, and new admins are subject to the three-\norganization cap. Staff fields `isUnlisted`, `slots` and `shortName` need\n`judge.edit_all_organization`. A slug that is taken is 400\n`validation_failed`; the admin cap is issue code `admin_cap`. Changed\nfields are recorded in the history.",
+        "description": "Organization administrators only. Changes the fields sent (null is refused\nfor `slots`); `about` is re-rendered, `adminIds` is the whole new admin\nlist and must not be empty, and new admins are subject to the three-\norganization cap. Staff fields `isUnlisted`, `slots` and `shortName` need\n`judge.edit_all_organization`. A slug that is taken is 400\n`validation_failed`; the admin cap is issue code `admin_cap`. New admins\nbecome members, so 409 `organization_full` when those not yet members do\nnot fit in `slots`. Changed fields are recorded in the history.",
         "operationId": "OrganizationEditingController_update",
         "parameters": [
           {
@@ -33111,7 +33286,7 @@
     },
     "/api/internal/polygon/syncs": {
       "get": {
-        "description": "Needs `judge.edit_all_problem` (the runs name every problem). Every finished Polygon import and sync job, newest\nfirst: problem code, Polygon problem, revision, package and its build time,\nfirst import or sync, manual or automatic, who started it, the result and,\nfor a failure, the step it stopped at and the error shown to the requester.\nPaged, default 20 per page (max 100). Errors: 403 `forbidden`.",
+        "description": "Needs `judge.edit_own_problem` and `judge.edit_all_problem` (the runs name every problem). Every finished Polygon import and sync job, newest\nfirst: problem code, Polygon problem, revision, package and its build time,\nfirst import or sync, manual or automatic, who started it, the result and,\nfor a failure, the step it stopped at and the error shown to the requester.\nPaged, default 20 per page (max 100). Errors: 403 `forbidden`.",
         "operationId": "PolygonController_syncs",
         "parameters": [
           {
@@ -40517,7 +40692,7 @@
     },
     "/api/internal/tickets/{id}": {
       "get": {
-        "description": "Returns the ticket with its messages, notes, assignees and timeline.\nReadable by its creator, its assignees, editors of the linked problem,\neditors of the contest it was filed from and staff. Fails with 404 `not_found` for an unknown id and 403 `forbidden`\nfor a ticket the caller may not read.",
+        "description": "Returns the ticket with its messages, assignees and timeline; the internal notes only to staff and assignees.\nReadable by its creator, its assignees, editors of the linked problem,\neditors of the contest it was filed from and staff. Fails with 404 `not_found` for an unknown id and 403 `forbidden`\nfor a ticket the caller may not read.",
         "operationId": "TicketsController_detail",
         "parameters": [
           {
@@ -41126,7 +41301,7 @@
     },
     "/api/internal/users/{username}/ban": {
       "post": {
-        "description": "Requires `judge.ban_user`. Deactivates the account, hides it from the leaderboards, sets its rank to `banned`, records the reason and signs the user out everywhere. Errors: 400 `validation_failed` for the reason reserved to automatic contest-cheating bans, 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`, 409 `conflict` when already banned. Returns 204.",
+        "description": "Requires `judge.ban_user`. Deactivates the account, hides it from the leaderboards, sets its rank to `banned`, records the reason, signs the user out everywhere and revokes their API token. Errors: 400 `validation_failed` for the reason reserved to automatic contest-cheating bans, 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`, 409 `conflict` when already banned. Returns 204.",
         "operationId": "UserModerationController_ban",
         "parameters": [
           {
@@ -41571,7 +41746,7 @@
     },
     "/api/internal/users/{username}/reset-two-factor": {
       "post": {
-        "description": "Requires `judge.ban_user`. Removes the user's authenticator app and all security keys so a locked-out user can sign in again, signs them out everywhere and records a `user` revision for audit. Errors: 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`. Returns 204.",
+        "description": "Requires `judge.ban_user` and a browser session (API tokens get 403), not while impersonating, like the other staff credential routes. Removes the user's authenticator app and all security keys so a locked-out user can sign in again, signs them out everywhere and records a `user` revision for audit. Errors: 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`. Returns 204.",
         "operationId": "UserModerationController_resetTwoFactor",
         "parameters": [
           {

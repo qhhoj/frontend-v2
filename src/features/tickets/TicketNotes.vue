@@ -7,13 +7,13 @@ import { useTicketPatch } from './use-ticket-patch';
 
 /** Notes: everyone who reads the ticket sees them; assignees and staff (`can.editNotes`) edit them. */
 const props = defineProps<{ ticket: TicketDetail }>();
-const draft = ref(props.ticket.notes);
+const draft = ref(props.ticket.notes ?? '');
 /** Set by typing, cleared once a save is accepted: a refetch never overwrites text the viewer is still working on. */
 const isEdited = ref(false);
 watch(
   () => props.ticket.notes,
   (notes) => {
-    if (!isEdited.value) draft.value = notes;
+    if (!isEdited.value) draft.value = notes ?? '';
   },
 );
 const { isPending, failureKey, patch } = useTicketPatch(props.ticket.id);
