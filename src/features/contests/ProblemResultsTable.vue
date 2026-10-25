@@ -79,7 +79,7 @@ const chipClasses = (code: ResultCode, value: number) =>
             </th>
             <td class="px-4 py-3">
               <div class="font-medium">{{ problem.name }}</div>
-              <div class="font-mono text-xs text-muted">{{ problem.code }}</div>
+              <div class="font-mono text-caption leading-4 text-muted">{{ problem.code }}</div>
             </td>
             <td class="px-4 py-3">
               <div
@@ -98,7 +98,7 @@ const chipClasses = (code: ResultCode, value: number) =>
                   v-for="code in RESULT_ORDER"
                   :key="code"
                   :class="[
-                    'rounded-pill px-2 py-0.5 font-mono text-xs',
+                    'rounded-pill px-2 py-0.5 font-mono text-caption leading-4',
                     chipClasses(code, problem.results[code]),
                   ]"
                 >
@@ -115,6 +115,6 @@ const chipClasses = (code: ResultCode, value: number) =>
         </tbody>
       </table>
     </Card>
-    <p class="px-1 text-xs text-muted">{{ $t('contests.stats.errNote') }}</p>
+    <p class="px-1 text-caption leading-4 text-muted">{{ $t('contests.stats.errNote') }}</p>
   </section>
 </template>

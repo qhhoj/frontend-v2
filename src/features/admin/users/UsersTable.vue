@@ -69,7 +69,10 @@ const columns = computed<AdminColumn[]>(() => [
           :link="false"
           :status="userStatusOf(row) === 'banned' ? 'banned' : 'active'"
         />
-        <span v-if="row.displayName !== row.username" class="truncate text-xs text-muted">
+        <span
+          v-if="row.displayName !== row.username"
+          class="truncate text-caption leading-4 text-muted"
+        >
           {{ row.displayName }}
         </span>
       </div>
@@ -113,7 +116,7 @@ const columns = computed<AdminColumn[]>(() => [
       </button>
       <span
         v-else
-        class="inline-flex items-center gap-1 px-2 text-xs text-muted"
+        class="inline-flex items-center gap-1 px-2 text-caption leading-4 text-muted"
         :title="$t(`admin.users.edit.locked.${locks[row.id]}`)"
       >
         <Lock aria-hidden="true" class="size-3.5" :stroke-width="1.75" />

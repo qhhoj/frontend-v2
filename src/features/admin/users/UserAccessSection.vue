@@ -171,7 +171,9 @@ const retry = () =>
         </fieldset>
         <div class="flex flex-col gap-2">
           <h4 class="text-sm font-semibold">{{ $t('admin.users.access.permissions') }}</h4>
-          <p class="text-xs text-muted">{{ $t('admin.users.access.permissionsHint') }}</p>
+          <p class="text-caption leading-4 text-muted">
+            {{ $t('admin.users.access.permissionsHint') }}
+          </p>
           <PermissionChecklist
             v-model="form.permissions"
             :catalog="catalogQuery.data.value ?? []"

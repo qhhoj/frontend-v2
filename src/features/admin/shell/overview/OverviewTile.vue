@@ -54,7 +54,7 @@ const hasCount = computed(() => typeof props.value === 'number' && props.value >
           {{ $t('admin.shell.overview.attention') }}
         </AdminChip>
       </span>
-      <span v-if="detail" class="text-xs text-muted">{{ detail }}</span>
+      <span v-if="detail" class="text-caption leading-4 text-muted">{{ detail }}</span>
       <span
         class="mt-auto inline-flex items-center gap-1 pt-1 text-sm font-semibold text-accent-text"
       >

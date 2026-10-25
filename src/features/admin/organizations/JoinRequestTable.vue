@@ -159,9 +159,11 @@ const bulkFailure = computed(() => {
           <p v-else class="m-0 text-sm text-muted">
             {{ $t('admin.organizations.queue.noReason') }}
           </p>
-          <time :datetime="row.createdAt" class="font-mono text-xs text-muted tabular-nums">{{
-            timeOf(row.createdAt)
-          }}</time>
+          <time
+            :datetime="row.createdAt"
+            class="font-mono text-caption leading-4 text-muted tabular-nums"
+            >{{ timeOf(row.createdAt) }}</time
+          >
           <AdminStatus
             v-if="failedId === row.id && decision.failure.value"
             kind="refused"

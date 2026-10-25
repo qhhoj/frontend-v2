@@ -17,7 +17,7 @@ const target = () => commentRoute(props.item.page, props.item.comment.id);
       {{ item.page.title }}
     </RouterLink>
     <span v-else class="truncate font-semibold">{{ item.page.title }}</span>
-    <span class="text-xs text-muted">{{
+    <span class="text-caption leading-4 text-muted">{{
       $t(`admin.comments.all.pageTypes.${item.page.type}`)
     }}</span>
   </span>

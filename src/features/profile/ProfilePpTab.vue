@@ -111,7 +111,9 @@ const verdictFor = (submission: PpSubmission): Verdict =>
                     >
                       {{ entry.problem.name }}
                     </RouterLink>
-                    <div class="font-mono text-xs text-muted">{{ entry.problem.code }}</div>
+                    <div class="font-mono text-caption leading-4 text-muted">
+                      {{ entry.problem.code }}
+                    </div>
                   </td>
                   <td
                     :class="[
@@ -147,7 +149,9 @@ const verdictFor = (submission: PpSubmission): Verdict =>
                           {{ entry.submission.casePoints }}/{{ entry.submission.caseTotal }}
                         </span>
                       </span>
-                      <span class="flex items-center gap-1 text-xs whitespace-nowrap text-muted">
+                      <span
+                        class="flex items-center gap-1 text-caption leading-4 whitespace-nowrap text-muted"
+                      >
                         <LanguageLabel
                           :language="{
                             key: entry.submission.languageKey,

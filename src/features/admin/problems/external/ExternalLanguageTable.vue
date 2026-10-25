@@ -36,7 +36,7 @@ const isTakenElsewhere = (remoteId: string, siteLanguageId: string) =>
       <tr v-for="remote in remoteLanguages" :key="remote.remoteId" class="border-t border-line">
         <th scope="row" class="py-2 pr-3 font-normal">
           {{ remote.remoteName }}
-          <span class="font-mono text-xs text-muted">{{ remote.remoteId }}</span>
+          <span class="font-mono text-caption leading-4 text-muted">{{ remote.remoteId }}</span>
         </th>
         <td class="py-2">
           <select

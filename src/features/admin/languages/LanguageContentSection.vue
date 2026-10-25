@@ -35,7 +35,7 @@ const countOf = (text: string) => formatNumber(codePointsOf(text), locale.locale
           :aria-invalid="invalid === 'true'"
           :class="INPUT"
         />
-        <span :id="`${id}-count`" class="text-xs text-muted">
+        <span :id="`${id}-count`" class="text-caption leading-4 text-muted">
           {{ countOf(form.template) }} / {{ textLimitText }}
         </span>
       </AdminField>
@@ -53,7 +53,7 @@ const countOf = (text: string) => formatNumber(codePointsOf(text), locale.locale
           :aria-invalid="invalid === 'true'"
           :class="INPUT"
         />
-        <span :id="`${id}-count`" class="text-xs text-muted">
+        <span :id="`${id}-count`" class="text-caption leading-4 text-muted">
           {{ countOf(form.info) }} / {{ textLimitText }}
         </span>
       </AdminField>
@@ -71,7 +71,7 @@ const countOf = (text: string) => formatNumber(codePointsOf(text), locale.locale
           :aria-invalid="invalid === 'true'"
           :class="INPUT"
         />
-        <span :id="`${id}-count`" class="text-xs text-muted">
+        <span :id="`${id}-count`" class="text-caption leading-4 text-muted">
           {{ countOf(form.description) }} / {{ textLimitText }}
         </span>
       </AdminField>

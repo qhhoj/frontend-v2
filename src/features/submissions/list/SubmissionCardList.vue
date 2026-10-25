@@ -60,7 +60,7 @@ const phoneMeta = (row: SubmissionListItem): PhoneMetaPart[] => [
 ];
 /** On md+ each chip fills a fixed slot with right-aligned tabular figures, so time, memory and language line up across cards. */
 const PILL =
-  'rounded-pill px-2.5 py-0.5 font-mono text-xs font-semibold whitespace-nowrap tabular-nums md:text-right';
+  'rounded-pill px-2.5 py-0.5 font-mono text-caption leading-4 font-semibold whitespace-nowrap tabular-nums md:text-right';
 </script>
 
 <template>
@@ -149,7 +149,7 @@ const PILL =
         <RouterLink
           :to="{ name: 'submission', params: { id: row.id } }"
           :aria-label="rowLabel(row)"
-          class="relative inline-flex min-h-8 items-center rounded-pill px-2.5 touch:after:absolute touch:after:-inset-y-1.5 touch:after:inset-x-0 font-mono text-xs font-bold whitespace-nowrap hover:brightness-95 md:justify-center md:px-3"
+          class="relative inline-flex min-h-8 items-center rounded-pill px-2.5 touch:after:absolute touch:after:-inset-y-1.5 touch:after:inset-x-0 font-mono text-caption leading-4 font-bold whitespace-nowrap hover:brightness-95 md:justify-center md:px-3"
           :class="VERDICT_TONE_CLASSES[submissionVerdictOf(row).tone]"
           >{{ submissionVerdictOf(row).code
           }}<span class="max-md:hidden">

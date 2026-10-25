@@ -66,7 +66,7 @@ const toggle = (chip: QuickFilter) =>
       {{ $t(`submissions.quick.${chip}`) }}
       <span
         v-if="chip === 'grading' && gradingCount"
-        class="font-mono text-xs tabular-nums opacity-80"
+        class="font-mono text-caption leading-4 tabular-nums opacity-80"
         >{{ formatNumber(gradingCount, locale.locale) }}</span
       >
     </FilterToggle>

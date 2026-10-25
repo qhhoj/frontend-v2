@@ -78,7 +78,7 @@ const hint = computed(() =>
             {{ $t('orgAdmin.info.avatarUseUrl') }}
           </button>
         </div>
-        <p class="text-xs text-muted">{{ $t(hint) }}</p>
+        <p class="text-caption leading-4 text-muted">{{ $t(hint) }}</p>
       </div>
     </div>
     <FormField

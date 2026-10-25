@@ -47,7 +47,7 @@ const search = useAdminMutation({
       {{ $t('admin.externalJudge.search.empty') }}
     </p>
     <template v-else-if="items">
-      <p class="text-xs text-muted">
+      <p class="text-caption leading-4 text-muted">
         {{ $t('admin.externalJudge.search.total', { shown: items.length, total }) }}
       </p>
       <ul class="flex flex-col gap-1" data-testid="external-search-results">

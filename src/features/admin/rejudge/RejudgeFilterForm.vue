@@ -89,7 +89,9 @@ const applyPreset = (preset: ResultPreset) => {
 
     <fieldset class="flex flex-col gap-2">
       <legend class="text-sm font-semibold">{{ $t('admin.rejudge.filter.languages') }}</legend>
-      <p class="text-xs text-muted">{{ $t('admin.rejudge.filter.languagesHint') }}</p>
+      <p class="text-caption leading-4 text-muted">
+        {{ $t('admin.rejudge.filter.languagesHint') }}
+      </p>
       <p v-if="errors.languages" class="text-sm text-negative">{{ errors.languages }}</p>
       <AdminCheckChips
         v-model="filter.languageIds"
@@ -104,7 +106,7 @@ const applyPreset = (preset: ResultPreset) => {
 
     <fieldset class="flex flex-col gap-2">
       <legend class="text-sm font-semibold">{{ $t('admin.rejudge.filter.results') }}</legend>
-      <p class="text-xs text-muted">{{ $t('admin.rejudge.filter.resultsHint') }}</p>
+      <p class="text-caption leading-4 text-muted">{{ $t('admin.rejudge.filter.resultsHint') }}</p>
       <div class="flex flex-wrap items-center gap-2 text-sm">
         <span class="text-muted">{{ $t('admin.rejudge.filter.presets') }}</span>
         <button

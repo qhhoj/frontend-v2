@@ -18,7 +18,7 @@ const locale = useLocaleStore();
 <template>
   <aside class="flex flex-col gap-4 rounded-row border border-line bg-surface p-4 md:p-5">
     <div>
-      <p class="text-xs font-bold tracking-wide text-muted uppercase">
+      <p class="text-caption leading-4 font-bold tracking-wide text-muted uppercase">
         {{ $t('admin.polygonLink.source.label') }}
       </p>
       <h2 class="font-display text-base font-semibold break-words">
@@ -51,7 +51,7 @@ const locale = useLocaleStore();
       </template>
     </dl>
     <div class="flex flex-col gap-2 border-t border-line pt-4">
-      <h3 class="text-xs font-bold tracking-wide text-muted uppercase">
+      <h3 class="text-caption leading-4 font-bold tracking-wide text-muted uppercase">
         {{ $t('admin.polygonLink.source.fromPolygon') }}
       </h3>
       <ul class="flex list-disc flex-col gap-1 pl-5 text-sm">
@@ -65,7 +65,7 @@ const locale = useLocaleStore();
       </ul>
     </div>
     <div class="flex flex-col gap-2 border-t border-line pt-4">
-      <h3 class="text-xs font-bold tracking-wide text-muted uppercase">
+      <h3 class="text-caption leading-4 font-bold tracking-wide text-muted uppercase">
         {{ $t('admin.polygonLink.source.keptByQhhoj') }}
       </h3>
       <p class="text-sm">{{ $t('admin.polygonLink.source.kept') }}</p>

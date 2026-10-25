@@ -56,10 +56,10 @@ const isFullScore = (points: number, total: number) => points >= total;
                 >
                   {{ problem.name }}
                 </RouterLink>
-                <span class="font-mono text-xs text-muted">{{ problem.code }}</span>
+                <span class="font-mono text-caption leading-4 text-muted">{{ problem.code }}</span>
               </div>
               <span
-                class="rounded-pill px-2.5 py-1 font-mono text-xs font-semibold"
+                class="rounded-pill px-2.5 py-1 font-mono text-caption leading-4 font-semibold"
                 :class="
                   isFullScore(problem.points, problem.total)
                     ? 'bg-verdict-ac-bg text-verdict-ac'

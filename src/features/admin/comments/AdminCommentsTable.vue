@@ -70,7 +70,7 @@ const menuItems = (item: AdminCommentItem) => [
     <template #bulk><slot name="bulk" /></template>
     <template #cell-comment="{ row }">
       <CommentExcerpt :comment="row.comment">
-        <p v-if="row.hiddenBy" class="m-0 text-xs text-muted">
+        <p v-if="row.hiddenBy" class="m-0 text-caption leading-4 text-muted">
           {{ $t('admin.comments.all.hiddenBy', { name: row.hiddenBy.username }) }}
         </p>
         <AdminStatus

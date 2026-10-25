@@ -55,7 +55,9 @@ const actionTone = computed(() =>
             {{ organization.name }}
           </RouterLink>
         </h3>
-        <span class="font-mono text-xs text-muted">{{ organization.shortName }}</span>
+        <span class="font-mono text-caption leading-4 text-muted">{{
+          organization.shortName
+        }}</span>
       </div>
       <span
         :aria-label="$t('orgs.rankBadge', { rank })"
@@ -67,11 +69,11 @@ const actionTone = computed(() =>
     </div>
     <dl class="grid grid-cols-2 gap-2 tabular-nums">
       <div class="flex flex-col gap-0.5">
-        <dt class="text-xs text-muted">{{ $t('orgs.membersLabel') }}</dt>
+        <dt class="text-caption leading-4 text-muted">{{ $t('orgs.membersLabel') }}</dt>
         <dd class="font-bold">{{ memberCount }}</dd>
       </div>
       <div class="flex flex-col gap-0.5">
-        <dt class="text-xs text-muted">{{ $t('orgs.ppLabel') }}</dt>
+        <dt class="text-caption leading-4 text-muted">{{ $t('orgs.ppLabel') }}</dt>
         <dd class="font-bold text-positive">{{ performancePoints }}</dd>
       </div>
     </dl>

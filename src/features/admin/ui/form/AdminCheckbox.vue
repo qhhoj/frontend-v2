@@ -47,7 +47,7 @@ const describedBy = computed(
       <span
         v-if="lockedBy"
         :id="`${id}-locked`"
-        class="text-xs text-muted"
+        class="text-caption leading-4 text-muted"
         :title="isSuperuser ? lockedBy : undefined"
       >
         {{ lockedText }}

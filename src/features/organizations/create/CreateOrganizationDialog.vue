@@ -70,7 +70,7 @@ async function create() {
       <FormField input-id="org-create-about" :label="$t('orgAdmin.create.about')">
         <TextArea v-model="form.about" rows="3" />
       </FormField>
-      <p class="text-xs text-muted">{{ $t('orgAdmin.create.unlistedNote') }}</p>
+      <p class="text-caption leading-4 text-muted">{{ $t('orgAdmin.create.unlistedNote') }}</p>
     </div>
     <template #error>
       <AdminStatus

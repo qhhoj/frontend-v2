@@ -55,7 +55,9 @@ const now = useNow(60_000);
             </RouterLink>
             <div class="mt-1.5 flex min-h-[54px] flex-wrap items-center gap-2 md:min-h-[22px]">
               <TicketLinkChip :link="ticket.link" />
-              <span class="font-mono text-xs text-muted">{{ shortTicketId(ticket.id) }}</span>
+              <span class="font-mono text-caption leading-4 text-muted">{{
+                shortTicketId(ticket.id)
+              }}</span>
               <span class="md:hidden">
                 <TicketStatusPill
                   :is-open="ticket.isOpen"

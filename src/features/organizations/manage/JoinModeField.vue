@@ -25,6 +25,8 @@ const options = computed(() =>
       :selected="mode"
       @pick="(picked) => (isOpen = picked === 'open')"
     />
-    <p class="text-xs text-muted" aria-live="polite">{{ $t(`orgAdmin.joinMode.${mode}Hint`) }}</p>
+    <p class="text-caption leading-4 text-muted" aria-live="polite">
+      {{ $t(`orgAdmin.joinMode.${mode}Hint`) }}
+    </p>
   </div>
 </template>

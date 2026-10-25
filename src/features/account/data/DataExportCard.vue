@@ -70,9 +70,11 @@ async function request() {
 <template>
   <SettingsCard :title="$t('settings.data.title')" :lead="$t('settings.data.lead')">
     <template #header-end>
-      <span class="rounded-pill px-2.5 py-0.5 text-xs font-semibold" :class="CHIPS[file.kind]">{{
-        $t(`settings.data.state.${file.kind}`)
-      }}</span>
+      <span
+        class="rounded-pill px-2.5 py-0.5 text-caption leading-4 font-semibold"
+        :class="CHIPS[file.kind]"
+        >{{ $t(`settings.data.state.${file.kind}`) }}</span
+      >
     </template>
     <div
       v-if="file.kind === 'ready'"

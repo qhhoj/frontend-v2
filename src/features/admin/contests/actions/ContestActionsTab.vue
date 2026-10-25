@@ -35,7 +35,7 @@ const SKELETON_HEIGHTS = [
   'h-[198px] lg:h-[178px]',
 ];
 /** A group heading: the cards are the sections' content, so the heading stays small. */
-const GROUP = 'm-0 text-xs font-semibold tracking-wide text-muted uppercase';
+const GROUP = 'm-0 text-caption leading-4 font-semibold tracking-wide text-muted uppercase';
 const queryClient = useQueryClient();
 const viewer = useViewerId();
 const locale = useLocaleStore();

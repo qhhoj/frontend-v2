@@ -58,7 +58,7 @@ function clear() {
         <X class="size-4" aria-hidden="true" />
       </button>
     </div>
-    <p v-if="hint" :id="`${id}-hint`" class="text-xs text-muted">{{ hint }}</p>
+    <p v-if="hint" :id="`${id}-hint`" class="text-caption leading-4 text-muted">{{ hint }}</p>
     <p aria-live="polite" class="sr-only">{{ status }}</p>
   </div>
 </template>

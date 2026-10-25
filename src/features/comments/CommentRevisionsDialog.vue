@@ -88,14 +88,14 @@ const SIGN = { same: ' ', removed: '−', added: '+' };
                 @click="chosenEdit = version.edit"
               >
                 <span class="font-semibold">{{ nameOf(version) }}</span>
-                <span v-if="version.at" class="text-xs text-muted">
+                <span v-if="version.at" class="text-caption leading-4 text-muted">
                   {{ formatDate(version.at, 'datetime', locale.locale) }}
                 </span>
                 <UserLink
                   v-if="version.editor"
                   :username="version.editor.username"
                   :rating="version.editor.rating"
-                  class="text-xs"
+                  class="text-caption leading-4"
                 />
               </button>
             </li>
@@ -114,7 +114,7 @@ const SIGN = { same: ' ', removed: '−', added: '+' };
             <h3 class="text-sm font-semibold">
               {{ $t('comments.revisions.compare', { version: nameOf(chosen) }) }}
             </h3>
-            <p class="text-xs text-muted">{{ $t('comments.revisions.legend') }}</p>
+            <p class="text-caption leading-4 text-muted">{{ $t('comments.revisions.legend') }}</p>
             <div
               role="table"
               :aria-label="$t('comments.revisions.diffLabel')"

@@ -134,7 +134,10 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
             />
             <Chip v-if="row.username === viewerName" tone="accent">{{ $t('common.you') }}</Chip>
           </span>
-          <span v-if="row.displayName !== row.username" class="truncate text-xs text-muted">
+          <span
+            v-if="row.displayName !== row.username"
+            class="truncate text-caption leading-4 text-muted"
+          >
             {{ row.displayName }}
           </span>
         </span>

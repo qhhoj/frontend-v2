@@ -23,7 +23,7 @@ defineEmits<{ search: []; menu: [] }>();
     </div>
     <span
       data-testid="admin-staff-badge"
-      class="hidden shrink-0 items-center gap-1.5 rounded-pill bg-content px-3 py-1 text-xs font-semibold whitespace-nowrap text-ground xl:inline-flex"
+      class="hidden shrink-0 items-center gap-1.5 rounded-pill bg-content px-3 py-1 text-caption leading-4 font-semibold whitespace-nowrap text-ground xl:inline-flex"
     >
       <ShieldCheck aria-hidden="true" class="size-3.5" />{{ $t('admin.shell.staffOnly') }}
     </span>
@@ -38,7 +38,7 @@ defineEmits<{ search: []; menu: [] }>();
       <span class="sr-only lg:not-sr-only">{{ $t('admin.shell.search.open') }}</span>
       <kbd
         aria-hidden="true"
-        class="ml-auto hidden rounded-row border border-line px-1.5 font-mono text-xs lg:inline"
+        class="ml-auto hidden rounded-row border border-line px-1.5 font-mono text-caption leading-4 lg:inline"
         >{{ shortcutHint() }}</kbd
       >
     </button>

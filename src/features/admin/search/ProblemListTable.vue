@@ -119,7 +119,7 @@ const menuItems = (code: string) =>
       >
         <HighlightedText :text="row.name" :query="search" />
       </RouterLink>
-      <span class="block font-mono text-xs text-muted">
+      <span class="block font-mono text-caption leading-4 text-muted">
         <HighlightedText :text="row.code" :query="search" />
       </span>
     </template>
@@ -149,7 +149,7 @@ const menuItems = (code: string) =>
           :rating="row.authors[0]!.rating"
           :link="false"
         />
-        <span v-if="row.authors.length > 1" class="text-xs text-muted">
+        <span v-if="row.authors.length > 1" class="text-caption leading-4 text-muted">
           {{ $t('admin.problemList.moreAuthors', { count: row.authors.length - 1 }) }}
         </span>
       </span>

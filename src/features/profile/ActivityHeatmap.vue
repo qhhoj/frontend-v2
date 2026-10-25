@@ -77,7 +77,7 @@ const cellY = (row: number) => LABEL_ROW + row * STEP;
         </template>
       </svg>
     </div>
-    <div class="flex items-center justify-end gap-1.5 text-xs text-muted">
+    <div class="flex items-center justify-end gap-1.5 text-caption leading-4 text-muted">
       <span>{{ $t('ratingChart.less') }}</span>
       <svg
         v-for="level in LEVELS"

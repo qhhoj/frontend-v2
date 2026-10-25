@@ -34,7 +34,7 @@ const detailId = computed(() => `language-${props.language.key}`);
       <LanguageIcon :language-key="language.key" size="md" />
       <span class="min-w-32 flex-1">
         <b>{{ language.name }}</b>
-        <span class="block text-xs text-muted"
+        <span class="block text-caption leading-4 text-muted"
           >{{ compiler ?? $t('runtimes.noJudge') }}
           <span v-if="common" class="font-mono">{{ common }}</span></span
         >
@@ -53,7 +53,9 @@ const detailId = computed(() => `language-${props.language.key}`);
         <Chip tone="accent" class="font-mono">.{{ language.extension }}</Chip>
         <span v-if="language.fileOnly" class="ml-2">{{ $t('submit.fileOnly') }}</span>
       </p>
-      <h4 class="text-xs font-semibold text-muted uppercase">{{ $t('runtimes.perJudge') }}</h4>
+      <h4 class="text-caption leading-4 font-semibold text-muted uppercase">
+        {{ $t('runtimes.perJudge') }}
+      </h4>
       <ul class="flex flex-col gap-1">
         <li v-for="judge in judges" :key="judge.name" class="flex items-center gap-2 text-sm">
           <span
@@ -68,7 +70,9 @@ const detailId = computed(() => `language-${props.language.key}`);
             class="font-mono"
             >{{ versionOf(judge.name) }}</Chip
           >
-          <span v-else class="text-xs text-muted">{{ $t('runtimes.notInstalled') }}</span>
+          <span v-else class="text-caption leading-4 text-muted">{{
+            $t('runtimes.notInstalled')
+          }}</span>
         </li>
       </ul>
     </div>

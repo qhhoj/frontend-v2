@@ -52,7 +52,7 @@ function choose(preference: LowPowerPreference) {
           class="text-sm font-semibold"
           >{{ $t(machineKey) }}</span
         >
-        <span v-else class="flex items-center gap-3 text-xs text-muted">
+        <span v-else class="flex items-center gap-3 text-caption leading-4 text-muted">
           <BitMascot v-if="option === 'on'" :look="PLACEMENT_LOOKS.hero" class="[--bit-px:2px]" />
           <BitLoop v-else kind="welcome" class="[--bit-px:2px]" />
           {{ $t(`lowPower.option.${option}.preview`) }}

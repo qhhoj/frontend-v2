@@ -111,7 +111,9 @@ async function confirmBan() {
       {{ $t('admin.users.moderation.banned.unban') }}
     </button>
     <template #status>
-      <p class="text-xs text-muted">{{ $t('admin.users.moderation.banned.unbanHint') }}</p>
+      <p class="text-caption leading-4 text-muted">
+        {{ $t('admin.users.moderation.banned.unbanHint') }}
+      </p>
     </template>
   </UserDangerRow>
   <ConfirmDialog

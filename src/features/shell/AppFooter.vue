@@ -24,7 +24,10 @@ const stateKey = computed(() => {
     class="page-gutter flex flex-wrap items-center gap-x-4 pt-2 pb-[calc(max(1.5rem,env(safe-area-inset-bottom))+var(--dock-height,0px))] text-meta text-muted"
   >
     <span>© QHHOJ</span>
-    <span data-testid="app-version" class="font-mono text-xs" :title="$t('footer.versionTitle')"
+    <span
+      data-testid="app-version"
+      class="font-mono text-caption leading-4"
+      :title="$t('footer.versionTitle')"
       ><a v-if="commitUrl" :href="commitUrl" class="underline" rel="noopener">{{ APP_COMMIT }}</a
       ><template v-else>{{ APP_COMMIT }}</template> · {{ BUILD_DATE }}</span
     >

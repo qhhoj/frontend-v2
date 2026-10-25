@@ -44,7 +44,7 @@ const problems = computed(() => (home.value?.newProblems ?? []).slice(0, props.l
           >
             {{ problem.name }}
           </RouterLink>
-          <span v-if="variant === 'home'" class="text-xs text-muted">
+          <span v-if="variant === 'home'" class="text-caption leading-4 text-muted">
             {{
               $t('blog.problemLine', {
                 code: problem.code,

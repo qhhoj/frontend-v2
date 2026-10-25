@@ -45,7 +45,7 @@ const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
           >{{ post.title }}</RouterLink
         >
         <p class="line-clamp-2 text-sm text-muted">{{ summaryExcerpt(post.summaryHtml) }}</p>
-        <p class="text-xs text-muted">
+        <p class="text-caption leading-4 text-muted">
           <template v-for="(author, index) in post.authors" :key="author.id"
             ><template v-if="index">, </template
             ><UserName :username="author.username" :rating="author.rating"

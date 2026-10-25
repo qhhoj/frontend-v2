@@ -88,7 +88,7 @@ const { tabs: viewTabs } = useOrganizationViewTabs();
           class="font-semibold text-accent-text hover:underline"
           >{{ row.name }}</RouterLink
         >
-        <span class="block font-mono text-xs text-muted">{{ row.slug }}</span>
+        <span class="block font-mono text-caption leading-4 text-muted">{{ row.slug }}</span>
       </template>
       <template #cell-credits="{ row }">
         <QuotaMeter

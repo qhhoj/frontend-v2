@@ -50,12 +50,16 @@ const TABLE_COLUMNS = [
               <template v-if="column.key === 'problem'">
                 <!-- The real cell has the name and, under it, the code in a smaller font. -->
                 <SkeletonBlock text :class="column.cell" />
-                <div class="font-mono text-xs"><SkeletonBlock text class="w-16" /></div>
+                <div class="font-mono text-caption leading-4">
+                  <SkeletonBlock text class="w-16" />
+                </div>
               </template>
               <span v-else-if="column.key === 'submission'" class="flex flex-col items-start gap-1">
                 <SkeletonBlock pill class="h-7 w-20" />
-                <span class="font-mono text-xs"><SkeletonBlock text class="w-14" /></span>
-                <span class="text-xs"><SkeletonBlock text class="w-28" /></span>
+                <span class="font-mono text-caption leading-4"
+                  ><SkeletonBlock text class="w-14"
+                /></span>
+                <span class="text-caption leading-4"><SkeletonBlock text class="w-28" /></span>
               </span>
               <SkeletonBlock v-else text :class="column.cell" />
             </td>

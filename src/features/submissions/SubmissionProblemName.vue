@@ -20,9 +20,11 @@ defineProps<{ problem: SubmissionListItem['problem']; label?: string; showCode?:
       >{{ problem.name }}</RouterLink
     >
     <!-- Only a wide card has room for the code; a narrower one keeps it for the name. -->
-    <span v-if="showCode" class="ml-2 hidden font-mono text-xs text-muted @5xl:inline">{{
-      problem.code
-    }}</span>
+    <span
+      v-if="showCode"
+      class="ml-2 hidden font-mono text-caption leading-4 text-muted @5xl:inline"
+      >{{ problem.code }}</span
+    >
   </div>
   <template v-else>{{ NO_VALUE }}</template>
 </template>

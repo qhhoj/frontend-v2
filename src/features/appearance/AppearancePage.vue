@@ -90,7 +90,7 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
           @input="(glass) => apply({ glass })"
           @commit="save()"
         >
-          <div class="flex justify-between text-xs text-muted" aria-hidden="true">
+          <div class="flex justify-between text-caption leading-4 text-muted" aria-hidden="true">
             <span v-for="stop in GLASS_STOPS" :key="stop.value">{{ $t(stop.labelKey) }}</span>
           </div>
           <p v-if="reducedTransparency" class="mt-2 text-meta text-muted">

@@ -51,7 +51,7 @@ function submit() {
         aria-describedby="prepare-glob-hint"
         autocomplete="off"
       />
-      <p id="prepare-glob-hint" class="text-xs text-muted">
+      <p id="prepare-glob-hint" class="text-caption leading-4 text-muted">
         {{ $t('admin.contests.actions.data.globHint') }}
       </p>
     </div>
@@ -59,7 +59,9 @@ function submit() {
       <legend class="text-sm font-semibold">
         {{ $t('admin.contests.actions.data.resultsLegend') }}
       </legend>
-      <p class="text-xs text-muted">{{ $t('admin.contests.actions.data.resultsHint') }}</p>
+      <p class="text-caption leading-4 text-muted">
+        {{ $t('admin.contests.actions.data.resultsHint') }}
+      </p>
       <div class="grid grid-cols-3 gap-2 sm:grid-cols-4">
         <label
           v-for="code in SUBMISSION_RESULT_CODES"

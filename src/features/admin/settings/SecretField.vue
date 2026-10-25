@@ -65,6 +65,6 @@ const cancelReplacing = () => (part.value = { ...part.value, isReplacing: false,
         :class="INPUT"
       />
     </AdminField>
-    <p v-else class="text-xs text-muted">{{ hint }}</p>
+    <p v-else class="text-caption leading-4 text-muted">{{ hint }}</p>
   </div>
 </template>

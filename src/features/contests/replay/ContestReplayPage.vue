@@ -129,8 +129,8 @@ const goToMyRow = () => myRowId.value && table.value?.focusRow(myRowId.value);
                   ><SkeletonBlock class="size-full"
                 /></span>
               </div>
-              <p class="font-mono text-xs"><SkeletonBlock text class="w-full" /></p>
-              <p class="text-xs"><SkeletonBlock text class="w-56" /></p>
+              <p class="font-mono text-caption leading-4"><SkeletonBlock text class="w-full" /></p>
+              <p class="text-caption leading-4"><SkeletonBlock text class="w-56" /></p>
             </Card>
             <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
               <Card as="div" data-replay-part="board" class="overflow-hidden">

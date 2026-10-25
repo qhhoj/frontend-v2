@@ -8,7 +8,7 @@ defineProps<{ verdict: Verdict; short?: boolean }>();
 
 <template>
   <span
-    class="inline-flex h-6 items-center gap-1.5 rounded-pill px-2.5 font-mono text-xs font-semibold"
+    class="inline-flex h-6 items-center gap-1.5 rounded-pill px-2.5 font-mono text-caption leading-4 font-semibold"
     :class="VERDICT_TONE_CLASSES[verdict.tone]"
     :title="short ? $t(verdict.labelKey) : undefined"
   >

@@ -46,7 +46,9 @@ const CELL = 'py-2 pr-3 align-middle';
             </td>
             <td :class="CELL">
               {{ $t(ledgerReasonKey(entry.reason)) }}
-              <span v-if="entry.ref" class="font-mono text-xs text-muted">· {{ entry.ref }}</span>
+              <span v-if="entry.ref" class="font-mono text-caption leading-4 text-muted"
+                >· {{ entry.ref }}</span
+              >
             </td>
             <td :class="CELL" class="text-right font-semibold tabular-nums">
               {{ ledgerAmountText(entry.amount, locale.locale) }}

@@ -80,7 +80,7 @@ async function send() {
       />
       <span
         :id="`${id}-note-count`"
-        class="self-end text-xs tabular-nums"
+        class="self-end text-caption leading-4 tabular-nums"
         :class="isNoteTooLong ? 'text-negative' : 'text-muted'"
       >
         {{ note.length }} / {{ COMMENT_REPORT_NOTE_MAX_LENGTH }}

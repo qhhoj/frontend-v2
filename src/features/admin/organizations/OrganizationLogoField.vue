@@ -44,7 +44,7 @@ const { canUpload, hasFailed, upload } = useLogoUpload(logo, isUploading);
             class="size-full object-cover"
             @error="hasFailed = true"
           />
-          <span v-else aria-hidden="true" class="text-xs text-muted">—</span>
+          <span v-else aria-hidden="true" class="text-caption leading-4 text-muted">—</span>
         </span>
         <input
           :id="id"

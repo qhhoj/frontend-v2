@@ -112,7 +112,7 @@ const model = computed<MenuItem[]>(() => {
         />
         <span class="flex flex-col" :class="item.hint && 'py-1.5'">
           <span>{{ item.label }}</span>
-          <span v-if="item.hint" class="text-xs text-muted">{{ item.hint }}</span>
+          <span v-if="item.hint" class="text-caption leading-4 text-muted">{{ item.hint }}</span>
         </span>
       </a>
     </template>

@@ -125,7 +125,7 @@ function submit() {
         />
         <span class="flex flex-col">
           <span>{{ $t(`admin.integrations.form.scope.${SCOPE_KEYS[scope]}`) }}</span>
-          <code class="font-mono text-xs text-muted">{{ scope }}</code>
+          <code class="font-mono text-caption leading-4 text-muted">{{ scope }}</code>
         </span>
       </label>
       <p v-if="create.fieldErrors.value.scopes" class="text-sm text-negative">

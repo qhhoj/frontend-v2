@@ -114,7 +114,7 @@ const describedBy = computed(() =>
         :aria-describedby="describedBy"
       />
       <p v-if="error" :id="`${id}-error`" class="text-sm text-negative">{{ error }}</p>
-      <div class="flex justify-between gap-3 text-xs text-muted">
+      <div class="flex justify-between gap-3 text-caption leading-4 text-muted">
         <span>{{ hint ?? $t('admin.ui.markdownSupported') }}</span>
         <span>{{ $t('admin.ui.charCount', { count: text.length }) }}</span>
       </div>
@@ -129,7 +129,7 @@ const describedBy = computed(() =>
       <div class="min-h-40 rounded-row border border-line bg-surface-strong p-4">
         <UserContent :html="preview.html.value" />
       </div>
-      <p v-if="preview.isRateLimited.value" class="text-xs text-negative">
+      <p v-if="preview.isRateLimited.value" class="text-caption leading-4 text-negative">
         {{ $t('admin.ui.previewRateLimited') }}
         <template v-if="preview.retryAfterSeconds.value">
           {{ $t('admin.ui.retryIn', { wait: formatWait(preview.retryAfterSeconds.value) }) }}
@@ -138,7 +138,7 @@ const describedBy = computed(() =>
       <p v-if="preview.failure.value" class="text-sm text-negative">
         {{ failureTextOf(preview.failure.value) }}
       </p>
-      <p class="text-xs text-muted">{{ $t('admin.ui.previewHint') }}</p>
+      <p class="text-caption leading-4 text-muted">{{ $t('admin.ui.previewHint') }}</p>
     </div>
   </div>
   <div v-else class="flex flex-col gap-3">
@@ -167,7 +167,7 @@ const describedBy = computed(() =>
           :aria-describedby="describedBy"
         />
         <p v-if="error" :id="`${id}-error`" class="text-sm text-negative">{{ error }}</p>
-        <p v-if="hint" :id="`${id}-hint`" class="text-xs text-muted">{{ hint }}</p>
+        <p v-if="hint" :id="`${id}-hint`" class="text-caption leading-4 text-muted">{{ hint }}</p>
       </div>
       <section
         :aria-label="previewHeading"
@@ -178,7 +178,7 @@ const describedBy = computed(() =>
         <div class="min-h-40 rounded-row border border-line bg-surface-strong p-4">
           <UserContent :html="preview.html.value" />
         </div>
-        <p v-if="preview.isRateLimited.value" class="text-xs text-negative">
+        <p v-if="preview.isRateLimited.value" class="text-caption leading-4 text-negative">
           {{ $t('admin.ui.previewRateLimited') }}
           <template v-if="preview.retryAfterSeconds.value">
             {{ $t('admin.ui.retryIn', { wait: formatWait(preview.retryAfterSeconds.value) }) }}
@@ -187,7 +187,7 @@ const describedBy = computed(() =>
         <p v-if="preview.failure.value" class="text-sm text-negative">
           {{ failureTextOf(preview.failure.value) }}
         </p>
-        <p class="text-xs text-muted">{{ $t('admin.ui.previewHint') }}</p>
+        <p class="text-caption leading-4 text-muted">{{ $t('admin.ui.previewHint') }}</p>
       </section>
     </div>
   </div>

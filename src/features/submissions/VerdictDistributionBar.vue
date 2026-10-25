@@ -33,7 +33,9 @@ const SEGMENT_CLASSES: Record<BlockTone, string> = {
       />
     </div>
     <figcaption class="sr-only">{{ $t('submissions.stats.distribution') }}</figcaption>
-    <ul class="m-0 flex list-none flex-wrap gap-x-3.5 gap-y-1 p-0 text-xs text-muted">
+    <ul
+      class="m-0 flex list-none flex-wrap gap-x-3.5 gap-y-1 p-0 text-caption leading-4 text-muted"
+    >
       <li
         v-for="share in shares"
         :key="share.result"

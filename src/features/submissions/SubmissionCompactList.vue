@@ -70,7 +70,7 @@ const costOf = (row: SubmissionListItem) =>
         </div>
         <div
           v-if="isShown('when') || isShown('language')"
-          class="flex min-w-0 items-center gap-1.5 text-xs whitespace-nowrap text-muted"
+          class="flex min-w-0 items-center gap-1.5 text-caption leading-4 whitespace-nowrap text-muted"
         >
           <time
             v-if="isShown('when')"
@@ -89,7 +89,10 @@ const costOf = (row: SubmissionListItem) =>
             <span v-else>{{ NO_VALUE }}</span>
           </template>
         </div>
-        <div v-if="costOf(row)" class="font-mono text-xs whitespace-nowrap text-muted">
+        <div
+          v-if="costOf(row)"
+          class="font-mono text-caption leading-4 whitespace-nowrap text-muted"
+        >
           {{ costOf(row) }}
         </div>
       </div>

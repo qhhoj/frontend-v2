@@ -32,7 +32,7 @@ usePageTitle(() => organization.value?.name);
       <div class="page-gutter flex min-w-0 flex-col gap-2 py-3">
         <RouterLink
           :to="{ name: 'organizations' }"
-          class="w-fit text-xs text-accent-text hover:underline"
+          class="w-fit text-caption leading-4 text-accent-text hover:underline"
         >
           {{ $t('orgs.back') }}
         </RouterLink>

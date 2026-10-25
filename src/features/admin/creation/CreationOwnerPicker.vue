@@ -155,7 +155,7 @@ const ownerHint = computed(() => {
     />
     <span
       v-if="isReady"
-      class="min-w-0 text-xs text-muted"
+      class="min-w-0 text-caption leading-4 text-muted"
       :class="layout === 'field' && 'w-full'"
       >{{ $t(ownerHint) }}</span
     >

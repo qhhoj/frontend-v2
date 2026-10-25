@@ -114,7 +114,7 @@ defineExpose({ focusRow });
             >
               <Ghost class="size-4 shrink-0" aria-hidden="true" />
               <span>{{ row.name }}</span>
-              <small v-if="row.caption" class="text-xs">{{ row.caption }}</small>
+              <small v-if="row.caption" class="text-caption leading-4">{{ row.caption }}</small>
               <Chip>{{
                 row.isUnranked ? $t('replay.table.unranked') : $t('replay.table.ghost')
               }}</Chip>

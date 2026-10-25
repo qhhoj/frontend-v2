@@ -12,7 +12,9 @@ const { t } = useI18n();
     <section v-for="line in lines" :key="line.field" class="flex min-w-0 flex-col gap-1.5">
       <h3 class="text-sm font-semibold">
         {{ t(fieldLabelKey(line.field)) }}
-        <span class="font-mono text-xs font-normal text-muted">{{ line.field }}</span>
+        <span class="font-mono text-caption leading-4 font-normal text-muted">{{
+          line.field
+        }}</span>
       </h3>
       <div
         v-for="(text, index) in line.removed"
@@ -28,7 +30,7 @@ const { t } = useI18n();
       >
         + {{ text }}
       </div>
-      <p v-if="line.hidden > 0" class="text-xs text-muted">
+      <p v-if="line.hidden > 0" class="text-caption leading-4 text-muted">
         {{ t('admin.pages.history.moreLines', { n: line.hidden }) }}
       </p>
     </section>

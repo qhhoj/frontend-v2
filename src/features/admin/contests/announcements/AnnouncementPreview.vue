@@ -25,7 +25,7 @@ const preview = useDebouncedPreview(
         {{ $t('admin.contestOps.announcements.previewEmpty') }}
       </p>
     </div>
-    <p v-if="preview.isRateLimited.value" class="text-xs text-negative">
+    <p v-if="preview.isRateLimited.value" class="text-caption leading-4 text-negative">
       {{ $t('admin.ui.previewRateLimited') }}
     </p>
     <p v-if="preview.failure.value" class="text-sm text-negative">

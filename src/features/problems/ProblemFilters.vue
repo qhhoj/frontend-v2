@@ -82,7 +82,9 @@ const panelCount = computed(() => panelFilterCount(props.filters));
       >
         <SlidersHorizontal class="size-4" aria-hidden="true" />
         {{ $t('problems.filterPanel') }}
-        <span v-if="panelCount" class="font-mono text-xs tabular-nums">{{ panelCount }}</span>
+        <span v-if="panelCount" class="font-mono text-caption leading-4 tabular-nums">{{
+          panelCount
+        }}</span>
       </button>
       <div v-show="isPanelOpen" :id="panelId" class="flex basis-full flex-wrap items-center gap-2">
         <ProblemFilterControls

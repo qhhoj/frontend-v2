@@ -60,7 +60,7 @@ function choose(reply: CannedReply) {
               class="flex min-h-11 flex-col justify-center gap-0.5 px-3 py-2"
             >
               <span class="text-sm"><SkeletonBlock text class="w-1/2" /></span>
-              <span class="text-xs"><SkeletonBlock text class="w-full" /></span>
+              <span class="text-caption leading-4"><SkeletonBlock text class="w-full" /></span>
             </li>
           </ul>
         </template>
@@ -75,7 +75,7 @@ function choose(reply: CannedReply) {
               @click="choose(reply)"
             >
               <span class="text-sm font-semibold">{{ reply.title }}</span>
-              <span class="line-clamp-1 text-xs text-muted">{{ reply.body }}</span>
+              <span class="line-clamp-1 text-caption leading-4 text-muted">{{ reply.body }}</span>
             </button>
           </li>
         </ul>

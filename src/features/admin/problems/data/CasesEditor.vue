@@ -83,7 +83,7 @@ function remove(index: number) {
       {{ $t('admin.problems.data.cases.overMax', { max: data.limits.maxCases }) }}
     </p>
     <p v-if="errors.cases" role="alert" class="text-sm text-negative">{{ errors.cases }}</p>
-    <p v-if="data.limits.maxCases < MASS_TESTCASE_LIMIT" class="text-xs text-muted">
+    <p v-if="data.limits.maxCases < MASS_TESTCASE_LIMIT" class="text-caption leading-4 text-muted">
       {{
         $t('admin.problems.data.cases.hardLimit', {
           max: MASS_TESTCASE_LIMIT,
@@ -102,7 +102,7 @@ function remove(index: number) {
           }}
         </caption>
         <thead>
-          <tr class="text-left text-xs font-semibold text-muted">
+          <tr class="text-left text-caption leading-4 font-semibold text-muted">
             <th scope="col" :class="[HEAD, 'sticky left-0 z-10 bg-surface']">
               {{ $t('admin.problems.data.cases.columns.order') }}
             </th>
@@ -148,6 +148,6 @@ function remove(index: number) {
         {{ $t('admin.problems.data.cases.addBatch') }}
       </button>
     </div>
-    <p class="text-xs text-muted">{{ $t('admin.problems.data.cases.legend') }}</p>
+    <p class="text-caption leading-4 text-muted">{{ $t('admin.problems.data.cases.legend') }}</p>
   </AdminFormSection>
 </template>

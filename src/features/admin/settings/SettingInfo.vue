@@ -45,7 +45,7 @@ const reset = () => {
     </IconButton>
     <Popover ref="popover" :label="$t('admin.settings.info.dialog', { key: settingKey })">
       <div class="flex max-w-72 min-w-56 flex-col gap-2 text-sm">
-        <code class="font-mono text-xs break-all text-muted">{{ settingKey }}</code>
+        <code class="font-mono text-caption leading-4 break-all text-muted">{{ settingKey }}</code>
         <p v-if="defaultText !== null" class="m-0">
           {{ $t('admin.settings.info.default') }}
           <span class="font-mono">{{ defaultText }}</span>

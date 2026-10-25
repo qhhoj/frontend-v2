@@ -130,7 +130,7 @@ function setNow() {
         />
         <span
           aria-hidden="true"
-          class="pointer-events-none absolute inset-y-0 right-3 flex items-center font-mono text-xs text-muted"
+          class="pointer-events-none absolute inset-y-0 right-3 flex items-center font-mono text-caption leading-4 text-muted"
         >
           {{ zone }}
         </span>

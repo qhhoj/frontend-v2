@@ -67,7 +67,7 @@ const ACTIVE =
   'border-accent bg-accent-soft font-semibold text-accent-soft-text disabled:border-line-strong disabled:bg-surface-hover disabled:text-content';
 const IDLE =
   'border-transparent text-muted hover:text-content disabled:border-line disabled:bg-surface-strong';
-const COUNT = 'rounded-pill bg-surface-strong px-1.5 font-mono text-xs tabular-nums';
+const COUNT = 'rounded-pill bg-surface-strong px-1.5 font-mono text-caption leading-4 tabular-nums';
 const ALERT = 'size-2 shrink-0 rounded-full bg-negative';
 </script>
 

@@ -105,7 +105,7 @@ const FILTER_CLASS =
         class="flex gap-1 overflow-x-auto lg:flex-col lg:self-start"
       >
         <p
-          class="hidden px-4 pb-1 text-xs font-semibold tracking-wider text-muted uppercase lg:block"
+          class="hidden px-4 pb-1 text-caption leading-4 font-semibold tracking-wider text-muted uppercase lg:block"
         >
           {{ $t('notifications.statusLabel') }}
         </p>
@@ -127,7 +127,7 @@ const FILTER_CLASS =
           </span>
         </RouterLink>
         <p
-          class="hidden px-4 pt-3 pb-1 text-xs font-semibold tracking-wider text-muted uppercase lg:block"
+          class="hidden px-4 pt-3 pb-1 text-caption leading-4 font-semibold tracking-wider text-muted uppercase lg:block"
         >
           {{ $t('notifications.kindLabel') }}
         </p>

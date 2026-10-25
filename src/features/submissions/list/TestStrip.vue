@@ -105,7 +105,7 @@ function move(event: KeyboardEvent) {
       >
     </div>
     <p
-      class="mt-1 line-clamp-2 font-mono text-xs text-muted"
+      class="mt-1 line-clamp-2 font-mono text-caption leading-4 text-muted"
       :aria-live="isFocused ? 'polite' : 'off'"
       :aria-hidden="!isFocused"
     >

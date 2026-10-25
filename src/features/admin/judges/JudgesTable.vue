@@ -90,9 +90,11 @@ function menuOf(judge: Judge): RowMenuItem[] {
     </template>
     <template #cell-name="{ row }">
       <span class="block font-mono font-semibold break-all">{{ row.name }}</span>
-      <span v-if="row.description" class="block max-w-80 truncate text-xs text-muted">{{
-        row.description
-      }}</span>
+      <span
+        v-if="row.description"
+        class="block max-w-80 truncate text-caption leading-4 text-muted"
+        >{{ row.description }}</span
+      >
     </template>
     <template #cell-status="{ row }">
       <JudgeStatusChip :judge="row" />

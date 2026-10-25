@@ -137,7 +137,7 @@ const reset = () =>
         {{ $t('admin.tickets.filters.awaiting') }}
         <span
           v-if="summary.data.value?.awaitingStaff"
-          class="rounded-pill bg-surface-strong px-1.5 font-mono text-xs tabular-nums"
+          class="rounded-pill bg-surface-strong px-1.5 font-mono text-caption leading-4 tabular-nums"
           >{{ summary.data.value.awaitingStaff }}</span
         >
       </label>

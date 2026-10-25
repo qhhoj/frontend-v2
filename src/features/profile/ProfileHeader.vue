@@ -59,7 +59,7 @@ const joinedDate = computed(() => formatDate(props.user.dateJoined, 'date', loca
             </h1>
             <span
               :class="tierClass"
-              class="rounded-pill border border-line px-2.5 py-0.5 text-xs font-semibold"
+              class="rounded-pill border border-line px-2.5 py-0.5 text-caption leading-4 font-semibold"
             >
               {{ $t(tierLabelKey) }}
             </span>
@@ -73,7 +73,7 @@ const joinedDate = computed(() => formatDate(props.user.dateJoined, 'date', loca
               <RouterLink
                 :to="{ name: 'organization', params: { slug: organization.slug } }"
                 :title="organization.name"
-                class="inline-flex items-center rounded-pill border border-line px-2.5 py-0.5 text-xs font-semibold hover:bg-surface-hover"
+                class="inline-flex items-center rounded-pill border border-line px-2.5 py-0.5 text-caption leading-4 font-semibold hover:bg-surface-hover"
               >
                 {{ organization.shortName }}
               </RouterLink>

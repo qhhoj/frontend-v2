@@ -107,7 +107,7 @@ const failure = computed(() => writer.failure.value ?? tester.failure.value);
           <div class="grid items-center gap-x-4 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto]">
             <div class="min-w-0">
               <p class="font-semibold">{{ $t(`admin.settings.webhooks.events.${row.event}`) }}</p>
-              <p class="font-mono text-xs text-muted">{{ row.event }}</p>
+              <p class="font-mono text-caption leading-4 text-muted">{{ row.event }}</p>
               <p class="mt-1 text-sm break-all" data-testid="webhook-target">
                 <span v-if="row.target" class="font-mono">{{ row.target }}</span>
                 <span v-else-if="row.usesDefault" class="text-muted">{{

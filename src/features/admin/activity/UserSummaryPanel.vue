@@ -133,7 +133,7 @@ const tops = computed(() =>
             <span class="text-muted">{{ deviceText(session.deviceType) }}</span>
           </span>
           <span>{{ session.browser }} · {{ session.os }}</span>
-          <span class="font-mono text-xs text-muted tabular-nums">
+          <span class="font-mono text-caption leading-4 text-muted tabular-nums">
             {{
               $t('admin.activity.summary.sessionSpan', {
                 created: timeOf(session.createdAt),

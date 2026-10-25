@@ -56,7 +56,9 @@ function filterText(entry: SubmissionBatchLog): string {
       <template #cell-count="{ row }">{{ formatNumber(row.count, locale.locale) }}</template>
       <template #cell-user="{ row }">{{ row.user?.username ?? '—' }}</template>
       <template #cell-filter="{ row }">
-        <span class="font-mono text-xs break-all text-muted">{{ filterText(row) }}</span>
+        <span class="font-mono text-caption leading-4 break-all text-muted">{{
+          filterText(row)
+        }}</span>
       </template>
       <template #cell-createdAt="{ row }">
         <span class="whitespace-nowrap text-muted">{{

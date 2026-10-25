@@ -27,7 +27,7 @@ const MARK_CLASS = {
     >
       <span
         aria-hidden="true"
-        class="inline-flex size-6 items-center justify-center rounded-full text-xs font-bold"
+        class="inline-flex size-6 items-center justify-center rounded-full text-caption leading-4 font-bold"
         :class="MARK_CLASS[stepStatusOf(step, current)]"
       >
         <Check v-if="stepStatusOf(step, current) === 'done'" class="size-3.5" />

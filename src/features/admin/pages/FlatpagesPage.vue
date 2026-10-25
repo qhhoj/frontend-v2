@@ -123,7 +123,9 @@ async function loadRevision(revision: FlatpageRevision) {
                     {{ t('admin.pages.list.loginChip') }}
                   </AdminChip>
                 </span>
-                <span class="truncate font-mono text-xs text-muted">{{ item.url }}</span>
+                <span class="truncate font-mono text-caption leading-4 text-muted">{{
+                  item.url
+                }}</span>
               </button>
             </li>
           </ul>

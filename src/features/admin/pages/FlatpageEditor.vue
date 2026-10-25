@@ -156,7 +156,7 @@ defineExpose({ loadOldValues, focusTitle });
               rows="16"
               :class="[INPUT, 'py-2 font-mono text-sm']"
             />
-            <p class="text-xs text-muted">
+            <p class="text-caption leading-4 text-muted">
               {{ t('admin.pages.field.contentCount', { length: form.content.length }) }}
             </p>
           </AdminField>

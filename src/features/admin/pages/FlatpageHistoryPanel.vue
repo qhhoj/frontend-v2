@@ -51,7 +51,7 @@ function goToPage(target: number) {
       </p>
       <div v-else class="relative overflow-x-auto rounded-card border border-line bg-surface-solid">
         <table class="w-full min-w-[640px] text-sm">
-          <thead class="text-left text-xs text-muted">
+          <thead class="text-left text-caption leading-4 text-muted">
             <tr>
               <th class="px-3 py-2 font-semibold">{{ t('admin.pages.history.columns.time') }}</th>
               <th class="px-3 py-2 font-semibold">{{ t('admin.pages.history.columns.action') }}</th>
@@ -94,7 +94,9 @@ function goToPage(target: number) {
           </button>
         </div>
       </footer>
-      <p v-if="!readonly" class="text-xs text-muted">{{ t('admin.pages.history.note') }}</p>
+      <p v-if="!readonly" class="text-caption leading-4 text-muted">
+        {{ t('admin.pages.history.note') }}
+      </p>
     </QueryState>
   </section>
 </template>

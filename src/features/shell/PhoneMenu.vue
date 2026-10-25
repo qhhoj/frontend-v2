@@ -128,7 +128,7 @@ const drawerPt = computed(() => ({
         <template v-if="badge">
           <span
             aria-hidden="true"
-            class="min-w-5 rounded-pill bg-accent px-1.5 text-center text-xs leading-5 font-bold text-on-accent"
+            class="min-w-5 rounded-pill bg-accent px-1.5 text-center text-caption leading-5 font-bold text-on-accent"
             >{{ badge }}</span
           >
           <span class="sr-only">{{ $t('notifications.unreadCount', { count: unread }) }}</span>
