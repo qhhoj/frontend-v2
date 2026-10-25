@@ -5,7 +5,12 @@ import Chip from '@/components/ui/Chip.vue';
 import BitLoop from '@/components/BitLoop.vue';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import InlineBit from '@/components/InlineBit.vue';
-import { LONG_COUNTDOWN_SECONDS, countdownTarget, freezeStart } from '@/lib/contest-time';
+import {
+  LONG_COUNTDOWN_SECONDS,
+  countdownTarget,
+  freezeStart,
+  ownEndTime,
+} from '@/lib/contest-time';
 import { formatClock, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -25,11 +30,8 @@ const now = useNow();
 /** Follows the clock (start, then end, then nothing) even before the refetch answers. */
 const target = computed(() => {
   const contestTarget = countdownTarget(props.contest, now.value);
-  const windowEnd = props.liveRun?.endTime;
-  if (contestTarget?.kind !== 'end' || !windowEnd) return contestTarget;
-  return Date.parse(windowEnd) < Date.parse(contestTarget.at)
-    ? { kind: 'end' as const, at: windowEnd }
-    : contestTarget;
+  if (contestTarget?.kind !== 'end') return contestTarget;
+  return { kind: 'end' as const, at: ownEndTime(contestTarget.at, props.liveRun) };
 });
 /**
  * The target moved on (start to end, end to none): the page refetches for the new phase. Counted from the

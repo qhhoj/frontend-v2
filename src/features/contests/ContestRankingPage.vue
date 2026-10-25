@@ -14,6 +14,7 @@ import TextInput from '@/components/ui/TextInput.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { rankingSummary } from './ranking-summary';
+import { ownEndTime } from '@/lib/contest-time';
 import { isPenaltyFormat, showsCellTime, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import { useNow } from '@/lib/use-now';
@@ -44,11 +45,20 @@ const {
 const now = useNow();
 const isSignedIn = computed(() => session.user !== null);
 /** Only an ended contest can have a virtual run to compare with, so a running contest never asks. */
-const needsCurrent = computed(() => isSignedIn.value && contest.value?.phase === 'ended');
+const needsCurrent = computed(
+  () =>
+    isSignedIn.value && (contest.value?.phase === 'ended' || contest.value?.phase === 'running'),
+);
 const { data: current } = useCurrentParticipationQuery(needsCurrent);
 /** The viewer's running virtual run of this ended contest: the only case the real-board comparison exists. */
 const virtualRun = computed(() =>
   contest.value?.phase === 'ended' ? virtualRunOf(current.value, key.value, now.value) : null,
+);
+/** The viewer's live participation here: its window can close before the contest does (a timed contest). */
+const liveRun = computed(() =>
+  current.value?.contest.key === key.value && current.value.participation.virtual === 0
+    ? current.value.participation
+    : null,
 );
 /** A live virtual run opens the board with its virtual row; `?virtual=0` keeps the official board. */
 const withVirtual = computed(() => {
@@ -204,7 +214,8 @@ async function goToMyRow() {
               <span aria-hidden="true" class="size-2 rounded-full bg-accent shadow-glow" />
               <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
               <CountdownTimer
-                :until="contest.endTime"
+                :key="ownEndTime(contest.endTime, liveRun)"
+                :until="ownEndTime(contest.endTime, liveRun)"
                 class="font-semibold"
                 @elapsed="refetchContest()"
               />

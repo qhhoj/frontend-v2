@@ -8,11 +8,14 @@ function isScoreboardHidden(contest: ContestDetail): boolean {
 }
 
 /**
- * Backend `canSeeFullSubmissionList`, approximated for the banner only (C8: the backend narrows the rows silently).
+ * Backend `canSeeFullSubmissionList`, approximated (C8: the backend narrows the rows silently): editors and curators
+ * always see all, scoreboard viewers see a hidden board's list too.
  * Replace with the viewer flag when backend ask B-8d1 lands.
  */
 export function ownSubmissionsOnly(contest: ContestDetail, now: number): boolean {
-  if (contest.viewer.canEdit) return false;
-  if (isScoreboardHidden(contest) || isFrozenAt(contest, now)) return true;
+  const { canEdit, isEditor, canSeeFullScoreboard } = contest.viewer;
+  if (canEdit || isEditor) return false;
+  if ((!canSeeFullScoreboard && isScoreboardHidden(contest)) || isFrozenAt(contest, now))
+    return true;
   return contest.phase !== 'ended' && !contest.showSubmissionList;
 }
