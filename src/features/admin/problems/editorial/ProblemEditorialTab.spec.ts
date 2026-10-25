@@ -72,7 +72,7 @@ describe('ProblemEditorialTab', () => {
     await wrapper.get('textarea').setValue('Lời giải mới');
     await wrapper
       .findAll('button')
-      .find((button) => button.text() === 'Lưu lời giải')!
+      .find((button) => button.text() === 'Lưu')!
       .trigger('click');
     await flushPromises();
     expect(calls.find((call) => call.method === 'PUT')?.body).toMatchObject({
