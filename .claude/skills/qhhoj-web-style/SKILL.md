@@ -35,7 +35,7 @@ Type scale (font size only; leading comes from the primitive or a `leading-*` cl
 
 Other tokens:
 
-- Control height, three steps only: `md` 44 px `--qh-control` (every public control, toolbars included) · `sm` 36 px, 44 on coarse pointers `--qh-control-sm` (every control under `.qh-admin`, and any control inside a table or list row) · `lg` 56 px `--qh-control-lg` (submit swap card only). The scope sets the height: page-level controls pass no `size`, and `size="sm"` appears only inside a row. Use as `h-(--qh-control)`. The `--qa-*` density tokens are global theme tokens, so a control's size never depends on the page opened first.
+- Control height, three steps only: `md` 44 px `--qh-control` (every public control, toolbars included) · `sm` 36 px, 44 on coarse pointers `--qh-control-sm` (every control under `.qh-admin`, and any control inside a table or list row) · `lg` 56 px `--qh-control-lg` (submit swap card only). The scope sets the height: page-level controls pass no `size`, and `size="sm"` appears only inside a row. Use as `h-(--qh-control)`. Target (not done yet, lane K0): the `--qa-*` density tokens move out of the lazy admin chunk into the global theme tokens, so a control's size never depends on the page opened first.
 - Chips: `sm` 22 / `md` 28 px; an interactive chip gets its 44 px hit area from `::after`.
 - Dialog widths: `Modal` `sm` 480 · `md` 640 · `lg` 760, full screen under 640 px. No other widths.
 - Radius by role: controls `rounded-control` (pill on public pages; 12 px under `.qh-admin`) · inputs and code `rounded-cell` 12 · inset tiles and notices `rounded-row` 16 · cards and dialogs `rounded-card` 24 · chips, tabs, segmented `rounded-pill`. `rounded-tile` and `rounded-panel` no longer exist (lint-banned); a menu or popover is `rounded-row`.
@@ -65,7 +65,7 @@ The kit part for each job is in `src/components/ui/README.md` (the one table; a 
 **Touch and inputs**
 
 - Every interactive element has a hit area of at least 44×44 px on a coarse pointer (padding or `::after`); every text input renders 16 px text at every width. OTP cells (60 px) and code editors are the exceptions.
-- Helper text is one line (~60 chars); longer help goes behind a "?" button. An error replaces the hint.
+- Helper text is one line (~60 chars); longer help goes behind a "?" button. An error replaces the hint. Optional fields say "(tùy chọn)".
 - Disabled = `aria-disabled` + muted token pair with the reason visible (hint or `#note`), never native `disabled` on a button, never `opacity`. A busy button shows a spinner (`AppButton loading`).
 - Active tab = `bg-accent-soft` + `text-accent-soft-text` + accent border.
 
