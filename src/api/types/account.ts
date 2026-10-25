@@ -20,3 +20,6 @@ export type ApiToken = Schemas['RegenerateTokenResponse'];
 
 /** backend: users/data/dto/user-data.response.ts (UserDataStatusResponse) */
 export type DataExportStatus = Schemas['UserDataStatusResponse'];
+
+/** backend: auth/social/dto/social-links.response.ts (SocialLinksResponse) */
+export type SocialLinks = Schemas['SocialLinksResponse'];

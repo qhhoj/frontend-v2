@@ -5,6 +5,7 @@ import ApiTokenSection from './ApiTokenSection.vue';
 import LockedSecurity from './LockedSecurity.vue';
 import LogoutEverywhereSection from './LogoutEverywhereSection.vue';
 import PasswordSection from './PasswordSection.vue';
+import SocialLinksSection from './SocialLinksSection.vue';
 import TwoFactorSection from './TwoFactorSection.vue';
 
 const session = useSessionStore();
@@ -16,6 +17,7 @@ const session = useSessionStore();
     <template v-else>
       <PasswordSection />
       <TwoFactorSection />
+      <SocialLinksSection />
       <ApiTokenSection />
       <LogoutEverywhereSection />
     </template>

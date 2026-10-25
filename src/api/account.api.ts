@@ -6,6 +6,7 @@ import type {
   ScratchCodes,
   ScratchCodesRemaining,
   SecurityKey,
+  SocialLinks,
   TotpEnrollment,
 } from './types/account';
 import type { Schemas } from './schemas';
@@ -51,3 +52,12 @@ export const requestDataExport = (): Promise<Schemas['QueuedResponse']> =>
   apiSend('post', '/profile/data');
 /** A plain link: the browser streams the zip to disk (`Content-Disposition: attachment`). */
 export const DATA_EXPORT_DOWNLOAD_URL = apiUrl('/profile/data/download');
+
+/** The providers (slugs) that sign in to this account; 403 while impersonating. */
+export const fetchSocialLinks = (): Promise<SocialLinks> => apiGet('/auth/social/links');
+/** The provider stops signing in to the account; the backend wants the current password. */
+export const removeSocialLink = (provider: string, currentPassword: string): Promise<void> =>
+  apiSend('delete', '/auth/social/links/{provider}', {
+    path: { provider },
+    body: { currentPassword },
+  });
