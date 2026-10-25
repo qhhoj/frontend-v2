@@ -25,6 +25,29 @@ describe('RankingTable', () => {
     expect(wrapper.text()).not.toContain('9999');
   });
 
+  it('prints the score the backend ranks by on a penalty board, not a count of solved problems', () => {
+    const icpc: RankingContext = { ...context, formatName: 'icpc' };
+    const [easy, hard] = ranking().problems;
+    const problems = [
+      { ...easy!, points: 100 },
+      { ...hard!, points: 300 },
+    ];
+    const rows = [
+      rankingRow(1, 'p1', 'user_02', 300, 10, {
+        [hard!.problemId]: { time: 600, points: 300, tries: 1 },
+      }),
+      rankingRow(2, 'p2', 'user_03', 100, 1, {
+        [easy!.problemId]: { time: 60, points: 100, tries: 1 },
+      }),
+    ];
+    const wrapper = mount(RankingTable, {
+      props: { ranking: ranking({ problems, rows }), rows, context: icpc, viewerId: null },
+      global: { plugins: [i18n] },
+    });
+    const totals = wrapper.findAll('tbody tr').map((row) => row.findAll('td')[1]!.text());
+    expect(totals).toEqual(['300', '100']);
+  });
+
   describe('rating change column', () => {
     const rated = (
       ratingChange: { rating: number; delta: number | null } | null,

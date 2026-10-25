@@ -405,6 +405,8 @@
     "login": "Sign in",
     "register": "Sign up",
     "logout": "Sign out",
+    "logoutFailed": "Sign-out did not complete: you are still signed in.",
+    "logoutRetry": "Try again",
     "menu": "Account of {username}",
     "profile": "My profile",
     "settings": "Settings",
@@ -1342,7 +1344,6 @@
     "columns": {
       "rank": "Rank",
       "user": "Contestant",
-      "solved": "Solved",
       "penalty": "Penalty",
       "score": "Score",
       "scoreTime": "Score · time",
@@ -1369,7 +1370,6 @@
       "pointsAt": "{points} points at {time}",
       "firstPointsAt": "First solve: {points} points at {time}"
     },
-    "solvedCount": "{count} solved",
     "empty": "No contestants yet.",
     "disqualified": "Disqualified",
     "refreshFailed": "Could not refresh the board, retrying.",

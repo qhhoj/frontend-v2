@@ -111,20 +111,31 @@ export const useSessionStore = defineStore('session', () => {
     applyOwn(await completeSocialSignupRequest(body));
   };
 
-  /** Ends the session here at once, without waiting for the server (it may be unreachable, and the viewer need not wait for it). */
-  function logout() {
-    signingOut = endServerSession();
+  /** The sign-out in flight, shared by a second click; while set, a `csrf_failed` on it is resent by `endServerSession`, never by the client's reload. */
+  let ending: Promise<void> | null = null;
+
+  /**
+   * Shows the guest state only once the server ended the session. A failed request (network, 5xx) leaves the viewer signed in,
+   * since the cookie still works, and rejects so the caller can say so and offer a retry. `unauthorized` means it had ended.
+   */
+  async function logout() {
+    ending ??= endServerSession()
+      .catch((error: unknown) => {
+        if (!(error instanceof ApiError && error.code === 'unauthorized')) throw error;
+      })
+      .finally(() => (ending = null));
+    signingOut = ending.catch(() => undefined);
+    await ending;
     applyOwn(null);
-    return Promise.resolve();
   }
 
-  /** Never rejects. A stale token (another tab signed in again) is reloaded and the sign-out sent once more: ending this browser's session is what the viewer asked for. */
+  /** A stale token (another tab signed in again) is reloaded and the sign-out sent once more: ending this browser's session is what the viewer asked for. */
   async function endServerSession() {
     try {
       await logoutRequest();
     } catch (error) {
-      if (error instanceof ApiError && error.code === 'csrf_failed')
-        await resendLogoutWithFreshToken().catch(() => undefined);
+      if (!(error instanceof ApiError && error.code === 'csrf_failed')) throw error;
+      await resendLogoutWithFreshToken();
     }
   }
 
@@ -155,11 +166,11 @@ export const useSessionStore = defineStore('session', () => {
 
   /**
    * A write refused with `csrf_failed`: reload the session, and allow the resend only when it still belongs to the account that sent the
-   * write (another tab may have signed in as someone else). A signed-out tab has no one to resend as, and its sign-out retries itself.
+   * write (another tab may have signed in as someone else). A signed-out tab has no one to resend as, and a sign-out retries itself.
    */
   async function reloadForResend(): Promise<boolean> {
     const senderId = user.value?.id ?? null;
-    if (senderId === null) return false;
+    if (senderId === null || ending) return false;
     await loadSession();
     return user.value?.id === senderId;
   }
