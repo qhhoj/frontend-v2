@@ -34,7 +34,7 @@ const remove = (tag: string) => (tags.value = tags.value.filter((item) => item !
       <li
         v-for="tag in tags"
         :key="tag"
-        class="inline-flex min-h-[var(--qa-chip,1.5rem)] items-center gap-0.5 rounded-pill border border-line-strong bg-surface-solid pl-2.5 text-caption leading-4 font-semibold"
+        class="inline-flex min-h-(--qa-chip) items-center gap-0.5 rounded-pill border border-line-strong bg-surface-solid pl-2.5 text-caption leading-4 font-semibold"
       >
         <span>{{ tag }}</span>
         <button

@@ -124,7 +124,7 @@ const menuOf = (tag: ContestTag): RowMenuItem[] => [
       <template #cell-tag="{ row }">
         <span
           :class="[
-            'inline-flex h-[var(--qa-chip,1.5rem)] items-center rounded-pill border px-2.5 text-caption leading-4 font-semibold',
+            'inline-flex h-(--qa-chip) items-center rounded-pill border px-2.5 text-caption leading-4 font-semibold',
             TAG_COLOR_CLASSES[row.color],
           ]"
           >{{ row.name }}</span
