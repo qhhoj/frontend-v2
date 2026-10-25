@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { ApiError } from '@/api/client';
 import { createShortLink } from '@/api/short-links.api';
-import type { ShortLink } from '@/api/types/short-links';
+import type { CreatedShortLink } from '@/api/types/short-links';
 import { CircleCheck } from 'lucide-vue-next';
 import CopyButton from '@/components/CopyButton.vue';
 import { shortLinkUrl } from '@/features/short-links/short-link-path';
@@ -18,9 +18,9 @@ import { shortLinksKey } from './short-links.queries';
 const path = ref('');
 const code = ref('');
 const expires = ref('');
-const created = ref<ShortLink | null>(null);
+const created = ref<CreatedShortLink | null>(null);
 const isExpiryPast = ref(false);
-const create = useAdminMutation<void, ShortLink>({
+const create = useAdminMutation<void, CreatedShortLink>({
   mutate: () =>
     createShortLink({
       path: path.value.trim(),
