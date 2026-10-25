@@ -21,6 +21,7 @@ import OrganizationContext from './OrganizationContext.vue';
 import OrganizationFlagField from './OrganizationFlagField.vue';
 import OrganizationLogoField from './OrganizationLogoField.vue';
 import { MAX_ORGANIZATION_ADMINS } from './organization-form';
+import { numberBoxValue } from '../ui/form/number-box';
 import { organizationPanelOf } from './organization-search';
 import { useOrganizationEditor } from './use-organization-editor';
 import { useSlugFromName } from './use-slug-from-name';
@@ -54,15 +55,6 @@ const staffLockText = computed(() =>
 const leavesForm = (to: RouteLocationNormalized, from: RouteLocationNormalized) =>
   to.query.org !== from.query.org || organizationPanelOf(to.query) !== 'info';
 const queryGuard = useQueryLeaveGuard(() => dirtyCount.value > 0, leavesForm);
-
-/** An empty box is no limit (`null`); a typed count is a whole number. `v-model` on a number box hands back a number. */
-const slotsText = computed({
-  get: () => (form.slots === null ? '' : String(form.slots)),
-  set: (value: string | number) => {
-    const text = String(value).trim();
-    form.slots = text === '' ? null : Number(text);
-  },
-});
 
 /** The save bar's button is a submit: a clean edit or a running upload sends nothing. */
 function submit() {
@@ -151,13 +143,14 @@ const fieldAttrs = (invalid: unknown, describedBy: string | undefined) => ({
         >
           <input
             :id="id"
-            v-model="slotsText"
+            :value="form.slots ?? ''"
             type="number"
             min="0"
             max="1000000"
             :class="[INPUT, 'font-mono']"
             :disabled="!canEditAll"
             v-bind="fieldAttrs(invalid, describedBy)"
+            @input="form.slots = numberBoxValue($event)"
           />
         </AdminField>
         <div class="lg:col-span-2">

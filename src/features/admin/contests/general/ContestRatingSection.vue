@@ -6,7 +6,7 @@ import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import type { ContestForm } from '../contest-form';
-import { nullableNumber, textOf } from './input-values';
+import { numberBoxValue } from '../../ui/form/number-box';
 import { usePermissionLocks } from './permission-locks';
 
 /** Whether and for whom the contest counts towards rating. */
@@ -54,7 +54,7 @@ const BOUNDS = ['ratingFloor', 'ratingCeiling'] as const;
           :class="[INPUT, 'font-mono tabular-nums']"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
-          @input="form[bound] = nullableNumber(textOf($event))"
+          @input="form[bound] = numberBoxValue($event)"
         />
       </template>
     </AdminField>

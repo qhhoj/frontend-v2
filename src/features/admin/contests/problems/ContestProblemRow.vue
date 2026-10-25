@@ -2,7 +2,7 @@
 import { checked } from '../../ui/use-row-selection';
 import { ArrowDown, ArrowUp, X } from 'lucide-vue-next';
 import { INPUT, iconButtonClass } from '../../ui/controls';
-import { nullableNumber, textOf } from '../general/input-values';
+import { numberBoxValue } from '../../ui/form/number-box';
 import type { ProblemRow } from './contest-problems';
 
 /**
@@ -106,7 +106,7 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
         :aria-label="$t('admin.contests.problems.prefixFor', { code: row.code })"
         :class="INPUT"
         class="md:w-28 md:min-w-24"
-        @input="row.outputPrefix = nullableNumber(textOf($event))"
+        @input="row.outputPrefix = numberBoxValue($event)"
       />
     </td>
     <td v-if="showLimits" :class="CELL">
@@ -119,7 +119,7 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
         :aria-label="$t('admin.contests.problems.maxFor', { code: row.code })"
         :class="INPUT"
         class="md:w-28 md:min-w-24"
-        @input="row.maxSubmissions = nullableNumber(textOf($event))"
+        @input="row.maxSubmissions = numberBoxValue($event)"
       />
     </td>
     <td :class="CELL" class="max-md:col-span-full">

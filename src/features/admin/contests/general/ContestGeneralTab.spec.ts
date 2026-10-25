@@ -287,4 +287,29 @@ describe('ContestGeneralTab', () => {
     await wrapper.get('#contest-rules').setValue('Không dùng tài liệu.');
     expect(count()).toBe(before + 1);
   });
+
+  it('refuses a number box holding unreadable text instead of saving it as a clear', async () => {
+    const contest = editableContest({ timeLimit: 3600 });
+    const calls = mockApi({
+      ...staffViewer(EDIT),
+      ...contestEditorRoutes(contest),
+      [`PATCH /contests/${contest.key}`]: ok(contest),
+    });
+    const { wrapper } = await mountAndWaitFor(
+      `/admin/contests/${contest.key}/general?view=advanced`,
+      'Thông tin kỳ thi',
+    );
+    // jsdom never reports badInput; a browser does for text it cannot parse, and then also reads the value as ''.
+    const box = wrapper.get('#contest-timeLimit').element as HTMLInputElement;
+    Object.defineProperty(box, 'validity', { value: { badInput: true }, configurable: true });
+    await wrapper.get('#contest-timeLimit').setValue('');
+    await save(wrapper);
+    Object.defineProperty(box, 'validity', { value: { badInput: false }, configurable: true });
+    expect(wrapper.text()).toContain('Giá trị không phải là số.');
+    expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
+
+    await wrapper.get('#contest-timeLimit').setValue('');
+    await save(wrapper);
+    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ timeLimit: null });
+  });
 });

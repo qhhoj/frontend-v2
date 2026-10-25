@@ -3,7 +3,8 @@ import { computed, ref } from 'vue';
 import type { CaseChecker } from '@/api/types/problem-data';
 import { ArrowDown, ArrowUp, X } from 'lucide-vue-next';
 import { INPUT, iconButtonClass } from '../../ui/controls';
-import { argsText, optionalNumber, parseArgs } from './test-cases';
+import { numberBoxValue } from '../../ui/form/number-box';
+import { argsText, parseArgs } from './test-cases';
 import type { KeyedCase } from './test-cases';
 
 const row = defineModel<KeyedCase>({ required: true });
@@ -40,8 +41,8 @@ function onArgsInput(text: string) {
   if (parsed !== undefined) row.value.checkerArgs = parsed;
 }
 
-function setOptionalNumber(field: 'points' | 'outputPrefix' | 'outputLimit', text: string) {
-  row.value[field] = optionalNumber(text);
+function setOptionalNumber(field: 'points' | 'outputPrefix' | 'outputLimit', event: Event) {
+  row.value[field] = numberBoxValue(event);
 }
 </script>
 
@@ -131,7 +132,7 @@ function setOptionalNumber(field: 'points' | 'outputPrefix' | 'outputLimit', tex
         type="number"
         min="0"
         :class="[INPUT, 'w-24 font-mono tabular-nums']"
-        @input="setOptionalNumber('points', ($event.target as HTMLInputElement).value)"
+        @input="setOptionalNumber('points', $event)"
       />
       <label v-if="row.type === 'C'" class="mt-1 flex min-h-8 items-center gap-2 text-sm">
         <input v-model="row.isPretest" type="checkbox" class="size-4 accent-accent" />
@@ -185,7 +186,7 @@ function setOptionalNumber(field: 'points' | 'outputPrefix' | 'outputLimit', tex
             type="number"
             min="0"
             :class="INPUT"
-            @input="setOptionalNumber('outputPrefix', ($event.target as HTMLInputElement).value)"
+            @input="setOptionalNumber('outputPrefix', $event)"
           />
           <label :for="`case-${index}-outputLimit`" class="text-sm">{{
             $t('admin.problems.data.checker.outputLimit')
@@ -196,7 +197,7 @@ function setOptionalNumber(field: 'points' | 'outputPrefix' | 'outputLimit', tex
             type="number"
             min="0"
             :class="INPUT"
-            @input="setOptionalNumber('outputLimit', ($event.target as HTMLInputElement).value)"
+            @input="setOptionalNumber('outputLimit', $event)"
           />
         </div>
       </details>

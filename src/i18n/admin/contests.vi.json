@@ -103,6 +103,7 @@
       "endBeforeStart": "Kết thúc phải sau bắt đầu.",
       "cacheTimeout": "Từ 0 đến 86400 giây.",
       "frozen": "Không được âm.",
+      "notNumber": "Giá trị không phải là số.",
       "ratingRange": "Rating tối đa phải không nhỏ hơn tối thiểu.",
       "tags": "Tối đa 20 thẻ.",
       "pointsPrecision": "Từ 0 đến 10.",

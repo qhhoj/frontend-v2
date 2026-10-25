@@ -561,6 +561,9 @@ function checkWindow(form: ContestForm, message: Message): FieldErrors {
   return errors;
 }
 
+/** Clearable number boxes: text the browser cannot read is NaN, and is refused rather than saved as a clear. */
+const UNREADABLE_CHECKED_FIELDS = ['timeLimit', 'ratingFloor', 'ratingCeiling'] as const;
+
 function checkNumbers(form: ContestForm, message: Message): FieldErrors {
   const errors: FieldErrors = {};
   if (isBadCount(form.scoreboardCacheTimeout, 86_400))
@@ -568,6 +571,8 @@ function checkNumbers(form: ContestForm, message: Message): FieldErrors {
   if (isBadCount(form.frozenLastMinutes)) errors.frozenLastMinutes = message('frozen');
   if (form.tags.length > 20) errors.tags = message('tags');
   if (!isWholeIn(form.pointsPrecision, 0, 10)) errors.pointsPrecision = message('pointsPrecision');
+  for (const field of UNREADABLE_CHECKED_FIELDS)
+    if (Number.isNaN(form[field])) errors[field] = message('notNumber');
   return errors;
 }
 

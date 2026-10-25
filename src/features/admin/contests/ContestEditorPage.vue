@@ -139,7 +139,7 @@ function openDelete(close: () => void) {
       </div>
       <template v-else>
         <AdminTabs :tabs="tabs" :label="$t('admin.contests.tabsLabel')" sticky />
-        <component :is="tabComponent" v-if="tabComponent" :contest="contest" />
+        <component :is="tabComponent" v-if="tabComponent" :key="contest.key" :contest="contest" />
         <ContestCloneDialog v-model:visible="isCloneOpen" :source="contest" />
         <ContestDeleteDialog
           v-model:visible="isDeleteOpen"

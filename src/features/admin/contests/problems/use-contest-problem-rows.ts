@@ -35,6 +35,10 @@ export function changedProblemCount(saved: ProblemRow[], current: ProblemRow[]):
   return [...ids].filter((id) => before.get(id) !== after.get(id)).length;
 }
 
+/** A limit box holding text the browser cannot read is NaN (`numberBoxValue`) and must not be saved as a clear. */
+const hasUnreadableLimit = (row: ProblemRow) =>
+  Number.isNaN(row.outputPrefix) || Number.isNaN(row.maxSubmissions);
+
 /** A row's own refusal first (points cleared or out of range), then the first server message about that row (`problems.<index>.<field>`). */
 function rowIssueOf(
   rows: ProblemRow[],
@@ -43,6 +47,7 @@ function rowIssueOf(
 ): string | undefined {
   const row = rows[index];
   if (row && !isPointsValid(row.points)) return translate('admin.contests.problems.pointsRange');
+  if (row && hasUnreadableLimit(row)) return translate('admin.contests.general.errors.notNumber');
   return Object.entries(serverErrors).find(([field]) =>
     field.startsWith(`problems.${index}.`),
   )?.[1];
@@ -81,8 +86,10 @@ export function useContestProblemRows(contest: () => EditableContest) {
 
   const issueOf = (index: number) => rowIssueOf(rows.value, mutation.fieldErrors.value, index);
 
-  /** Nothing is sent while a row's points are not a whole number in range. */
-  const hasInvalidPoints = computed(() => rows.value.some((row) => !isPointsValid(row.points)));
+  /** Nothing is sent while a row's points are not a whole number in range or a limit box is unreadable. */
+  const hasInvalidPoints = computed(() =>
+    rows.value.some((row) => !isPointsValid(row.points) || hasUnreadableLimit(row)),
+  );
   const save = () => (hasInvalidPoints.value ? undefined : mutation.run(rows.value));
 
   watch(contest, (next) => {

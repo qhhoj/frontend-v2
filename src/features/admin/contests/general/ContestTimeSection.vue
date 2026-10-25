@@ -8,7 +8,8 @@ import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import type { ContestForm } from '../contest-form';
 import ContestTimeline from './ContestTimeline.vue';
-import { nullableNumber, numberOrNaN, textOf, timeModel } from './input-values';
+import { numberBoxValue } from '../../ui/form/number-box';
+import { numberOrNaN, textOf, timeModel } from './input-values';
 import { usePermissionLocks } from './permission-locks';
 
 /** When the contest runs: a timeline over the start, end, registration, freeze and judging lock, all in the site zone. */
@@ -84,6 +85,7 @@ const isLockLocked = computed(() => Boolean(lockedBy('judge.lock_contest')));
       input-id="contest-timeLimit"
       :label="$t('admin.contests.general.fields.timeLimit')"
       :hint="$t('admin.contests.general.hints.timeLimit')"
+      :error="errors.timeLimit"
     >
       <template #default="{ id, describedBy, invalid }">
         <input
@@ -95,7 +97,7 @@ const isLockLocked = computed(() => Boolean(lockedBy('judge.lock_contest')));
           :class="[INPUT, 'font-mono tabular-nums']"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
-          @input="form.timeLimit = nullableNumber(textOf($event))"
+          @input="form.timeLimit = numberBoxValue($event)"
         />
       </template>
     </AdminField>

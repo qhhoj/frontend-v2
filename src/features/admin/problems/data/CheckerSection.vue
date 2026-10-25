@@ -10,7 +10,7 @@ import CheckerPicker from './CheckerPicker.vue';
 import CheckerRuleOptions from './CheckerRuleOptions.vue';
 import GraderPicker from './GraderPicker.vue';
 import IoMethodPicker from './IoMethodPicker.vue';
-import { optionalNumber } from './test-cases';
+import { numberBoxValue } from '../../ui/form/number-box';
 import type { DataForm } from './test-cases';
 
 /**
@@ -21,8 +21,8 @@ const form = defineModel<DataForm>({ required: true });
 defineProps<{ code: string; data: ProblemData; errors: FieldErrors; view: EditorView }>();
 const key = 'admin.problems.data.config';
 
-function setOutputNumber(field: 'outputLimit' | 'outputPrefix', text: string) {
-  form.value[field] = optionalNumber(text);
+function setOutputNumber(field: 'outputLimit' | 'outputPrefix', event: Event) {
+  form.value[field] = numberBoxValue(event);
 }
 </script>
 
@@ -43,6 +43,7 @@ function setOutputNumber(field: 'outputLimit' | 'outputPrefix', text: string) {
         input-id="data-outputLimit"
         :label="$t('admin.problems.data.checker.outputLimit')"
         :hint="$t(`${key}.outputLimitHint`)"
+        :error="errors.outputLimit"
       >
         <input
           :id="id"
@@ -52,7 +53,7 @@ function setOutputNumber(field: 'outputLimit' | 'outputPrefix', text: string) {
           min="0"
           :class="INPUT"
           :aria-describedby="describedBy"
-          @input="setOutputNumber('outputLimit', ($event.target as HTMLInputElement).value)"
+          @input="setOutputNumber('outputLimit', $event)"
         />
       </AdminField>
       <AdminField
@@ -60,6 +61,7 @@ function setOutputNumber(field: 'outputLimit' | 'outputPrefix', text: string) {
         input-id="data-outputPrefix"
         :label="$t('admin.problems.data.checker.outputPrefix')"
         :hint="$t(`${key}.outputPrefixHint`)"
+        :error="errors.outputPrefix"
       >
         <input
           :id="id"
@@ -69,7 +71,7 @@ function setOutputNumber(field: 'outputLimit' | 'outputPrefix', text: string) {
           min="0"
           :class="INPUT"
           :aria-describedby="describedBy"
-          @input="setOutputNumber('outputPrefix', ($event.target as HTMLInputElement).value)"
+          @input="setOutputNumber('outputPrefix', $event)"
         />
       </AdminField>
       <AdminCheckbox
