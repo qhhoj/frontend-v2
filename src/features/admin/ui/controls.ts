@@ -3,12 +3,12 @@ import type { ButtonTone } from '@/components/ui/button-classes';
 import { CARD_VARIANTS } from '@/components/ui/Card.variants';
 
 /**
- * Admin control classes (design-system/qhhoj/pages/admin.md). Heights follow the admin density tokens from `admin-density.css`
- * (36 px on a fine pointer, 44 px on a coarse one); the fallback is the fine-pointer value. Controls are `rounded-cell`; pills
+ * Admin control classes (design-system/qhhoj/pages/admin.md). Heights follow `--qh-control`: 44 px on public pages, and inside `.qh-admin` the small step
+ * (36 px on a fine pointer, 44 px on a coarse one). Controls are `rounded-cell`; pills
  * are only for chips, segmented filters and status. A disabled control keeps focus (`aria-disabled`) and wears muted token
  * pairs, never opacity.
  */
-const CONTROL_HEIGHT = 'min-h-[var(--qa-control,2.25rem)]';
+const CONTROL_HEIGHT = 'min-h-(--qh-control)';
 
 export type { ButtonTone };
 export type ControlSize = 'sm' | 'md';
@@ -19,7 +19,7 @@ export const buttonClass = (tone: ButtonTone = 'secondary', size: ControlSize = 
 
 /** A square icon-only button; give it an `aria-label` and a `title`. */
 export const iconButtonClass = (tone: ButtonTone = 'ghost', size: ControlSize = 'md') =>
-  `${buttonClass(tone, size)} ${size === 'sm' ? 'min-w-8 px-0 touch:min-w-11' : 'min-w-[var(--qa-control,2.25rem)] px-0'}`;
+  `${buttonClass(tone, size)} ${size === 'sm' ? 'min-w-8 px-0 touch:min-w-11' : 'min-w-(--qh-control) px-0'}`;
 
 export const BUTTON = {
   primary: buttonClass('primary'),

@@ -1,13 +1,8 @@
 /*
- * Admin density (design-system/qhhoj/pages/admin.md): 40 px rows and 36 px controls for a mouse, 48 px rows and 44 px
- * controls for touch. Use them as `h-(--qa-control)`, `min-h-(--qa-row)`, `gap-(--qa-gap)`. The admin shell imports this
- * file, so the values exist on every admin screen and in its overlays (dialogs are teleported to <body>).
+ * Admin layout sizes. The density tokens (--qa-row, --qa-control, --qa-chip, --qa-gap) live in theme/tokens.css so they exist
+ * before this lazy chunk loads; this file keeps what only the admin shell needs.
  */
 :root {
-  --qa-row: 2.5rem;
-  --qa-control: 2.25rem;
-  --qa-chip: 1.5rem;
-  --qa-gap: 0.75rem;
   --qa-sidebar: 248px;
   /* The content column's side padding; a sticky bar bleeds to the edges with -mx-(--qa-gutter) px-(--qa-gutter). */
   --qa-gutter: 1rem;
@@ -16,14 +11,6 @@
 @media (min-width: 48rem) {
   :root {
     --qa-gutter: 2rem;
-  }
-}
-
-@media (pointer: coarse), (max-width: 40rem) {
-  :root {
-    --qa-row: 3rem;
-    --qa-control: 2.75rem;
-    --qa-chip: 2rem;
   }
 }
 

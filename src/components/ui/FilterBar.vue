@@ -101,7 +101,7 @@ const removeChip = (key: string) => emit('remove', key);
         <RouterLink
           v-if="exact"
           :to="exact.to"
-          class="absolute inset-x-0 top-full z-20 mt-1 flex min-h-[var(--qa-control,2.25rem)] items-center gap-2 rounded-cell border border-line-strong bg-surface-solid px-3 text-sm font-semibold text-accent-text hover:bg-surface-hover"
+          class="absolute inset-x-0 top-full z-20 mt-1 flex min-h-(--qh-control) items-center gap-2 rounded-cell border border-line-strong bg-surface-solid px-3 text-sm font-semibold text-accent-text hover:bg-surface-hover"
         >
           {{ exact.label }}
           <CornerDownLeft
@@ -148,7 +148,7 @@ const removeChip = (key: string) => emit('remove', key);
       <li v-for="chip in chips" :key="chip.key">
         <button
           type="button"
-          class="inline-flex h-[var(--qa-chip,1.5rem)] items-center gap-1 rounded-pill border border-line-strong bg-surface-solid pr-1.5 pl-2.5 text-xs font-semibold hover:bg-surface-hover"
+          class="inline-flex h-(--qa-chip) items-center gap-1 rounded-pill border border-line-strong bg-surface-solid pr-1.5 pl-2.5 text-xs font-semibold hover:bg-surface-hover"
           :aria-label="$t('admin.table.removeFilter', { label: chip.label })"
           @click="removeChip(chip.key)"
         >

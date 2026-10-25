@@ -165,12 +165,8 @@ const growClass = (column: DataTableColumn) => growsOf(column) && 'w-full max-w-
 const CELL_BASE =
   'border-b border-line px-3 align-middle [overflow-wrap:anywhere] [:where(&)]:max-w-64';
 /** A body cell is the row's minimum height (admin 40 px, public 48 px); a header cell is as tall as an admin row, or 40 px. */
-const CELL = computed(
-  () => `${isCompact.value ? 'h-[var(--qa-row,2.5rem)]' : 'h-12'} ${CELL_BASE}`,
-);
-const HEAD_CELL = computed(
-  () => `${isCompact.value ? 'h-[var(--qa-row,2.5rem)]' : 'h-10'} ${CELL_BASE}`,
-);
+const CELL = computed(() => `${isCompact.value ? 'h-(--qa-row)' : 'h-12'} ${CELL_BASE}`);
+const HEAD_CELL = computed(() => `${isCompact.value ? 'h-(--qa-row)' : 'h-10'} ${CELL_BASE}`);
 const HEAD_TEXT = 'text-meta font-semibold whitespace-nowrap text-muted';
 const SORT_BUTTON =
   'inline-flex min-h-6 items-center gap-1 rounded-cell hover:text-content touch:min-h-11';
