@@ -326,6 +326,8 @@ describe('row total', () => {
   it('stays short of the full total once rounded, and rounds an ordinary total as before', () => {
     expect(totalScoreText(99.999, problems, context('default', 0))).toBe('99');
     expect(totalScoreText(100, problems, context('default', 0))).toBe('100');
+    const tenths = [problem({ points: 0.1 }), problem({ problemId: 'p2', points: 0.2 })];
+    expect(totalScoreText(0.3, tenths, context('default', 1))).toBe('0.3');
     expect(totalScoreText(54.6, problems, context('default', 0))).toBe('55');
   });
 });

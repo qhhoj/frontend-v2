@@ -73,6 +73,15 @@ describe('account cache sync', () => {
     expect(readStorage(recentKey)).toBeNull();
   });
 
+  it('drops the stored recent screens when the session resolves to anonymous at boot', async () => {
+    mountSync();
+    const recentKey = 'qhhoj.admin.recent.0192a000-0000-7000-8000-0000000000ff';
+    writeStorage(recentKey, '[]');
+    useSessionStore().$patch({ status: 'anonymous', user: null });
+    await flushPromises();
+    expect(readStorage(recentKey)).toBeNull();
+  });
+
   it('reads a mounted viewer-keyed query once for the new viewer, not twice', async () => {
     const viewer = sessionUser({ id: '0192a000-0000-7000-8000-00000000000d' });
     mockApi({ 'GET /auth/me': signedOut });

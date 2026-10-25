@@ -123,7 +123,7 @@ async function send(
       signal,
       cache,
     });
-    syncServerClock(response.headers);
+    syncServerClock(response.headers, cache);
     return response;
   } catch (error) {
     if ((error as { name?: string }).name === 'AbortError') throw error;

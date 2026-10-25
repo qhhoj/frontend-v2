@@ -1,3 +1,4 @@
+import { serverNow } from '@/lib/server-clock';
 import { SITE_TIME_ZONE, formatInZone } from '../../ui/form/site-time';
 
 export interface ContestWindow {
@@ -22,7 +23,7 @@ const partsOf = (iso: string, zone: string) => {
 export function contestWindowOf(
   startTime: string,
   endTime: string,
-  now: number = Date.now(),
+  now: number = serverNow(),
   zone: string = SITE_TIME_ZONE,
 ): ContestWindow {
   const start = partsOf(startTime, zone);

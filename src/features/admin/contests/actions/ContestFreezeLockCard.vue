@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { serverNow } from '@/lib/server-clock';
 import { needsPermissionText } from '../../ui/permission-text';
 import { computed, onBeforeUnmount, ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
@@ -31,8 +32,8 @@ const viewer = useViewerId();
 const queryClient = useQueryClient();
 const { can } = usePermissions();
 /** The clock the states are read against, moved on every half minute so a scheduled freeze or lock turns on in place. */
-const now = ref(Date.now());
-const clock = setInterval(() => (now.value = Date.now()), 30_000);
+const now = ref(serverNow());
+const clock = setInterval(() => (now.value = serverNow()), 30_000);
 onBeforeUnmount(() => clearInterval(clock));
 const freeze = computed(() => freezeStateOf(props.contest, now.value));
 const lockedAfter = computed(() => props.contest.settings?.lockedAfter ?? null);
@@ -56,14 +57,14 @@ const mutation = useAdminMutation({
     queryClient.setQueryData(editableContestKey(saved.key, viewer.value), saved),
   onDone: () => {
     pending.value = null;
-    now.value = Date.now();
+    now.value = serverNow();
   },
 });
 
 /** Opens the confirm for one change; the keys name the title, body and button under `admin.contestOps.freezeLock`. */
 function ask(patch: ContestPatch, action: string) {
   mutation.reset();
-  now.value = Date.now();
+  now.value = serverNow();
   const text = (part: string) => translate(`admin.contestOps.freezeLock.${action}.${part}`);
   pending.value = { patch, title: text('title'), body: text('body'), label: text('confirm') };
 }
@@ -155,7 +156,7 @@ const isFreezeValid = computed(
           type="button"
           :class="buttonClass('secondary')"
           class="self-start"
-          @click="ask({ lockedAfter: new Date().toISOString() }, 'lock')"
+          @click="ask({ lockedAfter: new Date(serverNow()).toISOString() }, 'lock')"
         >
           {{ $t('admin.contestOps.freezeLock.lock.button') }}
         </button>

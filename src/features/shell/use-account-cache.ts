@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import type { QueryClient } from '@tanstack/vue-query';
 import { watch } from 'vue';
-import { forgetRecentScreens } from '@/features/admin/shell/recent/recent-screens';
+import { forgetAllRecentScreens } from '@/features/admin/shell/recent/recent-screens';
 import { useSessionStore } from '@/stores/session.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 
@@ -33,10 +33,10 @@ export function useAccountCacheSync() {
   const viewerId = useViewerId();
   watch(
     () => [session.status, session.user?.id] as const,
-    ([, userId], [previousStatus, previousUserId]) => {
+    ([status, userId], [previousStatus, previousUserId]) => {
+      if (status === 'anonymous') forgetAllRecentScreens();
       if (previousStatus === 'unknown' || userId === previousUserId) return;
       dropAccountData(queryClient, viewerId.value);
-      if (previousUserId && !userId) forgetRecentScreens(previousUserId);
     },
     { flush: 'post' },
   );

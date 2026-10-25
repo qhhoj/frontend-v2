@@ -100,6 +100,9 @@ const EMPTY: RankingCellView = {
 const pointsText = (points: number, { pointsPrecision, locale }: RankingContext) =>
   formatNumber(roundTo(points, pointsPrecision), locale, pointsPrecision);
 
+/** The backend stores points at 3 decimals; sums are compared there so float noise (0.1 + 0.2) is not a shortfall. */
+const STORED_POINTS_DIGITS = 3;
+
 /** A row's total on a points board: short of the problems' sum stays short once rounded (like the cells), never printing as full. */
 export function totalScoreText(
   score: number,
@@ -107,7 +110,11 @@ export function totalScoreText(
   context: RankingContext,
 ): string {
   const fullTotal = problems.reduce((sum, problem) => sum + problem.points, 0);
-  const shown = scoreBelowFull(score, fullTotal, context.pointsPrecision);
+  const shown = scoreBelowFull(
+    roundTo(score, STORED_POINTS_DIGITS),
+    roundTo(fullTotal, STORED_POINTS_DIGITS),
+    context.pointsPrecision,
+  );
   return formatNumber(
     roundTo(shown, context.pointsPrecision),
     context.locale,

@@ -9,11 +9,15 @@ let isSynced = false;
 export const serverNow = (): number => Date.now() + offsetMs;
 
 /**
- * Sets the offset once, from the first answer that is fresh: a cached copy (`Age` above zero) carries an old `Date`.
- * The `Date` header has one-second resolution, so the offset is good to about a second.
+ * Sets the offset once, from the first answer fetched with `cache: 'no-store'`: a browser-cache hit carries no `Age` but an old
+ * `Date`, and a CDN copy has `Age` above zero. The `Date` header has one-second resolution, so the offset is good to about a second.
  */
-export function syncServerClock(headers: Headers, receivedAt = Date.now()): void {
-  if (isSynced || Number(headers.get('Age') ?? 0) > 0) return;
+export function syncServerClock(
+  headers: Headers,
+  cache: RequestCache | undefined,
+  receivedAt = Date.now(),
+): void {
+  if (isSynced || cache !== 'no-store' || Number(headers.get('Age') ?? 0) > 0) return;
   const serverTime = Date.parse(headers.get('Date') ?? '');
   if (Number.isNaN(serverTime)) return;
   offsetMs = serverTime - receivedAt;
