@@ -5,7 +5,7 @@ import GlassCard from '@/components/GlassCard.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { useTicketPatch } from './use-ticket-patch';
 
-/** Notes: everyone who reads the ticket sees them; assignees and staff (`can.editNotes`) edit them. */
+/** Notes: assignees and staff see and edit them (`can.editNotes`); readers without access get no notes card (the page renders this only when `notes` is non-null). */
 const props = defineProps<{ ticket: TicketDetail }>();
 const draft = ref(props.ticket.notes ?? '');
 /** Set by typing, cleared once a save is accepted: a refetch never overwrites text the viewer is still working on. */
