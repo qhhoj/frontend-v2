@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { putEditorial } from '@/api/problem-editing.api';
 import type { UserChip } from '@/api/types/admin-common';
 import type {
@@ -16,6 +16,7 @@ import { provideDateValidity } from '../../ui/form/date-validity';
 import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
 import { normalizeNewlines, sentText, useDirtyForm } from '../../ui/form/dirty-form';
+import { useSeededDraft } from '../../ui/form/seeded-draft';
 import MarkdownField from '../../ui/MarkdownField.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import UsernameChips from '../../ui/UsernameChips.vue';
@@ -46,14 +47,15 @@ const { draft, dirtyCount, discard, commit } = useDirtyForm<EditorialForm>(
 /** The content as stored (maybe `\r\n`): sent back while the edit leaves it unchanged. */
 let storedContent = props.problem.editor!.solution?.content ?? '';
 /** A clean form follows the stored editorial, so a later save never sends back what someone else changed meanwhile. */
-watch(
-  () => props.problem.editor?.solution,
-  (solution) => {
-    if (dirtyCount.value > 0) return;
-    storedContent = solution?.content ?? '';
-    commit(formOf(solution));
+const { target } = useSeededDraft(() => props.problem, {
+  idOf: (stored) => stored.code,
+  routeParam: 'code',
+  isDirty: () => dirtyCount.value > 0,
+  refill: (stored) => {
+    storedContent = stored.editor?.solution?.content ?? '';
+    commit(formOf(stored.editor?.solution));
   },
-);
+});
 const contentError = computed(() => markdownError(draft.value.content));
 const savedAt = ref<Date | null>(null);
 const { hasUnreadableDate, resetDates } = provideDateValidity();
@@ -63,22 +65,25 @@ const discardAll = () => {
 };
 
 const mutation = useAdminMutation({
-  mutate: (body: EditorialDraftBody) => putEditorial(props.problem.code, body),
-  invalidates: () => [['admin', 'problem', props.problem.code], PUBLIC_PROBLEMS_KEY],
+  mutate: ({ code, body }: { code: string; body: EditorialDraftBody }) => putEditorial(code, body),
+  invalidates: ({ code }) => [['admin', 'problem', code], PUBLIC_PROBLEMS_KEY],
   successText: () => translate('admin.problems.editorial.savedToast'),
   onSuccess: () => (savedAt.value = new Date()),
 });
 
+/** The editorial goes to the problem the form was filled from, and nowhere while the page shows another one. */
 async function save() {
-  if (contentError.value || hasUnreadableDate.value || dirtyCount.value === 0) return;
+  const code = target();
+  if (!code || contentError.value || hasUnreadableDate.value || dirtyCount.value === 0) return;
   const sent = { ...draft.value, authors: [...draft.value.authors] };
   const content = sentText(sent.content, storedContent);
-  await mutation.run({
+  const body = {
     isPublic: sent.isPublic,
     publishOn: sent.publishOn ?? new Date().toISOString(),
     authors: sent.authors.map((chip) => chip.id),
     content,
-  });
+  };
+  await mutation.run({ code, body });
   if (!mutation.isDone.value) return;
   storedContent = content;
   commit(sent);

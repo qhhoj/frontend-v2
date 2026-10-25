@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { updateAnnouncement } from '@/api/contest-admin.api';
 import type { Announcement } from '@/api/types/contest-editing';
 import AdminField from '../../ui/AdminField.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
 import { INPUT, buttonClass } from '../../ui/controls';
+import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
 import { translate } from '@/i18n';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import AnnouncementPreview from './AnnouncementPreview.vue';
@@ -15,6 +16,12 @@ const props = defineProps<{ contestKey: string; announcement: Announcement }>();
 const emit = defineEmits<{ close: [] }>();
 const title = ref(props.announcement.title);
 const description = ref(props.announcement.description);
+/** An unsaved fix asks before another contest or screen replaces it. */
+const dirtyCount = computed(
+  () =>
+    Number(title.value !== props.announcement.title) +
+    Number(description.value !== props.announcement.description),
+);
 
 const save = useAdminMutation({
   mutate: () =>
@@ -83,5 +90,6 @@ const save = useAdminMutation({
         :text="failureTextOf(save.failure.value)"
       />
     </div>
+    <AdminLeaveGuard :dirty-count="dirtyCount" />
   </form>
 </template>

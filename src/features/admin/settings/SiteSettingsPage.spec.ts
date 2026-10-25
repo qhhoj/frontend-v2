@@ -278,6 +278,20 @@ describe('clearing a secret', () => {
     expect((mail.get('input').element as HTMLInputElement).value).toBe('QHHOJ <ops@qhhoj.example>');
     expect(patches(calls)).toEqual([['/admin/settings/mail.smtpUrl', { value: '' }]]);
   });
+
+  it('keeps an unsaved edit when another admin changes the same key meanwhile', async () => {
+    const KEY = 'contest.banAfterDisqualifications';
+    let stored = ALL_SETTINGS;
+    mockApi(routes({ 'GET /admin/settings': () => ok(stored) }));
+    const { wrapper, queryClient } = await mountSettings();
+    const contest = block(wrapper, 'contest');
+    await contest.get('input[type="number"]').setValue('3');
+    stored = ALL_SETTINGS.map((item) => (item.key === KEY ? setting(KEY, 5) : item));
+    await queryClient.invalidateQueries({ queryKey: ['admin', 'settings'] });
+    await flushPromises();
+    expect((contest.get('input[type="number"]').element as HTMLInputElement).value).toBe('3');
+    expect(saveBar(wrapper).text()).toContain('1 thay đổi chưa lưu');
+  });
 });
 
 describe('saving a replaced secret', () => {

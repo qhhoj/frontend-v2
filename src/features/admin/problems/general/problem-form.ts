@@ -262,8 +262,9 @@ const requiredProblemFields = (form: ProblemForm): RequiredPart<ProblemBody> => 
   typeIds: form.typeIds,
 });
 
+/** Out of range, or not a number at all: a box holding text the browser cannot read gives '' (`v-model.number`). */
 const outOf = (value: number, range: { min: number; max: number }) =>
-  value < range.min || value > range.max;
+  !Number.isFinite(value) || value < range.min || value > range.max;
 
 function timeLimitError(
   form: ProblemForm,
@@ -277,14 +278,24 @@ function timeLimitError(
   return undefined;
 }
 
-/** A per-language limit above the plain-editor cap needs the same permission as the main one (the backend checks both). */
-function languageTimeErrors(form: ProblemForm, can: (permission: string) => boolean): FieldErrors {
-  if (can('judge.high_problem_timelimit')) return {};
+/** One per-language time limit's error: not a number, or above the plain-editor cap without its permission. */
+function languageTimeError(timeLimit: number, canHighTime: boolean): string | undefined {
+  if (!Number.isFinite(timeLimit)) return translate('admin.problems.general.errors.timeLimit');
+  if (!canHighTime && timeLimit > PROBLEM_LIMITS.timeLimit.highAbove)
+    return translate('admin.problems.general.errors.highTime');
+  return undefined;
+}
+
+/** Per-language limits: each box a number, and a time above the cap needs the same permission as the main one (the backend checks both). */
+function languageLimitErrors(form: ProblemForm, can: (permission: string) => boolean): FieldErrors {
+  const canHighTime = can('judge.high_problem_timelimit');
   const errors: FieldErrors = {};
   form.languageLimits.forEach((limit, index) => {
-    if (limit.timeLimit > PROBLEM_LIMITS.timeLimit.highAbove)
-      errors[`languageLimits.${index}.timeLimit`] = translate(
-        'admin.problems.general.errors.highTime',
+    const timeError = languageTimeError(limit.timeLimit, canHighTime);
+    if (timeError) errors[`languageLimits.${index}.timeLimit`] = timeError;
+    if (!Number.isFinite(limit.memoryLimit))
+      errors[`languageLimits.${index}.memoryLimit`] = translate(
+        'admin.problems.general.errors.memory',
       );
   });
   return errors;
@@ -308,7 +319,7 @@ export function checkProblemForm(
     errors.name = translate('admin.problems.general.errors.name');
   const timeError = timeLimitError(form, can);
   if (timeError) errors.timeLimit = timeError;
-  Object.assign(errors, languageTimeErrors(form, can));
+  Object.assign(errors, languageLimitErrors(form, can));
   if (outOf(form.memoryLimit, PROBLEM_LIMITS.memoryLimit))
     errors.memoryLimit = translate('admin.problems.general.errors.memory');
   if (outOf(form.points, PROBLEM_LIMITS.points))

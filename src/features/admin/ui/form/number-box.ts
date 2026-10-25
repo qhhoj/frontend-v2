@@ -8,3 +8,6 @@ export function numberBoxValue(event: Event): number | null {
   if (box.validity.badInput) return Number.NaN;
   return box.value.trim() === '' ? null : Number(box.value);
 }
+
+/** What a required number box holds: NaN when empty or unreadable (the form check refuses it, nothing is sent), else the number. */
+export const requiredNumberValue = (event: Event): number => numberBoxValue(event) ?? Number.NaN;

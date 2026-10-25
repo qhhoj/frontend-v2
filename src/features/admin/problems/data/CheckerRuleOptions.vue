@@ -7,6 +7,7 @@ import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { INPUT } from '../../ui/controls';
+import { numberBoxValue } from '../../ui/form/number-box';
 import {
   argsOf,
   DEFAULT_PRECISION,
@@ -39,8 +40,9 @@ const setArg = (name: string, value: unknown) => {
 };
 
 const precision = computed(() => args.value.precision ?? DEFAULT_PRECISION);
-function setPrecision(text: string) {
-  setArg('precision', text.trim() === '' ? undefined : Number(text));
+/** An empty box leaves the default; text the browser cannot read is kept as not-a-number, which the check refuses. */
+function setPrecision(event: Event) {
+  setArg('precision', numberBoxValue(event) ?? undefined);
 }
 const peAllowed = computed({
   get: () => args.value.pe_allowed !== false,
@@ -123,7 +125,7 @@ const weightsError = computed(() =>
           :class="INPUT"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
-          @input="setPrecision(($event.target as HTMLInputElement).value)"
+          @input="setPrecision($event)"
         />
       </AdminField>
 

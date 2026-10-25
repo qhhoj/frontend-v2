@@ -8,7 +8,8 @@ import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { chooseFormat, FORMAT_FIELDS } from '../format-config';
 import type { ContestForm } from '../contest-form';
-import { numberOrNaN, textOf } from './input-values';
+import { requiredNumberValue } from '../../ui/form/number-box';
+import { textOf } from './input-values';
 
 const form = defineModel<ContestForm>({ required: true });
 defineProps<{ errors: FieldErrors }>();
@@ -123,7 +124,7 @@ const pickFormat = (event: Event) => chooseFormat(form.value, textOf(event) as C
               min="0"
               :class="[INPUT, 'font-mono tabular-nums']"
               :aria-describedby="describedBy"
-              @input="form.formatConfig[field.name] = numberOrNaN(textOf($event))"
+              @input="form.formatConfig[field.name] = requiredNumberValue($event)"
             />
           </template>
         </AdminField>

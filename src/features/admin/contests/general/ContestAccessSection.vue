@@ -10,7 +10,7 @@ import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import type { ContestForm } from '../contest-form';
 import TagChips from './TagChips.vue';
-import { numberOrNaN, textOf } from './input-values';
+import { requiredNumberValue } from '../../ui/form/number-box';
 import { usePermissionLocks } from './permission-locks';
 
 /** Who sees the contest and its scoreboard: visibility, privacy, entry codes and bans. */
@@ -149,7 +149,7 @@ const ACCESS_CODE = 'judge.contest_access_code';
           :class="[INPUT, 'font-mono tabular-nums']"
           :aria-describedby="describedBy"
           :aria-invalid="invalid ? 'true' : undefined"
-          @input="form.scoreboardCacheTimeout = numberOrNaN(textOf($event))"
+          @input="form.scoreboardCacheTimeout = requiredNumberValue($event)"
         />
       </template>
     </AdminField>

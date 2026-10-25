@@ -1,9 +1,10 @@
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { updateContest } from '@/api/contest-editing.api';
 import type { EditableContest } from '@/api/types/contest-editing';
 import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { useSeededDraft } from '../../ui/form/seeded-draft';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { editableContestKey, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
 import {
@@ -67,14 +68,19 @@ export function useContestProblemRows(contest: () => EditableContest) {
   const savedAt = ref<Date | null>(null);
   const adding = useAddProblem(rows);
 
-  function reseed(saved: EditableContest) {
-    rows.value = toProblemRows(saved);
-    seedRows.value = toProblemRows(saved);
-  }
+  const { target, reseed } = useSeededDraft(contest, {
+    idOf: (stored) => stored.key,
+    routeParam: 'key',
+    isDirty: () => isDirty.value,
+    refill: (stored) => {
+      rows.value = toProblemRows(stored);
+      seedRows.value = toProblemRows(stored);
+    },
+  });
 
   const mutation = useAdminMutation({
-    mutate: (listed: ProblemRow[]) =>
-      updateContest(contest().key, { problems: toProblemsBody(listed) }),
+    mutate: ({ key, listed }: { key: string; listed: ProblemRow[] }) =>
+      updateContest(key, { problems: toProblemsBody(listed) }),
     invalidates: () => [PUBLIC_CONTESTS_KEY],
     successText: () => translate('admin.contests.problems.saved'),
     onDone: (saved: EditableContest) => {
@@ -90,11 +96,11 @@ export function useContestProblemRows(contest: () => EditableContest) {
   const hasInvalidPoints = computed(() =>
     rows.value.some((row) => !isPointsValid(row.points) || hasUnreadableLimit(row)),
   );
-  const save = () => (hasInvalidPoints.value ? undefined : mutation.run(rows.value));
-
-  watch(contest, (next) => {
-    if (!isDirty.value) reseed(next);
-  });
+  /** The list goes to the contest it was filled from, and nowhere while the page shows another one. */
+  function save() {
+    const key = target();
+    return !key || hasInvalidPoints.value ? undefined : mutation.run({ key, listed: rows.value });
+  }
 
   return {
     rows,

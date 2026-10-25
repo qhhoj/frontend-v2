@@ -29,6 +29,7 @@ const unlistedLanguages = computed(() =>
   ),
 );
 const timeErrorOf = (index: number) => props.errors[`languageLimits.${index}.timeLimit`];
+const memoryErrorOf = (index: number) => props.errors[`languageLimits.${index}.memoryLimit`];
 
 function addLimit() {
   if (!pickedLanguageId.value) return;
@@ -128,7 +129,18 @@ const ROW =
             :aria-label="
               $t('admin.problems.general.limits.memoryFor', { language: nameOf(limit.languageId) })
             "
+            :aria-invalid="memoryErrorOf(index) ? 'true' : undefined"
+            :aria-describedby="
+              memoryErrorOf(index) ? `language-limit-memory-${index}-error` : undefined
+            "
           />
+          <span
+            v-if="memoryErrorOf(index)"
+            :id="`language-limit-memory-${index}-error`"
+            class="text-sm font-normal text-negative"
+          >
+            {{ memoryErrorOf(index) }}
+          </span>
         </label>
       </li>
     </ul>

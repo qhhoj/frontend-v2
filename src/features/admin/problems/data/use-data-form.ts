@@ -5,12 +5,19 @@ import type { ProblemData, ProblemDataBody } from '@/api/types/problem-data';
 import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
 import type { FieldErrors } from '../../ui/admin-errors';
+import { useSeededDraft } from '../../ui/form/seeded-draft';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { problemDataKey, useProblemDataQuery } from './problem-data.queries';
 import { configErrors } from './checker-config';
 import { checkDataForm, countDataChanges, toDataBody, toDataForm } from './test-cases';
 import type { DataForm } from './test-cases';
 import { useInvalidArgs } from './use-invalid-args';
+
+/** A save of the whole configuration, to the problem it was filled from. */
+interface DataSave {
+  to: string;
+  body: ProblemDataBody;
+}
 
 /**
  * The data tab's form: seeded from the query, saved as a whole. A clean form follows the server (a Polygon sync, an
@@ -32,12 +39,24 @@ export function useDataForm(code: () => string) {
   );
   const { badRowNumbers, markInvalid } = useInvalidArgs(form);
 
+  /** Another problem empties the form until its own data loads; the query watch below then fills it. */
+  const { target } = useSeededDraft(code, {
+    idOf: (shown) => shown,
+    routeParam: 'code',
+    isDirty: () => false,
+    refill: () => {
+      form.value = null;
+      saved.value = null;
+    },
+  });
+
   const mutation = useAdminMutation({
-    mutate: (body: ProblemDataBody) => putProblemData(code(), body),
-    successText: () => translate('admin.problems.data.savedToast', { code: code() }),
+    mutate: ({ to, body }: DataSave) => putProblemData(to, body),
+    successText: (_answer: ProblemData, { to }: DataSave) =>
+      translate('admin.problems.data.savedToast', { code: to }),
     onSuccess: () => (savedAt.value = new Date()),
-    onDone: (answer: ProblemData) => {
-      queryClient.setQueryData(problemDataKey(code(), viewer.value), answer);
+    onDone: (answer: ProblemData, { to }: DataSave) => {
+      queryClient.setQueryData(problemDataKey(to, viewer.value), answer);
       saved.value = answer;
       form.value = toDataForm(answer);
     },
@@ -47,10 +66,6 @@ export function useDataForm(code: () => string) {
     saved.value = data;
     form.value = toDataForm(data);
   }
-  watch(code, () => {
-    form.value = null;
-    saved.value = null;
-  });
   /** Whether the server's configuration differs from the one the form was seeded from (row keys and non-form fields aside). */
   const isNewConfig = (data: ProblemData) =>
     !saved.value || countDataChanges(toDataForm(data), toDataForm(saved.value)) > 0;
@@ -70,13 +85,20 @@ export function useDataForm(code: () => string) {
     if (latest) seed(latest);
   }
 
+  /** The configuration goes to the problem it was filled from, and nowhere while the page shows another one. */
   function save() {
-    if (!form.value || badRowNumbers.value.length > 0 || Object.keys(errors.value).length > 0)
+    const to = target();
+    if (
+      !to ||
+      !form.value ||
+      badRowNumbers.value.length > 0 ||
+      Object.keys(errors.value).length > 0
+    )
       return;
     if (dirtyCount.value === 0) return;
     const result = toDataBody(form.value);
     if ('errors' in result) return;
-    void mutation.run(result.body);
+    void mutation.run({ to, body: result.body });
   }
 
   return {
