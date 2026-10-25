@@ -4,6 +4,7 @@ import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { SubmissionResult } from '@/api/types/submissions';
+import type { PpEntry, PpSubmission } from '@/api/types/users';
 import EmptyState from '@/components/EmptyState.vue';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import Card from '@/components/ui/Card.vue';
@@ -12,10 +13,10 @@ import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import VerdictLabel from '@/components/VerdictLabel.vue';
 import { usePpQuery } from '@/features/users/users.queries';
-import { formatFixed, formatNumber } from '@/lib/format';
+import { formatFixed, formatNumber, scoreCut } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { pageFromQuery } from '@/lib/paging';
-import { VERDICT_TONES, verdictOf } from '@/lib/verdicts';
+import { VERDICT_TONES, submissionVerdictOf } from '@/lib/verdicts';
 import type { Verdict } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import {
@@ -41,11 +42,22 @@ const ranks = computed(() => ({
 }));
 
 /** Weights and counted PP always show one decimal (`100,0`); points show at most one. */
+const POINT_DIGITS = 1;
+/** A row's points; short of full (its cases fell short) they are cut, never rounded up to the problem's points. */
+const pointsShown = ({ points, submission }: PpEntry) =>
+  submission.casePoints < submission.caseTotal ? scoreCut(points, POINT_DIGITS) : points;
 const isResult = (value: string | null): value is SubmissionResult =>
   value !== null && Object.hasOwn(VERDICT_TONES, value);
-/** The verdict of the submission a PP row counts (a judged row without a known result reads as done). */
-const verdictFor = (result: string | null): Verdict =>
-  verdictOf({ status: 'D', result: isResult(result) ? result : null });
+/** The verdict of the submission a PP row counts (a judged row without a known result reads as done); an AC short of its case total reads PC. */
+const verdictFor = (submission: PpSubmission): Verdict =>
+  submissionVerdictOf({
+    status: 'D',
+    result: isResult(submission.result) ? submission.result : null,
+    points: null,
+    problem: null,
+    casePoints: submission.casePoints,
+    caseTotal: submission.caseTotal,
+  });
 </script>
 
 <template>
@@ -117,7 +129,7 @@ const verdictFor = (result: string | null): Verdict =>
                       'text-right font-mono tabular-nums',
                     ]"
                   >
-                    {{ formatNumber(entry.points, locale.locale, 1) }}
+                    {{ formatNumber(pointsShown(entry), locale.locale, POINT_DIGITS) }}
                   </td>
                   <td
                     :class="[BODY_CELL_CLASSES, 'text-right font-mono font-semibold tabular-nums']"
@@ -130,7 +142,7 @@ const verdictFor = (result: string | null): Verdict =>
                       class="flex flex-col items-start gap-0.5 hover:underline"
                     >
                       <span class="flex items-center gap-2">
-                        <VerdictLabel :verdict="verdictFor(entry.submission.result)" short />
+                        <VerdictLabel :verdict="verdictFor(entry.submission)" short />
                         <span class="font-mono text-meta tabular-nums">
                           {{ entry.submission.casePoints }}/{{ entry.submission.caseTotal }}
                         </span>

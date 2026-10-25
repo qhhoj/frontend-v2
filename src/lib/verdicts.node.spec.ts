@@ -44,6 +44,8 @@ const finished = (result: 'AC' | 'WA', points: number | null, max: number) => ({
   result,
   points,
   problem: { points: max },
+  casePoints: 10,
+  caseTotal: 10,
 });
 
 describe('submissionVerdictOf', () => {
@@ -54,6 +56,11 @@ describe('submissionVerdictOf', () => {
       labelKey: 'verdicts.PC',
     });
   });
+
+  it('shows an AC whose cases fell short of their total as PC, even at full points (as the backend never solves it)', () =>
+    expect(
+      submissionVerdictOf({ ...finished('AC', 1, 1), casePoints: 200.9, caseTotal: 201 }).code,
+    ).toBe('PC'));
 
   it('keeps AC for full points and the judge verdict for anything else', () => {
     expect(submissionVerdictOf(finished('AC', 800, 800)).code).toBe('AC');

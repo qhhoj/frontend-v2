@@ -100,15 +100,21 @@ export function isPartial(
   return code === 'AC' && earned !== null && max !== null && max !== undefined && earned < max;
 }
 
-/** The verdict of one submission as shown to people: `verdictOf`, with a partial AC shown as PC. Not for counts or stats. */
+/**
+ * The verdict of one submission as shown to people: `verdictOf`, with a partial AC shown as PC. An AC is full only as
+ * the backend's `IS_SOLVED` is: its cases earned their whole total too, whatever its points. Not for counts or stats.
+ */
 export function submissionVerdictOf(row: {
   status: SubmissionStatus;
   result: SubmissionResult | null;
   points: number | null;
   problem: { points: number } | null;
+  casePoints: number;
+  caseTotal: number;
 }): Verdict {
   const verdict = verdictOf(row);
-  return isPartial(verdict.code, row.points, row.problem?.points)
+  return isPartial(verdict.code, row.points, row.problem?.points) ||
+    isPartial(verdict.code, row.casePoints, row.caseTotal)
     ? verdictOfCode(PARTIAL_CODE)
     : verdict;
 }

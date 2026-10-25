@@ -22,13 +22,15 @@ const { t } = useI18n();
 const locale = useLocaleStore();
 const lines = computed(() => sourceLines(props.source.source));
 const verdict = computed(() => verdictOfResult(props.source.result));
+/** Points as stored (3 decimals): the side has no problem points to cap against, so it is never rounded up to them. */
+const STORED_POINT_DIGITS = 3;
 const isDeleted = computed(() => isDeletedSide(props.source));
 const factsText = computed(() => {
   const parts: string[] = [];
   if (props.source.points !== null) {
     parts.push(
       t('admin.similarity.pair.pane.points', {
-        points: formatNumber(props.source.points, locale.locale),
+        points: formatNumber(props.source.points, locale.locale, STORED_POINT_DIGITS),
       }),
     );
   }
