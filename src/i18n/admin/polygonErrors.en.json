@@ -107,6 +107,10 @@
     "title": "The problem changed while the job waited",
     "fix": "Its tests or content were just edited. Try again to import over the new state."
   },
+  "problem_in_running_contest": {
+    "title": "A running contest uses this problem",
+    "fix": "An automatic sync waits until the contest ends, up to a week, then fails. To update now, run a manual sync of the same package."
+  },
   "problem_unlinked": {
     "title": "The problem was unlinked",
     "fix": "It was no longer linked to Polygon when the sync ran."

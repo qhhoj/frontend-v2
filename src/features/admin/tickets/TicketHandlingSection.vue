@@ -21,7 +21,7 @@ const props = defineProps<{ ticket: TicketDetail }>();
 const queryClient = useQueryClient();
 const stored = (ticket: TicketDetail): HandlingDraft => ({
   assignees: ticket.assignees.map((assignee) => assignee.username).join(', '),
-  notes: ticket.notes,
+  notes: ticket.notes ?? '',
   title: ticket.title,
   problem: ticket.link.type === 'problem' ? (ticket.link.key ?? '') : '',
 });

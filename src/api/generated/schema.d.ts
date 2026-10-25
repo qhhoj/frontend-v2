@@ -80,9 +80,10 @@ export interface paths {
         };
         /**
          * List the Discord webhooks
-         * @description Requires `judge.change_settings`. One row for `default` and each event:
-         *     the masked target of its own URL (host and last 4 characters; the URL
-         *     itself is never returned), and whether it falls back to `default`.
+         * @description Requires `judge.change_settings` and a superuser, like every route
+         *     here (403 `superuser_only` on `key` otherwise). One row for `default` and
+         *     each event: the masked target of its own URL (host and last 4 characters;
+         *     the URL itself is never returned), and whether it falls back to `default`.
          */
         get: operations["DiscordWebhooksAdminController_list"];
         put?: never;
@@ -103,7 +104,8 @@ export interface paths {
         get?: never;
         /**
          * Set one Discord webhook
-         * @description Requires `judge.change_settings`. Sets the URL of `default` or one event,
+         * @description Requires `judge.change_settings`, a superuser and a browser session (API
+         *     tokens are refused). Sets the URL of `default` or one event,
          *     keeping the others, as a revision of the `discord.webhooks` setting.
          *     Returns every row. 400 `validation_failed` for a URL the setting refuses.
          */
@@ -111,7 +113,8 @@ export interface paths {
         post?: never;
         /**
          * Remove one Discord webhook
-         * @description Requires `judge.change_settings`. Removes the URL of `default` or one
+         * @description Requires `judge.change_settings`, a superuser and a browser session.
+         *     Removes the URL of `default` or one
          *     event, keeping the others; an event without its own URL then uses
          *     `default`. Returns every row.
          */
@@ -132,7 +135,8 @@ export interface paths {
         put?: never;
         /**
          * Send a test message
-         * @description Requires `judge.change_settings`. Queues a test embed for the event, sent
+         * @description Requires `judge.change_settings`, a superuser and a browser session.
+         *     Queues a test embed for the event, sent
          *     to its own URL or else `default` like a real one; delivery happens in the
          *     background, so a bad URL shows in Discord (or the worker log), not here.
          *     409 `webhook_unset` when neither has a URL. Returns 204.
@@ -489,7 +493,7 @@ export interface paths {
         };
         /**
          * List site settings
-         * @description Requires `judge.change_settings`. Returns every registered setting with its description, current value, default and whether it differs from the default. Secret parts (keys, passwords) are never returned; they read `{set: boolean}`.
+         * @description Requires `judge.change_settings`. Returns every registered setting with its description, current value, default and whether it differs from the default; the superuser-only keys (see `PATCH`) only to a superuser. Secret parts (keys, passwords) are never returned; they read `{set: boolean}`.
          */
         get: operations["SettingsController_list"];
         put?: never;
@@ -515,7 +519,7 @@ export interface paths {
         head?: never;
         /**
          * Change a site setting
-         * @description Requires `judge.change_settings`. Sets the value of one setting and records a revision with the acting user. Object-valued settings are merged into the stored value. `null` is refused. Errors: 400 `validation_failed` on `value` when it does not fit the setting, 404 `not_found` for an unknown key.
+         * @description Requires `judge.change_settings` and a browser session (API tokens are refused); `mail.smtpUrl`, `organization.adminRoleId`, every `auth.*` key, `discord.webhooks`, `polygon.apiKey`, `polygon.apiSecret`, `polygon.accountName`, `externalJudge.baseUrl` and `externalJudge.apiToken` also need a superuser, to read as well. Sets the value of one setting and records a revision with the acting user. Object-valued settings are merged into the stored value. `null` is refused. Errors: 400 `validation_failed` on `value` when it does not fit the setting, 403 `superuser_only` on `key` for a superuser-only key, 404 `not_found` for an unknown key.
          */
         patch: operations["SettingsController_update"];
         trace?: never;
@@ -529,7 +533,7 @@ export interface paths {
         };
         /**
          * List the revisions of a setting
-         * @description Requires `judge.change_settings`. Returns the change history of one setting, newest first, with the values before and after, the changed fields and the acting user. Paged, default 20 per page (max 100). 404 `not_found` for an unknown key.
+         * @description Requires `judge.change_settings`; the superuser-only keys of `PATCH` also need a superuser. Returns the change history of one setting, newest first, with the values before and after, the changed fields and the acting user. Paged, default 20 per page (max 100). Errors: 403 `superuser_only` on `key` for a superuser-only key, 404 `not_found` for an unknown key.
          */
         get: operations["SettingsController_revisions"];
         put?: never;
@@ -551,7 +555,7 @@ export interface paths {
         put?: never;
         /**
          * Restore a setting to an earlier revision
-         * @description Requires `judge.change_settings`. Writes the value the setting had before the given revision, as a new revision. Secret values are not stored in revisions, so they are never restored. Errors: 404 `not_found` for an unknown setting or revision, 409 `secret_unrestorable` when the revision has nothing restorable because the value is secret.
+         * @description Requires `judge.change_settings` and a browser session; the superuser-only keys of `PATCH` also need a superuser. Writes the value the setting had before the given revision, as a new revision. Secret values are not stored in revisions, so they are never restored. Errors: 403 `superuser_only` on `key` for a superuser-only key, 404 `not_found` for an unknown setting or revision, 409 `secret_unrestorable` when the revision has nothing restorable because the value is secret.
          */
         post: operations["SettingsController_restore"];
         delete?: never;
@@ -967,7 +971,7 @@ export interface paths {
         head?: never;
         /**
          * Edit a user's profile
-         * @description Requires `judge.change_profile` and a browser session; changing `email` or `isActive` also needs `auth.change_user` (403 `forbidden`, issue `email_not_editable` or `activation_not_editable`), and an `email` change also your own `currentPassword` (400 `validation_failed` issue `password_required`, 400 `invalid_credentials`) and spends the credential budget shared with password sets (10 per admin per hour). An e-mail change keeps the user's sessions and reset links already sent: to recover a hijacked account, set a password. Not on yourself. Absent fields stay unchanged, `null` is refused; every check runs before the first write (a write that loses a race keeps the earlier ones, all audited). `organizations` replaces the whole ordered list (staff bypass the open-organization cap); deactivating signs the user out everywhere and revokes the API token. Every change is recorded as a `user` revision `staff_edit`.
+         * @description Requires `judge.change_profile` and a browser session; changing `email` or `isActive` also needs `auth.change_user` (403 `forbidden`, issue `email_not_editable` or `activation_not_editable`), and an `email` change also your own `currentPassword` (400 `validation_failed` issue `password_required`, 400 `invalid_credentials`) and spends the credential budget shared with password sets (10 per admin per hour). An e-mail change removes the user's social sign-in links (they were granted for the old address) but keeps their sessions and reset links already sent: to recover a hijacked account, set a password. Not on yourself. Absent fields stay unchanged, `null` is refused; every check runs before the first write (a write that loses a race keeps the earlier ones, all audited). `organizations` replaces the whole ordered list (staff bypass the open-organization cap); deactivating signs the user out everywhere and revokes the API token and the contest feed keys the user minted. Every change is recorded as a `user` revision `staff_edit`.
          *     Errors: 400 `validation_failed` with issues `email_invalid`, `password_required`, `email_taken`, `organization_unknown`, `organization_admin_member` (the user administers a dropped organization); 403 `forbidden` for yourself or a superuser unless you are one; 404 `not_found`; 409 `conflict` with issue `user_banned` (a banned account keeps its rank and unlisting and is reactivated by unbanning), or when the memberships changed meanwhile or the e-mail is being registered.
          */
         patch: operations["UserEditingController_update"];
@@ -989,6 +993,27 @@ export interface paths {
          */
         post: operations["UserEditingController_rename"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/admin/users/{username}/social-links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a user's social sign-in links
+         * @description Requires `auth.change_user` and a browser session. No Google, GitHub or Facebook identity signs in to the account any more (a provider can link again only through a verified e-mail matching the account's current one). Sessions already open stay: set a password to end them. Recorded as a `user` revision `staff_remove_social_links`.
+         *     Errors: 403 `forbidden` for yourself or a superuser unless you are one, 404 `not_found`. Returns 204.
+         */
+        delete: operations["UserEditingController_removeSocialLinks"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1474,7 +1499,7 @@ export interface paths {
         /**
          * Finish a social sign-in
          * @description Public. The provider redirects the browser here. Always answers with a 302 to the site: to `/` (or `/login/2fa` when a second factor is pending) after signing in, to `/register/social?token=...` when a new account must be completed with `POST /auth/social/complete`, or to `/login?error=<code>` with `oauth_state`, `oauth_failed`, `email_unverified`, `banned`, `account_not_activated` or `account_disabled`.
-         *     A verified email that matches exactly one active account links the provider to it. The state is single use.
+         *     A verified email that matches exactly one active account links the provider to it and ends that account's other sessions and API token; when it was never signed in to, its password also stops working (set one with the reset form). The state is single use.
          */
         get: operations["SocialController_callback"];
         put?: never;
@@ -1521,6 +1546,47 @@ export interface paths {
          */
         post: operations["SocialController_complete"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/auth/social/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List your social sign-in links
+         * @description Browser session only, not while impersonating. Returns the slugs of the providers that sign in to this account.
+         */
+        get: operations["SocialLinksController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/auth/social/links/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a social sign-in link
+         * @description Browser session only, not while impersonating. Requires the current password in the body (400 `invalid_credentials`, then 429 `rate_limited`, sharing the budget of other password confirmations). The provider no longer signs in to this account; sessions already open stay until you sign out everywhere.
+         *     Errors: 409 `conflict` with issue `password_unusable` when the account has no password yet (set one with the reset form first, so the account keeps a way to sign in), 404 `not_found` when no such link exists. Returns 204.
+         */
+        delete: operations["SocialLinksController_unlink"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2064,7 +2130,9 @@ export interface paths {
          * Delete a contest
          * @description Contest editors only, with the key typed again in `confirm` (400
          *     `confirmation_mismatch` otherwise). Only a hidden contest without ratings
-         *     or pending final submissions can be deleted (409 `contest_not_deletable`).
+         *     or pending final submissions can be deleted, and one with live or virtual
+         *     participations only with `judge.edit_all_contest` (409
+         *     `contest_not_deletable`).
          *     Its participations, announcements, ranking link, ghosts, balloons, feed
          *     keys, replay and official ranking are deleted; its submissions are kept
          *     outside any contest. Returns 204.
@@ -3898,8 +3966,9 @@ export interface paths {
          *     list and must not be empty, and new admins are subject to the three-
          *     organization cap. Staff fields `isUnlisted`, `slots` and `shortName` need
          *     `judge.edit_all_organization`. A slug that is taken is 400
-         *     `validation_failed`; the admin cap is issue code `admin_cap`. Changed
-         *     fields are recorded in the history.
+         *     `validation_failed`; the admin cap is issue code `admin_cap`. New admins
+         *     become members, so 409 `organization_full` when those not yet members do
+         *     not fit in `slots`. Changed fields are recorded in the history.
          */
         patch: operations["OrganizationEditingController_update"];
         trace?: never;
@@ -4595,7 +4664,7 @@ export interface paths {
         };
         /**
          * List the Polygon sync history of every problem
-         * @description Needs `judge.edit_all_problem` (the runs name every problem). Every finished Polygon import and sync job, newest
+         * @description Needs `judge.edit_own_problem` and `judge.edit_all_problem` (the runs name every problem). Every finished Polygon import and sync job, newest
          *     first: problem code, Polygon problem, revision, package and its build time,
          *     first import or sync, manual or automatic, who started it, the result and,
          *     for a failure, the step it stopped at and the error shown to the requester.
@@ -6777,7 +6846,7 @@ export interface paths {
         };
         /**
          * Get a ticket
-         * @description Returns the ticket with its messages, notes, assignees and timeline.
+         * @description Returns the ticket with its messages, assignees and timeline; the internal notes only to staff and assignees.
          *     Readable by its creator, its assignees, editors of the linked problem,
          *     editors of the contest it was filed from and staff. Fails with 404 `not_found` for an unknown id and 403 `forbidden`
          *     for a ticket the caller may not read.
@@ -6995,7 +7064,7 @@ export interface paths {
         put?: never;
         /**
          * Ban a user
-         * @description Requires `judge.ban_user`. Deactivates the account, hides it from the leaderboards, sets its rank to `banned`, records the reason and signs the user out everywhere. Errors: 400 `validation_failed` for the reason reserved to automatic contest-cheating bans, 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`, 409 `conflict` when already banned. Returns 204.
+         * @description Requires `judge.ban_user`. Deactivates the account, hides it from the leaderboards, sets its rank to `banned`, records the reason, signs the user out everywhere and revokes their API token. Errors: 400 `validation_failed` for the reason reserved to automatic contest-cheating bans, 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`, 409 `conflict` when already banned. Returns 204.
          */
         post: operations["UserModerationController_ban"];
         delete?: never;
@@ -7115,7 +7184,7 @@ export interface paths {
         put?: never;
         /**
          * Reset a user's two-factor sign-in
-         * @description Requires `judge.ban_user`. Removes the user's authenticator app and all security keys so a locked-out user can sign in again, signs them out everywhere and records a `user` revision for audit. Errors: 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`. Returns 204.
+         * @description Requires `judge.ban_user` and a browser session (API tokens get 403), not while impersonating, like the other staff credential routes. Removes the user's authenticator app and all security keys so a locked-out user can sign in again, signs them out everywhere and records a `user` revision for audit. Errors: 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`. Returns 204.
          */
         post: operations["UserModerationController_resetTwoFactor"];
         delete?: never;
@@ -10354,7 +10423,7 @@ export interface components {
             label: string;
         };
         /** @enum {string} */
-        PolygonImportErrorCode: "catalog_missing" | "checker_unsupported" | "generation_failed" | "generation_no_judge" | "generation_timeout" | "import_failed" | "imported_needs_attention" | "package_incomplete" | "package_invalid" | "package_needs_full" | "polygon_already_linked" | "polygon_clock_skew" | "polygon_failed" | "polygon_not_connected" | "polygon_package_too_large" | "polygon_package_unavailable" | "polygon_run_count_unsupported" | "polygon_unauthorized" | "polygon_unavailable" | "problem_changed" | "problem_code_taken" | "problem_not_found" | "problem_not_importable" | "problem_unlinked" | "requester_forbidden" | "statement_language_repeated" | "statement_language_required" | "statement_language_unmapped" | "storage_full" | "too_many_testcases" | "tutorial_language_required";
+        PolygonImportErrorCode: "catalog_missing" | "checker_unsupported" | "generation_failed" | "generation_no_judge" | "generation_timeout" | "import_failed" | "imported_needs_attention" | "package_incomplete" | "package_invalid" | "package_needs_full" | "polygon_already_linked" | "polygon_clock_skew" | "polygon_failed" | "polygon_not_connected" | "polygon_package_too_large" | "polygon_package_unavailable" | "polygon_run_count_unsupported" | "polygon_unauthorized" | "polygon_unavailable" | "problem_changed" | "problem_code_taken" | "problem_in_running_contest" | "problem_not_found" | "problem_not_importable" | "problem_unlinked" | "requester_forbidden" | "statement_language_repeated" | "statement_language_required" | "statement_language_unmapped" | "storage_full" | "too_many_testcases" | "tutorial_language_required";
         PolygonLatestPackageResponse: {
             /**
              * Format: date-time
@@ -11886,6 +11955,10 @@ export interface components {
             /** @description Desired login name: letters, digits and underscores, up to 30 characters. */
             username: string;
         };
+        SocialLinksResponse: {
+            /** @description Slugs of the providers linked to the account (a legacy provider v2 does not support keeps its stored name). */
+            providers: string[];
+        };
         SocialProvidersResponse: {
             /** @description Slugs of the enabled providers. */
             providers: ("facebook" | "github" | "google")[];
@@ -12683,8 +12756,8 @@ export interface components {
             messageCount: number;
             /** @description The ticket's messages, oldest first. */
             messages: components["schemas"]["TicketMessageResponse"][];
-            /** @description Every reader sees it; `can.editNotes` says who may change it. */
-            notes: string;
+            /** @description Staff-only internal notes: set for those who may edit them (`can.editNotes`: staff and assignees), null for every other reader. */
+            notes: string | null;
             /** @description Messages and state changes by time (equal instants: message first). */
             timeline: components["schemas"]["TicketTimelineEntryResponse"][];
             /** @description Ticket title. */
@@ -13393,6 +13466,8 @@ export interface components {
             notes: string;
             /** @description Memberships in the user's order. */
             organizations: components["schemas"]["OrganizationSummaryResponse"][];
+            /** @description Slugs of the social sign-in providers linked to the account (removed through `DELETE social-links`). */
+            socialProviders: string[];
             username: string;
         };
         UsernameAvailableResponse: {
@@ -15624,6 +15699,37 @@ export interface operations {
             };
         };
     };
+    UserEditingController_removeSocialLinks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Username of the account; an unknown name gives 404. */
+                username: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     TotpController_confirm: {
         parameters: {
             query?: never;
@@ -16502,6 +16608,73 @@ export interface operations {
                         data: components["schemas"]["SessionResponse"];
                     };
                 };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SocialLinksController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SocialLinksResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    SocialLinksController_unlink: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Provider slug from `GET /auth/social/links`. */
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CurrentPasswordDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {

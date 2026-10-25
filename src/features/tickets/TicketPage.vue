@@ -78,7 +78,7 @@ function takeSentFlag(current: Router): boolean {
           </div>
           <div class="flex min-w-0 flex-col gap-5">
             <TicketSidePanel :ticket="ticket" />
-            <TicketNotes :ticket="ticket" />
+            <TicketNotes v-if="ticket.notes !== null" :ticket="ticket" />
             <TicketStaffActions v-if="ticket.can.markGood || ticket.can.assign" :ticket="ticket" />
           </div>
         </div>

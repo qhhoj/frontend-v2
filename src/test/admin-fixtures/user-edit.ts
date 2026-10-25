@@ -31,6 +31,7 @@ export const userEdit = (overrides: Partial<UserEdit> = {}): UserEdit => ({
       isOpen: false,
     },
   ],
+  socialProviders: [],
   ...overrides,
 });
 
