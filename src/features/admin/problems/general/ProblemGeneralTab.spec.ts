@@ -293,7 +293,7 @@ describe('ProblemGeneralTab', () => {
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
     // A browser reads unparseable text ("256m") in a number box as ''.
     await wrapper.get('#problem-memoryLimit').setValue('');
-    await buttonLabelled(wrapper, 'Lưu thay đổi').trigger('click');
+    await buttonLabelled(wrapper, 'Lưu').trigger('click');
     await flushPromises();
     expect(wrapper.text()).toContain('Từ 0 đến 1048576 KiB.');
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
