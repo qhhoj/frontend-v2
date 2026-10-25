@@ -100,23 +100,22 @@ Everything syncs to the query string. No "Lọc" or "Tìm" buttons. Results coun
 - **Fields**: `AdminField`, kept. The label is above. Required fields get a ` *` with a visually hidden "bắt buộc". Helper text sits below the field. The error goes below the field, replaces the helper, is linked with `aria-describedby`, is validated on blur, and carries an icon + text.
 - **Switches versus checkboxes**: a switch only for an immediate on/off setting. Inside a form that is saved later, use checkboxes with a description. `AdminSwitch` is the kit `Switch` (`src/components/ui/Switch.vue`) plus `lockedBy`. Off: track `surface-strong` + `line-strong` border, muted thumb. On: accent track, `on-accent` thumb. Locked: muted pair, and the permission in words under it.
 - **Date and time**: one `AdminDateTimeField` that always shows and accepts the site timezone (Asia/Ho_Chi_Minh), formatted `dd/MM/yyyy HH:mm`, with a "GMT+7" suffix and a "Bây giờ" shortcut. A filter that takes a day alone (the log's from/to) sets `dateOnly`: `dd/MM/yyyy`, no shortcut, never a native `type="date"` picker (it shows `mm/dd/yyyy`). Dates shown in a row, card or log go through `formatDate` (`short`, `date`, `datetime`; `datetimeSeconds` for logs), never a hand-rolled format.
-- **Save bar**: one `AdminSaveBar`.
+- **Save bar**: `SaveBar` + `useLeaveGuard`; the rules (one commit model per screen, label "Lưu", no per-card Save, instant actions) are in the `qhhoj-web-style` skill §4 "Save".
   - Sticky to the bottom of the content column, `z-index` 30, `surface-solid` with a top hairline. `scroll-padding-bottom` on the page equals the bar's height, so focus is never covered.
   - Left side: "3 thay đổi chưa lưu" (polite live region), or "Đã lưu lúc 14:02".
-  - Right side: "Hủy thay đổi" (ghost) and "Lưu" (primary). Disabled when there are no changes, with `aria-disabled` and the reason as text.
-  - It replaces the 4 current bars.
-- **Dirty guard**: `useDirtyGuard(isDirty)` handles `onBeforeRouteLeave` and `beforeunload` with a ConfirmDialog ("Rời trang? 3 thay đổi chưa lưu sẽ mất"). It generalises `use-draft-leave-guard`.
-- **Danger zone**: the last section, with a red hairline. Each action is a row with a title, one line of consequence and a danger button. Each one confirms, and a type-to-confirm is required for irreversible deletes.
+  - Right side: "Hủy thay đổi" (ghost, asks to confirm when more than one change is pending) and "Lưu" (primary). Disabled when there are no changes, with `aria-disabled` and the reason as text.
+- **Dirty guard**: `useLeaveGuard` handles `onBeforeRouteLeave` and `beforeunload` with a ConfirmDialog ("Rời trang? 3 thay đổi chưa lưu sẽ mất").
+- **Danger zone**: the last section, with a red hairline. Each action is a row with a title, one line of consequence and a danger button. Each one confirms (`ConfirmDialog tone="danger"`), and irreversible deletes of records that hold data use `TypedCodeDialog`.
 
 ### Dialogs, drawers and confirmations
-- Dialog preset (in `src/theme/primevue-preset.ts`, shared): `max-height: calc(100dvh - 2rem)`. The header is fixed, the content scrolls (`overflow:auto`), and the footer is fixed with actions on the right. Focus starts on the first field or the title, never mid-body.
-- `AdminDrawer` (new): right side, 560 px, full screen under 768. It has a header (title, meta chips, close), optional tabs, a scrolling body and a footer save bar. It is used for user edit, judge details, ticket preview and flat-page edit.
-- `ConfirmDialog`: kept. Destructive confirms use the danger tone, and the confirm label names the action ("Xóa bài hcmus41c", not "OK").
+- Dialog preset (in `src/theme/primevue-preset.ts`, shared): `max-height: calc(100dvh - 2rem)`. The header is fixed, the content scrolls (`overflow:auto`), and the footer is fixed with actions on the right. Focus starts on the first field or the title, never mid-body. `Modal` widths: `sm` 480, `md` 640, `lg` 760.
+- `Drawer` / `EditDrawer`: right side, 560 px, full screen under 768. Header (title, meta chips, close), optional tabs, scrolling body, footer `SaveBar`. A small record in a list (8 fields or fewer) is created and edited in one; user edit, judge details and flat-page edit use it.
+- `ConfirmDialog`: only confirms. Destructive confirms use the danger tone, and the confirm label is always verb + object ("Xóa bài hcmus41c", "Gỡ liên kết Polygon"), never "OK" or a bare "Xóa". Anything with fields is a `Modal`.
 
 ### Feedback
-- `AdminToast` (new, `ui/feedback/`): bottom-right (phone: bottom centre above the safe area), max 3 stacked, `role="status"`, auto-dismiss after 4 s (errors stay until closed). Optional "Hoàn tác" for reversible bulk actions. Wire it once in `use-admin-mutation.ts` (success text param).
-- Inline status stays for field-level errors.
-- `AdminNotice` (new): a tone (info, caution, danger), a title and a one-line summary, with "Chi tiết" expanding the long explanation. It replaces the multi-paragraph Bit banners on config, log, activity and settings.
+- Toast (`useToast`): bottom-right (phone: bottom centre above the safe area), max 3 stacked, `role="status"`, auto-dismiss after 4 s (errors stay until closed). For row, bulk and background actions; a reversible one offers "Hoàn tác". Never after a SaveBar save.
+- A failed write is an inline `Notice tone="danger"` next to its cause, never toast-only.
+- `Notice`: a tone (info, warning, danger), a title and a one-line summary, with "Chi tiết" expanding the long explanation. It replaces the multi-paragraph Bit banners on config, log, activity and settings.
 
 ### Navigation
 - **Sidebar groups** (`shell/admin-nav.ts`): Tổng quan · Bài tập · Kỳ thi · Chấm bài · Cộng đồng · Người dùng · Trang web.

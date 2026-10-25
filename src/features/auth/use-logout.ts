@@ -27,7 +27,7 @@ export function useLogout(afterSignOut?: () => Promise<unknown>) {
         text: translate('account.logoutFailed'),
         tone: 'error',
         undo: () => void signOut(),
-        undoLabel: translate('account.logoutRetry'),
+        undoLabel: translate('common.retry'),
       });
       return;
     }

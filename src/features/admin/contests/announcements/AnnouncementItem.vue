@@ -61,7 +61,7 @@ const menuItems = computed<RowMenuItem[]>(() => [
       ]
     : []),
   {
-    label: translate('admin.contests.announcements.delete'),
+    label: translate('common.delete'),
     icon: Trash2,
     danger: true,
     run: () => {
@@ -82,7 +82,7 @@ const menuItems = computed<RowMenuItem[]>(() => [
       <div v-if="!isEditing" class="flex shrink-0 items-center gap-1">
         <button type="button" :class="buttonClass('ghost', 'sm')" @click="isEditing = true">
           <Pencil aria-hidden="true" class="size-4" :stroke-width="1.75" />
-          {{ $t('admin.contestOps.announcements.edit') }}
+          {{ $t('common.edit') }}
         </button>
         <AdminRowMenu
           :items="menuItems"

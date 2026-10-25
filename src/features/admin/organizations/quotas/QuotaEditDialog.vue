@@ -79,7 +79,7 @@ function submit() {
   <ConfirmDialog
     v-model:visible="visible"
     :title="$t('admin.quota.editTitle', { name })"
-    :confirm-label="$t('admin.quota.save')"
+    :confirm-label="$t('common.save')"
     :busy="save.isPending.value"
     :can-confirm="isLoaded"
     @confirm="submit"

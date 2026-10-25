@@ -33,8 +33,7 @@
     "open": "Mở",
     "unlisted": "Ẩn khỏi danh sách",
     "notYours": "Bạn không quản trị tổ chức này nên không sửa được.",
-    "createSubmit": "Tạo tổ chức mới",
-    "save": "Lưu thay đổi",
+    "createSubmit": "Tạo tổ chức",
     "logoHint": "URL http(s) hoặc đường dẫn trên trang; ảnh xem trước nằm bên trái.",
     "logoBroken": "Không tải được ảnh này. Kiểm tra lại đường dẫn trước khi lưu.",
     "logoPreview": "Xem trước ảnh đại diện",
@@ -153,7 +152,6 @@
     "contests": "Kỳ thi",
     "posts": "Bài viết",
     "quota": "Hạn mức",
-    "recalculate": "Tính lại điểm",
     "recalculateHint": "Tính lại PP và số thành viên khi số liệu bị lệch.",
     "recalculateQueued": "Đã xếp hàng tính lại; số liệu cập nhật sau ít phút."
   },

@@ -10,7 +10,7 @@ const texts = computed(() => ({
   warning: translate('admin.judges.key.warning'),
   label: translate('admin.judges.key.label'),
   saved: translate('admin.judges.key.saved'),
-  close: translate('admin.judges.key.close'),
+  close: translate('common.close'),
   copy: translate('admin.judges.key.copy'),
 }));
 </script>

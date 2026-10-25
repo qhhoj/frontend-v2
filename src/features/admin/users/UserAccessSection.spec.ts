@@ -52,7 +52,7 @@ async function openAccess() {
 /** The drawer footer's save button, labelled for the open tab. */
 const saveButton = (dialog: HTMLElement) =>
   [...dialog.querySelectorAll<HTMLButtonElement>('button[type="submit"]')].find(
-    (button) => button.textContent?.trim() === 'Lưu quyền',
+    (button) => button.textContent?.trim() === 'Lưu',
   );
 
 describe('UserAccessSection', () => {

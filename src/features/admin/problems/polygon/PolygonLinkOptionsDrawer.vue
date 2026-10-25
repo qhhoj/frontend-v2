@@ -130,10 +130,10 @@ const submit = () => repeatedLanguages(languages.value).length === 0 && save.run
     <AdminStatus v-if="pageRefusal" kind="refused" :text="pageRefusal" />
     <template #footer>
       <AppButton @click="visible = false">
-        {{ $t('admin.polygonLink.panel.drawer.cancel') }}
+        {{ $t('common.cancel') }}
       </AppButton>
       <AppButton tone="primary" class="ml-auto" :loading="save.isPending.value" @click="submit">
-        {{ $t('admin.polygonLink.panel.drawer.save') }}
+        {{ $t('common.save') }}
       </AppButton>
     </template>
   </AdminDrawer>

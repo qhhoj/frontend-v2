@@ -124,8 +124,8 @@ const removeChip = (key: string) => emit('remove', key);
         <SlidersHorizontal aria-hidden="true" class="size-4" :stroke-width="1.75" />
         {{
           filterCount
-            ? $t('admin.table.filtersCount', { count: filterCount })
-            : $t('admin.table.filters')
+            ? $t('common.table.filtersCount', { count: filterCount })
+            : $t('common.table.filters')
         }}
       </button>
       <span
@@ -149,7 +149,7 @@ const removeChip = (key: string) => emit('remove', key);
         <button
           type="button"
           class="inline-flex h-(--qa-chip) items-center gap-1 rounded-pill border border-line-strong bg-surface-solid pr-1.5 pl-2.5 text-xs font-semibold hover:bg-surface-hover"
-          :aria-label="$t('admin.table.removeFilter', { label: chip.label })"
+          :aria-label="$t('common.table.removeFilter', { label: chip.label })"
           @click="removeChip(chip.key)"
         >
           {{ chip.label }}
@@ -158,7 +158,7 @@ const removeChip = (key: string) => emit('remove', key);
       </li>
       <li>
         <button type="button" :class="buttonClass('ghost', 'sm')" @click="$emit('clear-all')">
-          {{ $t('admin.table.clearAll') }}
+          {{ $t('common.table.clearAll') }}
         </button>
       </li>
     </ul>

@@ -27,7 +27,7 @@ const rows = computed(() => [
     v-model:visible="visible"
     :title="$t('admin.contestData.feed.reveal.title')"
     :confirm-label="$t('admin.contestData.feed.reveal.done')"
-    :cancel-label="$t('admin.contestData.feed.reveal.close')"
+    :cancel-label="$t('common.close')"
     @confirm="visible = false"
   >
     <p class="flex items-center gap-2.5 font-semibold">

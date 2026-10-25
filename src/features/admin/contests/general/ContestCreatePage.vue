@@ -113,7 +113,7 @@ async function create() {
         </template>
         <template #actions>
           <RouterLink :to="{ name: 'admin-contests' }" :class="buttonClass('ghost')">
-            {{ $t('admin.contests.create.cancel') }}
+            {{ $t('common.cancel') }}
           </RouterLink>
         </template>
       </AdminSaveBar>

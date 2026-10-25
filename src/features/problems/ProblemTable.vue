@@ -114,7 +114,7 @@ const pointsText = (problem: ProblemListItem) =>
       <EmptyState>
         {{ $t('problems.empty') }}
         <template v-if="filtered" #action>
-          <AppButton @click="emit('clearFilters')">{{ $t('problems.clearFilters') }}</AppButton>
+          <AppButton @click="emit('clearFilters')">{{ $t('common.clearFilters') }}</AppButton>
         </template>
       </EmptyState>
     </template>

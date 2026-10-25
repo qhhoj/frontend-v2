@@ -38,7 +38,7 @@ describe('ProblemEditorialTab', () => {
     await wrapper.get('#editorial-isPublic').setValue(true);
     await wrapper
       .findAll('button')
-      .find((button) => button.text() === 'Lưu lời giải')!
+      .find((button) => button.text() === 'Lưu')!
       .trigger('click');
     await flushPromises();
     expect(calls.find((call) => call.method === 'PUT')?.body).toEqual({
@@ -96,8 +96,7 @@ describe('ProblemEditorialTab', () => {
       'PUT /problems/hcmus41c/editorial': { status: 204 },
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/editorial');
-    const save = () =>
-      wrapper.findAll('button').find((button) => button.text() === 'Lưu lời giải')!;
+    const save = () => wrapper.findAll('button').find((button) => button.text() === 'Lưu')!;
     await wrapper.get('textarea').setValue('Dòng 1\nDòng 2');
     expect(save().attributes('aria-disabled')).toBe('true');
     await wrapper.get('#editorial-isPublic').setValue(true);
@@ -121,7 +120,7 @@ describe('ProblemEditorialTab', () => {
     await wrapper.get('textarea').setValue('Lời giải mới');
     await wrapper
       .findAll('button')
-      .find((button) => button.text() === 'Lưu lời giải')!
+      .find((button) => button.text() === 'Lưu')!
       .trigger('click');
     await flushPromises();
     expect(invalidatedKeys(queryClient, [['problems', 'editorial', 'probe']])).toHaveLength(1);

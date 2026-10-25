@@ -72,10 +72,10 @@ const save = useAdminMutation({
         :class="buttonClass('primary')"
         :aria-busy="save.isPending.value || undefined"
       >
-        {{ $t('admin.ui.save') }}
+        {{ $t('common.save') }}
       </button>
       <button type="button" :class="buttonClass('ghost')" @click="emit('close')">
-        {{ $t('admin.contestOps.cancel') }}
+        {{ $t('common.cancel') }}
       </button>
       <AdminStatus
         v-if="save.failure.value"

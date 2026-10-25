@@ -34,9 +34,7 @@ const pageFailure = computed(() =>
       :pending="isPending"
       :saved-at="savedAt"
       :allow-clean="mode === 'create'"
-      :save-label="
-        mode === 'create' ? $t('admin.languages.form.create') : $t('admin.languages.form.save')
-      "
+      :save-label="mode === 'create' ? $t('admin.languages.form.create') : $t('common.save')"
       @discard="discard"
     >
       <template v-if="mode === 'create'" #status>
@@ -44,7 +42,7 @@ const pageFailure = computed(() =>
       </template>
       <template v-if="mode === 'create'" #actions>
         <RouterLink :to="{ name: 'admin-languages' }" :class="buttonClass('ghost')">
-          {{ $t('admin.languages.form.cancel') }}
+          {{ $t('common.cancel') }}
         </RouterLink>
       </template>
     </AdminSaveBar>

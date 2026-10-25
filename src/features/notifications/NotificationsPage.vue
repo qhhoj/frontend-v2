@@ -184,7 +184,7 @@ const FILTER_CLASS =
                 :to="filterLink('all')"
                 class="inline-flex min-h-11 items-center font-semibold text-accent-text"
               >
-                {{ $t('notifications.clearFilters') }}
+                {{ $t('common.clearFilters') }}
               </RouterLink>
             </EmptyState>
           </template>

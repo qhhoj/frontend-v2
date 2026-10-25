@@ -113,7 +113,7 @@ async function confirmRemove() {
             :disabled="!canSave"
             :aria-busy="save.isPending.value || undefined"
           >
-            {{ $t('admin.externalJudge.save') }}
+            {{ $t('common.save') }}
           </button>
           <button
             v-if="query.data.value.link"

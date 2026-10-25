@@ -129,8 +129,6 @@ export function describeRejudgeFilter(
     to: boundText(filter.dateTo),
     languages: orAll(languageNames.join(', '), 'allLanguages'),
     results: orAll(filter.results.join(', '), 'allResults'),
-    locked: translate(
-      filter.force ? 'admin.rejudge.summary.lockedRejudge' : 'admin.rejudge.summary.lockedSkip',
-    ),
+    locked: translate(filter.force ? 'common.rejudge' : 'admin.rejudge.summary.lockedSkip'),
   };
 }

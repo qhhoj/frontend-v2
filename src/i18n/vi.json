@@ -173,8 +173,7 @@
       "alert": {
         "label": "Thông báo mới của kỳ thi",
         "title": "Thông báo mới",
-        "view": "Xem",
-        "close": "Đóng"
+        "view": "Xem"
       }
     },
     "rules": {
@@ -279,7 +278,7 @@
       "ratedAny": "Tất cả",
       "ratedOnly": "Chỉ tính rating",
       "onlyGroup": "Xem riêng nhóm này",
-      "allGroups": "Xem mọi nhóm",
+      "allGroups": "Xem tất cả nhóm",
       "timeLeft": "còn {span}",
       "perParticipation": "{span} mỗi lượt kể từ lúc vào thi",
       "enter": "Vào thi",
@@ -288,7 +287,6 @@
       "viewAndRegister": "Xem & đăng ký",
       "endedRegion": "Bảng kỳ thi đã kết thúc, cuộn ngang",
       "shownOf": "{shown} trong {total}",
-      "viewAll": "Xem tất cả",
       "viewAllCount": "Xem tất cả {count} kỳ thi",
       "view": "Xem",
       "codeNeeded": "Cần mã",
@@ -346,8 +344,7 @@
       "forbiddenTitle": "Danh sách này đang ẩn",
       "forbiddenBody": "Bảng xếp hạng của kỳ thi chưa mở cho bạn, nên bài nộp tốt nhất cũng chưa.",
       "missingTitle": "Không tìm thấy bài này trong kỳ thi",
-      "loadFailed": "Không tải được kỳ thi",
-      "retry": "Thử lại"
+      "loadFailed": "Không tải được kỳ thi"
     },
     "leave": {
       "live": {
@@ -406,7 +403,6 @@
     "register": "Đăng ký",
     "logout": "Đăng xuất",
     "logoutFailed": "Đăng xuất chưa hoàn tất: bạn vẫn đang đăng nhập.",
-    "logoutRetry": "Thử lại",
     "menu": "Tài khoản của {username}",
     "profile": "Hồ sơ của tôi",
     "settings": "Cài đặt",
@@ -764,7 +760,6 @@
       "keyTitle": "Chạm vào khóa bảo mật",
       "keyLead": "Cắm khóa vào cổng USB rồi chạm vào nút trên khóa.",
       "keyWaiting": "Đang chờ khóa…",
-      "retryKey": "Thử lại",
       "unsupportedTitle": "Không dùng được khóa",
       "unsupportedLead": "Trình duyệt này chưa hỗ trợ khóa bảo mật. Hãy dùng Chrome, Edge, Firefox hoặc Safari bản mới.",
       "sessionChangedTitle": "Phiên đã thay đổi",
@@ -805,8 +800,7 @@
       "currentPassword": "Mật khẩu hiện tại",
       "confirmNew": "Nhập lại mật khẩu mới",
       "submit": "Đổi mật khẩu",
-      "changedNotLoaded": "Đã đổi mật khẩu. Chưa tải lại được tài khoản, hãy thử lại.",
-      "retry": "Thử lại"
+      "changedNotLoaded": "Đã đổi mật khẩu. Chưa tải lại được tài khoản, hãy thử lại."
     },
     "strength": {
       "label": "Độ mạnh mật khẩu",
@@ -843,8 +837,7 @@
       "doneTitle": "Tài khoản đã kích hoạt",
       "doneLead": "Email của bạn đã được xác nhận. Bạn có thể đăng nhập ngay.",
       "deadTitle": "Liên kết đã hết hạn",
-      "deadLead": "Liên kết kích hoạt chỉ dùng được trong 7 ngày. Nhập email để nhận liên kết mới.",
-      "retry": "Thử lại"
+      "deadLead": "Liên kết kích hoạt chỉ dùng được trong 7 ngày. Nhập email để nhận liên kết mới."
     },
     "resend": {
       "title": "Gửi lại email kích hoạt",
@@ -992,7 +985,36 @@
     "cancel": "Hủy",
     "confirm": "Xác nhận",
     "delete": "Xóa",
-    "close": "Đóng"
+    "close": "Đóng",
+    "table": {
+      "actions": "Thao tác",
+      "bulkLabel": "Thao tác hàng loạt",
+      "selected": "{count} đã chọn | {count} đã chọn",
+      "selectPage": "Chọn mọi dòng trên trang",
+      "selectRow": "Chọn {name}",
+      "rowMenu": "Thao tác khác cho {name}",
+      "details": "Chi tiết",
+      "empty": "Chưa có gì ở đây.",
+      "emptyFiltered": "Không có kết quả cho bộ lọc này.",
+      "filters": "Bộ lọc",
+      "filtersCount": "Bộ lọc ({count})",
+      "removeFilter": "Bỏ lọc {label}",
+      "clearAll": "Xóa tất cả",
+      "range": "{from}–{to} / {total}"
+    },
+    "notice": {
+      "details": "Chi tiết",
+      "hideDetails": "Ẩn chi tiết"
+    },
+    "save": "Lưu",
+    "edit": "Sửa",
+    "rejudge": "Chấm lại",
+    "rescore": "Tính lại điểm",
+    "undo": "Hoàn tác",
+    "clearFilters": "Xóa bộ lọc",
+    "clearSelection": "Bỏ chọn",
+    "show": "Hiện",
+    "hide": "Ẩn"
   },
   "verdicts": {
     "AC": "Chấp nhận",
@@ -1105,7 +1127,6 @@
     "pdfFailed": "Không thể chuẩn bị PDF",
     "pdfMissing": "Đề bài này không có bản PDF",
     "pdfRateLimited": "Quá nhiều yêu cầu PDF",
-    "pdfRetry": "Thử lại",
     "pdfRetryIn": "Thử lại sau {seconds} giây",
     "pdfStatement": {
       "open": "Mở trong thẻ mới",
@@ -1193,7 +1214,6 @@
     "signInToHide": "Đăng nhập để ẩn bài đã giải",
     "filtering": "Đang lọc:",
     "clearAll": "Xóa tất cả",
-    "clearFilters": "Xóa bộ lọc",
     "removeFilter": "Bỏ lọc: {name}",
     "pointsChip": "{min}–{max} điểm",
     "count": "{n} bài",
@@ -1599,7 +1619,7 @@
     "findMe": "Tìm hạng của tôi",
     "jumpLabel": "Tên đăng nhập",
     "jumpPlaceholder": "Đến hồ sơ theo tên đăng nhập",
-    "jumpSubmit": "Mở",
+    "jumpSubmit": "Xem",
     "pagerLabel": "Trang bảng xếp hạng",
     "empty": "Chưa có ai trên bảng xếp hạng này.",
     "title": "Bảng xếp hạng"
@@ -1824,7 +1844,6 @@
     "joinFailedTitle": "Không tham gia được",
     "joinFailedBody": "Bạn đã ở 3 tổ chức mở, đó là mức tối đa. Hãy rời một tổ chức mở trước khi tham gia.",
     "failedTitle": "Không thực hiện được",
-    "retry": "Thử lại",
     "forbiddenTitle": "Chỉ quản trị viên xem được yêu cầu tham gia",
     "sortLabel": "Sắp xếp thành viên",
     "membersFooter": "Hạng {first} – {last} trong {total} · 100 người mỗi trang",
@@ -1894,12 +1913,10 @@
     "notFoundTitle": "Không tìm thấy bài viết",
     "notFoundBody": "Bài viết không tồn tại hoặc chưa được công khai.",
     "backToBlog": "Về blog",
-    "edit": "Sửa",
     "pin": "Ghim",
     "unpin": "Bỏ ghim",
     "actions": "Thao tác với bài viết",
     "delete": {
-      "action": "Xóa",
       "title": "Xóa bài viết này?",
       "body": "“{title}” cùng bình luận và bình chọn sẽ bị xóa vĩnh viễn. Không thể hoàn tác.",
       "confirm": "Xóa bài"
@@ -1922,19 +1939,15 @@
     "replyToUnknown": "Trả lời một bình luận:",
     "collapsed": "#{number} · {author} · bị thu gọn vì điểm thấp ({score})",
     "collapsedReply": "#{number} · {author} · trả lời #{parent} · bị thu gọn vì điểm thấp ({score})",
-    "show": "Hiện",
     "tooOld": "Quá 1 năm, không nhận thêm trả lời",
     "empty": "Chưa có bình luận — hãy là người đầu tiên",
     "emptyBody": "Đặt câu hỏi về đề, chia sẻ gợi ý hoặc báo lỗi. Ô soạn nằm ngay bên dưới.",
     "action": {
       "reply": "Trả lời",
-      "edit": "Sửa",
       "history": "Lịch sử ({count})",
-      "hide": "Ẩn",
       "more": "Thêm thao tác",
       "lock": "Khóa bình luận",
       "unlock": "Mở khóa",
-      "delete": "Xóa",
       "report": "Báo cáo",
       "unhide": "Bỏ ẩn"
     },
@@ -1951,9 +1964,7 @@
       "send": "Gửi bình luận",
       "sendReply": "Gửi trả lời",
       "sending": "Đang gửi…",
-      "save": "Lưu thay đổi",
       "saving": "Đang lưu…",
-      "cancel": "Hủy",
       "editing": "đang sửa",
       "editHint": "Mỗi lần lưu tạo một phiên bản trong Lịch sử.",
       "markdownHelp": "Hỗ trợ Markdown: **đậm**, `mã`, khối ```cpp và công thức $…$.",
@@ -2099,7 +2110,6 @@
     "noMatch": "Không có phiếu nào khớp bộ lọc.",
     "errorTitle": "Không tải được phiếu",
     "errorBody": "Kết nối bị gián đoạn. Danh sách giữ nguyên, thử lại sau ít giây.",
-    "retry": "Thử lại",
     "signInTitle": "Cần đăng nhập để xem phiếu",
     "signInBody": "Phiếu chỉ hiển thị với người tạo, người xử lý và quản trị viên.",
     "signIn": "Đăng nhập",
@@ -2123,8 +2133,7 @@
       "body": "Nội dung (tối đa 8192 ký tự)",
       "bodyRequired": "Nhập nội dung.",
       "bodyTooLong": "Nội dung dài quá 8192 ký tự.",
-      "cancel": "Hủy",
-      "submit": "Gửi phiếu",
+      "submit": "Tạo phiếu",
       "before": "Trước khi gửi",
       "checkOpen": "Kiểm tra phiếu đang mở của bài đó.",
       "describe": "Mô tả bước lặp lại lỗi, kèm mã bài nộp nếu có.",
@@ -2160,7 +2169,6 @@
     "notesInternal": "Ghi chú nội bộ",
     "noNotes": "Chưa có ghi chú.",
     "notesHint": "Mọi người đọc phiếu đều xem được ghi chú; chỉ người xử lý và quản trị viên sửa được.",
-    "saveNotes": "Lưu ghi chú",
     "status": "Trạng thái",
     "close": "Đóng phiếu",
     "reopen": "Mở lại phiếu",
@@ -2169,7 +2177,6 @@
     "markGood": "Đánh dấu đóng góp tốt",
     "assigneesInput": "Người xử lý (tên đăng nhập)",
     "assigneesMax": "Tối đa 20 người xử lý.",
-    "save": "Lưu",
     "sentTitle": "Đã gửi phiếu",
     "sentBody": "Quản trị viên sẽ trả lời tại đây.",
     "forbiddenTitle": "Không có quyền xem phiếu này",
@@ -2198,7 +2205,6 @@
       "label": "Chọn bài nộp {id} để so sánh",
       "picked": "Đã chọn {first} và {second}",
       "pickedOne": "Đã chọn 1 / 2 bài",
-      "clear": "Bỏ chọn",
       "compare": "So sánh 2 bài đã chọn",
       "needTwo": "Chọn đủ 2 bài"
     },
@@ -2374,7 +2380,6 @@
       "kind": "Không có thông báo loại “{kind}”{state}"
     },
     "filteredHint": "Đổi bộ lọc để xem các thông báo khác.",
-    "clearFilters": "Bỏ bộ lọc",
     "kindLabel": "Loại",
     "kinds": {
       "ticket": "Phiếu hỗ trợ",
@@ -2453,7 +2458,6 @@
     },
     "states": {
       "ready": "Bản phát lại đã sẵn sàng.",
-      "retry": "Thử lại",
       "backToRanking": "Xem bảng xếp hạng",
       "building": {
         "title": "Đang dựng bản phát lại…",
@@ -2531,7 +2535,6 @@
     "unknownBody": "Địa chỉ có ?tag={slug} nhưng danh mục không có thẻ này. Đang hiện toàn bộ kỳ thi.",
     "emptyTitle": "Chưa có kỳ thi với thẻ “{name}”.",
     "emptyHint": "Thử bỏ thẻ hoặc chọn thẻ khác.",
-    "clear": "Bỏ lọc",
     "title": "Thẻ kỳ thi"
   },
   "joinRules": {
@@ -2583,7 +2586,6 @@
     "pendingCount": "{count} quả bóng chờ giao",
     "first": "Lời giải đầu tiên",
     "deliver": "Giao xong",
-    "undo": "Hoàn tác",
     "rowName": "bài {label}, đội {team}",
     "deliveredBy": "{name} giao lúc {time}",
     "frozenNote": "Bảng đang đóng băng: thời gian giải và số lượng được ẩn với tình nguyện viên.",
@@ -2646,7 +2648,6 @@
     "tagsDialog": {
       "title": "Thẻ của {code}",
       "legend": "Chọn thẻ cho bài",
-      "save": "Lưu thẻ",
       "limit": "Tối đa 20 thẻ mỗi bài.",
       "none": "Tổ chức chưa có thẻ nào. Tạo thẻ ở mục “Thẻ của tổ chức”."
     },
@@ -2658,10 +2659,10 @@
       "title": "Thẻ của tổ chức",
       "count": "{count} / {max}",
       "empty": "Chưa có thẻ nào. Thêm thẻ để nhóm bài.",
-      "add": "Thêm thẻ",
+      "add": "Tạo thẻ",
       "editLabel": "Sửa thẻ {name}",
       "deleteLabel": "Xóa thẻ {name}",
-      "createTitle": "Thêm thẻ",
+      "createTitle": "Tạo thẻ",
       "editTitle": "Sửa thẻ {name}",
       "slug": "Mã thẻ",
       "slugHint": "Chữ thường, số và dấu gạch ngang, tối đa 20 ký tự. Không đổi được sau khi tạo.",
@@ -2669,7 +2670,6 @@
       "name": "Tên thẻ",
       "color": "Màu",
       "colorName": "Màu {number}",
-      "save": "Lưu thẻ",
       "deleteTitle": "Xóa thẻ {name}?",
       "deleteBody": "Thẻ bị gỡ khỏi mọi bài của tổ chức. Không hoàn tác được.",
       "deleteConfirm": "Xóa thẻ",
@@ -2684,7 +2684,6 @@
       "tag": "Gắn thẻ…",
       "archive": "Lưu trữ",
       "unarchive": "Bỏ lưu trữ",
-      "clear": "Bỏ chọn",
       "tagTitle": "Gắn hoặc gỡ thẻ cho {count} bài",
       "modeLegend": "Thao tác",
       "addTag": "Gắn thẻ",
@@ -2883,7 +2882,6 @@
       "aboutLead": "Hiện trên trang tổ chức.",
       "about": "Giới thiệu (Markdown)",
       "joinLead": "Cách thành viên mới vào tổ chức.",
-      "save": "Lưu thay đổi",
       "logoUploading": "Đang tải logo lên…",
       "staffLink": "Mở trong trang quản trị (hạn mức, chỗ, ẩn hiện)"
     },
@@ -2933,7 +2931,6 @@
       "savedAt": "Đã lưu lúc {time}",
       "clean": "Chưa có thay đổi nào để lưu.",
       "discard": "Hủy thay đổi",
-      "save": "Lưu thay đổi",
       "saving": "Đang lưu…"
     }
   }

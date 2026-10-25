@@ -54,14 +54,14 @@ describe('FlatpagesPage', () => {
     await click(wrapper, 'Trang mới');
     await wrapper.get('#page-url').setValue('faq/');
     await wrapper.get('#page-title').setValue('Câu hỏi thường gặp');
-    await click(wrapper, 'Lưu trang');
+    await click(wrapper, 'Lưu');
     expect(calls.find((call) => call.method === 'POST')?.body).toMatchObject({
       url: '/faq',
       title: 'Câu hỏi thường gặp',
     });
     expect(wrapper.text()).toContain('“/faq” đã có trang khác dùng.');
     isTaken = false;
-    await click(wrapper, 'Lưu trang');
+    await click(wrapper, 'Lưu');
     expect(wrapper.text()).toContain('Đã lưu lúc');
   });
 
@@ -95,10 +95,10 @@ describe('FlatpagesPage', () => {
     await click(wrapper, 'Trang mới');
     await wrapper.get('#page-url').setValue('faq/');
     await wrapper.get('#page-title').setValue('Câu hỏi thường gặp');
-    await click(wrapper, 'Lưu trang');
+    await click(wrapper, 'Lưu');
     expect(router.currentRoute.value.query.page).toBe('fp-3');
     await wrapper.get('#page-title').setValue('Câu hỏi mới');
-    await click(wrapper, 'Lưu trang');
+    await click(wrapper, 'Lưu');
     expect(calls.filter((call) => call.method === 'POST')).toHaveLength(1);
     const patches = calls.filter((call) => call.method === 'PATCH');
     expect(patches.map((call) => call.path)).toEqual(['/admin/site/pages/fp-3']);
@@ -118,9 +118,9 @@ describe('FlatpagesPage', () => {
     await click(wrapper, 'Trang mới');
     await wrapper.get('#page-url').setValue('faq/');
     await wrapper.get('#page-title').setValue('Câu hỏi thường gặp');
-    await click(wrapper, 'Lưu trang');
+    await click(wrapper, 'Lưu');
     await wrapper.get('#page-title').setValue('Câu hỏi mới');
-    await click(wrapper, 'Lưu trang');
+    await click(wrapper, 'Lưu');
     expect(calls.filter((call) => call.method === 'POST')).toHaveLength(1);
     expect(calls.find((call) => call.method === 'PATCH')?.path).toBe('/admin/site/pages/fp-3');
   });
@@ -180,7 +180,7 @@ describe('history', () => {
       .find((button) => button.text() === 'Nạp giá trị cũ')!
       .trigger('click');
     await flushPromises();
-    await click(wrapper, 'Lưu trang');
+    await click(wrapper, 'Lưu');
     expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ title: 'Giới thiệu' });
   });
 
@@ -209,7 +209,7 @@ describe('history', () => {
     const publicKey = [['flatpages', '/about', 'probe']];
     seedCache(queryClient, publicKey);
     await wrapper.get('#page-title').setValue('Giới thiệu mới');
-    await click(wrapper, 'Lưu trang');
+    await click(wrapper, 'Lưu');
     expect(invalidatedKeys(queryClient, publicKey)).toEqual(publicKey);
     queryClient.setQueryData(['flatpages', '/about', 'probe'], { seeded: true });
     seedCache(queryClient, [['admin', 'flatpage-revisions', 'fp-1', 'probe']]);

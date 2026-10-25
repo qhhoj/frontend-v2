@@ -63,7 +63,7 @@ function menuOf(judge: Judge): RowMenuItem[] {
     judge.isBlocked
       ? item('unblock', t('admin.judges.row.unblock'), Ban)
       : item('block', t('admin.judges.row.block'), Ban, true),
-    ...(judge.online ? [] : [item('delete', t('admin.judges.row.delete'), Trash2, true)]),
+    ...(judge.online ? [] : [item('delete', t('common.delete'), Trash2, true)]),
   ];
 }
 </script>
@@ -116,7 +116,7 @@ function menuOf(judge: Judge): RowMenuItem[] {
       >
         {{ row.isDisabled ? $t('admin.judges.row.enable') : $t('admin.judges.row.disable') }}
       </button>
-      <AdminRowMenu :label="$t('admin.table.rowMenu', { name: row.name })" :items="menuOf(row)" />
+      <AdminRowMenu :label="$t('common.table.rowMenu', { name: row.name })" :items="menuOf(row)" />
     </template>
     <template v-if="!filtered && judges.length === 0" #empty>
       <slot name="empty" />

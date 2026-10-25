@@ -84,7 +84,7 @@ const retry = () => {
       :title="$t(errorCopy.title)"
       :body="$t(errorCopy.body)"
     >
-      <AppButton @click="retry">{{ $t('orgMembership.retry') }}</AppButton>
+      <AppButton @click="retry">{{ $t('common.retry') }}</AppButton>
     </StatePanel>
 
     <AppButton v-if="state === 'signedOut'" tone="primary" :to="signInTo" class="max-md:w-full">

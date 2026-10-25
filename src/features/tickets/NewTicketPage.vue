@@ -109,7 +109,7 @@ const trimmedCode = computed(() => draft.problemCode.trim());
             :body="$t(panelFailure.bodyKey, panelFailure.bodyParams ?? {})"
           />
           <div class="flex flex-wrap items-center justify-end gap-3">
-            <AppButton :to="{ name: 'tickets' }">{{ $t('tickets.new.cancel') }}</AppButton>
+            <AppButton :to="{ name: 'tickets' }">{{ $t('common.cancel') }}</AppButton>
             <AppButton type="submit" tone="primary" :loading="isPending">
               {{ $t('tickets.new.submit') }}
             </AppButton>

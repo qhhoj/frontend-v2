@@ -97,7 +97,7 @@ describe('QuotaOverviewPage', () => {
     expect(openDialog().querySelector<HTMLInputElement>('#quota-storage')!.value).toBe('');
     await fill('#quota-credits', '');
     await fill('#quota-storage', '1024');
-    await confirmDialog('Lưu hạn mức');
+    await confirmDialog('Lưu');
     expect(calls.find((call) => call.method === 'PATCH')!.body).toEqual({
       quotaMonthlyCredits: null,
       quotaStorageBytes: 1024 * MIB,
@@ -125,7 +125,7 @@ describe('QuotaOverviewPage', () => {
     expect(toggle.checked).toBe(true);
     toggle.click();
     await flushPromises();
-    await confirmDialog('Lưu hạn mức');
+    await confirmDialog('Lưu');
     expect(calls.find((call) => call.method === 'PATCH')!.body).toEqual({ quotaUnlimited: false });
   });
 });

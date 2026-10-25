@@ -48,7 +48,7 @@ describe('canned replies screen', () => {
         return ok(SECOND);
       },
     });
-    await buttonNamed(wrapper, 'Thêm mẫu').trigger('click');
+    await buttonNamed(wrapper, 'Tạo mẫu').trigger('click');
     await flushPromises();
     await setField('canned-title', 'Đã sửa test');
     await setField('canned-body', 'Đã sửa bài {bài}.');
@@ -70,14 +70,14 @@ describe('canned replies screen', () => {
       'GET /ticket-canned-replies': page([FIRST], { pageSize: 100 }),
       'POST /ticket-canned-replies': invalid(issue('title', 'too_long', 'title is too long')),
     });
-    await buttonNamed(wrapper, 'Thêm mẫu').trigger('click');
+    await buttonNamed(wrapper, 'Tạo mẫu').trigger('click');
     await flushPromises();
-    await confirmDialog('Lưu mẫu');
+    await confirmDialog('Lưu');
     expect(openDialog().textContent).toContain('Nhập tiêu đề.');
     expect(calls.some((call) => call.method === 'POST')).toBe(false);
     await setField('canned-title', 'T');
     await setField('canned-body', 'B');
-    await confirmDialog('Lưu mẫu');
+    await confirmDialog('Lưu');
     expect(openDialog().querySelector('#canned-title')!.getAttribute('aria-invalid')).toBe('true');
   });
 

@@ -73,7 +73,7 @@ const isDefaultList = computed(
           :title="$t('tickets.errorTitle')"
           :body="$t('tickets.errorBody')"
         >
-          <AppButton @click="refetch()">{{ $t('tickets.retry') }}</AppButton>
+          <AppButton @click="refetch()">{{ $t('common.retry') }}</AppButton>
         </StatePanel>
         <template v-if="data && !isSignedOut">
           <StatePanel

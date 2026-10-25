@@ -42,7 +42,7 @@ describe('PolygonLinkPanel', () => {
     const panel = await mountPanel(['judge.sync_polygon_problem']);
     expect(panel.find('[data-testid="polygon-link-read-only"]').exists()).toBe(false);
     expect(buttonsOf(panel).some((label) => label.startsWith('Đồng bộ ngay'))).toBe(true);
-    expect(buttonsOf(panel)).toContain('Hủy liên kết');
+    expect(buttonsOf(panel)).toContain('Gỡ liên kết');
   });
 
   it('shows a refused save of the options next to the statements it names, when none were saved', async () => {
@@ -60,9 +60,9 @@ describe('PolygonLinkPanel', () => {
     });
     await panel.get('[aria-label="Sửa tùy chọn khi đồng bộ"]').trigger('click');
     const drawer = () => document.body.querySelector<HTMLElement>('[role="dialog"]');
-    await vi.waitFor(() => expect(drawer()?.textContent).toContain('Lưu tùy chọn'));
+    await vi.waitFor(() => expect(drawer()?.textContent).toContain('Lưu'));
     const save = [...drawer()!.querySelectorAll('button')].find(
-      (button) => button.textContent?.trim() === 'Lưu tùy chọn',
+      (button) => button.textContent?.trim() === 'Lưu',
     );
     save!.click();
     await vi.waitFor(() =>
@@ -96,9 +96,9 @@ describe('PolygonLinkPanel', () => {
     const drawer = () => document.body.querySelector<HTMLElement>('[role="dialog"]');
     const saveButton = () =>
       [...drawer()!.querySelectorAll('button')].find(
-        (button) => button.textContent?.trim() === 'Lưu tùy chọn',
+        (button) => button.textContent?.trim() === 'Lưu',
       )!;
-    await vi.waitFor(() => expect(drawer()?.textContent).toContain('Lưu tùy chọn'));
+    await vi.waitFor(() => expect(drawer()?.textContent).toContain('Lưu'));
     saveButton().click();
 
     const russianSelect = () => {

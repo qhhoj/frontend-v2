@@ -24,7 +24,6 @@
   "bulk": {
     "allSelected": "Đã chọn cả {count} bài nộp khớp bộ lọc",
     "selectAll": "Chọn cả {total} bài nộp khớp",
-    "rejudge": "Chấm lại",
     "lineSelected": "{count} bài nộp đã chọn.",
     "lineAll": "Mọi bài nộp khớp bộ lọc của danh sách (trừ bộ lọc trạng thái)."
   },

@@ -98,7 +98,7 @@ function restoreFailureText(failure: ApiError): string {
         <p class="text-sm text-muted">{{ t('admin.settings.revisions.subtitle') }}</p>
       </div>
       <button v-if="closable" type="button" :class="BUTTON.ghost" @click="emit('close')">
-        {{ t('admin.settings.revisions.close') }}
+        {{ t('common.close') }}
       </button>
     </header>
     <QueryState

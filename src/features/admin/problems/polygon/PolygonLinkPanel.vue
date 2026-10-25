@@ -210,7 +210,7 @@ const isHistoryOpen = ref(false);
           :aria-label="$t('admin.polygonLink.panel.editLabel')"
           @click="openDrawer"
         >
-          {{ $t('admin.polygonLink.panel.edit') }}
+          {{ $t('common.edit') }}
         </AppButton>
       </dd>
       <dt class="text-muted">{{ $t('admin.polygonLink.panel.facts.autoSync') }}</dt>

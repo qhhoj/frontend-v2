@@ -35,7 +35,7 @@ const keyTexts = computed(() => ({
   warning: translate('admin.integrations.key.warning'),
   label: translate('admin.integrations.key.label'),
   saved: translate('admin.integrations.key.saved'),
-  close: translate('admin.integrations.key.close'),
+  close: translate('common.close'),
   copy: translate('admin.integrations.key.copy'),
 }));
 const pending = ref<IntegrationClient | null>(null);

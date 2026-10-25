@@ -59,7 +59,7 @@ function save() {
       </AdminField>
       <div>
         <button type="submit" :class="buttonClass()" :aria-busy="isSaving || undefined">
-          {{ $t('admin.judges.row.saveDescription') }}
+          {{ $t('common.save') }}
         </button>
       </div>
     </form>

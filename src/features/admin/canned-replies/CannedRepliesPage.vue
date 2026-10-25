@@ -73,7 +73,7 @@ const columns = computed<AdminColumn[]>(() => [
 ]);
 const menuItems = (reply: CannedReply) => [
   {
-    label: t('admin.cannedReplies.delete'),
+    label: t('common.delete'),
     icon: Trash2,
     danger: true,
     run: () => askDelete(reply),
@@ -132,10 +132,10 @@ const tableRegion = () => document.getElementById('canned-replies-table');
           @click="openEditor(row)"
         >
           <Pencil aria-hidden="true" class="size-4" :stroke-width="1.75" />
-          {{ $t('admin.cannedReplies.edit') }}
+          {{ $t('common.edit') }}
         </button>
         <AdminRowMenu
-          :label="$t('admin.table.rowMenu', { name: row.title })"
+          :label="$t('common.table.rowMenu', { name: row.title })"
           :items="menuItems(row)"
         />
       </template>

@@ -29,13 +29,12 @@
     "unused": "Not used",
     "duplicate": "A site language can be used for one remote language only."
   },
-  "save": "Save",
   "saved": "Saved. The allowed languages of this problem are now exactly the mapped ones.",
   "remove": {
     "button": "Remove link",
     "title": "Remove the external judge link?",
     "body": "Submissions are judged here again. The allowed languages stay as they are.",
-    "confirm": "Remove"
+    "confirm": "Remove link"
   },
   "check": {
     "button": "Test connection",

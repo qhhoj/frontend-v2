@@ -6,8 +6,9 @@ import Modal from '@/components/ui/Modal.vue';
 /**
  * One confirm step for the destructive or irreversible choices, in a `Modal` (the shared Dialog preset).
  * `confirm` only says the user chose it: the consumer closes the dialog (set `visible` false) once its request is done.
- * The buttons say "Hủy" and, for the `danger` tone, "Xóa" (`common.cancel`, `common.delete`; "Xác nhận" for `neutral`):
- * pass `cancelLabel` or `confirmLabel` only for an action with a name of its own ("Chặn", "Rời trang"), never to restate those words.
+ * The cancel button says "Hủy" (`common.cancel`) and a `neutral` confirm "Xác nhận" (`common.confirm`). A `danger` confirm names
+ * verb + object ("Xóa thẻ", "Gỡ liên kết Polygon", "Cấm bitcoder"): pass `confirmLabel`, never a bare "Xóa" or "OK" (the bare
+ * `common.delete` is only the fallback). Pass `cancelLabel` only for an action with a name of its own ("Rời trang").
  * Busy blocks Cancel, Escape and the close button, and a second confirm, until the consumer clears it.
  * `canConfirm` is false while a required input in the body (a code, a password) is still empty: the confirm button turns
  * `aria-disabled` (focus is kept) and neither it nor Enter confirms.

@@ -136,7 +136,7 @@ const applyPreset = (preset: ResultPreset) => {
         {{ $t('admin.rejudge.filter.reset') }}
       </button>
       <button type="button" :class="buttonClass('secondary')" @click="$emit('rescore')">
-        {{ $t('admin.rejudge.filter.rescore') }}
+        {{ $t('common.rescore') }}
       </button>
       <button type="button" :class="buttonClass('primary')" @click="$emit('rejudge')">
         <component :is="STAFF_ICONS.rejudge" class="size-4 shrink-0" aria-hidden="true" />

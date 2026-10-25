@@ -151,7 +151,7 @@ const hasFieldErrors = computed(() => Object.keys(save.fieldErrors.value).length
           :aria-disabled="isUnchanged || isOverLimit || save.isPending.value || undefined"
           :aria-busy="save.isPending.value || undefined"
         >
-          {{ $t('admin.tickets.handling.save') }}
+          {{ $t('common.save') }}
         </button>
         <AdminStatus
           v-if="save.isDone.value && isUnchanged"

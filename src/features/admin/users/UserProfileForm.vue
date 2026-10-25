@@ -81,7 +81,7 @@ function discardAll() {
 }
 defineExpose({
   formId: FORM_ID,
-  saveLabel: t('admin.users.edit.profile.save'),
+  saveLabel: t('common.save'),
   dirtyCount,
   isPending: save.isPending,
   savedAt,

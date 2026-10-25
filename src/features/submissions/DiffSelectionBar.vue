@@ -32,7 +32,7 @@ const summary = computed(() =>
     <InlineBit v-if="picked.length === MAX_DIFF_PICKS" :kind="DIFF_INLINE_BITS.pickedTwo" />
     <p aria-live="polite" class="min-w-0 flex-1 text-sm font-semibold">{{ summary }}</p>
     <AppButton data-testid="diff-clear" @click="$emit('clear')">
-      {{ $t('sourceDiff.select.clear') }}
+      {{ $t('common.clearSelection') }}
     </AppButton>
     <AppButton v-if="pair" data-testid="diff-compare" tone="primary" :to="diffRoute(pair)">
       {{ $t('sourceDiff.select.compare') }}

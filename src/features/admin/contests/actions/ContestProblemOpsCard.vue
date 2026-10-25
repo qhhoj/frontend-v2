@@ -155,7 +155,7 @@ const count = (value: number) => formatNumber(value, locale.locale);
     <ConfirmDialog
       v-model:visible="isRejudgeOpen"
       :title="$t('admin.contestOps.problemOps.rejudgeTitle', { label: selected?.label ?? '' })"
-      :confirm-label="$t('admin.contestOps.problemOps.rejudgeConfirm')"
+      :confirm-label="$t('common.rejudge')"
       tone="neutral"
       :busy="rejudge.isPending.value"
       :can-confirm="canConfirmRejudge"

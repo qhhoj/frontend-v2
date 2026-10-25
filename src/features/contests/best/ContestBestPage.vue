@@ -69,7 +69,7 @@ const CHIP =
     <ContestNotFound v-if="statusOf(contestError) === 404" />
     <StatePanel v-else-if="contestError" kind="error" :title="$t('contests.best.loadFailed')"
       ><AppButton @click="refetchContest()">
-        {{ $t('contests.best.retry') }}
+        {{ $t('common.retry') }}
       </AppButton></StatePanel
     >
     <template v-else>

@@ -87,7 +87,7 @@ function discard() {
 }
 defineExpose({
   formId: FORM_ID,
-  saveLabel: t('admin.users.access.save'),
+  saveLabel: t('common.save'),
   editable: canEdit,
   dirtyCount: computed(() => (canEdit.value ? Object.keys(change.value).length : 0)),
   isPending: save.isPending,

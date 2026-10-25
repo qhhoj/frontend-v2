@@ -94,7 +94,7 @@ function clear() {
       class="col-span-2 self-end justify-self-start lg:col-span-1"
       @click="clear"
     >
-      {{ $t('admin.audit.filters.clear') }}
+      {{ $t('common.clearFilters') }}
     </button>
   </section>
 </template>

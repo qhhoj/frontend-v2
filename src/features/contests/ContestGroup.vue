@@ -69,7 +69,7 @@ const countText = computed(() =>
 const linkText = computed(() => {
   if (isSingleGroup.value) return t('contests.list.allGroups');
   if (props.phase === 'running') return t('contests.list.onlyGroup');
-  if (props.phase === 'upcoming') return t('contests.list.viewAll');
+  if (props.phase === 'upcoming') return t('common.viewAll');
   return t('contests.list.viewAllCount', { count: formatNumber(total.value, locale.locale) });
 });
 /** "Only this group" from the overview, "all groups" back from it; the search and rated filter stay. */

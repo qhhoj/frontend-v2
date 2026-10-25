@@ -12,7 +12,7 @@
   "buttons": {
     "rejudge": "Chấm lại",
     "reject": "Từ chối bài nộp",
-    "abort": "Hủy chấm"
+    "abort": "Dừng chấm"
   },
   "reason": {
     "waiting": "Chờ chấm xong.",
@@ -34,9 +34,9 @@
       "label": "Từ chối"
     },
     "abort": {
-      "title": "Hủy chấm bài nộp?",
+      "title": "Dừng chấm bài nộp?",
       "body": "Bài nộp đang chờ sẽ chuyển ngay sang AB; bài nộp đang chạy sẽ được máy chấm dừng lại. Bài đã chấm xong thì không có gì thay đổi.",
-      "label": "Hủy chấm"
+      "label": "Dừng chấm"
     }
   },
   "done": {

@@ -132,9 +132,9 @@ const runReplayRebuild = () => runAction(rebuildReplay);
             id="rescore"
             :title="$t('admin.contests.actions.rescore.title')"
             :description="$t('admin.contests.actions.rescore.description')"
-            :button-label="$t('admin.contests.actions.rescore.button')"
+            :button-label="$t('common.rescore')"
             :confirm-title="$t('admin.contests.actions.rescore.confirmTitle')"
-            :confirm-label="$t('admin.contests.actions.rescore.confirm')"
+            :confirm-label="$t('common.rescore')"
             :state="stateOf('rescore')"
             :run="runRescore"
           >

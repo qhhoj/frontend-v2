@@ -1,9 +1,9 @@
 {
   "index": {
     "lead": "Connected judges, their load and status. An auth key is shown once, when a judge is created or its key is rotated.",
-    "addButton": "Add judge",
+    "addButton": "Create judge",
     "empty": "No judges yet.",
-    "emptyAdd": "Add judge",
+    "emptyAdd": "Create judge",
     "search": "Find a judge",
     "searchPlaceholder": "Name or IP"
   },
@@ -35,8 +35,6 @@
     "details": "Judge info",
     "started": "Started {time} · ping is the mean of the last 6 measurements.",
     "descriptionLabel": "Description (shown to staff)",
-    "saveDescription": "Save description",
-    "delete": "Delete",
     "protocol": "Protocol",
     "features": "Features",
     "lastIp": "Last IP"
@@ -70,18 +68,16 @@
     "warning": "The auth key is shown only once — the system stores only a hash of it. Copy the key into the judge's configuration before closing.",
     "label": "Auth key",
     "saved": "I have saved this key",
-    "close": "Close",
     "copy": "Copy key"
   },
   "add": {
-    "title": "Add judge",
+    "title": "Create judge",
     "nameLabel": "Judge name (matches the id the judge connects with)",
     "nameHint": "Letters, digits, “_”, “.” or “-” only (up to 50 characters).",
     "nameInvalid": "Letters, digits, “_”, “.” or “-” only (up to 50 characters).",
     "nameTaken": "That judge name is already in use.",
     "descriptionLabel": "Description",
     "descriptionHint": "Up to 10,000 characters.",
-    "cancel": "Cancel",
     "submit": "Create and get key",
     "descriptionTooLong": "Up to 10,000 characters."
   },

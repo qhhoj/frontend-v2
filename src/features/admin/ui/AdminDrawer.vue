@@ -104,8 +104,8 @@ function onAfterHide() {
         <button
           type="button"
           :class="iconButtonClass('ghost')"
-          :aria-label="t('admin.feedback.drawer.close')"
-          :title="t('admin.feedback.drawer.close')"
+          :aria-label="t('common.close')"
+          :title="t('common.close')"
           @click="closeCallback"
         >
           <X aria-hidden="true" class="size-4.5" :stroke-width="1.75" />

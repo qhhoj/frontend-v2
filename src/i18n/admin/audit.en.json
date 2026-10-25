@@ -13,8 +13,7 @@
     "anyType": "Any type",
     "from": "From",
     "to": "To",
-    "rangeInverted": "The start day is after the end day.",
-    "clear": "Clear filters"
+    "rangeInverted": "The start day is after the end day."
   },
   "listLabel": "Changes, newest first",
   "empty": "No changes match the filters.",

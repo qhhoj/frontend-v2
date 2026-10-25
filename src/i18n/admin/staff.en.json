@@ -12,7 +12,7 @@
   "buttons": {
     "rejudge": "Rejudge",
     "reject": "Reject submission",
-    "abort": "Abort judging"
+    "abort": "Stop judging"
   },
   "reason": {
     "waiting": "Waiting for judging to finish.",
@@ -34,9 +34,9 @@
       "label": "Reject"
     },
     "abort": {
-      "title": "Abort judging?",
+      "title": "Stop judging?",
       "body": "A waiting submission moves to AB at once; a running one is stopped by the judge. A finished submission does not change.",
-      "label": "Abort"
+      "label": "Stop judging"
     }
   },
   "done": {

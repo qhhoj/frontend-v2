@@ -86,8 +86,6 @@
     "rate": "Rate",
     "pager": "Contest list pages",
     "bulk": {
-      "show": "Show",
-      "hide": "Hide",
       "showTitle": "Show {count} contests?",
       "hideTitle": "Hide {count} contests?",
       "showConfirm": "Show selected contests",
@@ -275,7 +273,6 @@
     "submit": "Create contest",
     "lead": "Fill in the details and the times; everything else can be changed later. Next: add problems.",
     "required": "Fields marked * are required.",
-    "cancel": "Cancel",
     "done": "Created contest {key}. Next: add problems."
   },
   "problems": {
@@ -345,7 +342,6 @@
     "justPosted": "Just posted",
     "resend": "Resend to those not reached",
     "resent": "Resent to those not reached.",
-    "delete": "Delete",
     "deleteTitle": "Delete announcement “{title}”?",
     "deleteBody": "Participants will no longer see this announcement.",
     "empty": "No announcements yet.",
@@ -396,7 +392,6 @@
       "expiryAt": "At a time",
       "amountLabel": "Amount",
       "atLabel": "Expiry time",
-      "save": "Save link",
       "regenerate": "Regenerate URL",
       "regenerateTitle": "Regenerate the URL?",
       "regenerateBody": "The old URL stops working at once.",
@@ -414,10 +409,8 @@
     "rescore": {
       "title": "Rescore",
       "description": "Recalculate the score and rank of every participation from the existing submissions. Runs in the background.",
-      "button": "Rescore",
       "confirmTitle": "Rescore the contest?",
-      "confirmBody": "The score and rank of {count} participations will be recalculated from the submissions. The ranking may change while it runs.",
-      "confirm": "Rescore"
+      "confirmBody": "The score and rank of {count} participations will be recalculated from the submissions. The ranking may change while it runs."
     },
     "judgeFinal": {
       "title": "Final judging",
@@ -529,7 +522,6 @@
       "unknown_tag": "No such tag."
     },
     "selected": "{count} selected",
-    "clear": "Clear selection",
     "selectPage": "Select the whole page",
     "selectRow": "Select {name}"
   },

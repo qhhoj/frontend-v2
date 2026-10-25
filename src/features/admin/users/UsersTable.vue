@@ -109,7 +109,7 @@ const columns = computed<AdminColumn[]>(() => [
         :aria-label="$t('admin.users.list.openUser', { username: row.username })"
         @click="emit('open', row.username)"
       >
-        {{ $t('admin.users.edit.open') }}
+        {{ $t('common.edit') }}
       </button>
       <span
         v-else

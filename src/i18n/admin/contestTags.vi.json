@@ -2,7 +2,7 @@
   "title": "Thẻ kỳ thi",
   "lead": "Thẻ hiện trên danh sách kỳ thi. Màu là một màu có sẵn của giao diện.",
   "caption": "Danh mục thẻ kỳ thi",
-  "createTitle": "Thêm thẻ",
+  "createTitle": "Tạo thẻ",
   "editTitle": "Sửa thẻ “{name}”",
   "full": "Danh mục đã đủ 100 thẻ. Xóa bớt thẻ để thêm thẻ mới.",
   "sample": "Thẻ mẫu",
@@ -25,8 +25,7 @@
     "order": "Thứ tự là số nguyên từ -1000 đến 1000.",
     "slugTaken": "Mã thẻ này đã có. Hãy chọn mã khác."
   },
-  "create": "Thêm thẻ",
-  "save": "Lưu thẻ",
+  "create": "Tạo thẻ",
   "created": "Đã thêm thẻ.",
   "saved": "Đã lưu thẻ.",
   "empty": "Chưa có thẻ nào. Bấm “Thêm thẻ” để tạo thẻ đầu tiên.",
@@ -38,7 +37,6 @@
     "actions": "Thao tác",
     "contests": "Kỳ thi"
   },
-  "edit": "Sửa",
   "remove": "Xóa thẻ",
   "removeTitle": "Xóa thẻ “{name}”?",
   "removeBody": "Các kỳ thi đang gắn thẻ {slug} vẫn giữ thẻ đó và hiện nó bằng chip màu trung tính.",

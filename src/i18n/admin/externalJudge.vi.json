@@ -29,13 +29,12 @@
     "unused": "Không dùng",
     "duplicate": "Mỗi ngôn ngữ của trang chỉ dùng cho một ngôn ngữ bên ngoài."
   },
-  "save": "Lưu",
   "saved": "Đã lưu. Ngôn ngữ được phép của bài này giờ đúng bằng các ngôn ngữ đã ghép.",
   "remove": {
     "button": "Gỡ liên kết",
     "title": "Gỡ liên kết máy chấm ngoài?",
     "body": "Bài nộp lại được chấm tại đây. Ngôn ngữ được phép giữ nguyên.",
-    "confirm": "Gỡ"
+    "confirm": "Gỡ liên kết"
   },
   "check": {
     "button": "Kiểm tra kết nối",

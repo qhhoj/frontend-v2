@@ -22,8 +22,7 @@
     "dateFrom": "Submitted from",
     "dateTo": "Submitted before",
     "siteWide": "No problem or contest: the action covers the whole site. {permission}.",
-    "presets": "Quick pick:",
-    "rescore": "Recalculate points"
+    "presets": "Quick pick:"
   },
   "summary": {
     "title": "Selected filter",
@@ -36,7 +35,6 @@
     "allResults": "All results",
     "locked": "Locked submissions",
     "lockedSkip": "Skip",
-    "lockedRejudge": "Rejudge",
     "countNote": "The number of matching submissions shows in the confirm: pressing “Rejudge” counts first and resets nothing.",
     "lastResult": "Last result",
     "scope": "Scope",
@@ -55,7 +53,6 @@
     "line": "Filter: {scope} · {user} · {judge} · {languages} · {results} · from {from} to {to} · locked: {locked}",
     "labelCount": "Rejudge {count} submissions",
     "labelCounting": "Counting",
-    "labelPlain": "Rejudge",
     "count": {
       "counting": "Counting",
       "countingText": "Asking the server (dryRun). Nothing has been reset.",
@@ -80,7 +77,6 @@
   },
   "rescore": {
     "title": "Recalculate points of the matching submissions?",
-    "confirm": "Recalculate points",
     "preview": "{count} graded submissions match; {problems} problems and {contests} contests will be recalculated.",
     "body": "Points are recomputed from each test's result with the problem's current points and partial setting, then user points and contest results follow. Use it after changing a problem's points.",
     "done": "Queued recalculation of {problems} problems and {contests} contests ({count} matching submissions)."

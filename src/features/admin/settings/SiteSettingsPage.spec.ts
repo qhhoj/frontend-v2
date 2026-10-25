@@ -82,7 +82,7 @@ describe('SiteSettingsPage', () => {
     // The number box is bound with `v-model.number`: setValue('3') must reach the draft as the number 3, not the string '3'.
     await contest.get('input[type="number"]').setValue('3');
     expect(saveBar(wrapper).text()).toContain('2 thay đổi chưa lưu');
-    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
+    await clickIn(saveBar(wrapper), 'Lưu');
     expect(
       calls.filter((call) => call.method === 'PATCH').map((call) => [call.path, call.body]),
     ).toEqual([
@@ -103,7 +103,7 @@ describe('SiteSettingsPage', () => {
     const contest = block(wrapper, 'contest');
     await contest.get('[role="switch"]').trigger('click');
     await contest.get('input[type="number"]').setValue('3');
-    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
+    await clickIn(saveBar(wrapper), 'Lưu');
     expect(calls.filter((call) => call.method === 'PATCH').map((call) => call.path)).toEqual([
       '/admin/settings/contest.officialMode',
     ]);
@@ -121,7 +121,7 @@ describe('SiteSettingsPage', () => {
     const { wrapper } = await mountSettings();
     const site = block(wrapper, 'site');
     await site.get('input').setValue('Mars/Base');
-    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
+    await clickIn(saveBar(wrapper), 'Lưu');
     expect(site.get('[role="alert"]').text()).toContain(
       'Múi giờ không hợp lệ. Hãy chọn một múi giờ trong danh sách (ví dụ Asia/Ho_Chi_Minh).',
     );
@@ -291,10 +291,10 @@ describe('saving a replaced secret', () => {
     const mail = block(wrapper, 'mail');
     await clickIn(mail, 'Thay thế');
     await mail.get('input[type="password"]').setValue('smtps://u:p@h');
-    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
+    await clickIn(saveBar(wrapper), 'Lưu');
     expect(mail.find('input[type="password"]').exists()).toBe(false);
     expect(saveBar(wrapper).text()).toContain('Đã lưu lúc');
-    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
+    await clickIn(saveBar(wrapper), 'Lưu');
     expect(calls.filter((call) => call.method === 'PATCH')).toHaveLength(1);
   });
 });
@@ -315,7 +315,7 @@ describe('one save bar for every tab', () => {
     expect(wrapper.get('[data-testid="settings-tab-general"]').text()).toContain('1');
     expect(wrapper.get('[data-testid="settings-tab-limits"]').text()).toContain('1');
     expect(saveBar(wrapper).text()).toContain('2 thay đổi chưa lưu');
-    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
+    await clickIn(saveBar(wrapper), 'Lưu');
     expect(calls.filter((call) => call.method === 'PATCH').map((call) => call.path)).toEqual([
       '/admin/settings/site.timeZone',
       '/admin/settings/similarity.minPercent',
@@ -337,7 +337,7 @@ describe('one save bar for every tab', () => {
     await router.push('/admin/settings?tab=limits');
     await flushPromises();
     await keyRow(wrapper, 'similarity.minPercent').get('input').setValue('70');
-    await clickIn(saveBar(wrapper), 'Lưu thay đổi');
+    await clickIn(saveBar(wrapper), 'Lưu');
     await flushPromises();
     expect(calls.filter((call) => call.method === 'PATCH')).toHaveLength(2);
     expect(router.currentRoute.value.query.tab).toBe('general');
@@ -347,12 +347,12 @@ describe('one save bar for every tab', () => {
     expect(saveBar(wrapper).text()).toContain('1 thay đổi chưa lưu');
   });
 
-  it('keeps "Lưu thay đổi" disabled while nothing changed', async () => {
+  it('keeps "Lưu" disabled while nothing changed', async () => {
     const calls = mockApi(routes());
     const { wrapper } = await mountSettings();
     const save = saveBar(wrapper)
       .findAll('button')
-      .find((button) => button.text() === 'Lưu thay đổi')!;
+      .find((button) => button.text() === 'Lưu')!;
     expect(save.attributes('aria-disabled')).toBe('true');
     await save.trigger('click');
     await flushPromises();

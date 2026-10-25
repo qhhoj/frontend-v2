@@ -35,7 +35,7 @@ function submit() {
         ? $t('orgProblems.tags.editTitle', { name: tag.name })
         : $t('orgProblems.tags.createTitle')
     "
-    :confirm-label="$t('orgProblems.tags.save')"
+    :confirm-label="$t('common.save')"
     :busy="busy"
     @confirm="submit"
   >

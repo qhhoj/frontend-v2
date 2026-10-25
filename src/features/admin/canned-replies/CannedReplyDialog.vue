@@ -82,7 +82,7 @@ const pageLine = computed(() =>
   <ConfirmDialog
     v-model:visible="visible"
     :title="title"
-    :confirm-label="$t('admin.cannedReplies.dialog.save')"
+    :confirm-label="$t('common.save')"
     :busy="save.isPending.value"
     @confirm="submit"
   >

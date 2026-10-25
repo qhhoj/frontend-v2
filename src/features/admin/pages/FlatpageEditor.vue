@@ -188,7 +188,7 @@ defineExpose({ loadOldValues, focusTitle });
         :dirty-count="dirtyCount"
         :pending="writer.isPending.value"
         :saved-at="savedAt"
-        :save-label="t('admin.pages.save')"
+        :save-label="t('common.save')"
         @discard="editor.discard()"
       />
       <AdminLeaveGuard :dirty-count="dirtyCount" />

@@ -48,8 +48,6 @@
       "tagProblem": "Bài gắn thẻ"
     },
     "hiddenBy": "Ẩn bởi {name}",
-    "hide": "Ẩn",
-    "show": "Hiện",
     "bulk": {
       "hide": "Ẩn mục đã chọn",
       "show": "Hiện mục đã chọn"
@@ -89,11 +87,9 @@
     }
   },
   "edit": {
-    "action": "Sửa",
     "title": "Sửa bình luận",
     "label": "Nội dung bình luận (Markdown)",
     "hint": "Lưu thành một phiên bản mới: tác giả và người kiểm duyệt xem được lịch sử.",
-    "save": "Lưu",
     "loading": "Đang tải bình luận…",
     "loadFailed": "Không tải được bình luận. Có thể nó đã bị xóa hoặc ngoài quyền của bạn.",
     "blank": "Bình luận không được để trống.",

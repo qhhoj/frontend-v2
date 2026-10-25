@@ -179,7 +179,7 @@ async function save() {
         :dirty-count="dirtyCount"
         :pending="mutation.isPending.value"
         :allow-clean="isCreate"
-        :save-label="isCreate ? $t('admin.contestTags.create') : $t('admin.contestTags.save')"
+        :save-label="isCreate ? $t('admin.contestTags.create') : $t('common.save')"
         @discard="discard"
       >
         <template #actions>

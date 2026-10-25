@@ -36,6 +36,6 @@ describe('LanguagesPage', () => {
     expect(wrapper.text()).toContain('chỉ được thêm ngôn ngữ mới');
     expect(wrapper.text()).not.toContain('Bạn không có quyền làm việc này.');
     expect(wrapper.text()).not.toContain('Chưa có ngôn ngữ nào.');
-    expect(wrapper.get('a[href="/admin/languages/new"]').text()).toContain('Thêm ngôn ngữ');
+    expect(wrapper.get('a[href="/admin/languages/new"]').text()).toContain('Tạo ngôn ngữ');
   });
 });

@@ -24,7 +24,7 @@ const SWITCH = '[data-testid="contest-visibility"] [role="switch"]';
 const save = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) => {
   await wrapper
     .findAll('button')
-    .find((button) => button.text() === 'Lưu thay đổi')!
+    .find((button) => button.text() === 'Lưu')!
     .trigger('click');
   await flushPromises();
 };

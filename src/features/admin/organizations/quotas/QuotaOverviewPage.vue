@@ -125,7 +125,7 @@ const { tabs: viewTabs } = useOrganizationViewTabs();
           :aria-label="$t('admin.quota.editLabel', { name: row.name })"
           @click="editing = row"
         >
-          {{ $t('admin.quota.edit') }}
+          {{ $t('common.edit') }}
         </button>
       </template>
     </AdminDataTable>

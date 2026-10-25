@@ -85,7 +85,7 @@ const refusal = computed(() => {
       :dirty-count="dirtyCount"
       :pending="save.isPending.value"
       :blocked-reason="name.trim() === '' ? $t('admin.users.roles.nameRequired') : undefined"
-      :save-label="role ? $t('admin.users.roles.save') : $t('admin.users.roles.create')"
+      :save-label="role ? $t('common.save') : $t('admin.users.roles.create')"
       @discard="discard"
     >
       <template #actions>

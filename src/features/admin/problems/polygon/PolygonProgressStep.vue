@@ -138,7 +138,7 @@ const syncOptionsTo = computed(() => ({
           @click="retry.run(body)"
         >
           <template #icon><RotateCcw aria-hidden="true" class="size-4" /></template>
-          {{ $t(`${KEY}.retry`) }}
+          {{ $t('common.retry') }}
         </AppButton>
         <AppButton v-else-if="action === 'edit'" tone="primary" @click="emit('edit')">
           <template #icon><Pencil aria-hidden="true" class="size-4" /></template>

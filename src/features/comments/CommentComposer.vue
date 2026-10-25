@@ -62,8 +62,7 @@ const replyTarget = computed(() => {
 });
 const cannotSend = computed(() => props.busy || isBlank.value || isTooLong.value);
 const submitKey = computed(() => {
-  if (props.mode === 'edit')
-    return props.busy ? 'comments.composer.saving' : 'comments.composer.save';
+  if (props.mode === 'edit') return props.busy ? 'comments.composer.saving' : 'common.save';
   if (props.busy) return 'comments.composer.sending';
   return props.replyTo ? 'comments.composer.sendReply' : 'comments.composer.send';
 });
@@ -179,7 +178,7 @@ function submit() {
         }}
       </span>
       <AppButton v-if="mode === 'edit'" @click="emit('cancel')">
-        {{ $t('comments.composer.cancel') }}
+        {{ $t('common.cancel') }}
       </AppButton>
       <AppButton tone="primary" type="submit" :disabled="cannotSend" :loading="busy">
         {{ $t(submitKey) }}

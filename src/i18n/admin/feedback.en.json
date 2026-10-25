@@ -1,14 +1,6 @@
 {
   "toast": {
     "region": "Notifications",
-    "undo": "Undo",
     "close": "Dismiss notification"
-  },
-  "notice": {
-    "details": "Details",
-    "hideDetails": "Hide details"
-  },
-  "drawer": {
-    "close": "Close"
   }
 }

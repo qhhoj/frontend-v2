@@ -137,7 +137,7 @@ const resultText = computed(() =>
             :class="buttonClass('secondary', 'sm')"
             @click="dialogs?.open('rescore')"
           >
-            {{ $t('admin.rejudge.filter.rescore') }}
+            {{ $t('common.rescore') }}
           </button>
           <button
             type="button"
@@ -145,7 +145,7 @@ const resultText = computed(() =>
             @click="dialogs?.open('rejudge')"
           >
             <component :is="STAFF_ICONS.rejudge" class="size-4 shrink-0" aria-hidden="true" />
-            {{ $t('admin.submissions.bulk.rejudge') }}
+            {{ $t('common.rejudge') }}
           </button>
         </template>
         <template #empty>

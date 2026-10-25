@@ -104,7 +104,7 @@ describe('OrgProblemsPage', () => {
     )!;
     label.querySelector('input')!.click();
     await flushPromises();
-    await confirmDialog('Lưu thẻ');
+    await confirmDialog('Lưu');
     expect(calls.find((call) => call.method === 'PUT')!.body).toEqual({
       tagIds: [TAGS[1]!.id, TAGS[2]!.id],
     });
@@ -130,17 +130,17 @@ describe('OrgTagCatalogue', () => {
     const { wrapper } = await mountTab();
     await wrapper
       .findAll('button')
-      .find((button) => button.text().includes('Thêm thẻ'))!
+      .find((button) => button.text().includes('Tạo thẻ'))!
       .trigger('click');
     await flushPromises();
     await fill('#org-tag-slug', 'Bad Slug');
-    await confirmDialog('Lưu thẻ');
+    await confirmDialog('Lưu');
     expect(openDialog().textContent).toContain('chữ thường');
     expect(calls.some((call) => call.method === 'POST')).toBe(false);
     await fill('#org-tag-slug', 'ds');
     await fill('#org-tag-name', 'Cấu trúc dữ liệu');
     openDialog().querySelector<HTMLInputElement>('input[aria-label="Màu 5"]')!.click();
-    await confirmDialog('Lưu thẻ');
+    await confirmDialog('Lưu');
     expect(calls.find((call) => call.method === 'POST')!.body).toEqual({
       slug: 'ds',
       name: 'Cấu trúc dữ liệu',

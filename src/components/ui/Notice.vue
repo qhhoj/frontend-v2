@@ -113,9 +113,7 @@ const resolvedRole = computed(() =>
           :aria-controls="detailsId"
           @click="isOpen = !isOpen"
         >
-          {{
-            isOpen ? $t('admin.feedback.notice.hideDetails') : $t('admin.feedback.notice.details')
-          }}
+          {{ isOpen ? $t('common.notice.hideDetails') : $t('common.notice.details') }}
           <ChevronDown
             aria-hidden="true"
             class="size-4 transition-transform"

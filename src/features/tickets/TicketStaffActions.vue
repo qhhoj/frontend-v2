@@ -66,7 +66,7 @@ const markGood = () => patch({ isContributive: !props.ticket.isContributive });
       </p>
       <div class="flex justify-end">
         <AppButton type="submit" tone="primary" :disabled="isOverLimit" :loading="isPending">
-          {{ $t('ticket.save') }}
+          {{ $t('common.save') }}
         </AppButton>
       </div>
     </form>

@@ -75,8 +75,7 @@
         "stream": "Sao chép địa chỉ luồng"
       },
       "meta": "Chế độ: {mode}. Hết hạn: {expiresAt}.",
-      "done": "Tôi đã lưu khóa",
-      "close": "Đóng"
+      "done": "Tôi đã lưu khóa"
     }
   }
 }

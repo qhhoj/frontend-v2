@@ -25,7 +25,7 @@
   },
   "empty": "No languages yet.",
   "form": {
-    "addTitle": "Add language",
+    "addTitle": "Create language",
     "editTitle": "Edit {key}",
     "notFound": "There is no language “{key}”.",
     "back": "Back to the list",
@@ -64,8 +64,6 @@
     "sealed": "Fixed",
     "required": "Fields marked * are required. The key cannot change after creation.",
     "create": "Create language",
-    "save": "Save changes",
-    "cancel": "Cancel",
     "saved": "Saved.",
     "savedToast": "Saved language {key}.",
     "createdToast": "Created language {key}.",
@@ -81,7 +79,7 @@
     }
   },
   "actions": {
-    "add": "Add language"
+    "add": "Create language"
   },
   "addOnly": "You can add new languages only; the list of existing languages is not available to you.",
   "judgesUnavailable": "The judges could not be loaded, so judge coverage is not shown."

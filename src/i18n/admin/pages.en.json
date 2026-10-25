@@ -24,7 +24,6 @@
     "content": "At most 100,000 characters.",
     "taken": "“{url}” is already used by another page."
   },
-  "save": "Save page",
   "saved": "Page saved.",
   "deletedToast": "Page deleted.",
   "delete": {

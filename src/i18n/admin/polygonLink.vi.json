@@ -204,7 +204,6 @@
   "progress": {
     "title": "Nhập từ Polygon",
     "lead": "Gói được xử lý nền. Có thể rời trang; lượt nhập vẫn chạy và có trong “Lượt nhập của tôi”.",
-    "retry": "Thử lại",
     "another": "Nhập bài khác",
     "outcome": {
       "import": {
@@ -307,7 +306,7 @@
       "unknown": "Không hỏi được Polygon lúc này: chưa kết nối, mất kết nối hoặc tài khoản bị thu quyền đọc."
     },
     "syncNow": "Đồng bộ ngay",
-    "unlink": "Hủy liên kết",
+    "unlink": "Gỡ liên kết",
     "readOnly": "{needs} để đồng bộ, bật tự đồng bộ hoặc hủy liên kết.",
     "on": "bật",
     "off": "tắt",
@@ -327,7 +326,7 @@
     "unlinkConfirm": {
       "title": "Hủy liên kết {code} với Polygon?",
       "body": "Nội dung bài giữ nguyên; chỉ ngừng đồng bộ (cả tự đồng bộ). Muốn liên kết lại thì nhập lại bài ở chế độ cập nhật.",
-      "confirm": "Hủy liên kết"
+      "confirm": "Gỡ liên kết"
     },
     "banner": {
       "running": {
@@ -363,7 +362,6 @@
       "options": "Tùy chọn",
       "autoSync": "Tự đồng bộ"
     },
-    "edit": "Sửa",
     "editLabel": "Sửa tùy chọn khi đồng bộ",
     "turnOn": "Bật",
     "turnOff": "Tắt",
@@ -385,8 +383,6 @@
     "drawer": {
       "title": "Tùy chọn khi đồng bộ",
       "note": "Áp dụng từ lần đồng bộ sau; bài hiện tại không đổi.",
-      "save": "Lưu tùy chọn",
-      "cancel": "Hủy",
       "noLanguages": "Tùy chọn đã lưu không chọn đề nào: gói có một đề, đề đó là đề chính."
     }
   },

@@ -1,6 +1,6 @@
 {
   "lead": "Keys that let outside systems create private contests, seat contestants and read scoreboards.",
-  "add": "Add a system",
+  "add": "Create a system",
   "impersonating": "You are viewing as another user: keys cannot be created or revoked.",
   "form": {
     "title": "Create a key",
@@ -19,15 +19,13 @@
     "actsAsHint": "A username allowed to create private contests; created contests carry this author.",
     "expires": "Expires",
     "expiresHint": "Must be in the future. Leave empty for a key that works until revoked.",
-    "submit": "Create key",
-    "cancel": "Cancel"
+    "submit": "Create key"
   },
   "key": {
     "title": "Key of {name}",
     "warning": "The key is shown once — only its hash is stored. Copy it into the external system before closing.",
     "label": "Integration key",
     "saved": "I have saved this key",
-    "close": "Close",
     "copy": "Copy key"
   },
   "table": {

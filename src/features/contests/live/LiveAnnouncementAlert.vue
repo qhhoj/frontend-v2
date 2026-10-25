@@ -97,11 +97,7 @@ const announcementsTab = computed(() => ({
         <AppButton size="sm" tone="ghost" :to="announcementsTab">
           {{ $t('contests.announcements.alert.view') }}
         </AppButton>
-        <IconButton
-          size="sm"
-          :label="$t('contests.announcements.alert.close')"
-          @click="close(shown.id)"
-        >
+        <IconButton size="sm" :label="$t('common.close')" @click="close(shown.id)">
           <X aria-hidden="true" class="size-4" />
         </IconButton>
       </div>
@@ -119,7 +115,7 @@ const announcementsTab = computed(() => ({
               {{ $t('contests.announcements.alert.view') }}
             </AppButton>
             <AppButton size="sm" tone="ghost" @click="close(shown.id)">
-              {{ $t('contests.announcements.alert.close') }}
+              {{ $t('common.close') }}
             </AppButton>
           </div>
         </div>

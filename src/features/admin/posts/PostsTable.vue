@@ -73,7 +73,7 @@ const isBusy = computed(() => props.pendingPostId !== null);
 
 const menuItems = (post: PostListItem): RowMenuItem[] => [
   {
-    label: t('admin.posts.row.edit'),
+    label: t('common.edit'),
     icon: Pencil,
     to: { name: 'post-edit', params: { id: post.id } },
   },
@@ -188,7 +188,7 @@ const menuItems = (post: PostListItem): RowMenuItem[] => [
         {{ isRowPending(row) ? $t('admin.posts.row.unhiding') : $t('admin.posts.row.unhide') }}
       </button>
       <AdminRowMenu
-        :label="$t('admin.table.rowMenu', { name: row.title })"
+        :label="$t('common.table.rowMenu', { name: row.title })"
         :items="menuItems(row)"
       />
     </template>

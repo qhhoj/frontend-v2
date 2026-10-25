@@ -95,7 +95,7 @@ async function submit() {
     </template>
     <AuthError :text="summary" />
     <AuthSubmit :pending="pending">{{
-      accepted ? $t('auth.changePassword.retry') : $t('auth.changePassword.submit')
+      accepted ? $t('common.retry') : $t('auth.changePassword.submit')
     }}</AuthSubmit>
   </form>
 </template>
