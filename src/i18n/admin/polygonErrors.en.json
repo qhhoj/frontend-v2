@@ -95,6 +95,10 @@
     "title": "The problem code is taken",
     "fix": "Pick another code, or choose Update to overwrite that problem."
   },
+  "problem_in_running_contest": {
+    "title": "A contest using the problem is running",
+    "fix": "The automatic sync waited a week for running contests. Sync it by hand once they end."
+  },
   "problem_not_found": {
     "title": "The problem to update is gone",
     "fix": "It was deleted or its code changed. Check the code."

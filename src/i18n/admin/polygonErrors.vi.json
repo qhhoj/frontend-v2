@@ -95,6 +95,10 @@
     "title": "Mã bài đã có",
     "fix": "Chọn mã khác, hoặc chọn Cập nhật để ghi đè bài đó."
   },
+  "problem_in_running_contest": {
+    "title": "Bài đang được dùng trong kỳ thi đang diễn ra",
+    "fix": "Đồng bộ tự động đã chờ một tuần. Hãy đồng bộ thủ công khi kỳ thi kết thúc."
+  },
   "problem_not_found": {
     "title": "Không thấy bài cần cập nhật",
     "fix": "Bài đã bị xóa hoặc đổi mã. Kiểm tra lại mã bài."
