@@ -2,6 +2,7 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed, nextTick, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import type { RulesAcceptance } from '@/api/contests.api';
 import { ApiError } from '@/api/client';
 import type { ContestDetail, CurrentParticipation } from '@/api/types/contests';
 import InlineBit from '@/components/InlineBit.vue';
@@ -30,6 +31,8 @@ import { useParticipation } from './use-participation';
 const ACCESS_CODE_REQUIRED: ParticipationRefusal = 'access_code_required';
 /** A stale detail may not know the contest has rules now: the backend's refusal opens the rules dialog instead. */
 const RULES_NOT_ACCEPTED: ParticipationRefusal = 'rules_not_accepted';
+/** The rules were saved after the dialog opened: the dialog stays open on the new text and the viewer reads it again. */
+const RULES_CHANGED: ParticipationRefusal = 'rules_changed';
 /** The text each kind shows: a button label, or the notice itself when the kind has no request. Exhaustive, so a new kind fails to compile here. */
 const TEXT_KEYS: Record<ContestActionKind, string> = {
   signIn: 'contests.actions.signIn',
@@ -104,10 +107,10 @@ const hasButton = computed(() => isLocked.value || commandOf(chosen.value.kind) 
 
 const queryClient = useQueryClient();
 const isRulesOpen = ref(false);
-/** The detail is being read again after `rules_not_accepted`: its rules text may still be the old, empty one. */
+/** The detail is being read again after `rules_not_accepted` or `rules_changed`: its rules text may still be the old, empty one. */
 const isRulesRefreshing = ref(false);
-/** The viewer ticked the rules in this attempt; sent with the request and dropped when a new attempt starts. */
-const hasAcceptedRules = ref(false);
+/** The rules revision the viewer ticked in this attempt; sent with the request and dropped when a new attempt starts. */
+const acceptance = ref<RulesAcceptance | null>(null);
 const needsRules = computed(
   () =>
     hasRules(props.contest.rules) &&
@@ -127,8 +130,9 @@ function openDialogFor(failure: unknown): boolean {
     isDialogOpen.value = true;
     return true;
   }
-  if (!isRefusedWith(failure, RULES_NOT_ACCEPTED)) return false;
-  hasAcceptedRules.value = false;
+  if (!isRefusedWith(failure, RULES_NOT_ACCEPTED) && !isRefusedWith(failure, RULES_CHANGED))
+    return false;
+  acceptance.value = null;
   isDialogOpen.value = false;
   isRulesOpen.value = true;
   isRulesRefreshing.value = true;
@@ -140,14 +144,14 @@ function openDialogFor(failure: unknown): boolean {
 function closeDialogs() {
   isDialogOpen.value = false;
   isRulesOpen.value = false;
-  hasAcceptedRules.value = false;
+  acceptance.value = null;
 }
 /** Runs the request behind the chosen action; the access code is passed through and never kept. */
 async function perform(accessCode?: string) {
   const command = confirmedCommand.value;
   if (!command || isPending.value) return;
   try {
-    await run(command, { accessCode, acceptRules: hasAcceptedRules.value });
+    await run(command, { accessCode, acceptance: acceptance.value ?? undefined });
   } catch (failure: unknown) {
     if (!openDialogFor(failure)) throw failure;
     return;
@@ -177,13 +181,13 @@ function start() {
 function proceed() {
   isSwitchOpen.value = false;
   reset();
-  hasAcceptedRules.value = false;
+  acceptance.value = null;
   if (needsRules.value) isRulesOpen.value = true;
   else askCodeOrPerform();
 }
 /** Ticked and confirmed: the code dialog follows when the action needs a code, else the request goes now. */
 function acceptRules() {
-  hasAcceptedRules.value = true;
+  acceptance.value = { revision: props.contest.rulesRevision };
   if (!chosen.value.needsAccessCode) {
     void perform().catch(() => undefined);
     return;

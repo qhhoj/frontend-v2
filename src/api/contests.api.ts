@@ -6,10 +6,13 @@ import type { Announcement, ContestListQuery } from './types/contests';
 export const ANNOUNCEMENT_PAGE_SIZE = 20;
 export const ANNOUNCEMENT_FIRST_PAGE = 1;
 
-/** The code goes only when the viewer typed one (an empty string is a wrong code); `acceptRules` only when the box was ticked. */
-const joinBody = (accessCode?: string, acceptRules?: boolean) => ({
+/** The code goes only when the viewer typed one (an empty string is a wrong code); the acceptance only when the box was ticked, with the rules revision the viewer read. */
+export interface RulesAcceptance {
+  revision: number;
+}
+const joinBody = (accessCode?: string, acceptance?: RulesAcceptance) => ({
   ...(accessCode ? { accessCode } : {}),
-  ...(acceptRules ? { acceptRules: true } : {}),
+  ...(acceptance ? { acceptRules: true, acceptRulesRevision: acceptance.revision } : {}),
 });
 
 export const fetchContests = (query: ContestListQuery) => apiGetPage('/contests', { query });
@@ -20,15 +23,15 @@ export const fetchRanking = (key: string, withVirtual: boolean) =>
 export const fetchPublicRanking = (token: string) =>
   apiGet('/public-rankings/{token}', { path: { token } });
 
-export const joinContest = (key: string, accessCode?: string, acceptRules?: boolean) =>
+export const joinContest = (key: string, accessCode?: string, acceptance?: RulesAcceptance) =>
   apiSend('post', '/contests/{key}/join', {
     path: { key },
-    body: joinBody(accessCode, acceptRules),
+    body: joinBody(accessCode, acceptance),
   });
-export const registerContest = (key: string, accessCode?: string, acceptRules?: boolean) =>
+export const registerContest = (key: string, accessCode?: string, acceptance?: RulesAcceptance) =>
   apiSend('post', '/contests/{key}/register', {
     path: { key },
-    body: joinBody(accessCode, acceptRules),
+    body: joinBody(accessCode, acceptance),
   });
 export const leaveContest = (key: string) =>
   apiSend('post', '/contests/{key}/leave', { path: { key } });

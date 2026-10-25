@@ -16,6 +16,7 @@ export const userEdit = (overrides: Partial<UserEdit> = {}): UserEdit => ({
   notes: '',
   inContest: false,
   hasTwoFactor: false,
+  socialProviders: [],
   isActive: true,
   isStaff: false,
   isSuperuser: false,

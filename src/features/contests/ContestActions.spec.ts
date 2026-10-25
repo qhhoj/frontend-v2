@@ -231,7 +231,7 @@ describe('contest actions with rules', () => {
     expect(joinBodies(calls)).toEqual([]);
     expect(dialog()!.textContent).toContain('Quy định kỳ thi');
     await tickAndConfirm();
-    expect(joinBodies(calls)).toEqual([{ acceptRules: true }]);
+    expect(joinBodies(calls)).toEqual([{ acceptRules: true, acceptRulesRevision: 3 }]);
   });
 
   it('asks again for every virtual run', async () => {
@@ -247,7 +247,7 @@ describe('contest actions with rules', () => {
     await flushPromises();
     expect(dialog()!.textContent).toContain('Mỗi lượt thi ảo cần đồng ý lại');
     await tickAndConfirm();
-    expect(joinBodies(calls)).toEqual([{ acceptRules: true }]);
+    expect(joinBodies(calls)).toEqual([{ acceptRules: true, acceptRulesRevision: 3 }]);
   });
 
   it('asks nothing of a registered contestant who joins, nor when the rules are blank', async () => {
@@ -292,7 +292,9 @@ describe('contest actions with rules', () => {
     await typeCode('opensesame');
     dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
     await flushPromises();
-    expect(joinBodies(calls)).toEqual([{ accessCode: 'opensesame', acceptRules: true }]);
+    expect(joinBodies(calls)).toEqual([
+      { accessCode: 'opensesame', acceptRules: true, acceptRulesRevision: 3 },
+    ]);
   });
 
   it('opens the rules when the server refuses for rules the page did not know, and re-reads the contest', async () => {
@@ -314,7 +316,27 @@ describe('contest actions with rules', () => {
       calls.filter((call) => call.path === '/contests/r42' && call.method === 'GET').length,
     ).toBeGreaterThanOrEqual(2);
     await tickAndConfirm();
-    expect(joinBodies(calls)).toEqual([{}, { acceptRules: true }]);
+    expect(joinBodies(calls)).toEqual([{}, { acceptRules: true, acceptRulesRevision: 3 }]);
+  });
+
+  it('keeps the rules open with a notice when they changed, then sends the new revision', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(),
+      'GET /contests/r42': sequence(ok(ruled()), ok(ruled({ rulesRevision: 4 }))),
+      'POST /contests/r42/join': sequence(fail(409, 'rules_changed'), ok(participationSummary())),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    await tickAndConfirm();
+    expect(dialog()!.textContent).toContain('Thể lệ vừa được cập nhật, vui lòng đọc lại');
+    await tickAndConfirm();
+    expect(joinBodies(calls)).toEqual([
+      { acceptRules: true, acceptRulesRevision: 3 },
+      { acceptRules: true, acceptRulesRevision: 4 },
+    ]);
   });
 });
 

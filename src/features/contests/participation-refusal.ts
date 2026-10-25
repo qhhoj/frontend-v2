@@ -12,6 +12,7 @@ export const PARTICIPATION_REFUSALS = [
   'access_code_required',
   'wrong_access_code',
   'rules_not_accepted',
+  'rules_changed',
   'not_in_contest',
 ] as const;
 
