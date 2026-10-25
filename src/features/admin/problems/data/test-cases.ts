@@ -141,6 +141,8 @@ export function checkDataForm(form: DataForm): FieldErrors {
     errors.checkerArgs = translate('admin.problems.data.badJson');
   if (parseArgs(form.graderArgsText) === undefined)
     errors.graderArgs = translate('admin.problems.data.badJson');
+  for (const field of ['outputPrefix', 'outputLimit'] as const)
+    if (!isCount(form[field])) errors[field] = translate('admin.problems.data.errors.count');
   form.cases.forEach((row, index) => Object.assign(errors, caseErrors(row, index)));
   if (argsBytes(form.cases) > MAX_CASE_ARGS_BYTES)
     errors.cases = translate('admin.problems.data.errors.argsTotal');

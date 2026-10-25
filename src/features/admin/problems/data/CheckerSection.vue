@@ -43,6 +43,7 @@ function setOutputNumber(field: 'outputLimit' | 'outputPrefix', event: Event) {
         input-id="data-outputLimit"
         :label="$t('admin.problems.data.checker.outputLimit')"
         :hint="$t(`${key}.outputLimitHint`)"
+        :error="errors.outputLimit"
       >
         <input
           :id="id"
@@ -60,6 +61,7 @@ function setOutputNumber(field: 'outputLimit' | 'outputPrefix', event: Event) {
         input-id="data-outputPrefix"
         :label="$t('admin.problems.data.checker.outputPrefix')"
         :hint="$t(`${key}.outputPrefixHint`)"
+        :error="errors.outputPrefix"
       >
         <input
           :id="id"

@@ -56,8 +56,6 @@ const leavesForm = (to: RouteLocationNormalized, from: RouteLocationNormalized) 
   to.query.org !== from.query.org || organizationPanelOf(to.query) !== 'info';
 const queryGuard = useQueryLeaveGuard(() => dirtyCount.value > 0, leavesForm);
 
-/** An empty box is no limit (`null`); a typed count is a whole number. `v-model` on a number box hands back a number. */
-
 /** The save bar's button is a submit: a clean edit or a running upload sends nothing. */
 function submit() {
   if (isLogoUploading.value || (!isCreate && dirtyCount.value === 0)) return;
@@ -145,7 +143,6 @@ const fieldAttrs = (invalid: unknown, describedBy: string | undefined) => ({
         >
           <input
             :id="id"
-            
             :value="form.slots ?? ''"
             type="number"
             min="0"

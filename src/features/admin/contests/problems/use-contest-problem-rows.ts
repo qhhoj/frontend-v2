@@ -87,7 +87,9 @@ export function useContestProblemRows(contest: () => EditableContest) {
   const issueOf = (index: number) => rowIssueOf(rows.value, mutation.fieldErrors.value, index);
 
   /** Nothing is sent while a row's points are not a whole number in range or a limit box is unreadable. */
-  const hasInvalidPoints = computed(() => rows.value.some((row) => !isPointsValid(row.points) || hasUnreadableLimit(row)));
+  const hasInvalidPoints = computed(() =>
+    rows.value.some((row) => !isPointsValid(row.points) || hasUnreadableLimit(row)),
+  );
   const save = () => (hasInvalidPoints.value ? undefined : mutation.run(rows.value));
 
   watch(contest, (next) => {
