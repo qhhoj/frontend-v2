@@ -149,6 +149,7 @@ function openClone(close: () => void) {
         <component
           :is="body"
           v-else-if="body"
+          :key="code"
           :problem="problem.data.value"
           :meta="meta.data.value"
         />

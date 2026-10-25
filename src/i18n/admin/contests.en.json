@@ -103,6 +103,7 @@
       "endBeforeStart": "The end must be after the start.",
       "cacheTimeout": "From 0 to 86400 seconds.",
       "frozen": "Cannot be negative.",
+      "notNumber": "Not a number.",
       "ratingRange": "The maximum rating cannot be below the minimum.",
       "tags": "At most 20 tags.",
       "pointsPrecision": "From 0 to 10.",

@@ -51,8 +51,6 @@ export const caseBody = (row: KeyedCase): TestCase => ({
 });
 /** A JSON box's text for a stored object: empty for null. */
 export const argsText = (args: JsonObject | null) => (args === null ? '' : JSON.stringify(args));
-/** A number box's value: empty is null. */
-export const optionalNumber = (text: string) => (text.trim() === '' ? null : Number(text));
 
 const blankCase = (type: CaseType): TestCase => ({
   type,
