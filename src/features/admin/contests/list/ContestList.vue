@@ -223,10 +223,10 @@ const resultRows = computed(() =>
     >
       <template #bulk>
         <button type="button" :class="buttonClass('secondary', 'sm')" @click="openBulk(true)">
-          {{ $t('admin.contests.list.bulk.show') }}
+          {{ $t('common.show') }}
         </button>
         <button type="button" :class="buttonClass('secondary', 'sm')" @click="openBulk(false)">
-          {{ $t('admin.contests.list.bulk.hide') }}
+          {{ $t('common.hide') }}
         </button>
       </template>
       <template #cell-contest="{ row }">

@@ -1,7 +1,7 @@
 {
   "title": "Ticket reply templates",
   "lead": "Ready-made replies for ticket handlers. On insert, {'{'}tên{'}'} becomes the ticket author's name and {'{'}bài{'}'} the problem name.",
-  "add": "Add template",
+  "add": "Create template",
   "count": "{count} / {max} templates",
   "caption": "Reply templates",
   "columns": {
@@ -9,9 +9,7 @@
     "title": "Title",
     "body": "Text"
   },
-  "edit": "Edit",
   "editNamed": "Edit template {title}",
-  "delete": "Delete",
   "deleteTitle": "Delete the template “{title}”?",
   "deleteBody": "Handlers will no longer be able to pick it. Messages already sent do not change.",
   "deleteConfirm": "Delete template",
@@ -22,7 +20,7 @@
   "gone": "This template was deleted elsewhere. The list has been reloaded.",
   "openFromQueue": "Reply templates",
   "dialog": {
-    "addTitle": "Add a reply template",
+    "addTitle": "Create a reply template",
     "editTitle": "Edit the template “{title}”",
     "titleLabel": "Title",
     "titleHint": "At most {max} characters.",
@@ -30,7 +28,6 @@
     "bodyHint": "At most {max} characters. {'{'}tên{'}'} and {'{'}bài{'}'} are replaced on insert.",
     "orderLabel": "Order",
     "orderHint": "A whole number from 0 to {max}; leave empty to put it last.",
-    "save": "Save template",
     "titleRequired": "Enter a title.",
     "bodyRequired": "Enter the text.",
     "titleTooLong": "The title has {used} characters, at most {max}.",

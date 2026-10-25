@@ -24,7 +24,6 @@
   "bulk": {
     "allSelected": "All {count} matching submissions selected",
     "selectAll": "Select all {total} matching submissions",
-    "rejudge": "Rejudge",
     "lineSelected": "{count} selected submissions.",
     "lineAll": "Every submission matching the list filter (except the state filter)."
   },

@@ -14,7 +14,7 @@ const emit = defineEmits<{ clear: [] }>();
     </p>
     <slot />
     <button type="button" class="min-h-11 text-sm text-muted underline" @click="emit('clear')">
-      {{ $t('admin.contests.bulk.clear') }}
+      {{ $t('common.clearSelection') }}
     </button>
   </div>
 </template>

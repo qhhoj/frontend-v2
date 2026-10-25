@@ -142,7 +142,7 @@ const menuOf = (tag: ContestTag): RowMenuItem[] => [
           @click="openEditor(row)"
         >
           <Pencil aria-hidden="true" class="size-4" :stroke-width="1.75" />
-          {{ $t('admin.contestTags.edit') }}
+          {{ $t('common.edit') }}
         </button>
         <AdminRowMenu
           :items="menuOf(row)"

@@ -114,7 +114,7 @@ onMounted(() => {
     <template v-else>
       <AuthError :text="errorText" />
       <AppButton v-if="state === 'failed'" block @click="retryActivation">
-        {{ $t('auth.activation.retry') }}
+        {{ $t('common.retry') }}
       </AppButton>
     </template>
   </AuthLayout>

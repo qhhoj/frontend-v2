@@ -173,8 +173,7 @@
       "alert": {
         "label": "New contest announcement",
         "title": "New announcement",
-        "view": "View",
-        "close": "Close"
+        "view": "View"
       }
     },
     "rules": {
@@ -279,7 +278,7 @@
       "ratedAny": "All",
       "ratedOnly": "Rated only",
       "onlyGroup": "Only this group",
-      "allGroups": "All groups",
+      "allGroups": "View all groups",
       "timeLeft": "{span} left",
       "perParticipation": "{span} per participation, from the moment you enter",
       "enter": "Enter",
@@ -288,7 +287,6 @@
       "viewAndRegister": "View & register",
       "endedRegion": "Ended contests, scrolls sideways",
       "shownOf": "{shown} of {total}",
-      "viewAll": "View all",
       "viewAllCount": "View all {count} contests",
       "view": "View",
       "codeNeeded": "Code needed",
@@ -346,8 +344,7 @@
       "forbiddenTitle": "This list is hidden",
       "forbiddenBody": "The contest ranking is not open to you, so neither are its best submissions.",
       "missingTitle": "This problem is not in the contest",
-      "loadFailed": "The contest could not be loaded",
-      "retry": "Retry"
+      "loadFailed": "The contest could not be loaded"
     },
     "leave": {
       "live": {
@@ -406,7 +403,6 @@
     "register": "Sign up",
     "logout": "Sign out",
     "logoutFailed": "Sign-out did not complete: you are still signed in.",
-    "logoutRetry": "Try again",
     "menu": "Account of {username}",
     "profile": "My profile",
     "settings": "Settings",
@@ -764,7 +760,6 @@
       "keyTitle": "Touch your security key",
       "keyLead": "Plug the key into a USB port, then touch its button.",
       "keyWaiting": "Waiting for the key…",
-      "retryKey": "Try again",
       "unsupportedTitle": "The key cannot be used here",
       "unsupportedLead": "This browser does not support security keys yet. Use a recent Chrome, Edge, Firefox or Safari.",
       "sessionChangedTitle": "The session changed",
@@ -805,8 +800,7 @@
       "currentPassword": "Current password",
       "confirmNew": "Repeat the new password",
       "submit": "Change password",
-      "changedNotLoaded": "Your password is changed. Your account could not be loaded yet; try again.",
-      "retry": "Try again"
+      "changedNotLoaded": "Your password is changed. Your account could not be loaded yet; try again."
     },
     "strength": {
       "label": "Password strength",
@@ -843,8 +837,7 @@
       "doneTitle": "Account activated",
       "doneLead": "Your email is confirmed. You can sign in now.",
       "deadTitle": "The link has expired",
-      "deadLead": "An activation link works for 7 days. Enter your email to get a new one.",
-      "retry": "Try again"
+      "deadLead": "An activation link works for 7 days. Enter your email to get a new one."
     },
     "resend": {
       "title": "Resend the activation email",
@@ -992,7 +985,36 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "delete": "Delete",
-    "close": "Close"
+    "close": "Close",
+    "table": {
+      "actions": "Actions",
+      "bulkLabel": "Bulk actions",
+      "selected": "{count} selected | {count} selected",
+      "selectPage": "Select every row on this page",
+      "selectRow": "Select {name}",
+      "rowMenu": "More actions for {name}",
+      "details": "Details",
+      "empty": "Nothing here yet.",
+      "emptyFiltered": "No results for this filter.",
+      "filters": "Filters",
+      "filtersCount": "Filters ({count})",
+      "removeFilter": "Remove filter {label}",
+      "clearAll": "Clear all",
+      "range": "{from}–{to} of {total}"
+    },
+    "notice": {
+      "details": "Details",
+      "hideDetails": "Hide details"
+    },
+    "save": "Save",
+    "edit": "Edit",
+    "rejudge": "Rejudge",
+    "rescore": "Recalculate points",
+    "undo": "Undo",
+    "clearFilters": "Clear filters",
+    "clearSelection": "Clear selection",
+    "show": "Show",
+    "hide": "Hide"
   },
   "verdicts": {
     "AC": "Accepted",
@@ -1105,7 +1127,6 @@
     "pdfFailed": "The PDF could not be prepared",
     "pdfMissing": "This statement has no PDF",
     "pdfRateLimited": "Too many PDF requests",
-    "pdfRetry": "Try again",
     "pdfRetryIn": "Try again in {seconds} s",
     "pdfStatement": {
       "open": "Open in a new tab",
@@ -1193,7 +1214,6 @@
     "signInToHide": "Sign in to hide solved problems",
     "filtering": "Filtering:",
     "clearAll": "Clear all",
-    "clearFilters": "Clear filters",
     "removeFilter": "Remove filter: {name}",
     "pointsChip": "{min}–{max} points",
     "count": "{n} problem | {n} problems",
@@ -1599,7 +1619,7 @@
     "findMe": "Find my rank",
     "jumpLabel": "Username",
     "jumpPlaceholder": "Go to a profile by username",
-    "jumpSubmit": "Open",
+    "jumpSubmit": "View",
     "pagerLabel": "Leaderboard pages",
     "empty": "Nobody is on this board yet.",
     "title": "Leaderboard"
@@ -1824,7 +1844,6 @@
     "joinFailedTitle": "Could not join",
     "joinFailedBody": "You are in 3 open organizations, the maximum. Leave one before joining.",
     "failedTitle": "That did not work",
-    "retry": "Try again",
     "forbiddenTitle": "Only administrators see join requests",
     "sortLabel": "Sort members",
     "membersFooter": "Ranks {first} – {last} of {total} · 100 per page",
@@ -1894,12 +1913,10 @@
     "notFoundTitle": "Post not found",
     "notFoundBody": "The post does not exist or is not public yet.",
     "backToBlog": "Back to the blog",
-    "edit": "Edit",
     "pin": "Pin",
     "unpin": "Unpin",
     "actions": "Post actions",
     "delete": {
-      "action": "Delete",
       "title": "Delete this post?",
       "body": "“{title}” and its comments and votes will be deleted for good. This cannot be undone.",
       "confirm": "Delete post"
@@ -1922,19 +1939,15 @@
     "replyToUnknown": "Reply to a comment:",
     "collapsed": "#{number} · {author} · folded for a low score ({score})",
     "collapsedReply": "#{number} · {author} · reply to #{parent} · folded for a low score ({score})",
-    "show": "Show",
     "tooOld": "Older than a year, no more replies",
     "empty": "No comments yet — be the first",
     "emptyBody": "Ask about the statement, share a hint or report a mistake. The composer is right below.",
     "action": {
       "reply": "Reply",
-      "edit": "Edit",
       "history": "History ({count})",
-      "hide": "Hide",
       "more": "More actions",
       "lock": "Lock comments",
       "unlock": "Unlock",
-      "delete": "Delete",
       "report": "Report",
       "unhide": "Unhide"
     },
@@ -1951,9 +1964,7 @@
       "send": "Post comment",
       "sendReply": "Post reply",
       "sending": "Posting…",
-      "save": "Save changes",
       "saving": "Saving…",
-      "cancel": "Cancel",
       "editing": "editing",
       "editHint": "Every save adds a version to the History.",
       "markdownHelp": "Markdown works: **bold**, `code`, ```cpp blocks and $…$ formulas.",
@@ -2099,7 +2110,6 @@
     "noMatch": "No ticket matches the filter.",
     "errorTitle": "Could not load tickets",
     "errorBody": "The connection dropped. The list stays as it was; try again in a few seconds.",
-    "retry": "Try again",
     "signInTitle": "Sign in to see tickets",
     "signInBody": "Tickets show only to their creator, assignees and staff.",
     "signIn": "Sign in",
@@ -2123,8 +2133,7 @@
       "body": "Message (up to 8192 characters)",
       "bodyRequired": "Enter a message.",
       "bodyTooLong": "The message is over 8192 characters.",
-      "cancel": "Cancel",
-      "submit": "Send ticket",
+      "submit": "Create ticket",
       "before": "Before you send",
       "checkOpen": "Check the problem's open tickets.",
       "describe": "Describe how to reproduce it, with a submission id if there is one.",
@@ -2160,7 +2169,6 @@
     "notesInternal": "Internal notes",
     "noNotes": "No notes.",
     "notesHint": "Everyone who can read the ticket sees the notes; only assignees and staff edit them.",
-    "saveNotes": "Save notes",
     "status": "Status",
     "close": "Close ticket",
     "reopen": "Reopen ticket",
@@ -2169,7 +2177,6 @@
     "markGood": "Mark as good contribution",
     "assigneesInput": "Assignees (usernames)",
     "assigneesMax": "At most 20 assignees.",
-    "save": "Save",
     "sentTitle": "Ticket sent",
     "sentBody": "Staff will answer here.",
     "forbiddenTitle": "You cannot read this ticket",
@@ -2198,7 +2205,6 @@
       "label": "Pick submission {id} to compare",
       "picked": "Picked {first} and {second}",
       "pickedOne": "Picked 1 of 2",
-      "clear": "Clear",
       "compare": "Compare the 2 picked",
       "needTwo": "Pick 2 submissions"
     },
@@ -2374,7 +2380,6 @@
       "kind": "No “{kind}” notifications{state}"
     },
     "filteredHint": "Change the filter to see other notifications.",
-    "clearFilters": "Clear filters",
     "kindLabel": "Type",
     "kinds": {
       "ticket": "Tickets",
@@ -2453,7 +2458,6 @@
     },
     "states": {
       "ready": "The replay is ready.",
-      "retry": "Try again",
       "backToRanking": "View the ranking",
       "building": {
         "title": "Building the replay…",
@@ -2531,7 +2535,6 @@
     "unknownBody": "The address has ?tag={slug} but the catalogue has no such tag. Showing every contest.",
     "emptyTitle": "No contest has the tag “{name}” yet.",
     "emptyHint": "Try removing the tag or picking another one.",
-    "clear": "Clear filter",
     "title": "Contest tags"
   },
   "joinRules": {
@@ -2583,7 +2586,6 @@
     "pendingCount": "{count} balloon to deliver | {count} balloons to deliver",
     "first": "First solve",
     "deliver": "Delivered",
-    "undo": "Undo",
     "rowName": "problem {label}, team {team}",
     "deliveredBy": "delivered by {name} at {time}",
     "frozenNote": "The ranking is frozen: solve times and counts are hidden from volunteers.",
@@ -2646,7 +2648,6 @@
     "tagsDialog": {
       "title": "Tags of {code}",
       "legend": "Pick the problem’s tags",
-      "save": "Save tags",
       "limit": "At most 20 tags per problem.",
       "none": "The organization has no tags yet. Create them under “Organization tags”."
     },
@@ -2658,10 +2659,10 @@
       "title": "Organization tags",
       "count": "{count} / {max}",
       "empty": "No tags yet. Add tags to group problems.",
-      "add": "Add tag",
+      "add": "Create tag",
       "editLabel": "Edit tag {name}",
       "deleteLabel": "Delete tag {name}",
-      "createTitle": "Add tag",
+      "createTitle": "Create tag",
       "editTitle": "Edit tag {name}",
       "slug": "Tag code",
       "slugHint": "Lowercase letters, digits and hyphens, at most 20. It cannot change later.",
@@ -2669,7 +2670,6 @@
       "name": "Tag name",
       "color": "Colour",
       "colorName": "Colour {number}",
-      "save": "Save tag",
       "deleteTitle": "Delete tag {name}?",
       "deleteBody": "The tag is removed from every problem of the organization. This cannot be undone.",
       "deleteConfirm": "Delete tag",
@@ -2684,7 +2684,6 @@
       "tag": "Tag…",
       "archive": "Archive",
       "unarchive": "Unarchive",
-      "clear": "Clear selection",
       "tagTitle": "Add or remove a tag on {count} problem | Add or remove a tag on {count} problems",
       "modeLegend": "Action",
       "addTag": "Add tag",
@@ -2883,7 +2882,6 @@
       "aboutLead": "Shown on the organization page.",
       "about": "About (Markdown)",
       "joinLead": "How new members join the organization.",
-      "save": "Save changes",
       "logoUploading": "Uploading the logo…",
       "staffLink": "Open in the admin pages (quota, places, visibility)"
     },
@@ -2933,7 +2931,6 @@
       "savedAt": "Saved at {time}",
       "clean": "No changes to save.",
       "discard": "Discard changes",
-      "save": "Save changes",
       "saving": "Saving…"
     }
   }

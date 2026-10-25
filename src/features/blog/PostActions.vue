@@ -57,9 +57,9 @@ const pinLabel = computed(() => t(props.post.sticky ? 'blogPost.unpin' : 'blogPo
 const menu = ref<InstanceType<typeof Menu>>();
 const isMenuOpen = ref(false);
 const menuModel = computed<MenuItem[]>(() => [
-  ...(props.post.canEdit ? [{ label: t('blogPost.edit'), command: toEdit }] : []),
+  ...(props.post.canEdit ? [{ label: t('common.edit'), command: toEdit }] : []),
   ...(canPin.value ? [{ label: pinLabel.value, command: () => void pinner.run(undefined) }] : []),
-  ...(props.post.canDelete ? [{ label: t('blogPost.delete.action'), command: openDelete }] : []),
+  ...(props.post.canDelete ? [{ label: t('common.delete'), command: openDelete }] : []),
 ]);
 </script>
 
@@ -87,7 +87,7 @@ const menuModel = computed<MenuItem[]>(() => [
     <template v-else>
       <AppButton v-if="post.canEdit" :to="{ name: 'post-edit', params: { id: post.id } }">
         <template #icon><Pencil aria-hidden="true" class="size-4" /></template>
-        {{ $t('blogPost.edit') }}
+        {{ $t('common.edit') }}
       </AppButton>
       <AppButton v-if="canPin" :loading="pinner.isPending.value" @click="pinner.run(undefined)">
         <template #icon><Pin aria-hidden="true" class="size-4" /></template>
@@ -95,7 +95,7 @@ const menuModel = computed<MenuItem[]>(() => [
       </AppButton>
       <AppButton v-if="post.canDelete" tone="danger" @click="openDelete">
         <template #icon><Trash2 aria-hidden="true" class="size-4" /></template>
-        {{ $t('blogPost.delete.action') }}
+        {{ $t('common.delete') }}
       </AppButton>
     </template>
     <AdminStatus

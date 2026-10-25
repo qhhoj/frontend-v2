@@ -58,7 +58,7 @@ const buttonClass = computed(() => {
 const name = computed(() => {
   if (busy.value) return translate('problem.pdfPreparing');
   if (mustWait.value) return translate('problem.pdfRetryIn', { seconds: secondsToRetry.value });
-  if (phase.value === 'failed') return translate('problem.pdfRetry');
+  if (phase.value === 'failed') return translate('common.retry');
   return translate('problem.pdfRender');
 });
 

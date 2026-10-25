@@ -220,7 +220,7 @@ async function saveLink() {
         <p v-if="formError" role="alert" class="text-sm text-negative">{{ formError }}</p>
         <div class="flex flex-wrap items-center gap-3">
           <button type="button" :class="buttonClass('primary')" @click="saveLink">
-            {{ $t('admin.contests.ranking.link.save') }}
+            {{ $t('common.save') }}
           </button>
           <button type="button" :class="buttonClass('danger')" @click="isRegenerateOpen = true">
             {{ $t('admin.contests.ranking.link.regenerate') }}

@@ -107,7 +107,6 @@
     "banned": "Bị cấm"
   },
   "edit": {
-    "open": "Sửa",
     "profile": {
       "title": "Hồ sơ",
       "displayName": "Tên hiển thị",
@@ -116,7 +115,6 @@
       "email": "Email",
       "about": "Giới thiệu (Markdown)",
       "organizations": "Tổ chức",
-      "save": "Lưu hồ sơ",
       "saved": "Đã lưu hồ sơ.",
       "displayRank": "Danh hiệu",
       "displayRankHint": "Danh hiệu cạnh tên; “banned” chỉ đặt khi cấm.",
@@ -246,7 +244,6 @@
     "noneHeld": "Không có quyền.",
     "direct": "Trực tiếp",
     "via": "qua {role}",
-    "save": "Lưu quyền",
     "saved": "Đã lưu; áp dụng từ yêu cầu tiếp theo của người dùng.",
     "categories": {
       "problems": "Bài tập",
@@ -268,9 +265,7 @@
     "new": "Vai trò mới",
     "name": "Tên",
     "create": "Tạo vai trò",
-    "save": "Lưu vai trò",
     "nameRequired": "Nhập tên vai trò để lưu.",
-    "edit": "Sửa",
     "show": "Quyền",
     "counts": "{members} thành viên · {permissions} quyền",
     "orgAdminNote": "Quản trị viên tổ chức mới được thêm vào vai trò này theo tên; đổi tên sẽ ngừng việc đó."

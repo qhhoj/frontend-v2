@@ -30,7 +30,7 @@ const save = () =>
   <ConfirmDialog
     v-model:visible="visible"
     :title="$t('orgProblems.tagsDialog.title', { code: problem?.code ?? '' })"
-    :confirm-label="$t('orgProblems.tagsDialog.save')"
+    :confirm-label="$t('common.save')"
     :busy="busy"
     :can-confirm="isWithinLimit"
     @confirm="save"

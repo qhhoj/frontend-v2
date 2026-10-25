@@ -219,11 +219,9 @@
     "publishOnHint": "Lời giải mở cho mọi người khi đến giờ này (nếu đã bật công khai).",
     "authors": "Tác giả lời giải",
     "content": "Nội dung (Markdown)",
-    "save": "Lưu lời giải",
     "savedToast": "Đã lưu lời giải."
   },
   "data": {
-    "save": "Lưu cấu hình",
     "badJson": "JSON chưa hợp lệ.",
     "archive": {
       "title": "Gói dữ liệu",

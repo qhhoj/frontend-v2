@@ -41,7 +41,7 @@ const rejudgeLabel = computed(() => {
     return translate('admin.rejudge.confirm.labelCount', {
       count: formatNumber(state.count, locale.locale),
     });
-  return translate('admin.rejudge.confirm.labelPlain');
+  return translate('common.rejudge');
 });
 const rescoreLine = computed(() => {
   const preview = rescorer.preview.value;
@@ -97,7 +97,7 @@ async function confirmRescore() {
   <ConfirmDialog
     v-model:visible="isRescoreOpen"
     :title="$t('admin.rejudge.rescore.title')"
-    :confirm-label="$t('admin.rejudge.rescore.confirm')"
+    :confirm-label="$t('common.rescore')"
     :busy="rescorer.isPending.value"
     :can-confirm="canConfirmRescore(rescorer.preview.value)"
     @confirm="confirmRescore"

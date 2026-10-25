@@ -1,6 +1,6 @@
 {
   "lead": "Khóa cho hệ thống bên ngoài tạo kỳ thi riêng tư, đặt thí sinh và đọc bảng điểm.",
-  "add": "Thêm hệ thống",
+  "add": "Tạo hệ thống",
   "impersonating": "Bạn đang xem dưới tên người khác: không tạo hay thu hồi khóa được.",
   "form": {
     "title": "Tạo khóa mới",
@@ -19,15 +19,13 @@
     "actsAsHint": "Tên người dùng có quyền tạo kỳ thi riêng tư; kỳ thi tạo ra mang tên người này.",
     "expires": "Hết hạn",
     "expiresHint": "Phải sau thời điểm hiện tại. Để trống nếu khóa dùng đến khi bị thu hồi.",
-    "submit": "Tạo khóa",
-    "cancel": "Hủy"
+    "submit": "Tạo khóa"
   },
   "key": {
     "title": "Khóa của {name}",
     "warning": "Khóa chỉ hiển thị một lần — hệ thống chỉ lưu giá trị băm. Sao chép khóa vào hệ thống bên ngoài trước khi đóng.",
     "label": "Khóa tích hợp",
     "saved": "Tôi đã lưu khóa này",
-    "close": "Đóng",
     "copy": "Sao chép khóa"
   },
   "table": {

@@ -86,8 +86,6 @@
     "rate": "Tính rating",
     "pager": "Trang danh sách kỳ thi",
     "bulk": {
-      "show": "Hiện",
-      "hide": "Ẩn",
       "showTitle": "Hiện {count} kỳ thi?",
       "hideTitle": "Ẩn {count} kỳ thi?",
       "showConfirm": "Hiện các kỳ thi đã chọn",
@@ -275,7 +273,6 @@
     "submit": "Tạo kỳ thi",
     "lead": "Điền thông tin và thời gian; mọi mục khác có thể sửa sau. Sau khi tạo: thêm bài.",
     "required": "Trường có dấu * là bắt buộc.",
-    "cancel": "Hủy",
     "done": "Đã tạo kỳ thi {key}. Tiếp theo: thêm bài."
   },
   "problems": {
@@ -345,7 +342,6 @@
     "justPosted": "Vừa đăng",
     "resend": "Gửi lại cho những người chưa nhận được",
     "resent": "Đã gửi lại cho những người chưa nhận được.",
-    "delete": "Xóa",
     "deleteTitle": "Xóa thông báo “{title}”?",
     "deleteBody": "Thí sinh không còn thấy thông báo này.",
     "empty": "Chưa có thông báo nào.",
@@ -396,7 +392,6 @@
       "expiryAt": "Vào lúc",
       "amountLabel": "Số lượng",
       "atLabel": "Thời điểm hết hạn",
-      "save": "Lưu liên kết",
       "regenerate": "Tạo lại đường dẫn",
       "regenerateTitle": "Tạo lại đường dẫn?",
       "regenerateBody": "Đường dẫn cũ sẽ ngừng hoạt động ngay.",
@@ -414,10 +409,8 @@
     "rescore": {
       "title": "Tính lại điểm",
       "description": "Tính lại điểm và hạng của mọi lượt tham gia từ các bài nộp hiện có. Chạy nền.",
-      "button": "Tính lại điểm",
       "confirmTitle": "Tính lại điểm kỳ thi?",
-      "confirmBody": "Điểm và hạng của {count} lượt tham gia sẽ được tính lại từ bài nộp. Bảng xếp hạng có thể thay đổi trong lúc chạy.",
-      "confirm": "Tính lại"
+      "confirmBody": "Điểm và hạng của {count} lượt tham gia sẽ được tính lại từ bài nộp. Bảng xếp hạng có thể thay đổi trong lúc chạy."
     },
     "judgeFinal": {
       "title": "Chấm lần cuối",
@@ -529,7 +522,6 @@
       "unknown_tag": "Nhãn không tồn tại."
     },
     "selected": "Đã chọn {count}",
-    "clear": "Bỏ chọn",
     "selectPage": "Chọn cả trang",
     "selectRow": "Chọn {name}"
   },

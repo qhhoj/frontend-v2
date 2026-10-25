@@ -55,7 +55,7 @@ const statusCell = () =>
   <ConfirmDialog
     v-model:visible="isMoveOpen"
     :title="$t('admin.contestOps.participants.moveStartTitle', { username })"
-    :confirm-label="$t('admin.ui.save')"
+    :confirm-label="$t('common.save')"
     :busy="moveStart.isPending.value"
     :can-confirm="Boolean(start) && !hasUnreadableDate"
     :width="520"

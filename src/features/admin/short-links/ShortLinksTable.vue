@@ -38,7 +38,7 @@ const dateOrDash = (value: string | null) =>
 const menuItems = (link: ShortLink) => [
   { label: t('admin.shortlinks.table.open'), icon: ExternalLink, to: link.path },
   {
-    label: t('admin.shortlinks.table.delete'),
+    label: t('common.delete'),
     icon: Trash2,
     danger: true,
     run: () => emit('remove', link),
@@ -90,7 +90,7 @@ const menuItems = (link: ShortLink) => [
     </template>
     <template #actions="{ row }">
       <AdminRowMenu
-        :label="$t('admin.table.rowMenu', { name: `/s/${row.code}` })"
+        :label="$t('common.table.rowMenu', { name: `/s/${row.code}` })"
         :items="menuItems(row)"
       />
     </template>

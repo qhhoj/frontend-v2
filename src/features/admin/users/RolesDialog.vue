@@ -97,7 +97,7 @@ const titleId = useId();
                   :class="BUTTON.secondary"
                   @click="editing = role"
                 >
-                  {{ $t('admin.users.roles.edit') }}
+                  {{ $t('common.edit') }}
                 </button>
               </span>
             </div>

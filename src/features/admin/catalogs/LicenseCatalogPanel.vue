@@ -59,7 +59,7 @@ const columns = computed<AdminColumn[]>(() => [
         @click="editing = row"
       >
         <Pencil aria-hidden="true" class="size-4" :stroke-width="1.75" />
-        {{ $t('admin.catalogs.edit') }}
+        {{ $t('common.edit') }}
       </button>
     </template>
   </AdminDataTable>

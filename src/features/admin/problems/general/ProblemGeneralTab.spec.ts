@@ -49,7 +49,7 @@ describe('ProblemGeneralTab', () => {
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
     await wrapper.get('#problem-points').setValue('1500');
-    await buttonLabelled(wrapper, 'Lưu thay đổi').trigger('click');
+    await buttonLabelled(wrapper, 'Lưu').trigger('click');
     expect(wrapper.get('fieldset').attributes('disabled')).toBeDefined();
     await flushPromises();
     expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ points: 1500 });
@@ -82,7 +82,7 @@ describe('ProblemGeneralTab', () => {
     await queryClient.invalidateQueries({ queryKey: ['admin', 'problem', 'hcmus41c'] });
     await flushPromises();
     expect(pointsBox()).toBe('1500');
-    await buttonLabelled(wrapper, 'Lưu thay đổi').trigger('click');
+    await buttonLabelled(wrapper, 'Lưu').trigger('click');
     await flushPromises();
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
 
@@ -103,7 +103,7 @@ describe('ProblemGeneralTab', () => {
     });
     const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/general');
     await wrapper.get('#problem-code').setValue('hcmus41c2');
-    await buttonLabelled(wrapper, 'Lưu thay đổi').trigger('click');
+    await buttonLabelled(wrapper, 'Lưu').trigger('click');
     await flushPromises();
     expect(router.currentRoute.value.fullPath).toBe('/admin/problems/hcmus41c2/general');
   });
@@ -182,7 +182,7 @@ describe('ProblemGeneralTab', () => {
     const saved = await mountAdmin('/admin/problems/hcmus41c/general');
     seedCache(saved.queryClient, STALE_AFTER_WRITE);
     await saved.wrapper.get('#problem-points').setValue('1500');
-    await buttonLabelled(saved.wrapper, 'Lưu thay đổi').trigger('click');
+    await buttonLabelled(saved.wrapper, 'Lưu').trigger('click');
     await flushPromises();
     expect(invalidatedKeys(saved.queryClient, STALE_AFTER_WRITE)).toEqual(STALE_AFTER_WRITE);
     saved.wrapper.unmount();
@@ -278,7 +278,7 @@ describe('ProblemGeneralTab', () => {
     });
     const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/general');
     await wrapper.get('#problem-points').setValue('1500');
-    await buttonLabelled(wrapper, 'Lưu thay đổi').trigger('click');
+    await buttonLabelled(wrapper, 'Lưu').trigger('click');
     await flushPromises();
     expect(router.currentRoute.value.query.view).toBe('advanced');
     expect(wrapper.get('#problem-source').attributes('aria-invalid')).toBe('true');

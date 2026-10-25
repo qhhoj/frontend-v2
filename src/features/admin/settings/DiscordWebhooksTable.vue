@@ -167,7 +167,7 @@ const failure = computed(() => writer.failure.value ?? tester.failure.value);
               :class="BUTTON.primary"
               :aria-disabled="writer.isPending.value || undefined"
             >
-              {{ $t('admin.settings.webhooks.save') }}
+              {{ $t('common.save') }}
             </button>
             <button type="button" :class="BUTTON.secondary" @click="editing = null">
               {{ $t('admin.settings.secret.cancelReplace') }}

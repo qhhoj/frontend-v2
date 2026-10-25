@@ -53,7 +53,6 @@
     "title": "Tiêu đề",
     "problem": "Mã bài liên kết",
     "problemHint": "Gắn phiếu sang bài khác; để nguyên nếu giữ liên kết.",
-    "save": "Lưu",
     "saved": "Đã lưu."
   },
   "total": "{count} phiếu"

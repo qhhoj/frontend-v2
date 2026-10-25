@@ -30,7 +30,6 @@
     "chosen": "Chosen",
     "never": "Never",
     "expired": "Expired",
-    "delete": "Delete",
     "deleteLabel": "Delete link {code}",
     "empty": "No short links yet.",
     "pager": "Short-link pages",

@@ -25,7 +25,7 @@
   },
   "empty": "Chưa có ngôn ngữ nào.",
   "form": {
-    "addTitle": "Thêm ngôn ngữ",
+    "addTitle": "Tạo ngôn ngữ",
     "editTitle": "Sửa {key}",
     "notFound": "Không có ngôn ngữ “{key}”.",
     "back": "Về danh sách",
@@ -64,8 +64,6 @@
     "sealed": "Cố định",
     "required": "Trường có dấu * là bắt buộc. Mã ngôn ngữ không đổi được sau khi tạo.",
     "create": "Tạo ngôn ngữ",
-    "save": "Lưu thay đổi",
-    "cancel": "Hủy",
     "saved": "Đã lưu.",
     "savedToast": "Đã lưu ngôn ngữ {key}.",
     "createdToast": "Đã tạo ngôn ngữ {key}.",
@@ -81,7 +79,7 @@
     }
   },
   "actions": {
-    "add": "Thêm ngôn ngữ"
+    "add": "Tạo ngôn ngữ"
   },
   "addOnly": "Bạn chỉ được thêm ngôn ngữ mới, không xem hay sửa được danh sách ngôn ngữ hiện có.",
   "judgesUnavailable": "Không tải được máy chấm, nên không hiện máy chấm hỗ trợ."

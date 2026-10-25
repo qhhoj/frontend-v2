@@ -207,11 +207,7 @@ const fieldAttrs = (invalid: unknown, describedBy: string | undefined) => ({
       :saved-at="savedAt"
       :allow-clean="isCreate"
       :blocked-reason="isLogoUploading ? $t('admin.organizations.editor.logoUploading') : undefined"
-      :save-label="
-        isCreate
-          ? $t('admin.organizations.editor.createSubmit')
-          : $t('admin.organizations.editor.save')
-      "
+      :save-label="isCreate ? $t('admin.organizations.editor.createSubmit') : $t('common.save')"
       @discard="discard"
     />
     <AdminLeaveGuard :dirty-count="dirtyCount" />

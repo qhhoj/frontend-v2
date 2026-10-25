@@ -25,7 +25,7 @@ const mountAdmin = async (path: string) => {
 const buttonLabelled = (wrapper: Mounted['wrapper'], label: string) =>
   wrapper.findAll('button').find((button) => button.text() === label)!;
 const saveConfig = async (wrapper: Mounted['wrapper']) => {
-  await buttonLabelled(wrapper, 'Lưu cấu hình').trigger('click');
+  await buttonLabelled(wrapper, 'Lưu').trigger('click');
   await flushPromises();
 };
 

@@ -48,8 +48,6 @@
       "tagProblem": "Tagged problem"
     },
     "hiddenBy": "Hidden by {name}",
-    "hide": "Hide",
-    "show": "Show",
     "bulk": {
       "hide": "Hide selected",
       "show": "Show selected"
@@ -89,11 +87,9 @@
     }
   },
   "edit": {
-    "action": "Edit",
     "title": "Edit the comment",
     "label": "Comment text (Markdown)",
     "hint": "Saved as a new version: the author and moderators see the history.",
-    "save": "Save",
     "loading": "Loading the comment…",
     "loadFailed": "Could not load the comment. It may be deleted or out of your reach.",
     "blank": "The comment cannot be empty.",

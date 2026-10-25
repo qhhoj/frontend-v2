@@ -46,7 +46,7 @@ describe('ContestActionsTab', () => {
     await click(wrapper, 'Tính lại điểm');
     expect(openDialog().textContent).toContain('214 lượt tham gia');
     expect(calls.some((call) => call.path.endsWith('/rescore'))).toBe(false);
-    await confirmDialog('Tính lại');
+    await confirmDialog('Tính lại điểm');
     expect(calls.some((call) => call.path.endsWith('/rescore'))).toBe(true);
     const card = wrapper.get('[data-testid="action-rescore"]');
     expect(card.get('[role="status"]').text()).toContain('Đang chờ trong hàng chạy nền');

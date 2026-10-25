@@ -2,7 +2,7 @@
   "title": "Contest tags",
   "lead": "Tags shown on the contest list. The colour is one of the theme's colours.",
   "caption": "Contest tag catalogue",
-  "createTitle": "Add a tag",
+  "createTitle": "Create a tag",
   "editTitle": "Edit tag “{name}”",
   "full": "The catalogue holds 100 tags. Delete one to add another.",
   "sample": "Sample tag",
@@ -25,8 +25,7 @@
     "order": "A whole number from -1000 to 1000.",
     "slugTaken": "This key is already taken. Choose another."
   },
-  "create": "Add tag",
-  "save": "Save tag",
+  "create": "Create tag",
   "created": "Tag added.",
   "saved": "Tag saved.",
   "empty": "No tags yet. Press “Add tag” to create the first one.",
@@ -38,7 +37,6 @@
     "actions": "Actions",
     "contests": "Contests"
   },
-  "edit": "Edit",
   "remove": "Delete tag",
   "removeTitle": "Delete tag “{name}”?",
   "removeBody": "Contests tagged {slug} keep the tag and show it as a neutral chip.",

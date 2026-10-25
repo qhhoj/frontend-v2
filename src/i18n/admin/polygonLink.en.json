@@ -204,7 +204,6 @@
   "progress": {
     "title": "Import from Polygon",
     "lead": "The package is processed in the background. You can leave; the import keeps running and stays in “My imports”.",
-    "retry": "Try again",
     "another": "Import another problem",
     "outcome": {
       "import": {
@@ -363,7 +362,6 @@
       "options": "Options",
       "autoSync": "Auto-sync"
     },
-    "edit": "Edit",
     "editLabel": "Edit the sync options",
     "turnOn": "Turn on",
     "turnOff": "Turn off",
@@ -385,8 +383,6 @@
     "drawer": {
       "title": "Sync options",
       "note": "They apply from the next sync; the problem does not change now.",
-      "save": "Save options",
-      "cancel": "Cancel",
       "noLanguages": "The saved options pick no statement: the package has one, and it is the main one."
     }
   },

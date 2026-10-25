@@ -203,7 +203,7 @@ const bulkFailure = computed(() => {
           {{ $t('admin.organizations.queue.accept') }}
         </button>
         <AdminRowMenu
-          :label="$t('admin.table.rowMenu', { name: row.username })"
+          :label="$t('common.table.rowMenu', { name: row.username })"
           :items="menuItems(row)"
         />
       </template>

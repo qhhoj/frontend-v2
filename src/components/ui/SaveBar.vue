@@ -162,7 +162,7 @@ function keepFocusAbove() {
         :aria-busy="pending || undefined"
         @click="guardSave"
       >
-        {{ pending ? $t('form.saveBar.saving') : (saveLabel ?? $t('form.saveBar.save')) }}
+        {{ pending ? $t('form.saveBar.saving') : (saveLabel ?? $t('common.save')) }}
       </button>
     </div>
   </div>

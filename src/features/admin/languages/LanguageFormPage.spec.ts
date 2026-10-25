@@ -101,7 +101,7 @@ describe('LanguageFormPage, edit', () => {
     );
     const { wrapper } = await mountForm('/admin/languages/RUBY');
     await fillIn(wrapper, { name: 'Ruby 3' });
-    await press(wrapper, 'Lưu thay đổi');
+    await press(wrapper, 'Lưu');
     expect(writes(calls).map((call) => [call.method, call.path, call.body])).toEqual([
       ['PATCH', `/admin/languages/${ruby().id}`, { name: 'Ruby 3' }],
     ]);

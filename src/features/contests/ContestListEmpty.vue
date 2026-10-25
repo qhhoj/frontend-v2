@@ -42,7 +42,7 @@ const action = computed(() => {
   if (props.isPastLastPage)
     return { to: props.firstPageTarget, labelKey: 'contests.list.empty.backToFirstPage' };
   if (isTagEmpty.value && props.clearTagTarget)
-    return { to: props.clearTagTarget, labelKey: 'contestTags.clear' };
+    return { to: props.clearTagTarget, labelKey: 'common.clearFilters' };
   if (showsUpcomingHint.value)
     return { to: endedTarget.value, labelKey: 'contests.list.empty.seeEnded' };
   return null;

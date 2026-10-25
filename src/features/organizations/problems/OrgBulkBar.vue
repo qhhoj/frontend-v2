@@ -25,6 +25,6 @@ const emit = defineEmits<{ archive: []; unarchive: []; tag: []; clear: [] }>();
     <AppButton :disabled="isPending" @click="emit('unarchive')">
       {{ $t('orgProblems.bulk.unarchive') }}
     </AppButton>
-    <AppButton tone="ghost" @click="emit('clear')">{{ $t('orgProblems.bulk.clear') }}</AppButton>
+    <AppButton tone="ghost" @click="emit('clear')">{{ $t('common.clearSelection') }}</AppButton>
   </div>
 </template>

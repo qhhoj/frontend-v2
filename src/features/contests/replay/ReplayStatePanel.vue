@@ -48,7 +48,7 @@ const hasRankingLink = computed(() => RANKING_LINK_STATES.includes(props.state))
     </h2>
     <p class="max-w-md text-muted">{{ $t(`replay.states.${state}.body`) }}</p>
     <AppButton v-if="hasRetry" @click="$emit('retry')">
-      {{ $t('replay.states.retry') }}
+      {{ $t('common.retry') }}
     </AppButton>
     <AppButton
       v-else-if="hasRankingLink"

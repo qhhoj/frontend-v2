@@ -75,8 +75,7 @@
         "stream": "Copy the stream address"
       },
       "meta": "Mode: {mode}. Expires: {expiresAt}.",
-      "done": "I have saved the key",
-      "close": "Close"
+      "done": "I have saved the key"
     }
   }
 }

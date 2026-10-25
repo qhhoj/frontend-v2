@@ -209,9 +209,8 @@
     "note": "Each event goes to its own address, else to Default. Addresses are secret: only the host and the last 4 characters are shown.",
     "set": "Set",
     "replace": "Replace",
-    "remove": "Remove",
+    "remove": "Remove address",
     "test": "Send test",
-    "save": "Save address",
     "url": "https address",
     "usesDefault": "Uses Default",
     "off": "Off",
@@ -260,7 +259,6 @@
     "restoreField": "Restore non-secret fields",
     "confirmTitle": "Restore the previous value?",
     "confirmBody": "The server sets the old value back and writes it as a new revision; the stored secret is kept.",
-    "close": "Close",
     "restored": "Restored {key}."
   },
   "reset": {

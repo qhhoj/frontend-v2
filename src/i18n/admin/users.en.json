@@ -107,7 +107,6 @@
     "banned": "Banned"
   },
   "edit": {
-    "open": "Edit",
     "profile": {
       "title": "Profile",
       "displayName": "Display name",
@@ -116,7 +115,6 @@
       "email": "E-mail",
       "about": "About (Markdown)",
       "organizations": "Organizations",
-      "save": "Save profile",
       "saved": "Profile saved.",
       "displayRank": "Display rank",
       "displayRankHint": "The title beside the name; “banned” is set by banning.",
@@ -246,7 +244,6 @@
     "noneHeld": "No permissions.",
     "direct": "Direct",
     "via": "via {role}",
-    "save": "Save access",
     "saved": "Access saved; it applies on the user's next request.",
     "categories": {
       "problems": "Problems",
@@ -268,9 +265,7 @@
     "new": "New role",
     "name": "Name",
     "create": "Create role",
-    "save": "Save role",
     "nameRequired": "Enter a role name to save.",
-    "edit": "Edit",
     "show": "Permissions",
     "counts": "{members} members · {permissions} permissions",
     "orgAdminNote": "New organization admins join this role by its name; renaming it stops that."

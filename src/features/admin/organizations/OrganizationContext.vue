@@ -104,7 +104,7 @@ const recalculation = useOrganizationWrite<string, void>({
         @click="recalculation.run(organization.slug)"
       >
         <RefreshCw aria-hidden="true" class="size-4" :stroke-width="1.75" />
-        {{ $t('admin.organizations.context.recalculate') }}
+        {{ $t('common.rescore') }}
       </button>
     </div>
     <AdminStatus

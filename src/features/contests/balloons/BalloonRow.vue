@@ -55,7 +55,7 @@ const emit = defineEmits<{ toggle: [] }>();
       class="col-span-2 sm:col-span-1"
       @click="emit('toggle')"
     >
-      {{ isDelivered(balloon) ? $t('balloons.undo') : $t('balloons.deliver')
+      {{ isDelivered(balloon) ? $t('common.undo') : $t('balloons.deliver')
       }}<span class="sr-only">
         {{
           $t('balloons.rowName', { label: balloon.problemLabel, team: balloon.team.username })

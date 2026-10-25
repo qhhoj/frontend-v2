@@ -128,7 +128,7 @@ async function save() {
       :dirty-count="dirtyCount"
       :pending="mutation.isPending.value"
       :saved-at="savedAt"
-      :save-label="$t('admin.problems.editorial.save')"
+      :save-label="$t('common.save')"
       @discard="discardAll"
     />
     <AdminLeaveGuard :dirty-count="dirtyCount" />

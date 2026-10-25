@@ -42,7 +42,7 @@ const columns = computed<AdminColumn[]>(() => [
 ]);
 const menuItems = (item: AdminCommentItem) => [
   {
-    label: t('admin.comments.edit.action'),
+    label: t('common.edit'),
     icon: Pencil,
     run: () => emit('edit', item.comment.id),
   },
@@ -105,11 +105,11 @@ const menuItems = (item: AdminCommentItem) => [
           :aria-disabled="busy || undefined"
           @click="busy || $emit('setHidden', row.comment.id, !row.comment.hidden)"
         >
-          {{ row.comment.hidden ? $t('admin.comments.all.show') : $t('admin.comments.all.hide') }}
+          {{ row.comment.hidden ? $t('common.show') : $t('common.hide') }}
         </button>
         <AdminRowMenu
           :label="
-            $t('admin.table.rowMenu', {
+            $t('common.table.rowMenu', {
               name: $t('admin.comments.rowName', { page: row.page.title }),
             })
           "

@@ -181,7 +181,7 @@ function reset() {
           :pending="mutation.isPending.value"
           :saved-at="savedAt"
           :blocked-reason="blockedReason"
-          :save-label="$t('orgAdmin.info.save')"
+          :save-label="$t('common.save')"
           @discard="reset"
         />
       </form>

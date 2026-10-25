@@ -3,25 +3,23 @@
   "tabsLabel": "Danh mục",
   "problem-types": {
     "tab": "Loại bài",
-    "createTitle": "Thêm loại bài",
+    "createTitle": "Tạo loại bài",
     "caption": "Loại bài"
   },
   "problem-groups": {
     "tab": "Nhóm bài",
-    "createTitle": "Thêm nhóm bài",
+    "createTitle": "Tạo nhóm bài",
     "caption": "Nhóm bài"
   },
   "licenses": {
     "tab": "Giấy phép",
-    "createTitle": "Thêm giấy phép",
+    "createTitle": "Tạo giấy phép",
     "caption": "Giấy phép"
   },
   "editTitle": "Sửa “{name}”",
   "noAdd": "Bạn được sửa các dòng có sẵn nhưng không được thêm mới.",
   "empty": "Chưa có gì.",
-  "edit": "Sửa",
-  "create": "Thêm",
-  "save": "Lưu",
+  "create": "Tạo",
   "fields": {
     "name": "Tên",
     "fullName": "Tên đầy đủ",

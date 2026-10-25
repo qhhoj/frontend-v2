@@ -168,7 +168,7 @@ function submit() {
       >
         <template #actions>
           <button type="button" :class="BUTTON.ghost" @click="emit('cancel')">
-            {{ $t('admin.integrations.form.cancel') }}
+            {{ $t('common.cancel') }}
           </button>
         </template>
       </AdminSaveBar>

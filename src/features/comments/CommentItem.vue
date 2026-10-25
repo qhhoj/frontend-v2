@@ -75,22 +75,21 @@ const actions = computed<Action[]>(() => {
   const shown = comment.value;
   const list: Action[] = [];
   if (shown.canEdit && !props.isEditing)
-    list.push(actionOf('edit', t('comments.action.edit'), () => emit('edit')));
+    list.push(actionOf('edit', t('common.edit'), () => emit('edit')));
   if (shown.revisions && (!shown.deleted || props.moderates))
     list.push(
       actionOf('history', t('comments.action.history', { count: shown.revisions }), () =>
         emit('history'),
       ),
     );
-  if (shown.canDelete)
-    list.push(actionOf('delete', t('comments.action.delete'), () => emit('delete')));
+  if (shown.canDelete) list.push(actionOf('delete', t('common.delete'), () => emit('delete')));
   if (props.canReport && !shown.deleted && !shown.hidden)
     list.push(actionOf('report', t('comments.action.report'), () => emit('report')));
   if (props.moderates)
     list.push(
       shown.hidden
         ? actionOf('unhide', t('comments.action.unhide'), () => emit('unhide'), true)
-        : actionOf('hide', t('comments.action.hide'), () => emit('hide'), true),
+        : actionOf('hide', t('common.hide'), () => emit('hide'), true),
     );
   return list;
 });
@@ -136,7 +135,7 @@ const TEXT_BUTTON =
               })
         }}
       </span>
-      <span class="font-semibold text-accent-text">{{ $t('comments.show') }}</span>
+      <span class="font-semibold text-accent-text">{{ $t('common.show') }}</span>
     </button>
     <article
       v-else

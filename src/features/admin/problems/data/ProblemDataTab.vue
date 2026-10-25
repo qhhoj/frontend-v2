@@ -172,7 +172,7 @@ async function submit() {
         :pending="mutation.isPending.value"
         :saved-at="savedAt"
         :blocked-reason="blockedReason"
-        :save-label="$t('admin.problems.data.save')"
+        :save-label="$t('common.save')"
         @discard="discard"
       />
     </div>

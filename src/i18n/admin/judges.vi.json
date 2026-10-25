@@ -1,9 +1,9 @@
 {
   "index": {
     "lead": "Máy chấm đang kết nối, tải và trạng thái. Khóa xác thực chỉ hiện một lần khi tạo hoặc cấp mới.",
-    "addButton": "Thêm máy chấm",
+    "addButton": "Tạo máy chấm",
     "empty": "Chưa có máy chấm nào.",
-    "emptyAdd": "Thêm máy chấm",
+    "emptyAdd": "Tạo máy chấm",
     "search": "Tìm máy chấm",
     "searchPlaceholder": "Tên hoặc IP"
   },
@@ -35,8 +35,6 @@
     "details": "Thông tin máy",
     "started": "Khởi động lúc {time} · ping là trung bình 6 lần gần nhất.",
     "descriptionLabel": "Mô tả (hiện cho nhân viên)",
-    "saveDescription": "Lưu mô tả",
-    "delete": "Xóa",
     "protocol": "Giao thức",
     "features": "Tính năng",
     "lastIp": "IP gần nhất"
@@ -70,18 +68,16 @@
     "warning": "Khóa xác thực chỉ hiển thị một lần — Hệ thống chỉ lưu giá trị băm. Sao chép khóa vào cấu hình máy chấm trước khi đóng.",
     "label": "Khóa xác thực",
     "saved": "Tôi đã lưu khóa này",
-    "close": "Đóng",
     "copy": "Sao chép khóa"
   },
   "add": {
-    "title": "Thêm máy chấm",
+    "title": "Tạo máy chấm",
     "nameLabel": "Tên máy (khớp id khi máy chấm kết nối)",
     "nameHint": "Chỉ dùng chữ, số, “_”, “.” hoặc “-” (tối đa 50 ký tự).",
     "nameInvalid": "Chỉ dùng chữ, số, “_”, “.” hoặc “-” (tối đa 50 ký tự).",
     "nameTaken": "Tên máy đã được dùng.",
     "descriptionLabel": "Mô tả",
     "descriptionHint": "Tối đa 10 000 ký tự.",
-    "cancel": "Hủy",
     "submit": "Tạo và lấy khóa",
     "descriptionTooLong": "Tối đa 10 000 ký tự."
   },

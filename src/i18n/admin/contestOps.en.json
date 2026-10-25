@@ -1,6 +1,5 @@
 {
   "unsaved": "Unsaved changes.",
-  "cancel": "Cancel",
   "general": {
     "rescoreNotice": "Saving these changes rescores every participation in the background, and re-rates the contest if it has ratings.",
     "rescoreTitle": "Saving will rescore"
@@ -22,7 +21,6 @@
     "rescoreQueued": "Rescore of {code} queued.",
     "rejudged": "{count} submissions of {code} queued for judging.",
     "rejudgeTitle": "Rejudge problem {label}?",
-    "rejudgeConfirm": "Rejudge",
     "counting": "Counting submissions…",
     "willRejudge": "{count} submissions of {code} in this contest will be judged again. Results change as they finish.",
     "includeLocked": "Also rejudge locked submissions"
@@ -76,7 +74,7 @@
     "confirmTitle": "Delete contest {key}?",
     "confirmBody": "Everything that belongs to this contest is deleted. This cannot be undone.",
     "keyLabel": "Type {key} to confirm",
-    "confirm": "Delete",
+    "confirm": "Delete contest",
     "done": "Deleted contest {key}."
   },
   "participants": {
@@ -91,8 +89,6 @@
     "moveStart": "Change start",
     "moveStartTitle": "Change the start of {username}?",
     "moveStartBody": "A timed participant gets a new window from this time. The participation is recomputed.",
-    "recompute": "Recompute",
-    "delete": "Delete",
     "deleteTitle": "Delete the participation of {username}?",
     "deleteBody": "Only a participation without submissions can be deleted. To remove someone with submissions, take them off the board instead.",
     "filters": {
@@ -130,7 +126,6 @@
     "tiebreakerOf": "Tiebreaker: {value}"
   },
   "announcements": {
-    "edit": "Edit",
     "editNote": "Edits keep the original post time and are not sent again. Use resend to notify.",
     "previewLabel": "Preview",
     "previewEmpty": "Nothing to preview yet.",

@@ -177,7 +177,7 @@ const signOut = useLogout(() => router.push({ name: 'login' }));
       </p>
       <AuthError :text="summary" />
       <AppButton ref="keyButton" block :disabled="pending" @click="signInWithKey">
-        {{ keyAttempted ? $t('auth.twoFactor.retryKey') : $t('auth.twoFactor.useKey') }}
+        {{ keyAttempted ? $t('common.retry') : $t('auth.twoFactor.useKey') }}
       </AppButton>
     </template>
     <AppButton v-else-if="view === 'sessionChanged'" tone="primary" block @click="signOut">

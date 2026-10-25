@@ -219,11 +219,9 @@
     "publishOnHint": "The editorial opens to everyone at this time (when publishing is on).",
     "authors": "Editorial authors",
     "content": "Content (Markdown)",
-    "save": "Save editorial",
     "savedToast": "Editorial saved."
   },
   "data": {
-    "save": "Save configuration",
     "badJson": "Invalid JSON.",
     "archive": {
       "title": "Data archive",

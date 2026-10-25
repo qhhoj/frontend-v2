@@ -112,7 +112,7 @@ function leaveAfterKey() {
       >
         <template #actions>
           <RouterLink :to="{ name: 'admin-judges' }" :class="buttonClass('ghost')">
-            {{ $t('admin.judges.add.cancel') }}
+            {{ $t('common.cancel') }}
           </RouterLink>
         </template>
       </AdminSaveBar>

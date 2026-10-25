@@ -3,25 +3,23 @@
   "tabsLabel": "Catalogs",
   "problem-types": {
     "tab": "Problem types",
-    "createTitle": "Add a problem type",
+    "createTitle": "Create a problem type",
     "caption": "Problem types"
   },
   "problem-groups": {
     "tab": "Problem groups",
-    "createTitle": "Add a problem group",
+    "createTitle": "Create a problem group",
     "caption": "Problem groups"
   },
   "licenses": {
     "tab": "Licenses",
-    "createTitle": "Add a license",
+    "createTitle": "Create a license",
     "caption": "Licenses"
   },
   "editTitle": "Edit “{name}”",
   "noAdd": "You can edit existing rows but not add new ones.",
   "empty": "Nothing here yet.",
-  "edit": "Edit",
-  "create": "Add",
-  "save": "Save",
+  "create": "Create",
   "fields": {
     "name": "Name",
     "fullName": "Full name",

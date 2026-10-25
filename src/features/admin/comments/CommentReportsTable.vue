@@ -177,7 +177,7 @@ const rowName = (item: CommentReportQueueItem) =>
         {{ $t('admin.comments.resolve') }}
       </button>
       <AdminRowMenu
-        :label="$t('admin.table.rowMenu', { name: rowName(row) })"
+        :label="$t('common.table.rowMenu', { name: rowName(row) })"
         :items="menuItems(row)"
       />
     </template>

@@ -324,12 +324,12 @@ const offset = computed(() => (props.selectable ? 1 : 0));
         />
         <slot v-else name="empty">
           <div v-if="filtered" class="flex flex-col items-center gap-3 px-4 py-8 text-center">
-            <p class="text-muted">{{ $t('admin.table.emptyFiltered') }}</p>
+            <p class="text-muted">{{ $t('common.table.emptyFiltered') }}</p>
             <AppButton size="sm" @click="$emit('clear-filters')">
-              {{ $t('admin.table.clearFilters') }}
+              {{ $t('common.clearFilters') }}
             </AppButton>
           </div>
-          <EmptyState v-else>{{ emptyText ?? $t('admin.table.empty') }}</EmptyState>
+          <EmptyState v-else>{{ emptyText ?? $t('common.table.empty') }}</EmptyState>
         </slot>
       </template>
 
@@ -351,7 +351,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
             <span v-if="selectable" class="mt-1 flex shrink-0">
               <DataTableCheckbox
                 :checked="selected.has(rowKey(row))"
-                :label="$t('admin.table.selectRow', { name: labelOf(row) })"
+                :label="$t('common.table.selectRow', { name: labelOf(row) })"
                 @change="toggleRow(row, $event)"
               />
             </span>
@@ -410,7 +410,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
               :aria-controls="`${detailsId}-${index}`"
               @click="toggleDetails(rowKey(row))"
             >
-              {{ $t('admin.table.details') }}
+              {{ $t('common.table.details') }}
               <template #icon>
                 <ChevronDown
                   aria-hidden="true"
@@ -460,7 +460,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                   <DataTableCheckbox
                     :checked="isAllPicked"
                     :indeterminate="isSomePicked"
-                    :label="$t('admin.table.selectPage')"
+                    :label="$t('common.table.selectPage')"
                     @change="toggleAll"
                   />
                 </th>
@@ -505,7 +505,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                   scope="col"
                   :class="[HEAD_CELL, 'sticky top-0 z-10 bg-surface-solid']"
                 >
-                  <span class="sr-only">{{ $t('admin.table.actions') }}</span>
+                  <span class="sr-only">{{ $t('common.table.actions') }}</span>
                 </th>
               </tr>
             </thead>
@@ -525,7 +525,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                 <td v-if="selectable" :class="[CELL, bodyPin(0)?.class]" :style="bodyPin(0)?.style">
                   <DataTableCheckbox
                     :checked="selected.has(rowKey(row))"
-                    :label="$t('admin.table.selectRow', { name: labelOf(row) })"
+                    :label="$t('common.table.selectRow', { name: labelOf(row) })"
                     @change="toggleRow(row, $event)"
                   />
                 </td>
@@ -571,7 +571,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
     >
       <slot name="footer">
         <span v-if="range" class="font-mono tabular-nums">{{
-          $t('admin.table.range', range)
+          $t('common.table.range', range)
         }}</span>
         <NumberedPager
           v-if="pager"

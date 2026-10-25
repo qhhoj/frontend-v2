@@ -3,7 +3,7 @@
   "title": "Thao tác nhân viên",
   "state": {
     "finished": "Chấm lại cần quyền chấm lại trên bài này. Từ chối đặt kết quả RJ khi đã chấm xong.",
-    "running": "Chủ bài nộp hoặc người có quyền hủy mọi bài nộp có thể hủy. Chấm lại và từ chối chờ chấm xong."
+    "running": "Chủ bài nộp hoặc người có quyền dừng chấm mọi bài nộp có thể dừng. Chấm lại và từ chối chờ chấm xong."
   },
   "lock": {
     "since": "Bài nộp bị khóa từ {time}.",
@@ -12,7 +12,7 @@
   "buttons": {
     "rejudge": "Chấm lại",
     "reject": "Từ chối bài nộp",
-    "abort": "Hủy chấm"
+    "abort": "Dừng chấm"
   },
   "reason": {
     "waiting": "Chờ chấm xong.",
@@ -34,15 +34,15 @@
       "label": "Từ chối"
     },
     "abort": {
-      "title": "Hủy chấm bài nộp?",
+      "title": "Dừng chấm bài nộp?",
       "body": "Bài nộp đang chờ sẽ chuyển ngay sang AB; bài nộp đang chạy sẽ được máy chấm dừng lại. Bài đã chấm xong thì không có gì thay đổi.",
-      "label": "Hủy chấm"
+      "label": "Dừng chấm"
     }
   },
   "done": {
     "rejudge": "Đã gửi chấm lại.",
     "reject": "Đã từ chối bài nộp.",
-    "abort": "Đã gửi yêu cầu hủy."
+    "abort": "Đã gửi yêu cầu dừng chấm."
   },
   "conflict": "Bài nộp bị khóa, đang chờ chấm cuối kỳ thi hoặc đang được chấm (409). Chấm lại hàng loạt có tùy chọn “cả bài nộp đã bị khóa”; thao tác từng bài thì không.",
   "judgedOn": "Chấm bởi máy {judge}.",

@@ -38,7 +38,7 @@ const save = () => patch({ notes: draft.value }, () => (isEdited.value = false))
       </label>
       <div class="flex justify-end">
         <AppButton type="submit" tone="primary" :loading="isPending">
-          {{ $t('ticket.saveNotes') }}
+          {{ $t('common.save') }}
         </AppButton>
       </div>
     </form>

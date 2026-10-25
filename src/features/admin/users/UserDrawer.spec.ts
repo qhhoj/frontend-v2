@@ -70,7 +70,7 @@ describe('UserDrawer', () => {
     const calls = mockApi(routes());
     await openWithFullName('Khang Tuấn');
     expect(document.body.textContent).toContain('1 thay đổi chưa lưu');
-    buttonNamed('Lưu hồ sơ')!.click();
+    buttonNamed('Lưu')!.click();
     await flushPromises();
     expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({ fullName: 'Khang Tuấn' });
   });

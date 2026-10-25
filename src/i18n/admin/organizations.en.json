@@ -34,7 +34,6 @@
     "unlisted": "Hidden from the list",
     "notYours": "You do not administer this organization, so you cannot edit it.",
     "createSubmit": "Create organization",
-    "save": "Save changes",
     "logoHint": "An http(s) URL or a site path; the preview is on the left.",
     "logoBroken": "This image does not load. Check the path before saving.",
     "logoPreview": "Avatar preview",
@@ -153,7 +152,6 @@
     "contests": "Contests",
     "posts": "Posts",
     "quota": "Quota",
-    "recalculate": "Recalculate points",
     "recalculateHint": "Recomputes PP and the member count when they drift.",
     "recalculateQueued": "Recalculation queued; the numbers update within minutes."
   },

@@ -209,9 +209,8 @@
     "note": "Mỗi sự kiện gửi tới địa chỉ riêng, nếu không có thì tới Mặc định. Địa chỉ là bí mật: chỉ hiện tên miền và 4 ký tự cuối.",
     "set": "Đặt",
     "replace": "Thay thế",
-    "remove": "Gỡ",
+    "remove": "Gỡ địa chỉ",
     "test": "Gửi thử",
-    "save": "Lưu địa chỉ",
     "url": "Địa chỉ https",
     "usesDefault": "Dùng Mặc định",
     "off": "Tắt",
@@ -260,7 +259,6 @@
     "restoreField": "Khôi phục trường không bí mật",
     "confirmTitle": "Khôi phục giá trị trước?",
     "confirmBody": "Máy chủ đặt lại giá trị cũ và ghi thành một bản mới; bí mật đang lưu được giữ nguyên.",
-    "close": "Đóng",
     "restored": "Đã khôi phục {key}."
   },
   "reset": {

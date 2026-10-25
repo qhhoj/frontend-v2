@@ -76,7 +76,7 @@ export function useParticipationActions(contestKey: () => string) {
       run: () => openDialog('moveStart', row),
     },
     {
-      label: translate('admin.contestOps.participants.recompute'),
+      label: translate('common.rescore'),
       icon: RefreshCw,
       run: () => void recompute.run(row),
     },
@@ -93,7 +93,7 @@ export function useParticipationActions(contestKey: () => string) {
           run: () => openDialog('disqualify', row),
         },
     {
-      label: translate('admin.contestOps.participants.delete'),
+      label: translate('common.delete'),
       icon: Trash2,
       danger: true,
       run: () => openDialog('delete', row),

@@ -22,8 +22,7 @@
     "dateFrom": "Nộp từ",
     "dateTo": "Nộp trước",
     "siteWide": "Không có bài hay kỳ thi: thao tác áp dụng cho cả trang. {permission}.",
-    "presets": "Chọn nhanh:",
-    "rescore": "Tính lại điểm"
+    "presets": "Chọn nhanh:"
   },
   "summary": {
     "title": "Bộ lọc đã chọn",
@@ -36,7 +35,6 @@
     "allResults": "Mọi kết quả",
     "locked": "Bài bị khóa",
     "lockedSkip": "Bỏ qua",
-    "lockedRejudge": "Chấm lại",
     "countNote": "Số bài nộp khớp hiện trong hộp xác nhận: bấm “Chấm lại” sẽ đếm trước, chưa đặt lại gì.",
     "lastResult": "Kết quả gần nhất",
     "scope": "Phạm vi",
@@ -55,7 +53,6 @@
     "line": "Bộ lọc: {scope} · {user} · {judge} · {languages} · {results} · từ {from} đến {to} · bài bị khóa: {locked}",
     "labelCount": "Chấm lại {count} bài nộp",
     "labelCounting": "Đang đếm",
-    "labelPlain": "Chấm lại",
     "count": {
       "counting": "Đang đếm",
       "countingText": "Đang hỏi máy chủ (dryRun). Chưa có gì bị đặt lại.",
@@ -80,7 +77,6 @@
   },
   "rescore": {
     "title": "Tính lại điểm các bài nộp khớp?",
-    "confirm": "Tính lại điểm",
     "preview": "{count} bài nộp đã chấm khớp; tính lại {problems} bài, {contests} kỳ thi.",
     "body": "Điểm được tính lại từ kết quả từng test theo điểm và chế độ chấm từng phần hiện tại của bài, rồi cập nhật điểm người dùng và kết quả kỳ thi. Dùng sau khi đổi điểm bài.",
     "done": "Đã xếp lịch tính lại {problems} bài và {contests} kỳ thi ({count} bài nộp khớp)."

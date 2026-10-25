@@ -53,7 +53,6 @@
     "title": "Title",
     "problem": "Linked problem code",
     "problemHint": "Moves the ticket to another problem; leave it to keep the link.",
-    "save": "Save",
     "saved": "Saved."
   },
   "total": "{count} ticket | {count} tickets"
