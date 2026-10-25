@@ -1,14 +1,17 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { useSocialProvidersQuery } from './auth.queries';
 import { SOCIAL_PROVIDER_LABELS, socialStartUrl } from './social-providers';
+import { rememberSocialReturn } from './social-return';
 
 /**
  * Not a `QueryState`: the buttons are an extra next to a working form, so a failure or an empty list renders nothing
  * and the wait registers no Bits. The skeleton mirrors the divider and two buttons.
  */
 const { data: providers, isPending } = useSocialProvidersQuery();
+const route = useRoute();
 const ROW = 'grid grid-cols-[repeat(auto-fit,minmax(6rem,1fr))] gap-2';
 </script>
 
@@ -35,6 +38,7 @@ const ROW = 'grid grid-cols-[repeat(auto-fit,minmax(6rem,1fr))] gap-2';
         v-for="provider in providers"
         :key="provider"
         :href="socialStartUrl(provider)"
+        @click="rememberSocialReturn(route.query.redirect)"
         :aria-label="$t('auth.social.signInWith', { provider: SOCIAL_PROVIDER_LABELS[provider] })"
       >
         {{ SOCIAL_PROVIDER_LABELS[provider] }}

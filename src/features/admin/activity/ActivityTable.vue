@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { keepPreviousData, useQuery } from '@tanstack/vue-query';
+import { useQuery } from '@tanstack/vue-query';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -17,6 +17,7 @@ import type { AdminColumn } from '../ui/table/table-columns';
 import ActivityIp from './ActivityIp.vue';
 import { isFilteredActivity, toActivityRequest } from './activity';
 import type { ActivityFilter } from './activity';
+import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
 
 const props = defineProps<{ filter: ActivityFilter }>();
 defineEmits<{ 'clear-filters': [] }>();
@@ -33,7 +34,7 @@ const request = computed(() => ({ ...toActivityRequest(props.filter), page: page
 const logs = useQuery({
   queryKey: computed(() => ['admin', 'activity', 'logs', request.value, viewer.value]),
   queryFn: () => fetchActivityLogs(request.value),
-  placeholderData: keepPreviousData,
+  placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
 });
 
 /** A new filter starts at the first page; the previous rows stay on screen until the new ones arrive. */

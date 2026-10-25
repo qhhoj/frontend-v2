@@ -16,6 +16,7 @@ import {
   fetchUserPosts,
 } from '@/api/users.api';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
 
 /** Idle while `username` is empty (anonymous viewer). The answer lists organizations by the viewer's rights. */
 export const useUserPageQuery = (username: MaybeRefOrGetter<string>) => {
@@ -95,7 +96,7 @@ export const useUserPostsQuery = (
   return useQuery({
     queryKey: computed(() => ['users', 'posts', toValue(username), toValue(page), viewer.value]),
     queryFn: () => fetchUserPosts(toValue(username), toValue(page)),
-    placeholderData: keepPreviousData,
+    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
   });
 };
 

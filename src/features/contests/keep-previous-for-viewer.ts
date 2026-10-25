@@ -15,3 +15,13 @@ export const keepPreviousForSameViewer =
   <T>(previous: T | undefined, previousQuery: QueryWithKey | undefined): T | undefined => {
     return previousQuery?.queryKey[viewerIdIndex] === viewerId ? previous : undefined;
   };
+
+/**
+ * Same rule when the viewer id sits at no fixed place in the key (a page, a filter or a slug may come before it):
+ * the previous data stays only when its key carries `viewerId`, the check `dropAccountData` makes too.
+ */
+export const keepPreviousForViewer =
+  (viewerId: string) =>
+  <T>(previous: T | undefined, previousQuery: QueryWithKey | undefined): T | undefined => {
+    return previousQuery?.queryKey.includes(viewerId) ? previous : undefined;
+  };

@@ -1,6 +1,8 @@
 import { flushPromises } from '@vue/test-utils';
 import { defineComponent, h } from 'vue';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { useSessionStore } from '@/stores/session.store';
+import { sessionUser } from '@/test/fixtures';
 import { mockApi, noContent, ok, page } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
 import { notificationItem } from '@/test/notification-fixtures';
@@ -52,5 +54,41 @@ describe('notification queries', () => {
     await flushPromises();
     expect(wrapper.get('#count').text()).toBe('1');
     expect(calls.filter((call) => call.path === '/notifications')).toHaveLength(2);
+  });
+});
+
+describe('notification queries across a session change', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("shows none of account A's rows to account B while B's answer is on its way", async () => {
+    const json = (body: unknown) =>
+      new Response(JSON.stringify(body), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: string) => {
+        if (input.includes('/auth/me'))
+          return Promise.resolve(
+            json({ error: { code: 'unauthorized', message: 'Unauthorized' } }),
+          );
+        if (useSessionStore().user?.id === 'user-a')
+          return Promise.resolve(json(page([notificationItem()]).body));
+        return new Promise<Response>(() => {});
+      }),
+    );
+    const wrapper = mountComponent(Probe);
+    const session = useSessionStore();
+    await flushPromises();
+    session.user = sessionUser({ id: 'user-a' });
+    await flushPromises();
+    expect(wrapper.get('#rows').text()).toBe('1');
+
+    session.user = null; // the signed-out gap: the query is disabled and holds A's rows
+    await flushPromises();
+    session.user = sessionUser({ id: 'user-b' });
+    await flushPromises();
+    expect(wrapper.get('#rows').text()).toBe('-');
   });
 });

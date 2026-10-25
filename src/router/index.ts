@@ -10,6 +10,7 @@ import { onGateRequired } from '@/api/client';
 import { i18n, translate } from '@/i18n';
 import { useLoadingStore } from '@/stores/loading.store';
 import { useSessionStore } from '@/stores/session.store';
+import { takeSocialReturn } from '@/features/auth/social-return';
 import { focusMain } from './focus-main';
 import { resolveNavigation } from './guards';
 import { trackFirstPage } from '@/lib/arrived-by-redirect';
@@ -95,11 +96,23 @@ export function installLostSessionRedirect(router: Router) {
   });
 }
 
+/**
+ * A social sign-in lands on `/` signed in: go on to the page the viewer came from (kept by `rememberSocialReturn`).
+ * It runs after the session guard, so the session is loaded; a landing on `/` signed out or by any other route keeps the note for its page.
+ */
+function installSocialReturn(router: Router) {
+  router.beforeEach((to) => {
+    if (to.path !== '/' || useSessionStore().status !== 'authenticated') return true;
+    return takeSocialReturn() ?? true;
+  });
+}
+
 export function createAppRouter(history: RouterHistory = createWebHistory()): Router {
   const router = createRouter({ history, routes, scrollBehavior: scrollOnNavigation });
   installNavigationLoading(router);
   installGateSync(router);
   installLostSessionRedirect(router);
+  installSocialReturn(router);
   trackFirstPage(router);
   const titleDocument = () => {
     if (typeof document === 'undefined') return; // hook can fire after the DOM is torn down

@@ -18,6 +18,7 @@ import {
 } from './list/submission-scope';
 import type { SubmissionScope } from './list/submission-scope';
 import type { SubmissionFilters } from './use-submission-filters';
+import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
 
 /** The server caches the stats for 30 s: polling faster would only read the same answer. */
 const STATS_REFRESH_MS = 30_000;
@@ -79,7 +80,7 @@ export const useBestSubmissionsQuery = (code: Ref<string>, page: Ref<number>) =>
     queryKey: computed(() => ['submissions', 'best', viewerId.value, code.value, page.value]),
     queryFn: () =>
       fetchBestSubmissions(code.value, { page: page.value, pageSize: SUBMISSION_PAGE_SIZE }),
-    placeholderData: keepPreviousData,
+    placeholderData: computed(() => keepPreviousForViewer(viewerId.value)),
   });
 };
 

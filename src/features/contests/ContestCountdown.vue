@@ -10,13 +10,27 @@ import { formatClock, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 
-/** `virtualRun`: the viewer's running virtual run of this ended contest; the big clock counts its time left. */
-const props = defineProps<{ contest: ContestDetail; virtualRun?: ParticipationSummary | null }>();
+/**
+ * `virtualRun`: the viewer's running virtual run of this ended contest; the big clock counts its time left.
+ * `liveRun`: the viewer's running live participation; its own window (a timed contest) can close before the contest does.
+ */
+const props = defineProps<{
+  contest: ContestDetail;
+  virtualRun?: ParticipationSummary | null;
+  liveRun?: ParticipationSummary | null;
+}>();
 const emit = defineEmits<{ elapsed: [] }>();
 const locale = useLocaleStore();
 const now = useNow();
 /** Follows the clock (start, then end, then nothing) even before the refetch answers. */
-const target = computed(() => countdownTarget(props.contest, now.value));
+const target = computed(() => {
+  const contestTarget = countdownTarget(props.contest, now.value);
+  const windowEnd = props.liveRun?.endTime;
+  if (contestTarget?.kind !== 'end' || !windowEnd) return contestTarget;
+  return Date.parse(windowEnd) < Date.parse(contestTarget.at)
+    ? { kind: 'end' as const, at: windowEnd }
+    : contestTarget;
+});
 /**
  * The target moved on (start to end, end to none): the page refetches for the new phase. Counted from the
  * clock rather than from the timer's own zero, which the flip can unmount before it fires.

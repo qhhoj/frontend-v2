@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { RouteLocationNormalized } from 'vue-router';
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import CopyButton from '@/components/CopyButton.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { buttonClasses } from '@/components/ui/button-classes';
+import { useSessionStore } from '@/stores/session.store';
 import SettingsNotice from '../settings/SettingsNotice.vue';
 import { formatScratchCode, scratchCodesText } from './totp-setup';
 
@@ -16,6 +17,10 @@ const DONE_BUTTON = buttonClasses({ tone: 'primary' });
 const props = defineProps<{ codes: string[]; username: string; notice: string }>();
 const emit = defineEmits<{ done: [] }>();
 const router = useRouter();
+const session = useSessionStore();
+/** The codes belong to the signed-in account: once the session ends nothing is left to protect, and they go. */
+const sessionEnded = computed(() => session.user === null);
+watch(sessionEnded, (ended) => ended && emit('done'));
 const acknowledged = ref(false);
 const reminded = ref(false);
 const leaveOpen = ref(false);
@@ -69,7 +74,7 @@ function leaveAnyway() {
 }
 const noteHistoryMove = () => void (historyMoved = true);
 const keepUnsaved = (event: BeforeUnloadEvent) =>
-  void (acknowledged.value || event.preventDefault());
+  void (acknowledged.value || sessionEnded.value || event.preventDefault());
 onMounted(() => {
   window.addEventListener('beforeunload', keepUnsaved);
   window.addEventListener('popstate', noteHistoryMove);
@@ -86,7 +91,7 @@ onBeforeRouteLeave((to) => {
     leaveApproved = false;
     return true;
   }
-  if (acknowledged.value) return true;
+  if (acknowledged.value || sessionEnded.value) return true;
   pendingLeave = to;
   leaveFromHistory = byHistory;
   leaveOpen.value = true;

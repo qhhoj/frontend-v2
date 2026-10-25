@@ -1,8 +1,9 @@
-import { keepPreviousData, useQuery } from '@tanstack/vue-query';
+import { useQuery } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import type { Ref } from 'vue';
 import { fetchIntegrationClients } from '@/api/integration-clients.api';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
 
 export const INTEGRATION_PAGE_SIZE = 50;
 /** The base of the list key; the viewer id and the page follow, as for every admin key. */
@@ -13,6 +14,6 @@ export function useIntegrationClientsQuery(page: Ref<number>) {
   return useQuery({
     queryKey: computed(() => [...integrationClientsKey, viewer.value, page.value] as const),
     queryFn: () => fetchIntegrationClients({ page: page.value, pageSize: INTEGRATION_PAGE_SIZE }),
-    placeholderData: keepPreviousData,
+    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
   });
 }

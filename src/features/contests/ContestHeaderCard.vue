@@ -20,10 +20,11 @@ import PhasePill from './PhasePill.vue';
 
 /**
  * `run`: the viewer's running participation here. The contest bar then carries the clock, so a phone drops the big
- * countdown; a virtual run's countdown counts the run's own time.
+ * countdown; a run's countdown counts the run's own time (a virtual run, or a live window shorter than the contest).
  */
 const props = defineProps<{ contest: ContestDetail; run?: ParticipationSummary | null }>();
 const virtualRun = computed(() => (props.run && props.run.virtual > 0 ? props.run : null));
+const liveRun = computed(() => (props.run && props.run.virtual === 0 ? props.run : null));
 /** The header colours its tags: read the catalogue only when the contest has tags. */
 useContestTagsQuery(() => props.contest.tags.length > 0);
 const emit = defineEmits<{ elapsed: [] }>();
@@ -113,6 +114,7 @@ const oneDay = computed(() =>
       <ContestCountdown
         :contest="contest"
         :virtual-run="virtualRun"
+        :live-run="liveRun"
         :class="run && 'max-md:hidden'"
         @elapsed="emit('elapsed')"
       />
