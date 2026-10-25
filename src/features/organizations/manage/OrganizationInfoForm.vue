@@ -129,7 +129,7 @@ function reset() {
                   <input
                     :id="id"
                     v-model="form.slug"
-                    class="min-h-[var(--qa-control,2.25rem)] min-w-0 flex-1 rounded-b-cell bg-transparent sm:rounded-r-cell sm:rounded-bl-none px-3 font-mono text-sm text-content outline-none"
+                    class="min-h-(--qh-control) min-w-0 flex-1 rounded-b-cell bg-transparent sm:rounded-r-cell sm:rounded-bl-none px-3 font-mono text-sm text-content outline-none"
                     maxlength="128"
                     :aria-describedby="describedBy"
                     :aria-invalid="invalid ? 'true' : undefined"

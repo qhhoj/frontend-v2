@@ -31,6 +31,11 @@
   --qh-control: 2.75rem;
   --qh-control-sm: 2.25rem;
   --qh-control-lg: 3.5rem;
+  /* Admin density, global so no size depends on whether the admin chunk has loaded: 40 px rows, 36 px controls, 24 px chips (48, 44, 32 on touch). */
+  --qa-row: 2.5rem;
+  --qa-control: var(--qh-control-sm);
+  --qa-chip: 1.5rem;
+  --qa-gap: 0.75rem;
   /* Personal look (appearance.ts): --qh-glass-level 0 is the theme's own glass, 100 is opaque with no blur; blob strength is the opacity of the blobs. Unset, they equal the site look. */
   --qh-glass-level: 0;
   --qh-blob-strength: 1;
@@ -49,6 +54,8 @@
 @media (pointer: coarse), (max-width: 40rem) {
   :root {
     --qh-control-sm: 2.75rem;
+    --qa-row: 3rem;
+    --qa-chip: 2rem;
   }
 }
 
