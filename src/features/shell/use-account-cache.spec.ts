@@ -10,6 +10,7 @@ import { mockApi, page } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
 import { useSessionStore } from '@/stores/session.store';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { readStorage, writeStorage } from '@/lib/storage';
 import { useAccountCacheSync } from './use-account-cache';
 
 const CACHED_KEY = ['problems', 'list', { page: 1 }];
@@ -60,13 +61,16 @@ describe('account cache sync', () => {
     expect(isCached()).toBe(false);
   });
 
-  it('drops the cache on sign-out or expiry', async () => {
+  it('drops the cache and the admin recent screens on sign-out or expiry', async () => {
     const { session, isCached } = mountSync();
+    const recentKey = `qhhoj.admin.recent.${accountA.id}`;
+    writeStorage(recentKey, '[{"path":"/admin/users","titleKey":"t","detail":null}]');
     session.$patch({ status: 'authenticated', user: accountA });
     await flushPromises();
     session.$patch({ status: 'anonymous', user: null });
     await flushPromises();
     expect(isCached()).toBe(false);
+    expect(readStorage(recentKey)).toBeNull();
   });
 
   it('reads a mounted viewer-keyed query once for the new viewer, not twice', async () => {

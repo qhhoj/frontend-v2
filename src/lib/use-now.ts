@@ -1,8 +1,9 @@
 import { onScopeDispose, ref } from 'vue';
+import { serverNow } from './server-clock';
 
-/** `Date.now()` refreshed every `intervalMs` while the calling component lives; it stands still while the tab is hidden. */
+/** The server's time (`serverNow()`) refreshed every `intervalMs` while the calling component lives; it stands still while the tab is hidden. */
 export function useNow(intervalMs = 1000) {
-  const now = ref(Date.now());
+  const now = ref(serverNow());
   let timer: ReturnType<typeof setInterval> | undefined;
   const stop = () => {
     clearInterval(timer);
@@ -11,8 +12,8 @@ export function useNow(intervalMs = 1000) {
   const sync = () => {
     stop();
     if (document.hidden) return;
-    now.value = Date.now();
-    timer = setInterval(() => (now.value = Date.now()), intervalMs);
+    now.value = serverNow();
+    timer = setInterval(() => (now.value = serverNow()), intervalMs);
   };
   sync();
   document.addEventListener('visibilitychange', sync);

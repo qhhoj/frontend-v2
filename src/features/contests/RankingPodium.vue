@@ -5,8 +5,7 @@ import type { RankingProblem, RankingRow } from '@/api/types/contests';
 import UserName from '@/components/UserName.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { translate } from '@/i18n';
-import { formatNumber } from '@/lib/format';
-import { formatCumtime, isPenaltyFormat, solvedCount } from '@/lib/ranking-cells';
+import { formatCumtime, isPenaltyFormat, solvedCount, totalScoreText } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 
 /**
@@ -46,7 +45,7 @@ const groups = computed(() => {
 });
 const scoreOf = (row: RankingRow) => {
   if (!isPenaltyFormat(props.context.formatName))
-    return formatNumber(row.score, props.context.locale, props.context.pointsPrecision);
+    return totalScoreText(row.score, props.problems, props.context);
   const solved = solvedCount(row, props.problems, props.context);
   return `${translate('ranking.solvedCount', { count: solved }, solved)} · ${formatCumtime(props.context.formatName, row.cumtime, props.context.locale)}`;
 };

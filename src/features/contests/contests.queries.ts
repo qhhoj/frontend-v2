@@ -1,3 +1,4 @@
+import { serverNow } from '@/lib/server-clock';
 import { useQuery } from '@tanstack/vue-query';
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter, Ref } from 'vue';
@@ -128,7 +129,7 @@ export const usePublicRankingQuery = (token: MaybeRefOrGetter<string>) => {
     queryFn: () => fetchPublicRanking(toValue(token)),
     retry: false,
     refetchInterval: (query) =>
-      query.state.data && Date.parse(query.state.data.contest.endTime) <= Date.now()
+      query.state.data && Date.parse(query.state.data.contest.endTime) <= serverNow()
         ? false
         : rankingPollMs(isLowPower.value),
     refetchIntervalInBackground: false,

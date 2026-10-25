@@ -1,3 +1,4 @@
+import { serverNow } from '@/lib/server-clock';
 import { useQuery, useQueryClient } from '@tanstack/vue-query';
 import { computed, onScopeDispose, watch } from 'vue';
 import { fetchSite } from '@/api/site.api';
@@ -52,7 +53,7 @@ export function useRefetchWhenOfficialModeEnds() {
     endsAt,
     (iso) => {
       clearTimeout(timer);
-      const wait = iso === null ? 0 : Date.parse(iso) - Date.now();
+      const wait = iso === null ? 0 : Date.parse(iso) - serverNow();
       if (wait > 0)
         timer = setTimeout(
           () => void client.refetchQueries({ queryKey: siteKey }),

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { mockApi, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
@@ -13,6 +13,15 @@ const mountLog = async (path: string) => {
   });
   return mounted;
 };
+
+/** The first mount loads the admin shell and every screen module (seconds on a loaded machine): do it once here, not inside the test's limit. */
+beforeAll(async () => {
+  mockApi({
+    ...staffViewer(['judge.change_settings']),
+    'GET /admin/settings/mail.from/revisions': page([]),
+  });
+  (await mountLog('/admin/log?key=mail.from')).wrapper.unmount();
+}, 60_000);
 
 describe('AdminLogPage', () => {
   it('a different key starts its history on the first page', async () => {
