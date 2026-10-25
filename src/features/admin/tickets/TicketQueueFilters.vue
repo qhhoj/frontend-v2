@@ -130,7 +130,7 @@ const reset = () =>
         <input
           type="checkbox"
           name="awaiting"
-          class="size-4 accent-[var(--qh-accent)]"
+          class="size-4 accent-accent"
           :checked="filters.awaiting === true"
           @change="setAwaiting(($event.target as HTMLInputElement).checked)"
         />
@@ -145,7 +145,7 @@ const reset = () =>
         <input
           type="checkbox"
           name="own"
-          class="size-4 accent-[var(--qh-accent)]"
+          class="size-4 accent-accent"
           :checked="filters.own"
           @change="setOwn(($event.target as HTMLInputElement).checked)"
         />

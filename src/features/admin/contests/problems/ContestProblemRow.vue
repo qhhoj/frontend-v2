@@ -44,7 +44,7 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
       <div class="flex items-start gap-3">
         <input
           type="checkbox"
-          class="mt-0.5 size-4 shrink-0 accent-[var(--qh-accent)]"
+          class="mt-0.5 size-4 shrink-0 accent-accent"
           :checked="isSelected"
           :aria-label="$t('admin.contests.bulk.selectRow', { name: row.code })"
           @change="emit('select', checked($event))"
@@ -79,7 +79,7 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
         <input
           v-model="row.partial"
           type="checkbox"
-          class="size-4 accent-[var(--qh-accent)]"
+          class="size-4 accent-accent"
           :aria-label="$t('admin.contests.problems.partialFor', { code: row.code })"
         />
         <span class="text-sm md:hidden">{{ $t('admin.contests.problems.columns.partial') }}</span>
@@ -90,7 +90,7 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
         <input
           v-model="row.isPretested"
           type="checkbox"
-          class="size-4 accent-[var(--qh-accent)]"
+          class="size-4 accent-accent"
           :aria-label="$t('admin.contests.problems.pretestFor', { code: row.code })"
         />
         <span class="text-sm md:hidden">{{ $t('admin.contests.problems.columns.pretest') }}</span>

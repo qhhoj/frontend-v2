@@ -15,7 +15,7 @@ const checked = defineModel<boolean>({ required: true });
       type="checkbox"
       :disabled="disabled"
       :aria-describedby="`${inputId}-hint`"
-      class="mt-0.5 size-4 shrink-0 accent-[var(--qh-accent)] disabled:cursor-not-allowed"
+      class="mt-0.5 size-4 shrink-0 accent-accent disabled:cursor-not-allowed"
     />
     <span class="flex min-w-0 flex-col">
       <label :for="inputId" class="text-sm font-semibold" :class="disabled && 'text-muted'">{{

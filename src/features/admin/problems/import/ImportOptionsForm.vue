@@ -196,7 +196,7 @@ function submit() {
               v-model="form.mode"
               type="radio"
               name="import-mode"
-              class="size-4 accent-[var(--qh-accent)]"
+              class="size-4 accent-accent"
               :value="mode"
               :disabled="!canUseMode(mode)"
             />

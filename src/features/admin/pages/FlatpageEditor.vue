@@ -170,7 +170,7 @@ defineExpose({ loadOldValues, focusTitle });
           <input
             v-model="registrationRequired"
             type="checkbox"
-            class="mt-0.5 size-4 accent-[var(--qh-accent)]"
+            class="mt-0.5 size-4 accent-accent"
           />
           <span>{{ t('admin.pages.field.registrationRequired') }}</span>
         </label>

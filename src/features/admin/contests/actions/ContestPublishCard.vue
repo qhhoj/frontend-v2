@@ -112,7 +112,7 @@ const summaryText = computed(() =>
     <p v-if="!hasEnded" class="text-sm text-muted">{{ $t('admin.contestPublish.notEnded') }}</p>
     <template v-else>
       <label class="flex min-h-11 items-center gap-3 font-semibold">
-        <input v-model="withEditorials" type="checkbox" class="size-4 accent-[var(--qh-accent)]" />
+        <input v-model="withEditorials" type="checkbox" class="size-4 accent-accent" />
         {{ $t('admin.contestPublish.withEditorials') }}
       </label>
       <div class="flex flex-wrap gap-3">

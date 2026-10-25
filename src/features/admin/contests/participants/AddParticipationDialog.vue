@@ -85,7 +85,7 @@ watch(visible, (isOpen) => {
             v-model="kind"
             type="radio"
             value="live"
-            class="size-4 accent-[var(--qh-accent)]"
+            class="size-4 accent-accent"
           />
           {{ $t('admin.contestOps.participants.kindLive') }}
         </label>
@@ -94,7 +94,7 @@ watch(visible, (isOpen) => {
             v-model="kind"
             type="radio"
             value="virtual"
-            class="size-4 accent-[var(--qh-accent)]"
+            class="size-4 accent-accent"
           />
           {{ $t('admin.contestOps.participants.kindVirtual') }}
         </label>

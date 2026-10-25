@@ -120,7 +120,7 @@ function submit() {
         <input
           v-model="scopes"
           type="checkbox"
-          class="mt-0.5 size-4 accent-[var(--qh-accent)]"
+          class="mt-0.5 size-4 accent-accent"
           :value="scope"
         />
         <span class="flex flex-col">

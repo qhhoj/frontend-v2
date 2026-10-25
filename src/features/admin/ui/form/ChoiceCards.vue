@@ -29,7 +29,7 @@ defineProps<{
           type="radio"
           :name="name"
           :value="option.value"
-          class="mt-0.5 size-4 shrink-0 accent-[var(--qh-accent)]"
+          class="mt-0.5 size-4 shrink-0 accent-accent"
         />
         <span class="flex min-w-0 flex-col">
           <span class="text-sm font-semibold">{{ option.label }}</span>

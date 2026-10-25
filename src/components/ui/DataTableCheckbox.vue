@@ -13,7 +13,7 @@ defineEmits<{ change: [checked: boolean] }>();
   >
     <input
       type="checkbox"
-      class="size-4 accent-[var(--qh-accent)]"
+      class="size-4 accent-accent"
       :checked="checked"
       :indeterminate="indeterminate"
       :aria-label="label"

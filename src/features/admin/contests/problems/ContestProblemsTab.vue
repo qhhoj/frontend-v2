@@ -145,7 +145,7 @@ const HEAD = 'px-2 py-2 text-meta font-semibold text-muted';
                   <span class="flex items-center gap-3">
                     <input
                       type="checkbox"
-                      class="size-4 accent-[var(--qh-accent)]"
+                      class="size-4 accent-accent"
                       :checked="selection.isAllSelected.value"
                       :indeterminate="selection.isSomeSelected.value"
                       :aria-label="$t('admin.contests.bulk.selectPage')"
