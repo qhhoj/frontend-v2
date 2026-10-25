@@ -4,14 +4,14 @@ import type { MaybeRefOrGetter } from 'vue';
 import { fetchComposeOptions, fetchMyDrafts, fetchPost, fetchPosts } from '@/api/blog.api';
 import type { PostFeed } from '@/api/types/blog';
 import { ANONYMOUS_VIEWER, useViewerId } from '@/stores/use-viewer-id';
-import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 export const usePostsQuery = (feed: MaybeRefOrGetter<PostFeed>, page: MaybeRefOrGetter<number>) => {
   const viewer = useViewerId();
   return useQuery({
     queryKey: computed(() => ['posts', 'list', toValue(feed), toValue(page), viewer.value]),
     queryFn: () => fetchPosts(toValue(feed), toValue(page)),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(4, viewer.value)),
   });
 };
 
@@ -32,7 +32,7 @@ export const useMyDraftsQuery = (page: MaybeRefOrGetter<number>) => {
     queryKey: computed(() => ['posts', 'list', 'drafts', toValue(page), viewer.value]),
     queryFn: () => fetchMyDrafts(toValue(page)),
     enabled: computed(() => viewer.value !== ANONYMOUS_VIEWER),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(4, viewer.value)),
   });
 };
 

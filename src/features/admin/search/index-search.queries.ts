@@ -12,7 +12,7 @@ import { CONTEST_INDEX_KEY } from '../contests/contest-editing.queries';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { INDEX_PAGE_SIZE } from './index-search';
-import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 /** Keys start with `'admin'` and carry the viewer, because what an account may see differs per account. */
 export function useAdminProblemSearchQuery(query: Ref<ProblemListQuery>, isReady: Ref<boolean>) {
@@ -23,7 +23,7 @@ export function useAdminProblemSearchQuery(query: Ref<ProblemListQuery>, isReady
     queryFn: () =>
       fetchAdminProblems({ ...query.value, pageSize: INDEX_PAGE_SIZE, lang: locale.locale }),
     enabled: isReady,
-    placeholderData: computed(() => keepPreviousForViewer(viewerId.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(3, viewerId.value)),
   });
 }
 
@@ -58,6 +58,6 @@ export function useAdminContestSearchQuery(query: Ref<ContestListQuery>) {
   return useQuery({
     queryKey: computed(() => [...CONTEST_INDEX_KEY, viewerId.value, query.value]),
     queryFn: () => fetchContests({ ...query.value, pageSize: INDEX_PAGE_SIZE }),
-    placeholderData: computed(() => keepPreviousForViewer(viewerId.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(3, viewerId.value)),
   });
 }

@@ -11,7 +11,7 @@ import {
 } from '@/api/organizations.api';
 import type { JoinRequestState, MemberSort } from '@/api/types/organizations';
 import { useViewerId } from '@/stores/use-viewer-id';
-import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 /** The search term joins the key only when it is set, so the plain list keeps its key. */
 export const useOrganizationsQuery = (
@@ -30,7 +30,7 @@ export const useOrganizationsQuery = (
       ...(term() ? [term()] : []),
     ]),
     queryFn: () => fetchOrganizations(toValue(page), term()),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(3, viewer.value)),
     enabled: () => toValue(enabled),
   });
 };
@@ -74,7 +74,7 @@ export const useOrganizationPostsQuery = (
       viewer.value,
     ]),
     queryFn: () => fetchOrganizationPosts(toValue(slug), toValue(page)),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(4, viewer.value)),
   });
 };
 
@@ -83,19 +83,22 @@ export const useJoinRequestsQuery = (
   state: MaybeRefOrGetter<JoinRequestState>,
   page: MaybeRefOrGetter<number>,
   isEnabled: MaybeRefOrGetter<boolean>,
-) =>
-  useQuery({
+) => {
+  const viewer = useViewerId();
+  return useQuery({
     queryKey: computed(() => [
       'organizations',
       'requests',
       toValue(slug),
       toValue(state),
       toValue(page),
+      viewer.value,
     ]),
     queryFn: () => fetchJoinRequests(toValue(slug), toValue(state), toValue(page)),
-    placeholderData: keepPreviousData,
+    placeholderData: computed(() => keepPreviousForSameViewer(5, viewer.value)),
     enabled: computed(() => toValue(isEnabled)),
   });
+};
 
 /** The viewer's own pending request; idle when there is none. */
 export const usePendingRequestQuery = (

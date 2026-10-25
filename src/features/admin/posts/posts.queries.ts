@@ -4,7 +4,7 @@ import type { MaybeRefOrGetter } from 'vue';
 import { fetchModerationPosts } from '@/api/blog-admin.api';
 import type { ModerationState } from '@/api/blog-admin.api';
 import { useViewerId } from '@/stores/use-viewer-id';
-import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 export const useModerationPostsQuery = (
   state: MaybeRefOrGetter<ModerationState>,
@@ -28,6 +28,6 @@ export const useModerationPostsQuery = (
         search: toValue(search),
         organization: toValue(organization),
       }),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(6, viewer.value)),
   });
 };

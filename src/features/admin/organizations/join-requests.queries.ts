@@ -5,7 +5,7 @@ import { fetchAllJoinRequests } from '@/api/organizations-admin.api';
 import type { JoinRequestState } from '@/api/types/organizations';
 import { usePermissions } from '@/stores/use-permissions';
 import { useViewerId } from '@/stores/use-viewer-id';
-import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 /** Backend `OrganizationRequestQueueController`: a holder of `judge.add_organization` alone gets a 403, so the query stays idle for them. */
 export const ORGANIZATION_QUEUE_PERMISSION = 'judge.edit_all_organization';
@@ -28,6 +28,6 @@ export const useAllJoinRequestsQuery = (
     ]),
     queryFn: () => fetchAllJoinRequests(toValue(state), toValue(page), toValue(search)),
     enabled: computed(() => can(ORGANIZATION_QUEUE_PERMISSION)),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(5, viewer.value)),
   });
 };

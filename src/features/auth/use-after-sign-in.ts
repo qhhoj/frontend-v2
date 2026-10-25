@@ -2,7 +2,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { preloadRoute } from '@/router/preload';
 import { safeRedirect } from '@/router/safe-redirect';
 import { useSessionStore } from '@/stores/session.store';
-import { takeSocialReturn } from './social-return';
+import { clearSocialReturn, takeSocialReturn } from './social-return';
 
 /** Starts downloading the page after sign-in while the sign-in request is still on its way. */
 export function usePreloadAfterSignIn() {
@@ -22,6 +22,7 @@ export function useAfterSignIn(resumeSocial = false) {
   const route = useRoute();
   const router = useRouter();
   return async () => {
+    if (!resumeSocial) clearSocialReturn(); // a password sign-in ends any social attempt left open
     const asked = safeRedirect(route.query.redirect);
     const redirect = asked === '/' && resumeSocial ? (takeSocialReturn() ?? '/') : asked;
     // `/` is the default, so it is not carried (the same rule as the guards' `loginQuery`).

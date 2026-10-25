@@ -6,14 +6,14 @@ import { fetchTicket, fetchTicketSummary, fetchTickets } from '@/api/tickets.api
 import type { TicketListQuery } from '@/api/types/tickets';
 import { useSessionStore } from '@/stores/session.store';
 import { useViewerId } from '@/stores/use-viewer-id';
-import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 export const useTicketsQuery = (query: MaybeRefOrGetter<TicketListQuery>) => {
   const viewer = useViewerId();
   return useQuery({
     queryKey: computed(() => ['tickets', 'list', { ...toValue(query) }, viewer.value]),
     queryFn: () => fetchTickets(toValue(query)),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(3, viewer.value)),
   });
 };
 

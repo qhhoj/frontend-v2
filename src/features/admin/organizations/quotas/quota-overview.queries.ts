@@ -4,7 +4,7 @@ import type { MaybeRefOrGetter } from 'vue';
 import { fetchOrganizationUsage, fetchUsageOverview } from '@/api/organization-usage.api';
 import type { UsageSort } from '@/api/types/organization-usage';
 import { useViewerId } from '@/stores/use-viewer-id';
-import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 export const USAGE_OVERVIEW_KEY = ['admin', 'organization-usage'] as const;
 export const USAGE_DETAIL_KEY = ['admin', 'organization-usage-detail'] as const;
@@ -17,7 +17,7 @@ export function useUsageOverviewQuery(
   return useQuery({
     queryKey: computed(() => [...USAGE_OVERVIEW_KEY, viewer.value, toValue(sort), toValue(page)]),
     queryFn: () => fetchUsageOverview(toValue(sort), toValue(page)),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(2, viewer.value)),
   });
 }
 

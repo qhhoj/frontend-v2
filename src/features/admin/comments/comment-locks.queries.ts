@@ -5,7 +5,7 @@ import { fetchCommentLocks, unlockCommentPage } from '@/api/comments.api';
 import type { CommentPageLink } from '@/api/types/comments';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { useAdminMutation } from '../ui/use-admin-mutation';
-import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 const LOCKS_KEY = ['admin', 'comment-locks'] as const;
 
@@ -14,7 +14,7 @@ export const useCommentLocksQuery = (page: MaybeRefOrGetter<number>) => {
   return useQuery({
     queryKey: computed(() => [...LOCKS_KEY, toValue(page), viewer.value]),
     queryFn: () => fetchCommentLocks(toValue(page)),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(3, viewer.value)),
   });
 };
 

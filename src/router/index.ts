@@ -97,12 +97,14 @@ export function installLostSessionRedirect(router: Router) {
 }
 
 /**
- * A social sign-in lands on `/` signed in: go on to the page the viewer came from (kept by `rememberSocialReturn`).
- * It runs after the session guard, so the session is loaded; a landing on `/` signed out or by any other route keeps the note for its page.
+ * A social sign-in lands on `/` signed in, as the app's first page (the provider round trip is a full page load): go on to
+ * the page the viewer came from (kept by `rememberSocialReturn`). An in-app move to `/` never takes it. It runs after the
+ * session guard, so the session is loaded.
  */
 function installSocialReturn(router: Router) {
-  router.beforeEach((to) => {
-    if (to.path !== '/' || useSessionStore().status !== 'authenticated') return true;
+  router.beforeEach((to, from) => {
+    if (from !== START_LOCATION || to.path !== '/') return true;
+    if (useSessionStore().status !== 'authenticated') return true;
     return takeSocialReturn() ?? true;
   });
 }

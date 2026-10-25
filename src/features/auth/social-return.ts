@@ -12,14 +12,17 @@ export const SOCIAL_RETURN_TTL_MS = 10 * 60_000;
  */
 export function rememberSocialReturn(redirect: unknown, now = Date.now()): void {
   const path = safeRedirect(redirect);
-  if (path === '/') removeStorage(KEY, 'session');
+  if (path === '/') clearSocialReturn();
   else writeStorage(KEY, JSON.stringify({ path, at: now }), 'session');
 }
+
+/** Forgets an attempt that did not come back (a password sign-in, a sign-out): its path must not steer a later one. */
+export const clearSocialReturn = () => removeStorage(KEY, 'session');
 
 /** The remembered path once, or `null`; the note is gone after the first read. The path is re-checked on the way out. */
 export function takeSocialReturn(now = Date.now()): string | null {
   const raw = readStorage(KEY, 'session');
-  removeStorage(KEY, 'session');
+  clearSocialReturn();
   if (raw === null) return null;
   try {
     const note = JSON.parse(raw) as { path?: unknown; at?: unknown };

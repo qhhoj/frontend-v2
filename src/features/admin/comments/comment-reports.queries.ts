@@ -10,7 +10,7 @@ import {
 import type { CommentReportOutcome, CommentReportQueue } from '@/api/types/comments';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { useAdminMutation } from '../ui/use-admin-mutation';
-import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 const REPORTS_KEY = ['admin', 'comment-reports'] as const;
 
@@ -25,7 +25,7 @@ export const useCommentReportsQuery = (
     queryKey: computed(() => [...REPORTS_KEY, toValue(status), toValue(page), viewer.value]),
     queryFn: () => fetchCommentReports(toValue(page), toValue(status)),
     enabled: computed(() => toValue(isEnabled)),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(4, viewer.value)),
   });
 };
 

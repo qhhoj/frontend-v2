@@ -17,7 +17,7 @@ import {
 import type { CommentDraft } from '@/api/comments.api';
 import type { CommentPageType } from '@/api/types/comments';
 import { useViewerId } from '@/stores/use-viewer-id';
-import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 /** Every cached page number (and viewer) of one comment page. */
 export const commentPageKey = (type: CommentPageType, key: string) =>
@@ -52,7 +52,7 @@ export const useCommentPageQuery = (
       viewer.value,
     ]),
     queryFn: () => fetchCommentPage(toValue(type), toValue(key), toValue(page)),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(5, viewer.value)),
   });
 };
 

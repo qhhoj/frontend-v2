@@ -12,7 +12,7 @@ import { useViewerId } from '@/stores/use-viewer-id';
 import { isActive } from './similarity-runs';
 import { toPairsRequest } from './similarity-pairs';
 import type { PairFilter } from './similarity-pairs';
-import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 /** While a run is queued or running its list or summary refreshes every 5 seconds; a settled one stops the timer. */
 const RUN_POLL_MS = 5000;
@@ -64,7 +64,7 @@ export const useSimilarityPairsQuery = (
       viewer.value,
     ]),
     queryFn: () => fetchSimilarityPairs(toValue(runId), toPairsRequest(toValue(filter))),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(4, viewer.value)),
   });
 };
 

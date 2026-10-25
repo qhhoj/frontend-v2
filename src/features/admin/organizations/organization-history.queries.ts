@@ -3,7 +3,7 @@ import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
 import { fetchOrganizationHistory } from '@/api/organizations-admin.api';
 import { useViewerId } from '@/stores/use-viewer-id';
-import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 /** Under `['organizations', …]`, so every organization write (edit, kick) refreshes it. */
 export const organizationHistoryKey = (slug: string) => ['organizations', 'history', slug] as const;
@@ -20,6 +20,6 @@ export const useOrganizationHistoryQuery = (
       viewer.value,
     ]),
     queryFn: () => fetchOrganizationHistory(toValue(slug), toValue(page)),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(4, viewer.value)),
   });
 };

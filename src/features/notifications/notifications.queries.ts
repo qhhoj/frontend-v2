@@ -10,7 +10,7 @@ import {
 import type { NotificationListQuery } from '@/api/types/notifications';
 import { useSessionStore } from '@/stores/session.store';
 import { useViewerId } from '@/stores/use-viewer-id';
-import { keepPreviousForViewer } from '@/features/contests/keep-previous-for-viewer';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 /** Spec 3.1: the bell catches up every minute and on window focus (announcements send no nudge). */
 export const UNREAD_POLL_MS = 60_000;
@@ -49,7 +49,7 @@ export function useNotificationsQuery(
     queryKey: computed(() => [...notificationsKey(viewer.value), 'list', { ...toValue(query) }]),
     queryFn: () => fetchNotifications(toValue(query)),
     enabled: computed(() => isSignedIn.value && toValue(isEnabled)),
-    placeholderData: computed(() => keepPreviousForViewer(viewer.value)),
+    placeholderData: computed(() => keepPreviousForSameViewer(1, viewer.value)),
   });
 }
 

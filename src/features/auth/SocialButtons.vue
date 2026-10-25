@@ -38,8 +38,8 @@ const ROW = 'grid grid-cols-[repeat(auto-fit,minmax(6rem,1fr))] gap-2';
         v-for="provider in providers"
         :key="provider"
         :href="socialStartUrl(provider)"
-        @click="rememberSocialReturn(route.query.redirect)"
         :aria-label="$t('auth.social.signInWith', { provider: SOCIAL_PROVIDER_LABELS[provider] })"
+        @click="rememberSocialReturn(route.query.redirect)"
       >
         {{ SOCIAL_PROVIDER_LABELS[provider] }}
       </AppButton>
