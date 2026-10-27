@@ -901,7 +901,7 @@
     "oauth_state": "Phiên đăng nhập bằng mạng xã hội đã hết hạn. Hãy thử lại.",
     "oauth_failed": "Đăng nhập bằng mạng xã hội không thành công.",
     "email_unverified": "Email của tài khoản mạng xã hội này chưa được xác minh.",
-    "social_email_in_use": "Email này đã thuộc về một tài khoản. Hãy đăng nhập bằng mật khẩu, rồi liên kết tài khoản mạng xã hội trong phần cài đặt.",
+    "social_email_in_use": "Email này đã thuộc về một tài khoản. Hãy đăng nhập bằng mật khẩu.",
     "banned_from_problem": "Tài khoản bị cấm nộp bài này.",
     "contest_submission_limit": "Bạn đã dùng hết số lần nộp bài này trong kỳ thi.",
     "unfinished_submission_limit": "Bạn có quá nhiều bài nộp đang chờ chấm. Hãy đợi chúng chấm xong.",

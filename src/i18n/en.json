@@ -901,7 +901,7 @@
     "oauth_state": "The social sign-in session expired. Try again.",
     "oauth_failed": "Social sign-in failed.",
     "email_unverified": "The email of that social account is not verified.",
-    "social_email_in_use": "This email already belongs to an account. Sign in with your password, then link the social account from settings.",
+    "social_email_in_use": "This email already belongs to an account. Sign in with your password.",
     "banned_from_problem": "You are banned from submitting to this problem.",
     "contest_submission_limit": "You have used all your submissions for this problem in the contest.",
     "unfinished_submission_limit": "You have too many submissions still being judged. Wait for them to finish.",
