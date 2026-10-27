@@ -1,10 +1,12 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
-import { partialSession, signedOut } from '@/test/fixtures';
+import { partialSession, profile, signedIn, signedOut } from '@/test/fixtures';
+import { homeRoutes } from '@/test/home-routes';
 import { loginRoutes } from '@/test/auth-routes';
-import { fail, issue, mockApi, ok } from '@/test/mock-api';
+import { fail, issue, mockApi, ok, page } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { rememberSocialReturn } from './social-return';
 
 // The first mount in a file loads route chunks cold.
 vi.setConfig({ testTimeout: 30_000 });
@@ -130,5 +132,21 @@ describe('after a sign-in', () => {
       timeout: 5000,
     });
     expect(router.currentRoute.value.query).toEqual({ redirect: '/blog' });
+  });
+
+  it('does not send a password sign-in to the page of an abandoned social attempt', async () => {
+    rememberSocialReturn('/contests/x/ranking');
+    mockApi(
+      routes({
+        'POST /auth/login': ok(signedIn().body.data),
+        'GET /profile': ok(profile()),
+        'GET /posts': page([]),
+        ...homeRoutes,
+      }),
+    );
+    const { wrapper, router } = await mountApp('/login');
+    await signIn(wrapper, 'correct horse');
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('home'), { timeout: 5000 });
+    expect(router.currentRoute.value.path).toBe('/');
   });
 });

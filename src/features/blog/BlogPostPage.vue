@@ -59,7 +59,7 @@ usePageTitle(() => post.value?.title);
             <PostActions :post="post" />
           </div>
           <PostArticle :post="post" />
-          <CommentsSection type="blog" :page-key="post.id" class="mt-8" />
+          <CommentsSection :key="post.id" type="blog" :page-key="post.id" class="mt-8" />
         </div>
         <aside v-if="author" class="flex flex-col gap-6">
           <AuthorCard :username="author.username" />

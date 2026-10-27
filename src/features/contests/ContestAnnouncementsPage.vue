@@ -31,7 +31,13 @@ const viewerId = useViewerId();
 const key = computed(() => String(route.params.key));
 const page = computed(() => Math.max(1, Number(route.query.page) || 1));
 const { data: contest, error: contestError } = useContestQuery(key);
-const { data: list, isPending, error, refetch } = useContestAnnouncementsQuery(key, page);
+const {
+  data: list,
+  isPending,
+  isPlaceholderData,
+  error,
+  refetch,
+} = useContestAnnouncementsQuery(key, page);
 usePageTitle(() => contest.value?.name);
 /** "Mới" marks what was new when the tab opened (per contest; the badge clears at once). */
 const seenAtOpen = ref('');
@@ -47,7 +53,7 @@ watch(
   list,
   (value) => {
     const newest = value?.items[0];
-    if (newest && page.value === ANNOUNCEMENT_FIRST_PAGE)
+    if (newest && !isPlaceholderData.value && page.value === ANNOUNCEMENT_FIRST_PAGE)
       markAnnouncementsSeen(viewerId.value, key.value, newest.id);
   },
   { immediate: true },

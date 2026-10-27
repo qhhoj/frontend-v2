@@ -1,4 +1,4 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import type { QueryClient } from '@tanstack/vue-query';
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
@@ -17,6 +17,7 @@ import {
 import type { CommentDraft } from '@/api/comments.api';
 import type { CommentPageType } from '@/api/types/comments';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 /** Every cached page number (and viewer) of one comment page. */
 export const commentPageKey = (type: CommentPageType, key: string) =>
@@ -51,7 +52,7 @@ export const useCommentPageQuery = (
       viewer.value,
     ]),
     queryFn: () => fetchCommentPage(toValue(type), toValue(key), toValue(page)),
-    placeholderData: keepPreviousData,
+    placeholderData: computed(() => keepPreviousForSameViewer(5, viewer.value)),
   });
 };
 

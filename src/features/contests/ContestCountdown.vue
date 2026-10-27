@@ -5,18 +5,34 @@ import Chip from '@/components/ui/Chip.vue';
 import BitLoop from '@/components/BitLoop.vue';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import InlineBit from '@/components/InlineBit.vue';
-import { LONG_COUNTDOWN_SECONDS, countdownTarget, freezeStart } from '@/lib/contest-time';
+import {
+  LONG_COUNTDOWN_SECONDS,
+  countdownTarget,
+  freezeStart,
+  ownEndTime,
+} from '@/lib/contest-time';
 import { formatClock, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 
-/** `virtualRun`: the viewer's running virtual run of this ended contest; the big clock counts its time left. */
-const props = defineProps<{ contest: ContestDetail; virtualRun?: ParticipationSummary | null }>();
+/**
+ * `virtualRun`: the viewer's running virtual run of this ended contest; the big clock counts its time left.
+ * `liveRun`: the viewer's running live participation; its own window (a timed contest) can close before the contest does.
+ */
+const props = defineProps<{
+  contest: ContestDetail;
+  virtualRun?: ParticipationSummary | null;
+  liveRun?: ParticipationSummary | null;
+}>();
 const emit = defineEmits<{ elapsed: [] }>();
 const locale = useLocaleStore();
 const now = useNow();
 /** Follows the clock (start, then end, then nothing) even before the refetch answers. */
-const target = computed(() => countdownTarget(props.contest, now.value));
+const target = computed(() => {
+  const contestTarget = countdownTarget(props.contest, now.value);
+  if (contestTarget?.kind !== 'end') return contestTarget;
+  return { kind: 'end' as const, at: ownEndTime(contestTarget.at, props.liveRun) };
+});
 /**
  * The target moved on (start to end, end to none): the page refetches for the new phase. Counted from the
  * clock rather than from the timer's own zero, which the flip can unmount before it fires.

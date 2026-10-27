@@ -1,8 +1,9 @@
-import { keepPreviousData, useQuery } from '@tanstack/vue-query';
+import { useQuery } from '@tanstack/vue-query';
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
 import { fetchOrganizationHistory } from '@/api/organizations-admin.api';
 import { useViewerId } from '@/stores/use-viewer-id';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 /** Under `['organizations', …]`, so every organization write (edit, kick) refreshes it. */
 export const organizationHistoryKey = (slug: string) => ['organizations', 'history', slug] as const;
@@ -19,6 +20,6 @@ export const useOrganizationHistoryQuery = (
       viewer.value,
     ]),
     queryFn: () => fetchOrganizationHistory(toValue(slug), toValue(page)),
-    placeholderData: keepPreviousData,
+    placeholderData: computed(() => keepPreviousForSameViewer(4, viewer.value)),
   });
 };

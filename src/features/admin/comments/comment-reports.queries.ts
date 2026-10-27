@@ -1,4 +1,4 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
 import {
@@ -10,6 +10,7 @@ import {
 import type { CommentReportOutcome, CommentReportQueue } from '@/api/types/comments';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { useAdminMutation } from '../ui/use-admin-mutation';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 const REPORTS_KEY = ['admin', 'comment-reports'] as const;
 
@@ -24,7 +25,7 @@ export const useCommentReportsQuery = (
     queryKey: computed(() => [...REPORTS_KEY, toValue(status), toValue(page), viewer.value]),
     queryFn: () => fetchCommentReports(toValue(page), toValue(status)),
     enabled: computed(() => toValue(isEnabled)),
-    placeholderData: keepPreviousData,
+    placeholderData: computed(() => keepPreviousForSameViewer(4, viewer.value)),
   });
 };
 

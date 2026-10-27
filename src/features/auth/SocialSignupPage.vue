@@ -35,7 +35,7 @@ useNoReferrer();
 const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
-const afterSignIn = useAfterSignIn();
+const afterSignIn = useAfterSignIn(true);
 /**
  * The callback redirects here with the pending signup token (`/register/social?token=`). It is held in memory only:
  * on mount it leaves the address bar, so history and the Referer of later pages never carry it.

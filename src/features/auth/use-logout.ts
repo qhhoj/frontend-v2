@@ -3,6 +3,7 @@ import { forgetAllRecentScreens } from '@/features/admin/shell/recent/recent-scr
 import { useAdminToast } from '@/features/admin/ui/feedback/use-admin-toast';
 import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
+import { clearSocialReturn } from './social-return';
 
 /**
  * Ends the session (the shell drops the account's cached queries), then runs `afterSignOut`: by default it leaves pages
@@ -20,6 +21,7 @@ export function useLogout(afterSignOut?: () => Promise<unknown>) {
   };
   async function signOut() {
     forgetAllRecentScreens();
+    clearSocialReturn();
     try {
       await session.logout();
     } catch {

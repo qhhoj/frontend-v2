@@ -1,10 +1,11 @@
-import { keepPreviousData, useQuery } from '@tanstack/vue-query';
+import { useQuery } from '@tanstack/vue-query';
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
 import { fetchAdminComments, setCommentsHidden } from '@/api/comments.api';
 import type { AdminCommentQuery } from '@/api/comments.api';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { useAdminMutation } from '../ui/use-admin-mutation';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 const COMMENTS_KEY = ['admin', 'comments'] as const;
 
@@ -13,7 +14,7 @@ export const useAdminCommentsQuery = (query: MaybeRefOrGetter<AdminCommentQuery>
   return useQuery({
     queryKey: computed(() => [...COMMENTS_KEY, toValue(query), viewer.value]),
     queryFn: () => fetchAdminComments(toValue(query)),
-    placeholderData: keepPreviousData,
+    placeholderData: computed(() => keepPreviousForSameViewer(3, viewer.value)),
   });
 };
 

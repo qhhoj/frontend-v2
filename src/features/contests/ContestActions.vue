@@ -61,6 +61,8 @@ const now = useNow();
 const facts = computed(() => actionFactsOf(props.contest, session.user !== null, now.value));
 const chosen = computed(() => contestAction(facts.value));
 const isSwitchOpen = ref(false);
+/** The request the viewer chose when the dialogs opened: a phase change while they ask must not swap it. */
+const confirmedCommand = ref<ReturnType<typeof commandOf>>(null);
 /** The viewer's running participation here, or null while `/contests/current` has not said so. */
 const ownRun = computed(() =>
   props.current?.contest.key === props.contest.key ? props.current.participation : null,
@@ -142,7 +144,7 @@ function closeDialogs() {
 }
 /** Runs the request behind the chosen action; the access code is passed through and never kept. */
 async function perform(accessCode?: string) {
-  const command = commandOf(chosen.value.kind);
+  const command = confirmedCommand.value;
   if (!command || isPending.value) return;
   try {
     await run(command, { accessCode, acceptRules: hasAcceptedRules.value });
@@ -159,9 +161,15 @@ function askCodeOrPerform() {
   if (chosen.value.needsAccessCode) isDialogOpen.value = true;
   else void perform().catch(() => undefined);
 }
+/** The leave button asks in its own dialog and confirms here, where the action shown is the one confirmed. */
+function leave() {
+  confirmedCommand.value = commandOf('leave');
+  void perform().catch(() => undefined);
+}
 function start() {
   const command = commandOf(chosen.value.kind);
   if (isPending.value || command === null) return;
+  confirmedCommand.value = command;
   if (command === 'join' && replacedRun.value) isSwitchOpen.value = true;
   else proceed();
 }
@@ -207,7 +215,7 @@ watch(isRulesOpen, (isOpen) => {
       :since="ownRun?.realStart ?? contest.viewer.liveParticipation?.realStart ?? null"
       :is-pending="isPending"
       :return-focus-to="() => root"
-      @leave="perform().catch(() => undefined)"
+      @leave="leave"
     />
     <template v-else>
       <Chip v-if="chosen.kind === 'registered'" tone="accent" size="md" class="w-fit">

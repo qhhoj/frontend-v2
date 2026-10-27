@@ -43,11 +43,18 @@ const heading = computed(() =>
   }),
 );
 usePageTitle(() => (contest.value ? `${heading.value} · ${contest.value.name}` : null));
-/** The rows score in the contest's points, so the denominator is the contest problem's, not the problem's own. */
+/**
+ * The rows score in the contest's points: the score is the row's contest points over the contest problem's maximum.
+ * A row with no contest points (the problem left the contest) keeps the problem's own scale.
+ */
 const rows = computed(() =>
   (list.value?.items ?? []).map((row) =>
-    row.problem && current.value
-      ? { ...row, problem: { ...row.problem, points: current.value.points } }
+    row.problem && current.value && row.contest?.points != null
+      ? {
+          ...row,
+          points: row.contest.points,
+          problem: { ...row.problem, points: current.value.points },
+        }
       : row,
   ),
 );

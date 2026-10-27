@@ -1,6 +1,8 @@
 import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { useSessionStore } from '@/stores/session.store';
+import { sessionUser } from '@/test/fixtures';
 import { mountComponent } from '@/test/mount';
 import ScratchCodesPanel from './ScratchCodesPanel.vue';
 
@@ -52,5 +54,18 @@ describe('ScratchCodesPanel download', () => {
     expect(revoke).not.toHaveBeenCalled();
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(revoke).toHaveBeenCalledWith('blob:codes');
+  });
+});
+
+describe('ScratchCodesPanel when the session ends', () => {
+  it('closes at once, so the codes leave the screen, even though the box was never ticked', async () => {
+    const wrapper = mountComponent(ScratchCodesPanel, { props: PROPS });
+    const session = useSessionStore();
+    session.user = sessionUser({ id: 'user-a' });
+    await flushPromises();
+    expect(wrapper.emitted('done')).toBeUndefined();
+    session.user = null;
+    await flushPromises();
+    expect(wrapper.emitted('done')).toHaveLength(1);
   });
 });

@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from '@tanstack/vue-query';
+import { useQuery } from '@tanstack/vue-query';
 import { computed, toValue } from 'vue';
 import type { MaybeRefOrGetter } from 'vue';
 import {
@@ -12,6 +12,7 @@ import type {
   OrganizationProblemQuery,
 } from '@/api/types/organization-problems';
 import { ANONYMOUS_VIEWER, useViewerId } from '@/stores/use-viewer-id';
+import { keepPreviousForSameViewer } from '@/features/contests/keep-previous-for-viewer';
 
 /** What the "Bài tập" tab reads from its URL. `tag` is a tag slug; `q` is '' when there is no search. */
 export interface OrgProblemFilters {
@@ -45,7 +46,7 @@ export function useOrgProblemsQuery(
       { ...toValue(filters) },
     ]),
     queryFn: () => fetchOrganizationProblems(toValue(slug), queryOfFilters(toValue(filters))),
-    placeholderData: keepPreviousData,
+    placeholderData: computed(() => keepPreviousForSameViewer(3, viewer.value)),
     enabled: computed(() => toValue(isEnabled)),
   });
 }

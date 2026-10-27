@@ -176,7 +176,7 @@ const hasResultSummary = computed(() => {
             :can-resubmit="canResubmit"
             :contest-score="contestScore"
           >
-            <SubmissionStaffPanel :submission="row" />
+            <SubmissionStaffPanel :key="row.id" :submission="row" />
           </SubmissionHero>
           <SubmissionFacts :submission="row" :problem-name="problemName" :in-contest="inContest" />
         </div>

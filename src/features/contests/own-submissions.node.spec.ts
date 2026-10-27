@@ -44,4 +44,28 @@ describe('ownSubmissionsOnly (until backend ask B-8d1)', () => {
     expect(
       ownSubmissionsOnly(contestDetail({ viewer: contestViewer({ canEdit: true }) }), FROZEN),
     ).toBe(false));
+
+  it('lets editors, curators and scoreboard viewers see the list the backend gives them', () => {
+    const viewer = (flags: object) => contestViewer({ canEdit: false, ...flags });
+    const hidden = { phase: 'ended', frozenLastMinutes: 0, scoreboardVisibility: 'H' } as const;
+    expect(
+      ownSubmissionsOnly(
+        contestDetail({ ...hidden, viewer: viewer({ canSeeFullScoreboard: true }) }),
+        AFTER,
+      ),
+    ).toBe(false);
+    expect(ownSubmissionsOnly(contestDetail({ viewer: viewer({ isEditor: true }) }), FROZEN)).toBe(
+      false,
+    );
+    expect(
+      ownSubmissionsOnly(
+        contestDetail({
+          showSubmissionList: true,
+          scoreboardVisibility: 'P',
+          viewer: viewer({ canSeeFullScoreboard: true }),
+        }),
+        RUNNING,
+      ),
+    ).toBe(false);
+  });
 });

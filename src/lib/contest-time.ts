@@ -79,6 +79,13 @@ export function countdownTarget(
   return null;
 }
 
+/** Where a live participant's clock ends: their own window when it closes before the contest does, else the contest's end. */
+export function ownEndTime(contestEnd: string, liveRun?: { endTime: string } | null): string {
+  return liveRun && Date.parse(liveRun.endTime) < Date.parse(contestEnd)
+    ? liveRun.endTime
+    : contestEnd;
+}
+
 const DAY_MS = 86_400_000;
 
 /** Calendar days from the viewer-zone day of `from` to that of `to`: 0 the same day, 1 the next day (the `(+1)` label). */
