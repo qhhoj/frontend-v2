@@ -61,7 +61,7 @@ describe('home', () => {
     expect(wrapper.get('[data-testid="rating-hero"] [role="alert"] button').text()).toBe('Thử lại');
   });
 
-  it('puts the newest posts, pinned first, between the live contest and the top rating', async () => {
+  it('puts the newest posts, pinned first, between the running contests and the leaderboard', async () => {
     const posts = [
       postItem({ id: communityId(1), title: 'Nội quy thi', sticky: true }),
       postItem({ id: communityId(2), title: 'Lịch luyện tập', sticky: false }),
@@ -71,7 +71,7 @@ describe('home', () => {
     mockApi(signedInRoutes({ 'GET /posts': page(posts) }));
     const { wrapper } = await mountApp('/');
     await flushPromises();
-    const card = wrapper.get('[data-testid="home-posts"]');
+    const card = wrapper.get('[data-testid="new-posts"]');
     expect(
       card.findAll('li a[href^="/blog/"]').map((link) => [link.text(), link.attributes('href')]),
     ).toEqual([
@@ -79,16 +79,25 @@ describe('home', () => {
       ['Lịch luyện tập', `/blog/${communityId(2)}`],
       ['Tổng kết', `/blog/${communityId(3)}`],
     ]);
-    expect(card.findAll('[data-testid="post-pinned"]')).toHaveLength(1);
-    expect(card.get('li').find('[data-testid="post-pinned"]').attributes('aria-label')).toBe(
-      'Đã ghim',
-    );
+    expect(card.get('li').text()).toContain('Ghim');
     const order = wrapper
       .findAll(
-        '[data-testid="home-posts"], [data-testid="top-users"], [data-testid="live-contest"]',
+        '[data-testid="new-posts"], [data-testid="top-performers"], [data-testid="running-contests"]',
       )
       .map((node) => node.attributes('data-testid'));
-    expect(order).toEqual(['live-contest', 'home-posts', 'top-users']);
+    expect(order).toEqual(['running-contests', 'new-posts', 'top-performers']);
+  });
+
+  it('continues with the newest problem that is not accepted, inside the personal card', async () => {
+    mockApi(signedInRoutes());
+    const { wrapper } = await mountApp('/');
+    await flushPromises();
+    const button = wrapper.get('[data-testid="rating-hero"] [data-testid="continue-problem"]');
+    expect(button.attributes('href')).toBe('/problems/sp');
+    expect(button.text()).toBe('Tiếp tục: Đường đi ngắn nhất');
+    expect(
+      wrapper.get('[data-testid="rating-hero"] [data-testid="recent-submissions"]').text(),
+    ).toContain('Đường đi ngắn nhất');
   });
 
   it('leads with the rating, or with the problems solved before the first rating', async () => {
@@ -133,12 +142,11 @@ describe('home', () => {
     expect(wrapper.find('[data-testid="rating-chart"]').exists()).toBe(false);
   });
 
-  it('shows anonymous viewers the public cards only', async () => {
+  it('shows anonymous viewers the sign-up card above the same cards', async () => {
     mockApi({ ...publicRoutes, 'GET /auth/me': signedOut });
     const { wrapper } = await mountApp('/');
     expect(wrapper.get('h1').text()).toBe('Quốc Học Huế Online Judge');
     expect(wrapper.find('[data-testid="rating-hero"]').exists()).toBe(false);
-    expect(wrapper.find('[data-testid="top-users"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="running-contests"]').exists()).toBe(true);
   });
 });

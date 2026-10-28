@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import StateBit from '@/components/StateBit.vue';
+import SeeAllLink from '@/components/SeeAllLink.vue';
 import UserName from '@/components/UserName.vue';
 import CommunityCard from '@/features/community/CommunityCard.vue';
 import { useHomeQuery } from '@/features/community/community.queries';
@@ -23,7 +23,6 @@ const performers = computed(() => (home.value?.topPerformers ?? []).slice(0, PER
     :error="error"
     @retry="refetch()"
   >
-    <template #bit><StateBit variant="rankUp" size="inline" /></template>
     <template #skeleton>
       <div v-for="row in 3" :key="row" class="h-7 w-full rounded-pill bg-skeleton" />
     </template>
@@ -53,12 +52,9 @@ const performers = computed(() => (home.value?.topPerformers ?? []).slice(0, PER
       </li>
     </ol>
     <template #footer>
-      <RouterLink
-        :to="{ name: 'users', query: { sort: 'performancePoints' } }"
-        class="font-semibold text-accent-text hover:underline"
-      >
-        {{ $t('home.anon.leaderboard') }}
-      </RouterLink>
+      <SeeAllLink :to="{ name: 'users', query: { sort: 'performancePoints' } }">{{
+        $t('home.anon.leaderboard')
+      }}</SeeAllLink>
     </template>
   </CommunityCard>
 </template>

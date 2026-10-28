@@ -4,6 +4,7 @@ import Chip from '@/components/ui/Chip.vue';
 import ProgressBar from '@/components/ui/ProgressBar.vue';
 import { computed } from 'vue';
 import type { ContestListItem } from '@/api/types/contests';
+import SeeAllLink from '@/components/SeeAllLink.vue';
 import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -30,16 +31,11 @@ const timeLeftOf = (contest: ContestListItem) =>
 </script>
 
 <template>
-  <Card data-testid="running-contests" class="flex flex-col gap-4 p-5 sm:p-6">
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <h2 class="flex items-center gap-2 font-display text-base font-bold">
-        {{ $t('home.anon.running') }}
-        <Chip size="md" class="font-mono tabular-nums">{{ contests.length }}</Chip>
-      </h2>
-      <RouterLink :to="{ name: 'contests' }" class="font-semibold text-accent-text hover:underline">
-        {{ $t('home.anon.allContests') }}
-      </RouterLink>
-    </div>
+  <Card data-testid="running-contests" padding="lg" :title="$t('home.anon.running')">
+    <template #actions>
+      <Chip size="md" class="font-mono tabular-nums">{{ contests.length }}</Chip>
+      <SeeAllLink :to="{ name: 'contests' }">{{ $t('home.anon.allContests') }}</SeeAllLink>
+    </template>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <div data-skeleton-region="running-contest" class="grid gap-3 md:grid-cols-2">
@@ -87,12 +83,7 @@ const timeLeftOf = (contest: ContestListItem) =>
       <div v-else class="flex flex-wrap items-center gap-3 py-2">
         <StateBit variant="contest" size="inline" />
         <p class="text-muted">{{ $t('home.noLiveContest') }}</p>
-        <RouterLink
-          :to="{ name: 'contests' }"
-          class="font-semibold text-accent-text hover:underline"
-        >
-          {{ $t('home.browseContests') }}
-        </RouterLink>
+        <SeeAllLink :to="{ name: 'contests' }">{{ $t('home.browseContests') }}</SeeAllLink>
       </div>
     </QueryState>
   </Card>
