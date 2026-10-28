@@ -3,6 +3,7 @@ import { computed, ref, useId, watch } from 'vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import Notice from '@/components/ui/Notice.vue';
 import UserContent from '@/components/UserContent.vue';
 import { ApiError } from '@/api/client';
 import { errorMessageKey } from '@/i18n/error-message';
@@ -38,13 +39,21 @@ const RULES_DIALOG_WIDTH = 520;
 /** Rules whose rendered text is empty for good (everything sanitised away) must not block accepting forever. */
 const isLoading = computed(() => props.rulesHtml === '' && props.isRefreshing);
 const canAccept = computed(() => isTicked.value && !isLoading.value);
-const isNotRecorded = computed(
-  () => props.error instanceof ApiError && props.error.code === 'rules_not_accepted',
+/** Both codes mean the text on screen is not the one to accept: the page reloads it and the box is unticked. */
+const isChanged = computed(
+  () =>
+    props.error instanceof ApiError &&
+    (props.error.code === 'rules_changed' || props.error.code === 'rules_not_accepted'),
 );
 
 watch(visible, (isOpen) => {
   if (!isOpen) isTicked.value = false;
 });
+/** New rules text: the old tick does not cover it. */
+watch(
+  () => props.revision,
+  () => (isTicked.value = false),
+);
 function accept() {
   if (canAccept.value && !props.isPending) emit('accept');
 }
@@ -102,12 +111,11 @@ function accept() {
     </label>
     <p v-if="!isTicked" class="text-sm text-muted">{{ $t('joinRules.tickHint') }}</p>
     <template #error>
-      <p v-if="error" role="alert" class="flex items-center gap-2.5 text-verdict-wa">
+      <Notice v-if="isChanged" tone="warning">{{ $t('joinRules.changed') }}</Notice>
+      <p v-else-if="error" role="alert" class="flex items-center gap-2.5 text-verdict-wa">
         <InlineBit :kind="EXTRAS_BITS.rulesRefused" />
         <span>
-          <strong>{{
-            $t(isNotRecorded ? 'joinRules.notRecordedTitle' : 'joinRules.refusedTitle')
-          }}</strong>
+          <strong>{{ $t('joinRules.refusedTitle') }}</strong>
           {{ $t(errorMessageKey(error)) }}
         </span>
       </p>
