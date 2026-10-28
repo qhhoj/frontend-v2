@@ -19,6 +19,7 @@ const group = (spec: GroupSpec): SimilarityGroup => ({
   tokenizer: 'syntax',
   skippedEmpty: 0,
   skippedTooLarge: 0,
+  droppedByCap: 0,
   truncated: false,
   failed: false,
   ...spec,

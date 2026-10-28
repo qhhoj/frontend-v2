@@ -10,7 +10,7 @@ export interface paths {
         };
         /**
          * List recorded changes across the site
-         * @description Requires `judge.change_settings`. The global change log: every write that already leaves a record (the `revisions` rows of problems, contests, users, organizations, posts, comments, pages, catalogs, submission locks and batch rejudges, and setting changes), newest first, 50 per page (`limit` 1-50). Each entry names the actor, the action, the object (with a label and whether it still exists) and the changed field names; values are never returned. Filters: `actor` (exact username; unknown gives an empty page), `type`, and a `from`/`to` time range. Page with `before` = the previous page's `nextBefore`. Reads are not logged.
+         * @description Requires `judge.change_settings`. The global change log: every write that already leaves a record (the `revisions` rows of problems, contests, users, organizations, posts, comments, pages, catalogs, submission locks and batch rejudges, and setting changes), newest first, 50 per page (`limit` 1-50). Each entry names the actor, the action, the object (with a label and whether it still exists) and the changed field names; values are never returned, and the note (`comment`) of a `user`, `problem`, `contest` or `contestParticipation` record is empty unless you also hold `auth.change_user`, `judge.edit_all_problem` or `judge.edit_all_contest` respectively. Records of superuser-only settings (decision 416) are left out unless you are a superuser. Filters: `actor` (exact username; unknown gives an empty page), `type`, and a `from`/`to` time range. Page with `before` = the previous page's `nextBefore`. Reads are not logged.
          */
         get: operations["AuditController_list"];
         put?: never;
@@ -574,13 +574,13 @@ export interface paths {
         get?: never;
         /**
          * Set a public config value
-         * @description Requires `judge.change_miscconfig`. Creates or replaces a free-form key/value text served to everyone by `GET /site`, so it must never hold a secret. The empty string is a valid value. A changed value records a revision.
+         * @description Requires `judge.change_miscconfig` and a browser session (API tokens are refused). Creates or replaces a free-form key/value text served to everyone by `GET /site`, so it must never hold a secret. The empty string is a valid value. A changed value records a revision.
          */
         put: operations["MiscConfigAdminController_put"];
         post?: never;
         /**
          * Delete a public config value
-         * @description Requires `judge.change_miscconfig`. Removes the key and records a revision. 404 `not_found` if it does not exist. Returns 204.
+         * @description Requires `judge.change_miscconfig` and a browser session. Removes the key and records a revision. 404 `not_found` if it does not exist. Returns 204.
          */
         delete: operations["MiscConfigAdminController_delete"];
         options?: never;
@@ -732,7 +732,7 @@ export interface paths {
         post?: never;
         /**
          * Delete anonymous activity data
-         * @description Requires `judge.can_see_user_activity`. Deletes all activity log rows and sessions of signed-out visitors; the deletion is written to the server log with the acting staff member. Returns 204.
+         * @description Requires `judge.can_see_user_activity`. Needs a browser session (API tokens get 403) and not impersonating. Deletes all activity log rows and sessions of signed-out visitors; the deletion is written to the server log and recorded as a `user` revision (`delete_anonymous_activity`) on your account. Returns 204.
          */
         delete: operations["UserActivityStaffController_deleteAnonymous"];
         options?: never;
@@ -812,7 +812,7 @@ export interface paths {
         post?: never;
         /**
          * Delete a user's activity data
-         * @description Requires `judge.can_see_user_activity`. Deletes the user's activity log rows and their stored sessions; the deletion is written to the server log with the acting staff member. 404 `not_found` for an unknown user. Returns 204.
+         * @description Requires `judge.can_see_user_activity`. Needs a browser session (API tokens get 403) and not impersonating. Deletes the user's activity log rows and their stored sessions; the deletion is written to the server log and recorded as a `user` revision (`delete_activity`) with the counts. 403 `forbidden` when the target is yourself or a superuser and you are not a superuser; 404 `not_found` for an unknown user. Returns 204.
          */
         delete: operations["UserActivityStaffController_deleteUser"];
         options?: never;
@@ -1498,8 +1498,8 @@ export interface paths {
         };
         /**
          * Finish a social sign-in
-         * @description Public. The provider redirects the browser here. Always answers with a 302 to the site: to `/` (or `/login/2fa` when a second factor is pending) after signing in, to `/register/social?token=...` when a new account must be completed with `POST /auth/social/complete`, or to `/login?error=<code>` with `oauth_state`, `oauth_failed`, `email_unverified`, `banned`, `account_not_activated` or `account_disabled`.
-         *     A verified email that matches exactly one active account links the provider to it and ends that account's other sessions and API token; when it was never signed in to, its password also stops working (set one with the reset form). The state is single use.
+         * @description Public. The provider redirects the browser here. Always answers with a 302 to the site: to `/` (or `/login/2fa` when a second factor is pending) after signing in, to `/register/social?token=...` when a new account must be completed with `POST /auth/social/complete`, or to `/login?error=<code>` with `oauth_state`, `oauth_failed`, `email_unverified`, `social_email_in_use`, `banned`, `account_not_activated` or `account_disabled`.
+         *     A provider account that is not linked never attaches to an existing account by email: a verified email already used by an active account answers `social_email_in_use` and changes nothing (the person signs in with the password). The state is single use.
          */
         get: operations["SocialController_callback"];
         put?: never;
@@ -1795,9 +1795,11 @@ export interface paths {
         };
         /**
          * List the edit history of a comment
-         * @description Public. Returns every edit of a comment with the time, the editor, and the
-         *     text before and after. Hidden and deleted comments are only available to
-         *     holders of `judge.change_comment`.
+         * @description Public. Returns the edits of a comment, newest first, 100 per `page`
+         *     (a full page may have a next one), with the time, the editor, and the
+         *     text before and after. A deleted comment also lists its deletion, as the
+         *     last text changed to empty. Hidden and deleted comments are only
+         *     available to holders of `judge.change_comment`.
          */
         get: operations["CommentPostingController_revisions"];
         put?: never;
@@ -3081,11 +3083,13 @@ export interface paths {
          * Register for a contest
          * @description Registers the signed-in user for a contest that requires registration,
          *     before registration closes. Send `accessCode` when the contest has one
-         *     (editors skip it) and `acceptRules` true when the contest has rules.
+         *     (editors skip it), `acceptRules` true and the `acceptRulesRevision` shown
+         *     to the user when the contest has rules.
          *     Refusals are 409 `editor_cannot_register`, `registration_not_required`,
          *     `registration_closed`, `contest_ended` or `already_registered`; 403
-         *     `banned_from_contest`, `access_code_required` or `wrong_access_code`; and
-         *     400 `rules_not_accepted`. Wrong access codes are rate limited per user and
+         *     `banned_from_contest`, `access_code_required` or `wrong_access_code`; 400
+         *     `rules_not_accepted`; and 409 `rules_changed` when the rules were saved
+         *     after the user read them. Wrong access codes are rate limited per user and
          *     per IP.
          */
         post: operations["ContestParticipationController_register"];
@@ -3666,7 +3670,7 @@ export interface paths {
         put?: never;
         /**
          * Register a judge server
-         * @description Needs `judge.change_judge`. `name` uses letters, digits, `_`, `.` or `-` (at
+         * @description Needs `judge.change_judge` and a browser session, not while impersonating (API tokens are refused); each change is recorded in the change log. `name` uses letters, digits, `_`, `.` or `-` (at
          *     most 50) and is what the judge sends when it connects. Returns the judge and
          *     its `authKey`, shown only this once (only a hash is stored). Responds 409
          *     `conflict` (issue `name_taken`) when the name exists.
@@ -3690,7 +3694,7 @@ export interface paths {
         post?: never;
         /**
          * Delete a judge server
-         * @description Needs `judge.change_judge`. Only an offline judge can be deleted: 409
+         * @description Needs `judge.change_judge` and a browser session, not while impersonating (API tokens are refused); each change is recorded in the change log. Only an offline judge can be deleted: 409
          *     `conflict` (issue `judge_online`) while it is connected, 404 `not_found` for
          *     an unknown name. Queued submissions pinned to it fall back to any judge.
          *     Answers 204.
@@ -3700,7 +3704,7 @@ export interface paths {
         head?: never;
         /**
          * Update a judge server
-         * @description Needs `judge.change_judge`. Send only the fields to change: `isBlocked`,
+         * @description Needs `judge.change_judge` and a browser session, not while impersonating (API tokens are refused); each change is recorded in the change log. Send only the fields to change: `isBlocked`,
          *     `blockReason`, `isDisabled` and `description`. Blocking disconnects the
          *     judge and refuses it until unblocked; `blockReason` is kept only while the
          *     judge is blocked and cleared on unblock.
@@ -3722,7 +3726,7 @@ export interface paths {
         put?: never;
         /**
          * Disconnect a judge server
-         * @description Needs `judge.change_judge`. Asks the bridge to disconnect the judge; it may
+         * @description Needs `judge.change_judge` and a browser session, not while impersonating (API tokens are refused); each change is recorded in the change log. Asks the bridge to disconnect the judge; it may
          *     reconnect. With `force` every session and socket of the judge is retired at
          *     once. Answers 204; 404 `not_found` for an unknown name.
          */
@@ -3744,7 +3748,7 @@ export interface paths {
         put?: never;
         /**
          * Issue a new authentication key for a judge
-         * @description Needs `judge.change_judge`. The old key stops working and a connected judge
+         * @description Needs `judge.change_judge` and a browser session, not while impersonating (API tokens are refused); each change is recorded in the change log. The old key stops working and a connected judge
          *     is disconnected; it can only reconnect with the new `authKey`, returned only
          *     this once. Responds 404 `not_found` for an unknown name.
          */
@@ -3766,7 +3770,7 @@ export interface paths {
         put?: never;
         /**
          * Rename a judge server
-         * @description Needs `judge.change_judge`. Only an offline judge can be renamed: 409
+         * @description Needs `judge.change_judge` and a browser session, not while impersonating (API tokens are refused); each change is recorded in the change log. Only an offline judge can be renamed: 409
          *     `conflict` (issue `judge_online`) while it is connected, and (issue
          *     `judge_busy`) while submissions handed to it are still in flight. The new
          *     name follows the creation rule; 409 (issue `name_taken`) when it exists.
@@ -7532,7 +7536,7 @@ export interface components {
             at: string;
             /** @description Names of the changed fields. Values are never returned: some records hold sensitive before/after values. */
             changedFields: string[];
-            /** @description The writer's free-text note, often empty. */
+            /** @description The writer's free-text note, often empty; empty too when you lack the permission of the record's kind. */
             comment: string;
             /** @description Record id (UUIDv7, sorts by time). */
             id: string;
@@ -9687,6 +9691,8 @@ export interface components {
         IntegrationScope: "contests:read" | "contests:write";
         JoinBodyDto: {
             acceptRules?: boolean;
+            /** @description The `rulesRevision` the contestant read; a different current revision answers 409 `rules_changed`. Optional for one release. */
+            acceptRulesRevision?: number;
             accessCode?: string;
         };
         JudgeAddressResponse: {
@@ -11763,6 +11769,8 @@ export interface components {
         SimilarityGroupResponse: {
             /** @description Actually compared, after the cap and the skips. */
             comparedCount: number;
+            /** @description Pairs of two users at or above `limits.minPercent` left out by the `maxPairs` cap; above 0, the list is incomplete. */
+            droppedByCap: number;
             /** @description The engine failed on this group alone: it has no pairs, the rest of the run completed. */
             failed: boolean;
             /** @description Engine family: `cpp`, `python`, `pascal`, ... */
@@ -13627,7 +13635,7 @@ export interface operations {
                 /** @description Changes before this time (ISO 8601 with offset). */
                 to?: string;
                 /** @description Only changes to this kind of object. */
-                type?: "blogPost" | "comment" | "contest" | "contestParticipation" | "flatpage" | "group" | "license" | "organization" | "problem" | "problemGroup" | "problemType" | "setting" | "submission" | "submission_batch" | "tagProblem" | "user";
+                type?: "blogPost" | "comment" | "contest" | "contestParticipation" | "flatpage" | "group" | "judge" | "license" | "organization" | "problem" | "problemGroup" | "problemType" | "setting" | "submission" | "submission_batch" | "tagProblem" | "user";
             };
             header?: never;
             path?: never;
@@ -17047,7 +17055,10 @@ export interface operations {
     };
     CommentPostingController_revisions: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Page number, starting at 1. */
+                page?: number;
+            };
             header?: never;
             path: {
                 /** @description Id of the comment. */
