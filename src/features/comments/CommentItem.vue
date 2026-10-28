@@ -70,13 +70,13 @@ const actionOf = (id: string, label: string, run: () => void, isModeration = fal
   run,
   isModeration,
 });
-/** Edit, history, delete and report for the viewer; then the moderators' hide or unhide, set apart. */
+/** Edit, history (a deleted comment's only for moderators: its history holds the deleted text), delete and report for the viewer; then the moderators' hide or unhide, set apart. */
 const actions = computed<Action[]>(() => {
   const shown = comment.value;
   const list: Action[] = [];
   if (shown.canEdit && !props.isEditing)
     list.push(actionOf('edit', t('common.edit'), () => emit('edit')));
-  if (shown.revisions && (!shown.deleted || props.moderates))
+  if (shown.deleted ? props.moderates : shown.revisions)
     list.push(
       actionOf('history', t('comments.action.history', { count: shown.revisions }), () =>
         emit('history'),
@@ -169,7 +169,7 @@ const TEXT_BUTTON =
             {{ formatAgo(comment.createdAt, now, locale.locale) }}
           </time>
           <button
-            v-if="comment.revisions"
+            v-if="comment.revisions && !comment.deleted"
             type="button"
             class="text-caption leading-4 text-muted underline decoration-dotted hover:text-content"
             :aria-label="$t('comments.editedLabel', { count: comment.revisions })"
