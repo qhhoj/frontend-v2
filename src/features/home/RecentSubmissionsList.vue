@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
-import SeeAllLink from '@/components/SeeAllLink.vue';
+import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';

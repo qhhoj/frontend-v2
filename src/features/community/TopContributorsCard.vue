@@ -5,6 +5,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useHomeQuery } from './community.queries';
+import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import CommunityCard from './CommunityCard.vue';
 
 /** The users with the most contribution points, ranked in the order the API gives them. */
@@ -44,12 +45,9 @@ const contributors = computed(() => (home.value?.topContributors ?? []).slice(0,
       </li>
     </ol>
     <template #footer>
-      <RouterLink
-        :to="{ name: 'users', query: { sort: 'contributionPoints' } }"
-        class="font-semibold text-accent-text hover:underline"
-      >
-        {{ $t('blog.toLeaderboard') }}
-      </RouterLink>
+      <SeeAllLink :to="{ name: 'users', query: { sort: 'contributionPoints' } }">{{
+        $t('blog.toLeaderboard')
+      }}</SeeAllLink>
     </template>
   </CommunityCard>
 </template>

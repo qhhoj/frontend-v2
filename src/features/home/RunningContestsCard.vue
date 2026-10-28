@@ -4,7 +4,7 @@ import Chip from '@/components/ui/Chip.vue';
 import ProgressBar from '@/components/ui/ProgressBar.vue';
 import { computed } from 'vue';
 import type { ContestListItem } from '@/api/types/contests';
-import SeeAllLink from '@/components/SeeAllLink.vue';
+import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';

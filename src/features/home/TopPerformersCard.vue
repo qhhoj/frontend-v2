@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import SeeAllLink from '@/components/SeeAllLink.vue';
+import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import UserName from '@/components/UserName.vue';
 import CommunityCard from '@/features/community/CommunityCard.vue';
 import { useHomeQuery } from '@/features/community/community.queries';

@@ -16,12 +16,12 @@ defineEmits<{ retry: [] }>();
 
 <template>
   <section v-if="embedded" class="flex flex-col gap-3">
-    <h2 class="font-display text-base font-bold">{{ title }}</h2>
+    <h2 class="text-title leading-5.5 font-semibold">{{ title }}</h2>
     <QueryState :loading="loading" :error="error" @retry="$emit('retry')">
       <template #skeleton><slot name="skeleton" /></template>
       <slot />
     </QueryState>
-    <div v-if="$slots.footer" class="pt-1 text-sm"><slot name="footer" /></div>
+    <div v-if="$slots.footer"><slot name="footer" /></div>
   </section>
   <Card v-else padding="lg" :title="title">
     <template v-if="$slots.bit || $slots.footer" #actions>

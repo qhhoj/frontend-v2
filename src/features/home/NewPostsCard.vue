@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Chip from '@/components/ui/Chip.vue';
 import { computed } from 'vue';
-import SeeAllLink from '@/components/SeeAllLink.vue';
+import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import UserName from '@/components/UserName.vue';
 import CommunityCard from '@/features/community/CommunityCard.vue';
