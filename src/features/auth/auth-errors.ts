@@ -83,6 +83,7 @@ const CALLBACK_ERROR_CODES: readonly string[] = [
   'oauth_state',
   'oauth_failed',
   'email_unverified',
+  'social_email_in_use',
   'banned',
   'account_not_activated',
   'account_disabled',

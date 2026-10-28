@@ -638,6 +638,16 @@
       "removeTitle": "Remove the security key?",
       "removeBody": "The key {name} will no longer sign you in.",
       "removeConfirm": "Remove the key"
+    },
+    "social": {
+      "title": "Social accounts",
+      "lead": "The social accounts that sign in to this account.",
+      "remove": "Unlink",
+      "removeLabel": "Unlink {name}",
+      "removeTitle": "Unlink {name}?",
+      "removeBody": "{name} will no longer sign you in. Sessions already open stay until you sign out.",
+      "removed": "Unlinked {name}.",
+      "passwordUnusable": "This account has no password yet, so it cannot be unlinked. Set a password with the reset form first."
     }
   },
   "appearance": {
@@ -891,6 +901,7 @@
     "oauth_state": "The social sign-in session expired. Try again.",
     "oauth_failed": "Social sign-in failed.",
     "email_unverified": "The email of that social account is not verified.",
+    "social_email_in_use": "This email already belongs to an account. Sign in with your password.",
     "banned_from_problem": "You are banned from submitting to this problem.",
     "contest_submission_limit": "You have used all your submissions for this problem in the contest.",
     "unfinished_submission_limit": "You have too many submissions still being judged. Wait for them to finish.",

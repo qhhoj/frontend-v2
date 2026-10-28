@@ -638,6 +638,16 @@
       "removeTitle": "Xóa khóa bảo mật?",
       "removeBody": "Khóa {name} sẽ không dùng để đăng nhập được nữa.",
       "removeConfirm": "Xóa khóa"
+    },
+    "social": {
+      "title": "Tài khoản mạng xã hội",
+      "lead": "Các tài khoản mạng xã hội đang dùng để đăng nhập vào tài khoản này.",
+      "remove": "Gỡ liên kết",
+      "removeLabel": "Gỡ liên kết {name}",
+      "removeTitle": "Gỡ liên kết {name}?",
+      "removeBody": "{name} sẽ không dùng để đăng nhập được nữa. Các phiên đang mở vẫn giữ nguyên cho đến khi bạn đăng xuất.",
+      "removed": "Đã gỡ liên kết {name}.",
+      "passwordUnusable": "Tài khoản chưa có mật khẩu nên chưa thể gỡ liên kết. Hãy đặt mật khẩu bằng biểu mẫu quên mật khẩu trước."
     }
   },
   "appearance": {
@@ -891,6 +901,7 @@
     "oauth_state": "Phiên đăng nhập bằng mạng xã hội đã hết hạn. Hãy thử lại.",
     "oauth_failed": "Đăng nhập bằng mạng xã hội không thành công.",
     "email_unverified": "Email của tài khoản mạng xã hội này chưa được xác minh.",
+    "social_email_in_use": "Email này đã thuộc về một tài khoản. Hãy đăng nhập bằng mật khẩu.",
     "banned_from_problem": "Tài khoản bị cấm nộp bài này.",
     "contest_submission_limit": "Bạn đã dùng hết số lần nộp bài này trong kỳ thi.",
     "unfinished_submission_limit": "Bạn có quá nhiều bài nộp đang chờ chấm. Hãy đợi chúng chấm xong.",

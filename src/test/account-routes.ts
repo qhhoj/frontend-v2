@@ -14,4 +14,5 @@ export const settingsRoutes = (
   'GET /problems/meta': ok(problemMeta()),
   'GET /auth/2fa/totp/scratch-codes': ok({ remaining: 5 }),
   'GET /auth/2fa/webauthn/credentials': ok([]),
+  'GET /auth/social/links': ok({ providers: [] }),
 });
