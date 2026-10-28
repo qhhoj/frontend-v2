@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BitLoop from '@/components/BitLoop.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Chip from '@/components/ui/Chip.vue';
 import ProgressBar from '@/components/ui/ProgressBar.vue';
@@ -33,6 +34,13 @@ const timeLeftOf = (contest: ContestListItem) =>
 <template>
   <Card data-testid="running-contests" padding="lg" :title="$t('home.anon.running')">
     <template #actions>
+      <!-- The 32 px Bit of a running contest; the negative margin keeps the header's height when it arrives. -->
+      <BitLoop
+        v-if="contests.length"
+        data-testid="contest-bit"
+        kind="contest"
+        class="-my-1.5 [--bit-px:2px]"
+      />
       <Chip size="md" class="font-mono tabular-nums">{{ contests.length }}</Chip>
       <SeeAllLink :to="{ name: 'contests' }">{{ $t('home.anon.allContests') }}</SeeAllLink>
     </template>
