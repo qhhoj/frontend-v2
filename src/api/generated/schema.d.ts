@@ -3088,7 +3088,7 @@ export interface paths {
          *     Refusals are 409 `editor_cannot_register`, `registration_not_required`,
          *     `registration_closed`, `contest_ended` or `already_registered`; 403
          *     `banned_from_contest`, `access_code_required` or `wrong_access_code`; 400
-         *     `rules_not_accepted`; and 409 `rules_changed` when the rules were saved
+         *     `rules_not_accepted`; and 409 `rules_changed` when the revision is missing or the rules were saved
          *     after the user read them. Wrong access codes are rate limited per user and
          *     per IP.
          */
@@ -9691,7 +9691,7 @@ export interface components {
         IntegrationScope: "contests:read" | "contests:write";
         JoinBodyDto: {
             acceptRules?: boolean;
-            /** @description The `rulesRevision` the contestant read; a different current revision answers 409 `rules_changed`. Optional for one release. */
+            /** @description The `rulesRevision` the contestant read; a missing or different current revision answers 409 `rules_changed`. Required when the contest has rules. */
             acceptRulesRevision?: number;
             accessCode?: string;
         };
