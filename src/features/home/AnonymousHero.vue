@@ -23,7 +23,8 @@ const formatCount = (value: number) => formatNumber(value, locale.locale);
 <template>
   <Card
     data-testid="anonymous-hero"
-    class="flex flex-wrap items-center gap-6 p-6 sm:flex-nowrap sm:gap-8 sm:p-8"
+    padding="lg"
+    class="flex flex-wrap items-center gap-6 sm:flex-nowrap sm:gap-8"
   >
     <div class="flex min-w-0 flex-1 flex-col gap-3">
       <div class="flex items-center justify-between gap-3">

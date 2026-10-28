@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Chip from '@/components/ui/Chip.vue';
 import { computed } from 'vue';
+import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import UserName from '@/components/UserName.vue';
 import CommunityCard from '@/features/community/CommunityCard.vue';
@@ -10,7 +11,7 @@ import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 
-const POST_COUNT = 5;
+const POST_COUNT = 3;
 const locale = useLocaleStore();
 const { data, isPending, error, refetch } = usePostsQuery('global', 1);
 const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
@@ -56,9 +57,7 @@ const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
       </li>
     </ul>
     <template #footer>
-      <RouterLink :to="{ name: 'blog' }" class="font-semibold text-accent-text hover:underline">
-        {{ $t('home.anon.allPosts') }}
-      </RouterLink>
+      <SeeAllLink :to="{ name: 'blog' }">{{ $t('home.anon.allPosts') }}</SeeAllLink>
     </template>
   </CommunityCard>
 </template>

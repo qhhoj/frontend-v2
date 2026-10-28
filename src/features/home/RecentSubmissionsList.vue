@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
-import Card from '@/components/ui/Card.vue';
+import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import VerdictBadge from '@/components/VerdictBadge.vue';
@@ -11,6 +12,8 @@ import { submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useRecentSubmissionsQuery } from './home.queries';
 
+/** The three newest submissions, a section of the personal card. */
+const VISIBLE = 3;
 const props = defineProps<{ username: string }>();
 const {
   data: submissions,
@@ -20,29 +23,22 @@ const {
 } = useRecentSubmissionsQuery(() => props.username);
 const locale = useLocaleStore();
 const now = useNow(60_000);
-/**
- * The list box on a phone: the four skeleton rows, measured at 382 px on a 375 px screen. The skeleton and the empty
- * message both take it, so the card keeps its height when rows or the message replace the skeleton. From `sm`
- * the card sits beside the right column in a flex row that stretches it, so the box is dropped there.
- */
-const LIST_BOX = 'min-h-[382px] sm:min-h-0';
+const visible = computed(() => (submissions.value ?? []).slice(0, VISIBLE));
 </script>
 
 <template>
-  <Card data-testid="recent-submissions" class="p-6">
-    <div class="flex items-center justify-between">
-      <h2 class="font-display text-base leading-7 font-bold">{{ $t('home.recentSubmissions') }}</h2>
-      <RouterLink
-        :to="{ name: 'submissions', query: { user: username } }"
-        class="text-accent-text hover:underline"
-        >{{ $t('common.viewAll') }}</RouterLink
-      >
+  <section data-testid="recent-submissions" class="flex min-w-0 flex-col">
+    <div class="mb-2 flex items-center justify-between gap-2">
+      <h2 class="text-title leading-5.5 font-semibold">{{ $t('home.recentSubmissions') }}</h2>
+      <SeeAllLink :to="{ name: 'submissions', query: { user: username } }">{{
+        $t('common.viewAll')
+      }}</SeeAllLink>
     </div>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
-        <ul class="mt-3.5 flex flex-col gap-2" :class="LIST_BOX">
+        <ul class="flex flex-col gap-2">
           <li
-            v-for="row in 4"
+            v-for="row in VISIBLE"
             :key="row"
             class="flex flex-wrap items-center gap-x-3.5 gap-y-1 rounded-row bg-surface px-3.5 py-3"
           >
@@ -56,15 +52,11 @@ const LIST_BOX = 'min-h-[382px] sm:min-h-0';
         </ul>
       </template>
 
-      <EmptyState
-        v-if="!submissions?.length"
-        compact
-        class="mt-3.5 justify-center"
-        :class="LIST_BOX"
-        >{{ $t('home.noSubmissions') }}</EmptyState
-      >
-      <ul v-else class="mt-3.5 flex flex-col gap-2">
-        <li v-for="item in submissions" :key="item.id">
+      <EmptyState v-if="!visible.length" compact class="justify-center">{{
+        $t('home.noSubmissions')
+      }}</EmptyState>
+      <ul v-else class="flex flex-col gap-2">
+        <li v-for="item in visible" :key="item.id">
           <RouterLink
             :to="{ name: 'submission', params: { id: item.id } }"
             class="flex flex-wrap items-center gap-x-3.5 gap-y-1 rounded-row bg-surface px-3.5 py-3 text-content hover:bg-surface-hover"
@@ -87,5 +79,5 @@ const LIST_BOX = 'min-h-[382px] sm:min-h-0';
         </li>
       </ul>
     </QueryState>
-  </Card>
+  </section>
 </template>

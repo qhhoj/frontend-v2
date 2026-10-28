@@ -12,6 +12,7 @@ import { loginRoutes } from '@/test/auth-routes';
 import { installFakeEventSource } from '@/test/fake-event-source';
 import { signedInViewer } from '@/test/problem-routes';
 import { stubMatchMedia } from '@/test/match-media';
+import { homeResponse } from '@/test/community-fixtures';
 import { mockApi, ok, page } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
 import { pixelsOf, pixelsOfKind } from '@/test/bit-pixels';
@@ -26,6 +27,7 @@ const homeRoutes = (overrides: Record<string, MockHandler> = {}): Record<string,
   'GET /posts': page([]),
   'GET /contests': page([contestItem()]),
   'GET /users': page([]),
+  'GET /home': ok(homeResponse()),
   ...overrides,
 });
 
