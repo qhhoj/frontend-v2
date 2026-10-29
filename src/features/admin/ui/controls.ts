@@ -13,13 +13,17 @@ const CONTROL_HEIGHT = 'min-h-(--qh-control)';
 export type { ButtonTone };
 export type ControlSize = 'sm' | 'md';
 
-/** The class list of an admin button or button-styled link. Primary: one per page; danger: destructive only, outlined. */
+/**
+ * The class list of a button or button-styled link: the kit's recipe (`components/ui/button-classes.ts`), the one source of sizes
+ * and tones. Prefer `AppButton`; this is for a classed element the component cannot be. Primary: one per page; danger: destructive
+ * only, outlined.
+ */
 export const buttonClass = (tone: ButtonTone = 'secondary', size: ControlSize = 'md') =>
-  buttonClasses({ tone, size, shape: 'admin' });
+  buttonClasses({ tone, size });
 
 /** A square icon-only button; give it an `aria-label` and a `title`. */
 export const iconButtonClass = (tone: ButtonTone = 'ghost', size: ControlSize = 'md') =>
-  `${buttonClass(tone, size)} ${size === 'sm' ? 'min-w-8 px-0 touch:min-w-11' : 'min-w-(--qh-control) px-0'}`;
+  buttonClasses({ tone, size, iconOnly: true });
 
 export const BUTTON = {
   primary: buttonClass('primary'),

@@ -2939,7 +2939,10 @@
       "savedAt": "Đã lưu lúc {time}",
       "clean": "Chưa có thay đổi nào để lưu.",
       "discard": "Hủy thay đổi",
-      "saving": "Đang lưu…"
+      "saving": "Đang lưu…",
+      "discardTitle": "Hủy {count} thay đổi? | Hủy {count} thay đổi?",
+      "discardBody": "Các thay đổi chưa lưu sẽ mất.",
+      "keepEditing": "Tiếp tục sửa"
     }
   }
 }

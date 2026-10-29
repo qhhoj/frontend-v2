@@ -17,8 +17,18 @@ withDefaults(
     type?: 'button' | 'submit' | 'reset';
     loading?: boolean;
     disabled?: boolean;
+    pressed?: boolean;
+    disabledReason?: string;
   }>(),
-  { tone: 'ghost', size: 'md', to: undefined, href: undefined, type: 'button' },
+  {
+    tone: 'ghost',
+    size: 'md',
+    to: undefined,
+    href: undefined,
+    type: 'button',
+    pressed: undefined,
+    disabledReason: undefined,
+  },
 );
 const ICON_SIZES: Record<ButtonSize, string> = {
   sm: '[&_svg:not([class*=size-])]:size-4',
@@ -36,6 +46,8 @@ const ICON_SIZES: Record<ButtonSize, string> = {
     :type="type"
     :loading="loading"
     :disabled="disabled"
+    :pressed="pressed"
+    :disabled-reason="disabledReason"
     :class="ICON_SIZES[size]"
     :aria-label="label"
     :title="label"

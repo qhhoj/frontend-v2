@@ -2939,7 +2939,10 @@
       "savedAt": "Saved at {time}",
       "clean": "No changes to save.",
       "discard": "Discard changes",
-      "saving": "Saving…"
+      "saving": "Saving…",
+      "discardTitle": "Discard {count} change? | Discard {count} changes?",
+      "discardBody": "The unsaved changes will be lost.",
+      "keepEditing": "Keep editing"
     }
   }
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { X } from 'lucide-vue-next';
-import { buttonClass } from '../controls';
+import AppButton from '@/components/ui/AppButton.vue';
 
 /**
  * Shown only while rows are selected, in place of the table toolbar: "3 đã chọn · Bỏ chọn" and the bulk actions (default slot,
@@ -19,10 +19,10 @@ defineEmits<{ clear: [] }>();
     <span class="text-sm font-semibold" aria-live="polite">
       {{ $t('common.table.selected', count) }}
     </span>
-    <button type="button" :class="buttonClass('ghost', 'sm')" @click="$emit('clear')">
-      <X aria-hidden="true" class="size-4" :stroke-width="1.75" />
+    <AppButton tone="ghost" size="sm" @click="$emit('clear')">
+      <template #icon><X aria-hidden="true" class="size-4" :stroke-width="1.75" /></template>
       {{ $t('common.clearSelection') }}
-    </button>
+    </AppButton>
     <div class="ml-auto flex flex-wrap items-center gap-2"><slot /></div>
   </div>
 </template>

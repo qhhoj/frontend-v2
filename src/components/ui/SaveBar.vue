@@ -2,17 +2,18 @@
 import { computed, onBeforeUnmount, ref, useSlots, useTemplateRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Check } from 'lucide-vue-next';
-import { buttonClass } from '@/features/admin/ui/controls';
-import { SITE_TIME_ZONE } from '@/features/admin/ui/form/site-time';
-import { formatClock } from '@/lib/format-date';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { SITE_TIME_ZONE, formatClock } from '@/lib/format-date';
 import { useBottomScrollPadding } from '@/lib/use-bottom-scroll-padding';
+import AppButton from './AppButton.vue';
 import { SAVED_NOTE_MS } from './SaveBar.props';
 import type { SaveBarProps } from './SaveBar.props';
 
 /**
  * The one save bar of a form: sticky to the bottom of the content column (z-savebar).
  * Left: "3 thay đổi chưa lưu", "Đã lưu lúc 14:02" for 3 s after a save, or why saving is not possible, in a polite live region
- * (the `status` slot replaces it), then `note` (changes elsewhere on the page that the leave guard also counts). `hideIdleOnPhone`: below `sm` the bar shows only while it has one of those to say, and
+ * (the `status` slot replaces it), then `note` (changes elsewhere on the page that the leave guard also counts) and `immediateNote`
+ * (what applies at once, without Save). "Hủy thay đổi" asks first when more than one change is pending. `hideIdleOnPhone`: below `sm` the bar shows only while it has one of those to say, and
  * when it appears it keeps the focused field above itself.
  * Right: optional extra actions, "Hủy thay đổi" (emits `discard`) and the submit button.
  * The submit button is `type="submit"`: put the bar inside the `<form>`, or pass the form's id as `form`.
@@ -28,6 +29,7 @@ const props = withDefaults(defineProps<SaveBarProps>(), {
   allowClean: false,
   blockedReason: undefined,
   note: undefined,
+  immediateNote: undefined,
   saveLabel: undefined,
   form: undefined,
   variant: 'page',
@@ -48,7 +50,13 @@ const savedTime = useSavedNote(
 );
 const slots = useSlots();
 const isIdle = computed(
-  () => !isDirty.value && !savedTime.value && !props.blockedReason && !props.note && !slots.status,
+  () =>
+    !isDirty.value &&
+    !savedTime.value &&
+    !props.blockedReason &&
+    !props.note &&
+    !props.immediateNote &&
+    !slots.status,
 );
 
 const statusText = computed(() => {
@@ -58,11 +66,16 @@ const statusText = computed(() => {
   return props.allowClean || props.note ? '' : t('form.saveBar.clean');
 });
 
-function guardSave(event: MouseEvent) {
-  if (cannotSave.value) event.preventDefault();
-}
+const isDiscardAsked = ref(false);
+/** One change is discarded at once; several are asked about first. */
 function discard() {
-  if (!cannotDiscard.value) emit('discard');
+  if (cannotDiscard.value) return;
+  if (props.dirtyCount > 1) isDiscardAsked.value = true;
+  else emit('discard');
+}
+function confirmDiscard() {
+  isDiscardAsked.value = false;
+  emit('discard');
 }
 
 /** "14:02" in `timeZone` for `SAVED_NOTE_MS` after each new `savedAt`, then null. */
@@ -142,28 +155,36 @@ function keepFocusAbove() {
         <span v-if="statusText || slots.status" aria-hidden="true" class="text-muted">·</span>
         <span class="font-semibold">{{ note }}</span>
       </template>
+      <template v-if="immediateNote">
+        <span v-if="statusText || slots.status || note" aria-hidden="true" class="text-muted"
+          >·</span
+        >
+        <span class="text-muted">{{ immediateNote }}</span>
+      </template>
     </p>
     <div class="ml-auto flex flex-wrap items-center gap-2">
       <slot name="actions" />
-      <button
-        v-if="!allowClean"
-        type="button"
-        :class="buttonClass('ghost')"
-        :aria-disabled="cannotDiscard || undefined"
-        @click="discard"
-      >
+      <AppButton v-if="!allowClean" tone="ghost" :disabled="cannotDiscard" @click="discard">
         {{ $t('form.saveBar.discard') }}
-      </button>
-      <button
+      </AppButton>
+      <AppButton
+        tone="primary"
         type="submit"
         :form="form"
-        :class="buttonClass('primary')"
-        :aria-disabled="cannotSave || undefined"
-        :aria-busy="pending || undefined"
-        @click="guardSave"
+        :disabled="cannotSave"
+        :loading="pending"
       >
         {{ pending ? $t('form.saveBar.saving') : (saveLabel ?? $t('common.save')) }}
-      </button>
+      </AppButton>
     </div>
+    <ConfirmDialog
+      v-model:visible="isDiscardAsked"
+      :title="$t('form.saveBar.discardTitle', dirtyCount)"
+      :body="$t('form.saveBar.discardBody')"
+      :confirm-label="$t('form.saveBar.discard')"
+      :cancel-label="$t('form.saveBar.keepEditing')"
+      tone="danger"
+      @confirm="confirmDiscard"
+    />
   </div>
 </template>

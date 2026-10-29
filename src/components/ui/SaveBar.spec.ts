@@ -17,6 +17,17 @@ describe('SaveBar', () => {
     expect(save!.attributes('aria-disabled')).toBeUndefined();
   });
 
+  it('discards one change at once and asks before discarding several', async () => {
+    const one = mountComponent(SaveBar, { props: { dirtyCount: 1 } });
+    await one.findAll('button')[0]!.trigger('click');
+    expect(one.emitted('discard')).toHaveLength(1);
+
+    const several = mountComponent(SaveBar, { props: { dirtyCount: 3 } });
+    await several.findAll('button')[0]!.trigger('click');
+    expect(several.emitted('discard')).toBeUndefined();
+    expect(document.body.textContent).toContain('Hủy 3 thay đổi?');
+  });
+
   it('shows the save time for three seconds, then its resting text', async () => {
     const bar = mountComponent(SaveBar, { props: { dirtyCount: 1 } });
     await bar.setProps({ dirtyCount: 0, savedAt: '2026-10-12T07:02:00Z' } as never);
