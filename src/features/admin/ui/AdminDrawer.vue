@@ -3,7 +3,7 @@ import Drawer from 'primevue/drawer';
 import { X } from 'lucide-vue-next';
 import { computed, nextTick, onBeforeUnmount, useId, useSlots, useTemplateRef } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { iconButtonClass } from './controls';
+import IconButton from '@/components/ui/IconButton.vue';
 
 /**
  * A right-hand panel for editing one object (user, judge, ticket, page): 560 px, the full screen under 768 px.
@@ -101,15 +101,9 @@ function onAfterHide() {
             <slot name="meta" />
           </div>
         </div>
-        <button
-          type="button"
-          :class="iconButtonClass('ghost')"
-          :aria-label="t('common.close')"
-          :title="t('common.close')"
-          @click="closeCallback"
-        >
-          <X aria-hidden="true" class="size-4.5" :stroke-width="1.75" />
-        </button>
+        <IconButton :label="t('common.close')" @click="closeCallback">
+          <X aria-hidden="true" />
+        </IconButton>
       </header>
       <div v-if="slots.tabs" class="shrink-0 border-b border-line px-5">
         <slot name="tabs" />

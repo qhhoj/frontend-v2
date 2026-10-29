@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, h, useSlots } from 'vue';
+import { computed, h, useId, useSlots } from 'vue';
 import { RouterLink } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
 import { LoaderCircle } from 'lucide-vue-next';
@@ -9,7 +9,9 @@ import type { ButtonSize, ButtonTone } from './button-classes';
 /**
  * The site button (docs/design-language.md). `to` renders a RouterLink, `href` a plain link, otherwise a `<button>`. Disabled and
  * loading keep focus (`aria-disabled`, never the native attribute) and swallow the click; loading shows a spinner in place of the
- * icon and keeps the label. `iconOnly` is IconButton's square shape.
+ * icon and keeps the label. `iconOnly` is IconButton's square shape. `pressed` makes it a toggle (`aria-pressed`, the accent-soft
+ * pair while on). `tone="link"` is an inline text action with a 44 px hit area. `disabledReason` shows, beside a disabled button,
+ * why it cannot be used (and names it for assistive tech): a disabled button never has to guess.
  */
 defineOptions({ inheritAttrs: false });
 const props = withDefaults(
@@ -23,13 +25,26 @@ const props = withDefaults(
     disabled?: boolean;
     block?: boolean;
     iconOnly?: boolean;
+    pressed?: boolean;
+    disabledReason?: string;
   }>(),
-  { tone: 'secondary', size: 'md', to: undefined, href: undefined, type: 'button' },
+  {
+    tone: 'secondary',
+    size: 'md',
+    to: undefined,
+    href: undefined,
+    type: 'button',
+    pressed: undefined,
+    disabledReason: undefined,
+  },
 );
 const emit = defineEmits<{ click: [event: MouseEvent] }>();
 const slots = useSlots();
 
 const inactive = computed(() => props.disabled || props.loading);
+const reasonId = useId();
+const reason = computed(() => (props.disabled ? props.disabledReason : undefined));
+const described = computed(() => (reason.value ? reasonId : undefined));
 const classes = computed(() =>
   buttonClasses({
     tone: props.tone,
@@ -62,6 +77,8 @@ const ButtonContent = () => [props.loading ? spinner() : slots.icon?.(), slots.d
       :class="classes"
       :aria-disabled="inactive || undefined"
       :aria-busy="loading || undefined"
+      :aria-pressed="pressed"
+      :aria-describedby="described"
       :href="routeHref"
       @click="press($event, navigate)"
     >
@@ -74,6 +91,8 @@ const ButtonContent = () => [props.loading ? spinner() : slots.icon?.(), slots.d
     :class="classes"
     :aria-disabled="inactive || undefined"
     :aria-busy="loading || undefined"
+    :aria-pressed="pressed"
+    :aria-describedby="described"
     :href="href"
     @click="press"
   >
@@ -85,9 +104,12 @@ const ButtonContent = () => [props.loading ? spinner() : slots.icon?.(), slots.d
     :class="classes"
     :aria-disabled="inactive || undefined"
     :aria-busy="loading || undefined"
+    :aria-pressed="pressed"
+    :aria-describedby="described"
     :type="type"
     @click="press"
   >
     <ButtonContent />
   </button>
+  <span v-if="reason" :id="reasonId" class="text-caption text-muted">{{ reason }}</span>
 </template>
