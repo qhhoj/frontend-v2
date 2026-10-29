@@ -13,7 +13,20 @@ export const postComment = (type: CommentPageType, key: string, draft: CommentDr
   apiSend('post', '/comments/pages/{type}/{key}', { path: { type, key }, body: draft });
 export const editComment = (id: string, body: string) =>
   apiSend('patch', '/comments/{id}', { path: { id }, body: { body } });
-export const fetchRevisions = (id: string) => apiGet('/comments/{id}/revisions', { path: { id } });
+/** The backend pages the history 100 rows a page, newest first. */
+const REVISIONS_PAGE_SIZE = 100;
+/** Stops the loop if a backend ignores `page` and keeps answering full pages. */
+const REVISIONS_MAX_PAGES = 100;
+/** Every revision, newest first: pages until a short one comes back (a past-100-edits comment keeps its true original). */
+export async function fetchRevisions(id: string) {
+  const revisions = [];
+  for (let page = 1; page <= REVISIONS_MAX_PAGES; page++) {
+    const rows = await apiGet('/comments/{id}/revisions', { path: { id }, query: { page } });
+    revisions.push(...rows);
+    if (rows.length < REVISIONS_PAGE_SIZE) break;
+  }
+  return revisions;
+}
 export const voteComment = (id: string, score: VoteScore) =>
   apiSend('put', '/comments/{id}/vote', { path: { id }, body: { score } });
 export const setCommentHidden = (id: string, hidden: boolean) =>
