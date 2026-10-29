@@ -73,7 +73,7 @@ const ButtonContent = () => [props.loading ? spinner() : slots.icon?.(), slots.d
  * With a reason, button and reason are one inline unit, so a flex toolbar gives them one gap, not two. Without one there is no
  * wrapper at all.
  */
-const WithReason = (_: object, { slots }: { slots: { default?: () => VNode[] } }) =>
+const WithReason = (_props: object, { slots }: { slots: { default?: () => VNode[] } }) =>
   reason.value
     ? h('span', { class: 'inline-flex items-center gap-2' }, [
         slots.default?.(),
