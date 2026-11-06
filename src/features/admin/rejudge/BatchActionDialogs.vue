@@ -83,7 +83,7 @@ async function confirmRescore() {
     :confirm-label="rejudgeLabel"
     :busy="bulk.isPending.value"
     :can-confirm="canConfirmRejudge(countState)"
-    :width="720"
+    size="lg"
     @confirm="confirmRejudge"
   >
     <RejudgeCountPanel :state="countState" />

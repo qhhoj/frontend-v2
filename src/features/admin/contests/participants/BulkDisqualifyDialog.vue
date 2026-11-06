@@ -41,7 +41,7 @@ const verb = computed(() => (props.disqualified ? 'disqualify' : 'reinstate'));
     :confirm-label="$t(`admin.contests.participants.bulk.${verb}`)"
     :tone="disqualified ? 'danger' : 'neutral'"
     :busy="mutation.isPending.value"
-    :width="520"
+    size="sm"
     @confirm="mutation.run(undefined)"
   >
     <div class="flex flex-col gap-3 text-sm">

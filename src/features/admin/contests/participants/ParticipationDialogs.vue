@@ -58,7 +58,7 @@ const statusCell = () =>
     :confirm-label="$t('common.save')"
     :busy="moveStart.isPending.value"
     :can-confirm="Boolean(start) && !hasUnreadableDate"
-    :width="520"
+    size="sm"
     @confirm="row && start && !hasUnreadableDate && moveStart.run({ row, start })"
   >
     <div class="flex flex-col gap-4">

@@ -8,11 +8,11 @@ const pressEscape = () =>
   document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', bubbles: true }));
 
 describe('Modal', () => {
-  it('fills a phone screen only when sized', async () => {
-    mountComponent(Modal, { props: { visible: true, title: 'A', size: 'md' } });
+  it('fills a phone screen only when lg', async () => {
+    mountComponent(Modal, { props: { visible: true, title: 'A', size: 'lg' } });
     await flushPromises();
     expect(dialog().className).toContain('max-sm:w-screen');
-    expect(dialog().className).toContain('sm:w-[min(40rem,calc(100vw-2rem))]');
+    expect(dialog().className).toContain('sm:w-[min(47.5rem,calc(100vw-2rem))]');
   });
 
   it('keeps the preset width when no size is given', async () => {
@@ -35,5 +35,25 @@ describe('Modal', () => {
     pressEscape();
     await flushPromises();
     expect(locked.emitted('update:visible')).toBeUndefined();
+  });
+
+  it('opens on the first field, not on the close button', async () => {
+    mountComponent(Modal, {
+      props: { visible: true, title: 'A' },
+      slots: { default: '<input id="first" />' },
+    });
+    await flushPromises();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(document.activeElement?.id).toBe('first');
+  });
+
+  it('opens on the first footer button when the body has no field', async () => {
+    mountComponent(Modal, {
+      props: { visible: true, title: 'A' },
+      slots: { default: '<p>Text</p>', footer: '<button id="cancel">Hủy</button>' },
+    });
+    await flushPromises();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(document.activeElement?.id).toBe('cancel');
   });
 });

@@ -39,7 +39,7 @@ async function create() {
     :confirm-label="$t('orgAdmin.create.submit')"
     :busy="mutation.isPending.value"
     :can-confirm="canConfirm"
-    :width="560"
+    size="sm"
     @confirm="create"
   >
     <div class="flex flex-col gap-4">

@@ -34,8 +34,6 @@ const locale = useLocaleStore();
 const isTicked = ref(false);
 const boxId = useId();
 const SKELETON_LINES = 4;
-/** The rules dialog is 520 px wide. */
-const RULES_DIALOG_WIDTH = 520;
 /** Rules whose rendered text is empty for good (everything sanitised away) must not block accepting forever. */
 const isLoading = computed(() => props.rulesHtml === '' && props.isRefreshing);
 const canAccept = computed(() => isTicked.value && !isLoading.value);
@@ -65,7 +63,7 @@ function accept() {
     :title="isVirtual ? $t('joinRules.dialogTitleVirtual') : $t('joinRules.dialogTitle')"
     :confirm-label="actionLabel"
     :busy="isPending"
-    :width="RULES_DIALOG_WIDTH"
+    size="sm"
     :can-confirm="canAccept"
     @confirm="accept"
   >
