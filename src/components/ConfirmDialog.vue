@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, useId, watch } from 'vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Modal from '@/components/ui/Modal.vue';
+import type { ModalSize } from '@/components/ui/Modal.vue';
 
 /**
  * One confirm step for the destructive or irreversible choices, in a `Modal` (the shared Dialog preset).
@@ -17,7 +18,8 @@ import Modal from '@/components/ui/Modal.vue';
  * `returnFocusTo` names where focus lands when the dialog closes after a confirm (not after Cancel, Escape or the close button):
  * pass it when the opener row disappears with the confirmed action, so PrimeVue has nothing to return focus to.
  * The body is `body` or the default slot; the `error` slot shows a failed confirm inside the dialog.
- * `width` (px) widens the dialog past the preset's 448 px; it never exceeds the viewport minus 2 rem.
+ * `size` (sm 480, md 640, lg 760 px; full screen on a phone) widens the dialog past the preset's 448 px, for a body with a form.
+ * `blockedReason` says under the body why the confirm is blocked while `canConfirm` is false ("Nhập đúng mã để xác nhận").
  * A `<button>` in the body needs `type="button"`, or it submits the form and confirms.
  */
 const props = withDefaults(
@@ -28,7 +30,8 @@ const props = withDefaults(
     cancelLabel?: string;
     tone?: 'neutral' | 'danger';
     busy?: boolean;
-    width?: number;
+    size?: ModalSize;
+    blockedReason?: string;
     canConfirm?: boolean;
     returnFocusTo?: () => HTMLElement | null | undefined;
   }>(),
@@ -38,7 +41,8 @@ const props = withDefaults(
     cancelLabel: undefined,
     tone: 'neutral',
     busy: false,
-    width: undefined,
+    size: undefined,
+    blockedReason: undefined,
     canConfirm: true,
     returnFocusTo: undefined,
   },
@@ -46,9 +50,8 @@ const props = withDefaults(
 const visible = defineModel<boolean>('visible', { required: true });
 const emit = defineEmits<{ confirm: [] }>();
 const bodyId = useId();
-const dialogStyle = computed(() =>
-  props.width ? { width: `${props.width}px`, maxWidth: 'calc(100vw - 2rem)' } : undefined,
-);
+const reasonId = useId();
+const showReason = computed(() => !props.canConfirm && !!props.blockedReason);
 const cannotConfirm = computed(() => props.busy || !props.canConfirm);
 
 let isConfirmed = false;
@@ -82,7 +85,7 @@ onBeforeUnmount(returnFocus);
   <Modal
     :visible="visible"
     :title="title"
-    :style="dialogStyle"
+    :size="size"
     :closable="!busy"
     :aria-describedby="bodyId"
     @update:visible="dismiss"
@@ -91,6 +94,7 @@ onBeforeUnmount(returnFocus);
       <p v-if="body" class="text-muted">{{ body }}</p>
       <slot />
       <slot name="error" />
+      <p v-if="showReason" :id="reasonId" class="m-0 text-sm text-muted">{{ blockedReason }}</p>
     </form>
     <template #footer>
       <AppButton :disabled="busy" @click="cancel">
@@ -101,6 +105,7 @@ onBeforeUnmount(returnFocus);
         :form="bodyId"
         :tone="tone === 'danger' ? 'danger' : 'primary'"
         :disabled="!canConfirm"
+        :aria-describedby="showReason ? reasonId : undefined"
         :loading="busy"
       >
         {{ confirmLabel ?? $t(tone === 'danger' ? 'common.delete' : 'common.confirm') }}

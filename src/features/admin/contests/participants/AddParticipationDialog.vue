@@ -55,7 +55,7 @@ watch(visible, (isOpen) => {
     :confirm-label="$t('admin.contestOps.participants.add')"
     :busy="mutation.isPending.value"
     :can-confirm="username.trim().length > 0 && !hasUnreadableDate"
-    :width="520"
+    size="sm"
     @confirm="mutation.run(undefined)"
   >
     <div class="flex flex-col gap-4">

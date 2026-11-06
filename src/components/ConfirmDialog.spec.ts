@@ -143,4 +143,18 @@ describe('ConfirmDialog returnFocusTo', () => {
     await flushPromises();
     expect(document.activeElement).not.toBe(target);
   });
+
+  it('says why the confirm is blocked, and stops saying it once allowed', async () => {
+    const wrapper = mountDialog({
+      ...ASK,
+      visible: true,
+      canConfirm: false,
+      blockedReason: 'Nhập đúng mã.',
+    });
+    await flushPromises();
+    expect(dialog().textContent).toContain('Nhập đúng mã.');
+    expect(buttonNamed('Rời kỳ thi').getAttribute('aria-describedby')).toBeTruthy();
+    await wrapper.setProps({ canConfirm: true });
+    expect(dialog().textContent).not.toContain('Nhập đúng mã.');
+  });
 });

@@ -25,7 +25,7 @@ const items = computed(() =>
   <ConfirmDialog
     v-model:visible="visible"
     tone="danger"
-    :width="520"
+    size="sm"
     :title="$t('admin.polygonLink.configure.confirm.title', { code })"
     :confirm-label="$t('admin.polygonLink.configure.confirm.confirm', { code })"
     :busy="busy"

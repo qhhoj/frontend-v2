@@ -49,7 +49,7 @@ const verb = computed(() => (props.isPublic ? 'publish' : 'unpublish'));
     :confirm-label="$t(`admin.problemList.bulk.${verb}Confirm`)"
     tone="neutral"
     :busy="mutation.isPending.value"
-    :width="520"
+    size="sm"
     @confirm="mutation.run(undefined)"
   >
     <div class="flex flex-col gap-4 text-sm">

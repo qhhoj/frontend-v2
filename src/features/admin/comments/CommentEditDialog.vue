@@ -65,7 +65,7 @@ function submit() {
     :confirm-label="$t('common.save')"
     :busy="save.isPending.value"
     :can-confirm="!isLoading && !loadError"
-    :width="640"
+    size="md"
     @confirm="submit"
   >
     <p v-if="isLoading" class="text-sm text-muted" aria-live="polite">

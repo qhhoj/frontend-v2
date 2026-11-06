@@ -33,7 +33,7 @@ const verb = computed(() => (props.isVisible ? 'show' : 'hide'));
     :confirm-label="$t(`admin.contests.list.bulk.${verb}Confirm`)"
     tone="neutral"
     :busy="mutation.isPending.value"
-    :width="520"
+    size="sm"
     @confirm="mutation.run(undefined)"
   >
     <div class="flex flex-col gap-3 text-sm">

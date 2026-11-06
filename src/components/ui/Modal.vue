@@ -7,7 +7,9 @@ export type ModalSize = 'sm' | 'md' | 'lg';
 
 /**
  * The one dialog: PrimeVue's Dialog on the shared preset (modal, not draggable, a labelled close button, Escape closes).
- * PrimeVue traps focus while it is open and gives it back to the opener when it hides.
+ * PrimeVue traps focus while it is open and gives it back to the opener when it hides. On open, focus goes to the first
+ * meaningful control (the first field in the body, else the first enabled footer button), never to the close button, and a
+ * mouse- or touch-opened dialog shows no focus ring there (`:focus-visible` decides).
  * `size` picks a width (sm 480, md 640, lg 760 px, never wider than the viewport minus 2 rem) and makes the dialog fill
  * the screen below 640 px; without it the preset's 448 px applies at every width.
  * `closable` false hides the close button and ignores Escape (a busy step).
@@ -31,8 +33,26 @@ const WIDTHS: Record<ModalSize, string> = {
 const FULL_ON_PHONE =
   'max-sm:h-dvh max-sm:max-h-dvh max-sm:w-screen max-sm:rounded-none max-sm:border-0';
 const sizeClass = computed(() => props.size && [WIDTHS[props.size], FULL_ON_PHONE]);
+/** Fields first (or an `[autofocus]` element), then the footer's first enabled button (Cancel on a confirm). */
+const FIRST_FIELD = '[autofocus], input:not([type=hidden]):not(:disabled), select, textarea';
+const HEADER_BUTTON = '[data-pc-group-section="headericon"]';
+const FIRST_FOOTER_BUTTON = 'button:not(:disabled):not([aria-disabled=true])';
+/**
+ * PrimeVue's own focus (after the enter transition) lands on the close button when nothing is marked `autofocus`, and forces
+ * a visible ring. Right after it, move focus on with a plain `focus()`, so the ring follows the browser's `:focus-visible`.
+ */
+function focusFirstControl(dialog: Element) {
+  if (!document.activeElement?.matches(HEADER_BUTTON)) return;
+  const target =
+    dialog.querySelector<HTMLElement>(`[data-pc-section="content"] :is(${FIRST_FIELD})`) ??
+    dialog.querySelector<HTMLElement>(`[data-pc-section="footer"] ${FIRST_FOOTER_BUTTON}`);
+  target?.focus();
+}
 /** Merged into the preset's mask (not replacing it): no inset on a phone, so a sized dialog reaches the edges. */
-const pt = computed(() => (props.size ? { mask: { class: 'max-sm:p-0' } } : undefined));
+const pt = computed(() => ({
+  ...(props.size && { mask: { class: 'max-sm:p-0' } }),
+  transition: { onAfterEnter: focusFirstControl },
+}));
 </script>
 
 <template>

@@ -36,4 +36,24 @@ describe('Modal', () => {
     await flushPromises();
     expect(locked.emitted('update:visible')).toBeUndefined();
   });
+
+  it('opens on the first field, not on the close button', async () => {
+    mountComponent(Modal, {
+      props: { visible: true, title: 'A' },
+      slots: { default: '<input id="first" />' },
+    });
+    await flushPromises();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(document.activeElement?.id).toBe('first');
+  });
+
+  it('opens on the first footer button when the body has no field', async () => {
+    mountComponent(Modal, {
+      props: { visible: true, title: 'A' },
+      slots: { default: '<p>Text</p>', footer: '<button id="cancel">Hủy</button>' },
+    });
+    await flushPromises();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(document.activeElement?.id).toBe('cancel');
+  });
 });
