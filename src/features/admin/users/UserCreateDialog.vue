@@ -8,7 +8,7 @@ import { failureTextOf } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import AdminStatus from '../ui/AdminStatus.vue';
 import OrganizationChips from '../ui/OrganizationChips.vue';
-import UploadButton from '../ui/UploadButton.vue';
+import UploadButton from '@/components/ui/UploadButton.vue';
 import { BUTTON } from '../ui/controls';
 import CreatedUsersTable from './CreatedUsersTable.vue';
 import NewUserFields from './NewUserFields.vue';

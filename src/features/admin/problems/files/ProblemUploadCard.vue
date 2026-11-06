@@ -6,7 +6,7 @@ import CopyButton from '@/components/CopyButton.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { CARD, iconButtonClass } from '../../ui/controls';
 import { needsPermissionText } from '../../ui/permission-text';
-import UploadButton from '../../ui/UploadButton.vue';
+import UploadButton from '@/components/ui/UploadButton.vue';
 import { failureReasonOf } from '../failure-reason';
 import { useProblemUpload } from './use-problem-upload';
 import type { ProblemUploadKind } from './use-problem-upload';

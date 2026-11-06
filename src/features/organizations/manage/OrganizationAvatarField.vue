@@ -3,7 +3,7 @@ import { computed, ref, useId } from 'vue';
 import { IMAGE_ACCEPT, IMAGE_MAX_BYTES } from '@/features/admin/problems/limits';
 import { useLogoUpload } from '@/features/admin/organizations/use-logo-upload';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
-import UploadButton from '@/features/admin/ui/UploadButton.vue';
+import UploadButton from '@/components/ui/UploadButton.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
 import FormField from '@/components/ui/FormField.vue';
 import TextInput from '@/components/ui/TextInput.vue';

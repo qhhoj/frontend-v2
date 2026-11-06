@@ -14,3 +14,6 @@ export type CardVariant = keyof typeof CARD_VARIANTS;
 export const CARD_PADDING = { sm: 'p-4', md: 'p-5', lg: 'p-6' } as const;
 
 export type CardPadding = keyof typeof CARD_PADDING;
+
+/** The header's full-bleed rule needs the card's own padding to reach the edges, so it is keyed by the same sizes. */
+export const CARD_HEADER_BLEED = { sm: '-mx-4 px-4', md: '-mx-5 px-5', lg: '-mx-6 px-6' } as const;

@@ -17,6 +17,7 @@ export const ALLOWED = {
       'rows that change rank slide to their place (FLIP); off under reduced motion',
   },
   'components/ui/DataTable.vue': { 'transition-transform': CHEVRON },
+  'components/ui/Disclosure.vue': { 'transition-transform': CHEVRON },
   'components/ui/Notice.vue': { 'transition-transform': CHEVRON },
   'features/admin/problems/ProblemSetupChecklist.vue': { 'transition-transform': CHEVRON },
   'features/admin/problems/import/ImportOptionsForm.vue': { 'transition-transform': CHEVRON },

@@ -1026,7 +1026,36 @@
     "clearFilters": "Xóa bộ lọc",
     "clearSelection": "Bỏ chọn",
     "show": "Hiện",
-    "hide": "Ẩn"
+    "hide": "Ẩn",
+    "add": "Thêm",
+    "upload": {
+      "uploading": "Đang tải lên…",
+      "tooLarge": "Tệp quá lớn (tối đa {max}).",
+      "busy": "Đang tải lên. Hãy chọn lại tệp sau khi xong."
+    },
+    "markdown": {
+      "write": "Viết",
+      "preview": "Xem trước",
+      "supported": "Hỗ trợ Markdown",
+      "count": "{count} ký tự",
+      "countOf": "{count}/{max} ký tự",
+      "previewHint": "Cập nhật sau khi ngừng gõ 0,5 giây; kết quả đã lọc an toàn.",
+      "rateLimited": "Xem trước tạm dừng: quá 60 lần mỗi phút. Bản xem trước cũ được giữ lại.",
+      "retryIn": "Thử lại sau {seconds} giây.",
+      "tabs": "Soạn hoặc xem trước"
+    },
+    "diff": {
+      "added": "Dòng được thêm",
+      "removed": "Dòng bị xóa"
+    },
+    "prepared": {
+      "preparing": "Đang chuẩn bị tệp…",
+      "ready": "Tệp đã sẵn sàng.",
+      "none": "Chưa có tệp.",
+      "prepare": "Chuẩn bị tệp",
+      "download": "Tải xuống",
+      "waitUntil": "Có thể chuẩn bị lại sau {time}."
+    }
   },
   "verdicts": {
     "AC": "Chấp nhận",

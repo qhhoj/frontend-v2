@@ -1026,7 +1026,36 @@
     "clearFilters": "Clear filters",
     "clearSelection": "Clear selection",
     "show": "Show",
-    "hide": "Hide"
+    "hide": "Hide",
+    "add": "Add",
+    "upload": {
+      "uploading": "Uploading…",
+      "tooLarge": "File too large (max {max}).",
+      "busy": "Still uploading. Choose the file again when it finishes."
+    },
+    "markdown": {
+      "write": "Write",
+      "preview": "Preview",
+      "supported": "Markdown supported",
+      "count": "{count} chars",
+      "countOf": "{count}/{max} chars",
+      "previewHint": "Updates 0.5 s after you stop typing; the result is sanitised.",
+      "rateLimited": "Preview paused: over 60 a minute. The last preview is kept.",
+      "retryIn": "Try again in {seconds} s.",
+      "tabs": "Write or preview"
+    },
+    "diff": {
+      "added": "Added line",
+      "removed": "Removed line"
+    },
+    "prepared": {
+      "preparing": "Preparing the file…",
+      "ready": "The file is ready.",
+      "none": "No file yet.",
+      "prepare": "Prepare the file",
+      "download": "Download",
+      "waitUntil": "You can prepare it again after {time}."
+    }
   },
   "verdicts": {
     "AC": "Accepted",

@@ -11,7 +11,6 @@ const ARBITRARY =
  * StatGrid redesigns (phase 3, P8/P11); the tiny radii are marks too small for a role radius.
  */
 export const ALLOWED = {
-  'features/home/LiveContestCard.vue': ['text-[32px]'],
   'features/contests/ContestProblemsTable.vue': ['text-[22px]'],
   'features/auth/LoginBrandPanel.vue': ['text-[34px]'],
   'features/appearance/AppearancePreview.vue': ['text-[22px]'],

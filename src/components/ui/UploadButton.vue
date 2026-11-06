@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref, useId } from 'vue';
 import { formatFileSize } from '@/lib/format';
-import { BUTTON } from './controls';
-import { tooLargeFor } from './upload-limits';
+import { buttonClasses } from './button-classes';
 
 /**
- * Checks the size locally and refuses a pick while an upload runs (said in words, never dropped silently).
+ * A file picker drawn as a secondary button. Checks the size locally and refuses a pick while an upload runs (said in words, never dropped silently).
  * Server answers (413, 429) belong to the consumer, which shows them through `failureTextOf`.
  */
 const props = defineProps<{
@@ -35,7 +34,7 @@ function onChange(event: Event) {
     return;
   }
   emit('attempt');
-  if (props.maxBytes !== undefined && tooLargeFor(file, props.maxBytes)) {
+  if (props.maxBytes !== undefined && file.size > props.maxBytes) {
     refusal.value = formatFileSize(props.maxBytes);
     return;
   }
@@ -48,16 +47,19 @@ function clear() {
   isBusyNoticeShown.value = false;
 }
 defineExpose({ clear });
+defineOptions({ name: 'UiUploadButton' });
 </script>
 
 <template>
   <span class="inline-flex flex-col gap-1">
     <label
       :for="id"
-      :class="BUTTON.secondary"
-      class="cursor-pointer focus-within:ring-2 focus-within:ring-accent"
+      :class="[
+        buttonClasses({ tone: 'secondary', size: 'md' }),
+        'cursor-pointer focus-within:ring-2 focus-within:ring-accent',
+      ]"
     >
-      {{ isPending ? $t('admin.ui.uploading') : label }}
+      {{ isPending ? $t('common.upload.uploading') : label }}
       <input
         :id="id"
         type="file"
@@ -69,10 +71,10 @@ defineExpose({ clear });
       />
     </label>
     <span v-if="refusal" :id="`${id}-error`" role="alert" class="text-sm text-negative">
-      {{ $t('admin.ui.tooLarge', { max: refusal }) }}
+      {{ $t('common.upload.tooLarge', { max: refusal }) }}
     </span>
     <span v-if="isBusyNoticeShown" :id="`${id}-busy`" role="status" class="text-sm text-muted">
-      {{ $t('admin.ui.uploadBusy') }}
+      {{ $t('common.upload.busy') }}
     </span>
   </span>
 </template>

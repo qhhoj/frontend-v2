@@ -2,7 +2,7 @@
 import { computed, ref, useId, watch } from 'vue';
 import { Copy } from 'lucide-vue-next';
 import type { EditableContest } from '@/api/types/contest-editing';
-import BulkSelectionBar from '../../ui/BulkSelectionBar.vue';
+import BulkBar from '@/components/ui/BulkBar.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureTextOf } from '../../ui/admin-errors';
 import { CARD, INPUT, buttonClass } from '../../ui/controls';
@@ -109,7 +109,7 @@ const HEAD = 'px-2 py-2 text-meta font-semibold text-muted';
             <ProblemCopyFrom :current-key="contest.key" :copy="copyRows" />
           </div>
         </section>
-        <BulkSelectionBar :count="selection.selected.value.length" @clear="selection.clear">
+        <BulkBar sticky :count="selection.selected.value.length" @clear="selection.clear">
           <label class="flex items-center gap-2 text-sm font-semibold">
             {{ $t('admin.contests.problems.bulkPoints') }}
             <input
@@ -130,7 +130,7 @@ const HEAD = 'px-2 py-2 text-meta font-semibold text-muted';
           >
             {{ $t('admin.contests.problems.applyPoints') }}
           </button>
-        </BulkSelectionBar>
+        </BulkBar>
 
         <div :class="[CARD, 'px-3 py-1 md:overflow-x-auto']">
           <table class="w-full text-sm md:min-w-[720px]">

@@ -2,7 +2,7 @@
 import { IMAGE_ACCEPT, IMAGE_MAX_BYTES } from '../problems/limits';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
-import UploadButton from '../ui/UploadButton.vue';
+import UploadButton from '@/components/ui/UploadButton.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { INPUT } from '../ui/controls';
 import { useLogoUpload } from './use-logo-upload';

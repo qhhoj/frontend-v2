@@ -158,7 +158,6 @@ const fieldAttrs = (invalid: unknown, describedBy: string | undefined) => ({
             v-model="form.about"
             :label="$t('admin.organizations.editor.about')"
             preview-style="organization"
-            :preview-label="$t('admin.organizations.editor.aboutPreview')"
           />
         </div>
         <div class="lg:col-span-2">

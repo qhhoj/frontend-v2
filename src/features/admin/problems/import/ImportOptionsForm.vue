@@ -10,7 +10,7 @@ import CreationOwnerPicker from '../../creation/CreationOwnerPicker.vue';
 import { useCreationScope } from '../../creation/creation-scope';
 import { SYNC_POLYGON } from '../../admin-screens';
 import AdminField from '../../ui/AdminField.vue';
-import UploadButton from '../../ui/UploadButton.vue';
+import UploadButton from '@/components/ui/UploadButton.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { CARD, INPUT, buttonClass } from '../../ui/controls';
 import { needsPermissionText } from '../../ui/permission-text';

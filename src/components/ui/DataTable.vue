@@ -14,7 +14,7 @@ import { useMediaQuery } from '@/lib/use-media-query';
 import AppButton from './AppButton.vue';
 import { CARD_VARIANTS } from './Card.variants';
 import { useRowOpen } from './use-row-open';
-import AdminBulkBar from '@/features/admin/ui/table/AdminBulkBar.vue';
+import BulkBar from './BulkBar.vue';
 import DataTableCheckbox from './DataTableCheckbox.vue';
 import { ariaSortOf, hiddenClass, nextSort, rangeOf, stickyOffsets } from './DataTableColumns';
 import type { DataTableColumn } from './DataTableColumns';
@@ -253,13 +253,9 @@ const offset = computed(() => (props.selectable ? 1 : 0));
 
 <template>
   <div :class="[FRAME, 'flex min-w-0 flex-col overflow-hidden']">
-    <AdminBulkBar
-      v-if="selectable && selected.size > 0"
-      :count="selected.size"
-      @clear="clearSelection"
-    >
+    <BulkBar v-if="selectable && selected.size > 0" :count="selected.size" @clear="clearSelection">
       <slot name="bulk" :count="selected.size" />
-    </AdminBulkBar>
+    </BulkBar>
     <div
       v-else-if="$slots.toolbar"
       class="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2"

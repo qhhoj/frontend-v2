@@ -7,9 +7,9 @@ import { anonymousViewer } from '@/test/problem-routes';
 import { mountComponent } from '@/test/mount';
 import AdminField from './AdminField.vue';
 import AdminSwitch from './AdminSwitch.vue';
-import ExactChips from './ExactChips.vue';
+import ChipPicker from './ChipPicker.vue';
 import MarkdownField from './MarkdownField.vue';
-import UploadButton from './UploadButton.vue';
+import UploadButton from '@/components/ui/UploadButton.vue';
 import UsernameChips from './UsernameChips.vue';
 import { PREVIEW_DELAY_MS } from './use-render-preview';
 import { SUGGEST_DELAY_MS } from './use-chip-suggestions';
@@ -78,6 +78,35 @@ describe('UsernameChips', () => {
     await flushPromises();
     expect(wrapper.text()).toContain('Không có tài khoản “nobody”.');
     expect(wrapper.get('input').attributes('aria-invalid')).toBe('true');
+  });
+
+  it('commits typed text when the box loses focus and when the Thêm button is pressed', async () => {
+    mockApi({
+      ...anonymousViewer,
+      'GET /users/thayhung': ok({ id: ID_A, username: 'thayhung', displayName: 'x' }),
+    });
+    const wrapper = mountComponent(ChipsHost, { props: { component: UsernameChips, initial: [] } });
+    expect(wrapper.get('button[disabled], button[aria-disabled="true"]').text()).toBe('Thêm');
+    await wrapper.get('input').setValue('thayhung');
+    await wrapper.get('input').trigger('blur');
+    await flushPromises();
+    expect(wrapper.get('output').text()).toContain('"username":"thayhung"');
+    expect((wrapper.get('input').element as HTMLInputElement).value).toBe('');
+  });
+
+  it('a save right after the blur still gets the chip: commit waits for the lookup in flight', async () => {
+    mockApi({
+      ...anonymousViewer,
+      'GET /users/thayhung': ok({ id: ID_A, username: 'thayhung', displayName: 'x' }),
+    });
+    const wrapper = mountComponent(UsernameChips, {
+      props: { modelValue: [], label: 'Người dùng' },
+    });
+    await wrapper.get('input').setValue('thayhung');
+    await wrapper.get('input').trigger('blur');
+    const committed = await (wrapper.vm as unknown as { commit: () => Promise<boolean> }).commit();
+    expect(committed).toBe(true);
+    expect(wrapper.emitted('update:modelValue')).toHaveLength(1);
   });
 
   it('shows the wait for a 429 instead of saying the account is missing', async () => {
@@ -207,7 +236,7 @@ describe('UsernameChips suggestions', () => {
   });
 });
 
-describe('ExactChips suggestions', () => {
+describe('ChipPicker suggestions', () => {
   afterEach(() => vi.useRealTimers());
 
   it('shows only the answer for the newest text when answers arrive out of order', async () => {
@@ -216,7 +245,7 @@ describe('ExactChips suggestions', () => {
     const pending = new Map<string, (chips: { id: string }[]) => void>();
     const suggest = (typed: string) =>
       new Promise<{ id: string }[]>((resolve) => pending.set(typed, resolve));
-    const wrapper = mountComponent(ExactChips, {
+    const wrapper = mountComponent(ChipPicker, {
       props: {
         modelValue: [],
         label: 'Danh sách',
@@ -303,7 +332,7 @@ describe('MarkdownField', () => {
     expect(calls.filter((call) => call.method === 'POST').map((call) => call.body)).toEqual([
       { style: 'problem', markdown: 'Xin chào' },
     ]);
-    expect(wrapper.get('section').text()).toContain('Xin chào bạn');
+    expect(wrapper.text()).toContain('Xin chào bạn');
   });
 });
 
@@ -365,7 +394,7 @@ describe('preview failure and the reasons a control is off', () => {
     });
     await vi.advanceTimersByTimeAsync(PREVIEW_DELAY_MS);
     await flushPromises();
-    expect(wrapper.get('section').text()).toContain(translate('errors.forbidden'));
+    expect(wrapper.text()).toContain(translate('errors.forbidden'));
     vi.useRealTimers();
   });
 
