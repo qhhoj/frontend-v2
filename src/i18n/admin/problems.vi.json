@@ -501,7 +501,8 @@
       "progressLabel": "Tiến độ tải gói test",
       "interrupted": "Tải “{name}” chưa xong; phần đã gửi vẫn được giữ trong 24 giờ.",
       "resume": "Tiếp tục tải lên",
-      "chunk": "phần {number}/{count}"
+      "chunk": "phần {number}/{count}",
+      "finishing": "Đang hoàn tất trên máy chủ, không thể hủy nữa."
     }
   },
   "uploads": {

@@ -501,7 +501,8 @@
       "progressLabel": "Test archive upload progress",
       "interrupted": "The upload of “{name}” did not finish; the part already sent is kept for 24 hours.",
       "resume": "Resume upload",
-      "chunk": "part {number}/{count}"
+      "chunk": "part {number}/{count}",
+      "finishing": "Finishing on the server; it can no longer be cancelled."
     }
   },
   "uploads": {

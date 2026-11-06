@@ -10,7 +10,7 @@ import {
 import type { DataUpload } from '@/api/problem-data.api';
 import type { ProblemData } from '@/api/types/problem-data';
 import { missingChunks, planChunks } from './chunk-plan';
-import { withRetry } from './retry';
+import { isRetryable, withRetry } from './retry';
 import { Sha256 } from './sha256';
 
 export type ChunkedPhase = 'hashing' | 'uploading' | 'completing';
@@ -70,7 +70,8 @@ async function hashFile(file: File, signal: AbortSignal, onRead: (bytes: number)
  * A data archive sent in chunks: hash, create the session, send the chunks the server lacks one at a time (each retried
  * with backoff), complete. An upload stopped by a failure the server allows to retry stays `interrupted` (for the
  * problem it was started on): picking the same file again, or resuming, continues it in this tab. `cancel`, and leaving
- * the page, stop it and drop the session.
+ * the page, stop it and drop the session; once the server is storing it (cancel refused), it is `finishing`: the upload
+ * waits for the real outcome instead.
  */
 export function useChunkedUpload(code: () => string) {
   const phase = ref<ChunkedPhase | null>(null);
@@ -80,7 +81,10 @@ export function useChunkedUpload(code: () => string) {
   const chunkNumber = ref(0);
   const chunkCount = ref(0);
   const interrupted = shallowRef<InterruptedUpload | null>(null);
+  /** Cancel came too late: the server is storing the archive, so the upload waits for that outcome. */
+  const finishing = ref(false);
   let controller: AbortController | null = null;
+  let cancelling = false;
   const targetOf = (upload: InterruptedUpload) => ({ code: upload.code, id: upload.session.id });
 
   async function upload(file: File): Promise<ProblemData> {
@@ -96,17 +100,29 @@ export function useChunkedUpload(code: () => string) {
       signal.throwIfAborted();
       await sendMissing(current, signal);
       phase.value = 'completing';
-      const saved = await withRetry(() => completeDataUpload(targetOf(current), signal), {
-        ...COMPLETE_RETRY,
-        signal,
-      });
+      const saved = await completeStored(current, signal);
       interrupted.value = null;
       return saved;
     } catch (error) {
       throw settleFailure(error, signal);
     } finally {
       phase.value = null;
+      finishing.value = false;
       controller = null;
+    }
+  }
+
+  /** Complete with retries; once `finishing`, the retries go on until the server answers the stored data or a refusal. */
+  async function completeStored(current: InterruptedUpload, signal: AbortSignal) {
+    for (;;) {
+      try {
+        return await withRetry(() => completeDataUpload(targetOf(current), signal), {
+          ...COMPLETE_RETRY,
+          signal,
+        });
+      } catch (error) {
+        if (!finishing.value || !isRetryable(error)) throw error;
+      }
     }
   }
 
@@ -157,16 +173,37 @@ export function useChunkedUpload(code: () => string) {
     return error;
   }
 
-  /** Forgets the interrupted session and asks the server to drop it (best effort: it expires anyway). */
+  /** Forgets the interrupted session and asks the server to drop it, retried while a chunk still holds it (best effort: it expires anyway). */
   function discard() {
     const stopped = interrupted.value;
     interrupted.value = null;
-    if (stopped) void cancelDataUpload(targetOf(stopped)).catch(() => undefined);
+    if (stopped)
+      void withRetry(() => cancelDataUpload(targetOf(stopped)), CHUNK_RETRY).catch(() => undefined);
   }
 
+  /** Stops the upload and drops its session; while completing, only once the server agrees (else `finishing`). */
   function cancel() {
+    if (phase.value === 'completing') return void cancelCompleting();
     controller?.abort();
     discard();
+  }
+
+  /** The server drops the session only if it is not storing it (409 `busy` while it is, 404 once stored): any refusal leaves the complete running to its real outcome. */
+  async function cancelCompleting() {
+    const running = controller;
+    const current = interrupted.value;
+    if (cancelling || !running || !current) return;
+    cancelling = true;
+    try {
+      await cancelDataUpload(targetOf(current));
+      if (controller !== running) return;
+      interrupted.value = null;
+      running.abort();
+    } catch {
+      if (controller === running) finishing.value = true;
+    } finally {
+      cancelling = false;
+    }
   }
 
   /** The browser asks before a reload or close drops a running upload. */
@@ -180,5 +217,15 @@ export function useChunkedUpload(code: () => string) {
     cancel();
   });
 
-  return { upload, cancel, phase, doneBytes, totalBytes, chunkNumber, chunkCount, interrupted };
+  return {
+    upload,
+    cancel,
+    phase,
+    doneBytes,
+    totalBytes,
+    chunkNumber,
+    chunkCount,
+    interrupted,
+    finishing,
+  };
 }

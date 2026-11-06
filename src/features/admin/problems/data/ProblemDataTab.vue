@@ -85,12 +85,6 @@ function resumeArchive() {
   const file = interruptedHere.value?.file;
   if (file) void archive.run(file);
 }
-/** A cancel while the server already stores the archive may still land: the data is read again. */
-function cancelArchive() {
-  const wasCompleting = chunked.phase.value === 'completing';
-  chunked.cancel();
-  if (wasCompleting) void query.refetch();
-}
 const blockedReason = computed(() =>
   badRowNumbers.value.length > 0
     ? translate('admin.problems.data.cases.badJsonRows', { rows: badRowNumbers.value.join(', ') })
@@ -162,8 +156,9 @@ async function submit() {
             :total-bytes="chunked.totalBytes.value"
             :chunk-number="chunked.chunkNumber.value"
             :chunk-count="chunked.chunkCount.value"
+            :finishing="chunked.finishing.value"
             :interrupted-name="interruptedHere?.file.name ?? null"
-            @cancel="cancelArchive"
+            @cancel="chunked.cancel"
             @resume="resumeArchive"
           />
         </div>

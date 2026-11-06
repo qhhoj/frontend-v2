@@ -15,6 +15,8 @@ const props = defineProps<{
   /** 1-based chunk being sent, of `chunkCount`. */
   chunkNumber: number;
   chunkCount: number;
+  /** Cancel was refused because the server is storing the archive: no Hủy, a notice, the outcome follows. */
+  finishing: boolean;
   /** The file of an upload that stopped with its session kept; null when nothing waits. */
   interruptedName: string | null;
 }>();
@@ -28,6 +30,7 @@ const phaseText = computed(() =>
 /** What a screen reader hears: the phase, then every tenth percent, never each slice. */
 const announcement = computed(() => {
   if (!props.phase) return '';
+  if (props.finishing) return translate('admin.problems.data.chunked.finishing');
   if (props.phase === 'completing') return phaseText.value;
   return `${phaseText.value} ${Math.floor(percent.value / 10) * 10}%`;
 });
@@ -49,10 +52,13 @@ const announcement = computed(() => {
           </template>
         </span>
       </span>
-      <AppButton size="sm" tone="secondary" @click="emit('cancel')">
+      <AppButton v-if="!finishing" size="sm" tone="secondary" @click="emit('cancel')">
         {{ $t('common.cancel') }}
       </AppButton>
     </div>
+    <Notice v-if="finishing" tone="info" compact data-testid="chunked-upload-finishing">
+      {{ $t('admin.problems.data.chunked.finishing') }}
+    </Notice>
     <ProgressBar
       :value="phase === 'completing' ? 100 : percent"
       :label="$t('admin.problems.data.chunked.progressLabel')"
