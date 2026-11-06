@@ -96,7 +96,6 @@ export function auditObjectLink(entry: AuditEntry): RouteLocationRaw | null {
       : null;
   switch (entry.type) {
     case 'problem':
-    case 'tagProblem':
       return label ? { name: adminRouteName('problemGeneral'), params: { code: label } } : null;
     case 'contest':
       return label ? { name: adminRouteName('contestGeneral'), params: { key: label } } : null;
