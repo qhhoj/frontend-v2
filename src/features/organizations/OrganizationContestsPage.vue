@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { Plus } from 'lucide-vue-next';
 import EmptyState from '@/components/EmptyState.vue';
 import GlassCard from '@/components/GlassCard.vue';
-import ToolbarSearch from '@/components/ToolbarSearch.vue';
+import SearchInput from '@/components/ui/SearchInput.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import ContestGroup from '@/features/contests/ContestGroup.vue';
 import { useContestListQuery } from '@/features/contests/contests.queries';
@@ -47,7 +47,7 @@ const hasNone = computed(() => anyContest.data.value?.meta.total === 0);
   </GlassCard>
   <div v-else-if="organizationId" class="flex flex-col gap-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <ToolbarSearch
+      <SearchInput
         v-model="search"
         :label="$t('contests.list.search')"
         :placeholder="$t('contests.list.searchPlaceholder')"

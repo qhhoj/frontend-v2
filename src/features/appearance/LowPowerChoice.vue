@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import BitLoop from '@/components/BitLoop.vue';
 import BitMascot from '@/components/BitMascot.vue';
 import Card from '@/components/ui/Card.vue';
+import { RADIO_INPUT } from '@/components/ui/choice-classes';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { LOW_POWER_PREFERENCES } from '@/theme/low-power';
 import type { LowPowerPreference } from '@/theme/low-power';
@@ -38,7 +39,7 @@ function choose(preference: LowPowerPreference) {
           <input
             type="radio"
             name="low-power"
-            class="size-5"
+            :class="RADIO_INPUT"
             :value="option"
             :checked="lowPower.preference === option"
             @change="choose(option)"

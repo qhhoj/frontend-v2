@@ -4,7 +4,7 @@ import { updateContest } from '@/api/contest-editing.api';
 import type { ContestPatch, EditableContest } from '@/api/types/contest-editing';
 import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
-import { provideDateValidity } from '../../ui/form/date-validity';
+import { provideDateValidity } from '@/components/ui/date-validity';
 import { cloneValue } from '../../ui/form/dirty-form';
 import { useSeededDraft } from '../../ui/form/seeded-draft';
 import { useAdminMutation } from '../../ui/use-admin-mutation';

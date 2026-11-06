@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { PostComposeOptions } from '@/api/types/blog';
+import DateTimeField from '@/components/ui/DateTimeField.vue';
 import FormField from '@/components/ui/FormField.vue';
+import RadioGroup from '@/components/ui/RadioGroup.vue';
 import SelectField from '@/components/ui/SelectField.vue';
 import TextArea from '@/components/ui/TextArea.vue';
-import TextInput from '@/components/ui/TextInput.vue';
 import AdminSwitch from '@/features/admin/ui/AdminSwitch.vue';
 import type { FieldErrors } from '@/features/admin/ui/admin-errors';
 import type { PostFieldRights, PublishMode } from './post-form';
@@ -27,6 +29,7 @@ const summary = defineModel<string>('summary', { required: true });
 const sticky = defineModel<boolean>('sticky', { required: true });
 const globalPost = defineModel<boolean>('globalPost', { required: true });
 
+const { t } = useI18n();
 const organizations = computed(() => props.options?.organizations ?? []);
 const canChooseSelf = computed(() => props.options?.canWritePersonal ?? true);
 const postAs = computed({
@@ -40,7 +43,19 @@ const chosenOrganization = computed({
   get: () => organization.value ?? '',
   set: (slug: string | number) => (organization.value = String(slug)),
 });
+/** `DateTimeField` takes an instant or null; the form keeps '' for "now". */
+const publishAt = computed({
+  get: () => publishOn.value || null,
+  set: (iso: string | null) => (publishOn.value = iso ?? ''),
+});
 const MODES: PublishMode[] = ['draft', 'public', 'scheduled'];
+const modeOptions = computed(() =>
+  MODES.map((value) => ({
+    value,
+    label: t(`postEditor.mode.${value}`),
+    description: t(`postEditor.modeHint.${value}`),
+  })),
+);
 const SEGMENT =
   'inline-flex min-h-10 items-center rounded-pill px-4 text-sm font-semibold text-muted has-[:checked]:bg-accent-soft has-[:checked]:text-accent-soft-text has-[:focus-visible]:outline-2';
 const LABEL = 'text-caption leading-4 font-bold tracking-wide text-muted uppercase';
@@ -85,31 +100,20 @@ const LABEL = 'text-caption leading-4 font-bold tracking-wide text-muted upperca
       </FormField>
     </template>
 
-    <fieldset class="flex flex-col gap-2">
-      <legend :class="[LABEL, 'mb-1.5']">{{ $t('postEditor.settings.visibility') }}</legend>
-      <label
-        v-for="value in MODES"
-        :key="value"
-        class="flex cursor-pointer items-start gap-3 rounded-row border border-line-control px-3 py-2.5 has-[:checked]:border-accent has-[:checked]:bg-accent-soft"
-      >
-        <input v-model="mode" type="radio" :value="value" class="mt-1 accent-accent" />
-        <span class="flex flex-col">
-          <span class="font-semibold">{{ $t(`postEditor.mode.${value}`) }}</span>
-          <span class="text-caption leading-4 text-muted">{{
-            $t(`postEditor.modeHint.${value}`)
-          }}</span>
-        </span>
-      </label>
-    </fieldset>
+    <RadioGroup
+      v-model="mode"
+      name="post-visibility"
+      :legend="$t('postEditor.settings.visibility')"
+      :options="modeOptions"
+    />
 
-    <FormField
+    <DateTimeField
       v-if="mode === 'scheduled'"
+      v-model="publishAt"
       :label="$t('postEditor.settings.publishOn')"
       :error="errors.publishOn"
       input-id="post-publish-on"
-    >
-      <TextInput v-model="publishOn" type="datetime-local" />
-    </FormField>
+    />
 
     <FormField
       :label="$t('postEditor.settings.summary')"

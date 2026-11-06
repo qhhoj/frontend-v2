@@ -1,7 +1,7 @@
 import type { Participation } from '@/api/types/contest-editing';
 import type { Locale } from '@/i18n';
 import { translate } from '@/i18n';
-import { formatInZone } from '../../ui/form/site-time';
+import { formatInZone } from '@/lib/site-time';
 
 /** The label key of a participation: live (0), spectating (-1) or the number of a virtual one (n). */
 export function participationKindKey(virtual: number): {

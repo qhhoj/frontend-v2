@@ -11,7 +11,7 @@ import type {
   Participation,
 } from '@/api/types/contest-editing';
 import { formatNumber } from '@/lib/format';
-import { formatInZone } from '../../ui/form/site-time';
+import { formatInZone } from '@/lib/site-time';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AdminChip from '../../ui/AdminChip.vue';

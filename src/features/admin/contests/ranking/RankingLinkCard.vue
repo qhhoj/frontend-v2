@@ -17,7 +17,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { failureTextOf } from '../../ui/admin-errors';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
-import { provideDateValidity } from '../../ui/form/date-validity';
+import { provideDateValidity } from '@/components/ui/date-validity';
 import { CARD, INPUT, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { expiryPreview, publicRankingUrl, toLinkPatch } from './ranking-link';

@@ -116,25 +116,14 @@ function reset() {
               :label="$t('orgAdmin.info.slug')"
               :error="errors.slug"
             >
-              <template #default="{ id, describedBy, invalid }">
-                <div
-                  class="flex min-w-0 flex-col items-stretch rounded-cell sm:flex-row border border-line-control bg-surface-solid focus-within:ring-2 focus-within:ring-accent has-[[aria-invalid=true]]:border-negative"
-                >
-                  <span
-                    aria-hidden="true"
-                    class="flex min-h-9 shrink-0 items-center rounded-t-cell border-b border-line bg-surface-strong px-3 font-mono text-sm break-all text-muted sm:rounded-l-cell sm:rounded-tr-none sm:border-r sm:border-b-0"
-                  >
-                    {{ SLUG_PREFIX }}
-                  </span>
-                  <input
-                    :id="id"
-                    v-model="form.slug"
-                    class="min-h-(--qh-control) min-w-0 flex-1 rounded-b-cell bg-transparent sm:rounded-r-cell sm:rounded-bl-none px-3 font-mono text-sm text-content outline-none"
-                    maxlength="128"
-                    :aria-describedby="describedBy"
-                    :aria-invalid="invalid ? 'true' : undefined"
-                  />
-                </div>
+              <template #default>
+                <TextInput v-model="form.slug" maxlength="128" class="font-mono">
+                  <template #prefix>
+                    <span aria-hidden="true" class="font-mono text-base break-all">{{
+                      SLUG_PREFIX
+                    }}</span>
+                  </template>
+                </TextInput>
                 <p
                   v-if="isSlugChanged"
                   role="status"

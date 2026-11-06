@@ -46,12 +46,13 @@ describe('ShortLinksPage', () => {
     const form = wrapper.get('[data-testid="short-link-form"]');
     await form.get('#short-link-path').setValue('/contests/r42');
     await form.get('#short-link-code').setValue('thi-thu');
-    await form.get('#short-link-expires').setValue('2099-12-31T23:30');
+    await form.get('#short-link-expires').setValue('31/12/2099 23:30');
     await form.trigger('submit');
     await flushPromises();
     const body = calls.find((call) => call.method === 'POST')!.body as Record<string, string>;
     expect(body).toMatchObject({ path: '/contests/r42', code: 'thi-thu' });
-    expect(new Date(body.expiresAt!).getTime()).toBe(new Date('2099-12-31T23:30').getTime());
+    // Typed on the site's clock (GMT+7).
+    expect(body.expiresAt).toBe('2099-12-31T16:30:00.000Z');
     expect(wrapper.get('[data-testid="short-link-created"]').text()).toContain('Đã tạo /s/thi-thu');
     expect(
       calls.filter((call) => call.path === '/short-links' && call.method === 'GET'),
@@ -87,7 +88,7 @@ describe('ShortLinksPage', () => {
     const { wrapper } = await openPage();
     const form = wrapper.get('[data-testid="short-link-form"]');
     await form.get('#short-link-path').setValue('/contests/r42');
-    await form.get('#short-link-expires').setValue('2020-01-01T00:00');
+    await form.get('#short-link-expires').setValue('01/01/2020 00:00');
     await form.trigger('submit');
     await flushPromises();
     expect(calls.some((call) => call.method === 'POST')).toBe(false);

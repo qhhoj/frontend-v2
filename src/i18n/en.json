@@ -986,6 +986,7 @@
     "upload_still_processing": "The server is still processing the upload; reload the page to see the result."
   },
   "common": {
+    "clearSearch": "Clear search",
     "scrollHint": "Swipe sideways to see more columns →",
     "retry": "Retry",
     "loading": "Loading…",

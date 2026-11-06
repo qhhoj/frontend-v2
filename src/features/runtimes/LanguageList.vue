@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Search } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import type { RuntimeJudge, RuntimeLanguage } from '@/api/types/runtimes';
 import { LANGUAGE_LOGO_LICENCES_URL } from '@/components/language/language-icons';
+import SearchInput from '@/components/ui/SearchInput.vue';
 import Card from '@/components/ui/Card.vue';
 import LanguageRow from './LanguageRow.vue';
 
@@ -30,16 +30,12 @@ const toggle = (key: string) => (openKey.value = openKey.value === key ? null : 
         {{ $t('runtimes.languages') }}
         <span class="text-sm font-normal text-muted">({{ languages.length }})</span>
       </h2>
-      <label class="relative flex items-center">
-        <Search aria-hidden="true" class="pointer-events-none absolute left-3 size-4 text-muted" />
-        <input
-          v-model="search"
-          type="search"
-          :aria-label="$t('runtimes.search')"
-          :placeholder="$t('runtimes.search')"
-          class="min-h-11 rounded-pill border border-line-control bg-surface-solid pr-4 pl-9 text-sm"
-        />
-      </label>
+      <SearchInput
+        v-model="search"
+        :label="$t('runtimes.search')"
+        :placeholder="$t('runtimes.search')"
+        class="w-full sm:w-64"
+      />
     </header>
     <ul v-if="shown.length">
       <LanguageRow

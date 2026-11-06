@@ -37,6 +37,7 @@ const onCleared = (answer: Setting) => emit('cleared', answer);
       kind === 'boolean' ||
       kind === 'integer' ||
       kind === 'text' ||
+      kind === 'dateTime' ||
       kind === 'choice' ||
       kind === 'url'
     "

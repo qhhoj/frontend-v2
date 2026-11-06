@@ -2,6 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { computed, defineComponent, h, ref } from 'vue';
 import { createMemoryHistory, createRouter } from 'vue-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { i18n } from '@/i18n';
 import FilterBar from './FilterBar.vue';
 
 const Blank = { render: () => h('div') };
@@ -35,7 +36,7 @@ async function mountBar() {
         });
     },
   });
-  const wrapper = mount(Host, { global: { plugins: [router] } });
+  const wrapper = mount(Host, { global: { plugins: [router, i18n] } });
   return { wrapper, router, search, isReady };
 }
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import PageHeader from '@/components/ui/PageHeader.vue';
-import ToolbarSearch from '@/components/ToolbarSearch.vue';
+import SearchInput from '@/components/ui/SearchInput.vue';
 import ToolbarSelect from '@/components/ToolbarSelect.vue';
 import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
 import { computed } from 'vue';
@@ -44,18 +44,19 @@ const tagName = computed(() => {
   <div class="page-column">
     <PageHeader :title="$t('contests.title')" :lead="$t('contests.list.lead')">
       <template #actions>
-        <ToolbarSearch
+        <SearchInput
           v-model="search"
           :label="$t('contests.list.search')"
           :placeholder="$t('contests.list.searchPlaceholder')"
           :maxlength="100"
-          class="w-64"
+          class="w-full sm:w-64"
         />
         <ToolbarSelect
           v-model="ratedChoice"
           :label="$t('contests.list.ratedLabel')"
           :options="ratedOptions"
           :active="ratedChoice !== 'any'"
+          class="w-full sm:w-auto"
         />
         <CreateShortcut kind="contest" />
       </template>

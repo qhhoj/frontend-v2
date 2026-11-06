@@ -1,5 +1,5 @@
 import { serverNow } from '@/lib/server-clock';
-import { SITE_TIME_ZONE, formatInZone } from '../../ui/form/site-time';
+import { SITE_TIME_ZONE, formatInZone } from '@/lib/site-time';
 
 export interface ContestWindow {
   /** `dd/mm hh:mm` in the site zone, `dd/mm/yyyy hh:mm` outside the current year. */

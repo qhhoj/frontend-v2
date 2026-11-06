@@ -91,7 +91,7 @@ async function apply(action: MarkdownAction) {
           :aria-label="$t('postEditor.body.label')"
           :aria-invalid="error ? 'true' : undefined"
           :aria-describedby="error ? `${id}-error` : undefined"
-          class="min-h-72 w-full resize-y bg-transparent px-4 py-3 font-mono text-sm leading-relaxed text-content focus:outline-none md:min-h-[28rem]"
+          class="min-h-72 w-full resize-y bg-transparent px-4 py-3 font-mono text-base leading-relaxed text-content focus:outline-none md:min-h-[28rem]"
         />
         <section
           v-show="!isPhone || tab === 'preview'"

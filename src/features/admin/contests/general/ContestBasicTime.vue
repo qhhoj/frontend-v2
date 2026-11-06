@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { spanMessage } from '@/lib/contest-time';
 import { buttonClass } from '../../ui/controls';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
-import { useDateReset } from '../../ui/form/date-validity';
+import { useDateReset } from '@/components/ui/date-validity';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import type { ContestForm } from '../contest-form';

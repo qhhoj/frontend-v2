@@ -4,7 +4,7 @@ import type { SubmissionResult } from '@/api/types/submissions';
 import { SUBMISSION_RESULT_CODES } from '@/api/types/submissions';
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../ui/admin-errors';
-import { formatInZone } from '../ui/form/site-time';
+import { formatInZone } from '@/lib/site-time';
 
 export const MAX_REJUDGE_LANGUAGES = 50;
 

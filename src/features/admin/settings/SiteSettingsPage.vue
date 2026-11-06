@@ -8,7 +8,7 @@ import SaveBar from '@/components/ui/SaveBar.vue';
 import Tabs from '@/components/ui/Tabs.vue';
 import type { TabItem } from '@/components/ui/Tabs.vue';
 import type { SettingKey } from '@/api/types/settings-admin';
-import ToolbarSearch from '@/components/ToolbarSearch.vue';
+import SearchInput from '@/components/ui/SearchInput.vue';
 import { SITE_NOTICE_KEY } from '@/features/site-notice/site-notice';
 import { usePermissions } from '@/stores/use-permissions';
 import { useSiteAdminQuery } from '../site/site.queries';
@@ -197,7 +197,7 @@ const SAVE_FORM_ID = 'site-settings-save';
 <template>
   <AdminPageHeader :title="t('admin.settings.title')" :lead="t('admin.settings.lead')" />
   <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-    <ToolbarSearch
+    <SearchInput
       v-model="searchText"
       class="w-full sm:max-w-sm"
       :label="t('admin.settings.search.label')"
