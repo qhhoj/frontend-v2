@@ -94,6 +94,21 @@ describe('UsernameChips', () => {
     expect((wrapper.get('input').element as HTMLInputElement).value).toBe('');
   });
 
+  it('a save right after the blur still gets the chip: commit waits for the lookup in flight', async () => {
+    mockApi({
+      ...anonymousViewer,
+      'GET /users/thayhung': ok({ id: ID_A, username: 'thayhung', displayName: 'x' }),
+    });
+    const wrapper = mountComponent(UsernameChips, {
+      props: { modelValue: [], label: 'Người dùng' },
+    });
+    await wrapper.get('input').setValue('thayhung');
+    await wrapper.get('input').trigger('blur');
+    const committed = await (wrapper.vm as unknown as { commit: () => Promise<boolean> }).commit();
+    expect(committed).toBe(true);
+    expect(wrapper.emitted('update:modelValue')).toHaveLength(1);
+  });
+
   it('shows the wait for a 429 instead of saying the account is missing', async () => {
     mockApi({ ...anonymousViewer, 'GET /users/busy': rateLimited(42) });
     const wrapper = mountComponent(ChipsHost, {

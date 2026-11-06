@@ -66,11 +66,9 @@ function onEnter() {
   else void add();
 }
 
-/** Looks the typed text up and picks it; true when nothing is left typed (picked, or nothing was typed). */
-async function add(): Promise<boolean> {
-  const text = typed.value.trim();
-  if (!text) return true;
-  if (isLooking.value) return false;
+let inflight: Promise<boolean> | null = null;
+
+async function lookUp(text: string): Promise<boolean> {
   isLooking.value = true;
   lookupError.value = '';
   try {
@@ -84,6 +82,20 @@ async function add(): Promise<boolean> {
   } finally {
     isLooking.value = false;
   }
+}
+
+/**
+ * Looks the typed text up and picks it; true when nothing is left typed (picked, or nothing was typed). A lookup already
+ * running (started by the blur) is awaited, so a save right after leaving the box still gets its answer.
+ */
+async function add(): Promise<boolean> {
+  if (inflight && !(await inflight)) return false;
+  const text = typed.value.trim();
+  if (!text) return true;
+  inflight = lookUp(text);
+  const done = await inflight;
+  inflight = null;
+  return done;
 }
 
 /** A form's save calls this first, so text typed but not yet added is never lost; false means it could not be added. */

@@ -35,7 +35,7 @@ const SIGNS = { '+': '+', '-': '−', ' ': '' } as const;
       <span v-if="line.sign !== ' '" class="sr-only">{{
         $t(line.sign === '+' ? 'common.diff.added' : 'common.diff.removed')
       }}</span>
-      <span class="min-w-0 break-words whitespace-pre-wrap">{{ line.text }}</span>
+      <span class="min-w-0 break-words whitespace-pre-wrap">{{ line.text || ' ' }}</span>
     </div>
   </div>
 </template>
