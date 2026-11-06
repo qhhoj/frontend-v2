@@ -127,7 +127,12 @@
     "ranking_column_missing": "The file has no {column} column.",
     "ban_reason_reserved": "This reason is reserved for automatic contest-cheating bans.",
     "ranking_row_columns": "Line {line} has {found} columns; the header has {expected}.",
-    "time_zone_invalid": "Not a valid time zone. Pick one from the list (for example Asia/Ho_Chi_Minh)."
+    "time_zone_invalid": "Not a valid time zone. Pick one from the list (for example Asia/Ho_Chi_Minh).",
+    "chunk_index_out_of_range": "A chunk was sent past the end of the file.",
+    "chunk_size_mismatch": "A chunk had the wrong length; upload the file again.",
+    "upload_hash_mismatch": "The received file differs from the chosen one; upload it again.",
+    "chunks_missing": "Some chunks of the file have not been sent yet.",
+    "upload_sessions_full": "You already have 2 unfinished archive uploads; cancel one or wait for it to expire."
   },
   "uploading": "Uploading…",
   "uploadBusy": "Still uploading. Choose the file again when it finishes.",

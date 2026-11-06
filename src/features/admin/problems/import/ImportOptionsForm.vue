@@ -114,9 +114,9 @@ function chooseFile(file: File) {
     localErrors.value = { file: translate('admin.polygon.form.notZip') };
     return;
   }
-  if (tooLargeFor(file, UPLOAD_LIMITS.archive)) {
+  if (tooLargeFor(file, UPLOAD_LIMITS.polygonPackage)) {
     localErrors.value = {
-      file: translate('admin.ui.tooLarge', { max: formatFileSize(UPLOAD_LIMITS.archive) }),
+      file: translate('admin.ui.tooLarge', { max: formatFileSize(UPLOAD_LIMITS.polygonPackage) }),
     };
     return;
   }
@@ -165,7 +165,7 @@ function submit() {
         <UploadButton
           :label="$t('admin.polygon.form.chooseFile')"
           accept=".zip"
-          :max-bytes="UPLOAD_LIMITS.archive"
+          :max-bytes="UPLOAD_LIMITS.polygonPackage"
           :is-pending="isPending"
           @picked="chooseFile"
         />

@@ -26,6 +26,9 @@ import DataSourceFiles from './DataSourceFiles.vue';
 import { useKeepDataAnswer } from './problem-data.queries';
 import CasesAutofill from './CasesAutofill.vue';
 import CasesSummary from './CasesSummary.vue';
+import { SINGLE_UPLOAD_MAX_BYTES } from './chunked-upload/chunk-plan';
+import ChunkedUploadStatus from './chunked-upload/ChunkedUploadStatus.vue';
+import { UPLOAD_CANCELLED, useChunkedUpload } from './chunked-upload/use-chunked-upload';
 import { DATA_BASIC_FIELDS, dataAdvancedCount } from './data-views';
 import { toDataForm } from './test-cases';
 import { useDataForm } from './use-data-form';
@@ -53,9 +56,16 @@ const {
 const keepAnswer = useKeepDataAnswer(() => props.problem.code);
 const isAutofillOpen = ref(false);
 const isAutofillAfterUpload = ref(false);
-/** An upload only stores the zip: the tests are made from it next, so that dialog opens at once when the zip has pairs. */
+const chunked = useChunkedUpload(() => props.problem.code);
+/**
+ * An upload only stores the zip: the tests are made from it next, so that dialog opens at once when the zip has pairs.
+ * A zip larger than one request goes in chunks (resumable in this tab); a smaller one in a single request.
+ */
 const archive = useAdminMutation({
-  mutate: (file: File) => uploadDataArchive(props.problem.code, file),
+  mutate: (file: File) =>
+    file.size > SINGLE_UPLOAD_MAX_BYTES
+      ? chunked.upload(file)
+      : uploadDataArchive(props.problem.code, file),
   onDone: (saved: ProblemData) => {
     keepAnswer(saved);
     if (pairArchiveFiles(saved.archiveFiles).pairs.length === 0) return;
@@ -63,6 +73,14 @@ const archive = useAdminMutation({
     isAutofillOpen.value = true;
   },
 });
+/** A cancel is the user's own doing: no refusal line for it. */
+const archiveFailure = computed(() =>
+  archive.failure.value?.code === UPLOAD_CANCELLED ? null : archive.failure.value,
+);
+function resumeArchive() {
+  const file = chunked.interrupted.value?.file;
+  if (file) void archive.run(file);
+}
 const blockedReason = computed(() =>
   badRowNumbers.value.length > 0
     ? translate('admin.problems.data.cases.badJsonRows', { rows: badRowNumbers.value.join(', ') })
@@ -127,8 +145,18 @@ async function submit() {
             <CasesSummary :cases="form.cases" />
           </template>
         </DataArchiveCard>
-        <div v-if="archive.failure.value" class="px-4 pb-4 sm:px-5">
-          <AdminStatus kind="refused" :text="failureReasonOf(archive.failure.value)" />
+        <div v-if="chunked.phase.value || chunked.interrupted.value" class="px-4 pb-4 sm:px-5">
+          <ChunkedUploadStatus
+            :phase="chunked.phase.value"
+            :done-bytes="chunked.doneBytes.value"
+            :total-bytes="chunked.totalBytes.value"
+            :interrupted-name="chunked.interrupted.value?.file.name ?? null"
+            @cancel="chunked.cancel"
+            @resume="resumeArchive"
+          />
+        </div>
+        <div v-if="archiveFailure" class="px-4 pb-4 sm:px-5">
+          <AdminStatus kind="refused" :text="failureReasonOf(archiveFailure)" />
         </div>
       </div>
       <template v-else>

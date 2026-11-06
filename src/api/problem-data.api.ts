@@ -1,5 +1,6 @@
 import { fetchText } from './admin-common.api';
 import { apiGet, apiSend, apiUrl, fillPath } from './typed';
+import type { DataOf } from './typed';
 import type { DataFileKind, ProblemData, ProblemDataBody } from './types/problem-data';
 
 export const fetchProblemData = (code: string): Promise<ProblemData> =>
@@ -28,3 +29,38 @@ export const uploadDataArchive = (code: string, file: File): Promise<ProblemData
 
 export const deleteDataFile = (code: string, kind: DataFileKind): Promise<ProblemData> =>
   apiSend('delete', '/problems/{code}/data/files/{kind}', { path: { code, kind } });
+
+/** A chunked archive upload: the server's chunk size, chunk count and the chunks it holds. */
+export type DataUpload = DataOf<'/problems/{code}/data/uploads', 'post'>;
+type DataUploadTarget = { code: string; id: string };
+
+export const createDataUpload = (
+  code: string,
+  file: { name: string; size: number; sha256: string },
+): Promise<DataUpload> =>
+  apiSend('post', '/problems/{code}/data/uploads', { path: { code }, body: file });
+
+export const fetchDataUpload = (
+  target: DataUploadTarget,
+  signal?: AbortSignal,
+): Promise<DataUpload> => apiGet('/problems/{code}/data/uploads/{id}', { path: target, signal });
+
+export const putDataUploadChunk = (
+  target: DataUploadTarget & { index: number },
+  chunk: Blob,
+  signal?: AbortSignal,
+): Promise<DataUpload> => {
+  const body = new FormData();
+  body.append('file', chunk, 'chunk');
+  return apiSend('put', '/problems/{code}/data/uploads/{id}/chunks/{index}', {
+    path: target,
+    body,
+    signal,
+  });
+};
+
+export const completeDataUpload = (target: DataUploadTarget): Promise<ProblemData> =>
+  apiSend('post', '/problems/{code}/data/uploads/{id}/complete', { path: target });
+
+export const cancelDataUpload = (target: DataUploadTarget): Promise<void> =>
+  apiSend('delete', '/problems/{code}/data/uploads/{id}', { path: target });

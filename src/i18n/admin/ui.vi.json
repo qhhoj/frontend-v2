@@ -127,7 +127,12 @@
     "ranking_column_missing": "Tệp thiếu cột {column}.",
     "ban_reason_reserved": "Lý do này dành riêng cho các vụ cấm tự động do gian lận trong kỳ thi.",
     "ranking_row_columns": "Dòng {line} có {found} cột, trong khi tiêu đề có {expected} cột.",
-    "time_zone_invalid": "Múi giờ không hợp lệ. Hãy chọn một múi giờ trong danh sách (ví dụ Asia/Ho_Chi_Minh)."
+    "time_zone_invalid": "Múi giờ không hợp lệ. Hãy chọn một múi giờ trong danh sách (ví dụ Asia/Ho_Chi_Minh).",
+    "chunk_index_out_of_range": "Phần tệp gửi lên nằm ngoài tệp.",
+    "chunk_size_mismatch": "Một phần tệp gửi lên có độ dài sai; hãy tải lại.",
+    "upload_hash_mismatch": "Tệp nhận được khác tệp đã chọn; hãy tải lại.",
+    "chunks_missing": "Còn phần tệp chưa gửi xong.",
+    "upload_sessions_full": "Bạn đang có 2 lượt tải gói test chưa xong; hãy hủy bớt hoặc đợi chúng hết hạn."
   },
   "uploading": "Đang tải lên…",
   "uploadBusy": "Đang tải lên. Hãy chọn lại tệp sau khi xong.",
