@@ -46,6 +46,7 @@ describe('audit feed helpers', () => {
     const gone = entry({ object: { id: 'x', label: 'aplusb', deleted: true } });
     expect(auditObjectLink(gone)).toBeNull();
     expect(auditObjectLink(entry({ type: 'comment' }))).toBeNull();
+    expect(auditObjectLink(entry({ type: 'tagProblem' }))).toBeNull();
     expect(
       auditObjectLink(
         entry({ type: 'setting', object: { id: 'mail.from', label: 'mail.from', deleted: false } }),
