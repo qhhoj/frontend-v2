@@ -493,6 +493,16 @@
       "summary": "{count} test · tổng {points} điểm",
       "summaryEmpty": "Chưa có test. Tải gói zip rồi bấm “Tạo test từ gói zip”.",
       "summaryMore": "Sửa từng test, nhóm test và pretest ở tab Nâng cao."
+    },
+    "chunked": {
+      "hashing": "Đang kiểm tra tệp",
+      "uploading": "Đang tải lên",
+      "completing": "Đang lưu gói test (có thể mất một phút)…",
+      "progressLabel": "Tiến độ tải gói test",
+      "interrupted": "Tải “{name}” chưa xong; phần đã gửi vẫn được giữ trong 24 giờ.",
+      "resume": "Tiếp tục tải lên",
+      "chunk": "phần {number}/{count}",
+      "finishing": "Đang hoàn tất trên máy chủ, không thể hủy nữa."
     }
   },
   "uploads": {

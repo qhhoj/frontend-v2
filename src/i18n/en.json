@@ -983,7 +983,9 @@
     "tutorial_language_required": "The package has several tutorials: pick the one to use as the editorial.",
     "too_many_testcases": "The problem has more tests than your limit.",
     "already_participating": "This user already has a live participation in the contest.",
-    "participation_has_submissions": "The participation has submissions, so it cannot be deleted."
+    "participation_has_submissions": "The participation has submissions, so it cannot be deleted.",
+    "file_unreadable": "The file can no longer be read (moved, changed or deleted); pick it again.",
+    "upload_still_processing": "The server is still processing the upload; reload the page to see the result."
   },
   "common": {
     "scrollHint": "Swipe sideways to see more columns →",

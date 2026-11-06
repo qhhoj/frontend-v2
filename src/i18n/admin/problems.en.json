@@ -493,6 +493,16 @@
       "summary": "{count} tests · {points} points in total",
       "summaryEmpty": "No tests yet. Upload a zip, then press “Create tests from the zip”.",
       "summaryMore": "Edit single tests, batches and pretests on the Advanced tab."
+    },
+    "chunked": {
+      "hashing": "Checking the file",
+      "uploading": "Uploading",
+      "completing": "Saving the test archive (this can take a minute)…",
+      "progressLabel": "Test archive upload progress",
+      "interrupted": "The upload of “{name}” did not finish; the part already sent is kept for 24 hours.",
+      "resume": "Resume upload",
+      "chunk": "part {number}/{count}",
+      "finishing": "Finishing on the server; it can no longer be cancelled."
     }
   },
   "uploads": {

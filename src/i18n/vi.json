@@ -983,7 +983,9 @@
     "tutorial_language_required": "Gói có nhiều lời giải: chọn đề lấy lời giải.",
     "too_many_testcases": "Bài có nhiều test hơn giới hạn của bạn.",
     "already_participating": "Người này đã có lượt tham gia đang diễn ra trong kỳ thi.",
-    "participation_has_submissions": "Lượt tham gia đã có bài nộp nên không xóa được."
+    "participation_has_submissions": "Lượt tham gia đã có bài nộp nên không xóa được.",
+    "file_unreadable": "Không đọc được tệp nữa (đã bị chuyển, sửa hoặc xóa); hãy chọn lại.",
+    "upload_still_processing": "Máy chủ vẫn đang xử lý; tải lại trang để xem kết quả."
   },
   "common": {
     "scrollHint": "Vuốt ngang để xem thêm cột →",

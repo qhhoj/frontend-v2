@@ -519,7 +519,7 @@ export interface paths {
         head?: never;
         /**
          * Change a site setting
-         * @description Requires `judge.change_settings` and a browser session (API tokens are refused); `mail.smtpUrl`, `organization.adminRoleId`, every `auth.*` key, `discord.webhooks`, `polygon.apiKey`, `polygon.apiSecret`, `polygon.accountName`, `externalJudge.baseUrl` and `externalJudge.apiToken` also need a superuser, to read as well. Sets the value of one setting and records a revision with the acting user. Object-valued settings are merged into the stored value. `null` is refused. Errors: 400 `validation_failed` on `value` when it does not fit the setting, 403 `superuser_only` on `key` for a superuser-only key, 404 `not_found` for an unknown key.
+         * @description Requires `judge.change_settings` and a browser session (API tokens are refused); `mail.smtpUrl`, `organization.adminRoleId`, every `auth.*` key, `discord.webhooks`, `polygon.apiKey`, `polygon.apiSecret`, `polygon.accountName`, `externalJudge.baseUrl` and `externalJudge.apiToken` also need a superuser, to read as well. Sets the value of one setting and records a revision with the acting user. Object-valued settings are merged into the stored value. `null` is refused. Errors: 400 `validation_failed` on `key` for an unknown key and on `value` when it does not fit the setting, 403 `superuser_only` on `key` for a superuser-only key.
          */
         patch: operations["SettingsController_update"];
         trace?: never;
@@ -533,7 +533,7 @@ export interface paths {
         };
         /**
          * List the revisions of a setting
-         * @description Requires `judge.change_settings`; the superuser-only keys of `PATCH` also need a superuser. Returns the change history of one setting, newest first, with the values before and after, the changed fields and the acting user. Paged, default 20 per page (max 100). Errors: 403 `superuser_only` on `key` for a superuser-only key, 404 `not_found` for an unknown key.
+         * @description Requires `judge.change_settings`; the superuser-only keys of `PATCH` also need a superuser. Returns the change history of one setting, newest first, with the values before and after, the changed fields and the acting user. Paged, default 20 per page (max 100). Errors: 400 `validation_failed` on `key` for an unknown key, 403 `superuser_only` on `key` for a superuser-only key.
          */
         get: operations["SettingsController_revisions"];
         put?: never;
@@ -555,7 +555,7 @@ export interface paths {
         put?: never;
         /**
          * Restore a setting to an earlier revision
-         * @description Requires `judge.change_settings` and a browser session; the superuser-only keys of `PATCH` also need a superuser. Writes the value the setting had before the given revision, as a new revision. Secret values are not stored in revisions, so they are never restored. Errors: 403 `superuser_only` on `key` for a superuser-only key, 404 `not_found` for an unknown setting or revision, 409 `secret_unrestorable` when the revision has nothing restorable because the value is secret.
+         * @description Requires `judge.change_settings` and a browser session; the superuser-only keys of `PATCH` also need a superuser. Writes the value the setting had before the given revision, as a new revision. Secret values are not stored in revisions, so they are never restored. Errors: 400 `validation_failed` on `key` for an unknown key, 403 `superuser_only` on `key` for a superuser-only key, 404 `not_found` for an unknown revision, 409 `secret_unrestorable` when the revision has nothing restorable because the value is secret.
          */
         post: operations["SettingsController_restore"];
         delete?: never;
@@ -5079,7 +5079,9 @@ export interface paths {
         /**
          * Upload the test data archive of a problem
          * @description Needs edit rights; mirror problems are refused. Send one multipart `file`, a
-         *     .zip of up to 512 MiB (400 `zip_required` or a zip error code otherwise). It
+         *     .zip of up to 512 MiB (400 `zip_required` or a zip error code otherwise);
+         *     behind Cloudflare one request carries at most 100 MB, so a larger archive
+         *     goes through the chunked upload (`/data/uploads`). It
          *     replaces the previous archive, regenerates `init.yml` and is counted against
          *     the organization's storage and credits (403 `quota_exceeded`). Limited to 30
          *     uploads per hour per user. Returns the new data configuration.
@@ -5162,6 +5164,110 @@ export interface paths {
         get: operations["ProblemDataController_init"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/problems/{code}/data/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start a chunked upload of the test data archive
+         * @description For archives too large for one request (above `chunkBytes`, 48 MiB). Same
+         *     rights as the archive upload; mirror problems are refused. `name` must end
+         *     in `.zip` (400 `zip_required`), `size` is at most 2 GiB. Spends one upload of
+         *     the 30 per hour per user and checks the organization's storage and credits
+         *     now (403 `quota_exceeded`); credits are charged at complete. At most 2 open uploads per
+         *     user (409 `upload_sessions_full`); a session expires 24 hours after create.
+         */
+        post: operations["ChunkedUploadsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/problems/{code}/data/uploads/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a chunked upload
+         * @description `received` lists the chunks the server holds; resume by sending the others.
+         */
+        get: operations["ChunkedUploadsController_status"];
+        put?: never;
+        post?: never;
+        /**
+         * Cancel a chunked upload
+         * @description Drops the session and its chunks; nothing was charged. While a chunk or
+         *     complete of this upload runs it is 409 `busy`: try again once it ends.
+         */
+        delete: operations["ChunkedUploadsController_cancel"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/problems/{code}/data/uploads/{id}/chunks/{index}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Send one chunk of a chunked upload
+         * @description One multipart `file` holding bytes `index * chunkBytes` onwards, exactly
+         *     `chunkBytes` long (the last chunk: the rest; 400 `chunk_size_mismatch`, 413
+         *     `file_too_large`). An index past the last chunk is 400
+         *     `chunk_index_out_of_range`. Sending a chunk again replaces it. Chunks of one
+         *     upload are written one at a time (409 `busy`). Limited to 300 chunks per hour
+         *     per user. Another user's upload, or an expired one, is 404 `not_found`.
+         */
+        put: operations["ChunkedUploadsController_putChunk"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/problems/{code}/data/uploads/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete a chunked upload
+         * @description Needs every chunk (409 `chunks_missing`). Joins them and checks the size and
+         *     SHA-256 given at create: a mismatch is 400 `upload_hash_mismatch` and ends
+         *     the upload. Then stores the archive exactly like the archive upload, with its
+         *     answer and its errors (zip codes, `quota_exceeded`, 409 `busy`); after such
+         *     an error the chunks are kept, so complete can be retried or the upload
+         *     cancelled; a refused zip (zip codes) ends the upload like a hash mismatch.
+         *     A data write that lands meanwhile is 409 `conflict` (retry). Spends one
+         *     upload of the 30 per hour per user. Once stored, completing again answers
+         *     the stored data and charges nothing (for an answer lost on the way); its
+         *     chunks and cancel are refused (404).
+         */
+        post: operations["ChunkedUploadsController_complete"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7875,6 +7981,25 @@ export interface components {
          * @enum {string}
          */
         Checker: "bridged" | "easy" | "floats" | "floatsabs" | "floatsrel" | "identical" | "linecount" | "linematches" | "rstripped" | "sorted" | "standard" | "unordered";
+        ChunkedUploadResponse: {
+            /** @description Bytes of every chunk but the last, which holds the rest. */
+            chunkBytes: number;
+            /** @description Number of chunks. */
+            chunkCount: number;
+            /**
+             * Format: date-time
+             * @description When the session and its chunks are dropped.
+             */
+            expiresAt: string;
+            /** @description Session id. */
+            id: string;
+            /** @description The archive's name once stored. */
+            name: string;
+            /** @description Indexes of the chunks the server holds, ascending; send the others. */
+            received: number[];
+            /** @description Size of the whole file in bytes. */
+            size: number;
+        };
         ClampedLimitResponse: {
             applied: number;
             polygon: number;
@@ -8625,6 +8750,14 @@ export interface components {
             order?: number;
             /** @description Short name of the template. */
             title: string;
+        };
+        CreateChunkedUploadDto: {
+            /** @description File name of the archive; it must end in `.zip` (400 `zip_required`) and becomes the archive's name. */
+            name: string;
+            /** @description SHA-256 of the whole file, lowercase hex; checked at complete. */
+            sha256: string;
+            /** @description Size of the whole file in bytes, 1 to 2 GiB. */
+            size: number;
         };
         CreateContestDto: {
             /** @description Stored hashed; an empty string removes it. */
@@ -14601,7 +14734,7 @@ export interface operations {
             header?: never;
             path: {
                 /** @description Setting key, for example `auth.google`. */
-                key: string;
+                key: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "auth.sessionMaxDays" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "externalJudge.apiToken" | "externalJudge.baseUrl" | "externalJudge.maxInFlight" | "externalJudge.maxWaitMinutes" | "mail.from" | "mail.smtpUrl" | "organization.adminRoleId" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "polygon.accountName" | "polygon.apiKey" | "polygon.apiSecret" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultJudgingMs" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
             };
             cookie?: never;
         };
@@ -14645,7 +14778,7 @@ export interface operations {
             header?: never;
             path: {
                 /** @description Setting key, for example `auth.google`. */
-                key: string;
+                key: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "auth.sessionMaxDays" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "externalJudge.apiToken" | "externalJudge.baseUrl" | "externalJudge.maxInFlight" | "externalJudge.maxWaitMinutes" | "mail.from" | "mail.smtpUrl" | "organization.adminRoleId" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "polygon.accountName" | "polygon.apiKey" | "polygon.apiSecret" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultJudgingMs" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
             };
             cookie?: never;
         };
@@ -14681,7 +14814,7 @@ export interface operations {
             header?: never;
             path: {
                 /** @description Setting key, for example `auth.google`. */
-                key: string;
+                key: "auth.facebook" | "auth.github" | "auth.google" | "auth.pwnedApiUrl" | "auth.sessionMaxDays" | "contest.banAfterDisqualifications" | "contest.officialMode" | "contest.officialModeEndsAt" | "discord.webhooks" | "externalJudge.apiToken" | "externalJudge.baseUrl" | "externalJudge.maxInFlight" | "externalJudge.maxWaitMinutes" | "mail.from" | "mail.smtpUrl" | "organization.adminRoleId" | "pdf.maxBytes" | "pdf.renderTimeoutMs" | "polygon.accountName" | "polygon.apiKey" | "polygon.apiSecret" | "problem.deleteGraceDays" | "quota.cost.contest" | "quota.cost.dataPer10MiB" | "quota.cost.problem" | "quota.defaultJudgingMs" | "quota.defaultMonthlyCredits" | "quota.defaultStorageBytes" | "quota.enforce" | "similarity.maxPairs" | "similarity.maxSubmissions" | "similarity.minPercent" | "site.timeZone";
                 /** @description Id of the revision, from the revision list. */
                 revisionId: string;
             };
@@ -23257,6 +23390,198 @@ export interface operations {
                 };
                 content: {
                     "text/yaml": string;
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ChunkedUploadsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateChunkedUploadDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ChunkedUploadResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ChunkedUploadsController_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+                /** @description Upload session id, from create. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ChunkedUploadResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ChunkedUploadsController_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+                /** @description Upload session id, from create. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ChunkedUploadsController_putChunk: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+                /** @description Upload session id, from create. */
+                id: string;
+                /** @description Chunk index, from 0 to `chunkCount - 1`. */
+                index: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ChunkedUploadResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ChunkedUploadsController_complete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Problem code: lowercase letters, digits and underscores, 1 to 32 characters. */
+                code: string;
+                /** @description Upload session id, from create. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProblemDataResponse"];
+                    };
                 };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
