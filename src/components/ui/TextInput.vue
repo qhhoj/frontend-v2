@@ -11,6 +11,12 @@ defineOptions({ inheritAttrs: false });
 const model = defineModel<string | number>();
 const field = useFieldControl();
 const { frame, input } = useSplitAttrs();
+/** A tap on the frame (a prefix, the padding) focuses the input; the frame is a `div`, so a button in `#suffix` does not join the input's accessible name. */
+function focusInput(event: MouseEvent) {
+  const frameEl = event.currentTarget as HTMLElement;
+  if (event.target === frameEl || !(event.target as HTMLElement).closest('button'))
+    frameEl.querySelector('input')?.focus();
+}
 const FRAMED =
   'flex h-(--qh-control) items-center gap-2 rounded-cell border border-line-control bg-surface-solid px-3 text-base text-content has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus has-aria-invalid:border-negative has-aria-invalid:inset-ring has-aria-invalid:inset-ring-negative has-disabled:cursor-not-allowed has-disabled:border-line has-disabled:bg-surface-strong has-disabled:text-muted';
 </script>
@@ -30,7 +36,7 @@ const FRAMED =
     "
     :class="`${CONTROL_FRAME} h-(--qh-control)`"
   />
-  <label v-else v-bind="frame" :class="FRAMED">
+  <div v-else v-bind="frame" :class="FRAMED" @click="focusInput">
     <span v-if="$slots.prefix" class="flex shrink-0 items-center text-muted"
       ><slot name="prefix"
     /></span>
@@ -50,5 +56,5 @@ const FRAMED =
     <span v-if="$slots.suffix" class="flex shrink-0 items-center text-muted"
       ><slot name="suffix"
     /></span>
-  </label>
+  </div>
 </template>

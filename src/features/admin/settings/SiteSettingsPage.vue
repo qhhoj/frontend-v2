@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import SaveBar from '@/components/ui/SaveBar.vue';
+import { provideDateValidity } from '@/components/ui/date-validity';
 import Tabs from '@/components/ui/Tabs.vue';
 import type { TabItem } from '@/components/ui/Tabs.vue';
 import type { SettingKey } from '@/api/types/settings-admin';
@@ -131,11 +132,13 @@ const bindBlock = (id: string) => (handle: unknown) => {
   else blockRefs.delete(id);
 };
 
+/** A date box holding text that is not a date blocks the save: nothing is dropped or replaced silently. */
+const { hasUnreadableDate } = provideDateValidity();
 const isSaving = ref(false);
 const savedAt = ref<Date | null>(null);
 
 async function saveAll() {
-  if (isSaving.value || dirtyCount.value === 0) return;
+  if (isSaving.value || dirtyCount.value === 0 || hasUnreadableDate.value) return;
   isSaving.value = true;
   const { saved, refused } = await saveDirtyBlocks(
     pageBlocks.value.map((block) => block.id),
@@ -300,6 +303,7 @@ const SAVE_FORM_ID = 'site-settings-save';
       :form="SAVE_FORM_ID"
       :dirty-count="dirtyCount"
       :pending="isSaving"
+      :blocked-reason="hasUnreadableDate ? t('admin.form.dateTime.invalid') : undefined"
       :saved-at="savedAt"
       @discard="discardAll"
     />

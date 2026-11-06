@@ -6,6 +6,7 @@ import type { CreatedShortLink } from '@/api/types/short-links';
 import { CircleCheck } from 'lucide-vue-next';
 import CopyButton from '@/components/CopyButton.vue';
 import DateTimeField from '@/components/ui/DateTimeField.vue';
+import { provideDateValidity } from '@/components/ui/date-validity';
 import { shortLinkUrl } from '@/features/short-links/short-link-path';
 import { translate } from '@/i18n';
 import AdminField from '../ui/AdminField.vue';
@@ -20,6 +21,9 @@ const code = ref('');
 const expires = ref<string | null>(null);
 const created = ref<CreatedShortLink | null>(null);
 const isExpiryPast = ref(false);
+/** An expiry text that is not a date refuses the submit: a link is never created without the expiry the user typed. */
+const { hasUnreadableDate } = provideDateValidity();
+const isExpiryUnreadable = ref(false);
 const create = useAdminMutation<void, CreatedShortLink>({
   mutate: () =>
     createShortLink({
@@ -60,13 +64,17 @@ function isPast(instant: string | null): boolean {
 }
 function submit() {
   created.value = null;
+  isExpiryUnreadable.value = hasUnreadableDate.value;
+  if (isExpiryUnreadable.value) return;
   isExpiryPast.value = isPast(expires.value);
   if (!isExpiryPast.value) void create.run();
 }
 const expiresError = computed(() =>
-  isExpiryPast.value
-    ? translate('admin.shortlinks.form.expiresPast')
-    : refusedText('expiresAt', 'admin.shortlinks.form.expiresPast'),
+  isExpiryUnreadable.value && hasUnreadableDate.value
+    ? translate('admin.form.dateTime.invalid')
+    : isExpiryPast.value
+      ? translate('admin.shortlinks.form.expiresPast')
+      : refusedText('expiresAt', 'admin.shortlinks.form.expiresPast'),
 );
 </script>
 

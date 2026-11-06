@@ -83,6 +83,19 @@ describe('ShortLinksPage', () => {
     expect(form.text()).not.toContain('Only site pages can be shortened.');
   });
 
+  it('refuses an expiry that is not a date: nothing is sent and the field says why', async () => {
+    const calls = mockApi(routes());
+    const { wrapper } = await openPage();
+    const form = wrapper.get('[data-testid="short-link-form"]');
+    await form.get('#short-link-path').setValue('/contests/r42');
+    await form.get('#short-link-expires').setValue('31/12/2099 25:00');
+    await form.trigger('submit');
+    await flushPromises();
+    expect(calls.some((call) => call.method === 'POST')).toBe(false);
+    expect(form.get('#short-link-expires').attributes('aria-invalid')).toBe('true');
+    expect(form.text()).toContain('dd/mm/yyyy hh:mm');
+  });
+
   it('refuses an expiry in the past without sending anything', async () => {
     const calls = mockApi(routes());
     const { wrapper } = await openPage();

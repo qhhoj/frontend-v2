@@ -16,7 +16,6 @@ const props = withDefaults(
 );
 const generatedId = useId();
 const id = computed(() => props.inputId ?? generatedId);
-const describedBy = computed(() => (props.description ? `${id.value}-desc` : undefined));
 /** The native `disabled` would drop the box from the tab order and mute it by opacity; `aria-disabled` keeps both. */
 const refuseWhenDisabled = (event: Event) => {
   if (props.disabled) event.preventDefault();
@@ -24,8 +23,11 @@ const refuseWhenDisabled = (event: Event) => {
 </script>
 
 <template>
-  <div :class="CHOICE_ROW">
-    <span class="relative mt-0.5 inline-flex shrink-0 touch:mt-0">
+  <!-- The whole row is the label, so the 44 px touch row clicks; without a text the box grows a 44 px overlay instead. -->
+  <label :class="[CHOICE_ROW, disabled ? 'cursor-not-allowed' : 'cursor-pointer']">
+    <span
+      class="relative mt-0.5 inline-flex shrink-0 after:absolute after:-inset-3 after:content-[''] touch:mt-0"
+    >
       <input
         v-bind="$attrs"
         :id="id"
@@ -33,7 +35,6 @@ const refuseWhenDisabled = (event: Event) => {
         type="checkbox"
         :class="CHECKBOX_INPUT"
         :aria-disabled="disabled ? 'true' : undefined"
-        :aria-describedby="describedBy"
         @click="refuseWhenDisabled"
       />
       <Check
@@ -41,17 +42,9 @@ const refuseWhenDisabled = (event: Event) => {
         class="pointer-events-none absolute inset-0.5 hidden size-4 text-on-accent peer-checked:block"
       />
     </span>
-    <label
-      v-if="label"
-      :for="id"
-      class="flex min-w-0 flex-col"
-      :class="{ 'cursor-pointer': !disabled }"
-    >
+    <span v-if="label" class="flex min-w-0 flex-col">
       <span class="text-sm font-semibold" :class="{ 'text-muted': disabled }">{{ label }}</span>
-      <span v-if="description" :id="`${id}-desc`" class="text-meta text-muted">{{
-        description
-      }}</span>
-    </label>
-    <slot />
-  </div>
+      <span v-if="description" class="text-meta text-muted">{{ description }}</span>
+    </span>
+  </label>
 </template>

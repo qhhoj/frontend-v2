@@ -7,6 +7,7 @@ import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import FormField from '@/components/ui/FormField.vue';
+import { provideDateValidity } from '@/components/ui/date-validity';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import AdminLeaveGuard from '@/features/admin/ui/form/AdminLeaveGuard.vue';
 import { hasPermission } from '@/lib/permissions';
@@ -18,6 +19,7 @@ import PostBodyEditor from './PostBodyEditor.vue';
 import PostSaveBar from './PostSaveBar.vue';
 import PostSettingsCard from './PostSettingsCard.vue';
 import PostStaffCard from './PostStaffCard.vue';
+import type { FieldErrors } from '@/features/admin/ui/admin-errors';
 import { POST_LIMITS } from './post-form';
 import { usePostEditor } from './use-post-editor';
 
@@ -30,7 +32,20 @@ const postId = computed(() => (route.name === 'post-edit' ? String(route.params.
 const options = useComposeOptionsQuery();
 const organization = ref<string | null>(null);
 const editor = usePostEditor(() => postId.value, organization);
-const { form, rights, errors, writer } = editor;
+const { form, rights, writer } = editor;
+/** A publish time that is not a date blocks every save: nothing is dropped or replaced silently. */
+const { hasUnreadableDate } = provideDateValidity();
+const isSaveRefused = ref(false);
+const errors = computed<FieldErrors>(() => ({
+  ...editor.errors.value,
+  ...(isSaveRefused.value && hasUnreadableDate.value
+    ? { publishOn: t('admin.form.dateTime.invalid') }
+    : {}),
+}));
+function save(intent: Parameters<typeof editor.save>[0]) {
+  isSaveRefused.value = hasUnreadableDate.value;
+  if (!isSaveRefused.value) editor.save(intent);
+}
 /** The staff render (blog style) needs the problem preview permission; any other writer gets the comment preview. */
 const previewStyle = computed(() =>
   hasPermission(session.user, 'judge.edit_own_problem') ? 'blog' : 'comment',
@@ -66,7 +81,7 @@ const backTo = computed(() =>
     : { to: { name: 'blog' }, label: t('nav.blog') },
 );
 /** The bar's submit publishes (or updates a live post); the draft button saves on its own. */
-const publish = () => editor.save(editor.isPostLive.value ? 'keep' : 'publish');
+const publish = () => save(editor.isPostLive.value ? 'keep' : 'publish');
 /** Enter in a one-line field would submit the form: only the bar's buttons save. */
 function blockImplicitSubmit(event: KeyboardEvent) {
   if (event.target instanceof HTMLInputElement) event.preventDefault();
@@ -188,7 +203,7 @@ const fixedAuthor = computed(() =>
           :is-done="writer.isDone.value"
           :is-nothing-to-save="editor.isNothingToSave.value"
           :failure="writer.failure.value"
-          @save-draft="editor.save('draft')"
+          @save-draft="save('draft')"
         />
       </form>
     </QueryState>
