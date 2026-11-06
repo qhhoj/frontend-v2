@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import Notice from '@/components/ui/Notice.vue';
 import { mountComponent } from '@/test/mount';
 import { judge } from '@/test/admin-fixtures/judges';
 import { LANGUAGES } from '@/test/admin-fixtures/languages';
@@ -44,7 +45,7 @@ describe('LanguageCoverageNotice', () => {
       judgeRunning('b', { languages: ['CPP17', 'CPP20', 'PY3'] }),
       judgeRunning('c', { languages: ['PAS'], online: false }),
     ]);
-    expect(wrapper.classes()).toContain('bg-verdict-wa-bg');
+    expect(wrapper.findComponent(Notice).props('tone')).toBe('danger');
     expect(wrapper.findAll('li')).toHaveLength(1);
     expect(wrapper.get('li').text()).toContain('PAS');
   });
@@ -56,7 +57,7 @@ describe('LanguageCoverageNotice', () => {
       judgeRunning('c', { languages: ['PAS'], online: false }),
     ]);
     const [unserved, single] = wrapper.findAll('li');
-    expect(wrapper.classes()).toContain('bg-verdict-wa-bg');
+    expect(wrapper.findComponent(Notice).props('tone')).toBe('danger');
     expect(wrapper.findAll('li')).toHaveLength(2);
     expect(unserved!.text()).toBe('Không máy chấm trực tuyến nào chạy PAS: bài nộp sẽ nằm chờ.');
     expect(single!.text()).toBe(
