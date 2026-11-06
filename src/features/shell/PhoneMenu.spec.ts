@@ -19,11 +19,31 @@ const openOnPhone = async (path: string) => {
 };
 
 describe('phone menu', () => {
-  it('holds sign-in and register for a visitor, and switches the language', async () => {
+  it('lists the seven sections with the current one marked', async () => {
+    mockApi({ ...blogListRoutes, ...anonymousViewer });
+    await openOnPhone('/blog');
+    const links = [...sheet()!.querySelectorAll('nav a')];
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      '/',
+      '/problems',
+      '/contests',
+      '/submissions',
+      '/users',
+      '/blog',
+      '/organizations',
+    ]);
+    expect(links.filter((link) => link.getAttribute('aria-current') === 'page')).toEqual([
+      links[5],
+    ]);
+  });
+
+  it('keeps sign-in in the header and register in the sheet, and switches the language', async () => {
     mockApi({ ...blogListRoutes, ...anonymousViewer });
     const { wrapper } = await openOnPhone('/blog');
     expect(wrapper.find('button[aria-label="Switch to English"]').exists()).toBe(false);
-    expect(sheet()?.querySelector('a[href="/login?redirect=/blog"]')).not.toBeNull();
+    expect(wrapper.find('header a[href="/login?redirect=/blog"]').exists()).toBe(true);
+    expect(sheet()?.querySelector('a[href="/login?redirect=/blog"]')).toBeNull();
+    expect(sheet()?.querySelector('a[href="/register"]')).not.toBeNull();
     const english = [...sheet()!.querySelectorAll('button')].find(
       (button) => button.textContent?.trim() === 'English',
     );
@@ -32,7 +52,7 @@ describe('phone menu', () => {
     expect(useLocaleStore().locale).toBe('en');
   });
 
-  it('carries the notifications instead of a bell: a dot on the button, the count in the sheet', async () => {
+  it('shows the bell in the header for a signed-in viewer, not in the sheet', async () => {
     mockApi({
       ...blogListRoutes,
       'GET /auth/me': signedIn(),
@@ -40,13 +60,9 @@ describe('phone menu', () => {
       'GET /notifications/unread-count': ok({ count: 3 }),
     });
     const { wrapper } = await openOnPhone('/blog');
-    expect(wrapper.find('[data-testid="notification-bell"]').exists()).toBe(false);
-    const button = wrapper.get('[data-testid="phone-menu"]');
-    expect(button.attributes('aria-label')).toBe('Mở menu, 3 thông báo chưa đọc');
-    expect(button.find('[data-testid="phone-menu-dot"]').exists()).toBe(true);
-    const row = sheet()!.querySelector('[data-testid="phone-menu-notifications"]')!;
-    expect(row.getAttribute('href')).toBe('/notifications');
-    expect(row.textContent).toContain('3 chưa đọc');
+    expect(wrapper.find('[data-testid="notification-bell"]').exists()).toBe(true);
+    expect(wrapper.find('header a[href^="/login"]').exists()).toBe(false);
+    expect(sheet()!.querySelector('[data-testid="phone-menu-notifications"]')).toBeNull();
   });
 
   it("leads the account's pages with the signed-in viewer's own profile", async () => {

@@ -14,8 +14,7 @@
     "organizations": "Organizations",
     "more": "More",
     "menu": "Menu",
-    "openMenu": "Open the menu",
-    "openMenuUnread": "Open the menu, {count} unread notifications"
+    "openMenu": "Open the menu"
   },
   "pages": {
     "problem": "Problem",
@@ -717,7 +716,6 @@
   },
   "locale": {
     "switchTo": "Chuyển sang tiếng Việt",
-    "short": "VI",
     "title": "Language"
   },
   "auth": {

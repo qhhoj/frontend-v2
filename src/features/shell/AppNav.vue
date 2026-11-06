@@ -2,60 +2,38 @@
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { translate } from '@/i18n';
-import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
-import { useIsFirstNavigationPending } from '@/router/first-navigation';
 import NavOverflowMenu from './NavOverflowMenu.vue';
-import { navSectionOverride } from './nav-section';
-import { NAV_ITEM_CLASS, scrollToClearFade, splitNavItems } from './nav-overflow';
+import { NAV_ITEMS, useIsNavCurrent } from './nav-items';
+import { NAV_ITEM_CLASS, splitNavItems } from './nav-overflow';
 
 /**
- * The main navigation. From `md` up the bar never wraps: the items that do not fit move into a
- * "More" menu. On a phone it is a plain strip between the logo and the menu button that scrolls inside itself, with
- * fades where items are clipped.
+ * The main navigation, from `md` up (a phone lists the sections in the menu sheet, `PhoneMenu`). The bar never wraps:
+ * the items that do not fit move into a "More" menu.
  */
 const route = useRoute();
-/** Before the first navigation lands the route is the start location (`/`): no item is current yet. */
-const isFirstNavigationPending = useIsFirstNavigationPending();
-const NAV_ITEMS = [
-  { path: '/', labelKey: 'nav.home' },
-  { path: '/problems', labelKey: 'nav.problems' },
-  { path: '/contests', labelKey: 'nav.contests' },
-  { path: '/submissions', labelKey: 'nav.submissions' },
-  { path: '/users', labelKey: 'nav.users' },
-  { path: '/blog', labelKey: 'nav.blog' },
-  { path: '/organizations', labelKey: 'nav.organizations' },
-] as const;
-/** A section stays current on its sub-pages (`/problems/aplusb` is in Problems), unless the page claims another (`useNavSection`). */
-const isCurrent = (path: string) => {
-  if (isFirstNavigationPending.value) return false;
-  if (navSectionOverride.value !== null) return path === navSectionOverride.value;
-  return path === '/'
-    ? route.path === '/'
-    : route.path === path || route.path.startsWith(`${path}/`);
-};
-/** The current item: a tinted pill in the phone strip, an underline in the glass bar. */
+const isCurrent = useIsNavCurrent();
+/** The current item gets an underline in the glass bar. */
 const itemClass = (path: string) => [
   NAV_ITEM_CLASS,
   isCurrent(path)
-    ? 'relative font-bold max-md:bg-accent-soft max-md:text-accent-soft-text md:text-accent-text md:after:absolute md:after:inset-x-4 md:after:bottom-1.5 md:after:h-0.5 md:after:rounded-pill md:after:bg-accent'
+    ? 'relative font-bold text-accent-text after:absolute after:inset-x-4 after:bottom-1.5 after:h-0.5 after:rounded-pill after:bg-accent'
     : 'text-muted hover:text-content',
 ];
 
-const isPhone = useMediaQuery(PHONE_QUERY);
 const wrapper = useTemplateRef<HTMLElement>('wrapper');
 const navElement = useTemplateRef<HTMLElement>('navElement');
 const track = useTemplateRef<HTMLElement>('track');
 const measurer = useTemplateRef<HTMLElement>('measurer');
 const measureRow = useTemplateRef<HTMLElement>('measureRow');
 
-// --- bar mode (md and up): which items fit ---
+// Which items fit the bar.
 const itemWidths = ref<number[]>([]);
 const moreWidth = ref(0);
 const gap = ref(0);
 const available = ref(Infinity);
 const activeIndex = computed(() => NAV_ITEMS.findIndex((item) => isCurrent(item.path)));
 const split = computed(() =>
-  isPhone.value || itemWidths.value.length === 0
+  itemWidths.value.length === 0
     ? { visible: NAV_ITEMS.map((_item, index) => index), hidden: [] }
     : splitNavItems({
         widths: itemWidths.value,
@@ -89,52 +67,7 @@ const measureBar = () => {
   available.value = wrap.clientWidth - horizontalPadding(pill);
 };
 
-// --- phone mode: the strip scrolls and fades where items are clipped ---
-const startClipped = ref(false);
-const endClipped = ref(false);
-/** Wide enough that a clipped item visibly fades out instead of looking cut (M-05). */
-const FADE_PX = 32;
-const fadeMask = computed(() => {
-  if (!isPhone.value) return undefined;
-  const start = startClipped.value ? `transparent 0, black ${FADE_PX}px` : 'black 0';
-  const end = endClipped.value ? `black calc(100% - ${FADE_PX}px), transparent 100%` : 'black 100%';
-  return `linear-gradient(to right, ${start}, ${end})`;
-});
-const readClipping = () => {
-  const element = navElement.value;
-  if (!element) return;
-  const hiddenWidth = element.scrollWidth - element.clientWidth;
-  startClipped.value = isPhone.value && element.scrollLeft > 0;
-  endClipped.value = isPhone.value && element.scrollLeft < hiddenWidth - 1;
-};
-/** Scrolls the strip just far enough for the item to sit clear of the fades; the page itself does not move. */
-const revealItem = (pill: HTMLElement, item: HTMLElement) => {
-  const left =
-    item.getBoundingClientRect().left - pill.getBoundingClientRect().left + pill.scrollLeft;
-  pill.scrollLeft = scrollToClearFade({
-    left,
-    right: left + item.offsetWidth,
-    scrollLeft: pill.scrollLeft,
-    viewWidth: pill.clientWidth,
-    fadeWidth: FADE_PX,
-  });
-};
-/** Brings the current section's item into the strip, so the item of the page being viewed is never out of reach. */
-const showCurrentItem = () => {
-  const pill = navElement.value;
-  const item = pill?.querySelector<HTMLElement>('[aria-current="page"]');
-  if (pill && isPhone.value && item) revealItem(pill, item);
-};
-const onFocusIn = (event: FocusEvent) => {
-  const pill = navElement.value;
-  if (pill && isPhone.value && event.target instanceof HTMLElement) revealItem(pill, event.target);
-};
-
-const refresh = () => {
-  measureBar();
-  showCurrentItem();
-  readClipping();
-};
+const refresh = measureBar;
 
 /** Locale switches, sign-in, fonts loading and scrollbars change widths without a window resize. */
 let observer: ResizeObserver | undefined;
@@ -146,9 +79,8 @@ onMounted(() => {
     if (element) observer.observe(element);
 });
 onBeforeUnmount(() => observer?.disconnect());
-/** The route can settle after the header mounts, so the current item is brought in again on each path change. */
+/** The route can settle after the header mounts, so the bar is measured again on each path change (the current item never goes into the menu). */
 watch(() => route.path, refresh, { flush: 'post' });
-watch(isPhone, refresh, { flush: 'post' });
 </script>
 
 <template>
@@ -156,13 +88,9 @@ watch(isPhone, refresh, { flush: 'post' });
     <nav
       ref="navElement"
       :aria-label="$t('nav.main')"
-      class="flex w-full gap-0.5 overflow-x-auto md:glass md:w-fit md:max-w-full md:overflow-hidden md:rounded-pill md:p-1"
-      :style="{ maskImage: fadeMask, WebkitMaskImage: fadeMask }"
-      @scroll="readClipping"
-      @focusin="onFocusIn"
+      class="glass flex w-fit max-w-full gap-0.5 overflow-hidden rounded-pill p-1"
     >
-      <!-- On a phone the track keeps 12 px clear at both ends of the strip, away from the logo and the menu button. -->
-      <div ref="track" class="flex w-max gap-0.5 max-md:px-3">
+      <div ref="track" class="flex w-max gap-0.5">
         <RouterLink
           v-for="item in visibleItems"
           :key="item.path"
@@ -180,7 +108,7 @@ watch(isPhone, refresh, { flush: 'post' });
       ref="measurer"
       aria-hidden="true"
       inert
-      class="pointer-events-none invisible absolute top-0 left-0 hidden h-0 w-0 overflow-hidden md:block"
+      class="pointer-events-none invisible absolute top-0 left-0 h-0 w-0 overflow-hidden"
     >
       <div ref="measureRow" class="flex w-max gap-0.5">
         <span

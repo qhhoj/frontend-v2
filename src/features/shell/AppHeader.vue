@@ -1,21 +1,29 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router';
+import AppButton from '@/components/ui/AppButton.vue';
 import BrandWordmark from '@/components/ui/BrandWordmark.vue';
 import AppearancePanel from '@/features/appearance/AppearancePanel.vue';
 import NotificationBell from '@/features/notifications/NotificationBell.vue';
 import { useNotificationAlerts } from '@/features/notifications/use-notification-alerts';
 import OfficialModePill from '@/features/official-mode/OfficialModePill.vue';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
+import { useIsFirstNavigationPending } from '@/router/first-navigation';
+import { useSessionStore } from '@/stores/session.store';
 import AppNav from './AppNav.vue';
 import LocaleToggle from './LocaleToggle.vue';
 import PhoneMenu from './PhoneMenu.vue';
 import UserMenu from './UserMenu.vue';
 
 /**
- * One row at every width. On a phone it is 56 px: the logo, the navigation strip and a menu button whose sheet
- * holds notifications, the language, the mode, the official-mode pill and the account (M-05: the bell moved there, so the
- * strip shows more items). The header owns the notification stream and announcements for both layouts.
+ * One row at every width. On a phone it is 56 px: the logo, then sign-in for a visitor or the bell for a member, and
+ * a menu button whose sheet lists the sections, the account, the language and the mode. The header owns the
+ * notification stream and announcements for both layouts.
  */
 const isPhone = useMediaQuery(PHONE_QUERY);
+const session = useSessionStore();
+const route = useRoute();
+/** Until the session answers the header offers neither sign-in nor the bell. */
+const isSessionPending = useIsFirstNavigationPending();
 const alerts = useNotificationAlerts();
 </script>
 
@@ -27,13 +35,22 @@ const alerts = useNotificationAlerts();
   >
     <BrandWordmark />
     <OfficialModePill v-if="!isPhone" />
-    <AppNav />
+    <AppNav v-if="!isPhone" />
     <div class="ml-auto flex shrink-0 items-center gap-2">
       <template v-if="!isPhone">
         <LocaleToggle />
         <AppearancePanel />
       </template>
-      <PhoneMenu v-if="isPhone" :unread="alerts.unread.value" />
+      <template v-if="isPhone">
+        <NotificationBell />
+        <AppButton
+          v-if="!session.user && !isSessionPending"
+          :to="{ name: 'login', query: { redirect: route.fullPath } }"
+        >
+          {{ $t('account.login') }}
+        </AppButton>
+        <PhoneMenu />
+      </template>
       <template v-else>
         <NotificationBell />
         <UserMenu />

@@ -9,9 +9,10 @@ const locale = useLocaleStore();
     type="button"
     class="inline-flex size-11 items-center justify-center rounded-pill border border-line bg-surface-strong font-mono text-caption leading-4 font-semibold hover:bg-surface-hover"
     :aria-label="$t('locale.switchTo')"
+    :title="$t('locale.switchTo')"
     :lang="locale.locale === 'vi' ? 'en' : 'vi'"
     @click="locale.toggle()"
   >
-    {{ $t('locale.short') }}
+    {{ locale.locale.toUpperCase() }}
   </button>
 </template>

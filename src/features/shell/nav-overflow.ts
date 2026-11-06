@@ -53,20 +53,3 @@ export function splitNavItems(input: NavSplitInput): NavSplit {
   }
   return { visible, hidden: all.filter((index) => !visible.includes(index)) };
 }
-
-/**
- * The scroll position that puts an item of a scrolling strip clear of the fade bands at both
- * ends (the browser clamps it to the strip, where no fade is drawn at the very start or end).
- */
-export function scrollToClearFade(item: {
-  left: number;
-  right: number;
-  scrollLeft: number;
-  viewWidth: number;
-  fadeWidth: number;
-}): number {
-  const { left, right, scrollLeft, viewWidth, fadeWidth } = item;
-  if (left - fadeWidth < scrollLeft) return left - fadeWidth;
-  if (right + fadeWidth > scrollLeft + viewWidth) return right + fadeWidth - viewWidth;
-  return scrollLeft;
-}
