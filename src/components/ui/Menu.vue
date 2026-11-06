@@ -88,7 +88,7 @@ const model = computed<MenuItem[]>(() => {
     ref="menu"
     :model="model"
     popup
-    :pt="{ root: { 'aria-label': label } }"
+    :pt="{ list: { 'aria-label': label } }"
     @show="onShow"
     @hide="isOpen = false"
   >

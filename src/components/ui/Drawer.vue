@@ -8,7 +8,7 @@ import IconButton from './IconButton.vue';
 
 /**
  * The one side panel (edit a record, a menu sheet, a notification list). `side` right (default) / left / bottom; `size` sm
- * 400 px or md 560 px from 768 px up; below 768 px it fills the screen (a bottom sheet fills the width and caps its height).
+ * 400, md 560 or lg 720 px from 768 px up; below 768 px it fills the screen (a bottom sheet fills the width and caps its height).
  * `role="dialog"` and `aria-modal` (PrimeVue Drawer), named by its title; focus is trapped, Escape and a scrim click close it
  * (Escape only while the drawer is the topmost modal: a confirm dialog opened over it takes the key alone),
  * and focus returns to the opener. On open, focus goes to the first `[autofocus]` element, else to the title.
@@ -16,7 +16,7 @@ import IconButton from './IconButton.vue';
  * e.g. a `SaveBar variant="footer"`).
  */
 export type DrawerSide = 'right' | 'left' | 'bottom';
-export type DrawerSize = 'sm' | 'md';
+export type DrawerSize = 'sm' | 'md' | 'lg';
 const props = withDefaults(
   defineProps<{ title: string; subtitle?: string; side?: DrawerSide; size?: DrawerSize }>(),
   { subtitle: undefined, side: 'right', size: 'md' },
@@ -30,7 +30,11 @@ const body = useTemplateRef<HTMLElement>('body');
 const heading = useTemplateRef<HTMLElement>('heading');
 let opener: HTMLElement | null = null;
 
-const WIDTHS: Record<DrawerSize, string> = { sm: 'md:w-[25rem]', md: 'md:w-[35rem]' };
+const WIDTHS: Record<DrawerSize, string> = {
+  sm: 'md:w-[25rem]',
+  md: 'md:w-[35rem]',
+  lg: 'md:w-[45rem]',
+};
 /** Per side: the panel's shape, where the mask pushes it, and the slide it enters and leaves by. */
 const SIDES: Record<DrawerSide, { root: string; mask: string; slide: string }> = {
   right: { root: 'h-full border-l', mask: 'justify-end', slide: 'translate-x-6' },

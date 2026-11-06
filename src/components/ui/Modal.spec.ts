@@ -8,11 +8,11 @@ const pressEscape = () =>
   document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', bubbles: true }));
 
 describe('Modal', () => {
-  it('fills a phone screen only when sized', async () => {
-    mountComponent(Modal, { props: { visible: true, title: 'A', size: 'md' } });
+  it('fills a phone screen only when lg', async () => {
+    mountComponent(Modal, { props: { visible: true, title: 'A', size: 'lg' } });
     await flushPromises();
     expect(dialog().className).toContain('max-sm:w-screen');
-    expect(dialog().className).toContain('sm:w-[min(40rem,calc(100vw-2rem))]');
+    expect(dialog().className).toContain('sm:w-[min(47.5rem,calc(100vw-2rem))]');
   });
 
   it('keeps the preset width when no size is given', async () => {

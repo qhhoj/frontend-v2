@@ -70,7 +70,7 @@ const columns = computed<AdminColumn[]>(() => [
         ? $t('admin.catalogs.editTitle', { name: editing.name })
         : $t('admin.catalogs.licenses.createTitle')
     "
-    size="md"
+    size="lg"
   >
     <LicenseEditor :row="editing" @done="isOpen = false" @cancel="isOpen = false" />
   </AdminDrawer>

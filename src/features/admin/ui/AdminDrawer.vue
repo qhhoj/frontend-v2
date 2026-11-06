@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import Drawer from '@/components/ui/Drawer.vue';
 
-/** The admin side panel: the kit `Drawer` (right side, `size` sm 400 / md 560 px), kept under its old name for the admin screens. */
-const props = defineProps<{ title: string; subtitle?: string; size?: 'sm' | 'md' }>();
+/** The admin side panel: the kit `Drawer` (right side, `size` sm 400 / md 560 / lg 720 px), kept under its old name for the admin screens. */
+const props = defineProps<{ title: string; subtitle?: string; size?: 'sm' | 'md' | 'lg' }>();
 const visible = defineModel<boolean>('visible', { required: true });
 defineEmits<{ hide: [] }>();
 </script>

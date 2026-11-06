@@ -18,7 +18,7 @@ import type { ModalSize } from '@/components/ui/Modal.vue';
  * `returnFocusTo` names where focus lands when the dialog closes after a confirm (not after Cancel, Escape or the close button):
  * pass it when the opener row disappears with the confirmed action, so PrimeVue has nothing to return focus to.
  * The body is `body` or the default slot; the `error` slot shows a failed confirm inside the dialog.
- * `size` (sm 480, md 640, lg 760 px; full screen on a phone) widens the dialog past the preset's 448 px, for a body with a form.
+ * `size` (sm 480, md 640, lg 760 px; lg is full screen on a phone) widens the dialog past the preset's 448 px, for a body with a form.
  * `blockedReason` says under the body why the confirm is blocked while `canConfirm` is false ("Nhập đúng mã để xác nhận").
  * A `<button>` in the body needs `type="button"`, or it submits the form and confirms.
  */

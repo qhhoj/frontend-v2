@@ -10,8 +10,8 @@ export type ModalSize = 'sm' | 'md' | 'lg';
  * PrimeVue traps focus while it is open and gives it back to the opener when it hides. On open, focus goes to the first
  * meaningful control (the first field in the body, else the first enabled footer button), never to the close button, and a
  * mouse- or touch-opened dialog shows no focus ring there (`:focus-visible` decides).
- * `size` picks a width (sm 480, md 640, lg 760 px, never wider than the viewport minus 2 rem) and makes the dialog fill
- * the screen below 640 px; without it the preset's 448 px applies at every width.
+ * `size` picks a width (sm 480, md 640, lg 760 px, never wider than the viewport minus 2 rem); `lg` fills
+ * the screen below 640 px, sm and md stay a centred card; without it the preset's 448 px applies at every width.
  * `closable` false hides the close button and ignores Escape (a busy step).
  * Slots: default (body), `header` (in place of `title`), `footer`. Other attributes (`style`, `aria-describedby`) go to the Dialog.
  */
@@ -30,9 +30,12 @@ const WIDTHS: Record<ModalSize, string> = {
   md: 'sm:w-[min(40rem,calc(100vw-2rem))]',
   lg: 'sm:w-[min(47.5rem,calc(100vw-2rem))]',
 };
+/** Only the widest size is full screen on a phone; sm and md stay a centred card with the mask's 1 rem margins. */
 const FULL_ON_PHONE =
   'max-sm:h-dvh max-sm:max-h-dvh max-sm:w-screen max-sm:rounded-none max-sm:border-0';
-const sizeClass = computed(() => props.size && [WIDTHS[props.size], FULL_ON_PHONE]);
+const sizeClass = computed(
+  () => props.size && [WIDTHS[props.size], props.size === 'lg' && FULL_ON_PHONE],
+);
 /** Fields first (or an `[autofocus]` element), then the footer's first enabled button (Cancel on a confirm). */
 const FIRST_FIELD = '[autofocus], input:not([type=hidden]):not(:disabled), select, textarea';
 const HEADER_BUTTON = '[data-pc-group-section="headericon"]';
@@ -50,7 +53,7 @@ function focusFirstControl(dialog: Element) {
 }
 /** Merged into the preset's mask (not replacing it): no inset on a phone, so a sized dialog reaches the edges. */
 const pt = computed(() => ({
-  ...(props.size && { mask: { class: 'max-sm:p-0' } }),
+  ...(props.size === 'lg' && { mask: { class: 'max-sm:p-0' } }),
   transition: { onAfterEnter: focusFirstControl },
 }));
 </script>

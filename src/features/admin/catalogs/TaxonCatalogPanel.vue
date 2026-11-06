@@ -68,7 +68,7 @@ const columns = computed<AdminColumn[]>(() => [
         ? $t('admin.catalogs.editTitle', { name: editing.fullName })
         : $t(`admin.catalogs.${kind}.createTitle`)
     "
-    size="sm"
+    size="md"
   >
     <TaxonEditor :kind="kind" :row="editing" @done="isOpen = false" @cancel="isOpen = false" />
   </AdminDrawer>
