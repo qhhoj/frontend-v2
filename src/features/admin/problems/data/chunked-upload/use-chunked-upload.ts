@@ -10,7 +10,7 @@ import {
 import type { DataUpload } from '@/api/problem-data.api';
 import type { ProblemData } from '@/api/types/problem-data';
 import { missingChunks, planChunks } from './chunk-plan';
-import { isRetryable, withRetry } from './retry';
+import { abortableWait, isBusy, isRetryable, withRetry } from './retry';
 import { Sha256 } from './sha256';
 
 export type ChunkedPhase = 'hashing' | 'uploading' | 'completing';
@@ -25,6 +25,20 @@ const CHUNK_RETRY = { attempts: 5, baseDelayMs: 1000 };
 const COMPLETE_RETRY = { attempts: 6, baseDelayMs: 2000 };
 /** A chunk that has not arrived in this long is on a dead connection: sent again (48 MiB at about 160 kB/s). */
 const CHUNK_TIMEOUT_MS = 5 * 60 * 1000;
+/** Complete joins, checks and stores up to 2 GiB on the server before it answers. */
+const COMPLETE_TIMEOUT_MS = 5 * 60 * 1000;
+/** Create, status and cancel answer at once; longer is a dead connection. */
+const REQUEST_TIMEOUT_MS = 30 * 1000;
+/** Once `finishing`, how long the upload waits for the server's outcome before it gives up showing it. */
+const FINISHING_MAX_MS = 10 * 60 * 1000;
+/** Longest backoff between rounds while `finishing`. */
+const FINISHING_MAX_BACKOFF_MS = 60 * 1000;
+/** The upload stopped waiting for a server that is still storing it; the outcome shows after a reload. */
+export const UPLOAD_STILL_PROCESSING = 'upload_still_processing';
+
+/** `signal`, also aborted (as a `network_error`) once `ms` pass. */
+const timed = (ms: number, signal?: AbortSignal) =>
+  signal ? AbortSignal.any([signal, AbortSignal.timeout(ms)]) : AbortSignal.timeout(ms);
 
 /** An upload that stopped with its session kept on the server: what resuming needs. */
 export interface InterruptedUpload {
@@ -44,6 +58,19 @@ const endsSession = (error: unknown) =>
   error.issues.some(
     (issue) => issue.code === 'upload_hash_mismatch' || issue.code.startsWith('zip_'),
   );
+
+/** The wait before the next `finishing` round: the backoff (capped), or the server's `Retry-After` when longer. */
+function finishingDelay(error: unknown, round: number): number {
+  const backoff = Math.min(COMPLETE_RETRY.baseDelayMs * 2 ** round, FINISHING_MAX_BACKOFF_MS);
+  const retryAfter = error instanceof ApiError ? (error.retryAfterSeconds ?? 0) : 0;
+  return Math.max(backoff, retryAfter * 1000);
+}
+
+/** A rate limit stays itself (its wait is the reason); anything else is `UPLOAD_STILL_PROCESSING`. */
+const stillProcessing = (error: unknown) =>
+  error instanceof ApiError && error.status === 429
+    ? error
+    : new ApiError(UPLOAD_STILL_PROCESSING, 0, 'The server is still processing the upload');
 
 /** Bytes `start..end` of the file; a file that can no longer be read is the `FILE_UNREADABLE` refusal. */
 async function readSlice(file: File, start: number, end: number): Promise<ArrayBuffer> {
@@ -112,16 +139,25 @@ export function useChunkedUpload(code: () => string) {
     }
   }
 
-  /** Complete with retries; once `finishing`, the retries go on until the server answers the stored data or a refusal. */
+  /**
+   * Complete with retries. Once `finishing`, rounds of retries go on, with a backoff (or the server's `Retry-After`)
+   * between them, until the server answers the stored data or a refusal; a wait past `FINISHING_MAX_MS` ends the
+   * upload instead (the 429 itself, or `UPLOAD_STILL_PROCESSING`), its session kept.
+   */
   async function completeStored(current: InterruptedUpload, signal: AbortSignal) {
-    for (;;) {
+    let deadline: number | null = null;
+    for (let round = 0; ; round++) {
       try {
-        return await withRetry(() => completeDataUpload(targetOf(current), signal), {
-          ...COMPLETE_RETRY,
-          signal,
-        });
+        return await withRetry(
+          () => completeDataUpload(targetOf(current), timed(COMPLETE_TIMEOUT_MS, signal)),
+          { ...COMPLETE_RETRY, signal },
+        );
       } catch (error) {
         if (!finishing.value || !isRetryable(error)) throw error;
+        deadline ??= Date.now() + FINISHING_MAX_MS;
+        const delay = finishingDelay(error, round);
+        if (Date.now() + delay > deadline) throw stillProcessing(error);
+        await abortableWait(delay, signal);
       }
     }
   }
@@ -130,21 +166,21 @@ export function useChunkedUpload(code: () => string) {
     phase.value = 'hashing';
     doneBytes.value = 0;
     const sha256 = await hashFile(file, signal, (bytes) => (doneBytes.value = bytes));
-    const session = await createDataUpload(problemCode, {
-      name: file.name,
-      size: file.size,
-      sha256,
-    });
+    const session = await createDataUpload(
+      problemCode,
+      { name: file.name, size: file.size, sha256 },
+      AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    );
     return { code: problemCode, file, session };
   }
 
   async function sendMissing(current: InterruptedUpload, signal: AbortSignal) {
     phase.value = 'uploading';
     const { file, session } = current;
-    const { received } = await withRetry(() => fetchDataUpload(targetOf(current), signal), {
-      ...CHUNK_RETRY,
-      signal,
-    });
+    const { received } = await withRetry(
+      () => fetchDataUpload(targetOf(current), timed(REQUEST_TIMEOUT_MS, signal)),
+      { ...CHUNK_RETRY, signal },
+    );
     const missing = missingChunks(planChunks(file.size, session.chunkBytes), received);
     doneBytes.value = file.size - missing.reduce((sum, span) => sum + span.end - span.start, 0);
     chunkCount.value = session.chunkCount;
@@ -152,12 +188,7 @@ export function useChunkedUpload(code: () => string) {
       chunkNumber.value = span.index + 1;
       const chunk = new Blob([await readSlice(file, span.start, span.end)]);
       const chunkTarget = { ...targetOf(current), index: span.index };
-      const send = () =>
-        putDataUploadChunk(
-          chunkTarget,
-          chunk,
-          AbortSignal.any([signal, AbortSignal.timeout(CHUNK_TIMEOUT_MS)]),
-        );
+      const send = () => putDataUploadChunk(chunkTarget, chunk, timed(CHUNK_TIMEOUT_MS, signal));
       await withRetry(send, { ...CHUNK_RETRY, signal });
       doneBytes.value += span.end - span.start;
     }
@@ -178,7 +209,10 @@ export function useChunkedUpload(code: () => string) {
     const stopped = interrupted.value;
     interrupted.value = null;
     if (stopped)
-      void withRetry(() => cancelDataUpload(targetOf(stopped)), CHUNK_RETRY).catch(() => undefined);
+      void withRetry(
+        () => cancelDataUpload(targetOf(stopped), timed(REQUEST_TIMEOUT_MS)),
+        CHUNK_RETRY,
+      ).catch(() => undefined);
   }
 
   /** Stops the upload and drops its session; while completing, only once the server agrees (else `finishing`). */
@@ -188,19 +222,22 @@ export function useChunkedUpload(code: () => string) {
     discard();
   }
 
-  /** The server drops the session only if it is not storing it (409 `busy` while it is, 404 once stored): any refusal leaves the complete running to its real outcome. */
+  /**
+   * The server drops the session only if it is not storing it. 409 `busy` (storing now) makes the upload `finishing`;
+   * any other failure leaves it running with Hủy still offered (404: already stored, the complete answers it).
+   */
   async function cancelCompleting() {
     const running = controller;
     const current = interrupted.value;
     if (cancelling || !running || !current) return;
     cancelling = true;
     try {
-      await cancelDataUpload(targetOf(current));
+      await cancelDataUpload(targetOf(current), timed(REQUEST_TIMEOUT_MS));
       if (controller !== running) return;
       interrupted.value = null;
       running.abort();
-    } catch {
-      if (controller === running) finishing.value = true;
+    } catch (error) {
+      if (controller === running && isBusy(error)) finishing.value = true;
     } finally {
       cancelling = false;
     }
@@ -212,9 +249,11 @@ export function useChunkedUpload(code: () => string) {
     if (running) window.addEventListener('beforeunload', confirmLeave);
     else window.removeEventListener('beforeunload', confirmLeave);
   });
+  /** Leaving stops everything at once, `finishing` included: the server finishes without us, nobody is shown a result. */
   onScopeDispose(() => {
     window.removeEventListener('beforeunload', confirmLeave);
-    cancel();
+    controller?.abort();
+    discard();
   });
 
   return {

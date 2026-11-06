@@ -34,12 +34,13 @@ export const deleteDataFile = (code: string, kind: DataFileKind): Promise<Proble
 export type DataUpload = DataOf<'/problems/{code}/data/uploads', 'post'>;
 type DataUploadTarget = { code: string; id: string };
 
-/** Takes no signal on purpose: a create the server ran must still answer its id, so a cancelled upload can delete it. */
+/** `signal` is meant for a timeout only, not a cancel: a create the server ran must still answer its id, so a cancelled upload can delete it. */
 export const createDataUpload = (
   code: string,
   file: { name: string; size: number; sha256: string },
+  signal?: AbortSignal,
 ): Promise<DataUpload> =>
-  apiSend('post', '/problems/{code}/data/uploads', { path: { code }, body: file });
+  apiSend('post', '/problems/{code}/data/uploads', { path: { code }, body: file, signal });
 
 export const fetchDataUpload = (
   target: DataUploadTarget,
@@ -66,5 +67,5 @@ export const completeDataUpload = (
 ): Promise<ProblemData> =>
   apiSend('post', '/problems/{code}/data/uploads/{id}/complete', { path: target, signal });
 
-export const cancelDataUpload = (target: DataUploadTarget): Promise<void> =>
-  apiSend('delete', '/problems/{code}/data/uploads/{id}', { path: target });
+export const cancelDataUpload = (target: DataUploadTarget, signal?: AbortSignal): Promise<void> =>
+  apiSend('delete', '/problems/{code}/data/uploads/{id}', { path: target, signal });

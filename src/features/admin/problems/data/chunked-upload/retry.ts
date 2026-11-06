@@ -29,11 +29,18 @@ export function abortableWait(ms: number, signal?: AbortSignal): Promise<void> {
   });
 }
 
+/** 409 `busy`: the upload's lock is held by a chunk, its completion or a cancel. */
+export const isBusy = (error: unknown): boolean =>
+  error instanceof ApiError &&
+  error.status === 409 &&
+  error.issues.some((issue) => issue.code === 'busy');
+
 /** A dropped connection (`network_error`; an abort is not one), a server or gateway error, a rate limit or a busy lock can pass on a later try; any other answer will not. */
 export function isRetryable(error: unknown): boolean {
   if (!(error instanceof ApiError)) return false;
-  const isBusy = error.status === 409 && error.issues.some((issue) => issue.code === 'busy');
-  return error.code === 'network_error' || error.status >= 500 || error.status === 429 || isBusy;
+  return (
+    error.code === 'network_error' || error.status >= 500 || error.status === 429 || isBusy(error)
+  );
 }
 
 /** The wait before try `attempt + 1`: the backoff, or the server's `Retry-After` when longer; null when that is too long to wait for. */
