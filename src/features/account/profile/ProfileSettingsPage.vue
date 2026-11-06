@@ -169,7 +169,6 @@ async function submit() {
           :pending="pending"
           :saved-at="savedAt"
           :time-zone="savedTimeZone"
-          hide-idle-on-phone
           @discard="undo"
         >
           <template v-if="fixText" #status>

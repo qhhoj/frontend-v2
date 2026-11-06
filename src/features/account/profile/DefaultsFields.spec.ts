@@ -51,7 +51,7 @@ describe('Settings › Profile defaults', () => {
       .setValue('en');
     expect(document.documentElement.lang).toBe('en');
     expect(patches(calls)).toEqual([]);
-    expect(wrapper.text()).toContain('No changes to save.');
+    expect(wrapper.find('[data-save-bar]').exists()).toBe(false);
     expect(localStorage.getItem('qhhoj.locale')).toBe('en');
   });
 });

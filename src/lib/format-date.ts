@@ -62,6 +62,9 @@ export function formatDayKey(date: DateInput, timeZone?: string): string {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
+/** The site's own time zone: admin dates, and the default of "Đã lưu lúc" in the save bar. */
+export const SITE_TIME_ZONE = 'Asia/Ho_Chi_Minh';
+
 /** The IANA name of the viewer's zone (`Asia/Ho_Chi_Minh`). */
 export const viewerTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
 

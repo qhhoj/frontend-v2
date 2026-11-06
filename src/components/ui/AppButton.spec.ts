@@ -5,7 +5,7 @@ import { anonymousViewer } from '@/test/problem-routes';
 import AppButton from './AppButton.vue';
 import IconButton from './IconButton.vue';
 import { buttonClasses } from './button-classes';
-import type { ButtonShape, ButtonSize, ButtonTone } from './button-classes';
+import type { ButtonSize, ButtonTone } from './button-classes';
 
 beforeEach(() => mockApi({ ...anonymousViewer }));
 
@@ -102,12 +102,9 @@ describe('IconButton', () => {
 });
 
 describe('buttonClasses', () => {
-  const tones: ButtonTone[] = ['primary', 'secondary', 'ghost', 'danger'];
+  const tones: ButtonTone[] = ['primary', 'secondary', 'ghost', 'danger', 'link'];
   const sizes: ButtonSize[] = ['sm', 'md', 'lg'];
-  const shapes: ButtonShape[] = ['token', 'admin', 'pill'];
-  const every = shapes.flatMap((shape) =>
-    tones.flatMap((tone) => sizes.map((size) => buttonClasses({ tone, size, shape }))),
-  );
+  const every = tones.flatMap((tone) => sizes.map((size) => buttonClasses({ tone, size })));
 
   it('never dims with opacity and always draws a disabled look', () => {
     for (const classes of every) {
@@ -118,7 +115,6 @@ describe('buttonClasses', () => {
 
   it('takes its corner from the control token, so the admin scope gets 12 px', () => {
     expect(buttonClasses().split(' ')).toContain('rounded-control');
-    expect(buttonClasses({ shape: 'admin' }).split(' ')).toContain('rounded-cell');
   });
 
   it('gives an icon-only button no side padding, and a block button the full width', () => {
@@ -126,5 +122,18 @@ describe('buttonClasses', () => {
     expect(square).toContain('px-0');
     expect(square.filter((name) => /^px-/.test(name))).toEqual(['px-0']);
     expect(buttonClasses({ block: true }).split(' ')).toContain('w-full');
+  });
+});
+
+describe('AppButton disabledReason', () => {
+  it('keeps focus on the same button when disabled toggles', async () => {
+    const wrapper = mountButton({ disabledReason: 'Vì sao' });
+    const button = wrapper.get('button').element;
+    document.body.append(wrapper.element);
+    button.focus();
+    await wrapper.setProps({ disabled: true } as never);
+    expect(wrapper.get('button').element).toBe(button);
+    expect(document.activeElement).toBe(button);
+    wrapper.unmount();
   });
 });

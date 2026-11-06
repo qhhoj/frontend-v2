@@ -98,7 +98,7 @@ describe('ProblemEditorialTab', () => {
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/editorial');
     const save = () => wrapper.findAll('button').find((button) => button.text() === 'Lưu')!;
     await wrapper.get('textarea').setValue('Dòng 1\nDòng 2');
-    expect(save().attributes('aria-disabled')).toBe('true');
+    expect(save()).toBeUndefined();
     await wrapper.get('#editorial-isPublic').setValue(true);
     await save().trigger('click');
     await flushPromises();

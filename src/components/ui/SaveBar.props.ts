@@ -7,11 +7,11 @@ export interface SaveBarProps {
   blockedReason?: string;
   /** Unsaved changes this bar does not save but the page's leave guard counts, shown after the status ("Tiếng Việt: 1 thay đổi chưa lưu"). */
   note?: string;
+  /** What applies at once, without Save (instant toggles on the same page), shown after the status in the muted style. */
+  immediateNote?: string;
   saveLabel?: string;
   form?: string;
   variant?: 'page' | 'footer';
-  /** Below `sm` the bar shows only with something to say (a change, a save, a status), so it never covers a field while idle. */
-  hideIdleOnPhone?: boolean;
   /** The time zone of "Đã lưu lúc 14:02"; the site's by default (admin), the viewer's own on their settings. */
   timeZone?: string;
 }

@@ -12,7 +12,7 @@ const mountAdmin = async (path: string) => {
   const mounted = await mountApp(path);
   await vi.waitFor(
     () => {
-      if (!mounted.wrapper.find('[data-testid="data-save-bar"]').exists())
+      if (!mounted.wrapper.find('[data-testid="data-form"]').exists())
         throw new Error('tab not yet');
     },
     { timeout: 5000 },

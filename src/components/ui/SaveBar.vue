@@ -2,18 +2,20 @@
 import { computed, onBeforeUnmount, ref, useSlots, useTemplateRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Check } from 'lucide-vue-next';
-import { buttonClass } from '@/features/admin/ui/controls';
-import { SITE_TIME_ZONE } from '@/features/admin/ui/form/site-time';
-import { formatClock } from '@/lib/format-date';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { SITE_TIME_ZONE, formatClock } from '@/lib/format-date';
 import { useBottomScrollPadding } from '@/lib/use-bottom-scroll-padding';
+import AppButton from './AppButton.vue';
 import { SAVED_NOTE_MS } from './SaveBar.props';
 import type { SaveBarProps } from './SaveBar.props';
 
 /**
  * The one save bar of a form: sticky to the bottom of the content column (z-savebar).
  * Left: "3 thay đổi chưa lưu", "Đã lưu lúc 14:02" for 3 s after a save, or why saving is not possible, in a polite live region
- * (the `status` slot replaces it), then `note` (changes elsewhere on the page that the leave guard also counts). `hideIdleOnPhone`: below `sm` the bar shows only while it has one of those to say, and
- * when it appears it keeps the focused field above itself.
+ * (the `status` slot replaces it), then `note` (changes elsewhere on the page that the leave guard also counts) and `immediateNote`
+ * (what applies at once, without Save). "Hủy thay đổi" asks first when more than one change is pending. A page bar with nothing to say (no change, no save running,
+ * no error, no note) is not rendered at any width: it slides in on the first change and keeps the focused field above itself.
+ * `allowClean` forms always show it.
  * Right: optional extra actions, "Hủy thay đổi" (emits `discard`) and the submit button.
  * The submit button is `type="submit"`: put the bar inside the `<form>`, or pass the form's id as `form`.
  * While there is nothing to save (no change, `pending`, or a `blockedReason`) both buttons are `aria-disabled`, keep focus,
@@ -28,10 +30,10 @@ const props = withDefaults(defineProps<SaveBarProps>(), {
   allowClean: false,
   blockedReason: undefined,
   note: undefined,
+  immediateNote: undefined,
   saveLabel: undefined,
   form: undefined,
   variant: 'page',
-  hideIdleOnPhone: false,
   timeZone: SITE_TIME_ZONE,
 });
 const emit = defineEmits<{ discard: [] }>();
@@ -48,7 +50,14 @@ const savedTime = useSavedNote(
 );
 const slots = useSlots();
 const isIdle = computed(
-  () => !isDirty.value && !savedTime.value && !props.blockedReason && !props.note && !slots.status,
+  () =>
+    !isDirty.value &&
+    !props.pending &&
+    !savedTime.value &&
+    !props.blockedReason &&
+    !props.note &&
+    !props.immediateNote &&
+    !slots.status,
 );
 
 const statusText = computed(() => {
@@ -58,11 +67,18 @@ const statusText = computed(() => {
   return props.allowClean || props.note ? '' : t('form.saveBar.clean');
 });
 
-function guardSave(event: MouseEvent) {
-  if (cannotSave.value) event.preventDefault();
-}
+const isShown = computed(() => props.variant === 'footer' || props.allowClean || !isIdle.value);
+
+const isDiscardAsked = ref(false);
+/** One change is discarded at once; several are asked about first. */
 function discard() {
-  if (!cannotDiscard.value) emit('discard');
+  if (cannotDiscard.value) return;
+  if (props.dirtyCount > 1) isDiscardAsked.value = true;
+  else emit('discard');
+}
+function confirmDiscard() {
+  isDiscardAsked.value = false;
+  emit('discard');
 }
 
 /** "14:02" in `timeZone` for `SAVED_NOTE_MS` after each new `savedAt`, then null. */
@@ -95,9 +111,27 @@ useBottomScrollPadding(
   bar,
   () => props.variant !== 'footer',
   () => {
-    if (props.hideIdleOnPhone) keepFocusAbove();
+    keepFocusAbove();
   },
 );
+/** A bar that hides while focus is inside it would drop focus to the page: hand it to the form's first field instead. */
+watch(
+  isShown,
+  (shown) => {
+    if (!shown && bar.value?.contains(document.activeElement)) focusForm();
+  },
+  { flush: 'pre' },
+);
+function focusForm() {
+  const form = props.form ? document.getElementById(props.form) : bar.value?.closest('form');
+  const field = form?.querySelector<HTMLElement>('input:not([type=hidden]), select, textarea');
+  if (field) field.focus();
+  else if (form instanceof HTMLElement) {
+    form.tabIndex = -1;
+    form.focus();
+  }
+}
+
 /** A bar that just appeared may sit on the field being typed into: scroll that field above it (the padding is set first). */
 function keepFocusAbove() {
   const focused = document.activeElement;
@@ -109,61 +143,75 @@ function keepFocusAbove() {
 </script>
 
 <template>
-  <div
-    ref="bar"
-    :data-variant="variant"
-    :data-save-bar="variant"
-    :data-phone-hidden="(hideIdleOnPhone && isIdle) || undefined"
-    class="flex flex-wrap items-center gap-x-3 gap-y-2"
-    :class="[
-      { 'max-sm:hidden': hideIdleOnPhone && isIdle },
-      variant === 'footer'
-        ? 'flex-auto'
-        : 'sticky bottom-0 z-savebar -mx-[var(--qa-gutter,1rem)] border-t border-line bg-surface-solid px-[var(--qa-gutter,1rem)] py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]',
-    ]"
+  <Transition
+    enter-active-class="motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out"
+    leave-active-class="motion-safe:transition-transform motion-safe:duration-150 motion-safe:ease-in"
+    enter-from-class="motion-safe:translate-y-full"
+    leave-to-class="motion-safe:translate-y-full"
   >
-    <p role="status" class="flex min-w-0 flex-1 basis-48 items-center gap-2 text-sm">
-      <span
-        v-if="isDirty || note"
-        aria-hidden="true"
-        class="size-2 shrink-0 rounded-full bg-accent"
-      />
-      <slot name="status">
+    <div
+      v-if="isShown"
+      ref="bar"
+      :data-variant="variant"
+      :data-save-bar="variant"
+      class="flex flex-wrap items-center gap-x-3 gap-y-2"
+      :class="[
+        variant === 'footer'
+          ? 'flex-auto'
+          : 'sticky bottom-0 z-savebar -mx-[var(--qa-gutter,1rem)] border-t border-line bg-surface-solid px-[var(--qa-gutter,1rem)] py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]',
+      ]"
+    >
+      <p role="status" class="flex min-w-0 flex-1 basis-48 items-center gap-2 text-sm">
         <span
-          v-if="!isDirty && !blockedReason && savedTime"
-          class="inline-flex items-center gap-1.5 font-semibold text-positive"
-          ><Check class="size-4 shrink-0" aria-hidden="true" />{{ statusText }}</span
+          v-if="isDirty || note"
+          aria-hidden="true"
+          class="size-2 shrink-0 rounded-full bg-accent"
+        />
+        <slot name="status">
+          <span
+            v-if="!isDirty && !blockedReason && savedTime"
+            class="inline-flex items-center gap-1.5 font-semibold text-positive"
+            ><Check class="size-4 shrink-0" aria-hidden="true" />{{ statusText }}</span
+          >
+          <span v-else-if="statusText" :class="isDirty ? 'font-semibold' : 'text-muted'">{{
+            statusText
+          }}</span>
+        </slot>
+        <template v-if="note">
+          <span v-if="statusText || slots.status" aria-hidden="true" class="text-muted">·</span>
+          <span class="font-semibold">{{ note }}</span>
+        </template>
+        <template v-if="immediateNote">
+          <span v-if="statusText || slots.status || note" aria-hidden="true" class="text-muted"
+            >·</span
+          >
+          <span class="text-muted">{{ immediateNote }}</span>
+        </template>
+      </p>
+      <div class="ml-auto flex flex-wrap items-center gap-2">
+        <slot name="actions" />
+        <AppButton v-if="!allowClean" tone="ghost" :disabled="cannotDiscard" @click="discard">
+          {{ $t('form.saveBar.discard') }}
+        </AppButton>
+        <AppButton
+          tone="primary"
+          type="submit"
+          :form="form"
+          :disabled="cannotSave"
+          :loading="pending"
         >
-        <span v-else-if="statusText" :class="isDirty ? 'font-semibold' : 'text-muted'">{{
-          statusText
-        }}</span>
-      </slot>
-      <template v-if="note">
-        <span v-if="statusText || slots.status" aria-hidden="true" class="text-muted">·</span>
-        <span class="font-semibold">{{ note }}</span>
-      </template>
-    </p>
-    <div class="ml-auto flex flex-wrap items-center gap-2">
-      <slot name="actions" />
-      <button
-        v-if="!allowClean"
-        type="button"
-        :class="buttonClass('ghost')"
-        :aria-disabled="cannotDiscard || undefined"
-        @click="discard"
-      >
-        {{ $t('form.saveBar.discard') }}
-      </button>
-      <button
-        type="submit"
-        :form="form"
-        :class="buttonClass('primary')"
-        :aria-disabled="cannotSave || undefined"
-        :aria-busy="pending || undefined"
-        @click="guardSave"
-      >
-        {{ pending ? $t('form.saveBar.saving') : (saveLabel ?? $t('common.save')) }}
-      </button>
+          {{ pending ? $t('form.saveBar.saving') : (saveLabel ?? $t('common.save')) }}
+        </AppButton>
+      </div>
+      <ConfirmDialog
+        v-model:visible="isDiscardAsked"
+        :title="$t('form.saveBar.discardTitle', dirtyCount)"
+        :body="$t('form.saveBar.discardBody')"
+        :confirm-label="$t('form.saveBar.discard')"
+        :cancel-label="$t('form.saveBar.keepEditing')"
+        tone="danger"
+        @confirm="confirmDiscard"
+      />
     </div>
-  </div>
+  </Transition>
 </template>

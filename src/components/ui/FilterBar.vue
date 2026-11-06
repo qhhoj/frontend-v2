@@ -3,7 +3,8 @@ import { CornerDownLeft, Search, SlidersHorizontal, X } from 'lucide-vue-next';
 import { onBeforeUnmount, ref, useId, watch } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import { useRouter } from 'vue-router';
-import { INPUT, buttonClass } from '@/features/admin/ui/controls';
+import { INPUT } from '@/features/admin/ui/controls';
+import AppButton from './AppButton.vue';
 
 export interface ActiveFilter {
   key: string;
@@ -113,21 +114,21 @@ const removeChip = (key: string) => emit('remove', key);
       </div>
       <slot name="selects" />
       <slot name="view" />
-      <button
+      <AppButton
         v-if="$slots.filters"
-        type="button"
-        :class="buttonClass('secondary')"
         :aria-expanded="isPanelOpen"
         :aria-controls="panelId"
         @click="isPanelOpen = !isPanelOpen"
       >
-        <SlidersHorizontal aria-hidden="true" class="size-4" :stroke-width="1.75" />
+        <template #icon>
+          <SlidersHorizontal aria-hidden="true" class="size-4" :stroke-width="1.75" />
+        </template>
         {{
           filterCount
             ? $t('common.table.filtersCount', { count: filterCount })
             : $t('common.table.filters')
         }}
-      </button>
+      </AppButton>
       <span
         v-if="resultText"
         class="ml-auto text-sm whitespace-nowrap text-muted"
@@ -157,9 +158,9 @@ const removeChip = (key: string) => emit('remove', key);
         </button>
       </li>
       <li>
-        <button type="button" :class="buttonClass('ghost', 'sm')" @click="$emit('clear-all')">
+        <AppButton tone="ghost" size="sm" @click="$emit('clear-all')">
           {{ $t('common.table.clearAll') }}
-        </button>
+        </AppButton>
       </li>
     </ul>
   </div>

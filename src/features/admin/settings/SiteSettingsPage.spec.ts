@@ -361,15 +361,10 @@ describe('one save bar for every tab', () => {
     expect(saveBar(wrapper).text()).toContain('1 thay đổi chưa lưu');
   });
 
-  it('keeps "Lưu" disabled while nothing changed', async () => {
+  it('has no save bar while nothing changed', async () => {
     const calls = mockApi(routes());
     const { wrapper } = await mountSettings();
-    const save = saveBar(wrapper)
-      .findAll('button')
-      .find((button) => button.text() === 'Lưu')!;
-    expect(save.attributes('aria-disabled')).toBe('true');
-    await save.trigger('click');
-    await flushPromises();
+    expect(wrapper.find('[data-testid="settings-save-bar"]').exists()).toBe(false);
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
   });
 });

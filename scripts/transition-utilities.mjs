@@ -9,6 +9,10 @@ const CHEVRON = 'the disclosure chevron turns with the open state';
 
 /** Known exceptions, by file (path under src/), class and the reason it is real motion. */
 export const ALLOWED = {
+  'components/ui/SaveBar.vue': {
+    'transition-transform':
+      'the bar slides in when the form becomes dirty; off under reduced motion',
+  },
   'components/ui/Switch.vue': {
     'transition-transform': 'the thumb slides between the ends of the track',
   },
