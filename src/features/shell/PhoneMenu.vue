@@ -87,6 +87,7 @@ const drawerPt = computed(() => ({
   <Drawer
     v-model:visible="isOpen"
     position="top"
+    block-scroll
     :pt="drawerPt"
     :close-button-props="{ 'aria-label': $t('common.close') }"
     @hide="opener?.focus()"
