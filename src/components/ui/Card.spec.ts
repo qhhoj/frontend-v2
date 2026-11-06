@@ -22,6 +22,19 @@ describe('Card', () => {
     expect(card.get('header button').text()).toBe('Xem');
   });
 
+  it('draws a rule under the header, edge to edge when the card has padding', () => {
+    const padded = mount(Card, { props: { title: 'Cài đặt', divided: true, padding: 'md' } });
+    expect(padded.get('header').classes()).toEqual(expect.arrayContaining(['border-b', '-mx-5']));
+    const plain = mount(Card, { props: { title: 'Cài đặt', divided: true } });
+    expect(plain.get('header').classes()).toContain('border-b');
+    expect(
+      plain
+        .get('header')
+        .classes()
+        .some((name) => name.startsWith('-mx')),
+    ).toBe(false);
+  });
+
   it('GlassCard renders the same markup as the default Card', () => {
     const options = { props: { as: 'div' }, attrs: { class: 'p-5' }, slots: { default: 'Body' } };
     expect(mount(GlassCard, options).html()).toBe(mount(Card, options).html());

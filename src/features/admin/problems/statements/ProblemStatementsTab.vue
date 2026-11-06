@@ -9,7 +9,7 @@ import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
 import MarkdownField from '../../ui/MarkdownField.vue';
 import { needsPermissionText } from '../../ui/permission-text';
-import UploadButton from '../../ui/UploadButton.vue';
+import UploadButton from '@/components/ui/UploadButton.vue';
 import { failureReasonOf } from '../failure-reason';
 import { IMAGE_ACCEPT, IMAGE_MAX_BYTES } from '../limits';
 import { STATEMENT_SLOTS } from './statement-drafts';

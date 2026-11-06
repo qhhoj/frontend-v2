@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { lookupUser, suggestUsers } from '@/api/admin-common.api';
 import { usernameProblem } from '@/lib/username';
 import type { UserChip } from '@/api/types/admin-common';
-import ExactChips from './ExactChips.vue';
+import ChipPicker from './ChipPicker.vue';
 import { shortId } from './short-id';
 
 const chips = defineModel<UserChip[]>({ required: true });
+const picker = ref<{ commit: () => Promise<boolean> } | null>(null);
+/** Adds what is typed but not yet added; a save awaits it. False: it could not be added. */
+defineExpose({ commit: async () => (await picker.value?.commit()) ?? true });
 defineProps<{ label: string; max?: number; error?: string; lockedBy?: string }>();
 /** Only a well-formed prefix is sent; anything else could never match a username. */
 const suggest = async (typed: string) => (usernameProblem(typed) ? [] : suggestUsers(typed));
@@ -13,7 +17,8 @@ const nameOf = (chip: UserChip) => chip.username ?? shortId(chip.id);
 </script>
 
 <template>
-  <ExactChips
+  <ChipPicker
+    ref="picker"
     v-model="chips"
     :label="label"
     :lookup="lookupUser"

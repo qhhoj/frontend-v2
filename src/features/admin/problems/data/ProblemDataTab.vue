@@ -12,7 +12,7 @@ import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
 import EditorViewTabs from '../../ui/form/EditorViewTabs.vue';
 import { useEditorView } from '../../ui/form/use-editor-view';
-import UploadButton from '../../ui/UploadButton.vue';
+import UploadButton from '@/components/ui/UploadButton.vue';
 import { UPLOAD_LIMITS } from '../../ui/upload-limits';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { failureReasonOf } from '../failure-reason';

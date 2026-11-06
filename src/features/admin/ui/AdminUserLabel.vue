@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ratingTextClass } from '@/lib/tier-classes';
-import UserName from '@/components/UserName.vue';
-import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
+import UserLink from '@/components/UserLink.vue';
 
+/** Shim over `UserLink` (sizes are pixel edges here); new code uses `UserLink` with `status` and `link`. */
+const SIZE_NAMES = { 24: 'xs', 28: 'sm', 32: 'md' } as const;
 withDefaults(
   defineProps<{
     username: string;
@@ -12,20 +12,16 @@ withDefaults(
     status?: 'active' | 'banned' | 'deleted';
     link?: boolean;
   }>(),
-  {
-    size: 24,
-    status: 'active',
-    link: true,
-  },
+  { rating: undefined, size: 24, status: 'active', link: true },
 );
 </script>
 
 <template>
-  <span class="inline-flex min-w-0 items-center gap-2">
-    <UserAvatar :username="username" :size="size" :status="status" />
-    <UserName v-if="link" :username="username" :rating="rating" class="truncate" />
-    <span v-else :class="ratingTextClass(rating)" class="truncate font-semibold">{{
-      username
-    }}</span>
-  </span>
+  <UserLink
+    :username="username"
+    :rating="rating"
+    :size="SIZE_NAMES[size]"
+    :status="status"
+    :link="link"
+  />
 </template>

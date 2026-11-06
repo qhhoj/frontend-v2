@@ -13,7 +13,7 @@ import QueryState from '@/components/QueryState.vue';
 import AdminBit from '../../shell/AdminBit.vue';
 import { failureTextOf, fieldErrorsOf } from '../../ui/admin-errors';
 import { CARD, INPUT, buttonClass } from '../../ui/controls';
-import UploadButton from '../../ui/UploadButton.vue';
+import UploadButton from '@/components/ui/UploadButton.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { formatFileSize } from '@/lib/format';
 import OfficialRankingPreview from './OfficialRankingPreview.vue';

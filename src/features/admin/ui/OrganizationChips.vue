@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { lookupOrganization } from '@/api/admin-common.api';
 import type { OrganizationChip } from '@/api/types/admin-common';
-import ExactChips from './ExactChips.vue';
+import ChipPicker from './ChipPicker.vue';
 import { shortId } from './short-id';
 import { useOrganizationNames } from './use-organization-names';
 
 const chips = defineModel<OrganizationChip[]>({ required: true });
+const picker = ref<{ commit: () => Promise<boolean> } | null>(null);
+/** Adds what is typed but not yet added; a save awaits it. False: it could not be added. */
+defineExpose({ commit: async () => (await picker.value?.commit()) ?? true });
 defineProps<{ label: string; max?: number; error?: string; lockedBy?: string }>();
 /** A chip from an edit form carries only an id: its name is fetched, and a typed one shows its slug. */
 const names = useOrganizationNames(() => chips.value.some((chip) => chip.slug === null));
@@ -15,7 +19,8 @@ const isNamed = (chip: OrganizationChip) => chip.slug !== null || names.value.ha
 </script>
 
 <template>
-  <ExactChips
+  <ChipPicker
+    ref="picker"
     v-model="chips"
     :label="label"
     :lookup="lookupOrganization"

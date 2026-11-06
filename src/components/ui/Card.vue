@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { computed, useSlots } from 'vue';
-import { CARD_PADDING, CARD_VARIANTS, type CardPadding, type CardVariant } from './Card.variants';
+import {
+  CARD_HEADER_BLEED,
+  CARD_PADDING,
+  CARD_VARIANTS,
+  type CardPadding,
+  type CardVariant,
+} from './Card.variants';
 
 const props = withDefaults(
   defineProps<{
@@ -9,14 +15,28 @@ const props = withDefaults(
     padding?: CardPadding;
     title?: string;
     lead?: string;
+    /** A rule between the header and the body, edge to edge when `padding` is set. */
+    divided?: boolean;
   }>(),
-  { as: 'section', variant: 'glass', padding: undefined, title: undefined, lead: undefined },
+  {
+    as: 'section',
+    variant: 'glass',
+    padding: undefined,
+    title: undefined,
+    lead: undefined,
+    divided: false,
+  },
 );
 
 defineOptions({ name: 'UiCard' });
 
 const slots = useSlots();
 const hasHeader = computed(() => Boolean(props.title || props.lead || slots.actions));
+const headerClass = computed(() =>
+  props.divided
+    ? ['mb-4 border-b border-line pb-3', props.padding && CARD_HEADER_BLEED[props.padding]]
+    : 'mb-4',
+);
 const cardClass = computed(() => [
   CARD_VARIANTS[props.variant],
   props.padding && CARD_PADDING[props.padding],
@@ -25,7 +45,11 @@ const cardClass = computed(() => [
 
 <template>
   <component :is="as" :class="cardClass">
-    <header v-if="hasHeader" class="mb-4 flex flex-wrap items-start justify-between gap-2">
+    <header
+      v-if="hasHeader"
+      class="flex flex-wrap items-start justify-between gap-2"
+      :class="headerClass"
+    >
       <div class="min-w-0">
         <h2 v-if="title" class="text-title leading-5.5 font-semibold">{{ title }}</h2>
         <p v-if="lead" class="mt-1 text-meta leading-4.5 text-muted">{{ lead }}</p>

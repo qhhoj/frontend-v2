@@ -1,9 +1,10 @@
 <script setup lang="ts" generic="Chip extends { id: string }">
 import { computed, ref, useId } from 'vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { failureTextOf, isNotFound } from './admin-errors';
 import { needsPermissionText } from './permission-text';
 import { X } from 'lucide-vue-next';
-import { INPUT } from './controls';
+import TextInput from '@/components/ui/TextInput.vue';
 import { useChipSuggestions } from './use-chip-suggestions';
 import type { Suggest } from './use-chip-suggestions';
 
@@ -65,20 +66,33 @@ function onEnter() {
   else void add();
 }
 
-async function add() {
+/** Looks the typed text up and picks it; true when nothing is left typed (picked, or nothing was typed). */
+async function add(): Promise<boolean> {
   const text = typed.value.trim();
-  if (!text || isLooking.value) return;
+  if (!text) return true;
+  if (isLooking.value) return false;
   isLooking.value = true;
   lookupError.value = '';
   try {
     const found = await props.lookup(text);
     if (!chips.value.some((chip) => chip.id === found.id)) chips.value = [...chips.value, found];
     typed.value = '';
+    return true;
   } catch (error) {
     lookupError.value = lookupFailureText(error, text);
+    return false;
   } finally {
     isLooking.value = false;
   }
+}
+
+/** A form's save calls this first, so text typed but not yet added is never lost; false means it could not be added. */
+defineExpose({ commit: add });
+
+/** Leaving the box commits what was typed; a click on a suggestion keeps focus (mousedown is prevented), so it never races this. */
+function onBlur() {
+  suggestions.close();
+  void add();
 }
 
 const remove = (chipId: string) => (chips.value = chips.value.filter((chip) => chip.id !== chipId));
@@ -107,48 +121,58 @@ const remove = (chipId: string) => (chips.value = chips.value.filter((chip) => c
       </li>
       <li v-if="chips.length === 0" class="text-sm text-muted">{{ $t('admin.ui.nobody') }}</li>
     </ul>
-    <div class="relative">
-      <input
-        :id="id"
-        v-model="typed"
-        :class="INPUT"
-        :placeholder="placeholder"
-        :disabled="isChipsFull || Boolean(lockedBy)"
-        :aria-invalid="lookupError || error ? 'true' : undefined"
-        :aria-describedby="describedBy"
-        :role="suggest ? 'combobox' : undefined"
-        :aria-expanded="suggest ? suggestions.options.value.length > 0 : undefined"
-        :aria-controls="suggest ? listboxId : undefined"
-        :aria-activedescendant="activeOptionId"
-        aria-autocomplete="list"
-        autocomplete="off"
-        @keydown.enter.prevent="onEnter"
-        @keydown.down.prevent="suggestions.move(1)"
-        @keydown.up.prevent="suggestions.move(-1)"
-        @keydown.esc="suggestions.close"
-        @blur="suggestions.close"
-      />
-      <ul
-        v-if="suggest"
-        v-show="suggestions.options.value.length > 0"
-        :id="listboxId"
-        role="listbox"
-        :aria-label="label"
-        class="absolute top-full right-0 left-0 z-10 mt-1 max-h-72 overflow-y-auto rounded-row border border-line bg-surface-solid p-1"
-      >
-        <li
-          v-for="(chip, index) in suggestions.options.value"
-          :id="optionId(index)"
-          :key="chip.id"
-          role="option"
-          :aria-selected="index === suggestions.activeIndex.value"
-          class="flex min-h-11 cursor-pointer items-center rounded-row px-3 text-sm aria-selected:bg-accent-soft aria-selected:text-accent-soft-text hover:bg-surface-hover"
-          @mousedown.prevent
-          @click="pick(chip)"
+    <div class="flex items-start gap-2">
+      <div class="relative min-w-0 flex-1">
+        <TextInput
+          :id="id"
+          v-model="typed"
+          :placeholder="placeholder"
+          :disabled="isChipsFull || Boolean(lockedBy)"
+          :aria-invalid="lookupError || error ? 'true' : undefined"
+          :aria-describedby="describedBy"
+          :role="suggest ? 'combobox' : undefined"
+          :aria-expanded="suggest ? suggestions.options.value.length > 0 : undefined"
+          :aria-controls="suggest ? listboxId : undefined"
+          :aria-activedescendant="activeOptionId"
+          aria-autocomplete="list"
+          autocomplete="off"
+          @keydown.enter.prevent="onEnter"
+          @keydown.down.prevent="suggestions.move(1)"
+          @keydown.up.prevent="suggestions.move(-1)"
+          @keydown.esc="suggestions.close"
+          @blur="onBlur"
+        />
+        <ul
+          v-if="suggest"
+          v-show="suggestions.options.value.length > 0"
+          :id="listboxId"
+          role="listbox"
+          :aria-label="label"
+          class="absolute top-full right-0 left-0 z-10 mt-1 max-h-72 overflow-y-auto rounded-row border border-line bg-surface-solid p-1"
         >
-          {{ nameOf(chip) }}
-        </li>
-      </ul>
+          <li
+            v-for="(chip, index) in suggestions.options.value"
+            :id="optionId(index)"
+            :key="chip.id"
+            role="option"
+            :aria-selected="index === suggestions.activeIndex.value"
+            class="flex min-h-11 cursor-pointer items-center rounded-row px-3 text-sm aria-selected:bg-accent-soft aria-selected:text-accent-soft-text hover:bg-surface-hover"
+            @mousedown.prevent
+            @click="pick(chip)"
+          >
+            {{ nameOf(chip) }}
+          </li>
+        </ul>
+      </div>
+      <AppButton
+        v-if="!lockedBy"
+        size="sm"
+        :loading="isLooking"
+        :disabled="!typed.trim() || isChipsFull || Boolean(lockedBy)"
+        @click="add"
+      >
+        {{ $t('common.add') }}
+      </AppButton>
     </div>
     <p v-if="lookupError || error" :id="`${id}-error`" class="text-sm text-negative">
       {{ lookupError || error }}

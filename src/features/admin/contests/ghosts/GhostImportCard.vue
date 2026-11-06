@@ -8,7 +8,7 @@ import { useViewerId } from '@/stores/use-viewer-id';
 import AdminBit from '../../shell/AdminBit.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import AdminSwitch from '../../ui/AdminSwitch.vue';
-import UploadButton from '../../ui/UploadButton.vue';
+import UploadButton from '@/components/ui/UploadButton.vue';
 import { failureTextOf } from '../../ui/admin-errors';
 import { CARD, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
