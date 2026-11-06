@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { TIER_TEXT_CLASSES } from '@/lib/tier-classes';
+import type { TierColor } from '@/lib/rating-tiers';
 
-/** `tone` colours the value; the palette is kept small on purpose. */
-export type StatTone = 'accent' | 'positive' | 'negative' | 'warning' | 'info';
+/**
+ * `tone` colours the value; the palette is kept small on purpose: the status vocabulary of Chip and Notice, or a rating
+ * tier (a rating or a title). `positive`/`negative` are the old names of `success`/`danger`.
+ */
+export type StatTone =
+  'accent' | 'success' | 'danger' | 'warning' | 'info' | 'positive' | 'negative' | TierColor;
 
 export interface StatItem {
   label: string;
@@ -31,10 +37,13 @@ const AUTO_COLUMNS = 'grid-cols-[repeat(auto-fit,minmax(6.5rem,1fr))]';
 
 const TONES: Record<StatTone, string> = {
   accent: 'text-accent-text',
+  success: 'text-positive',
+  danger: 'text-negative',
   positive: 'text-positive',
   negative: 'text-negative',
   warning: 'text-warning',
   info: 'text-info',
+  ...TIER_TEXT_CLASSES,
 };
 
 const MODES = {
@@ -56,7 +65,10 @@ const look = computed(() => MODES[props.mode]);
   <dl class="m-0 grid gap-3" :class="gridClass">
     <div v-for="item in items" :key="item.label" :class="look.item">
       <dt class="text-meta leading-4.5 text-muted">{{ item.label }}</dt>
-      <dd class="m-0" :class="[look.value, item.tone && TONES[item.tone]]">{{ item.value }}</dd>
+      <dd class="m-0" :class="[look.value, item.tone && TONES[item.tone]]">
+        <!-- A rich value (a rating with its delta chip): the slot replaces the plain text, the tone still colours it. -->
+        <slot name="value" :item="item">{{ item.value }}</slot>
+      </dd>
       <dd v-if="item.hint" class="m-0 mt-1 text-meta leading-4.5 text-muted">{{ item.hint }}</dd>
     </div>
   </dl>

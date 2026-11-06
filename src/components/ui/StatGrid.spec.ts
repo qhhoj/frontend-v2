@@ -27,7 +27,7 @@ describe('StatGrid', () => {
       props: {
         mode: 'stat',
         items: [
-          { label: 'AC', value: 9, tone: 'positive' },
+          { label: 'AC', value: 9, tone: 'success' },
           { label: 'WA', value: 2 },
         ],
       },

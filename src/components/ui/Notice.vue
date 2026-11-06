@@ -53,7 +53,7 @@ const DEFAULT_ROLES: Record<NoticeTone, NoticeRole | undefined> = {
   warning: undefined,
   danger: 'alert',
 };
-/** Same tints as the verdicts: no notice colour of its own. */
+/** Status tints (positive/negative/warning/info tokens): no notice colour of its own. */
 const LOOKS: Record<'default' | 'compact', NoticeLook> = {
   default: {
     box: 'rounded-row px-3.5 py-3 leading-normal',
@@ -61,9 +61,9 @@ const LOOKS: Record<'default' | 'compact', NoticeLook> = {
     strokeWidth: 2,
     tones: {
       info: { box: 'bg-accent-soft text-accent-soft-text', icon: '' },
-      success: { box: 'bg-verdict-ac-bg text-verdict-ac', icon: '' },
+      success: { box: 'bg-positive-bg text-positive', icon: '' },
       warning: { box: 'bg-warning-bg text-warning', icon: '' },
-      danger: { box: 'bg-verdict-wa-bg text-verdict-wa', icon: '' },
+      danger: { box: 'bg-negative-bg text-negative', icon: '' },
     },
     icons: { info: Info, success: CircleCheck, warning: TriangleAlert, danger: CircleAlert },
   },
@@ -73,9 +73,9 @@ const LOOKS: Record<'default' | 'compact', NoticeLook> = {
     strokeWidth: 1.75,
     tones: {
       info: { box: 'bg-info-bg', icon: 'text-info' },
-      success: { box: 'bg-verdict-ac-bg', icon: 'text-verdict-ac' },
+      success: { box: 'bg-positive-bg', icon: 'text-positive' },
       warning: { box: 'bg-warning-bg', icon: 'text-warning' },
-      danger: { box: 'bg-verdict-wa-bg', icon: 'text-verdict-wa' },
+      danger: { box: 'bg-negative-bg', icon: 'text-negative' },
     },
     icons: { info: Info, success: CircleCheck, warning: TriangleAlert, danger: OctagonAlert },
   },
