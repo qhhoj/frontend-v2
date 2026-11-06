@@ -13,8 +13,8 @@ withDefaults(defineProps<{ lines: DiffLine[]; size?: 'sm' | 'meta' }>(), { size:
 defineOptions({ name: 'UiDiffLines' });
 
 const TONES = {
-  '+': 'bg-verdict-ac-bg text-verdict-ac',
-  '-': 'bg-verdict-wa-bg text-verdict-wa',
+  '+': 'bg-positive-bg text-positive',
+  '-': 'bg-negative-bg text-negative',
   ' ': 'text-muted',
 } as const;
 const SIZES = { sm: 'text-sm', meta: 'text-meta leading-relaxed' } as const;
