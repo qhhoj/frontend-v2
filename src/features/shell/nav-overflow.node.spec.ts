@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { scrollToClearFade, splitNavItems } from './nav-overflow';
+import { splitNavItems } from './nav-overflow';
 
 const WIDTHS = [60, 80, 70, 90, 100]; // gap 2: the row is 400 + 8 = 408
 const base = { widths: WIDTHS, moreWidth: 50, gap: 2, activeIndex: -1 };
@@ -40,17 +40,5 @@ describe('splitNavItems', () => {
       visible: [],
       hidden: [0, 1, 2, 3, 4],
     });
-  });
-});
-
-describe('scrollToClearFade', () => {
-  const strip = { scrollLeft: 100, viewWidth: 300, fadeWidth: 24 };
-
-  it('scrolls back until an item hidden under the left fade clears it', () => {
-    expect(scrollToClearFade({ ...strip, left: 110, right: 180 })).toBe(86);
-  });
-
-  it('scrolls on until an item under the right fade clears it', () => {
-    expect(scrollToClearFade({ ...strip, left: 330, right: 390 })).toBe(114);
   });
 });

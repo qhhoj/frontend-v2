@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Bell, LogOut, Menu } from 'lucide-vue-next';
+import { LogOut, Menu } from 'lucide-vue-next';
 import Drawer from 'primevue/drawer';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -8,7 +8,6 @@ import BrandWordmark from '@/components/ui/BrandWordmark.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import ModeChoice from '@/features/appearance/ModeChoice.vue';
 import { useLogout } from '@/features/auth/use-logout';
-import { unreadBadge } from '@/features/notifications/use-notification-alerts';
 import OfficialModePill from '@/features/official-mode/OfficialModePill.vue';
 import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
@@ -18,15 +17,15 @@ import { useIsFirstNavigationPending } from '@/router/first-navigation';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { useAccountLinks } from './account-links';
+import { NAV_ITEMS, useIsNavCurrent } from './nav-items';
 
 /**
- * The phone header's menu. A sheet drops from the top with what the desktop row shows beside the navigation:
- * the language, the light/dark mode (the rest of the look is one link away), the official-mode pill and the account
- * (who is signed in, then its pages in the desktop menu's order and sign-out, or sign-in and register), and for a
- * signed-in viewer the notifications with their unread count, which a dot on the menu button signals too. Any
+ * The phone header's menu. A sheet drops from the top: the seven sections (the current one marked), then what the
+ * desktop row shows beside the navigation: the official-mode pill, the account (who is signed in, its pages in the
+ * desktop menu's order and sign-out, or register for a visitor; sign-in and the bell stay in the header), the language
+ * and the light/dark mode (the rest of the look is one link away). The drawer traps focus and closes on Esc; any
  * navigation closes it; focus goes back to the menu button.
  */
-const props = defineProps<{ unread: number }>();
 const LANGUAGES: ReadonlyArray<{ value: Locale; label: string }> = [
   { value: 'vi', label: 'Tiếng Việt' },
   { value: 'en', label: 'English' },
@@ -43,8 +42,7 @@ const logout = useLogout();
 /** Until the session answers the sheet offers neither sign-out nor sign-in. */
 const isSessionPending = useIsFirstNavigationPending();
 const isOpen = ref(false);
-const badge = computed(() => unreadBadge(props.unread, locale.locale));
-const hasUnread = computed(() => session.user !== null && props.unread > 0);
+const isCurrent = useIsNavCurrent();
 const opener = ref<HTMLButtonElement | null>(null);
 watch(
   () => route.fullPath,
@@ -81,25 +79,32 @@ const drawerPt = computed(() => ({
     class="relative inline-flex size-11 items-center justify-center rounded-pill border border-line bg-surface-strong hover:bg-surface-hover"
     aria-haspopup="dialog"
     :aria-expanded="isOpen"
-    :aria-label="hasUnread ? $t('nav.openMenuUnread', { count: unread }) : $t('nav.openMenu')"
+    :aria-label="$t('nav.openMenu')"
     @click="isOpen = true"
   >
     <Menu aria-hidden="true" class="size-5" />
-    <span
-      v-if="hasUnread"
-      aria-hidden="true"
-      data-testid="phone-menu-dot"
-      class="absolute top-1.5 right-1.5 size-2.5 rounded-pill bg-accent ring-2 ring-surface-strong"
-    />
   </button>
   <Drawer
     v-model:visible="isOpen"
     position="top"
+    block-scroll
     :pt="drawerPt"
     :close-button-props="{ 'aria-label': $t('common.close') }"
     @hide="opener?.focus()"
   >
     <template #header><BrandWordmark /></template>
+    <nav :aria-label="$t('nav.main')">
+      <RouterLink
+        v-for="item in NAV_ITEMS"
+        :key="item.path"
+        :to="item.path"
+        :aria-current="isCurrent(item.path) ? 'page' : undefined"
+        :class="[ROW, isCurrent(item.path) ? 'bg-accent-soft text-accent-soft-text' : '']"
+      >
+        <component :is="item.icon" aria-hidden="true" class="size-5 shrink-0" />
+        {{ $t(item.labelKey) }}
+      </RouterLink>
+    </nav>
     <OfficialModePill class="self-start" />
     <section
       v-if="session.user"
@@ -117,22 +122,6 @@ const drawerPt = computed(() => ({
       <RouterLink v-for="link in links" :key="link.labelKey" :to="link.to" :class="ROW">
         <component :is="link.icon" aria-hidden="true" class="size-5 text-muted" />
         {{ $t(link.labelKey) }}
-      </RouterLink>
-      <RouterLink
-        :to="{ name: 'notifications' }"
-        :class="ROW"
-        data-testid="phone-menu-notifications"
-      >
-        <Bell aria-hidden="true" class="size-5 text-muted" />
-        <span class="flex-1">{{ $t('notifications.drawerTitle') }}</span>
-        <template v-if="badge">
-          <span
-            aria-hidden="true"
-            class="min-w-5 rounded-pill bg-accent px-1.5 text-center text-caption leading-5 font-bold text-on-accent"
-            >{{ badge }}</span
-          >
-          <span class="sr-only">{{ $t('notifications.unreadCount', { count: unread }) }}</span>
-        </template>
       </RouterLink>
     </section>
     <div>
@@ -158,14 +147,9 @@ const drawerPt = computed(() => ({
         <template #icon><LogOut class="size-4" aria-hidden="true" /></template>
         {{ $t('account.logout') }}
       </AppButton>
-      <div v-else-if="!isSessionPending" class="grid grid-cols-2 gap-2">
-        <AppButton block :to="{ name: 'login', query: { redirect: route.fullPath } }">
-          {{ $t('account.login') }}
-        </AppButton>
-        <AppButton block tone="primary" :to="{ name: 'register' }">
-          {{ $t('account.register') }}
-        </AppButton>
-      </div>
+      <AppButton v-else-if="!isSessionPending" block tone="primary" :to="{ name: 'register' }">
+        {{ $t('account.register') }}
+      </AppButton>
     </template>
   </Drawer>
 </template>

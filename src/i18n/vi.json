@@ -14,8 +14,7 @@
     "organizations": "Tổ chức",
     "more": "Thêm",
     "menu": "Menu",
-    "openMenu": "Mở menu",
-    "openMenuUnread": "Mở menu, {count} thông báo chưa đọc"
+    "openMenu": "Mở menu"
   },
   "pages": {
     "problem": "Bài tập",
@@ -717,7 +716,6 @@
   },
   "locale": {
     "switchTo": "Switch to English",
-    "short": "EN",
     "title": "Ngôn ngữ"
   },
   "auth": {
