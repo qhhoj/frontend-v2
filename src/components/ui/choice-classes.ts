@@ -3,7 +3,7 @@
  * blue shows beside the accent. The tick is a `Check` icon over the box (`Checkbox.vue`); the dot an inset ring.
  */
 const BOX =
-  'size-5 shrink-0 cursor-pointer appearance-none border border-line-control bg-surface-solid checked:border-accent checked:bg-accent aria-disabled:cursor-not-allowed aria-disabled:border-line aria-disabled:bg-surface-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus aria-invalid:border-negative';
+  'size-5 shrink-0 cursor-pointer appearance-none border border-line-control bg-surface-solid checked:border-accent checked:bg-accent disabled:cursor-not-allowed disabled:border-line disabled:bg-surface-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus aria-invalid:border-negative';
 
 export const CHECKBOX_INPUT = `${BOX} peer rounded-control`;
 

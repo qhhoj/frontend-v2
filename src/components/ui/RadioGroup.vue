@@ -35,8 +35,7 @@ defineProps<{
           :name="name"
           :value="option.value"
           :class="RADIO_INPUT"
-          :aria-disabled="option.disabled ? 'true' : undefined"
-          @click="option.disabled && $event.preventDefault()"
+          :disabled="option.disabled"
         />
         <span class="flex min-w-0 flex-col">
           <span class="text-sm font-semibold" :class="{ 'text-muted': option.disabled }">{{
