@@ -17,9 +17,7 @@ type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 /** The screens are lazy routes: the form is there once its chunk has loaded. */
 async function mountForm(path: string) {
   const mounted = await mountApp(path);
-  await vi.waitFor(() =>
-    expect(mounted.wrapper.find('[data-testid="language-save-bar"]').exists()).toBe(true),
-  );
+  await vi.waitFor(() => expect(mounted.wrapper.find('#language-name').exists()).toBe(true));
   return mounted;
 }
 async function fillIn(wrapper: Wrapper, values: Record<string, string>) {

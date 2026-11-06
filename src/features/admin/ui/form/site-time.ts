@@ -1,11 +1,11 @@
-import { formatDate, wallClockIn } from '@/lib/format-date';
+import { SITE_TIME_ZONE, formatDate, wallClockIn } from '@/lib/format-date';
 import type { WallClock } from '@/lib/format-date';
 
 /**
  * Admin dates and times are typed and shown in the site's time zone, not the viewer's, as `dd/mm/yyyy hh:mm`.
  * Values crossing the API are ISO instants in UTC.
  */
-export const SITE_TIME_ZONE = 'Asia/Ho_Chi_Minh';
+export { SITE_TIME_ZONE };
 
 const MINUTE_MS = 60_000;
 const pad = (value: number) => String(value).padStart(2, '0');

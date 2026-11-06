@@ -305,7 +305,9 @@ describe('ContestGeneralTab', () => {
     const box = wrapper.get('#contest-timeLimit').element as HTMLInputElement;
     Object.defineProperty(box, 'validity', { value: { badInput: true }, configurable: true });
     await wrapper.get('#contest-timeLimit').setValue('');
-    await save(wrapper);
+    // Nothing is dirty, so the bar is away; Enter in the box still submits the form.
+    await wrapper.get('form').trigger('submit');
+    await flushPromises();
     Object.defineProperty(box, 'validity', { value: { badInput: false }, configurable: true });
     expect(wrapper.text()).toContain('Giá trị không phải là số.');
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);

@@ -173,7 +173,7 @@ async function submit() {
           <DataSourceFiles :code="problem.code" :data="query.data.value" />
         </div>
       </template>
-      <form :id="FORM_ID" novalidate @submit.prevent="submit">
+      <form :id="FORM_ID" data-testid="data-form" novalidate @submit.prevent="submit">
         <fieldset
           :disabled="mutation.isPending.value"
           :class="[CARD, 'm-0 flex min-w-0 flex-col p-0']"

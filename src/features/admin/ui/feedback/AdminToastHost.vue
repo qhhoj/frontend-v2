@@ -81,17 +81,9 @@ function undo(toast: Toast) {
 <style>
 /*
  * Toasts stand above a save bar that is on screen (a page bar, or a drawer footer) so its buttons stay
- * clickable. A page bar hidden while idle on a phone (`data-phone-hidden`) takes no room, so nothing is raised for it.
+ * clickable. An idle page bar is not rendered, so nothing is raised for it.
  */
-@media (min-width: 640px) {
-  body:has([data-save-bar='page'], [data-save-bar='footer']) [data-testid='admin-toasts'] {
-    bottom: 5.5rem;
-  }
-}
-@media (max-width: 639.98px) {
-  body:has([data-save-bar='page']:not([data-phone-hidden]), [data-save-bar='footer'])
-    [data-testid='admin-toasts'] {
-    bottom: 5.5rem;
-  }
+body:has([data-save-bar='page'], [data-save-bar='footer']) [data-testid='admin-toasts'] {
+  bottom: 5.5rem;
 }
 </style>

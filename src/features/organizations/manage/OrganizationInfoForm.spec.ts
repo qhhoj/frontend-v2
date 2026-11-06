@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { flushPromises } from '@vue/test-utils';
 import { organizationDetail } from '@/test/community-fixtures';
 import { organizationRoutes } from '@/test/community-routes';
@@ -27,17 +27,17 @@ async function openManage() {
 }
 
 describe('organization settings form', () => {
-  it('keeps Lưu thay đổi aria-disabled until the form is dirty, and Hủy thay đổi puts it back', async () => {
+  it('shows Lưu thay đổi only while the form is dirty, and Hủy thay đổi hides it again', async () => {
     const wrapper = await openManage();
     const form = wrapper.get('form');
     const save = () => form.get('button[type="submit"]');
-    expect(save().attributes('aria-disabled')).toBe('true');
+    expect(form.find('button[type="submit"]').exists()).toBe(false);
     await form.get('#org-info-name').setValue('Tên mới');
     expect(save().attributes('aria-disabled')).toBeUndefined();
     const cancel = form.findAll('button').find((button) => button.text() === 'Hủy thay đổi')!;
     await cancel.trigger('click');
     expect((form.get('#org-info-name').element as HTMLInputElement).value).not.toBe('Tên mới');
-    expect(save().attributes('aria-disabled')).toBe('true');
+    await vi.waitFor(() => expect(form.find('button[type="submit"]').exists()).toBe(false));
   });
 
   it('opens and closes from its summary, but stays open while an edit is unsaved', async () => {

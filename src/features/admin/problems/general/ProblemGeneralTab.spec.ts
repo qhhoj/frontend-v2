@@ -82,8 +82,7 @@ describe('ProblemGeneralTab', () => {
     await queryClient.invalidateQueries({ queryKey: ['admin', 'problem', 'hcmus41c'] });
     await flushPromises();
     expect(pointsBox()).toBe('1500');
-    await buttonLabelled(wrapper, 'Lưu').trigger('click');
-    await flushPromises();
+    expect(buttonLabelled(wrapper, 'Lưu')).toBeUndefined();
     expect(calls.some((call) => call.method === 'PATCH')).toBe(false);
 
     await wrapper.get('#problem-points').setValue('900');

@@ -1,3 +1,4 @@
+import { defineComponent, h } from 'vue';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mountComponent } from '@/test/mount';
 import SaveBar from './SaveBar.vue';
@@ -17,13 +18,24 @@ describe('SaveBar', () => {
     expect(save!.attributes('aria-disabled')).toBeUndefined();
   });
 
-  it('shows the save time for three seconds, then its resting text', async () => {
+  it('discards one change at once and asks before discarding several', async () => {
+    const one = mountComponent(SaveBar, { props: { dirtyCount: 1 } });
+    await one.findAll('button')[0]!.trigger('click');
+    expect(one.emitted('discard')).toHaveLength(1);
+
+    const several = mountComponent(SaveBar, { props: { dirtyCount: 3 } });
+    await several.findAll('button')[0]!.trigger('click');
+    expect(several.emitted('discard')).toBeUndefined();
+    expect(document.body.textContent).toContain('Hủy 3 thay đổi?');
+  });
+
+  it('shows the save time for three seconds, then goes away', async () => {
     const bar = mountComponent(SaveBar, { props: { dirtyCount: 1 } });
     await bar.setProps({ dirtyCount: 0, savedAt: '2026-10-12T07:02:00Z' } as never);
     expect(statusOf(bar)).toBe('Đã lưu lúc 14:02');
     vi.advanceTimersByTime(SAVED_NOTE_MS);
     await bar.vm.$nextTick();
-    expect(statusOf(bar)).toBe('Chưa có thay đổi nào để lưu.');
+    expect(bar.find('[role="status"]').exists()).toBe(false);
   });
 
   it('a new change replaces the save time at once', async () => {
@@ -53,20 +65,18 @@ describe('SaveBar', () => {
     expect(bar.findAll('button')[1]!.attributes('aria-disabled')).toBe('true');
   });
 
-  it('with hideIdleOnPhone, hides on phones only while it has nothing to say', async () => {
-    const isHiddenOnPhone = (bar: ReturnType<typeof mountComponent>) =>
-      bar.classes().includes('max-sm:hidden');
-    const bar = mountComponent(SaveBar, { props: { dirtyCount: 0, hideIdleOnPhone: true } });
-    expect(isHiddenOnPhone(bar)).toBe(true);
+  it('is not rendered while it has nothing to say, but is for a clean-saveable form', async () => {
+    const bar = mountComponent(SaveBar, { props: { dirtyCount: 0 } });
+    expect(bar.find('[data-save-bar]').exists()).toBe(false);
     await bar.setProps({ dirtyCount: 1 } as never);
-    expect(isHiddenOnPhone(bar)).toBe(false);
+    expect(bar.find('[data-save-bar]').exists()).toBe(true);
     await bar.setProps({ dirtyCount: 0, savedAt: '2026-10-12T07:02:00Z' } as never);
-    expect(isHiddenOnPhone(bar)).toBe(false);
+    expect(bar.find('[data-save-bar]').exists()).toBe(true);
     vi.advanceTimersByTime(SAVED_NOTE_MS);
     await bar.vm.$nextTick();
-    expect(isHiddenOnPhone(bar)).toBe(true);
-    const plain = mountComponent(SaveBar, { props: { dirtyCount: 0 } });
-    expect(isHiddenOnPhone(plain)).toBe(false);
+    expect(bar.find('[data-save-bar]').exists()).toBe(false);
+    const create = mountComponent(SaveBar, { props: { dirtyCount: 0, allowClean: true } });
+    expect(create.find('[data-save-bar]').exists()).toBe(true);
   });
 
   it('tells the save time in the given zone, and in the site zone for one the browser does not know', async () => {
@@ -76,5 +86,22 @@ describe('SaveBar', () => {
     const unknown = mountComponent(SaveBar, { props: { dirtyCount: 1, timeZone: 'Mars/Base' } });
     await unknown.setProps({ dirtyCount: 0, savedAt: '2026-10-12T07:02:00Z' } as never);
     expect(statusOf(unknown)).toBe('Đã lưu lúc 14:02');
+  });
+});
+
+describe('SaveBar focus', () => {
+  it('hands focus to the form’s first field when the bar hides under it', async () => {
+    const host = mountComponent(
+      defineComponent({
+        props: { count: { type: Number, default: 1 } },
+        setup: (props) => () =>
+          h('form', [h('input', { id: 'first' }), h(SaveBar, { dirtyCount: props.count })]),
+      }),
+      { props: { count: 1 } },
+    );
+    host.get<HTMLElement>('button[type="submit"]').element.focus();
+    await host.setProps({ count: 0 } as never);
+    expect(document.activeElement?.id).toBe('first');
+    host.unmount();
   });
 });

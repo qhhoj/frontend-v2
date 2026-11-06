@@ -13,7 +13,7 @@ const mountAdmin = async (path: string) => {
   const mounted = await mountApp(path);
   await vi.waitFor(
     () => {
-      if (!mounted.wrapper.find('[data-testid="data-save-bar"]').exists())
+      if (!mounted.wrapper.find('[data-testid="data-form"]').exists())
         throw new Error('tab not yet');
     },
     { timeout: 5000 },
@@ -51,7 +51,7 @@ describe('ProblemDataTab', () => {
     };
     expect(body.unicode).toBe(true);
     expect(body.cases).toHaveLength(5);
-    expect(wrapper.get('[data-testid="data-save-bar"]').text()).toContain('Đã lưu lúc');
+    expect(wrapper.text()).toContain('Đã lưu lúc');
   });
 
   it('sends a migrated configuration back unchanged apart from the edit', async () => {
@@ -189,7 +189,7 @@ describe('ProblemDataTab', () => {
       'GET /problems/hcmus41c/data': ok(problemData()),
     });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/data');
-    await saveConfig(wrapper);
+    expect(buttonLabelled(wrapper, 'Lưu')).toBeUndefined();
     expect(calls.some((call) => call.method === 'PUT')).toBe(false);
   });
 

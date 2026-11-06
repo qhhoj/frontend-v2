@@ -137,9 +137,7 @@ describe('ProblemStatementsTab', () => {
     });
     const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/statements');
     await wrapper.get('[data-slot="en"]').trigger('click');
-    expect(buttonLabelled(wrapper, 'Lưu bản dịch tiếng Anh').attributes('aria-disabled')).toBe(
-      'true',
-    );
+    expect(buttonLabelled(wrapper, 'Lưu bản dịch tiếng Anh')).toBeUndefined();
     await wrapper.get('#statement-name').setValue('Constrained shortest path');
     expect(
       buttonLabelled(wrapper, 'Lưu bản dịch tiếng Anh').attributes('aria-disabled'),
@@ -168,9 +166,7 @@ describe('ProblemStatementsTab', () => {
     });
     const { wrapper, router } = await mountAdmin('/admin/problems/hcmus41c/statements');
     await wrapper.get('textarea').setValue('Dòng 1\nDòng 2');
-    expect(buttonLabelled(wrapper, 'Lưu bản dịch tiếng Việt').attributes('aria-disabled')).toBe(
-      'true',
-    );
+    expect(buttonLabelled(wrapper, 'Lưu bản dịch tiếng Việt')).toBeUndefined();
     await wrapper.get('[data-slot="en"]').trigger('click');
     await wrapper.get('a[href="/admin/problems/hcmus41c/data"]').trigger('click');
     await flushPromises();

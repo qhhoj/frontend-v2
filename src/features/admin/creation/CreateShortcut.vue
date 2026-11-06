@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Plus } from 'lucide-vue-next';
-import { BUTTON } from '@/features/account/settings/buttons';
+import AppButton from '@/components/ui/AppButton.vue';
 import { useCreationScope } from './creation-scope';
 import type { CreationKind } from './creation-scope';
 
@@ -14,12 +14,13 @@ const ROUTE = { problem: 'admin-problemNew', contest: 'admin-contestNew' } as co
 </script>
 
 <template>
-  <RouterLink
+  <AppButton
     v-if="canCreate"
     :data-testid="`create-${kind}`"
     :to="{ name: ROUTE[kind] }"
-    :class="BUTTON.primary"
+    tone="primary"
   >
-    <Plus class="size-4" aria-hidden="true" />{{ $t(`create.${kind}`) }}
-  </RouterLink>
+    <template #icon><Plus class="size-4" aria-hidden="true" /></template>
+    {{ $t(`create.${kind}`) }}
+  </AppButton>
 </template>
