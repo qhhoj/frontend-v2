@@ -13,7 +13,9 @@
   --qh-limit-memory-bg: var(--qh-tag-6-bg);
   --qh-limit-points: var(--qh-tag-8);
   --qh-limit-points-bg: var(--qh-tag-8-bg);
-  /* Status roles (docs/design-language.md): warning reuses the TLE pair, info the tag-5 pair, so every theme has them. */
+  /* Status roles (docs/design-language.md): positive/negative reuse the AC/WA tints (the text colours are per theme), warning the TLE pair, info the tag-5 pair, so every theme has them. */
+  --qh-positive-bg: var(--qh-verdict-ac-bg);
+  --qh-negative-bg: var(--qh-verdict-wa-bg);
   --qh-warning: var(--qh-verdict-tle);
   --qh-warning-bg: var(--qh-verdict-tle-bg);
   --qh-info: var(--qh-tag-5);

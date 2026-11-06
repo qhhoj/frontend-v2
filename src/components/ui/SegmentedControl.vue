@@ -2,6 +2,7 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import { RouterLink } from 'vue-router';
+import Chip from './Chip.vue';
 
 export interface SegmentOption<V extends string | number = string> {
   value: V;
@@ -67,7 +68,6 @@ const ACTIVE =
   'border-accent bg-accent-soft font-semibold text-accent-soft-text disabled:border-line-strong disabled:bg-surface-hover disabled:text-content';
 const IDLE =
   'border-transparent text-muted hover:text-content disabled:border-line disabled:bg-surface-strong';
-const COUNT = 'rounded-pill bg-surface-strong px-1.5 font-mono text-caption leading-4 tabular-nums';
 const ALERT = 'size-2 shrink-0 rounded-full bg-negative';
 </script>
 
@@ -90,14 +90,14 @@ const ALERT = 'size-2 shrink-0 rounded-full bg-negative';
       @click="option.to ? undefined : emit('update:modelValue', option.value)"
     >
       {{ option.label }}
-      <span v-if="option.count" :class="COUNT">
+      <Chip v-if="option.count" size="sm" class="font-mono tabular-nums">
         <span
           :data-testid="option.countTestid"
           :aria-hidden="option.countLabel ? 'true' : undefined"
           >{{ option.count }}</span
         >
         <span v-if="option.countLabel" class="sr-only">{{ option.countLabel }}</span>
-      </span>
+      </Chip>
       <span v-if="option.alertLabel" :data-testid="`${option.testid}-alert`" :class="ALERT">
         <span class="sr-only">{{ option.alertLabel }}</span>
       </span>

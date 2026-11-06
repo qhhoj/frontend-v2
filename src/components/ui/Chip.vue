@@ -1,19 +1,28 @@
 <script setup lang="ts">
 import type { Component } from 'vue';
+import { X } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { RouterLink } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 import { VERDICT_TONE_CLASSES, VERDICT_TONES } from '@/lib/verdicts';
 import type { VerdictCode } from '@/lib/verdicts';
 
 type TagTone = `tag-${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8}`;
-type StatusTone = 'neutral' | 'accent' | 'success' | 'danger' | 'warning' | 'info';
+/** `solid` is the attention count ("something waits for you"): the one filled chip. */
+type StatusTone = 'neutral' | 'accent' | 'solid' | 'success' | 'danger' | 'warning' | 'info';
 /** A status, a tag colour, or a verdict code (AC, WA, ...) for the verdict's own pair. */
 export type ChipTone = StatusTone | TagTone | VerdictCode;
 export type ChipSize = 'sm' | 'md';
 
 /**
  * A pill chip: optional dot or icon, then text on a tone's token pair, never wrapping. sm is 22 px with caption text and a 14 px
- * icon, md 28 px with meta text and a 16 px icon; an icon in the `icon` slot without its own `size-*` class gets the same size. The text carries the meaning; colour only repeats it. `interactive` makes it a button with a 44 px hit area
- * on coarse pointers.
+ * icon, md 28 px with meta text and a 16 px icon; an icon in the `icon` slot without its own `size-*` class gets the same size.
+ * The text carries the meaning; colour only repeats it, so give a chip a tone only when the tone means a status.
+ *
+ * One chip in a set: `pressed` (true/false) makes it a toggle button (`aria-pressed`) and a pressed chip takes the one active look
+ * (accent-soft fill, accent border) whatever its tone; `to` makes it a link; `interactive` alone is a plain button. `removable` adds
+ * an x button (`removeLabel` is its aria-label) and emits `remove`: an active filter. Interactive chips get a 44 px hit area on
+ * coarse pointers. The count badge of Tabs and SegmentedControl is `size="sm"` with `class="font-mono tabular-nums"`.
  */
 const props = withDefaults(
   defineProps<{
@@ -22,17 +31,33 @@ const props = withDefaults(
     icon?: Component;
     dot?: boolean;
     interactive?: boolean;
+    pressed?: boolean;
+    to?: RouteLocationRaw;
+    removable?: boolean;
+    removeLabel?: string;
   }>(),
-  { tone: 'neutral', size: 'sm', icon: undefined, dot: false, interactive: false },
+  {
+    tone: 'neutral',
+    size: 'sm',
+    icon: undefined,
+    dot: false,
+    interactive: false,
+    pressed: undefined,
+    to: undefined,
+    removable: false,
+    removeLabel: undefined,
+  },
 );
+const emit = defineEmits<{ remove: [] }>();
 
 defineOptions({ name: 'UiChip' });
 
 const STATUS_TONES: Record<StatusTone | TagTone, string> = {
   neutral: 'border-line bg-surface-strong text-muted',
   accent: 'border-transparent bg-accent-soft text-accent-soft-text',
-  success: 'border-transparent bg-verdict-ac-bg text-verdict-ac',
-  danger: 'border-transparent bg-verdict-wa-bg text-verdict-wa',
+  solid: 'border-transparent bg-accent text-on-accent',
+  success: 'border-transparent bg-positive-bg text-positive',
+  danger: 'border-transparent bg-negative-bg text-negative',
   warning: 'border-transparent bg-warning-bg text-warning',
   info: 'border-transparent bg-info-bg text-info',
   'tag-1': 'border-transparent bg-tag-1-bg text-tag-1',
@@ -57,19 +82,34 @@ const SIZES: Record<ChipSize, { box: string; icon: string }> = {
 const INTERACTIVE =
   'relative cursor-pointer transition-colors hover:border-current focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus touch:after:absolute touch:after:inset-x-0 touch:after:top-1/2 touch:after:h-11 touch:after:-translate-y-1/2';
 
-const toneClass = computed(() =>
-  props.tone in VERDICT_TONES
+const PRESSED = 'border-accent bg-accent-soft text-accent-soft-text';
+const REMOVE =
+  'relative -mr-1 inline-flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-pill hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus touch:after:absolute touch:after:top-1/2 touch:after:left-1/2 touch:after:size-11 touch:after:-translate-1/2';
+
+const tag = computed(() => {
+  if (props.to) return RouterLink;
+  return props.interactive || props.pressed !== undefined ? 'button' : 'span';
+});
+const isInteractive = computed(() => tag.value !== 'span');
+const elementAttrs = computed(() => {
+  if (props.to) return { to: props.to, 'aria-current': props.pressed ? 'true' : undefined };
+  if (tag.value === 'button') return { type: 'button', 'aria-pressed': props.pressed };
+  return {};
+});
+const toneClass = computed(() => {
+  if (props.pressed) return PRESSED;
+  return props.tone in VERDICT_TONES
     ? `border-transparent ${VERDICT_TONE_CLASSES[VERDICT_TONES[props.tone as VerdictCode]]}`
-    : STATUS_TONES[props.tone as StatusTone | TagTone],
-);
+    : STATUS_TONES[props.tone as StatusTone | TagTone];
+});
 </script>
 
 <template>
   <component
-    :is="interactive ? 'button' : 'span'"
-    :type="interactive ? 'button' : undefined"
+    :is="tag"
+    v-bind="elementAttrs"
     class="inline-flex max-w-full shrink-0 items-center gap-1 rounded-pill border font-semibold whitespace-nowrap"
-    :class="[SIZES[size].box, toneClass, interactive && INTERACTIVE]"
+    :class="[SIZES[size].box, toneClass, isInteractive && INTERACTIVE]"
   >
     <span v-if="dot" aria-hidden="true" class="size-1.5 shrink-0 rounded-pill bg-current" />
     <slot name="icon">
@@ -83,5 +123,14 @@ const toneClass = computed(() =>
       />
     </slot>
     <span class="truncate"><slot /></span>
+    <button
+      v-if="removable"
+      type="button"
+      :aria-label="removeLabel"
+      :class="REMOVE"
+      @click="emit('remove')"
+    >
+      <X aria-hidden="true" class="size-3.5" />
+    </button>
   </component>
 </template>

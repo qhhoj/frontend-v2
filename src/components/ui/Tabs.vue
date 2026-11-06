@@ -5,6 +5,7 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
 import { RouterLink, useRouter } from 'vue-router';
+import Chip from './Chip.vue';
 import { useTabsOverflow } from './TabsOverflow';
 
 export interface TabItem {
@@ -111,14 +112,8 @@ const TAB = {
 };
 const TAB_BASE =
   'inline-flex items-center gap-2 text-sm whitespace-nowrap text-muted hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text aria-selected:border-accent aria-selected:bg-accent-soft aria-selected:text-accent-soft-text';
-const COUNT = {
-  pill: 'inline-flex min-w-5 items-center justify-center rounded-pill px-1.5 text-tiny font-semibold tabular-nums',
-  underline: 'rounded-pill px-2 font-mono text-caption leading-4 tabular-nums',
-};
-const COUNT_TONE = {
-  pill: { neutral: 'bg-surface-hover text-content', accent: 'bg-accent text-on-accent' },
-  underline: { neutral: 'bg-surface-strong text-muted', accent: 'bg-accent text-on-accent' },
-};
+/** The count is a small Chip; `accent` (something waits for the viewer) is the filled one. */
+const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
 const ALERT = 'size-2 shrink-0 rounded-full bg-negative';
 </script>
 
@@ -163,9 +158,11 @@ const ALERT = 'size-2 shrink-0 rounded-full bg-negative';
               @keydown="item.to ? undefined : onTabKeydown($event, index)"
             >
               {{ item.label }}
-              <span
+              <Chip
                 v-if="item.count != null"
-                :class="[COUNT[variant], COUNT_TONE[variant][item.countTone ?? 'neutral']]"
+                size="sm"
+                class="font-mono tabular-nums"
+                :tone="COUNT_TONE[item.countTone ?? 'neutral']"
               >
                 <span
                   :data-testid="item.countTestid"
@@ -173,7 +170,7 @@ const ALERT = 'size-2 shrink-0 rounded-full bg-negative';
                   >{{ item.count }}</span
                 >
                 <span v-if="item.countLabel" class="sr-only">{{ item.countLabel }}</span>
-              </span>
+              </Chip>
               <span v-if="item.alertLabel" :class="ALERT">
                 <span class="sr-only">{{ item.alertLabel }}</span>
               </span>
