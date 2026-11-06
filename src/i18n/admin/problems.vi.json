@@ -497,10 +497,11 @@
     "chunked": {
       "hashing": "Đang kiểm tra tệp",
       "uploading": "Đang tải lên",
-      "completing": "Đang lưu gói test…",
+      "completing": "Đang lưu gói test (có thể mất một phút)…",
       "progressLabel": "Tiến độ tải gói test",
-      "interrupted": "Tải “{name}” bị gián đoạn; phần đã gửi vẫn được giữ trong 24 giờ.",
-      "resume": "Tiếp tục tải lên"
+      "interrupted": "Tải “{name}” chưa xong; phần đã gửi vẫn được giữ trong 24 giờ.",
+      "resume": "Tiếp tục tải lên",
+      "chunk": "phần {number}/{count}"
     }
   },
   "uploads": {

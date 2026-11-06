@@ -497,10 +497,11 @@
     "chunked": {
       "hashing": "Checking the file",
       "uploading": "Uploading",
-      "completing": "Saving the test archive…",
+      "completing": "Saving the test archive (this can take a minute)…",
       "progressLabel": "Test archive upload progress",
-      "interrupted": "The upload of “{name}” stopped; the part already sent is kept for 24 hours.",
-      "resume": "Resume upload"
+      "interrupted": "The upload of “{name}” did not finish; the part already sent is kept for 24 hours.",
+      "resume": "Resume upload",
+      "chunk": "part {number}/{count}"
     }
   },
   "uploads": {

@@ -34,6 +34,7 @@ export const deleteDataFile = (code: string, kind: DataFileKind): Promise<Proble
 export type DataUpload = DataOf<'/problems/{code}/data/uploads', 'post'>;
 type DataUploadTarget = { code: string; id: string };
 
+/** Takes no signal on purpose: a create the server ran must still answer its id, so a cancelled upload can delete it. */
 export const createDataUpload = (
   code: string,
   file: { name: string; size: number; sha256: string },
@@ -59,8 +60,11 @@ export const putDataUploadChunk = (
   });
 };
 
-export const completeDataUpload = (target: DataUploadTarget): Promise<ProblemData> =>
-  apiSend('post', '/problems/{code}/data/uploads/{id}/complete', { path: target });
+export const completeDataUpload = (
+  target: DataUploadTarget,
+  signal?: AbortSignal,
+): Promise<ProblemData> =>
+  apiSend('post', '/problems/{code}/data/uploads/{id}/complete', { path: target, signal });
 
 export const cancelDataUpload = (target: DataUploadTarget): Promise<void> =>
   apiSend('delete', '/problems/{code}/data/uploads/{id}', { path: target });

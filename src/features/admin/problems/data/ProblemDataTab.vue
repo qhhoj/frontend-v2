@@ -77,9 +77,19 @@ const archive = useAdminMutation({
 const archiveFailure = computed(() =>
   archive.failure.value?.code === UPLOAD_CANCELLED ? null : archive.failure.value,
 );
+/** Only the upload started on this problem is offered to resume here. */
+const interruptedHere = computed(() =>
+  chunked.interrupted.value?.code === props.problem.code ? chunked.interrupted.value : null,
+);
 function resumeArchive() {
-  const file = chunked.interrupted.value?.file;
+  const file = interruptedHere.value?.file;
   if (file) void archive.run(file);
+}
+/** A cancel while the server already stores the archive may still land: the data is read again. */
+function cancelArchive() {
+  const wasCompleting = chunked.phase.value === 'completing';
+  chunked.cancel();
+  if (wasCompleting) void query.refetch();
 }
 const blockedReason = computed(() =>
   badRowNumbers.value.length > 0
@@ -145,13 +155,15 @@ async function submit() {
             <CasesSummary :cases="form.cases" />
           </template>
         </DataArchiveCard>
-        <div v-if="chunked.phase.value || chunked.interrupted.value" class="px-4 pb-4 sm:px-5">
+        <div v-if="chunked.phase.value || interruptedHere" class="px-4 pb-4 sm:px-5">
           <ChunkedUploadStatus
             :phase="chunked.phase.value"
             :done-bytes="chunked.doneBytes.value"
             :total-bytes="chunked.totalBytes.value"
-            :interrupted-name="chunked.interrupted.value?.file.name ?? null"
-            @cancel="chunked.cancel"
+            :chunk-number="chunked.chunkNumber.value"
+            :chunk-count="chunked.chunkCount.value"
+            :interrupted-name="interruptedHere?.file.name ?? null"
+            @cancel="cancelArchive"
             @resume="resumeArchive"
           />
         </div>

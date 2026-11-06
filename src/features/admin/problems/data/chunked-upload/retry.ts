@@ -7,10 +7,27 @@ export interface RetryOptions {
   baseDelayMs: number;
   signal?: AbortSignal;
   /** Injected by specs. */
-  wait?: (ms: number) => Promise<void>;
+  wait?: (ms: number, signal?: AbortSignal) => Promise<void>;
 }
 
-const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+/** A `Retry-After` longer than this ends the retries at once: the budget will not come back while the user watches. */
+const MAX_RETRY_AFTER_SECONDS = 60;
+
+/** Resolves after `ms`, or rejects with the signal's reason as soon as it aborts. */
+export function abortableWait(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) return reject(signal.reason as Error);
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    function onAbort() {
+      clearTimeout(timer);
+      reject(signal!.reason as Error);
+    }
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
+}
 
 /** A dropped connection (`network_error`; an abort is not one), a server or gateway error, a rate limit or a busy lock can pass on a later try; any other answer will not. */
 export function isRetryable(error: unknown): boolean {
@@ -19,17 +36,27 @@ export function isRetryable(error: unknown): boolean {
   return error.code === 'network_error' || error.status >= 500 || error.status === 429 || isBusy;
 }
 
-/** Runs `task` until it succeeds, a refusal is final, the tries run out or `signal` aborts; backs off exponentially. */
+/** The wait before try `attempt + 1`: the backoff, or the server's `Retry-After` when longer; null when that is too long to wait for. */
+function delayBefore(error: unknown, attempt: number, baseDelayMs: number): number | null {
+  const backoff = baseDelayMs * 2 ** (attempt - 1);
+  const retryAfter = error instanceof ApiError ? error.retryAfterSeconds : null;
+  if (retryAfter === null) return backoff;
+  return retryAfter > MAX_RETRY_AFTER_SECONDS ? null : Math.max(backoff, retryAfter * 1000);
+}
+
+/** Runs `task` until it succeeds, a refusal is final, the tries run out or `signal` aborts (also during a wait); backs off exponentially. */
 export async function withRetry<Result>(
   task: () => Promise<Result>,
-  { attempts, baseDelayMs, signal, wait = sleep }: RetryOptions,
+  { attempts, baseDelayMs, signal, wait = abortableWait }: RetryOptions,
 ): Promise<Result> {
   for (let attempt = 1; ; attempt++) {
     try {
       return await task();
     } catch (error) {
       if (signal?.aborted || attempt >= attempts || !isRetryable(error)) throw error;
-      await wait(baseDelayMs * 2 ** (attempt - 1));
+      const delay = delayBefore(error, attempt, baseDelayMs);
+      if (delay === null) throw error;
+      await wait(delay, signal);
     }
   }
 }

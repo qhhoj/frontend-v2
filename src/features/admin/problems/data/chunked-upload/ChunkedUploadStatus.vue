@@ -7,12 +7,15 @@ import { translate } from '@/i18n';
 import { formatFileSize } from '@/lib/format';
 import type { ChunkedPhase } from './use-chunked-upload';
 
-/** A large archive's progress while it runs (phase, percent, bytes, Hủy), or, once it stopped, what is kept and how to go on. */
+/** A large archive's progress while it runs (phase, percent, bytes, chunk, Hủy), or, once it stopped, what is kept and how to go on. */
 const props = defineProps<{
   phase: ChunkedPhase | null;
   doneBytes: number;
   totalBytes: number;
-  /** The file of an upload that stopped on a lasting failure; null when nothing waits. */
+  /** 1-based chunk being sent, of `chunkCount`. */
+  chunkNumber: number;
+  chunkCount: number;
+  /** The file of an upload that stopped with its session kept; null when nothing waits. */
   interruptedName: string | null;
 }>();
 const emit = defineEmits<{ cancel: []; resume: [] }>();
@@ -22,18 +25,31 @@ const percent = computed(() =>
 const phaseText = computed(() =>
   props.phase ? translate(`admin.problems.data.chunked.${props.phase}`) : '',
 );
+/** What a screen reader hears: the phase, then every tenth percent, never each slice. */
+const announcement = computed(() => {
+  if (!props.phase) return '';
+  if (props.phase === 'completing') return phaseText.value;
+  return `${phaseText.value} ${Math.floor(percent.value / 10) * 10}%`;
+});
 </script>
 
 <template>
+  <p class="sr-only" aria-live="polite">{{ announcement }}</p>
   <div v-if="phase" class="flex flex-col gap-2" data-testid="chunked-upload-progress">
     <div class="flex flex-wrap items-center justify-between gap-2 text-sm">
-      <span role="status">
+      <span>
         {{ phaseText }}
         <span v-if="phase !== 'completing'" class="font-mono tabular-nums text-muted">
           {{ percent }}% · {{ formatFileSize(doneBytes) }} / {{ formatFileSize(totalBytes) }}
+          <template v-if="phase === 'uploading' && chunkCount > 1">
+            ·
+            {{
+              $t('admin.problems.data.chunked.chunk', { number: chunkNumber, count: chunkCount })
+            }}
+          </template>
         </span>
       </span>
-      <AppButton v-if="phase !== 'completing'" size="sm" tone="secondary" @click="emit('cancel')">
+      <AppButton size="sm" tone="secondary" @click="emit('cancel')">
         {{ $t('common.cancel') }}
       </AppButton>
     </div>
