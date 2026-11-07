@@ -3,7 +3,7 @@ import { mountComponent } from '@/test/mount';
 import Notice from './Notice.vue';
 
 describe('Notice', () => {
-  it('interrupts on danger, announces success politely and leaves advice silent', () => {
+  it('always interrupts on danger, announces success politely and leaves advice silent', () => {
     expect(mountComponent(Notice, { props: { tone: 'danger' } }).attributes('role')).toBe('alert');
     expect(mountComponent(Notice, { props: { tone: 'success' } }).attributes('role')).toBe(
       'status',
@@ -11,6 +11,9 @@ describe('Notice', () => {
     expect(mountComponent(Notice, { props: { tone: 'info' } }).attributes('role')).toBeUndefined();
     expect(
       mountComponent(Notice, { props: { tone: 'danger', role: null } }).attributes('role'),
+    ).toBe('alert');
+    expect(
+      mountComponent(Notice, { props: { tone: 'warning', role: null } }).attributes('role'),
     ).toBeUndefined();
   });
 
@@ -26,5 +29,11 @@ describe('Notice', () => {
     await toggle.trigger('click');
     expect(toggle.attributes('aria-expanded')).toBe('true');
     expect(details.isVisible()).toBe(true);
+  });
+
+  it('offers a named close button that emits dismiss', async () => {
+    const wrapper = mountComponent(Notice, { props: { dismissible: true } });
+    await wrapper.get('button[aria-label="Đóng thông báo"]').trigger('click');
+    expect(wrapper.emitted('dismiss')).toHaveLength(1);
   });
 });

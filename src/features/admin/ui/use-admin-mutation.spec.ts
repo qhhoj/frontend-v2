@@ -133,7 +133,7 @@ describe('useAdminMutation', () => {
     await api.run('ab');
     await flushPromises();
     expect(adminToasts.map((toast) => toast.text)).toEqual(['Đã lưu AB (ab)']);
-    expect(document.querySelector('[data-testid="admin-toasts"]')?.textContent).toContain(
+    expect(document.querySelector('[data-testid="toasts"]')?.textContent).toContain(
       'Đã lưu AB (ab)',
     );
   });

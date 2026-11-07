@@ -741,7 +741,6 @@
     "forgot": "Quên mật khẩu?",
     "activating": "Đang kích hoạt…",
     "showPassword": "Hiện mật khẩu",
-    "dismissNotice": "Đóng thông báo",
     "social": {
       "or": "hoặc tiếp tục với",
       "signInWith": "Đăng nhập với {provider}"
@@ -1020,7 +1019,12 @@
     },
     "notice": {
       "details": "Chi tiết",
-      "hideDetails": "Ẩn chi tiết"
+      "hideDetails": "Ẩn chi tiết",
+      "dismiss": "Đóng thông báo"
+    },
+    "toast": {
+      "region": "Thông báo",
+      "close": "Đóng thông báo"
     },
     "save": "Lưu",
     "edit": "Sửa",

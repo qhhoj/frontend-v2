@@ -156,7 +156,7 @@ describe('BitRoamLayer', () => {
     const resting = runUntilResting(wrapper);
     await resting.trigger('dblclick');
     expect(sessionStorage.getItem('qhhoj.bitRoamResting')).toBe('1');
-    const toast = document.querySelector('[data-testid="admin-toasts"]')!;
+    const toast = document.querySelector('[data-testid="toasts"]')!;
     expect(toast.textContent).toContain('Bit đi nghỉ đến hết phiên này');
     for (let time = 0; time < 20_000 && layer(wrapper).exists(); time += 16) {
       frames.runFrame(100_000 + time);

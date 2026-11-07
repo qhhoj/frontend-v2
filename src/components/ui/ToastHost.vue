@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import { CircleAlert, CircleCheck, Info, X } from 'lucide-vue-next';
 import { translate } from '@/i18n';
-import { buttonClass, iconButtonClass } from '../controls';
-import { adminToasts, dismissToast, pauseToast, resumeToast } from './admin-toasts';
-import type { Toast } from './admin-toasts';
+import AppButton from './AppButton.vue';
+import IconButton from './IconButton.vue';
+import { dismissToast, pauseToast, resumeToast, toasts } from './toasts';
+import type { Toast } from './toasts';
 
 /**
- * The toast stack: one polite region (an error item is an alert), bottom right, bottom centre on phones.
+ * The toast stack: one polite region (a failure is an alert), bottom right, bottom centre on phones.
  * Texts come from the global `translate`: the host outlives the component that mounted it.
  */
-const ICONS = { success: CircleCheck, error: CircleAlert, info: Info } as const;
+const ICONS = { success: CircleCheck, danger: CircleAlert, info: Info } as const;
 const ICON_TONES = {
-  success: 'text-verdict-ac',
-  error: 'text-negative',
-  info: 'text-tag-5',
+  success: 'text-positive',
+  danger: 'text-negative',
+  info: 'text-info',
 } as const;
 
 function undo(toast: Toast) {
@@ -24,10 +25,10 @@ function undo(toast: Toast) {
 
 <template>
   <div
-    data-testid="admin-toasts"
+    data-testid="toasts"
     role="status"
     aria-live="polite"
-    :aria-label="translate('admin.feedback.toast.region')"
+    :aria-label="translate('common.toast.region')"
     class="pointer-events-none fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-toast flex justify-center sm:inset-x-auto sm:right-6 sm:bottom-6"
   >
     <TransitionGroup
@@ -39,9 +40,9 @@ function undo(toast: Toast) {
       leave-to-class="opacity-0"
     >
       <li
-        v-for="toast in adminToasts"
+        v-for="toast in toasts"
         :key="toast.id"
-        :role="toast.tone === 'error' ? 'alert' : undefined"
+        :role="toast.tone === 'danger' ? 'alert' : undefined"
         class="pointer-events-auto flex items-start gap-2.5 rounded-row border border-line-strong bg-surface-solid py-2 pr-2 pl-3 text-sm text-content shadow-float"
         @mouseenter="pauseToast(toast.id)"
         @mouseleave="resumeToast(toast.id)"
@@ -53,26 +54,18 @@ function undo(toast: Toast) {
           aria-hidden="true"
           class="mt-2 size-4 shrink-0"
           :class="ICON_TONES[toast.tone]"
-          :stroke-width="1.75"
         />
         <p class="m-0 min-w-0 flex-1 py-1.5">{{ toast.text }}</p>
-        <button
-          v-if="toast.undo"
-          type="button"
-          :class="buttonClass('ghost', 'sm')"
-          @click="undo(toast)"
-        >
+        <AppButton v-if="toast.undo" tone="ghost" size="sm" @click="undo(toast)">
           {{ toast.undoLabel ?? translate('common.undo') }}
-        </button>
-        <button
-          type="button"
-          :class="iconButtonClass('ghost', 'sm')"
-          :aria-label="translate('admin.feedback.toast.close')"
-          :title="translate('admin.feedback.toast.close')"
+        </AppButton>
+        <IconButton
+          size="sm"
+          :label="translate('common.toast.close')"
           @click="dismissToast(toast.id)"
         >
-          <X aria-hidden="true" class="size-4" :stroke-width="1.75" />
-        </button>
+          <X aria-hidden="true" />
+        </IconButton>
       </li>
     </TransitionGroup>
   </div>
@@ -83,7 +76,7 @@ function undo(toast: Toast) {
  * Toasts stand above a save bar that is on screen (a page bar, or a drawer footer) so its buttons stay
  * clickable. An idle page bar is not rendered, so nothing is raised for it.
  */
-body:has([data-save-bar='page'], [data-save-bar='footer']) [data-testid='admin-toasts'] {
+body:has([data-save-bar='page'], [data-save-bar='footer']) [data-testid='toasts'] {
   bottom: 5.5rem;
 }
 </style>

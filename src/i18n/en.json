@@ -741,7 +741,6 @@
     "forgot": "Forgot password?",
     "activating": "Activating…",
     "showPassword": "Show password",
-    "dismissNotice": "Dismiss",
     "social": {
       "or": "or continue with",
       "signInWith": "Sign in with {provider}"
@@ -1020,7 +1019,12 @@
     },
     "notice": {
       "details": "Details",
-      "hideDetails": "Hide details"
+      "hideDetails": "Hide details",
+      "dismiss": "Dismiss"
+    },
+    "toast": {
+      "region": "Notifications",
+      "close": "Dismiss notification"
     },
     "save": "Save",
     "edit": "Edit",
