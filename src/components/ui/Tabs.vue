@@ -4,7 +4,7 @@ import type { Component } from 'vue';
 import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
 import Chip from './Chip.vue';
 import IconButton from './IconButton.vue';
 import Menu from './Menu.vue';
@@ -69,15 +69,18 @@ const props = withDefaults(
 defineOptions({ name: 'UiTabs' });
 const current = defineModel<string>();
 const { t } = useI18n();
+const route = useRoute();
 
 const isTablist = computed(() => props.items.every((item) => !item.to));
 /** The tablist's selected tab: the model, else the first, so the row is always reachable by Tab. */
 const selectedKey = computed(() => current.value ?? props.items[0]?.key);
 const scroller = ref<HTMLElement | null>(null);
 const hasMenu = props.overflow === 'menu';
+/** A route change re-reveals the current tab too: link tabs without a model get it from the router alone. */
 const { hiddenKeys, measure } = useTabsOverflow(scroller, hasMenu, [
   current,
   () => props.items.length,
+  () => route.fullPath,
 ]);
 /** A tab out of view, hidden whole; the current one is always kept in view. */
 const isHidden = (item: TabItem) =>
