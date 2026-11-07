@@ -996,6 +996,8 @@
     "copied": "Đã chép",
     "breadcrumb": "Đường dẫn",
     "moreActions": "Thêm thao tác",
+    "hiddenUnsaved": "có thay đổi chưa lưu ở mục ẩn",
+    "hiddenAlert": "có mục cần sửa ở mục ẩn",
     "cancel": "Hủy",
     "confirm": "Xác nhận",
     "delete": "Xóa",

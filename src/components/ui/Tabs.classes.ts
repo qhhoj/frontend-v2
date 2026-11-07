@@ -20,11 +20,23 @@ export function tabsScroller(variant: TabsVariant, hasMenu: boolean): string {
   return variant === 'rail' ? `${frame} lg:m-0 lg:overflow-visible lg:p-0` : frame;
 }
 
-export const TABS_LIST: Record<TabsVariant, string> = {
+const LIST: Record<TabsVariant, string> = {
   pill: 'flex min-w-max gap-1',
   underline: 'flex min-w-max gap-1',
   rail: 'flex min-w-max gap-1 lg:min-w-0 lg:flex-col',
 };
+/**
+ * With the menu the list keeps room at its end for the "⋯" button (its width plus a 4 px gap), so the last tab can
+ * scroll clear of it and the button's showing never changes a measured size.
+ */
+const MENU_ROOM: Record<TabsVariant, string> = {
+  pill: 'pe-12',
+  underline: 'pe-[calc(var(--qh-control-sm)+0.25rem)]',
+  rail: 'pe-12 lg:pe-0',
+};
+
+export const tabsList = (variant: TabsVariant, hasMenu: boolean) =>
+  hasMenu ? `${LIST[variant]} ${MENU_ROOM[variant]}` : LIST[variant];
 
 const PILL_TAB =
   'min-h-11 rounded-pill border border-transparent px-4 font-medium hover:bg-surface-hover aria-[current=page]:font-semibold aria-selected:font-semibold';
@@ -40,11 +52,9 @@ export const TAB_CLASS: Record<TabsVariant, string> = {
 export const TAB_BASE =
   'inline-flex items-center gap-2 text-sm whitespace-nowrap text-muted hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text aria-selected:border-accent aria-selected:bg-accent-soft aria-selected:text-accent-soft-text';
 
-/** The "⋯" button sits on the underline's baseline, or centred on the pill row. */
+/** The "⋯" button sits over the strip's right end: on the underline's baseline, or centred on the pill row. */
 export const MORE_CLASS: Record<TabsVariant, string> = {
-  pill: 'ml-1 self-center',
-  underline: 'mb-1 ml-1',
-  rail: 'ml-1 self-center',
+  pill: 'absolute top-1/2 right-0 -translate-y-1/2',
+  underline: 'absolute right-0 bottom-1',
+  rail: 'absolute top-1/2 right-0 -translate-y-1/2',
 };
-
-export const DOT = 'size-2 shrink-0 rounded-full';

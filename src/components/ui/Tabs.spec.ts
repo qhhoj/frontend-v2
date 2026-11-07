@@ -109,6 +109,22 @@ describe('Tabs with the overflow menu', () => {
   });
 });
 
+describe('Tabs overflow marks', () => {
+  it('shows a hidden tab’s unsaved edits on the ⋯ button, in its name and as a mark', async () => {
+    fakeStripLayout();
+    const items = SECTIONS.map((item) => (item.key === 'history' ? { ...item, dirty: 2 } : item));
+    const wrapper = mountComponent(Tabs, {
+      props: { items, label: 'Mục', modelValue: 'statement' },
+    });
+    await nextTick();
+    expect(wrapper.findAll('li')[2]!.classes()).toContain('invisible');
+    expect(wrapper.get('[data-testid="tabs-more"]').attributes('aria-label')).toBe(
+      'Thêm: có thay đổi chưa lưu ở mục ẩn',
+    );
+    expect(wrapper.find('[data-testid="tabs-more-mark"]').exists()).toBe(true);
+  });
+});
+
 describe('Tabs as links', () => {
   const LINKS: TabItem[] = [
     { key: 'all', label: 'Tất cả', to: '/users' },

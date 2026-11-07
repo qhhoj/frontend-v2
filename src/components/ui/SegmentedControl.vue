@@ -3,6 +3,7 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import { RouterLink } from 'vue-router';
 import Chip from './Chip.vue';
+import StatusMark from './StatusMark.vue';
 
 export interface SegmentOption<V extends string | number = string> {
   value: V;
@@ -16,11 +17,11 @@ export interface SegmentOption<V extends string | number = string> {
   /** A short word in a small chip after the label ("Chưa có"): a state of the choice, not a number. */
   badge?: string;
   /**
-   * A dot after the label, read as its `label`: `accent` says the choice holds unsaved edits, `danger` something to fix.
-   * `alertLabel` is the danger dot's shorthand.
+   * A `StatusMark` after the label, read as its `label`: `accent` (a dot) says the choice holds unsaved edits, `danger`
+   * (an alert icon) something to fix. `alertLabel` is the danger mark's shorthand.
    */
   dot?: SegmentDot;
-  /** A red dot after the label, read as this text: the choice holds something to fix (a field error). */
+  /** The danger mark after the label, read as this text: the choice holds something to fix (a field error). */
   alertLabel?: string;
   testid?: string;
 }
@@ -80,8 +81,6 @@ const ACTIVE =
   'border-accent bg-accent-soft font-semibold text-accent-soft-text disabled:border-line-strong disabled:bg-surface-hover disabled:text-content';
 const IDLE =
   'border-transparent text-muted hover:text-content disabled:border-line disabled:bg-surface-strong';
-const DOT_TONE = { accent: 'bg-accent', danger: 'bg-negative' } as const;
-const DOT = 'inline-block size-2 shrink-0 rounded-full align-middle';
 
 /** The option's dot: its own, else the red one `alertLabel` names. */
 function dotOf(option: SegmentOption<Value>): SegmentDot | undefined {
@@ -119,13 +118,12 @@ const segments = computed(() => props.options.map((option) => ({ option, dot: do
         <span v-if="option.countLabel" class="sr-only">{{ option.countLabel }}</span>
       </Chip>
       <Chip v-if="option.badge" size="sm">{{ option.badge }}</Chip>
-      <span
+      <StatusMark
         v-if="dot"
         :data-testid="`${option.testid}-${dot.tone === 'danger' ? 'alert' : 'dot'}`"
-        :class="[DOT, DOT_TONE[dot.tone]]"
-      >
-        <span class="sr-only">{{ dot.label }}</span>
-      </span>
+        :tone="dot.tone"
+        :label="dot.label"
+      />
     </component>
   </component>
 </template>

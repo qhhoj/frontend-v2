@@ -996,6 +996,8 @@
     "copied": "Copied",
     "breadcrumb": "Breadcrumb",
     "moreActions": "More actions",
+    "hiddenUnsaved": "unsaved changes in a hidden section",
+    "hiddenAlert": "a hidden section needs fixing",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "delete": "Delete",

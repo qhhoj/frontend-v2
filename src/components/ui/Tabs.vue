@@ -9,13 +9,13 @@ import Chip from './Chip.vue';
 import IconButton from './IconButton.vue';
 import Menu from './Menu.vue';
 import type { MenuEntry } from './Menu.vue';
+import StatusMark from './StatusMark.vue';
 import {
-  DOT,
   MORE_CLASS,
   TAB_BASE,
   TAB_CLASS,
   TABS_FRAME,
-  TABS_LIST,
+  tabsList,
   tabsScroller,
 } from './Tabs.classes';
 import type { TabsVariant } from './Tabs.classes';
@@ -75,9 +75,10 @@ const isTablist = computed(() => props.items.every((item) => !item.to));
 /** The tablist's selected tab: the model, else the first, so the row is always reachable by Tab. */
 const selectedKey = computed(() => current.value ?? props.items[0]?.key);
 const scroller = ref<HTMLElement | null>(null);
+const trigger = ref<HTMLElement | null>(null);
 const hasMenu = props.overflow === 'menu';
 /** A route change re-reveals the current tab too: link tabs without a model get it from the router alone. */
-const { hiddenKeys, measure } = useTabsOverflow(scroller, hasMenu, [
+const { hiddenKeys, measure } = useTabsOverflow(scroller, trigger, hasMenu, [
   current,
   () => props.items.length,
   () => route.fullPath,
@@ -138,7 +139,19 @@ const moreItems = computed<MenuEntry[]>(() =>
     ...(item.to ? { to: item.to } : { run: () => (current.value = item.key) }),
   })),
 );
+/** The strongest state among the hidden tabs, shown on the "⋯" button: something to fix, else unsaved edits. */
+const hiddenMark = computed(() => {
+  const hidden = props.items.filter(isHidden);
+  if (hidden.some((item) => item.alertLabel))
+    return { tone: 'danger' as const, label: t('common.hiddenAlert') };
+  if (hidden.some((item) => item.dirty))
+    return { tone: 'accent' as const, label: t('common.hiddenUnsaved') };
+  return null;
+});
 const moreName = computed(() => props.moreLabel ?? t('nav.more'));
+const triggerName = computed(() =>
+  hiddenMark.value ? `${moreName.value}: ${hiddenMark.value.label}` : moreName.value,
+);
 /** The count is a small Chip; `accent` (something waits for the viewer) is the filled one. */
 const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
 </script>
@@ -149,10 +162,10 @@ const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
     :aria-label="isTablist ? undefined : label"
     :class="[TABS_FRAME[variant], sticky && 'sticky top-0 z-20 bg-ground']"
   >
-    <div class="min-w-0 flex-1">
+    <div class="relative min-w-0 flex-1">
       <div ref="scroller" :class="tabsScroller(variant, hasMenu)" @scroll.passive="measure">
         <ul
-          :class="TABS_LIST[variant]"
+          :class="tabsList(variant, hasMenu)"
           :role="isTablist ? 'tablist' : undefined"
           :aria-label="isTablist ? label : undefined"
         >
@@ -197,33 +210,45 @@ const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
                 data-testid="tab-dirty"
                 class="inline-flex items-center gap-1 font-mono text-caption text-accent-text tabular-nums"
               >
-                <span aria-hidden="true" :class="[DOT, 'bg-accent']" />
+                <StatusMark tone="accent" :label="t('form.saveBar.unsaved', item.dirty)" />
                 <span aria-hidden="true">{{ item.dirty }}</span>
-                <span class="sr-only">{{ t('form.saveBar.unsaved', item.dirty) }}</span>
               </span>
-              <span v-if="item.alertLabel" :class="[DOT, 'bg-negative']">
-                <span class="sr-only">{{ item.alertLabel }}</span>
-              </span>
+              <StatusMark v-if="item.alertLabel" tone="danger" :label="item.alertLabel" />
             </component>
           </li>
         </ul>
       </div>
+      <!-- Always laid out (hidden while nothing overflows) and over the strip, so its showing never resizes the strip. -->
+      <span
+        v-if="hasMenu"
+        ref="trigger"
+        class="inline-flex"
+        :class="[MORE_CLASS[variant], moreItems.length === 0 && 'invisible']"
+      >
+        <Menu :items="moreItems" :label="moreName">
+          <template #trigger="{ toggle, open, setOpener }">
+            <IconButton
+              :ref="(el) => setOpener((el as { $el?: HTMLElement } | null)?.$el ?? null)"
+              :label="triggerName"
+              :size="variant === 'underline' ? 'sm' : 'md'"
+              :data-testid="moreTestid"
+              aria-haspopup="menu"
+              :aria-expanded="open"
+              @click="toggle"
+            >
+              <Ellipsis aria-hidden="true" />
+            </IconButton>
+          </template>
+        </Menu>
+        <StatusMark
+          v-if="hiddenMark"
+          aria-hidden="true"
+          data-testid="tabs-more-mark"
+          class="pointer-events-none absolute -top-0.5 -right-0.5"
+          :tone="hiddenMark.tone"
+          :label="hiddenMark.label"
+        />
+      </span>
     </div>
-    <Menu v-if="moreItems.length > 0" :items="moreItems" :label="moreName">
-      <template #trigger="{ toggle, open, setOpener }">
-        <IconButton
-          :ref="(el) => setOpener((el as { $el?: HTMLElement } | null)?.$el ?? null)"
-          :label="moreName"
-          :size="variant === 'underline' ? 'sm' : 'md'"
-          :class="MORE_CLASS[variant]"
-          :data-testid="moreTestid"
-          aria-haspopup="menu"
-          :aria-expanded="open"
-          @click="toggle"
-        >
-          <Ellipsis aria-hidden="true" />
-        </IconButton>
-      </template>
-    </Menu>
   </component>
 </template>
