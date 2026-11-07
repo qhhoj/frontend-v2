@@ -3,16 +3,17 @@ import { Ellipsis } from 'lucide-vue-next';
 import { computed, ref, useSlots } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import AppButton from '@/components/ui/AppButton.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import Popover from '@/components/ui/Popover.vue';
 import { navCrumbsOf } from '../shell/admin-nav';
 import type { AdminCrumb } from '../shell/admin-nav';
 
 /**
- * Every admin page's header: `PageHeader` (the same title step as the public pages), its breadcrumb led by the nav's crumbs. One primary
- * action per page goes in `#actions` with the secondary ones; a third action or more goes in `#overflow`, behind a
- * "⋯ Thêm" button. Below `md` the breadcrumb becomes one back link: `back`, else the nearest crumb that links somewhere.
- * `#meta` sits under the title (chips, a code, a status line).
+ * Shim over `PageHeader` (new pages use it directly, with `overflow` items): the breadcrumb is led by the nav's crumbs,
+ * and below `md` it becomes one back link: `back`, else the nearest crumb that links somewhere. One primary action per
+ * page goes in `#actions` with the secondary ones; the `#overflow` slot (hand-built items, until its pages move to
+ * `PageHeader overflow`) opens behind the same "⋯ Thêm" button. `#meta` sits under the title.
  */
 const props = defineProps<{
   title: string;
@@ -47,22 +48,18 @@ const closeOverflow = () => overflowMenu.value?.hide();
   <PageHeader :title="title" :lead="lead" :crumbs="crumbs" :back="backLink">
     <template v-if="slots.meta" #meta><slot name="meta" /></template>
     <template v-if="slots.actions || slots.overflow" #actions>
-      <slot name="actions" />
       <template v-if="slots.overflow">
-        <button
-          type="button"
-          aria-haspopup="true"
-          class="inline-flex min-h-(--qa-control) items-center gap-1.5 rounded-cell border border-line-strong bg-surface-solid px-3 text-sm font-semibold hover:bg-surface-hover"
-          @click="overflowMenu?.toggle($event)"
-        >
-          <Ellipsis aria-hidden="true" class="size-4" />{{ $t('admin.shell.more') }}
-        </button>
+        <AppButton aria-haspopup="true" @click="overflowMenu?.toggle($event)">
+          <template #icon><Ellipsis aria-hidden="true" class="size-4" /></template>
+          {{ $t('admin.shell.more') }}
+        </AppButton>
         <Popover ref="overflowMenu" :label="$t('admin.shell.more')">
           <div class="flex min-w-48 flex-col gap-1">
             <slot name="overflow" :close="closeOverflow" />
           </div>
         </Popover>
       </template>
+      <slot name="actions" />
     </template>
   </PageHeader>
 </template>

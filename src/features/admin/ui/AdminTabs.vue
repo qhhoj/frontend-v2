@@ -14,6 +14,8 @@ export interface AdminTab {
   /** Read instead of the bare number ("3 yêu cầu chờ duyệt"). */
   countLabel?: string;
   countTestid?: string;
+  /** Unsaved changes in the section: a dot and the count (Tabs `dirty`). */
+  dirty?: number;
   testid?: string;
 }
 
