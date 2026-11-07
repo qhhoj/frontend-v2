@@ -158,8 +158,7 @@ const isActionBelow = computed(() => lookName.value === 'compact');
     <slot v-if="!isActionBelow" name="action" />
     <IconButton
       v-if="dismissible"
-      size="sm"
-      class="-my-2 -mr-1.5 shrink-0"
+      class="-my-3 -mr-2.5 shrink-0"
       :label="$t('common.notice.dismiss')"
       @click="$emit('dismiss')"
     >
