@@ -60,15 +60,15 @@ const DEFAULT_ROLES: Record<NoticeTone, NoticeRole | undefined> = {
 };
 /** One icon per tone in every look. */
 const ICONS = { info: Info, success: CircleCheck, warning: TriangleAlert, danger: CircleAlert };
-/** One status tint per tone (positive/negative/warning/info tokens) in every look: no notice colour of its own. */
+/** One status tint per tone in every look; info is the `notice-info` pair (theme/tokens.css), the one place to switch it. */
 const INKS: Record<NoticeTone, string> = {
-  info: 'text-info',
+  info: 'text-notice-info',
   success: 'text-positive',
   warning: 'text-warning',
   danger: 'text-negative',
 };
 const TINTS: Record<NoticeTone, string> = {
-  info: 'bg-info-bg',
+  info: 'bg-notice-info-bg',
   success: 'bg-positive-bg',
   warning: 'bg-warning-bg',
   danger: 'bg-negative-bg',

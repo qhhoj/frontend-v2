@@ -59,6 +59,6 @@ Also in `src/components/`: `QueryState` (+ `#skeleton`), `SkeletonBlock`, `State
 
 The wrappers in the last column stay only for the call sites that already use them; ESLint rejects a new import. The ledger and the rule: `docs/wrapper-migration.md`.
 
-Colour means status: a chip gets a tone only when the tone says something (success/danger/warning/info, a verdict); time, memory, language and other facts are `neutral`. The status tone names are one vocabulary everywhere (`success`, `warning`, `danger`); `positive`/`caution`/`negative` on `AdminChip`, `StatGrid` and `ProgressBar` are deprecated aliases. The count badge of `Tabs`/`SegmentedControl` is `Chip size="sm"`.
+Colour means status: a chip gets a tone only when the tone says something (success/danger/warning/info, a verdict); time, memory, language and other facts are `neutral`. The status tone names are one vocabulary everywhere (`success`, `warning`, `danger`); `positive`/`caution`/`negative` on `AdminChip`, `StatGrid` and `ProgressBar` are deprecated aliases. The count badge of `Tabs`/`SegmentedControl` is `Chip size="sm"`. A `Notice` with `tone="danger"` is always an alert, so it is for a failure that just happened; a standing warning that is not a failure takes `warning`.
 
 Known gaps: `Notice` has no icon override; a single toolbar toggle is `AppButton pressed` (K2). Not built: `ListRow`, `SidebarLayout`, and the parts marked "next" above.

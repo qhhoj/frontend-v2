@@ -139,6 +139,8 @@
   --color-warning-bg: var(--qh-warning-bg);
   --color-info: var(--qh-info);
   --color-info-bg: var(--qh-info-bg);
+  --color-notice-info: var(--qh-notice-info);
+  --color-notice-info-bg: var(--qh-notice-info-bg);
   --font-display: var(--qh-font-display);
   --font-body: var(--qh-font-body);
   --font-mono: var(--qh-font-mono);

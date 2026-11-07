@@ -12,7 +12,7 @@ const lines = computed(() =>
 </script>
 
 <template>
-  <div v-if="lines.length > 0" role="alert" data-testid="data-feedback">
+  <div v-if="lines.length > 0" data-testid="data-feedback">
     <AdminNotice tone="danger" :title="$t('admin.problems.data.feedback.title')">
       <template #action>
         <ul class="mt-1 list-disc pl-5">

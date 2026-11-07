@@ -14,7 +14,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { hairlineControlBorders } from './control-borders.mjs';
-import { actionlessEmptyStates } from './empty-actions.mjs';
+import { emptyStateOffences } from './empty-actions.mjs';
 import { rawHeadings } from './page-headings.mjs';
 import { retiredUtilities } from './retired-utilities.mjs';
 import { stockUtilities } from './stock-utilities.mjs';
@@ -83,7 +83,7 @@ const CHECKS = [
   },
   {
     message: `EmptyState without a next step (fill its #action slot: "Xóa bộ lọc", "Tạo <đối tượng>" or a way on; a listed file in scripts/empty-actions.mjs leaves the list when it gains one; docs/design-language.md):`,
-    find: actionlessEmptyStates,
+    find: emptyStateOffences,
   },
   {
     message: `Colour literals outside src/theme/themes/ (use a --qh- token):`,
