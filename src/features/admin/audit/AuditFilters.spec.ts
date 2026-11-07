@@ -46,7 +46,9 @@ describe('AuditFilters day range', () => {
 
   it('flags a range that ends before it starts', () => {
     const wrapper = mountFilters({ from: '2026-10-17', to: '2026-10-01' });
-    expect(wrapper.findAll<HTMLInputElement>(SHOWN_INPUT)[toBox]!.attributes('aria-invalid')).toBe('true');
+    expect(wrapper.findAll<HTMLInputElement>(SHOWN_INPUT)[toBox]!.attributes('aria-invalid')).toBe(
+      'true',
+    );
     expect(mountFilters({ from: '2026-10-01', to: '2026-10-17' }).text()).not.toContain('sau ngày');
   });
 });
