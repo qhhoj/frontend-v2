@@ -3,28 +3,29 @@ import type { Ref, WatchSource } from 'vue';
 
 /** Sub-pixel rounding leaves up to a pixel of false overflow. */
 const SLACK_PX = 1;
-/** Width of the edge fade: a tab behind it is as good as clipped. */
-const FADE_PX = 32;
 const CURRENT_TAB = '[aria-current="page"], [aria-selected="true"]';
 
 function isClipped(tab: HTMLElement, left: number, right: number): boolean {
   return tab.offsetLeft < left - SLACK_PX || tab.offsetLeft + tab.offsetWidth > right + SLACK_PX;
 }
 
-/** Scrolls `strip` so `tab` sits fully in view, clear of the edge fades, never scrolling the page. */
+/**
+ * Scrolls `strip` so `tab` sits fully in view, never scrolling the page. Scrolling right stops on a tab's left edge, so
+ * the tabs that stay visible are whole and packed from the left (a hidden tab leaves no gap before them).
+ */
 function scrollIntoStrip(strip: HTMLElement, tab: HTMLElement) {
-  const start = tab.offsetLeft;
-  const end = start + tab.offsetWidth;
-  const hasLeftFade = strip.scrollLeft > SLACK_PX;
-  const hasRightFade = strip.scrollWidth - (strip.scrollLeft + strip.clientWidth) > SLACK_PX;
-  if (start < strip.scrollLeft + (hasLeftFade ? FADE_PX : 0)) strip.scrollLeft = start - FADE_PX;
-  else if (end > strip.scrollLeft + strip.clientWidth - (hasRightFade ? FADE_PX : 0))
-    strip.scrollLeft = end - strip.clientWidth + FADE_PX;
+  const end = tab.offsetLeft + tab.offsetWidth;
+  if (tab.offsetLeft < strip.scrollLeft) strip.scrollLeft = tab.offsetLeft;
+  else if (end > strip.scrollLeft + strip.clientWidth) {
+    const tabs = [...strip.querySelectorAll<HTMLElement>('[data-tab-key]')];
+    const first = tabs.find((other) => end - other.offsetLeft <= strip.clientWidth) ?? tab;
+    strip.scrollLeft = first.offsetLeft;
+  }
 }
 
 /**
- * The tab strip's overflow: which tabs (`data-tab-key`) are clipped, whether each edge hides more, and the current tab
- * kept in view. The strip or its tabs changing size (a drawer finishing its layout, a font loading, a count appearing)
+ * The tab strip's overflow: which tabs (`data-tab-key`) are clipped (the strip hides them whole and lists them in its
+ * menu), and the current tab kept in view. The strip or its tabs changing size (a drawer finishing its layout, a font loading, a count appearing)
  * re-fits the current tab. Inactive when `enabled` is false: the strip just scrolls.
  */
 export function useTabsOverflow(
@@ -33,16 +34,12 @@ export function useTabsOverflow(
   changes: WatchSource[],
 ) {
   const hiddenKeys = ref<string[]>([]);
-  const hasMoreLeft = ref(false);
-  const hasMoreRight = ref(false);
 
   function measure() {
     const strip = scroller.value;
     if (!strip || !enabled) return;
     const left = strip.scrollLeft;
     const right = left + strip.clientWidth;
-    hasMoreLeft.value = left > SLACK_PX;
-    hasMoreRight.value = strip.scrollWidth - right > SLACK_PX;
     hiddenKeys.value = [...strip.querySelectorAll<HTMLElement>('[data-tab-key]')]
       .filter((tab) => isClipped(tab, left, right))
       .map((tab) => tab.dataset.tabKey ?? '');
@@ -67,5 +64,5 @@ export function useTabsOverflow(
   onBeforeUnmount(() => observer?.disconnect());
   watch(changes, () => nextTick(revealCurrent));
 
-  return { hiddenKeys, hasMoreLeft, hasMoreRight, measure };
+  return { hiddenKeys, measure };
 }

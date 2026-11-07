@@ -995,6 +995,7 @@
     "copy": "Sao chép",
     "copied": "Đã chép",
     "breadcrumb": "Đường dẫn",
+    "moreActions": "Thêm thao tác",
     "cancel": "Hủy",
     "confirm": "Xác nhận",
     "delete": "Xóa",
@@ -1632,7 +1633,9 @@
     "position": "{page} / {last}",
     "outOfRange": "Trang {page} nằm ngoài danh sách, không có mục nào.",
     "toFirst": "Về trang đầu",
-    "toLast": "Về trang cuối (trang {page})"
+    "toLast": "Về trang cuối (trang {page})",
+    "positionOpen": "Trang {page}",
+    "loadMore": "Xem thêm"
   },
   "vote": {
     "up": "Bình chọn lên",

@@ -13,9 +13,21 @@ export interface SegmentOption<V extends string | number = string> {
   count?: number;
   countLabel?: string;
   countTestid?: string;
+  /** A short word in a small chip after the label ("Chưa có"): a state of the choice, not a number. */
+  badge?: string;
+  /**
+   * A dot after the label, read as its `label`: `accent` says the choice holds unsaved edits, `danger` something to fix.
+   * `alertLabel` is the danger dot's shorthand.
+   */
+  dot?: SegmentDot;
   /** A red dot after the label, read as this text: the choice holds something to fix (a field error). */
   alertLabel?: string;
   testid?: string;
+}
+
+export interface SegmentDot {
+  label: string;
+  tone: 'accent' | 'danger';
 }
 
 /**
@@ -68,7 +80,15 @@ const ACTIVE =
   'border-accent bg-accent-soft font-semibold text-accent-soft-text disabled:border-line-strong disabled:bg-surface-hover disabled:text-content';
 const IDLE =
   'border-transparent text-muted hover:text-content disabled:border-line disabled:bg-surface-strong';
-const ALERT = 'size-2 shrink-0 rounded-full bg-negative';
+const DOT_TONE = { accent: 'bg-accent', danger: 'bg-negative' } as const;
+const DOT = 'inline-block size-2 shrink-0 rounded-full align-middle';
+
+/** The option's dot: its own, else the red one `alertLabel` names. */
+function dotOf(option: SegmentOption<Value>): SegmentDot | undefined {
+  if (option.dot) return option.dot;
+  return option.alertLabel ? { label: option.alertLabel, tone: 'danger' } : undefined;
+}
+const segments = computed(() => props.options.map((option) => ({ option, dot: dotOf(option) })));
 </script>
 
 <template>
@@ -81,7 +101,7 @@ const ALERT = 'size-2 shrink-0 rounded-full bg-negative';
   >
     <component
       :is="option.to ? RouterLink : 'button'"
-      v-for="option in options"
+      v-for="{ option, dot } in segments"
       :key="option.value"
       v-bind="stateOf(option)"
       :data-testid="option.testid"
@@ -98,8 +118,13 @@ const ALERT = 'size-2 shrink-0 rounded-full bg-negative';
         >
         <span v-if="option.countLabel" class="sr-only">{{ option.countLabel }}</span>
       </Chip>
-      <span v-if="option.alertLabel" :data-testid="`${option.testid}-alert`" :class="ALERT">
-        <span class="sr-only">{{ option.alertLabel }}</span>
+      <Chip v-if="option.badge" size="sm">{{ option.badge }}</Chip>
+      <span
+        v-if="dot"
+        :data-testid="`${option.testid}-${dot.tone === 'danger' ? 'alert' : 'dot'}`"
+        :class="[DOT, DOT_TONE[dot.tone]]"
+      >
+        <span class="sr-only">{{ dot.label }}</span>
       </span>
     </component>
   </component>

@@ -1,11 +1,24 @@
 <script setup lang="ts">
 import { Ellipsis } from 'lucide-vue-next';
-import Menu from 'primevue/menu';
-import { computed, ref } from 'vue';
+import type { Component } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
-import { RouterLink, useRouter } from 'vue-router';
+import { RouterLink } from 'vue-router';
 import Chip from './Chip.vue';
+import IconButton from './IconButton.vue';
+import Menu from './Menu.vue';
+import type { MenuEntry } from './Menu.vue';
+import {
+  DOT,
+  MORE_CLASS,
+  TAB_BASE,
+  TAB_CLASS,
+  TABS_FRAME,
+  TABS_LIST,
+  tabsScroller,
+} from './Tabs.classes';
+import type { TabsVariant } from './Tabs.classes';
 import { useTabsOverflow } from './TabsOverflow';
 
 export interface TabItem {
@@ -15,6 +28,8 @@ export interface TabItem {
   to?: RouteLocationRaw;
   /** Lights a link tab on a page that is not its own route; otherwise the router marks the exact match. */
   isCurrent?: boolean;
+  /** A 16 px icon before the label (a side nav's sections). */
+  icon?: Component;
   /** A count chip after the label; hidden while null or absent. */
   count?: number | string | null;
   /** Spoken instead of the bare count ("3 yêu cầu chờ duyệt"). */
@@ -22,6 +37,8 @@ export interface TabItem {
   /** `neutral` is a count; `accent` says something waits for the viewer. */
   countTone?: 'neutral' | 'accent';
   countTestid?: string;
+  /** Unsaved changes in this section: an accent dot and the count, read as "3 thay đổi chưa lưu"; hidden at 0. */
+  dirty?: number;
   /** A red dot after the label, read as this text: the section holds something to fix. */
   alertLabel?: string;
   testid?: string;
@@ -30,15 +47,17 @@ export interface TabItem {
 }
 
 /**
- * A row of tabs. `pill` is the public look; `underline` switches an admin page's sections. Link tabs mark the open one
- * `aria-current="page"` (the `v-model` key, else the router's exact match); without links the row is a tablist with a
- * roving tabindex and arrow keys. `overflow="menu"` fades the clipped edges and lists hidden tabs behind a "⋯" button.
+ * A row of tabs. `pill` is the public look; `underline` switches an admin page's sections; `rail` is a vertical side nav
+ * from `lg` and the pill row below it. Link tabs mark the open one `aria-current="page"` (the `v-model` key, else the
+ * router's exact match); without links the row is a tablist with a roving tabindex and arrow keys. `overflow="menu"`
+ * hides a tab that does not fit whole (never the current one) and lists it behind a "⋯" button; `scroll` lets the row
+ * scroll sideways.
  */
 const props = withDefaults(
   defineProps<{
     items: TabItem[];
     label: string;
-    variant?: 'pill' | 'underline';
+    variant?: TabsVariant;
     overflow?: 'scroll' | 'menu';
     /** Pins the row to the top of the page (an editor's header). */
     sticky?: boolean;
@@ -49,23 +68,37 @@ const props = withDefaults(
 );
 defineOptions({ name: 'UiTabs' });
 const current = defineModel<string>();
-const router = useRouter();
 const { t } = useI18n();
 
 const isTablist = computed(() => props.items.every((item) => !item.to));
 /** The tablist's selected tab: the model, else the first, so the row is always reachable by Tab. */
 const selectedKey = computed(() => current.value ?? props.items[0]?.key);
 const scroller = ref<HTMLElement | null>(null);
-const { hiddenKeys, hasMoreLeft, hasMoreRight, measure } = useTabsOverflow(
-  scroller,
-  props.overflow === 'menu',
-  [current, () => props.items.length],
-);
+const hasMenu = props.overflow === 'menu';
+const { hiddenKeys, measure } = useTabsOverflow(scroller, hasMenu, [
+  current,
+  () => props.items.length,
+]);
+/** A tab out of view, hidden whole; the current one is always kept in view. */
+const isHidden = (item: TabItem) =>
+  hiddenKeys.value.includes(item.key) && item.key !== current.value && !item.isCurrent;
 
 function linkCurrent(item: TabItem) {
   if (current.value !== undefined)
     return { 'aria-current': item.key === current.value ? 'page' : undefined };
   return item.isCurrent ? { 'aria-current': 'page' } : {};
+}
+
+function tabAttrs(item: TabItem) {
+  if (item.to) return { to: item.to, ...linkCurrent(item) };
+  return {
+    type: 'button',
+    role: 'tab',
+    id: item.panelId && `${item.panelId}-tab`,
+    'aria-controls': item.panelId,
+    'aria-selected': item.key === selectedKey.value,
+    tabindex: item.key === selectedKey.value ? 0 : -1,
+  };
 }
 
 const STEPS: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
@@ -77,57 +110,46 @@ function targetIndex(key: string, index: number, count: number): number | null {
   return step === undefined ? null : (index + step + count) % count;
 }
 
-function onTabKeydown(event: KeyboardEvent, index: number) {
+/** Selects the target tab, then focuses it once it is shown (a hidden tab cannot take focus). */
+async function onTabKeydown(event: KeyboardEvent, index: number) {
   const target = targetIndex(event.key, index, props.items.length);
   const item = target === null ? undefined : props.items[target];
   if (target === null || !item) return;
   event.preventDefault();
   current.value = item.key;
+  await nextTick();
   scroller.value?.querySelectorAll<HTMLElement>('[role="tab"]')[target]?.focus();
 }
 
-const moreMenu = ref<InstanceType<typeof Menu> | null>(null);
-const moreItems = computed(() =>
-  props.items
-    .filter((item) => hiddenKeys.value.includes(item.key))
-    .map((item) => ({
-      label: item.label + (item.count == null ? '' : ` (${item.count})`),
-      command: () => (item.to ? void router.push(item.to) : (current.value = item.key)),
-    })),
-);
+/** What a hidden tab carries besides its count: unsaved changes, else something to fix. */
+function hintOf(item: TabItem): string | undefined {
+  if (item.dirty) return t('form.saveBar.unsaved', item.dirty);
+  return item.alertLabel;
+}
 
-const FRAME = {
-  pill: 'flex',
-  underline: 'relative flex items-end border-b border-line',
-};
-const SCROLLER = {
-  pill: '-m-1 overflow-x-auto p-1',
-  underline: 'overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
-};
-/** One active look for every tab set: accent-soft fill, accent border. */
-const TAB = {
-  pill: 'min-h-11 rounded-pill border border-transparent px-4 font-medium hover:bg-surface-hover aria-[current=page]:font-semibold aria-selected:font-semibold',
-  underline:
-    '-mb-px min-h-(--qh-control-sm) rounded-t-cell border-b-2 border-transparent px-3 font-semibold focus-visible:-outline-offset-2',
-};
-const TAB_BASE =
-  'inline-flex items-center gap-2 text-sm whitespace-nowrap text-muted hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text aria-selected:border-accent aria-selected:bg-accent-soft aria-selected:text-accent-soft-text';
+const moreItems = computed<MenuEntry[]>(() =>
+  props.items.filter(isHidden).map((item) => ({
+    label: item.label + (item.count == null ? '' : ` (${item.count})`),
+    icon: item.icon,
+    hint: hintOf(item),
+    ...(item.to ? { to: item.to } : { run: () => (current.value = item.key) }),
+  })),
+);
+const moreName = computed(() => props.moreLabel ?? t('nav.more'));
 /** The count is a small Chip; `accent` (something waits for the viewer) is the filled one. */
 const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
-const ALERT = 'size-2 shrink-0 rounded-full bg-negative';
 </script>
 
 <template>
   <component
     :is="isTablist ? 'div' : 'nav'"
     :aria-label="isTablist ? undefined : label"
-    :class="[FRAME[variant], sticky && 'sticky top-0 z-20 bg-ground']"
+    :class="[TABS_FRAME[variant], sticky && 'sticky top-0 z-20 bg-ground']"
   >
-    <div class="relative min-w-0 flex-1">
-      <!-- The pill strip's padding and negative margin leave room for the focus ring that the scroll frame would clip. -->
-      <div ref="scroller" :class="SCROLLER[variant]" @scroll.passive="measure">
+    <div class="min-w-0 flex-1">
+      <div ref="scroller" :class="tabsScroller(variant, hasMenu)" @scroll.passive="measure">
         <ul
-          class="flex min-w-max gap-1"
+          :class="TABS_LIST[variant]"
           :role="isTablist ? 'tablist' : undefined"
           :aria-label="isTablist ? label : undefined"
         >
@@ -135,28 +157,24 @@ const ALERT = 'size-2 shrink-0 rounded-full bg-negative';
             v-for="(item, index) in items"
             :key="item.key"
             class="flex"
+            :class="isHidden(item) && 'invisible'"
             :role="isTablist ? 'presentation' : undefined"
           >
             <component
               :is="item.to ? RouterLink : 'button'"
-              v-bind="
-                item.to
-                  ? { to: item.to, ...linkCurrent(item) }
-                  : {
-                      type: 'button',
-                      role: 'tab',
-                      id: item.panelId && `${item.panelId}-tab`,
-                      'aria-controls': item.panelId,
-                      'aria-selected': item.key === selectedKey,
-                      tabindex: item.key === selectedKey ? 0 : -1,
-                    }
-              "
+              v-bind="tabAttrs(item)"
               :data-tab-key="item.key"
               :data-testid="item.testid"
-              :class="[TAB_BASE, TAB[variant]]"
+              :class="[TAB_BASE, TAB_CLASS[variant]]"
               @click="item.to ? undefined : (current = item.key)"
               @keydown="item.to ? undefined : onTabKeydown($event, index)"
             >
+              <component
+                :is="item.icon"
+                v-if="item.icon"
+                aria-hidden="true"
+                class="size-4 shrink-0"
+              />
               {{ item.label }}
               <Chip
                 v-if="item.count != null"
@@ -171,36 +189,38 @@ const ALERT = 'size-2 shrink-0 rounded-full bg-negative';
                 >
                 <span v-if="item.countLabel" class="sr-only">{{ item.countLabel }}</span>
               </Chip>
-              <span v-if="item.alertLabel" :class="ALERT">
+              <span
+                v-if="item.dirty"
+                data-testid="tab-dirty"
+                class="inline-flex items-center gap-1 font-mono text-caption text-accent-text tabular-nums"
+              >
+                <span aria-hidden="true" :class="[DOT, 'bg-accent']" />
+                <span aria-hidden="true">{{ item.dirty }}</span>
+                <span class="sr-only">{{ t('form.saveBar.unsaved', item.dirty) }}</span>
+              </span>
+              <span v-if="item.alertLabel" :class="[DOT, 'bg-negative']">
                 <span class="sr-only">{{ item.alertLabel }}</span>
               </span>
             </component>
           </li>
         </ul>
       </div>
-      <span
-        v-if="hasMoreLeft"
-        aria-hidden="true"
-        class="pointer-events-none absolute inset-y-0 left-0 w-8 bg-linear-to-r from-ground to-transparent"
-      />
-      <span
-        v-if="hasMoreRight"
-        aria-hidden="true"
-        class="pointer-events-none absolute inset-y-0 right-0 w-8 bg-linear-to-l from-ground to-transparent"
-      />
     </div>
-    <template v-if="moreItems.length > 0">
-      <button
-        type="button"
-        :data-testid="moreTestid"
-        aria-haspopup="menu"
-        :aria-label="moreLabel ?? t('nav.more')"
-        class="mb-1 ml-1 flex size-(--qh-control-sm) shrink-0 items-center justify-center rounded-cell text-muted hover:bg-surface-hover hover:text-content"
-        @click="moreMenu?.toggle($event)"
-      >
-        <Ellipsis aria-hidden="true" class="size-4" />
-      </button>
-      <Menu ref="moreMenu" :model="moreItems" popup />
-    </template>
+    <Menu v-if="moreItems.length > 0" :items="moreItems" :label="moreName">
+      <template #trigger="{ toggle, open, setOpener }">
+        <IconButton
+          :ref="(el) => setOpener((el as { $el?: HTMLElement } | null)?.$el ?? null)"
+          :label="moreName"
+          :size="variant === 'underline' ? 'sm' : 'md'"
+          :class="MORE_CLASS[variant]"
+          :data-testid="moreTestid"
+          aria-haspopup="menu"
+          :aria-expanded="open"
+          @click="toggle"
+        >
+          <Ellipsis aria-hidden="true" />
+        </IconButton>
+      </template>
+    </Menu>
   </component>
 </template>

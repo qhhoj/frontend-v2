@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { nextTick } from 'vue';
 import { mockApi } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
 import { anonymousViewer } from '@/test/problem-routes';
@@ -66,6 +67,45 @@ describe('Tabs as an in-page tablist', () => {
     const wrapper = mountTablist('data');
     expect(tabs(wrapper)[1]!.get('.sr-only').text()).toBe('3 tệp');
     expect(tabs(wrapper)[1]!.get('[aria-hidden="true"]').text()).toBe('3');
+  });
+});
+
+/** A 200 px strip of 80 px tabs: the third (160 to 240) does not fit. jsdom has no layout. */
+function fakeStripLayout() {
+  vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(200);
+  vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(240);
+  vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(80);
+  vi.spyOn(HTMLElement.prototype, 'offsetLeft', 'get').mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    const item = this.closest('li');
+    return item ? [...item.parentElement!.children].indexOf(item) * 80 : 0;
+  });
+}
+
+describe('Tabs with the overflow menu', () => {
+  it('hides a tab that does not fit whole, lists it behind ⋯, and scrolls to and focuses it when selected', async () => {
+    fakeStripLayout();
+    const wrapper = mountComponent(Tabs, {
+      props: {
+        items: SECTIONS,
+        label: 'Mục',
+        modelValue: 'statement',
+        // Tabs' defineModel prop is not in the mounted type; the cast only satisfies setProps.
+        'onUpdate:modelValue': (key?: string) => wrapper.setProps({ modelValue: key } as never),
+      },
+    });
+    document.body.append(wrapper.element);
+    await nextTick();
+    const rows = () => wrapper.findAll('li');
+    expect(rows()[2]!.classes()).toContain('invisible');
+    expect(wrapper.find('[data-testid="tabs-more"]').attributes('aria-label')).toBe('Thêm');
+    await tabs(wrapper)[0]!.trigger('keydown', { key: 'End' });
+    await nextTick();
+    expect(rows()[2]!.classes()).not.toContain('invisible');
+    expect(rows()[0]!.classes()).toContain('invisible');
+    expect(document.activeElement).toBe(tabs(wrapper)[2]!.element);
+    wrapper.unmount();
   });
 });
 
