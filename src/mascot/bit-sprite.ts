@@ -38,7 +38,8 @@ export const PLACEMENT_LOOKS = {
   hero: { headgear: 'cap', palette: 'terracotta' },
   accepted: { headgear: 'crown', palette: 'terracotta' },
   rejected: { headgear: 'sweat', palette: 'terracotta' },
-  emptyList: { headgear: 'nightcap', palette: 'charcoal' },
+  /** Terracotta like every single Bit: the charcoal twin read as dead in light and vanished on dark cards. */
+  emptyList: { headgear: 'nightcap', palette: 'terracotta' },
   /** The 404 look: bare head, tears drawn by the caller. */
   crying: { headgear: 'none', palette: 'terracotta' },
 } as const satisfies Record<string, BitLook>;

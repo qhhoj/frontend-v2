@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, vi } from 'vitest';
 import { DEFAULT_LOCALE, i18n } from '@/i18n';
 import { FakeEventSource, installFakeEventSource } from './fake-event-source';
 import { stubMatchMedia } from './match-media';
-import { resetToastHost } from '@/features/admin/ui/feedback/use-admin-toast';
+import { resetToastHost } from '@/components/ui/use-toast';
 import { takeUnmatchedRequests } from './mock-api';
 
 /**

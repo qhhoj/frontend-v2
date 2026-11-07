@@ -6,6 +6,7 @@
 // So are the bare transitions that also animate transform (scripts/transition-utilities.mjs).
 // So is `uppercase` on a table header cell or header recipe (scripts/table-header-case.mjs).
 // So is a raw `<h1` outside PageHeader (scripts/page-headings.mjs).
+// So is an `<EmptyState>` without its `#action` next step (scripts/empty-actions.mjs).
 // So is a hairline border (`border-line`, `border-line-strong`) on a form control (scripts/control-borders.mjs).
 // So are arbitrary sizes, radii and z-indexes (`text-[13px]`, `rounded-[3px]`, `z-[5]`, `z-50`) and the arbitrary token wrappers `accent-[var(--qh-accent)]` and `min-h-[var(--qa-control)]`: use the named steps (scripts/arbitrary-utilities.mjs).
 // The exemptions are Bit's sprite palettes (src/mascot/bit-sprite.ts) and the avatar's sprite data (src/mascot/avatar/avatar-sprites.ts):
@@ -13,6 +14,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { hairlineControlBorders } from './control-borders.mjs';
+import { emptyStateOffences } from './empty-actions.mjs';
 import { rawHeadings } from './page-headings.mjs';
 import { retiredUtilities } from './retired-utilities.mjs';
 import { stockUtilities } from './stock-utilities.mjs';
@@ -78,6 +80,10 @@ const CHECKS = [
   {
     message: `Raw <h1> (a page title is the kit PageHeader, one size; a page that cannot use it goes in ALLOWED in scripts/page-headings.mjs with its reason and still takes page-title; docs/design-language.md):`,
     find: rawHeadings,
+  },
+  {
+    message: `EmptyState without a next step (fill its #action slot: "Xóa bộ lọc", "Tạo <đối tượng>" or a way on; a listed file in scripts/empty-actions.mjs leaves the list when it gains one; docs/design-language.md):`,
+    find: emptyStateOffences,
   },
   {
     message: `Colour literals outside src/theme/themes/ (use a --qh- token):`,

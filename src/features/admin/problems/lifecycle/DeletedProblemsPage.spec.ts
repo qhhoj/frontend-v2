@@ -35,7 +35,7 @@ async function pickPurge(wrapper: Wrapper, code: string) {
   (item!.querySelector('a') as HTMLElement).click();
   await flushPromises();
 }
-const toastText = () => document.querySelector('[data-testid="admin-toasts"]')?.textContent ?? '';
+const toastText = () => document.querySelector('[data-testid="toasts"]')?.textContent ?? '';
 const listCalls = (calls: ApiCall[]) => calls.filter((call) => call.path === '/problems/deleted');
 const dialogConfirm = (label: string) =>
   [...openDialog().querySelectorAll<HTMLButtonElement>('button[type="submit"]')].find(

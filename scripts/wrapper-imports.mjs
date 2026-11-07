@@ -236,7 +236,6 @@ export const WRAPPER_IMPORTERS = [
   'src/features/admin/tickets/TicketQueueTable.vue',
   'src/features/admin/ui/AdminCheckChips.vue',
   'src/features/admin/ui/RevealKeyDialog.vue',
-  'src/features/admin/ui/feedback/AdminToastHost.vue',
   'src/features/admin/ui/form/AdminSectionNav.vue',
   'src/features/admin/ui/table/AdminDataTable.spec.ts',
   'src/features/admin/ui/ui.spec.ts',

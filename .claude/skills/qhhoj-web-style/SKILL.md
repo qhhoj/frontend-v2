@@ -56,7 +56,7 @@ Other tokens:
 
 The kit lives in `src/components/ui/`; new code imports from there. The part for each need, its key props and the wrapper it replaces: `src/components/ui/README.md` (the one copy; keep it current when a kit prop changes).
 
-Thin wrappers kept for old call sites (ESLint rejects a new import of `AdminField`, `AdminChip`, `AdminPageHeader`, `AdminDataTable`, `AdminNotice`, `GlassCard` and the `controls.ts` classes; ledger in `docs/wrapper-migration.md`): `GlassCard`, `PillTabs`, `AdminPageHeader`, `AdminField`, `AdminChip`, `AdminTabs`, `AdminFilterTabs`, `AdminDataTable`, `AdminFilterBar`, `AdminSaveBar`, `AdminNotice`, `AdminSwitch` (adds `lockedBy`), `SettingsNotice`, `SettingsCard`, `AuthField`, `controls.ts` and `settings/buttons.ts` classes. Use the `ui/` part in new code.
+Thin wrappers kept for old call sites (ESLint rejects a new import of `AdminField`, `AdminChip`, `AdminPageHeader`, `AdminDataTable`, `AdminNotice`, `GlassCard` and the `controls.ts` classes; ledger in `docs/wrapper-migration.md`): `GlassCard`, `PillTabs`, `AdminPageHeader`, `AdminField`, `AdminChip`, `AdminTabs`, `AdminFilterTabs`, `AdminDataTable`, `AdminFilterBar`, `AdminSaveBar`, `AdminNotice`, `AdminSwitch` (adds `lockedBy`), `SettingsNotice`, `AuthNotice`, `SettingsCard`, `AuthField`, `use-admin-toast` (re-exports `useToast`), `controls.ts` and `settings/buttons.ts` classes. Use the `ui/` part in new code.
 
 ## 4. Rules
 
@@ -124,7 +124,7 @@ The kit part for each job is in `src/components/ui/README.md` (the one table; a 
 - Numbers: `formatNumber` for every number, units and scores included; one space before a unit ("1,8 MB", "0,25 s"); scores through `formatFixed`/`scoreBelowFull`.
 - Tones, one vocabulary: `neutral · accent · success · warning · danger · info`. `verdict-*` classes appear only in verdict parts (`lib/verdicts.ts` is the one source).
 - Show a fact once per screen: a rating, time, language or status is not repeated in two blocks; an empty block is hidden or merged into the nearest relevant card.
-- Empty states always offer one next step (`EmptyState`'s `#action`); a loading state is `QueryState` with a `#skeleton` shaped from the real component, never fixed pixel heights.
+- Empty states always offer one next step (`EmptyState`'s `#action`, `DataTable #emptyAction`; `lint:tokens` checks it); an unknown record id is a `StatePanel kind="notFound"` with a way back, never a bare line; a loading state is `QueryState` with a `#skeleton` shaped from the real component, never fixed pixel heights.
 - Person names in mock-ups, placeholders, examples and fixtures shown on screen: only `bitcoder` (a handle, not a real-looking personal name).
 
 ## 5. Process
