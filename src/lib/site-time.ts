@@ -81,3 +81,19 @@ export function parseInZone(
   const instant = asUtc - zoneOffsetMinutes(zone, new Date(firstGuess)) * MINUTE_MS;
   return { ok: true, iso: new Date(instant).toISOString() };
 }
+
+/** A box text `dd/mm/yyyy[ hh:mm]` as the value of a native picker (`yyyy-mm-dd[Thh:mm]`); text that is not that is empty. */
+export function pickerValueOf(text: string): string {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})(?: (\d{2}):(\d{2}))?$/.exec(text.trim());
+  if (!match) return '';
+  const [, day, month, year, hour, minute] = match;
+  return `${year}-${month}-${day}${hour ? `T${hour}:${minute}` : ''}`;
+}
+
+/** The value of a native picker as box text `dd/mm/yyyy[ hh:mm]`; a value that is not a date is empty. */
+export function pickerTextOf(value: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?$/.exec(value);
+  if (!match) return '';
+  const [, year, month, day, hour, minute] = match;
+  return `${day}/${month}/${year}${hour ? ` ${hour}:${minute}` : ''}`;
+}

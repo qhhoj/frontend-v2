@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { formatInZone } from '../../ui/form/site-time';
+import { formatInZone } from '@/lib/site-time';
 import { timelineOf } from './contest-timeline';
 import type { TimelineInput, TimelineKey } from './contest-timeline';
 

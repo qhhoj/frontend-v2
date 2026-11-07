@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { CornerDownLeft, Search, SlidersHorizontal, X } from 'lucide-vue-next';
+import { CornerDownLeft, SlidersHorizontal, X } from 'lucide-vue-next';
 import { onBeforeUnmount, ref, useId, watch } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import { useRouter } from 'vue-router';
-import { INPUT } from '@/features/admin/ui/controls';
 import AppButton from './AppButton.vue';
+import SearchInput from './SearchInput.vue';
 
 export interface ActiveFilter {
   key: string;
@@ -85,17 +85,9 @@ const removeChip = (key: string) => emit('remove', key);
   <div class="flex flex-col gap-2">
     <div class="flex flex-wrap items-center gap-2">
       <div class="relative min-w-0 flex-1 basis-56">
-        <Search
-          aria-hidden="true"
-          class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted"
-          :stroke-width="1.75"
-        />
-        <input
+        <SearchInput
           v-model="typed"
-          type="search"
-          :aria-label="searchLabel"
-          :placeholder="searchLabel"
-          :class="[INPUT, 'pl-9']"
+          :label="searchLabel"
           @input="cancelAwaited"
           @keydown.enter="openExact"
         />

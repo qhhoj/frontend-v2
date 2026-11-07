@@ -7,7 +7,7 @@ import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
 import { useViewerId } from '@/stores/use-viewer-id';
 import type { FieldErrors } from '../../ui/admin-errors';
-import { provideDateValidity } from '../../ui/form/date-validity';
+import { provideDateValidity } from '@/components/ui/date-validity';
 import { useSeededDraft } from '../../ui/form/seeded-draft';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import {

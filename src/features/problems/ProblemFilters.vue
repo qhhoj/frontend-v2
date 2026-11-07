@@ -8,7 +8,7 @@ import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import ProblemFilterControls from './ProblemFilterControls.vue';
 import RandomProblemButton from './RandomProblemButton.vue';
-import ToolbarSearch from '@/components/ToolbarSearch.vue';
+import SearchInput from '@/components/ui/SearchInput.vue';
 import ToolbarSelect from '@/components/ToolbarSelect.vue';
 import { DEFAULT_SORT, sortOptions } from './problem-sort-options';
 import { panelFilterCount } from './use-problem-filters';
@@ -46,7 +46,7 @@ const panelCount = computed(() => panelFilterCount(props.filters));
 
 <template>
   <div class="flex flex-wrap items-center gap-2" role="search">
-    <ToolbarSearch
+    <SearchInput
       v-model="searchText"
       :label="$t('problems.searchLabel')"
       :placeholder="$t('problems.search')"

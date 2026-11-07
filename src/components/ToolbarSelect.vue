@@ -40,7 +40,7 @@ const chosen = computed(
     </span>
     <select
       :value="modelValue"
-      class="absolute -inset-px size-[calc(100%+2px)] cursor-pointer appearance-none opacity-0"
+      class="absolute -inset-px size-[calc(100%+2px)] cursor-pointer appearance-none text-base opacity-0"
       @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
     >
       <option v-for="option in options" :key="option.value" :value="option.value">

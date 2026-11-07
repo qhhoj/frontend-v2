@@ -4,6 +4,8 @@ import { reportComment } from '@/api/comments.api';
 import { COMMENT_REPORT_NOTE_MAX_LENGTH, COMMENT_REPORT_REASONS } from '@/api/types/comments';
 import type { CommentReportReason } from '@/api/types/comments';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import RadioGroup from '@/components/ui/RadioGroup.vue';
+import { translate } from '@/i18n';
 import { reportFailureKey } from './comment-failure';
 
 /** "Report": a reason (radio) and an optional note for the moderators; once per user and comment. Emits `sent` when it landed. */
@@ -15,6 +17,10 @@ const reason = ref<CommentReportReason | null>(null);
 const note = ref('');
 const isBusy = ref(false);
 const failureKey = ref<string | null>(null);
+const reasonOptions = COMMENT_REPORT_REASONS.map((value) => ({
+  value,
+  label: translate(`comments.report.reason.${value}`),
+}));
 const isNoteTooLong = computed(() => note.value.length > COMMENT_REPORT_NOTE_MAX_LENGTH);
 
 // Each opening starts blank.
@@ -55,17 +61,12 @@ async function send() {
     :can-confirm="reason !== null && !isNoteTooLong"
     @confirm="send"
   >
-    <fieldset class="flex flex-col gap-1">
-      <legend class="mb-1 text-sm font-semibold">{{ $t('comments.report.reasonLabel') }}</legend>
-      <label
-        v-for="option in COMMENT_REPORT_REASONS"
-        :key="option"
-        class="flex min-h-10 cursor-pointer items-center gap-2.5 rounded-row px-2 hover:bg-surface-hover"
-      >
-        <input v-model="reason" type="radio" :name="`${id}-reason`" :value="option" />
-        <span>{{ $t(`comments.report.reason.${option}`) }}</span>
-      </label>
-    </fieldset>
+    <RadioGroup
+      v-model="reason"
+      :name="`${id}-reason`"
+      :legend="$t('comments.report.reasonLabel')"
+      :options="reasonOptions"
+    />
     <div class="flex flex-col gap-1">
       <label :for="`${id}-note`" class="text-sm font-semibold">{{
         $t('comments.report.noteLabel')
@@ -76,7 +77,7 @@ async function send() {
         rows="3"
         :aria-invalid="isNoteTooLong || undefined"
         :aria-describedby="`${id}-note-count`"
-        class="block w-full resize-y rounded-row border border-line-control bg-surface-solid px-3 py-2 text-sm text-content"
+        class="block w-full resize-y rounded-row border border-line-control bg-surface-solid px-3 py-2 text-base text-content"
       />
       <span
         :id="`${id}-note-count`"

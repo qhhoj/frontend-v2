@@ -15,7 +15,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { submissionVerdictOf } from '@/lib/verdicts';
 import { useAdminToast } from '../ui/feedback/use-admin-toast';
 import { shortId } from '../ui/short-id';
-import { SITE_TIME_ZONE } from '../ui/form/site-time';
+import { SITE_TIME_ZONE } from '@/lib/site-time';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
 import type { RowMenuItem } from '../ui/table/AdminRowMenu.vue';

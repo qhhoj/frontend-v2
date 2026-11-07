@@ -986,6 +986,7 @@
     "upload_still_processing": "Máy chủ vẫn đang xử lý; tải lại trang để xem kết quả."
   },
   "common": {
+    "clearSearch": "Xóa từ khóa",
     "scrollHint": "Vuốt ngang để xem thêm cột →",
     "retry": "Thử lại",
     "loading": "Đang tải…",

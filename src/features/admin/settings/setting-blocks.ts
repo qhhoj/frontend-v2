@@ -5,6 +5,8 @@ export type SettingKind =
   | { kind: 'boolean' }
   | { kind: 'integer'; min: number; max: number }
   | { kind: 'text' }
+  /** An ISO instant, or '' when unset: shown and typed in the site's zone. */
+  | { kind: 'dateTime' }
   | { kind: 'choice'; options: readonly string[] }
   /** `allowHttp`: a plain `http://` address is accepted (the form warns about it). */
   | { kind: 'url'; allowHttp?: boolean }
@@ -16,7 +18,7 @@ export type SettingKind =
 export const SETTING_KINDS: Record<SettingKey, SettingKind> = {
   'site.timeZone': { kind: 'timeZone' },
   'contest.officialMode': { kind: 'boolean' },
-  'contest.officialModeEndsAt': { kind: 'text' },
+  'contest.officialModeEndsAt': { kind: 'dateTime' },
   'contest.banAfterDisqualifications': { kind: 'integer', min: 0, max: 1000 },
   'organization.adminRoleId': { kind: 'text' },
   'problem.deleteGraceDays': { kind: 'integer', min: 1, max: 365 },

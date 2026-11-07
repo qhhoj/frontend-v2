@@ -5,7 +5,7 @@ import { useProblemMetaQuery } from '@/features/problems/problems.queries';
 import { translate } from '@/i18n';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import type { FieldErrors } from '../ui/admin-errors';
-import { provideDateValidity } from '../ui/form/date-validity';
+import { provideDateValidity } from '@/components/ui/date-validity';
 import BatchActionDialogs from './BatchActionDialogs.vue';
 import RecentBatches from './RecentBatches.vue';
 import RejudgeFilterForm from './RejudgeFilterForm.vue';

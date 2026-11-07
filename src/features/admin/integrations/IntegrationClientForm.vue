@@ -9,7 +9,7 @@ import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { BUTTON, INPUT } from '../ui/controls';
-import { provideDateValidity } from '../ui/form/date-validity';
+import { provideDateValidity } from '@/components/ui/date-validity';
 import AdminDateTimeField from '../ui/form/AdminDateTimeField.vue';
 import AdminSaveBar from '../ui/form/AdminSaveBar.vue';
 import { useAdminMutation } from '../ui/use-admin-mutation';

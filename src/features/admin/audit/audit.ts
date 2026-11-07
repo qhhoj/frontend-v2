@@ -3,7 +3,7 @@ import type { AuditRequest } from '@/api/audit-admin.api';
 import type { AuditEntry } from '@/api/types/audit-admin';
 import { formatDayKey } from '@/lib/format-date';
 import { adminRouteName } from '../admin-screens';
-import { parseInZone } from '../ui/form/site-time';
+import { parseInZone } from '@/lib/site-time';
 
 /** Every kind the backend can filter by (`AUDIT_TYPES`), in the order the filter lists them. */
 export const AUDIT_TYPES = [

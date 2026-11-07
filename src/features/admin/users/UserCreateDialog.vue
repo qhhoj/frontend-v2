@@ -107,7 +107,7 @@ const titleId = useId();
           v-model="csvText"
           rows="6"
           spellcheck="false"
-          class="w-full rounded-row border border-line-control bg-surface-solid px-3 py-2 font-mono text-sm text-content"
+          class="w-full rounded-row border border-line-control bg-surface-solid px-3 py-2 font-mono text-base text-content"
           placeholder="username,fullname,email,password,invite"
         />
         <p class="text-sm" :class="parsed.problem ? 'text-negative' : 'text-muted'">

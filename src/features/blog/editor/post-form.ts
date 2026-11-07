@@ -3,13 +3,17 @@ import type { UserChip } from '@/api/types/admin-common';
 import type { PostDetail } from '@/api/types/blog';
 import { translate } from '@/i18n';
 import type { FieldErrors } from '@/features/admin/ui/admin-errors';
-import { fromLocalInput, toLocalInput } from '@/features/admin/ui/datetime';
 
 /** backend: libs/community BLOG_TITLE_MAX_LENGTH and the `ogImage` DTO limit. */
 export const POST_LIMITS = { title: 100, ogImage: 150 } as const;
+/** An ISO instant (normalised), or null when empty or not a date. */
+const isoOf = (value: string): string | null => {
+  const time = value ? new Date(value).getTime() : Number.NaN;
+  return Number.isNaN(time) ? null : new Date(time).toISOString();
+};
 const IMAGE_PATTERN = /^(|https?:\/\/[^\s"'<>]+|\/[^\s"'<>]*)$/;
 
-/** The editor's state: `publishOn` is the `datetime-local` value (empty: now). */
+/** The editor's state: `publishOn` is an ISO instant (empty: now), shown and typed in the site's zone by `DateTimeField`. */
 export interface PostForm {
   title: string;
   content: string;
@@ -40,7 +44,7 @@ export const postFormOf = (post: PostDetail): PostForm => ({
   content: post.content ?? '',
   summary: post.summary ?? '',
   ogImage: post.ogImage,
-  publishOn: toLocalInput(String(post.publishOn)),
+  publishOn: String(post.publishOn),
   visible: post.visible,
   sticky: post.sticky,
   globalPost: post.globalPost,
@@ -57,7 +61,7 @@ export function checkPostForm(form: PostForm, mode: PublishMode): FieldErrors {
     errors.content = translate('admin.postEditor.errors.content');
   if (form.ogImage.length > POST_LIMITS.ogImage || !IMAGE_PATTERN.test(form.ogImage))
     errors.ogImage = translate('admin.postEditor.errors.ogImage');
-  if (form.publishOn && fromLocalInput(form.publishOn) === null)
+  if (form.publishOn && isoOf(form.publishOn) === null)
     errors.publishOn = translate('admin.postEditor.errors.publishOn');
   else if (mode === 'scheduled' && !isAhead(form.publishOn, Date.now()))
     errors.publishOn = translate('postEditor.errors.scheduleAhead');
@@ -68,7 +72,7 @@ export function checkPostForm(form: PostForm, mode: PublishMode): FieldErrors {
 export type PublishMode = 'draft' | 'public' | 'scheduled';
 
 const isAhead = (publishOn: string, now: number) => {
-  const at = fromLocalInput(publishOn);
+  const at = isoOf(publishOn);
   return at !== null && new Date(at).getTime() > now;
 };
 
@@ -78,7 +82,8 @@ export const publishModeOf = (form: PostForm, now = Date.now()): PublishMode => 
 };
 
 /** An hour from now, on the minute: the time a newly scheduled post starts with. */
-const nextHour = (now: number) => toLocalInput(new Date(now + 3_600_000).toISOString());
+const nextHour = (now: number) =>
+  new Date(Math.floor((now + 3_600_000) / 60_000) * 60_000).toISOString();
 
 /**
  * The visibility fields for `mode`. Making a post public keeps the time it went live (`liveSince`, for an edit of a live
@@ -111,7 +116,7 @@ export function createBodyOf(
   rights: PostFieldRights,
   organization: string | null,
 ): PostCreateBody {
-  const publishOn = fromLocalInput(form.publishOn);
+  const publishOn = isoOf(form.publishOn);
   return {
     title: form.title.trim(),
     content: form.content,
@@ -137,7 +142,7 @@ export function patchOf(before: PostForm, after: PostForm): PostPatch {
     if (after[key] !== before[key]) patch[key] = after[key];
   // An emptied time means "now", as on create.
   if (after.publishOn !== before.publishOn)
-    patch.publishOn = fromLocalInput(after.publishOn) ?? new Date().toISOString();
+    patch.publishOn = isoOf(after.publishOn) ?? new Date().toISOString();
   if (!sameIds(before.authors, after.authors))
     patch.authorIds = after.authors.map((chip) => chip.id);
   return patch;

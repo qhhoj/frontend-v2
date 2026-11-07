@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ChevronDown } from 'lucide-vue-next';
-import Select from 'primevue/select';
 import { computed, ref, useId } from 'vue';
+import ComboBox from '@/components/ui/ComboBox.vue';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { useDebouncedText } from '@/lib/use-debounced-text';
@@ -76,23 +75,20 @@ const onFilter = (text: string) => {
 <template>
   <div class="flex flex-col gap-1">
     <span :id="labelId" class="text-sm text-muted">{{ $t(labelKey) }}</span>
-    <Select
+    <ComboBox
       :model-value="code || ANY_PROBLEM"
       :placeholder="anyLabel"
       :options="options"
       option-label="label"
       option-value="code"
       filter
-      show-clear
+      clearable
       :filter-placeholder="$t('submissions.rail.problemSearch')"
       :loading="orgProblems.isFetching.value"
       :aria-labelledby="labelId"
       data-testid="problem-picker"
-      class="h-11 w-full"
       @filter="onFilter($event.value)"
-      @update:model-value="emit('pick', $event ?? '')"
-    >
-      <template #dropdownicon><ChevronDown class="size-4" aria-hidden="true" /></template>
-    </Select>
+      @update:model-value="emit('pick', String($event ?? ''))"
+    />
   </div>
 </template>

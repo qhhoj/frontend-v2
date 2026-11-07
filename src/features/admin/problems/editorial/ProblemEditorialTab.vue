@@ -12,7 +12,7 @@ import AdminStatus from '../../ui/AdminStatus.vue';
 import { CARD } from '../../ui/controls';
 import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
-import { provideDateValidity } from '../../ui/form/date-validity';
+import { provideDateValidity } from '@/components/ui/date-validity';
 import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
 import { normalizeNewlines, sentText, useDirtyForm } from '../../ui/form/dirty-form';

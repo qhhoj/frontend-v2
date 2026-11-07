@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { defineComponent, h, ref } from 'vue';
 import { mountComponent } from '@/test/mount';
-import AdminDateTimeField from './AdminDateTimeField.vue';
+import DateTimeField from './DateTimeField.vue';
 import { provideDateValidity } from './date-validity';
 
 const mountField = (modelValue: string | null) =>
-  mountComponent(AdminDateTimeField, { props: { modelValue, label: 'Bắt đầu' } });
+  mountComponent(DateTimeField, { props: { modelValue, label: 'Bắt đầu' } });
 
-describe('AdminDateTimeField', () => {
+describe('DateTimeField', () => {
   it('shows the instant on the site clock with the zone', () => {
     const wrapper = mountField('2026-10-08T06:00:00.000Z');
     expect(wrapper.get('input').element.value).toBe('08/10/2026 13:00');
@@ -38,7 +38,7 @@ describe('AdminDateTimeField', () => {
 
   it('offers "Bây giờ" unless the field takes a day alone', () => {
     expect(mountField(null).text()).toContain('Bây giờ');
-    const dayField = mountComponent(AdminDateTimeField, {
+    const dayField = mountComponent(DateTimeField, {
       props: { modelValue: null, label: 'Từ ngày', dateOnly: true },
     });
     expect(dayField.text()).not.toContain('Bây giờ');
@@ -46,7 +46,7 @@ describe('AdminDateTimeField', () => {
 
   describe('as a day box', () => {
     const mountDay = (modelValue: string | null) =>
-      mountComponent(AdminDateTimeField, {
+      mountComponent(DateTimeField, {
         props: { modelValue, label: 'Từ ngày', dateOnly: true },
       });
 
@@ -80,7 +80,7 @@ describe('AdminDateTimeField', () => {
         resetForm = resetDates;
         return () =>
           h('div', [
-            isShown.value ? h(AdminDateTimeField, { modelValue: null, label: 'Từ' }) : null,
+            isShown.value ? h(DateTimeField, { modelValue: null, label: 'Từ' }) : null,
             h('output', hasUnreadableDate.value ? 'refused' : 'ok'),
           ]);
       },
@@ -126,7 +126,7 @@ describe('AdminDateTimeField', () => {
       await wrapper.vm.$nextTick();
       await wrapper.vm.$nextTick();
       expect(wrapper.get('input').element.value).toBe('');
-      expect(wrapper.get('input').attributes('aria-invalid')).toBe('false');
+      expect(wrapper.get('input').attributes('aria-invalid')).toBeUndefined();
       expect(wrapper.get('output').text()).toBe('ok');
     });
 

@@ -5,34 +5,38 @@ import { createShortLink } from '@/api/short-links.api';
 import type { CreatedShortLink } from '@/api/types/short-links';
 import { CircleCheck } from 'lucide-vue-next';
 import CopyButton from '@/components/CopyButton.vue';
+import DateTimeField from '@/components/ui/DateTimeField.vue';
+import { provideDateValidity } from '@/components/ui/date-validity';
 import { shortLinkUrl } from '@/features/short-links/short-link-path';
 import { translate } from '@/i18n';
 import AdminField from '../ui/AdminField.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf, isConflict } from '../ui/admin-errors';
 import { BUTTON, CARD, INPUT } from '../ui/controls';
-import { fromLocalInput } from '../ui/datetime';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import { shortLinksKey } from './short-links.queries';
 
 const path = ref('');
 const code = ref('');
-const expires = ref('');
+const expires = ref<string | null>(null);
 const created = ref<CreatedShortLink | null>(null);
 const isExpiryPast = ref(false);
+/** An expiry text that is not a date refuses the submit: a link is never created without the expiry the user typed. */
+const { hasUnreadableDate } = provideDateValidity();
+const isExpiryUnreadable = ref(false);
 const create = useAdminMutation<void, CreatedShortLink>({
   mutate: () =>
     createShortLink({
       path: path.value.trim(),
       code: code.value.trim() || undefined,
-      expiresAt: fromLocalInput(expires.value) ?? undefined,
+      expiresAt: expires.value ?? undefined,
     }),
   invalidates: () => [shortLinksKey],
   onDone: (link) => {
     created.value = link;
     path.value = '';
     code.value = '';
-    expires.value = '';
+    expires.value = null;
   },
 });
 /** The backend raises `invalid` with an English message: the SPA text by (field, code); other codes go through `adminIssueText` (`fieldErrors`). */
@@ -55,19 +59,22 @@ const pageFailure = computed(() => {
   return failure && !isConflict(failure) && !hasFieldError ? failureTextOf(failure) : null;
 });
 /** A link that is dead on arrival is a slip: refused here before sending; the backend refuses it too (`invalid` on `expiresAt`). */
-function isPast(local: string): boolean {
-  const instant = fromLocalInput(local);
+function isPast(instant: string | null): boolean {
   return instant !== null && new Date(instant).getTime() <= Date.now();
 }
 function submit() {
   created.value = null;
+  isExpiryUnreadable.value = hasUnreadableDate.value;
+  if (isExpiryUnreadable.value) return;
   isExpiryPast.value = isPast(expires.value);
   if (!isExpiryPast.value) void create.run();
 }
 const expiresError = computed(() =>
-  isExpiryPast.value
-    ? translate('admin.shortlinks.form.expiresPast')
-    : refusedText('expiresAt', 'admin.shortlinks.form.expiresPast'),
+  isExpiryUnreadable.value && hasUnreadableDate.value
+    ? translate('admin.form.dateTime.invalid')
+    : isExpiryPast.value
+      ? translate('admin.shortlinks.form.expiresPast')
+      : refusedText('expiresAt', 'admin.shortlinks.form.expiresPast'),
 );
 </script>
 
@@ -116,22 +123,13 @@ const expiresError = computed(() =>
             :class="`${INPUT} font-mono`"
           />
         </AdminField>
-        <AdminField
-          v-slot="{ id, describedBy, invalid }"
+        <DateTimeField
+          v-model="expires"
           input-id="short-link-expires"
           :label="$t('admin.shortlinks.form.expires')"
           :hint="$t('admin.shortlinks.form.expiresHint')"
           :error="expiresError"
-        >
-          <input
-            :id="id"
-            v-model="expires"
-            type="datetime-local"
-            :aria-describedby="describedBy"
-            :aria-invalid="invalid ? 'true' : undefined"
-            :class="INPUT"
-          />
-        </AdminField>
+        />
       </div>
       <div>
         <button

@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { Setting } from '@/api/types/settings-admin';
+import DateTimeField from '@/components/ui/DateTimeField.vue';
 import Notice from '@/components/ui/Notice.vue';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminField from '../ui/AdminField.vue';
@@ -29,6 +30,11 @@ const isOn = computed({
   get: () => draft.value.value === true,
   set: (next: boolean) => (draft.value = { value: next }),
 });
+/** The setting holds an ISO instant or ''; the field takes an instant or null. */
+const instant = computed({
+  get: () => (typeof draft.value.value === 'string' && draft.value.value) || null,
+  set: (next: string | null) => (draft.value = { value: next ?? '' }),
+});
 const isFilled = computed(() => isFilledFromDefault(props.setting, draft.value));
 const storedText = computed(() => valueText(props.setting.value, locale.locale));
 /** Browsers list every IANA zone; a missing `Intl.supportedValuesOf` leaves the box free text. */
@@ -41,6 +47,14 @@ const timeZones = computed(() =>
   <div class="flex flex-col gap-2">
     <div class="flex items-center gap-3">
       <AdminSwitch v-if="kind.kind === 'boolean'" v-model="isOn" class="flex-1" :label="label" />
+      <DateTimeField
+        v-else-if="kind.kind === 'dateTime'"
+        v-model="instant"
+        class="flex-1"
+        :label="label"
+        :hint="hint"
+        scale="admin"
+      />
       <AdminField v-else v-slot="{ id, describedBy }" class="flex-1" :label="label" :hint="hint">
         <input
           v-if="kind.kind === 'integer'"

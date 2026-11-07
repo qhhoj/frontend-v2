@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatInZone, parseInZone, zoneLabel } from './site-time';
+import { formatInZone, parseInZone, pickerTextOf, pickerValueOf, zoneLabel } from './site-time';
 
 describe('site time', () => {
   it('shows an API instant on the site clock', () => {
@@ -65,5 +65,19 @@ describe('site time', () => {
     expect(zoneLabel('Asia/Kolkata')).toBe('GMT+5:30');
     expect(zoneLabel('UTC')).toBe('GMT');
     expect(zoneLabel('America/New_York', new Date('2026-01-15T12:00:00Z'))).toBe('GMT-5');
+  });
+});
+
+describe('native picker values', () => {
+  it('converts the box text to a picker value and back', () => {
+    expect(pickerValueOf('08/10/2026 13:00')).toBe('2026-10-08T13:00');
+    expect(pickerValueOf('08/10/2026')).toBe('2026-10-08');
+    expect(pickerTextOf('2026-10-08T13:00')).toBe('08/10/2026 13:00');
+    expect(pickerTextOf('2026-10-08')).toBe('08/10/2026');
+  });
+
+  it('gives nothing for text that is not a date', () => {
+    expect(pickerValueOf('31/2')).toBe('');
+    expect(pickerTextOf('')).toBe('');
   });
 });

@@ -14,6 +14,8 @@
     "nowLabel": "Set {label} to now",
     "invalid": "Use dd/mm/yyyy hh:mm, for example 08/10/2026 13:00.",
     "invalidDate": "Use dd/mm/yyyy, for example 08/10/2026.",
+    "pick": "Choose date and time",
+    "pickDate": "Choose date",
     "zoneHint": "{zone} time"
   },
   "section": {

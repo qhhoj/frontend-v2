@@ -5,6 +5,7 @@ import { PROBLEM_LIMITS } from '@/features/admin/problems/general/problem-form';
 import { translate } from '@/i18n';
 import { toolbarControlClass } from '@/components/toolbar-classes';
 import Popover from '@/components/ui/Popover.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 
 const props = defineProps<{ min: number | null; max: number | null }>();
 const emit = defineEmits<{
@@ -93,29 +94,29 @@ const commit = () => setRange(draftMin.value, draftMax.value);
       <div class="flex gap-3">
         <label class="flex flex-1 flex-col gap-1 text-sm">
           {{ $t('problems.pointsMin') }}
-          <input
+          <TextInput
+            :model-value="min ?? ''"
             name="pointsMin"
             type="number"
             inputmode="numeric"
             :min="SLIDER.min"
             :max="SLIDER.max"
             :step="SLIDER.step"
-            :value="min ?? ''"
-            class="h-11 w-full rounded-row border border-line-control bg-surface-strong px-3 text-content"
+            :placeholder="String(SLIDER.min)"
             @change="setMin(numberOf($event))"
           />
         </label>
         <label class="flex flex-1 flex-col gap-1 text-sm">
           {{ $t('problems.pointsMax') }}
-          <input
+          <TextInput
+            :model-value="max ?? ''"
             name="pointsMax"
             type="number"
             inputmode="numeric"
             :min="SLIDER.min"
             :max="SLIDER.max"
             :step="SLIDER.step"
-            :value="max ?? ''"
-            class="h-11 w-full rounded-row border border-line-control bg-surface-strong px-3 text-content"
+            :placeholder="String(SLIDER.max)"
             @change="setMax(numberOf($event))"
           />
         </label>

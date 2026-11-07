@@ -14,6 +14,7 @@ const SCALAR_KINDS: readonly SettingKind['kind'][] = [
   'boolean',
   'integer',
   'text',
+  'dateTime',
   'choice',
   'url',
 ];

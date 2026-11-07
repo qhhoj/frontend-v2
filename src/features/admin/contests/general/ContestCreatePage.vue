@@ -11,7 +11,7 @@ import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { CARD, buttonClass } from '../../ui/controls';
 import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
-import { provideDateValidity } from '../../ui/form/date-validity';
+import { provideDateValidity } from '@/components/ui/date-validity';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
 import {
