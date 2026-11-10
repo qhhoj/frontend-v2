@@ -11,7 +11,9 @@ const { isDeciding } = useMineByDefault();
 <template>
   <div class="page-column">
     <PageHeader :title="$t('submissions.title')">
-      <template #actions><StateBit variant="judging" size="inline" class="shrink-0" /></template>
+      <template #start
+        ><StateBit variant="judging" size="inline" class="shrink-0 max-sm:hidden"
+      /></template>
     </PageHeader>
     <SubmissionList :scope="GLOBAL_SCOPE" :enabled="!isDeciding" />
   </div>

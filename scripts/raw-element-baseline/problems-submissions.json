@@ -25,9 +25,6 @@
     "button": 1,
     "verdict-tone": 1
   },
-  "features/submissions/AdvancedFiltersButton.vue": {
-    "button": 1
-  },
   "features/submissions/CasesTable.vue": {
     "table": 1
   },
@@ -38,16 +35,7 @@
     "button": 1,
     "input": 1
   },
-  "features/submissions/DiffSideHeader.vue": {
-    "uppercase": 1
-  },
-  "features/submissions/LiveToggle.vue": {
-    "button": 1
-  },
   "features/submissions/ResultSummaryCard.vue": {
-    "button": 1
-  },
-  "features/submissions/SourceView.vue": {
     "button": 1
   },
   "features/submissions/SubmissionLockControl.vue": {
@@ -56,10 +44,6 @@
   },
   "features/submissions/SubmissionPickBox.vue": {
     "checkbox": 1
-  },
-  "features/submissions/SubmissionStaffPanel.vue": {
-    "button": 1,
-    "controls": 2
   },
   "features/submissions/SubmissionTable.vue": {
     "table": 1
@@ -72,10 +56,5 @@
   },
   "features/submissions/list/LiveListNotices.vue": {
     "button": 1
-  },
-  "features/submissions/list/SubmissionFilterPanel.vue": {
-    "button": 1,
-    "checkbox": 2,
-    "input": 2
   }
 }

@@ -16,9 +16,7 @@ defineProps<{ label: string; id: string; detail: SubmissionDetail | undefined }>
     class="flex min-w-0 flex-col gap-1 rounded-row border border-line bg-surface-strong px-4 py-3"
   >
     <p class="flex flex-wrap items-center gap-2">
-      <span class="text-caption leading-4 font-semibold tracking-wider text-muted uppercase">{{
-        label
-      }}</span>
+      <span class="text-caption leading-4 font-semibold text-muted">{{ label }}</span>
       <RouterLink
         :to="{ name: 'submission', params: { id } }"
         class="font-mono font-semibold text-content hover:underline"

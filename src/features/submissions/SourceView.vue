@@ -124,16 +124,15 @@ const isExpanded = computed(() => expandChoice.value ?? lineCount.value <= UNFOL
         <pre ref="sourceBlock" class="pr-6"></pre>
       </div>
       <div v-else class="px-6 pb-5">
-        <button
-          type="button"
+        <AppButton
+          block
           data-testid="source-expand"
           aria-controls="source-code"
           :aria-expanded="false"
-          class="flex min-h-11 w-full items-center justify-center rounded-row border border-dashed border-line bg-surface-strong px-5 font-mono text-sm font-semibold hover:bg-surface-hover"
           @click="expandChoice = true"
         >
           {{ $t('submission.source.expand', { count: lineCount }) }}
-        </button>
+        </AppButton>
       </div>
       <SourceFileBar
         v-if="data"

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SlidersHorizontal } from 'lucide-vue-next';
-import { toolbarControlClass } from '@/components/toolbar-classes';
+import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
 
 /**
  * "Bộ lọc nâng cao" ("Bộ lọc" on phones): opens the panel `panelId`; `count` is how many filters only the panel shows.
@@ -11,24 +12,20 @@ defineEmits<{ toggle: [] }>();
 </script>
 
 <template>
-  <button
-    type="button"
+  <AppButton
     data-testid="advanced-filters"
+    class="shrink-0"
     :aria-expanded="open"
     :aria-controls="panelId"
-    :class="[toolbarControlClass(count > 0), 'shrink-0 border-dashed whitespace-nowrap']"
+    :pressed="count > 0"
     @click="$emit('toggle')"
   >
-    <SlidersHorizontal class="size-4" aria-hidden="true" />
+    <template #icon><SlidersHorizontal class="size-4" aria-hidden="true" /></template>
     <span class="sm:hidden">{{ $t('submissions.quick.filters') }}</span>
     <span class="max-sm:hidden">{{ $t('submissions.quick.advanced') }}</span>
-    <span
-      v-if="(props.phoneCount ?? count) > 0"
-      class="font-mono text-caption leading-4 tabular-nums sm:hidden"
-      >{{ props.phoneCount ?? count }}</span
-    >
-    <span v-if="count" class="font-mono text-caption leading-4 tabular-nums max-sm:hidden">{{
-      count
-    }}</span>
-  </button>
+    <Chip v-if="(props.phoneCount ?? count) > 0" class="font-mono tabular-nums sm:hidden">{{
+      props.phoneCount ?? count
+    }}</Chip>
+    <Chip v-if="count" class="font-mono tabular-nums max-sm:hidden">{{ count }}</Chip>
+  </AppButton>
 </template>

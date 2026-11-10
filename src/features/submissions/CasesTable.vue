@@ -131,7 +131,7 @@ const isHidden = computed(
               v-for="column in COLUMN_KEYS"
               :key="column"
               scope="col"
-              class="px-6 py-3 font-medium xl:px-3 xl:py-2.5"
+              class="px-6 py-3 font-medium whitespace-nowrap xl:px-3 xl:py-2.5"
               :class="{ 'text-right': column !== 'test' && column !== 'result' }"
             >
               {{ $t(`submission.cases.${column}`) }}

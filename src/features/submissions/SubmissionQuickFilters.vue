@@ -2,7 +2,7 @@
 import { GitCompareArrows } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { Language } from '@/api/types/problems';
-import FilterToggle from '@/features/problems/FilterToggle.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdvancedFiltersButton from './AdvancedFiltersButton.vue';
@@ -55,13 +55,13 @@ const toggle = (chip: QuickFilter) =>
     :aria-label="$t('submissions.rail.title')"
     class="flex items-center gap-2 max-sm:-mx-4 max-sm:overflow-x-auto max-sm:px-4 max-sm:pb-1 sm:flex-wrap"
   >
-    <FilterToggle
+    <AppButton
       v-for="chip in chips"
       :key="chip"
       class="shrink-0 whitespace-nowrap"
       :data-quick-filter="chip"
       :pressed="isOn(chip)"
-      @toggle="toggle(chip)"
+      @click="toggle(chip)"
     >
       {{ $t(`submissions.quick.${chip}`) }}
       <span
@@ -69,7 +69,7 @@ const toggle = (chip: QuickFilter) =>
         class="font-mono text-caption leading-4 tabular-nums opacity-80"
         >{{ formatNumber(gradingCount, locale.locale) }}</span
       >
-    </FilterToggle>
+    </AppButton>
     <LanguageFilterSelect
       class="max-sm:hidden"
       :filters="filters"
@@ -83,15 +83,15 @@ const toggle = (chip: QuickFilter) =>
       :panel-id="panelId"
       @toggle="emit('toggleAdvanced')"
     />
-    <FilterToggle
+    <AppButton
       v-if="comparing !== null"
       data-testid="compare-mode"
       class="shrink-0 whitespace-nowrap"
       :pressed="comparing"
-      @toggle="emit('toggleCompare')"
+      @click="emit('toggleCompare')"
     >
-      <GitCompareArrows class="size-4" aria-hidden="true" />
+      <template #icon><GitCompareArrows class="size-4" aria-hidden="true" /></template>
       {{ $t('submissions.quick.compare') }}
-    </FilterToggle>
+    </AppButton>
   </div>
 </template>
