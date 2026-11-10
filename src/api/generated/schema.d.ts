@@ -3559,7 +3559,7 @@ export interface paths {
          *     saved base URL and token and answers the OJ ids it serves. Errors: 409
          *     `external_judge_not_configured`, 502 `external_judge_unauthorized`, 404
          *     `external_judge_not_found`, 502 `external_judge_rejected`, 503
-         *     `external_judge_unavailable`. Messages never carry the URL or the token.
+         *     `external_judge_unavailable`, 429 `rate_limited` (10 tests per user per minute). Messages never carry the URL or the token.
          */
         post: operations["ExternalJudgeConnectionController_test"];
         delete?: never;
@@ -4698,7 +4698,7 @@ export interface paths {
          *     key and secret and answers how many problems the account can read. Errors:
          *     409 `polygon_not_connected` (key or secret unset), 502
          *     `polygon_unauthorized` (wrong key or secret), 502 `polygon_clock_skew` (the
-         *     server clock is off by more than Polygon allows), 503 `polygon_unavailable`.
+         *     server clock is off by more than Polygon allows), 503 `polygon_unavailable`, 429 `rate_limited` (10 tests per user per minute).
          */
         post: operations["PolygonConnectionController_test"];
         delete?: never;
@@ -5432,8 +5432,10 @@ export interface paths {
          *     attachment named `<code>.zip`; 202 `{ data: { status: 'building' } }` with
          *     `Retry-After` means the build is still running. Other outcomes: 404
          *     `package_not_built` when no package was requested for the current data, 409
-         *     `package_too_large`, 503 `package_unavailable` with `Retry-After` when the
-         *     build failed. Polling is free of rate limits.
+         *     `package_too_large`, 409 `package_data_unsaved` when the last test-data
+         *     save did not finish (save it again), 503 `package_unavailable` with
+         *     `Retry-After` when the build failed (including a data write that outlasted
+         *     the build's wait). Polling is free of rate limits.
          */
         get: operations["ProblemPackageController_download"];
         put?: never;
@@ -5444,8 +5446,11 @@ export interface paths {
          *     the package is cached and `GET` on the same path returns it; 202
          *     `{ data: { status: 'building', key } }` means a build is queued or running,
          *     so poll `GET`. Every request counts against 3 per problem and 10 in total
-         *     per user per hour (429 `rate_limited`). Responds 409 `package_too_large`
-         *     when the package is over the size limit.
+         *     per user per hour (429 `rate_limited`); a build later refused for the test
+         *     data's state gives the request back. Responds 409 `package_too_large` when
+         *     the package is over the size limit, and 409 `conflict` (issue
+         *     `data_save_unfinished`, nothing spent) when the last test-data save did not
+         *     finish: save the test data again.
          */
         post: operations["ProblemPackageController_request"];
         delete?: never;
