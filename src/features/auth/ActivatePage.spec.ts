@@ -3,13 +3,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { createMemoryHistory } from 'vue-router';
 import { signedOut } from '@/test/fixtures';
 import { fail, mockApi, noContent, sequence } from '@/test/mock-api';
+import { brandRoutes } from '@/test/auth-routes';
 import { mountApp } from '@/test/mount';
 
 const DONE = 'Email của bạn đã được xác nhận. Bạn có thể đăng nhập ngay.';
 
 describe('activate page', () => {
   it('shows the success card when the finished page is reloaded, without sending the placeholder as a key', async () => {
-    const calls = mockApi({ 'GET /auth/me': signedOut });
+    const calls = mockApi({ 'GET /auth/me': signedOut, ...brandRoutes });
     const { wrapper } = await mountApp('/activate/done');
     expect(calls.some((call) => call.path === '/auth/activate')).toBe(false);
     expect(wrapper.get('h1').text()).toBe('Tài khoản đã kích hoạt');
@@ -21,7 +22,11 @@ describe('activate page', () => {
     const history = createMemoryHistory();
     const pushed = vi.spyOn(history, 'push');
     const replaced = vi.spyOn(history, 'replace');
-    const calls = mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate': noContent() });
+    const calls = mockApi({
+      'GET /auth/me': signedOut,
+      ...brandRoutes,
+      'POST /auth/activate': noContent(),
+    });
     await mountApp('/activate/k123', history);
     expect(calls.filter((call) => call.path === '/auth/activate').map((call) => call.body)).toEqual(
       [{ token: 'k123' }],
@@ -33,6 +38,7 @@ describe('activate page', () => {
   it('explains a dead link and sends a new one to the address typed', async () => {
     const calls = mockApi({
       'GET /auth/me': signedOut,
+      ...brandRoutes,
       'POST /auth/activate': fail(400, 'invalid_token'),
       'POST /auth/activate/resend': noContent(),
     });
@@ -55,6 +61,7 @@ describe('activate page', () => {
   it('lets the viewer try a still-valid key again after a throttled attempt', async () => {
     const calls = mockApi({
       'GET /auth/me': signedOut,
+      ...brandRoutes,
       'POST /auth/activate': sequence(fail(429, 'rate_limited'), noContent()),
     });
     const { wrapper } = await mountApp('/activate/k123');
@@ -68,7 +75,11 @@ describe('activate page', () => {
   });
 
   it('does not tell a viewer to get a new link when the server failed', async () => {
-    mockApi({ 'GET /auth/me': signedOut, 'POST /auth/activate': fail(429, 'rate_limited') });
+    mockApi({
+      'GET /auth/me': signedOut,
+      ...brandRoutes,
+      'POST /auth/activate': fail(429, 'rate_limited'),
+    });
     const { wrapper } = await mountApp('/activate/k123');
     expect(wrapper.get('#main [role="alert"]').text()).toBe(
       'Bạn thao tác quá nhanh. Hãy thử lại sau.',

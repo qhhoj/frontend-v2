@@ -113,12 +113,7 @@ async function submit() {
     <template #badge>
       <AuthBadge tone="accent"><UserRoundPlus /></AuthBadge>
     </template>
-    <form
-      v-if="!endReason"
-      ref="formElement"
-      class="flex flex-col gap-[18px]"
-      @submit.prevent="submit"
-    >
+    <form v-if="!endReason" ref="formElement" class="flex flex-col gap-5" @submit.prevent="submit">
       <UsernameField
         v-model="form.username"
         :error="fieldErrors.username"

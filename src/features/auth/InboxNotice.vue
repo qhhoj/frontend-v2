@@ -30,7 +30,7 @@ async function resendMail() {
     </div>
     <AuthError :text="summary" />
     <AppButton block :disabled="coolingDown || pending" @click="resendMail">
-      <template #icon><RotateCw aria-hidden="true" class="size-[18px]" /></template>
+      <template #icon><RotateCw aria-hidden="true" class="size-5" /></template>
       <template v-if="coolingDown">{{
         $t('auth.inbox.resendIn', { time: remainingText })
       }}</template>

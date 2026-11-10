@@ -20,7 +20,6 @@ import { TWO_FACTOR_CARDS, isKeyUsable, twoFactorView } from './two-factor-view'
 import type { SecondFactorMode } from './two-factor-view';
 import { useAfterSignIn } from './use-after-sign-in';
 import { useAuthAction } from './use-auth-action';
-import { AUTH_LINK } from './auth-link';
 
 const session = useSessionStore();
 const router = useRouter();
@@ -162,7 +161,7 @@ const signOut = useLogout(() => router.push({ name: 'login' }));
       <AuthError :id="CODE_ERROR_ID" :text="summary" />
       <AuthSubmit :pending="pending">{{ $t('auth.twoFactor.submit') }}</AuthSubmit>
       <AppButton v-if="view === 'app' && keyUsable" block @click="signInWithKey">
-        <template #icon><Fingerprint aria-hidden="true" class="size-[18px]" /></template>
+        <template #icon><Fingerprint aria-hidden="true" class="size-5" /></template>
         {{ $t('auth.twoFactor.useKey') }}
       </AppButton>
     </form>
@@ -184,13 +183,13 @@ const signOut = useLogout(() => router.push({ name: 'login' }));
       {{ $t('auth.twoFactor.signInAgain') }}
     </AppButton>
     <p v-if="hasCode" class="text-center text-sm">
-      <button
-        type="button"
-        :class="AUTH_LINK"
+      <AppButton
+        tone="link"
+        class="font-semibold"
         @click="switchTo(view === 'backup' ? 'app' : 'backup')"
       >
         {{ view === 'backup' ? $t('auth.twoFactor.useApp') : $t('auth.twoFactor.useBackup') }}
-      </button>
+      </AppButton>
     </p>
     <template #after>
       <p
@@ -202,9 +201,9 @@ const signOut = useLogout(() => router.push({ name: 'login' }));
           <strong class="font-mono text-content">{{ username }}</strong></span
         >
         <span aria-hidden="true">·</span>
-        <button type="button" :class="AUTH_LINK" @click="signOut">
+        <AppButton tone="link" class="font-semibold" @click="signOut">
           {{ $t('account.logout') }}
-        </button>
+        </AppButton>
       </p>
     </template>
   </AuthLayout>

@@ -1,6 +1,6 @@
 import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
-import { loginRoutes } from '@/test/auth-routes';
+import { brandRoutes, loginRoutes } from '@/test/auth-routes';
 import { partialSession, profile, signedIn, signedOut } from '@/test/fixtures';
 import { fail, mockApi, noContent, ok } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
@@ -62,6 +62,7 @@ describe('reset-password page', () => {
     const replaced = vi.spyOn(history, 'replace');
     mockApi({
       'GET /auth/me': signedOut,
+      ...brandRoutes,
       'POST /auth/password/reset/confirm': fail(400, 'invalid_token'),
     });
     const { wrapper, router } = await mountApp('/reset-password/spent', history);
@@ -94,7 +95,7 @@ describe('reset-password page', () => {
   });
 
   it('opens for a viewer whose second factor is still pending, without sending them to the second-factor step', async () => {
-    mockApi({ 'GET /auth/me': signedIn(partialSession()) });
+    mockApi({ 'GET /auth/me': signedIn(partialSession()), ...brandRoutes });
     const { wrapper, router } = await mountApp('/reset-password/tok-1');
     expect(router.currentRoute.value.name).toBe('reset-password');
     expect(wrapper.get('h1').text()).toBe('Đặt mật khẩu mới');

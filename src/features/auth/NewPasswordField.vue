@@ -21,7 +21,6 @@ const score = computed(() => estimatePasswordStrength(model.value, props.owner))
     :name="name"
     :label="label ?? $t('auth.password')"
     autocomplete="new-password"
-    placeholder="••••••••"
     :error="error"
     :described-by="strengthId"
     required

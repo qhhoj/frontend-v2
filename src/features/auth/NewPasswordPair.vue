@@ -42,7 +42,6 @@ const mismatch = computed(() => confirmation.value !== '' && confirmation.value 
     name="confirmPassword"
     :label="confirmLabel ?? $t('auth.confirmPassword')"
     autocomplete="new-password"
-    placeholder="••••••••"
     :error="mismatch ? $t('auth.passwordMismatch') : undefined"
     required
   />

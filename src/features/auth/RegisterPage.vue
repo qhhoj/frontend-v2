@@ -4,6 +4,7 @@ import { register, resendActivation } from '@/api/auth.api';
 import { ApiError } from '@/api/client';
 import InlineBit from '@/components/InlineBit.vue';
 import AppButton from '@/components/ui/AppButton.vue';
+import Checkbox from '@/components/ui/Checkbox.vue';
 import { maskEmail } from '@/lib/mask-email';
 import { usernameProblem } from '@/lib/username';
 import { focusMain } from '@/router/focus-main';
@@ -96,9 +97,9 @@ async function submit() {
     </InboxNotice>
     <div class="flex flex-col gap-3 text-center text-sm text-muted">
       <p>{{ $t('auth.heldUsername', { username: form.username }) }}</p>
-      <button type="button" :class="AUTH_LINK" @click="registerAgain">
+      <AppButton tone="link" class="self-center font-semibold" @click="registerAgain">
         {{ $t('auth.registerAgain') }}
-      </button>
+      </AppButton>
     </div>
   </AuthLayout>
   <AuthLayout
@@ -121,15 +122,7 @@ async function submit() {
     width="double"
     brand
   >
-    <template #header-end>
-      <span class="flex items-center gap-1"
-        ><span class="text-muted max-sm:hidden">{{ $t('auth.haveAccountPrompt') }}</span>
-        <RouterLink :to="{ name: 'login' }" :class="AUTH_LINK">{{
-          $t('auth.submitLogin')
-        }}</RouterLink></span
-      >
-    </template>
-    <form ref="formElement" class="flex flex-col gap-[18px]" @submit.prevent="submit">
+    <form ref="formElement" class="flex flex-col gap-5" @submit.prevent="submit">
       <div class="grid gap-4 sm:grid-cols-2">
         <UsernameField
           v-model="form.username"
@@ -165,18 +158,14 @@ async function submit() {
         />
       </div>
       <div>
-        <label class="flex min-h-11 cursor-pointer items-start gap-2.5 py-1 text-sm">
-          <input
-            v-model="acceptedRules"
-            type="checkbox"
-            name="rules"
-            class="mt-0.5 size-5 shrink-0 accent-accent"
-            :aria-invalid="rulesMissing ? 'true' : undefined"
-            :aria-describedby="rulesMissing ? 'register-rules-error' : undefined"
-            @change="rulesMissing = false"
-          />
-          {{ $t('auth.rules') }}
-        </label>
+        <Checkbox
+          v-model="acceptedRules"
+          name="rules"
+          :label="$t('auth.rules')"
+          :aria-invalid="rulesMissing ? 'true' : undefined"
+          :aria-describedby="rulesMissing ? 'register-rules-error' : undefined"
+          @change="rulesMissing = false"
+        />
         <p v-if="rulesMissing" id="register-rules-error" class="text-meta text-negative">
           {{ $t('auth.rulesRequired') }}
         </p>

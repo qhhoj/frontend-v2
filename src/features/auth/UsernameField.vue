@@ -55,7 +55,7 @@ const hintId = useId();
       <component
         :is="line.icon"
         aria-hidden="true"
-        class="size-[18px]"
+        class="size-5"
         :class="[line.colour, status === 'checking' && 'motion-safe:animate-spin']"
       />
     </template>

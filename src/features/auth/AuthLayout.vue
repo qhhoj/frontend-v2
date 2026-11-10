@@ -33,7 +33,7 @@ const WIDTHS = {
     class="flex min-h-[calc(100dvh-env(safe-area-inset-top))] flex-col pb-[env(safe-area-inset-bottom)]"
   >
     <header
-      class="flex items-center justify-between gap-3 border-b border-line bg-surface-solid px-4 py-2 sm:px-8 sm:py-3"
+      class="flex items-center justify-between gap-3 border-b border-line px-4 py-2 sm:px-8 sm:py-3"
     >
       <BrandWordmark />
       <div class="flex items-center gap-2 text-sm sm:gap-3">
@@ -51,7 +51,7 @@ const WIDTHS = {
         class="flex flex-1 flex-col items-center justify-center gap-5 px-4 py-8 sm:p-8"
         :class="brand && 'max-xl:justify-start max-xl:pt-6'"
       >
-        <Card class="flex w-full flex-col gap-[18px] p-6 sm:p-8" :class="WIDTHS[width]">
+        <Card class="flex w-full flex-col gap-5 p-6 sm:p-8" :class="WIDTHS[width]">
           <slot name="badge" />
           <div :class="centered && 'text-center'">
             <h1 class="page-title">{{ title }}</h1>

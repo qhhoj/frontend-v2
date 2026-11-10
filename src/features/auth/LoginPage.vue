@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Notice from '@/components/ui/Notice.vue';
 import { computed, nextTick, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
@@ -7,7 +8,6 @@ import { useSessionStore } from '@/stores/session.store';
 import { queryErrorText } from './auth-errors';
 import AuthError from './AuthError.vue';
 import AuthField from './AuthField.vue';
-import AuthNotice from './AuthNotice.vue';
 import AuthSubmit from './AuthSubmit.vue';
 import AuthLayout from './AuthLayout.vue';
 import SocialButtons from './SocialButtons.vue';
@@ -76,14 +76,6 @@ const attempt = () =>
 
 <template>
   <AuthLayout :title="$t('pages.login')" brand>
-    <template #header-end>
-      <span class="flex items-center gap-1"
-        ><span class="text-muted max-sm:hidden">{{ $t('auth.noAccountPrompt') }}</span>
-        <RouterLink :to="{ name: 'register' }" :class="AUTH_LINK">{{
-          $t('account.register')
-        }}</RouterLink></span
-      >
-    </template>
     <form
       ref="formElement"
       method="post"
@@ -91,9 +83,9 @@ const attempt = () =>
       class="flex flex-col gap-4"
       @submit.prevent="submit"
     >
-      <AuthNotice v-if="notice" dismissible @dismiss="noticeDismissed = true">{{
+      <Notice v-if="notice" role="status" dismissible @dismiss="noticeDismissed = true">{{
         notice
-      }}</AuthNotice>
+      }}</Notice>
       <AuthError :text="errorText">
         <RouterLink v-if="notActivated" :to="{ name: 'activate-resend' }" :class="AUTH_LINK">{{
           $t('auth.resendLink')
@@ -106,7 +98,6 @@ const attempt = () =>
         autocomplete="username"
         maxlength="150"
         :error="fieldErrors.username"
-        placeholder="bitcoder"
         required
         spellcheck="false"
         autocapitalize="none"
@@ -119,7 +110,6 @@ const attempt = () =>
         :label="$t('auth.password')"
         autocomplete="current-password"
         :error="fieldErrors.password"
-        placeholder="••••••••"
         required
         @input="clearMissing('password')"
       />

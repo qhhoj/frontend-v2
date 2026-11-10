@@ -1,5 +1,6 @@
 <script setup lang="ts">
 /** Only for a viewer whose password is in a breach list: the guard sends them here from every page until it is changed. The voluntary change lives in the security settings. */
+import Notice from '@/components/ui/Notice.vue';
 import { LogOut } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -9,7 +10,6 @@ import { safeRedirect } from '@/router/safe-redirect';
 import { useSessionStore } from '@/stores/session.store';
 import { useLogout } from './use-logout';
 import AuthLayout from './AuthLayout.vue';
-import AuthNotice from './AuthNotice.vue';
 import ChangePasswordForm from './ChangePasswordForm.vue';
 
 const route = useRoute();
@@ -41,17 +41,17 @@ const signOut = useLogout(() => router.push({ name: 'login' }));
     </template>
     <div v-if="!passwordChanged" class="flex items-center gap-3">
       <InlineBit kind="sweat" class="shrink-0" />
-      <AuthNotice tone="warning" class="flex-1">
+      <Notice role="status" tone="warning" class="flex-1">
         <i18n-t keypath="auth.changePassword.breached" tag="span">
           <template #username>
             <strong class="font-mono text-content">{{ session.user?.username }}</strong>
           </template>
         </i18n-t>
-      </AuthNotice>
+      </Notice>
     </div>
-    <AuthNotice v-if="sessionStale" tone="success">{{
+    <Notice v-if="sessionStale" role="status" tone="success">{{
       $t('auth.changePassword.changedNotLoaded')
-    }}</AuthNotice>
+    }}</Notice>
     <ChangePasswordForm
       :after-change="reloadSession"
       @accepted="passwordChanged = true"
