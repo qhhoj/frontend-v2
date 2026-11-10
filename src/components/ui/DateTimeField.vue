@@ -19,7 +19,7 @@ import {
 
 /**
  * A date and time typed and shown in the site's time zone as `dd/mm/yyyy hh:mm`, with the zone ("GMT+7") inside the box
- * a "Bây giờ" shortcut and a calendar button that opens the browser's picker (set to the site's wall clock, not the viewer's). The model is an ISO instant (UTC) or null, the value the API sends and takes.
+ * (at least 15 rem wide, so the whole text shows; the calendar button stays beside it and "Bây giờ" wraps first), a "Bây giờ" shortcut and a calendar button that opens the browser's picker (set to the site's wall clock, not the viewer's). The model is an ISO instant (UTC) or null, the value the API sends and takes.
  * With `dateOnly` the box takes `dd/mm/yyyy` alone (the model is the instant that day starts, and there is no "Bây giờ").
  * Text that does not read as a date leaves the model alone, says so when the box loses focus (or Enter is pressed), and tells
  * the form above at once (`provideDateValidity`), which refuses to save or confirm while any of its date fields is unreadable.
@@ -123,44 +123,46 @@ function setNow() {
     :scale="scale"
   >
     <div class="flex flex-wrap items-center gap-2">
-      <TextInput
-        v-model="text"
-        class="min-w-48 flex-1 font-mono tabular-nums"
-        autocomplete="off"
-        spellcheck="false"
-        :placeholder="
-          $t(dateOnly ? 'admin.form.dateTime.placeholderDate' : 'admin.form.dateTime.placeholder')
-        "
-        :aria-required="required || undefined"
-        :disabled="disabled"
-        @input="onInput"
-        @blur="onBlur"
-        @keydown.enter="onBlur"
-      >
-        <template #suffix>
-          <span aria-hidden="true" class="font-mono text-caption leading-4">{{ zone }}</span>
-        </template>
-      </TextInput>
-      <span class="relative shrink-0">
-        <IconButton
-          :label="$t(dateOnly ? 'admin.form.dateTime.pickDate' : 'admin.form.dateTime.pick')"
-          tone="secondary"
+      <div class="flex min-w-0 flex-[1_1_18rem] items-center gap-2">
+        <TextInput
+          v-model="text"
+          class="min-w-60 flex-1 font-mono tabular-nums"
+          autocomplete="off"
+          spellcheck="false"
+          :placeholder="
+            $t(dateOnly ? 'admin.form.dateTime.placeholderDate' : 'admin.form.dateTime.placeholder')
+          "
+          :aria-required="required || undefined"
           :disabled="disabled"
-          @click="openPicker"
+          @input="onInput"
+          @blur="onBlur"
+          @keydown.enter="onBlur"
         >
-          <CalendarDays aria-hidden="true" />
-        </IconButton>
-        <!-- The browser's picker, set to the site's wall clock and read back through the same parser as the typed box. -->
-        <input
-          ref="picker"
-          :type="dateOnly ? 'date' : 'datetime-local'"
-          :value="pickerValue"
-          tabindex="-1"
-          aria-hidden="true"
-          class="pointer-events-none absolute right-0 bottom-0 size-px opacity-0"
-          @change="onPick"
-        />
-      </span>
+          <template #suffix>
+            <span aria-hidden="true" class="font-mono text-caption leading-4">{{ zone }}</span>
+          </template>
+        </TextInput>
+        <span class="relative shrink-0">
+          <IconButton
+            :label="$t(dateOnly ? 'admin.form.dateTime.pickDate' : 'admin.form.dateTime.pick')"
+            tone="secondary"
+            :disabled="disabled"
+            @click="openPicker"
+          >
+            <CalendarDays aria-hidden="true" />
+          </IconButton>
+          <!-- The browser's picker, set to the site's wall clock and read back through the same parser as the typed box. -->
+          <input
+            ref="picker"
+            :type="dateOnly ? 'date' : 'datetime-local'"
+            :value="pickerValue"
+            tabindex="-1"
+            aria-hidden="true"
+            class="pointer-events-none absolute right-0 bottom-0 size-px opacity-0"
+            @change="onPick"
+          />
+        </span>
+      </div>
       <AppButton
         v-if="hasNowButton"
         tone="secondary"

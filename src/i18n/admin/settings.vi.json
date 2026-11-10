@@ -139,7 +139,7 @@
     },
     "contest": {
       "banAfterDisqualifications": "Số nguyên từ 0 đến 1000; 0 là tắt. Chỉ tính kỳ thi không riêng của tổ chức.",
-      "officialModeEndsAt": "Thời điểm ISO 8601 có múi giờ, ví dụ 2026-10-10T17:00:00+07:00. Để trống thì chỉ công tắc quyết định."
+      "officialModeEndsAt": "Giờ GMT+7. Để trống thì chỉ công tắc quyết định."
     },
     "mail": {
       "from": "Địa chỉ hoặc “Tên <địa chỉ>”, không xuống dòng.",

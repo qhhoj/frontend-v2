@@ -21,7 +21,7 @@ const keysOf = (rows: LanguageRow[]) => rows.map((row) => row.key).join(', ');
     v-if="count > 0"
     compact
     :role="null"
-    :tone="unserved.length > 0 ? 'danger' : 'warning'"
+    tone="warning"
     :title="t('admin.languages.attention.title', { count }, count)"
   >
     <ul class="m-0 flex list-none flex-col gap-1 p-0">
