@@ -32,8 +32,17 @@ const props = withDefaults(
     back?: { to: RouteLocationRaw; label: string; ariaLabel?: string } | null;
     meta?: string[];
     overflow?: MenuEntry[];
+    /** Extra classes on the h1, for a title that carries a colour (a user's rating tier). */
+    titleClass?: string;
   }>(),
-  { lead: undefined, crumbs: () => [], back: null, meta: () => [], overflow: () => [] },
+  {
+    lead: undefined,
+    titleClass: undefined,
+    crumbs: () => [],
+    back: null,
+    meta: () => [],
+    overflow: () => [],
+  },
 );
 defineSlots<{
   start?: () => unknown;
@@ -92,7 +101,10 @@ const CELL = {
     <div v-if="slots.above" class="col-start-2 row-start-2 mb-1 min-w-0">
       <slot name="above" />
     </div>
-    <h1 class="col-start-2 row-start-3 min-w-0 page-title [overflow-wrap:anywhere]">
+    <h1
+      class="col-start-2 row-start-3 min-w-0 page-title [overflow-wrap:anywhere]"
+      :class="titleClass"
+    >
       {{ title }}
     </h1>
     <div

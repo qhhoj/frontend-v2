@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { Bell } from 'lucide-vue-next';
-import Drawer from 'primevue/drawer';
 import { computed, ref } from 'vue';
 import type { NotificationItem } from '@/api/types/notifications';
 import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
 import AppButton from '@/components/ui/AppButton.vue';
+import Drawer from '@/components/ui/Drawer.vue';
+import IconButton from '@/components/ui/IconButton.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { translate } from '@/i18n';
-import { errorMessageKey } from '@/i18n/error-message';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
+import MarkAllReadButton from './MarkAllReadButton.vue';
 import NotificationList from './NotificationList.vue';
 import NotificationLoadError from './NotificationLoadError.vue';
 import NotificationRowSkeleton from './NotificationRowSkeleton.vue';
@@ -18,7 +19,6 @@ import { NOTIFICATION_BITS } from './notification-bits';
 import {
   DRAWER_QUERY,
   LATEST_ROWS,
-  useMarkAllRead,
   useNotificationsQuery,
   useUnreadCountQuery,
 } from './notifications.queries';
@@ -32,10 +32,8 @@ import { useOpenNotification } from './use-open-notification';
 const session = useSessionStore();
 const locale = useLocaleStore();
 const isOpen = ref(false);
-const bellButton = ref<HTMLButtonElement | null>(null);
 const countQuery = useUnreadCountQuery();
 const listQuery = useNotificationsQuery(DRAWER_QUERY, isOpen);
-const markAll = useMarkAllRead();
 const opener = useOpenNotification();
 
 const unread = computed(() => countQuery.data.value?.count ?? 0);
@@ -49,44 +47,19 @@ const bellLabel = computed(() =>
 async function openRow(item: NotificationItem) {
   if ((await opener.open(item)) === 'opened') isOpen.value = false;
 }
-const readAll = () => {
-  if (!markAll.isPending.value) markAll.mutate();
-};
 /** The page already shows a refused "Đọc hết" (429); the drawer says it too. */
-const readAllFailureKey = computed(() =>
-  markAll.error.value ? errorMessageKey(markAll.error.value) : null,
-);
-/** Drawer is unstyled: these classes are its whole look. 430 px from `sm`, the full screen below (M1BPhone). */
-const drawerPt = computed(() => ({
-  root: {
-    class:
-      'flex h-full w-full flex-col border-l border-line-strong bg-surface-solid text-content sm:w-[430px]',
-    'aria-label': translate('notifications.drawerTitle'),
-  },
-  header: { class: 'flex items-center justify-between gap-3 px-5 pt-5' },
-  title: { class: 'font-display text-section leading-7 font-semibold' },
-  pcCloseButton: {
-    root: {
-      class: 'inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-hover',
-    },
-  },
-  content: { class: 'flex-1 overflow-y-auto px-5 py-3' },
-  footer: { class: 'px-5 pt-3 pb-5' },
-  mask: { class: 'fixed inset-0 z-overlay flex justify-end bg-ground/70' },
-}));
+const readAllFailureKey = ref<string | null>(null);
 </script>
 
 <template>
   <template v-if="session.user">
-    <button
-      ref="bellButton"
-      type="button"
+    <IconButton
+      tone="secondary"
       data-testid="notification-bell"
-      class="relative inline-flex size-11 items-center justify-center rounded-pill border border-line bg-surface-strong hover:bg-surface-hover"
+      class="relative"
       aria-haspopup="dialog"
       :aria-expanded="isOpen"
-      :aria-label="bellLabel"
-      :title="bellLabel"
+      :label="bellLabel"
       @click="isOpen = !isOpen"
     >
       <Bell aria-hidden="true" class="size-5" />
@@ -98,26 +71,15 @@ const drawerPt = computed(() => ({
       >
         {{ badge }}
       </span>
-    </button>
-    <Drawer
-      v-model:visible="isOpen"
-      position="right"
-      :header="$t('notifications.drawerTitle')"
-      :pt="drawerPt"
-      :close-button-props="{ 'aria-label': $t('common.close') }"
-      @hide="bellButton?.focus()"
-    >
+    </IconButton>
+    <Drawer v-model:visible="isOpen" :title="$t('notifications.drawerTitle')" size="sm">
       <div class="flex min-h-11 items-center justify-between gap-3 pb-2">
         <p class="text-sm text-muted">{{ $t('notifications.unreadCount', { count: unread }) }}</p>
-        <button
+        <MarkAllReadButton
           v-if="unread > 0 && opener.canMarkRead.value"
-          type="button"
-          class="min-h-11 rounded-pill px-3 text-sm font-semibold text-accent-text hover:bg-surface-hover"
-          :aria-busy="markAll.isPending.value ? 'true' : undefined"
-          @click="readAll"
-        >
-          {{ $t('notifications.readAll') }}
-        </button>
+          tone="link"
+          @failed="readAllFailureKey = $event"
+        />
       </div>
       <SettingsNotice
         v-if="!opener.canMarkRead.value"

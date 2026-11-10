@@ -43,15 +43,14 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
     <ProfileStats :user="user" class="order-first lg:order-none lg:col-start-2 lg:row-start-1" />
 
     <div class="flex min-w-0 flex-col gap-6 lg:col-start-1 lg:row-span-2 lg:row-start-1">
-      <Card data-testid="rating-card" class="p-5">
-        <h2 class="font-display text-base font-bold">{{ $t('ratingChart.title') }}</h2>
+      <Card data-testid="rating-card" :title="$t('ratingChart.title')" padding="md">
         <QueryState :loading="ratingsPending" :error="ratingsError" @retry="refetchRatings()">
           <template #skeleton><ProfileOverviewSkeleton part="chart" /></template>
           <template v-if="ratedCount > 0">
-            <p class="mt-1 text-sm text-muted">
+            <p class="mb-3 text-sm text-muted">
               {{ $t('profile.chartLead', { count: ratedCount }) }}
             </p>
-            <RatingChart :history="history" class="mt-3 w-full" />
+            <RatingChart :history="history" class="w-full" />
           </template>
           <StatePanel
             v-else
@@ -66,11 +65,10 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
         </QueryState>
       </Card>
 
-      <Card class="p-5">
-        <h2 class="font-display text-base font-bold">{{ $t('profile.activityTitle') }}</h2>
+      <Card :title="$t('profile.activityTitle')" padding="md">
         <QueryState :loading="activityPending" :error="activityError" @retry="refetchActivity()">
           <template #skeleton><ProfileOverviewSkeleton part="heatmap" /></template>
-          <ActivityHeatmap v-if="activity" :activity="activity" class="mt-3" />
+          <ActivityHeatmap v-if="activity" :activity="activity" />
         </QueryState>
       </Card>
 
@@ -81,13 +79,11 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
     </div>
 
     <div class="flex min-w-0 flex-col gap-6 lg:col-start-2 lg:row-start-2">
-      <Card v-if="user.aboutHtml" class="p-5">
-        <h2 class="font-display text-base font-bold">{{ $t('profile.about') }}</h2>
-        <UserContent :html="user.aboutHtml" class="mt-3" />
+      <Card v-if="user.aboutHtml" :title="$t('profile.about')" padding="md">
+        <UserContent :html="user.aboutHtml" />
       </Card>
-      <Card v-if="user.organizations.length" class="p-5">
-        <h2 class="font-display text-base font-bold">{{ $t('profile.organizations') }}</h2>
-        <ul class="mt-3 flex flex-col gap-1">
+      <Card v-if="user.organizations.length" :title="$t('profile.organizations')" padding="md">
+        <ul class="flex flex-col gap-1">
           <li v-for="organization in user.organizations" :key="organization.id">
             <RouterLink
               :to="{ name: 'organization', params: { slug: organization.slug } }"

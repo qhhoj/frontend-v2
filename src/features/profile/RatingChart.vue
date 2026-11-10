@@ -2,6 +2,7 @@
 import { formatDelta } from '@/lib/rating-delta';
 import { computed, ref } from 'vue';
 import type { RatingHistoryEntry } from '@/api/types/users';
+import Chip from '@/components/ui/Chip.vue';
 import { translate } from '@/i18n';
 import { formatDate, formatMonthYear } from '@/lib/format-date';
 import {
@@ -22,11 +23,10 @@ import type { ChartBox, ChartPoint } from '@/lib/rating-chart';
 import { ratingTier, tierColor } from '@/lib/rating-tiers';
 import { TIER_FILL_CLASSES, TIER_STROKE_CLASSES } from '@/lib/tier-classes';
 import { useLocaleStore } from '@/stores/locale.store';
-import RatingStats from './RatingStats.vue';
 import { useElementWidth } from './use-element-width';
 
 /**
- * Rating over the contests a viewer may see: a row of four figures, then faint tier bands behind a line with a hollow dot per contest.
+ * Rating over the contests a viewer may see: the latest change, then faint tier bands behind a line with a hollow dot per contest.
  * Hovering or focusing a contest shows its name, date, place, rating change and tier. Draws nothing without a rated contest.
  */
 const props = defineProps<{ history: RatingHistoryEntry[] }>();
@@ -39,6 +39,7 @@ const NAME_SLOT = 80; // px per contest needed to print the contest name (cut to
 const AXIS_LEFT = 44;
 const TOP = 18;
 const LABEL_CHAR = 6.4;
+const LABEL_INSET = 16; // the tier names stay clear of the card's edge
 const TOOLTIP_HEIGHT = 70;
 const isPhone = computed(() => width.value < PHONE_WIDTH);
 const height = computed(() => (isPhone.value ? 280 : 300));
@@ -53,7 +54,8 @@ const bandName = (low: number) => {
 /** The right margin holds the widest tier name. */
 const rightMargin = computed(
   () =>
-    Math.max(...tierBands(range.value).map((band) => bandName(band.low).length)) * LABEL_CHAR + 8,
+    Math.max(...tierBands(range.value).map((band) => bandName(band.low).length)) * LABEL_CHAR +
+    LABEL_INSET,
 );
 const baseBox = computed<ChartBox>(() => ({
   width: width.value,
@@ -66,7 +68,7 @@ const baseBox = computed<ChartBox>(() => ({
 const spacing = computed(() => pointSpacing(rated.value.length, baseBox.value));
 /** Few contests: each dot is named (name and date, two rows); many: dates only (one row). */
 const showNames = computed(() => rated.value.length < 2 || spacing.value >= NAME_SLOT);
-const box = computed<ChartBox>(() => ({ ...baseBox.value, bottom: showNames.value ? 44 : 30 }));
+const box = computed<ChartBox>(() => ({ ...baseBox.value, bottom: showNames.value ? 58 : 30 }));
 const plotRight = computed(() => box.value.width - box.value.right);
 
 const points = computed(() => chartPoints(props.history, box.value));
@@ -103,6 +105,14 @@ const best = computed(() =>
 const current = computed(() => points.value.at(-1)!);
 
 const dateOf = (point: ChartPoint) => formatDate(point.endTime, 'date', locale.locale);
+/** A contest name on up to two lines, broken at a space; what still does not fit on the second line is cut with "…". */
+function wrapLabel(text: string, maxWidth: number): string[] {
+  const fit = Math.max(1, Math.floor(maxWidth / LABEL_CHAR));
+  if (text.length <= fit) return [text];
+  const cut = text.lastIndexOf(' ', fit);
+  const first = cut > 0 ? text.slice(0, cut) : text.slice(0, fit);
+  return [first, truncateLabel(text.slice(first.length).trim(), maxWidth)];
+}
 const xLabels = computed(() => {
   const labelled = labelledIndices(
     points.value.length,
@@ -114,12 +124,9 @@ const xLabels = computed(() => {
     return {
       key: index,
       x: point.x,
-      name: showNames.value
-        ? truncateLabel(
-            point.contestName ?? translate('ratingChart.hiddenContest'),
-            spacing.value - 16,
-          )
-        : null,
+      names: showNames.value
+        ? wrapLabel(point.contestName ?? translate('ratingChart.hiddenContest'), spacing.value - 16)
+        : [],
       date: showNames.value ? dateOf(point) : formatMonthYear(point.endTime),
     };
   });
@@ -179,12 +186,19 @@ const hitWidth = computed(() => Math.max(spacing.value, 24));
 
 <template>
   <div v-if="points.length" ref="root" class="flex flex-col gap-3">
-    <RatingStats
-      :current="current.rating"
-      :max="best.rating"
-      :count="points.length"
-      :delta="current.delta"
-    />
+    <p
+      v-if="current.delta !== null"
+      data-testid="rating-delta"
+      class="flex items-center gap-2 text-sm text-muted"
+    >
+      {{ $t('ratingChart.delta') }}
+      <Chip
+        size="md"
+        :tone="current.delta > 0 ? 'success' : current.delta < 0 ? 'danger' : 'neutral'"
+      >
+        {{ formatDelta(current.delta) }}
+      </Chip>
+    </p>
     <svg
       role="group"
       :aria-label="label"
@@ -264,12 +278,18 @@ const hitWidth = computed(() => Math.max(spacing.value, 24));
         stroke-dasharray="2 2"
       />
       <g v-for="mark in xLabels" :key="mark.key" class="fill-muted text-caption">
-        <text v-if="mark.name" :x="mark.x" :y="box.height - 28" text-anchor="middle">
-          {{ mark.name }}
+        <text
+          v-for="(line, row) in mark.names"
+          :key="row"
+          :x="mark.x"
+          :y="box.height - 28 - (mark.names.length - 1 - row) * 14"
+          text-anchor="middle"
+        >
+          {{ line }}
         </text>
         <text
           :x="mark.x"
-          :y="box.height - (mark.name ? 13 : 12)"
+          :y="box.height - (mark.names.length ? 13 : 12)"
           text-anchor="middle"
           class="tabular-nums"
         >

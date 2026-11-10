@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { ratingTextClass } from '@/lib/tier-classes';
 import { usePageTitle } from '@/router/page-title';
 import ProfileHeader from './ProfileHeader.vue';
@@ -47,10 +48,12 @@ watch(user, (shown) => {
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><ProfileHeaderSkeleton /></template>
       <template v-if="user">
-        <nav :aria-label="$t('common.breadcrumb')" class="text-sm text-muted">
-          <RouterLink to="/users" class="hover:underline">{{ $t('nav.users') }}</RouterLink> /
-          <span :class="ratingTextClass(user.rating)">{{ user.username }}</span>
-        </nav>
+        <PageHeader
+          :title="user.username"
+          :title-class="ratingTextClass(user.rating)"
+          :crumbs="[{ label: $t('nav.users'), to: '/users' }]"
+          :back="{ to: '/users', label: $t('nav.users') }"
+        />
         <ProfileHeader :user="user" />
         <ProfileTabsNav :username="user.username" />
         <RouterView />

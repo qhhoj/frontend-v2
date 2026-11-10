@@ -1,47 +1,15 @@
 {
   "features/notifications/HighPriorityBanner.vue": {
-    "SettingsNotice": 1,
-    "uppercase": 1
+    "SettingsNotice": 1
   },
   "features/notifications/NotificationBell.vue": {
-    "SettingsNotice": 2,
-    "button": 2,
-    "primevue": 1
-  },
-  "features/notifications/NotificationList.vue": {
-    "uppercase": 1
+    "SettingsNotice": 2
   },
   "features/notifications/NotificationRow.vue": {
-    "button": 1,
-    "fixed-size": 2
+    "button": 1
   },
   "features/notifications/NotificationsPage.vue": {
-    "SettingsNotice": 4,
-    "uppercase": 2
-  },
-  "features/notifications/NotificationsPageSkeleton.vue": {
-    "uppercase": 1
-  },
-  "features/profile/BanUserDialog.vue": {
-    "textarea": 1
-  },
-  "features/profile/ProfileHeaderSkeleton.vue": {
-    "fixed-size": 2
-  },
-  "features/profile/ProfileOverviewSkeleton.vue": {
-    "fixed-size": 5
-  },
-  "features/profile/ProfilePpTab.vue": {
-    "table": 1
-  },
-  "features/profile/ProfileTabSkeleton.vue": {
-    "table": 1
-  },
-  "features/profile/ProfileTabsNav.vue": {
-    "PillTabs": 4
-  },
-  "features/profile/RecentContests.vue": {
-    "table": 1
+    "SettingsNotice": 3
   },
   "features/profile/profile-geometry.ts": {
     "fixed-size": 1

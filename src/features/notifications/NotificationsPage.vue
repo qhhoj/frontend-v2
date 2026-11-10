@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import PageHeader from '@/components/ui/PageHeader.vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { NOTIFICATION_STATES } from '@/api/types/notifications';
 import EmptyState from '@/components/EmptyState.vue';
@@ -8,25 +7,21 @@ import InlineBit from '@/components/InlineBit.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import AppButton from '@/components/ui/AppButton.vue';
+import PageHeader from '@/components/ui/PageHeader.vue';
 import Card from '@/components/ui/Card.vue';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { translate } from '@/i18n';
-import { errorMessageKey } from '@/i18n/error-message';
 import { formatNumber } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
+import MarkAllReadButton from './MarkAllReadButton.vue';
 import NotificationList from './NotificationList.vue';
 import NotificationsPageSkeleton from './NotificationsPageSkeleton.vue';
 import { NOTIFICATION_BITS } from './notification-bits';
 import { filterLink, kindGroupFromQuery, stateFromQuery } from './notification-filters';
 import { KIND_GROUPS, kindsOfGroup } from './notification-kinds';
 import NotificationLoadError from './NotificationLoadError.vue';
-import {
-  DRAWER_QUERY,
-  useMarkAllRead,
-  useNotificationsQuery,
-  useUnreadCountQuery,
-} from './notifications.queries';
+import { DRAWER_QUERY, useNotificationsQuery, useUnreadCountQuery } from './notifications.queries';
 import { useOpenNotification } from './use-open-notification';
 
 /** Page: a status rail (chips on a phone), the inbox grouped by day, "Đánh dấu tất cả đã đọc". */
@@ -44,7 +39,6 @@ const listQuery = useNotificationsQuery(query);
 const countQuery = useUnreadCountQuery();
 /** The board's rail counts: all (the drawer's own read, shared), unread (the poll), read = all - unread. */
 const allQuery = useNotificationsQuery(DRAWER_QUERY);
-const markAll = useMarkAllRead();
 const opener = useOpenNotification();
 
 const items = computed(() => listQuery.data.value?.items ?? []);
@@ -59,24 +53,18 @@ const totals = computed(() => {
 const stateSuffix = computed(() => translate(`notifications.stateSuffix.${state.value}`));
 const hasMorePages = computed(() => (meta.value?.total ?? 0) > (meta.value?.pageSize ?? Infinity));
 const canReadAll = computed(() => unread.value > 0 && opener.canMarkRead.value);
-const readAllFailureKey = computed(() =>
-  markAll.error.value ? errorMessageKey(markAll.error.value) : null,
-);
-const readAll = () => {
-  if (!markAll.isPending.value) markAll.mutate();
-};
+/** Why "mark all read" failed (the button reports it); its success is a toast. */
+const readAllFailureKey = ref<string | null>(null);
 const FILTER_CLASS =
   'inline-flex min-h-11 items-center justify-between gap-3 rounded-pill px-4 text-sm whitespace-nowrap';
 </script>
 
 <template>
-  <div class="mx-auto flex max-w-5xl flex-col gap-5 px-4 py-6 sm:px-8">
+  <div class="page-column">
     <PageHeader :title="$t('notifications.title')" :lead="$t('notifications.lead')">
       <template #start><InlineBit :kind="NOTIFICATION_BITS.header" /></template>
       <template v-if="canReadAll" #actions>
-        <AppButton :loading="markAll.isPending.value" @click="readAll">
-          {{ $t('notifications.readAllLong') }}
-        </AppButton>
+        <MarkAllReadButton @failed="readAllFailureKey = $event" />
       </template>
     </PageHeader>
     <SettingsNotice
@@ -86,14 +74,7 @@ const FILTER_CLASS =
     >
       {{ $t('notifications.impersonating') }}
     </SettingsNotice>
-    <SettingsNotice v-if="markAll.isSuccess.value" tone="success" :bit="NOTIFICATION_BITS.allRead">
-      {{ $t('notifications.readAllDone') }}
-    </SettingsNotice>
-    <SettingsNotice
-      v-else-if="readAllFailureKey"
-      tone="error"
-      :bit="NOTIFICATION_BITS.readAllFailed"
-    >
+    <SettingsNotice v-if="readAllFailureKey" tone="error" :bit="NOTIFICATION_BITS.readAllFailed">
       {{ $t(readAllFailureKey) }}
     </SettingsNotice>
     <SettingsNotice v-if="opener.lastStaleId.value" tone="warning" :bit="NOTIFICATION_BITS.stale">
@@ -104,9 +85,7 @@ const FILTER_CLASS =
         :aria-label="`${$t('notifications.statusLabel')}, ${$t('notifications.kindLabel')}`"
         class="flex gap-1 overflow-x-auto lg:flex-col lg:self-start"
       >
-        <p
-          class="hidden px-4 pb-1 text-caption leading-4 font-semibold tracking-wider text-muted uppercase lg:block"
-        >
+        <p class="hidden px-4 pb-1 text-caption leading-4 font-semibold text-muted lg:block">
           {{ $t('notifications.statusLabel') }}
         </p>
         <RouterLink
@@ -126,9 +105,7 @@ const FILTER_CLASS =
             {{ formatNumber(totals[option], locale.locale) }}
           </span>
         </RouterLink>
-        <p
-          class="hidden px-4 pt-3 pb-1 text-caption leading-4 font-semibold tracking-wider text-muted uppercase lg:block"
-        >
+        <p class="hidden px-4 pt-3 pb-1 text-caption leading-4 font-semibold text-muted lg:block">
           {{ $t('notifications.kindLabel') }}
         </p>
         <RouterLink
@@ -149,7 +126,7 @@ const FILTER_CLASS =
       <Card
         as="section"
         data-testid="notifications-card"
-        class="p-4 sm:p-6"
+        class="p-4 sm:p-6 lg:self-start"
         :aria-label="$t('notifications.title')"
       >
         <NotificationLoadError
@@ -180,12 +157,9 @@ const FILTER_CLASS =
                 }}
               </strong>
               <span class="block">{{ $t('notifications.filteredHint') }}</span>
-              <RouterLink
-                :to="filterLink('all')"
-                class="inline-flex min-h-11 items-center font-semibold text-accent-text"
-              >
-                {{ $t('common.clearFilters') }}
-              </RouterLink>
+              <template #action>
+                <AppButton :to="filterLink('all')">{{ $t('common.clearFilters') }}</AppButton>
+              </template>
             </EmptyState>
           </template>
           <template v-else>

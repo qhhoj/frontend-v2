@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import PillTabs, { type PillTab } from '@/components/PillTabs.vue';
+import Tabs from '@/components/ui/Tabs.vue';
+import type { TabItem } from '@/components/ui/Tabs.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
 import { formatNumber } from '@/lib/format';
 import { hasPermission } from '@/lib/permissions';
@@ -16,30 +17,27 @@ const { t } = useI18n();
 /** The user page (already loaded by the profile header) carries the count the viewer may see. */
 const { data: user } = useUserPageQuery(() => props.username);
 
-const tabOf = (route: string, key: string): PillTab => ({
+const tabOf = (route: string, key: string): TabItem => ({
   key: route,
   label: t(`profile.tabs.${key}`),
   to: { name: route, params: { username: props.username } },
 });
 /** The user's submissions are one tap away, on the site list filtered to them, with their count. */
-const submissionsTab = computed<PillTab>(() => {
+const submissionsTab = computed<TabItem>(() => {
   const count = user.value?.submissionCount;
   const text = count == null ? null : formatNumber(count, locale.locale);
   return {
     key: 'submissions',
     label: t('profile.tabs.submissions'),
     to: { name: 'submissions', query: { user: props.username } },
-    badge:
-      text === null
-        ? undefined
-        : {
-            text,
-            tone: 'neutral',
-            srLabel: t('profile.tabs.submissionCount', { count: text }, count!),
-          },
+    count: text,
+    countLabel:
+      text === null ? undefined : t('profile.tabs.submissionCount', { count: text }, count!),
+    countTone: 'neutral',
+    countTestid: 'tab-badge',
   };
 });
-const tabs = computed<PillTab[]>(() => [
+const tabs = computed<TabItem[]>(() => [
   tabOf('user', 'overview'),
   tabOf('user-solved', 'solved'),
   submissionsTab.value,
@@ -51,5 +49,5 @@ const tabs = computed<PillTab[]>(() => [
 ]);
 </script>
 <template>
-  <PillTabs :tabs="tabs" :label="t('profileTabs.title')" />
+  <Tabs :items="tabs" :label="t('profileTabs.title')" overflow="menu" />
 </template>

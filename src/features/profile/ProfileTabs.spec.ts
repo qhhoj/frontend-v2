@@ -63,13 +63,16 @@ describe('profile tabs', () => {
       ),
     });
     const { wrapper } = await mountApp('/users/user_01/comments');
-    await wrapper.get('button[data-testid="older-comments"]').trigger('click');
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Tải bình luận cũ hơn')!
+      .trigger('click');
     await flushPromises();
     const asked = calls
       .filter((call) => call.path.endsWith('/comments'))
       .map((call) => call.query.get('before'));
     expect(asked).toEqual([null, '0192a000-0000-7000-8000-00000000c0aa']);
-    expect(wrapper.find('button[data-testid="older-comments"]').exists()).toBe(false);
+    expect(wrapper.text()).not.toContain('Tải bình luận cũ hơn');
   });
   it('shows no comments tab and the not-found page to a viewer without the right, with no comments request', async () => {
     const calls = mockApi({ ...signedInViewer(), ...base });
@@ -101,7 +104,7 @@ describe('profile tabs', () => {
     // The count comes with the user page: no list request of its own.
     expect(calls.some((call) => call.path === '/submissions')).toBe(false);
   });
-  it('gives a full-score chip the accepted tone and a partial one the neutral tone, with one decimal when fractional', async () => {
+  it('gives a full-score chip the success tone and a partial one the warning tone, with one decimal when fractional', async () => {
     mockApi({
       ...anonymousViewer,
       ...base,
@@ -123,11 +126,12 @@ describe('profile tabs', () => {
       wrapper
         .findAll('li')
         .find((row) => row.text().includes(name))!
-        .get('span.rounded-pill');
-    expect(chipOf('Đủ điểm').classes()).toContain('bg-verdict-ac-bg');
+        .findAll('span')
+        .find((chip) => /\/100$/.test(chip.text()))!;
+    expect(chipOf('Đủ điểm').classes()).toContain('bg-positive-bg');
     expect(chipOf('Đủ điểm').text()).toBe('100/100');
-    expect(chipOf('Một phần').classes()).toContain('bg-partial-bg-2');
-    expect(chipOf('Một phần').classes()).not.toContain('bg-verdict-ac-bg');
+    expect(chipOf('Một phần').classes()).toContain('bg-warning-bg');
+    expect(chipOf('Một phần').classes()).not.toContain('bg-positive-bg');
     expect(chipOf('Một phần').text()).toBe('70,5/100');
     expect(wrapper.text()).toContain('2 bài · 170,5 điểm');
   });

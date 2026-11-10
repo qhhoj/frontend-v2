@@ -8,6 +8,7 @@ import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
+import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { hasPermission } from '@/lib/permissions';
@@ -42,6 +43,12 @@ const canUnban = computed(() => canModerate.value && isBanned.value);
 const isUnbanOpen = ref(false);
 const isSignedIn = computed(() => session.status === 'authenticated');
 const joinedDate = computed(() => formatDate(props.user.dateJoined, 'date', locale.locale));
+/** The display name only when it adds something: it is often the username again. */
+const joinedLine = computed(() =>
+  props.user.displayName === props.user.username
+    ? translate('profile.joinedDate', { date: joinedDate.value })
+    : translate('profile.joined', { name: props.user.displayName, date: joinedDate.value }),
+);
 </script>
 
 <template>
@@ -53,30 +60,22 @@ const joinedDate = computed(() => formatDate(props.user.dateJoined, 'date', loca
       <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
         <UserAvatar :username="user.username" :size="96" />
         <div class="flex min-w-0 flex-col gap-1.5">
-          <div class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-            <h1 :class="tierClass" class="page-title break-all">
-              {{ user.username }}
-            </h1>
-            <span
-              :class="tierClass"
-              class="rounded-pill border border-line px-2.5 py-0.5 text-caption leading-4 font-semibold"
-            >
-              {{ $t(tierLabelKey) }}
-            </span>
-            <Chip v-if="isOwn" tone="accent">{{ $t('profile.own') }}</Chip>
+          <div class="flex min-w-0 flex-wrap items-center gap-2">
+            <Chip size="md">
+              <span :class="tierClass">{{ $t(tierLabelKey) }}</span>
+            </Chip>
+            <Chip v-if="isOwn" size="md" tone="accent">{{ $t('profile.own') }}</Chip>
           </div>
-          <p class="text-muted">
-            {{ $t('profile.joined', { name: user.displayName, date: joinedDate }) }}
-          </p>
+          <p class="text-muted">{{ joinedLine }}</p>
           <ul v-if="user.organizations.length" class="mt-1 flex flex-wrap gap-1.5">
             <li v-for="organization in user.organizations" :key="organization.id">
-              <RouterLink
+              <Chip
+                interactive
                 :to="{ name: 'organization', params: { slug: organization.slug } }"
                 :title="organization.name"
-                class="inline-flex items-center rounded-pill border border-line px-2.5 py-0.5 text-caption leading-4 font-semibold hover:bg-surface-hover"
               >
                 {{ organization.shortName }}
-              </RouterLink>
+              </Chip>
             </li>
           </ul>
         </div>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import AppButton from '@/components/ui/AppButton.vue';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import EmptyState from '@/components/EmptyState.vue';
+import LoadMore from '@/components/LoadMore.vue';
 import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
@@ -35,14 +35,12 @@ const now = Date.now();
         <RecentCommentRow :comment="comment" :now="now" />
       </li>
     </ul>
-    <div v-if="hasNextPage" class="mt-4 flex justify-center">
-      <AppButton
-        data-testid="older-comments"
-        :aria-busy="isFetchingNextPage"
-        @click="fetchNextPage()"
-      >
-        {{ $t('profileTabs.olderComments') }}
-      </AppButton>
-    </div>
+    <LoadMore
+      class="mt-4"
+      :has-more="hasNextPage"
+      :pending="isFetchingNextPage"
+      :label="$t('profileTabs.olderComments')"
+      @more="fetchNextPage()"
+    />
   </QueryState>
 </template>

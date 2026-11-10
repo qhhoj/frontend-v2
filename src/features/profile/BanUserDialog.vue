@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import AppButton from '@/components/ui/AppButton.vue';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { computed, ref, useId } from 'vue';
+import { computed, ref } from 'vue';
 import { banUser } from '@/api/users.api';
 import { BAN_REASON_MAX_LENGTH } from '@/api/types/users';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import FormField from '@/components/ui/FormField.vue';
+import Notice from '@/components/ui/Notice.vue';
+import TextArea from '@/components/ui/TextArea.vue';
 import { errorMessageKey } from '@/i18n/error-message';
 
 /**
@@ -16,7 +19,6 @@ const props = defineProps<{ username: string }>();
 const visible = ref(false);
 const reason = ref('');
 const isBanned = ref(false);
-const reasonId = useId();
 const canConfirm = computed(() => reason.value.trim().length > 0);
 const queryClient = useQueryClient();
 
@@ -53,25 +55,20 @@ function confirm() {
     v-model:visible="visible"
     :title="$t('profile.ban.title', { username })"
     :body="$t('profile.ban.body')"
-    :confirm-label="$t('profile.ban.submit')"
+    :confirm-label="$t('profile.ban.submit', { username })"
+    :blocked-reason="$t('profile.ban.reasonRequired')"
     tone="danger"
     :busy="ban.isPending.value"
     :can-confirm="canConfirm"
     @confirm="confirm"
   >
-    <label :for="reasonId" class="font-semibold">{{ $t('profile.ban.reason') }}</label>
-    <textarea
-      :id="reasonId"
-      v-model="reason"
-      required
-      :maxlength="BAN_REASON_MAX_LENGTH"
-      rows="4"
-      class="rounded-cell border border-line-control bg-surface-solid p-3 text-content"
-    />
+    <FormField :label="$t('profile.ban.reason')" required>
+      <TextArea v-model="reason" :maxlength="BAN_REASON_MAX_LENGTH" rows="4" />
+    </FormField>
     <template #error>
-      <p v-if="ban.isError.value" role="alert" class="text-negative">
+      <Notice v-if="ban.isError.value" tone="danger" inline>
         {{ $t(errorMessageKey(ban.error.value)) }}
-      </p>
+      </Notice>
     </template>
   </ConfirmDialog>
 </template>
