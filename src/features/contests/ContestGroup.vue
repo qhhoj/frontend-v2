@@ -3,6 +3,7 @@ import Chip from '@/components/ui/Chip.vue';
 import { computed, watch } from 'vue';
 import type { ContestPhase } from '@/api/types/contests';
 import Card from '@/components/ui/Card.vue';
+import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import QueryState from '@/components/QueryState.vue';
 import SubmissionPager from '@/features/submissions/SubmissionPager.vue';
 import { phaseAt } from '@/lib/contest-time';
@@ -65,13 +66,12 @@ const countText = computed(() =>
       })
     : formatNumber(total.value, locale.locale),
 );
-/** Each overview group names its own way in; the single group offers the way back. */
-const linkText = computed(() => {
-  if (isSingleGroup.value) return t('contests.list.allGroups');
-  if (props.phase === 'running') return t('contests.list.onlyGroup');
-  if (props.phase === 'upcoming') return t('common.viewAll');
-  return t('contests.list.viewAllCount', { count: formatNumber(total.value, locale.locale) });
-});
+/** Each overview group says "Xem tất cả" (its own page of the list); the single group offers the way back. */
+const linkText = computed(() =>
+  isSingleGroup.value ? t('contests.list.allGroups') : t('common.viewAll'),
+);
+/** An empty overview group shows no count and no link: there is nothing to see. */
+const hasItems = computed(() => isSingleGroup.value || total.value > 0);
 /** "Only this group" from the overview, "all groups" back from it; the search and rated filter stay. */
 const toggleTarget = computed(() => ({
   ...listPage.value,
@@ -98,19 +98,21 @@ const clearTagTarget = computed(() => ({
 </script>
 
 <template>
-  <section :aria-labelledby="headingId" :aria-describedby="countId" class="flex flex-col gap-4">
+  <section
+    :aria-labelledby="headingId"
+    :aria-describedby="hasItems ? countId : undefined"
+    class="flex flex-col gap-4"
+  >
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-baseline gap-2.5">
         <h2 :id="headingId" class="section-title">
           {{ $t(`contests.phase.${phase}`) }}
         </h2>
-        <Chip :id="countId" size="md">{{ countText }}</Chip>
+        <Chip v-if="hasItems" :id="countId" size="md">{{ countText }}</Chip>
       </div>
-      <RouterLink
-        :to="toggleTarget"
-        class="inline-flex min-h-11 items-center text-accent-text underline"
+      <SeeAllLink v-if="hasItems" :to="toggleTarget"
         >{{ linkText
-        }}<span class="sr-only">: {{ $t(`contests.phase.${phase}`) }}</span></RouterLink
+        }}<span class="sr-only">: {{ $t(`contests.phase.${phase}`) }}</span></SeeAllLink
       >
     </div>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">

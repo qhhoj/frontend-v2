@@ -231,6 +231,7 @@
         "count": "Submissions",
         "ac": "AC"
       },
+      "resultErr": "Other errors",
       "errNote": "ERR covers MLE, OLE, IR, RTE, AB and IE. Totals include submissions still waiting.",
       "languageTitle": "Languages",
       "closedTitle": "Statistics are not open yet",
@@ -271,12 +272,10 @@
       }
     },
     "list": {
-      "lead": "Grouped by phase: running, upcoming and ended.",
       "search": "Find a contest",
       "ratedLabel": "Rating",
       "ratedAny": "All",
       "ratedOnly": "Rated only",
-      "onlyGroup": "Only this group",
       "allGroups": "View all groups",
       "timeLeft": "{span} left",
       "perParticipation": "{span} per participation, from the moment you enter",
@@ -286,7 +285,6 @@
       "viewAndRegister": "View & register",
       "endedRegion": "Ended contests, scrolls sideways",
       "shownOf": "{shown} of {total}",
-      "viewAllCount": "View all {count} contests",
       "view": "View",
       "codeNeeded": "Code needed",
       "badges": {
@@ -2535,8 +2533,7 @@
       "scrub": "Replay time",
       "marksLegend": "Green dot: first solve of each problem",
       "myRow": "Go to my row",
-      "finished": "Reached the end.",
-      "speedOption": "x{speed} (speed times {speed})"
+      "finished": "Reached the end."
     },
     "feed": {
       "title": "Just happened",

@@ -38,7 +38,7 @@ const freezeClock = computed(() => {
       <!-- Under 10 % from the end the centred label would run off the bar: it sits flush right instead. -->
       <span
         data-testid="freeze-label"
-        class="absolute font-semibold whitespace-nowrap text-verdict-tle"
+        class="absolute font-semibold whitespace-nowrap text-warning"
         :class="isFreezeNearEnd ? 'right-0' : '-translate-x-1/2'"
         :style="isFreezeNearEnd ? undefined : { left: `${freezePercent}%` }"
         >{{ $t('contests.detail.freezeAt', { time: freezeClock }) }}</span

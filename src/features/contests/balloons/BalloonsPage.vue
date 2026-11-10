@@ -99,7 +99,7 @@ const go = (patch: Record<string, string | undefined>) =>
 </script>
 
 <template>
-  <div ref="root" class="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-8">
+  <div ref="root" class="page-column">
     <StatePanel
       v-if="isMissing"
       kind="notFound"
