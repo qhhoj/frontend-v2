@@ -7,40 +7,24 @@
 // So is `uppercase` on a table header cell or header recipe (scripts/table-header-case.mjs).
 // So is a raw `<h1` outside PageHeader (scripts/page-headings.mjs).
 // So is an `<EmptyState>` without its `#action` next step (scripts/empty-actions.mjs).
+// So are raw elements, old wrapper imports and retired classes above a file's baseline (scripts/raw-elements.mjs).
 // So is a hairline border (`border-line`, `border-line-strong`) on a form control (scripts/control-borders.mjs).
 // So are arbitrary sizes, radii and z-indexes (`text-[13px]`, `rounded-[3px]`, `z-[5]`, `z-50`) and the arbitrary token wrappers `accent-[var(--qh-accent)]` and `min-h-[var(--qa-control)]`: use the named steps (scripts/arbitrary-utilities.mjs).
 // The exemptions are Bit's sprite palettes (src/mascot/bit-sprite.ts) and the avatar's sprite data (src/mascot/avatar/avatar-sprites.ts):
 // image-like data that Bit keeps in every theme.
-import { readdirSync, readFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
 import { hairlineControlBorders } from './control-borders.mjs';
 import { emptyStateOffences } from './empty-actions.mjs';
 import { rawHeadings } from './page-headings.mjs';
+import { baselineErrors, rawElementOffences, readBaselines } from './raw-elements.mjs';
 import { retiredUtilities } from './retired-utilities.mjs';
+import { sourceTree } from './source-tree.mjs';
 import { stockUtilities } from './stock-utilities.mjs';
 import { tableHeaderUppercase } from './table-header-case.mjs';
 import { ALLOWED as MOTION, bareTransitions } from './transition-utilities.mjs';
 import { ALLOWED, arbitraryUtilities } from './arbitrary-utilities.mjs';
 
-const root = new URL('../src/', import.meta.url).pathname;
-const themesDir = join(root, 'theme', 'themes');
-const generatedDir = join(root, 'api', 'generated');
-const spriteFiles = new Set([
-  join(root, 'mascot', 'bit-sprite.ts'),
-  join(root, 'mascot', 'avatar', 'avatar-sprites.ts'),
-]);
 const colourLiteral = /#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|oklch|oklab|lab|lch|hwb|color)\(/;
-
-const files = (dir) =>
-  readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const path = join(dir, entry.name);
-    if (entry.isDirectory()) return path === themesDir || path === generatedDir ? [] : files(path);
-    return /\.(vue|ts|css)$/.test(entry.name) &&
-      !entry.name.endsWith('.spec.ts') &&
-      !spriteFiles.has(path)
-      ? [path]
-      : [];
-  });
+const baselines = readBaselines();
 
 /** A finder that reads one line (and the file's path under src/) and answers the offending words. */
 const perLine = (find) => (source, rel) =>
@@ -86,15 +70,16 @@ const CHECKS = [
     find: emptyStateOffences,
   },
   {
+    message: `Raw elements, old wrappers and retired classes above the file's count in scripts/raw-element-baseline/<area>.json (a file never gains one: use the kit part named on each line; a fixed file lowers its count with npm run raw-elements:shrink; docs/wrapper-migration.md):`,
+    find: (source, rel) => rawElementOffences(source, rel, baselines.merged[rel]),
+  },
+  {
     message: `Colour literals outside src/theme/themes/ (use a --qh- token):`,
     find: perLine((line) => (colourLiteral.test(line) ? [line.trim()] : [])),
   },
 ];
 
-const sources = files(root).map((path) => ({
-  rel: relative(root, path),
-  source: readFileSync(path, 'utf8'),
-}));
+const sources = sourceTree();
 
 for (const { message, find } of CHECKS) {
   const offences = sources.flatMap(({ rel, source }) =>
@@ -104,4 +89,13 @@ for (const { message, find } of CHECKS) {
     console.error(`${message}\n${offences.join('\n')}`);
     process.exit(1);
   }
+}
+
+const strayEntries = baselineErrors(
+  baselines,
+  sources.map(({ rel }) => rel),
+);
+if (strayEntries.length) {
+  console.error(`Stale entries in scripts/raw-element-baseline/:\n${strayEntries.join('\n')}`);
+  process.exit(1);
 }

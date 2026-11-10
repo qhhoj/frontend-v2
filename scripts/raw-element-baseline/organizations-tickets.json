@@ -1,0 +1,126 @@
+{
+  "features/organizations/MemberRows.vue": {
+    "table": 1
+  },
+  "features/organizations/MembershipPanel.vue": {
+    "use-admin-toast": 1
+  },
+  "features/organizations/OrganizationCardSkeleton.vue": {
+    "fixed-size": 3
+  },
+  "features/organizations/OrganizationContestsPage.vue": {
+    "GlassCard": 1
+  },
+  "features/organizations/OrganizationLogo.vue": {
+    "fixed-size": 1
+  },
+  "features/organizations/OrganizationMenu.vue": {
+    "primevue": 2,
+    "use-admin-toast": 1
+  },
+  "features/organizations/OrganizationTabsNav.vue": {
+    "PillTabs": 3
+  },
+  "features/organizations/manage/OrganizationAvatarField.vue": {
+    "button": 1
+  },
+  "features/organizations/problems/OrgBulkResult.vue": {
+    "SettingsNotice": 1
+  },
+  "features/organizations/problems/OrgBulkTagDialog.vue": {
+    "radio": 3
+  },
+  "features/organizations/problems/OrgProblemActions.vue": {
+    "button": 2
+  },
+  "features/organizations/problems/OrgProblemFilters.vue": {
+    "button": 3,
+    "search": 1
+  },
+  "features/organizations/problems/OrgProblemTable.vue": {
+    "table": 1
+  },
+  "features/organizations/problems/OrgProblemTableSkeleton.vue": {
+    "table": 1
+  },
+  "features/organizations/problems/OrgProblemTagsDialog.vue": {
+    "checkbox": 1
+  },
+  "features/organizations/problems/OrgProblemsPage.vue": {
+    "GlassCard": 1,
+    "SettingsNotice": 1,
+    "button": 1
+  },
+  "features/organizations/problems/OrgSelectBox.vue": {
+    "checkbox": 1
+  },
+  "features/organizations/problems/OrgTagCatalogue.vue": {
+    "GlassCard": 1
+  },
+  "features/organizations/problems/OrgTagDialog.vue": {
+    "radio": 1
+  },
+  "features/organizations/problems/ProblemArchivedNotice.vue": {
+    "SettingsNotice": 1
+  },
+  "features/organizations/quota/CreditLedger.vue": {
+    "GlassCard": 1,
+    "table": 1
+  },
+  "features/organizations/quota/OrgQuotaPage.vue": {
+    "fixed-size": 5
+  },
+  "features/organizations/quota/QuotaMeterCard.vue": {
+    "GlassCard": 1
+  },
+  "features/organizations/quota/QuotaNotice.vue": {
+    "SettingsNotice": 1
+  },
+  "features/tickets/NewTicketPage.vue": {
+    "GlassCard": 2,
+    "radio": 1
+  },
+  "features/tickets/TicketAlertsStrip.vue": {
+    "fixed-size": 1
+  },
+  "features/tickets/TicketHeader.vue": {
+    "GlassCard": 1
+  },
+  "features/tickets/TicketMessages.vue": {
+    "SettingsNotice": 1,
+    "details": 1
+  },
+  "features/tickets/TicketNotes.vue": {
+    "GlassCard": 1,
+    "textarea": 1
+  },
+  "features/tickets/TicketPageSkeleton.vue": {
+    "GlassCard": 2
+  },
+  "features/tickets/TicketReply.vue": {
+    "GlassCard": 1,
+    "textarea": 1
+  },
+  "features/tickets/TicketSidePanel.vue": {
+    "GlassCard": 1
+  },
+  "features/tickets/TicketStaffActions.vue": {
+    "GlassCard": 1,
+    "input": 1
+  },
+  "features/tickets/TicketTable.vue": {
+    "fixed-size": 2,
+    "table": 1
+  },
+  "features/tickets/TicketTableSkeleton.vue": {
+    "fixed-size": 3,
+    "table": 1
+  },
+  "features/tickets/TicketsPage.vue": {
+    "GlassCard": 1
+  },
+  "features/tickets/canned/CannedReplyPicker.vue": {
+    "button": 1,
+    "fixed-size": 1
+  }
+}

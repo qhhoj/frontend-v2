@@ -1,0 +1,327 @@
+{
+  "features/admin/catalogs/LicenseCatalogPanel.vue": {
+    "AdminDataTable": 1,
+    "AdminDrawer": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/catalogs/LicenseEditor.vue": {
+    "AdminField": 1,
+    "button": 1,
+    "controls": 3,
+    "input": 1
+  },
+  "features/admin/catalogs/ProblemCatalogsPage.vue": {
+    "AdminPageHeader": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/catalogs/TaxonCatalogPanel.vue": {
+    "AdminDataTable": 1,
+    "AdminDrawer": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/catalogs/TaxonEditor.vue": {
+    "AdminField": 2,
+    "button": 1,
+    "controls": 5,
+    "input": 2
+  },
+  "features/admin/contest-tags/ColorTokenPicker.vue": {
+    "radio": 1
+  },
+  "features/admin/contest-tags/ContestTagEditor.vue": {
+    "AdminDrawer": 1,
+    "AdminField": 4,
+    "button": 1,
+    "controls": 9,
+    "input": 4
+  },
+  "features/admin/contest-tags/ContestTagsPage.vue": {
+    "AdminDataTable": 1,
+    "AdminNotice": 1,
+    "AdminPageHeader": 1,
+    "AdminRowMenu": 2,
+    "button": 2,
+    "controls": 2
+  },
+  "features/admin/contest-tags/TagContestsPanel.vue": {
+    "AdminDrawer": 1,
+    "button": 2,
+    "checkbox": 2,
+    "controls": 6,
+    "input": 1
+  },
+  "features/admin/judges/DisconnectDialog.vue": {
+    "checkbox": 1
+  },
+  "features/admin/judges/JudgeAddPage.vue": {
+    "AdminField": 2,
+    "AdminPageHeader": 1,
+    "controls": 5,
+    "input": 1,
+    "textarea": 1
+  },
+  "features/admin/judges/JudgeDetails.vue": {
+    "AdminField": 1,
+    "button": 1,
+    "controls": 2,
+    "textarea": 1
+  },
+  "features/admin/judges/JudgeDrawer.vue": {
+    "AdminDrawer": 1
+  },
+  "features/admin/judges/JudgeQueueCard.vue": {
+    "controls": 1
+  },
+  "features/admin/judges/JudgeRuntimes.vue": {
+    "AdminDataTable": 1
+  },
+  "features/admin/judges/JudgeStats.vue": {
+    "button": 2,
+    "controls": 2
+  },
+  "features/admin/judges/JudgeStatusChip.vue": {
+    "AdminChip": 2
+  },
+  "features/admin/judges/JudgesPage.vue": {
+    "AdminNotice": 1,
+    "AdminPageHeader": 1,
+    "controls": 2
+  },
+  "features/admin/judges/JudgesTable.vue": {
+    "AdminDataTable": 1,
+    "AdminRowMenu": 2,
+    "button": 1,
+    "controls": 3,
+    "search": 1
+  },
+  "features/admin/languages/LanguageContentSection.vue": {
+    "AdminField": 3,
+    "controls": 3,
+    "textarea": 3
+  },
+  "features/admin/languages/LanguageEditorSection.vue": {
+    "AdminField": 4,
+    "checkbox": 2,
+    "controls": 10,
+    "input": 4
+  },
+  "features/admin/languages/LanguageForm.vue": {
+    "controls": 2
+  },
+  "features/admin/languages/LanguageFormPage.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/languages/LanguageIdentitySection.vue": {
+    "AdminChip": 1,
+    "AdminField": 4,
+    "controls": 8,
+    "input": 4
+  },
+  "features/admin/languages/LanguagesPage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 2
+  },
+  "features/admin/languages/LanguagesTable.vue": {
+    "AdminChip": 3,
+    "AdminDataTable": 1,
+    "details": 1
+  },
+  "features/admin/organizations/JoinRequestTable.vue": {
+    "AdminChip": 1,
+    "AdminDataTable": 1,
+    "AdminRowMenu": 1,
+    "AdminUserLabel": 1,
+    "button": 3,
+    "controls": 3,
+    "use-admin-toast": 1
+  },
+  "features/admin/organizations/MembersPanel.vue": {
+    "AdminChip": 1,
+    "AdminDataTable": 1,
+    "AdminRowMenu": 3,
+    "AdminUserLabel": 1,
+    "use-admin-toast": 1
+  },
+  "features/admin/organizations/OrganizationContext.vue": {
+    "button": 1,
+    "controls": 2,
+    "use-admin-toast": 1
+  },
+  "features/admin/organizations/OrganizationDeleteCard.vue": {
+    "AdminField": 1,
+    "button": 1,
+    "controls": 4,
+    "input": 1,
+    "use-admin-toast": 1
+  },
+  "features/admin/organizations/OrganizationDetail.vue": {
+    "AdminChip": 2,
+    "button": 2,
+    "controls": 2
+  },
+  "features/admin/organizations/OrganizationEditor.vue": {
+    "AdminField": 4,
+    "AdminNotice": 2,
+    "controls": 9,
+    "input": 4,
+    "use-admin-toast": 1
+  },
+  "features/admin/organizations/OrganizationFlagField.vue": {
+    "checkbox": 1
+  },
+  "features/admin/organizations/OrganizationHistoryPanel.vue": {
+    "AdminChip": 2,
+    "AdminUserLabel": 1,
+    "controls": 1,
+    "verdict-tone": 4
+  },
+  "features/admin/organizations/OrganizationList.vue": {
+    "AdminChip": 2,
+    "AdminDataTable": 1,
+    "AdminField": 1,
+    "controls": 1,
+    "select": 1
+  },
+  "features/admin/organizations/OrganizationLogoField.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/organizations/OrganizationsPage.vue": {
+    "AdminPageHeader": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/organizations/quotas/QuotaEditDialog.vue": {
+    "AdminField": 2,
+    "checkbox": 1,
+    "controls": 5,
+    "input": 2
+  },
+  "features/admin/organizations/quotas/QuotaMeter.vue": {
+    "verdict-tone": 2
+  },
+  "features/admin/organizations/quotas/QuotaOverviewPage.vue": {
+    "AdminDataTable": 1,
+    "AdminPageHeader": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/pages/ChangeLines.vue": {
+    "verdict-tone": 4
+  },
+  "features/admin/pages/DeletedFlatpagesList.vue": {
+    "button": 2
+  },
+  "features/admin/pages/FlatpageEditor.vue": {
+    "AdminField": 3,
+    "AdminNotice": 1,
+    "button": 1,
+    "checkbox": 1,
+    "controls": 10,
+    "input": 2,
+    "textarea": 1
+  },
+  "features/admin/pages/FlatpageHistoryPanel.vue": {
+    "button": 2,
+    "controls": 4,
+    "table": 1
+  },
+  "features/admin/pages/FlatpagePreview.vue": {
+    "AdminChip": 1
+  },
+  "features/admin/pages/FlatpageRevisionRow.vue": {
+    "AdminChip": 2,
+    "AdminUserLabel": 1,
+    "button": 2,
+    "controls": 3
+  },
+  "features/admin/pages/FlatpagesPage.vue": {
+    "AdminChip": 1,
+    "AdminPageHeader": 1,
+    "button": 2,
+    "controls": 4
+  },
+  "features/admin/settings/AdminLogPage.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/settings/ClearSecretButton.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/settings/DiscordWebhooksTable.vue": {
+    "button": 5,
+    "controls": 12,
+    "input": 1
+  },
+  "features/admin/settings/ExternalJudgeConnectionCheck.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/settings/OAuthClientField.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/settings/PolygonConnectionCheck.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/settings/RevisionItem.vue": {
+    "AdminChip": 1,
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/settings/RevisionsPanel.vue": {
+    "button": 3,
+    "controls": 7
+  },
+  "features/admin/settings/ScalarSettingField.vue": {
+    "AdminField": 1,
+    "controls": 7,
+    "input": 3,
+    "select": 1
+  },
+  "features/admin/settings/SecretField.vue": {
+    "AdminChip": 1,
+    "AdminField": 1,
+    "button": 2,
+    "controls": 6,
+    "password": 1
+  },
+  "features/admin/settings/SettingBlock.vue": {
+    "AdminChip": 1,
+    "AdminNotice": 1,
+    "controls": 1,
+    "use-admin-toast": 1
+  },
+  "features/admin/settings/SettingInfo.vue": {
+    "button": 2,
+    "controls": 2
+  },
+  "features/admin/settings/SettingsLogPanel.vue": {
+    "AdminNotice": 1,
+    "controls": 1,
+    "select": 1
+  },
+  "features/admin/settings/SiteNoticeBlock.vue": {
+    "AdminChip": 1,
+    "AdminField": 1,
+    "AdminNotice": 1,
+    "button": 1,
+    "controls": 3,
+    "textarea": 1
+  },
+  "features/admin/settings/SiteSettingsPage.vue": {
+    "AdminPageHeader": 1,
+    "fixed-size": 2
+  },
+  "features/admin/site/ConfigHistory.vue": {
+    "AdminUserLabel": 1,
+    "button": 2,
+    "controls": 4
+  }
+}

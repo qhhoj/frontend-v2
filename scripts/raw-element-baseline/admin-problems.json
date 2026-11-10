@@ -1,0 +1,332 @@
+{
+  "features/admin/creation/CreationOwnerPicker.vue": {
+    "controls": 3,
+    "radio": 2,
+    "select": 1
+  },
+  "features/admin/problems/ProblemEditorPage.vue": {
+    "AdminChip": 4,
+    "AdminPageHeader": 1,
+    "button": 1,
+    "controls": 2,
+    "fixed-size": 2
+  },
+  "features/admin/problems/ProblemImportMenu.vue": {
+    "button": 1,
+    "controls": 1,
+    "primevue": 2
+  },
+  "features/admin/problems/ProblemSetupChecklist.vue": {
+    "button": 1,
+    "controls": 3
+  },
+  "features/admin/problems/ProblemsIndexPage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 1
+  },
+  "features/admin/problems/data/CaseRow.vue": {
+    "button": 3,
+    "checkbox": 1,
+    "controls": 18,
+    "details": 1,
+    "input": 7,
+    "select": 2
+  },
+  "features/admin/problems/data/CasesAutofill.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/problems/data/CasesEditor.vue": {
+    "button": 2,
+    "controls": 2,
+    "table": 1
+  },
+  "features/admin/problems/data/CheckerPicker.vue": {
+    "AdminChoiceCards": 1
+  },
+  "features/admin/problems/data/CheckerRuleOptions.vue": {
+    "AdminField": 4,
+    "controls": 6,
+    "input": 2,
+    "select": 2
+  },
+  "features/admin/problems/data/CheckerSection.vue": {
+    "AdminField": 2,
+    "controls": 4,
+    "input": 2
+  },
+  "features/admin/problems/data/DataArchiveCard.vue": {
+    "AdminChip": 2,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/problems/data/DataFeedback.vue": {
+    "AdminNotice": 1
+  },
+  "features/admin/problems/data/DataSourceFiles.vue": {
+    "controls": 1
+  },
+  "features/admin/problems/data/DataSourceRow.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/problems/data/GraderPicker.vue": {
+    "AdminChoiceCards": 1
+  },
+  "features/admin/problems/data/InitYamlDialog.vue": {
+    "primevue": 1
+  },
+  "features/admin/problems/data/IoMethodPicker.vue": {
+    "AdminChoiceCards": 1,
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/problems/data/ProblemDataTab.vue": {
+    "controls": 3
+  },
+  "features/admin/problems/data/SourceCheckStatus.vue": {
+    "details": 1
+  },
+  "features/admin/problems/data/ZipAutofillDialog.vue": {
+    "AdminChip": 2,
+    "AdminField": 1,
+    "button": 2,
+    "controls": 7,
+    "details": 1,
+    "input": 1,
+    "primevue": 1,
+    "radio": 1,
+    "table": 1,
+    "verdict-tone": 1
+  },
+  "features/admin/problems/editorial/ProblemEditorialTab.vue": {
+    "AdminDateTimeField": 1,
+    "controls": 1
+  },
+  "features/admin/problems/external/ExternalJudgeNotConnected.vue": {
+    "controls": 1
+  },
+  "features/admin/problems/external/ExternalJudgeSearch.vue": {
+    "button": 2,
+    "controls": 3
+  },
+  "features/admin/problems/external/ExternalLanguageTable.vue": {
+    "controls": 1,
+    "select": 1,
+    "table": 1
+  },
+  "features/admin/problems/external/ProblemExternalTab.vue": {
+    "AdminField": 2,
+    "button": 3,
+    "controls": 10,
+    "input": 2
+  },
+  "features/admin/problems/files/ProblemUploadCard.vue": {
+    "button": 1,
+    "controls": 2,
+    "fixed-size": 1
+  },
+  "features/admin/problems/general/LanguageLimitsTable.vue": {
+    "button": 2,
+    "controls": 7,
+    "input": 2,
+    "select": 1
+  },
+  "features/admin/problems/general/ProblemBasicForm.vue": {
+    "AdminField": 2,
+    "controls": 4,
+    "input": 2
+  },
+  "features/admin/problems/general/ProblemBasicsSection.vue": {
+    "AdminDateTimeField": 1,
+    "AdminField": 3,
+    "controls": 5,
+    "input": 2,
+    "textarea": 1
+  },
+  "features/admin/problems/general/ProblemClassSection.vue": {
+    "AdminField": 2,
+    "button": 3,
+    "checkbox": 1,
+    "controls": 7,
+    "select": 3
+  },
+  "features/admin/problems/general/ProblemCloneDialog.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/problems/general/ProblemCodeField.vue": {
+    "AdminField": 1,
+    "input": 1
+  },
+  "features/admin/problems/general/ProblemCreateForm.vue": {
+    "AdminField": 6,
+    "button": 2,
+    "controls": 15,
+    "input": 4,
+    "select": 2
+  },
+  "features/admin/problems/general/ProblemCreatePage.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/problems/general/ProblemGeneralTab.vue": {
+    "controls": 1
+  },
+  "features/admin/problems/general/ProblemOrganizationsField.vue": {
+    "button": 1,
+    "controls": 1,
+    "select": 1
+  },
+  "features/admin/problems/general/ProblemPeopleSection.vue": {
+    "AdminUserLabel": 1
+  },
+  "features/admin/problems/general/ProblemStatusSection.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/problems/general/ProblemVisibilityCard.vue": {
+    "AdminChip": 4,
+    "checkbox": 1
+  },
+  "features/admin/problems/general/ProblemVisibilitySection.vue": {
+    "AdminField": 1,
+    "controls": 1,
+    "select": 1
+  },
+  "features/admin/problems/import/ImportCheckbox.vue": {
+    "button": 1,
+    "checkbox": 1
+  },
+  "features/admin/problems/import/ImportOptionsForm.vue": {
+    "AdminField": 3,
+    "button": 1,
+    "controls": 8,
+    "details": 1,
+    "input": 2,
+    "radio": 1,
+    "textarea": 1
+  },
+  "features/admin/problems/import/ImportProgress.vue": {
+    "controls": 2
+  },
+  "features/admin/problems/import/ImportStepList.vue": {
+    "verdict-tone": 4
+  },
+  "features/admin/problems/import/ZipImportPage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 1
+  },
+  "features/admin/problems/lifecycle/DeletedProblemsPage.vue": {
+    "AdminChip": 1,
+    "AdminDataTable": 1,
+    "AdminPageHeader": 1,
+    "AdminRowMenu": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/problems/lifecycle/ProblemDangerZone.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/problems/lifecycle/TypedCodeDialog.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/problems/package/ProblemPackageCard.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/problems/polygon/ImportOutcomeHeader.vue": {
+    "verdict-tone": 4
+  },
+  "features/admin/problems/polygon/ImportSummaryTable.vue": {
+    "table": 1
+  },
+  "features/admin/problems/polygon/PackageStatePill.vue": {
+    "AdminChip": 2
+  },
+  "features/admin/problems/polygon/PackageTypePill.vue": {
+    "AdminChip": 1
+  },
+  "features/admin/problems/polygon/PolygonConfigureStep.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/problems/polygon/PolygonLinkOptionsDrawer.vue": {
+    "AdminDrawer": 1
+  },
+  "features/admin/problems/polygon/PolygonLinkPanel.vue": {
+    "SettingsCard": 1
+  },
+  "features/admin/problems/polygon/PolygonLinkRefusal.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/problems/polygon/PolygonLinkStep.vue": {
+    "AdminChip": 1,
+    "button": 1,
+    "controls": 5,
+    "details": 1,
+    "input": 1
+  },
+  "features/admin/problems/polygon/PolygonNotConnected.vue": {
+    "AdminNotice": 1,
+    "controls": 2
+  },
+  "features/admin/problems/polygon/PolygonProgressStep.vue": {
+    "details": 1
+  },
+  "features/admin/problems/polygon/PolygonSourcePanel.vue": {
+    "uppercase": 3
+  },
+  "features/admin/problems/polygon/PolygonSyncHistory.vue": {
+    "AdminChip": 1,
+    "AdminDataTable": 1,
+    "AdminUserLabel": 1
+  },
+  "features/admin/problems/polygon/PolygonWizardPage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 2,
+    "details": 1
+  },
+  "features/admin/problems/polygon/WizardStepper.vue": {
+    "verdict-tone": 2
+  },
+  "features/admin/problems/statements/ProblemStatementsTab.vue": {
+    "AdminField": 1,
+    "button": 1,
+    "controls": 3,
+    "input": 1
+  },
+  "features/admin/search/IndexSearchBox.vue": {
+    "button": 1,
+    "controls": 4,
+    "search": 1
+  },
+  "features/admin/search/ProblemBulkVisibilityDialog.vue": {
+    "checkbox": 1,
+    "controls": 3,
+    "input": 1
+  },
+  "features/admin/search/ProblemListFilters.vue": {
+    "AdminField": 3,
+    "controls": 4,
+    "input": 1,
+    "select": 2
+  },
+  "features/admin/search/ProblemListTable.vue": {
+    "AdminChip": 5,
+    "AdminDataTable": 1,
+    "AdminRowMenu": 1,
+    "AdminUserLabel": 1
+  },
+  "features/admin/search/ProblemSearchList.vue": {
+    "button": 2,
+    "controls": 2,
+    "use-admin-toast": 1
+  }
+}

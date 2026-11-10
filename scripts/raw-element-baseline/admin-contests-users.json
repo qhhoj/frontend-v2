@@ -1,0 +1,373 @@
+{
+  "features/admin/contests/ContestEditorPage.vue": {
+    "AdminChip": 1,
+    "AdminPageHeader": 1,
+    "button": 2,
+    "controls": 6,
+    "fixed-size": 2
+  },
+  "features/admin/contests/ContestsIndexPage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 1
+  },
+  "features/admin/contests/actions/ContestActionCard.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/contests/actions/ContestActionsTab.vue": {
+    "fixed-size": 7,
+    "uppercase": 1
+  },
+  "features/admin/contests/actions/ContestCloneCard.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/contests/actions/ContestDataCard.vue": {
+    "button": 1,
+    "controls": 3
+  },
+  "features/admin/contests/actions/ContestDeleteCard.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/contests/actions/ContestFreezeLockCard.vue": {
+    "button": 4,
+    "controls": 7,
+    "input": 1
+  },
+  "features/admin/contests/actions/ContestProblemOpsCard.vue": {
+    "button": 2,
+    "checkbox": 1,
+    "controls": 5,
+    "select": 1
+  },
+  "features/admin/contests/actions/ContestPublishCard.vue": {
+    "button": 2,
+    "checkbox": 1,
+    "controls": 3
+  },
+  "features/admin/contests/actions/PrepareDataDialog.vue": {
+    "checkbox": 1,
+    "controls": 3,
+    "input": 1
+  },
+  "features/admin/contests/actions/PublishResultTable.vue": {
+    "AdminDataTable": 1
+  },
+  "features/admin/contests/announcements/AnnouncementComposer.vue": {
+    "AdminField": 2,
+    "button": 1,
+    "controls": 5,
+    "input": 1,
+    "textarea": 1
+  },
+  "features/admin/contests/announcements/AnnouncementEditForm.vue": {
+    "AdminField": 2,
+    "button": 2,
+    "controls": 5,
+    "input": 1,
+    "textarea": 1
+  },
+  "features/admin/contests/announcements/AnnouncementItem.vue": {
+    "AdminRowMenu": 2,
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/contests/data/ContestExportCard.vue": {
+    "button": 1,
+    "controls": 3
+  },
+  "features/admin/contests/data/FeedKeyCard.vue": {
+    "button": 3,
+    "controls": 7,
+    "input": 1,
+    "radio": 1
+  },
+  "features/admin/contests/general/ContestAccessSection.vue": {
+    "AdminField": 3,
+    "controls": 6,
+    "input": 1,
+    "password": 2
+  },
+  "features/admin/contests/general/ContestBasicForm.vue": {
+    "AdminChoiceCards": 1,
+    "AdminField": 3,
+    "controls": 5,
+    "input": 2,
+    "select": 1
+  },
+  "features/admin/contests/general/ContestBasicTime.vue": {
+    "AdminDateTimeField": 2,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/contests/general/ContestCreatePage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 2
+  },
+  "features/admin/contests/general/ContestFormatSection.vue": {
+    "AdminField": 4,
+    "controls": 6,
+    "input": 2,
+    "select": 2
+  },
+  "features/admin/contests/general/ContestGeneralForm.vue": {
+    "controls": 1
+  },
+  "features/admin/contests/general/ContestGeneralTab.vue": {
+    "AdminNotice": 1
+  },
+  "features/admin/contests/general/ContestInfoSection.vue": {
+    "AdminField": 3,
+    "controls": 4,
+    "input": 1,
+    "textarea": 2
+  },
+  "features/admin/contests/general/ContestOperationsSection.vue": {
+    "AdminField": 1,
+    "controls": 1,
+    "textarea": 1
+  },
+  "features/admin/contests/general/ContestRatingSection.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/contests/general/ContestSummaryRail.vue": {
+    "button": 1,
+    "controls": 2,
+    "uppercase": 1
+  },
+  "features/admin/contests/general/ContestTimeSection.vue": {
+    "AdminDateTimeField": 3,
+    "AdminField": 2,
+    "controls": 4,
+    "input": 2
+  },
+  "features/admin/contests/general/SectionJumpSelect.vue": {
+    "controls": 1,
+    "select": 1
+  },
+  "features/admin/contests/general/TagChips.vue": {
+    "button": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/contests/ghosts/ContestGhostsTab.vue": {
+    "controls": 1
+  },
+  "features/admin/contests/ghosts/GhostCurrentCard.vue": {
+    "button": 1,
+    "controls": 3
+  },
+  "features/admin/contests/ghosts/GhostImportCard.vue": {
+    "button": 2,
+    "controls": 3
+  },
+  "features/admin/contests/ghosts/GhostPreviewTable.vue": {
+    "AdminDataTable": 1
+  },
+  "features/admin/contests/lifecycle/ContestCloneDialog.vue": {
+    "AdminDateTimeField": 1,
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/contests/lifecycle/ContestDeleteDialog.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/contests/list/ContestFlagChips.vue": {
+    "AdminChip": 2
+  },
+  "features/admin/contests/list/ContestList.vue": {
+    "AdminDataTable": 1,
+    "AdminRowMenu": 1,
+    "button": 2,
+    "controls": 2
+  },
+  "features/admin/contests/list/ContestListFilters.vue": {
+    "AdminField": 4,
+    "controls": 4,
+    "select": 4
+  },
+  "features/admin/contests/list/ContestPhaseChip.vue": {
+    "AdminChip": 2
+  },
+  "features/admin/contests/list/use-contest-row-menu.ts": {
+    "AdminRowMenu": 2
+  },
+  "features/admin/contests/participants/AddParticipationDialog.vue": {
+    "AdminDateTimeField": 1,
+    "AdminField": 1,
+    "controls": 4,
+    "input": 1,
+    "radio": 2
+  },
+  "features/admin/contests/participants/ContestParticipantsTab.vue": {
+    "AdminChip": 1,
+    "AdminDataTable": 1,
+    "AdminRowMenu": 1,
+    "AdminUserLabel": 1,
+    "button": 3,
+    "controls": 3
+  },
+  "features/admin/contests/participants/ParticipantsFilters.vue": {
+    "AdminField": 3,
+    "controls": 3,
+    "select": 3
+  },
+  "features/admin/contests/participants/ParticipationDialogs.vue": {
+    "AdminDateTimeField": 1
+  },
+  "features/admin/contests/participants/use-participation-actions.ts": {
+    "AdminRowMenu": 1
+  },
+  "features/admin/contests/problems/ContestProblemRow.vue": {
+    "button": 3,
+    "checkbox": 3,
+    "controls": 12,
+    "input": 4
+  },
+  "features/admin/contests/problems/ContestProblemsTab.vue": {
+    "button": 3,
+    "checkbox": 1,
+    "controls": 7,
+    "input": 1,
+    "table": 1
+  },
+  "features/admin/contests/problems/ProblemAddPicker.vue": {
+    "button": 1,
+    "controls": 2,
+    "disabled-opacity": 1,
+    "search": 1
+  },
+  "features/admin/contests/problems/ProblemCopyFrom.vue": {
+    "button": 1,
+    "controls": 3,
+    "input": 1
+  },
+  "features/admin/contests/ranking/OfficialRankingCard.vue": {
+    "button": 3,
+    "controls": 8,
+    "input": 1,
+    "radio": 2
+  },
+  "features/admin/contests/ranking/RankingLinkCard.vue": {
+    "AdminDateTimeField": 1,
+    "button": 3,
+    "controls": 12,
+    "input": 1,
+    "radio": 6
+  },
+  "features/admin/users/CreatedUsersTable.vue": {
+    "AdminDataTable": 1,
+    "verdict-tone": 1
+  },
+  "features/admin/users/NewUserFields.vue": {
+    "AdminField": 4,
+    "checkbox": 1,
+    "controls": 9,
+    "input": 3,
+    "password": 1
+  },
+  "features/admin/users/PermissionChecklist.vue": {
+    "AdminChip": 2,
+    "checkbox": 1,
+    "controls": 3,
+    "search": 1,
+    "uppercase": 1
+  },
+  "features/admin/users/RoleEditor.vue": {
+    "AdminField": 1,
+    "button": 1,
+    "controls": 4,
+    "input": 1
+  },
+  "features/admin/users/RolesDialog.vue": {
+    "AdminChip": 1,
+    "button": 3,
+    "controls": 6,
+    "primevue": 1
+  },
+  "features/admin/users/UserAccessSection.vue": {
+    "button": 1
+  },
+  "features/admin/users/UserAccountPanel.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/users/UserActivationRow.vue": {
+    "button": 2,
+    "controls": 4
+  },
+  "features/admin/users/UserCreateDialog.vue": {
+    "button": 2,
+    "controls": 4,
+    "primevue": 1,
+    "radio": 1,
+    "textarea": 1
+  },
+  "features/admin/users/UserDrawer.vue": {
+    "AdminDrawer": 1,
+    "AdminNotice": 2
+  },
+  "features/admin/users/UserDrawerChips.vue": {
+    "AdminChip": 4
+  },
+  "features/admin/users/UserModerationPanel.vue": {
+    "AdminField": 1,
+    "button": 2,
+    "controls": 5,
+    "textarea": 1
+  },
+  "features/admin/users/UserPasswordForm.vue": {
+    "AdminField": 3,
+    "AdminNotice": 1,
+    "button": 1,
+    "controls": 8,
+    "password": 3
+  },
+  "features/admin/users/UserProfileForm.vue": {
+    "AdminField": 7,
+    "checkbox": 1,
+    "controls": 12,
+    "input": 3,
+    "password": 1,
+    "select": 1,
+    "textarea": 2
+  },
+  "features/admin/users/UserRenameForm.vue": {
+    "AdminField": 1,
+    "button": 1,
+    "controls": 4,
+    "input": 1
+  },
+  "features/admin/users/UserResetLink.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/users/UserSecurityPanel.vue": {
+    "AdminNotice": 1
+  },
+  "features/admin/users/UserStatusChips.vue": {
+    "AdminChip": 2
+  },
+  "features/admin/users/UserTwoFactorReset.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/users/UsersPage.vue": {
+    "AdminPageHeader": 1,
+    "button": 2,
+    "controls": 4
+  },
+  "features/admin/users/UsersTable.vue": {
+    "AdminChip": 2,
+    "AdminDataTable": 1,
+    "AdminUserLabel": 1,
+    "button": 1,
+    "controls": 1
+  }
+}

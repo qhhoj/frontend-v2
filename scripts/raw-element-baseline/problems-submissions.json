@@ -1,0 +1,96 @@
+{
+  "features/external-judge/ExternalJudgeStatusCard.vue": {
+    "GlassCard": 1
+  },
+  "features/problems/FileDropzone.vue": {
+    "file": 1
+  },
+  "features/problems/FilterToggle.vue": {
+    "button": 1
+  },
+  "features/problems/PdfButton.vue": {
+    "button": 1
+  },
+  "features/problems/ProblemFactsCard.vue": {
+    "button": 1
+  },
+  "features/problems/ProblemFilterChips.vue": {
+    "button": 2
+  },
+  "features/problems/ProblemFilters.vue": {
+    "button": 1
+  },
+  "features/problems/ProblemPointsPicker.vue": {
+    "button": 1
+  },
+  "features/problems/ProblemTierMark.vue": {
+    "fixed-size": 1
+  },
+  "features/problems/ProblemTypePicker.vue": {
+    "button": 1
+  },
+  "features/problems/SourceUploadButton.vue": {
+    "file": 1
+  },
+  "features/runtimes/JudgeCard.vue": {
+    "verdict-tone": 1
+  },
+  "features/runtimes/LanguageRow.vue": {
+    "button": 1,
+    "uppercase": 1,
+    "verdict-tone": 1
+  },
+  "features/submissions/AdvancedFiltersButton.vue": {
+    "button": 1
+  },
+  "features/submissions/CasesTable.vue": {
+    "table": 1
+  },
+  "features/submissions/CasesTableSkeleton.vue": {
+    "table": 1
+  },
+  "features/submissions/CompareWithForm.vue": {
+    "button": 1,
+    "input": 1
+  },
+  "features/submissions/DiffSideHeader.vue": {
+    "uppercase": 1
+  },
+  "features/submissions/LiveToggle.vue": {
+    "button": 1
+  },
+  "features/submissions/ResultSummaryCard.vue": {
+    "button": 1
+  },
+  "features/submissions/SourceView.vue": {
+    "button": 1
+  },
+  "features/submissions/SubmissionLockControl.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/submissions/SubmissionPickBox.vue": {
+    "checkbox": 1
+  },
+  "features/submissions/SubmissionStaffPanel.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/submissions/SubmissionTable.vue": {
+    "table": 1
+  },
+  "features/submissions/SubmissionTableSkeleton.vue": {
+    "table": 1
+  },
+  "features/submissions/TestOverview.vue": {
+    "table": 1
+  },
+  "features/submissions/list/LiveListNotices.vue": {
+    "button": 1
+  },
+  "features/submissions/list/SubmissionFilterPanel.vue": {
+    "button": 1,
+    "checkbox": 2,
+    "input": 2
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "features/contests/AccessCodeDialog.vue": {
+    "password": 1,
+    "uppercase": 1,
+    "verdict-tone": 1
+  },
+  "features/contests/ContestActions.vue": {
+    "verdict-tone": 1
+  },
+  "features/contests/ContestAnnouncementsPage.vue": {
+    "SubmissionPager": 1
+  },
+  "features/contests/ContestCountdown.vue": {
+    "uppercase": 2,
+    "verdict-tone": 1
+  },
+  "features/contests/ContestDetailSkeleton.vue": {
+    "fixed-size": 2
+  },
+  "features/contests/ContestGroup.vue": {
+    "SubmissionPager": 1
+  },
+  "features/contests/ContestProblemsTable.vue": {
+    "table": 1
+  },
+  "features/contests/ContestRankingPage.vue": {
+    "fixed-size": 1
+  },
+  "features/contests/ContestRulesDialog.vue": {
+    "checkbox": 1,
+    "verdict-tone": 1
+  },
+  "features/contests/ContestTabs.vue": {
+    "PillTabs": 2
+  },
+  "features/contests/ContestTagFilter.vue": {
+    "button": 2
+  },
+  "features/contests/ContestTimeBar.vue": {
+    "verdict-tone": 1
+  },
+  "features/contests/EndedContestSkeleton.vue": {
+    "table": 1
+  },
+  "features/contests/EndedContestTable.vue": {
+    "table": 1
+  },
+  "features/contests/InContestStatus.vue": {
+    "button": 2,
+    "verdict-tone": 1
+  },
+  "features/contests/LanguageStatsTable.vue": {
+    "table": 1
+  },
+  "features/contests/ProblemResultsTable.vue": {
+    "table": 1
+  },
+  "features/contests/RankingTable.vue": {
+    "table": 1
+  },
+  "features/contests/balloons/BalloonsPage.vue": {
+    "SubmissionPager": 1,
+    "verdict-tone": 1
+  },
+  "features/contests/print/ContestPrintPage.vue": {
+    "button": 3,
+    "uppercase": 1
+  },
+  "features/contests/replay/ContestReplayPage.vue": {
+    "fixed-size": 2
+  },
+  "features/contests/replay/ReplayPlayerBar.vue": {
+    "button": 1,
+    "verdict-tone": 1
+  },
+  "features/contests/replay/ReplayTable.vue": {
+    "table": 1
+  },
+  "features/leaderboard/MyRankLine.vue": {
+    "button": 1
+  },
+  "features/leaderboard/UsernameJump.vue": {
+    "input": 1
+  },
+  "features/official-mode/OfficialModeBanner.vue": {
+    "SettingsNotice": 1
+  },
+  "features/official-mode/OfficialModePill.vue": {
+    "verdict-tone": 2
+  }
+}

@@ -1,7 +1,8 @@
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting';
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript';
 import pluginVue from 'eslint-plugin-vue';
-import { WRAPPER_IMPORT_PATTERNS, WRAPPER_IMPORTERS } from './scripts/wrapper-imports.mjs';
+import { readBaselines } from './scripts/raw-elements.mjs';
+import { eslintImportBlocks } from './scripts/wrapper-imports.mjs';
 
 export default defineConfigWithVueTs(
   {
@@ -16,10 +17,7 @@ export default defineConfigWithVueTs(
       'vue/multi-word-component-names': ['error', { ignores: ['App'] }],
     },
   },
-  {
-    files: ['src/**/*.{ts,vue}'],
-    ignores: WRAPPER_IMPORTERS,
-    rules: { 'no-restricted-imports': ['error', { patterns: WRAPPER_IMPORT_PATTERNS }] },
-  },
+  // Old wrappers and direct PrimeVue parts: a file may keep the imports its raw-element baseline counts (docs/wrapper-migration.md).
+  ...eslintImportBlocks(readBaselines().merged),
   skipFormatting,
 );

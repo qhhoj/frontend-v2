@@ -139,7 +139,7 @@ Two more site screens: short links (`src/features/admin/short-links/`, `judge.ma
 
 Problem lifecycle and organization quotas live in `problems/lifecycle/` (the "Đã xóa" tab and the danger-zone delete), `problems/package/` (the full package download on the Data tab) and `organizations/quotas/` (the staff quota overview) under `src/features/admin/`; the public organization tabs "Bài tập" and "Hạn mức" live in `src/features/organizations/problems/` and `src/features/organizations/quota/`, their Bit placements in `src/features/organizations/org-bits.ts`.
 
-To add a screen: import the parts from `src/components/ui/` (see its README), not `Admin*` wrappers; existing admin pages are allow-listed in `scripts/wrapper-imports.mjs`, so do not copy their imports. Then add its entry to `ADMIN_SCREENS`, add one `SCREEN_COMPONENTS` line for it, add `admin.shell.screens.<id>` (nav title) and the area's i18n files, put the nav item in `shell/admin-nav.ts` if it has one, and add a skeleton with a `data-skeleton-region` sized to the loaded content.
+To add a screen: import the parts from `src/components/ui/` (see its README), not `Admin*` wrappers; existing admin pages are counted in `scripts/raw-element-baseline/` (`docs/wrapper-migration.md`), so do not copy their imports. Then add its entry to `ADMIN_SCREENS`, add one `SCREEN_COMPONENTS` line for it, add `admin.shell.screens.<id>` (nav title) and the area's i18n files, put the nav item in `shell/admin-nav.ts` if it has one, and add a skeleton with a `data-skeleton-region` sized to the loaded content.
 
 ## More
 
