@@ -56,13 +56,12 @@ export function checkPostForm(form: PostForm, mode: PublishMode): FieldErrors {
   const errors: FieldErrors = {};
   const title = form.title.trim();
   if (title.length === 0 || title.length > POST_LIMITS.title)
-    errors.title = translate('admin.postEditor.errors.title', { max: POST_LIMITS.title });
-  if (form.content.trim().length === 0)
-    errors.content = translate('admin.postEditor.errors.content');
+    errors.title = translate('postEditor.errors.title', { max: POST_LIMITS.title });
+  if (form.content.trim().length === 0) errors.content = translate('postEditor.errors.content');
   if (form.ogImage.length > POST_LIMITS.ogImage || !IMAGE_PATTERN.test(form.ogImage))
-    errors.ogImage = translate('admin.postEditor.errors.ogImage');
+    errors.ogImage = translate('postEditor.errors.ogImage');
   if (form.publishOn && isoOf(form.publishOn) === null)
-    errors.publishOn = translate('admin.postEditor.errors.publishOn');
+    errors.publishOn = translate('postEditor.errors.publishOn');
   else if (mode === 'scheduled' && !isAhead(form.publishOn, Date.now()))
     errors.publishOn = translate('postEditor.errors.scheduleAhead');
   return errors;

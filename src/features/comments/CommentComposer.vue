@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { COMMENT_MAX_LENGTH } from '@/api/types/comments';
 import AppButton from '@/components/ui/AppButton.vue';
 import Notice from '@/components/ui/Notice.vue';
+import TextArea from '@/components/ui/TextArea.vue';
 import Tabs from '@/components/ui/Tabs.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -36,7 +37,7 @@ const emit = defineEmits<{ submit: []; cancel: []; cancelReply: []; reload: [] }
 const { t } = useI18n();
 const locale = useLocaleStore();
 const id = useId();
-const textarea = ref<HTMLTextAreaElement | null>(null);
+const textarea = ref<{ $el: HTMLTextAreaElement } | null>(null);
 const isOpen = ref(!props.startCollapsed);
 const tab = ref('write');
 const tabs = computed(() =>
@@ -72,8 +73,8 @@ async function focus() {
   isOpen.value = true;
   tab.value = 'write';
   await nextTick();
-  textarea.value?.scrollIntoView({ block: 'center' });
-  textarea.value?.focus();
+  textarea.value?.$el.scrollIntoView({ block: 'center' });
+  textarea.value?.$el.focus();
 }
 defineExpose({ focus });
 
@@ -83,15 +84,15 @@ function submit() {
 </script>
 
 <template>
-  <button
+  <AppButton
     v-if="!isExpanded"
-    type="button"
+    block
     data-testid="composer-open"
-    class="flex min-h-12 w-full items-center rounded-card border border-line bg-surface-solid px-4 text-left text-muted hover:bg-surface-hover"
+    class="justify-start text-left text-muted"
     @click="focus"
   >
     {{ $t('comments.composer.open') }}
-  </button>
+  </AppButton>
   <form
     v-else
     :aria-label="$t(mode === 'edit' ? 'comments.composer.editLabel' : 'comments.composer.label')"
@@ -127,7 +128,7 @@ function submit() {
         :aria-labelledby="`${id}-panel-write-tab`"
       >
         <label :for="id" class="sr-only">{{ $t('comments.composer.bodyLabel') }}</label>
-        <textarea
+        <TextArea
           :id="id"
           ref="textarea"
           v-model="text"
@@ -135,7 +136,7 @@ function submit() {
           :placeholder="$t(placeholderKey)"
           :aria-invalid="isTooLong || undefined"
           :aria-describedby="`${id}-help ${id}-count`"
-          class="block w-full resize-y rounded-row border border-line-control bg-surface-solid px-3 py-2.5 font-mono text-base leading-relaxed text-content"
+          class="block w-full resize-y font-mono leading-relaxed"
           @keydown.ctrl.enter.prevent="submit"
           @keydown.meta.enter.prevent="submit"
         />

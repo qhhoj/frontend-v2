@@ -2,7 +2,7 @@
 import { Pencil } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -35,7 +35,7 @@ const posts = computed(() => data.value?.items ?? []);
       ]"
       :back="{ to: { name: 'blog' }, label: $t('nav.blog') }"
     />
-    <GlassCard as="div" class="overflow-hidden">
+    <Card as="div" class="overflow-hidden">
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton><SkeletonBlock class="h-40 w-full" /></template>
         <StatePanel v-if="!posts.length" kind="communityEmpty" :title="$t('blog.drafts.empty')">
@@ -78,6 +78,6 @@ const posts = computed(() => data.value?.items ?? []);
           :label="$t('blog.pager')"
         />
       </QueryState>
-    </GlassCard>
+    </Card>
   </div>
 </template>

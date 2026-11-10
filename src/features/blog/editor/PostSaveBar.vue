@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import Notice from '@/components/ui/Notice.vue';
 import SaveBar from '@/components/ui/SaveBar.vue';
-import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
-import { buttonClass } from '@/features/admin/ui/controls';
 import type { PublishMode } from './post-form';
 
 /**
@@ -35,28 +35,19 @@ const publishLabel = computed(() => {
     allow-clean
   >
     <template #status>
-      <AdminStatus v-if="failure" kind="refused" :text="failureTextOf(failure)" />
-      <AdminStatus v-else-if="isDone" kind="done" :text="$t('admin.postEditor.saved')" />
-      <AdminStatus
-        v-else-if="isNothingToSave"
-        kind="queued"
-        :text="$t('admin.postEditor.nothingToSave')"
-      />
+      <Notice v-if="failure" tone="danger">{{ failureTextOf(failure) }}</Notice>
+      <Notice v-else-if="isDone" tone="success" role="status">{{ $t('postEditor.saved') }}</Notice>
+      <Notice v-else-if="isNothingToSave" tone="info" role="status">
+        {{ $t('postEditor.nothingToSave') }}
+      </Notice>
       <span v-else :class="isDirty ? 'font-semibold' : 'text-muted'">
         {{ $t(isDirty ? 'postEditor.bar.unsaved' : 'postEditor.bar.clean') }}
       </span>
     </template>
     <template #actions>
-      <!-- SaveBar's own buttons are the admin shape; the draft button matches them. -->
-      <button
-        v-if="!isLive"
-        type="button"
-        :class="buttonClass('secondary')"
-        :aria-disabled="isPending || undefined"
-        @click="isPending || emit('saveDraft')"
-      >
+      <AppButton v-if="!isLive" :disabled="isPending" @click="emit('saveDraft')">
         {{ $t('postEditor.bar.saveDraft') }}
-      </button>
+      </AppButton>
     </template>
   </SaveBar>
 </template>

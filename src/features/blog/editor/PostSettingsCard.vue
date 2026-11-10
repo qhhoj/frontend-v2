@@ -2,12 +2,14 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { PostComposeOptions } from '@/api/types/blog';
+import Card from '@/components/ui/Card.vue';
+import Checkbox from '@/components/ui/Checkbox.vue';
 import DateTimeField from '@/components/ui/DateTimeField.vue';
 import FormField from '@/components/ui/FormField.vue';
 import RadioGroup from '@/components/ui/RadioGroup.vue';
+import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import SelectField from '@/components/ui/SelectField.vue';
 import TextArea from '@/components/ui/TextArea.vue';
-import AdminSwitch from '@/features/admin/ui/AdminSwitch.vue';
 import type { FieldErrors } from '@/features/admin/ui/admin-errors';
 import type { PostFieldRights, PublishMode } from './post-form';
 
@@ -56,87 +58,81 @@ const modeOptions = computed(() =>
     description: t(`postEditor.modeHint.${value}`),
   })),
 );
-const SEGMENT =
-  'inline-flex min-h-10 items-center rounded-pill px-4 text-sm font-semibold text-muted has-[:checked]:bg-accent-soft has-[:checked]:text-accent-soft-text has-[:focus-visible]:outline-2';
-const LABEL = 'text-caption leading-4 font-bold tracking-wide text-muted uppercase';
+const postAsOptions = computed(() =>
+  (['self', 'organization'] as const).map((value) => ({
+    value,
+    label: t(`postEditor.settings.${value}`),
+  })),
+);
+const LABEL = 'text-meta font-semibold text-muted';
 </script>
 
 <template>
-  <section
-    class="flex flex-col gap-5 rounded-card border border-line bg-surface-solid p-4 sm:p-5"
-    aria-labelledby="post-settings"
-  >
-    <h2 id="post-settings" class="font-display text-base font-bold text-accent-text">
-      {{ $t('postEditor.settings.title') }}
-    </h2>
-
-    <div v-if="fixedAuthor !== null" class="flex flex-col gap-1.5">
-      <span :class="LABEL">{{ $t('postEditor.settings.postAs') }}</span>
-      <span class="font-semibold">{{ fixedAuthor || $t('postEditor.settings.self') }}</span>
-    </div>
-    <template v-else-if="organizations.length">
-      <fieldset v-if="canChooseSelf" class="flex flex-col gap-1.5">
-        <legend :class="[LABEL, 'mb-1.5']">{{ $t('postEditor.settings.postAs') }}</legend>
-        <div
-          class="inline-flex w-fit gap-0.5 rounded-pill border border-line-strong bg-surface-solid p-1"
+  <Card padding="md" :title="$t('postEditor.settings.title')">
+    <div class="flex flex-col gap-5">
+      <div v-if="fixedAuthor !== null" class="flex flex-col gap-1.5">
+        <span :class="LABEL">{{ $t('postEditor.settings.postAs') }}</span>
+        <span class="font-semibold">{{ fixedAuthor || $t('postEditor.settings.self') }}</span>
+      </div>
+      <template v-else-if="organizations.length">
+        <SegmentedControl
+          v-if="canChooseSelf"
+          v-model="postAs"
+          :label="$t('postEditor.settings.postAs')"
+          :options="postAsOptions"
+        />
+        <FormField
+          v-if="organization !== null"
+          :label="$t('postEditor.settings.organization')"
+          :hint="$t('postEditor.settings.organizationHint')"
+          input-id="post-organization"
         >
-          <label v-for="value in ['self', 'organization'] as const" :key="value" :class="SEGMENT">
-            <input v-model="postAs" type="radio" :value="value" class="sr-only" />
-            {{ $t(`postEditor.settings.${value}`) }}
-          </label>
-        </div>
-      </fieldset>
+          <SelectField v-model="chosenOrganization">
+            <option v-for="item in organizations" :key="item.slug" :value="item.slug">
+              {{ item.name }}
+            </option>
+          </SelectField>
+        </FormField>
+      </template>
+
+      <RadioGroup
+        v-model="mode"
+        name="post-visibility"
+        :legend="$t('postEditor.settings.visibility')"
+        :options="modeOptions"
+      />
+
+      <DateTimeField
+        v-if="mode === 'scheduled'"
+        v-model="publishAt"
+        :label="$t('postEditor.settings.publishOn')"
+        :error="errors.publishOn"
+        input-id="post-publish-on"
+      />
+
       <FormField
-        v-if="organization !== null"
-        :label="$t('postEditor.settings.organization')"
-        :hint="$t('postEditor.settings.organizationHint')"
-        input-id="post-organization"
+        :label="$t('postEditor.settings.summary')"
+        :hint="
+          $t(rights.staff ? 'postEditor.settings.summaryHint' : 'postEditor.settings.summaryLocked')
+        "
+        :error="errors.summary"
+        input-id="post-summary"
       >
-        <SelectField v-model="chosenOrganization">
-          <option v-for="item in organizations" :key="item.slug" :value="item.slug">
-            {{ item.name }}
-          </option>
-        </SelectField>
+        <TextArea v-model="summary" rows="3" :disabled="!rights.staff" />
       </FormField>
-    </template>
 
-    <RadioGroup
-      v-model="mode"
-      name="post-visibility"
-      :legend="$t('postEditor.settings.visibility')"
-      :options="modeOptions"
-    />
-
-    <DateTimeField
-      v-if="mode === 'scheduled'"
-      v-model="publishAt"
-      :label="$t('postEditor.settings.publishOn')"
-      :error="errors.publishOn"
-      input-id="post-publish-on"
-    />
-
-    <FormField
-      :label="$t('postEditor.settings.summary')"
-      :hint="
-        $t(rights.staff ? 'postEditor.settings.summaryHint' : 'postEditor.settings.summaryLocked')
-      "
-      :error="errors.summary"
-      input-id="post-summary"
-    >
-      <TextArea v-model="summary" rows="3" :disabled="!rights.staff" />
-    </FormField>
-
-    <AdminSwitch
-      v-if="rights.pin"
-      v-model="sticky"
-      :label="$t('postEditor.settings.sticky')"
-      :description="$t('postEditor.settings.stickyHint')"
-    />
-    <AdminSwitch
-      v-if="rights.markGlobal"
-      v-model="globalPost"
-      :label="$t('admin.postEditor.fields.globalPost')"
-      :description="$t('admin.postEditor.hints.globalPost')"
-    />
-  </section>
+      <Checkbox
+        v-if="rights.pin"
+        v-model="sticky"
+        :label="$t('postEditor.settings.sticky')"
+        :description="$t('postEditor.settings.stickyHint')"
+      />
+      <Checkbox
+        v-if="rights.markGlobal"
+        v-model="globalPost"
+        :label="$t('postEditor.fields.globalPost')"
+        :description="$t('postEditor.hints.globalPost')"
+      />
+    </div>
+  </Card>
 </template>

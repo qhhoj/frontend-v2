@@ -1,19 +1,4 @@
 {
-  "features/community/NewProblemsCard.vue": {
-    "CommunityCard": 1
-  },
-  "features/community/RecentCommentsCard.vue": {
-    "CommunityCard": 1
-  },
-  "features/community/TopContributorsCard.vue": {
-    "CommunityCard": 1
-  },
-  "features/home/NewPostsCard.vue": {
-    "CommunityCard": 1
-  },
-  "features/home/TopPerformersCard.vue": {
-    "CommunityCard": 1
-  },
   "features/shell/NavOverflowMenu.vue": {
     "button": 1
   },

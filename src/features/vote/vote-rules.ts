@@ -15,3 +15,6 @@ export function voteRefusalKey(error: unknown): string {
   if (error instanceof ApiError && error.code === 'rate_limited') return 'vote.refusedRate';
   return errorMessageKey(error);
 }
+
+/** Why the arrows are inert, as a message key: nobody is signed in, or the viewer wrote the text. */
+export const voteDisabledKey = (isSignedIn: boolean) => (isSignedIn ? 'vote.own' : 'vote.signIn');

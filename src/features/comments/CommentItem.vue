@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { ChevronRight, EyeOff, MoreHorizontal } from 'lucide-vue-next';
-import Menu from 'primevue/menu';
-import type { MenuItem } from 'primevue/menuitem';
+import { ChevronRight, EyeOff } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { voteComment } from '@/api/comments.api';
 import type { VoteScore } from '@/api/types/votes';
 import UserContent from '@/components/UserContent.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
+import Notice from '@/components/ui/Notice.vue';
+import RowMenu from '@/components/ui/RowMenu.vue';
+import type { RowMenuItem } from '@/components/ui/RowMenu.vue';
 import UserLink from '@/components/UserLink.vue';
 import VoteControl from '@/components/VoteControl.vue';
 import { signedScore } from '@/lib/format';
@@ -19,7 +22,7 @@ import type { CommentQuote } from './comment-quote';
 /**
  * One comment of the flat list (layout C2): author, time, permalink and vote in the header; the quote of the comment it answers;
  * the body (or the edit form, the default slot, while `isEditing`); the actions. A folded comment (low score) is one line until shown.
- * On a phone the actions past Reply move into a "more" menu. Moderators also get hidden comments (a dashed, muted card with a
+ * Reply is the one visible action; the rest sit in a "more actions" menu (delete last, in red). Moderators also get hidden comments (a dashed, muted card with a
  * "hidden" badge naming who hid it, a line saying users no longer see it, and Unhide); a deleted comment stays as a placeholder
  * so the replies quoting it keep their context.
  */
@@ -35,7 +38,10 @@ const props = defineProps<{
   /** Signed in and not the author: may report it (once; the backend says 409 after). */
   canReport: boolean;
   isEditing: boolean;
-  isPhone: boolean;
+  /** Why the vote arrows are inert for this viewer (signed out, own comment); their tooltip. */
+  voteDisabledReason?: string;
+  /** The moderator's unhide of this comment failed: said under its actions. */
+  unhideFailed?: boolean;
 }>();
 const emit = defineEmits<{
   reply: [];
@@ -58,67 +64,49 @@ const hiderName = computed(() => comment.value.hiddenBy?.username ?? null);
 const authorName = computed(() => comment.value.author?.username ?? t('comments.deletedAccount'));
 const send = (score: VoteScore) => voteComment(comment.value.id, score);
 
-interface Action {
-  id: string;
-  label: string;
-  run: () => void;
-  isModeration?: boolean;
-}
-const actionOf = (id: string, label: string, run: () => void, isModeration = false): Action => ({
-  id,
-  label,
-  run,
-  isModeration,
-});
-/** Edit, history (a deleted comment's only for moderators: its history holds the deleted text), delete and report for the viewer; then the moderators' hide or unhide, set apart. */
-const actions = computed<Action[]>(() => {
+/** Edit, history (a deleted comment's only for moderators: its history holds the deleted text), report and the moderators' hide or unhide, then delete last. */
+const menuItems = computed<RowMenuItem[]>(() => {
   const shown = comment.value;
-  const list: Action[] = [];
+  const items: RowMenuItem[] = [];
   if (shown.canEdit && !props.isEditing)
-    list.push(actionOf('edit', t('common.edit'), () => emit('edit')));
+    items.push({ label: t('common.edit'), run: () => emit('edit') });
   if (shown.deleted ? props.moderates : shown.revisions)
-    list.push(
-      actionOf('history', t('comments.action.history', { count: shown.revisions }), () =>
-        emit('history'),
-      ),
-    );
-  if (shown.canDelete) list.push(actionOf('delete', t('common.delete'), () => emit('delete')));
+    items.push({
+      label: t('comments.action.history', { count: shown.revisions }),
+      run: () => emit('history'),
+    });
   if (props.canReport && !shown.deleted && !shown.hidden)
-    list.push(actionOf('report', t('comments.action.report'), () => emit('report')));
+    items.push({ label: t('comments.action.report'), run: () => emit('report') });
   if (props.moderates)
-    list.push(
+    items.push(
       shown.hidden
-        ? actionOf('unhide', t('comments.action.unhide'), () => emit('unhide'), true)
-        : actionOf('hide', t('common.hide'), () => emit('hide'), true),
+        ? { label: t('comments.action.unhide'), run: () => emit('unhide') }
+        : { label: t('common.hide'), run: () => emit('hide') },
     );
-  return list;
+  if (shown.canDelete)
+    items.push({ label: t('common.delete'), run: () => emit('delete'), danger: true });
+  return items;
 });
 /** No row while editing (the form has its own buttons) or when there is nothing to offer. */
 const hasActionRow = computed(
   () =>
     !props.isEditing &&
     ((!comment.value.deleted && (props.canReply || props.isPastReplyWindow)) ||
-      actions.value.length > 0),
+      menuItems.value.length > 0),
 );
-const menu = ref<InstanceType<typeof Menu>>();
-const isMenuOpen = ref(false);
-const menuModel = computed<MenuItem[]>(() =>
-  actions.value.map((action) => ({ label: action.label, command: action.run })),
-);
-const TEXT_BUTTON =
-  'inline-flex min-h-11 items-center rounded-row px-2.5 text-sm text-muted hover:bg-surface-hover hover:text-content';
 </script>
 
 <template>
   <li :id="anchor" class="scroll-mt-24">
-    <button
+    <AppButton
       v-if="isFolded"
-      type="button"
+      tone="ghost"
+      block
       :aria-expanded="false"
-      class="flex min-h-11 w-full items-center gap-2 rounded-card border border-dashed border-line px-4 py-3 text-left text-sm text-muted hover:bg-surface-hover sm:px-5"
+      class="justify-start border-dashed border-line text-left text-sm font-normal text-muted"
       @click="isExpanded = true"
     >
-      <ChevronRight aria-hidden="true" class="size-4 shrink-0" />
+      <template #icon><ChevronRight aria-hidden="true" class="size-4 shrink-0" /></template>
       <span class="min-w-0 flex-1">
         {{
           quote?.number
@@ -136,7 +124,7 @@ const TEXT_BUTTON =
         }}
       </span>
       <span class="font-semibold text-accent-text">{{ $t('common.show') }}</span>
-    </button>
+    </AppButton>
     <article
       v-else
       :aria-labelledby="`${anchor}-h`"
@@ -168,31 +156,29 @@ const TEXT_BUTTON =
           >
             {{ formatAgo(comment.createdAt, now, locale.locale) }}
           </time>
-          <button
+          <AppButton
             v-if="comment.revisions && !comment.deleted"
-            type="button"
-            class="text-caption leading-4 text-muted underline decoration-dotted hover:text-content"
+            tone="link"
+            class="text-caption leading-4 text-muted"
             :aria-label="$t('comments.editedLabel', { count: comment.revisions })"
             @click="emit('history')"
           >
             {{ $t('comments.edited') }}
-          </button>
+          </AppButton>
           <span v-if="isEditing" class="text-sm text-muted"
             >· {{ $t('comments.composer.editing') }}</span
           >
           <template v-if="comment.hidden">
-            <span
-              data-testid="comment-hidden-badge"
-              class="rounded-pill bg-content px-2 text-caption leading-4 font-semibold text-ground"
-              >{{ $t('comments.hidden.badge') }}</span
-            >
+            <Chip data-testid="comment-hidden-badge" tone="warning">{{
+              $t('comments.hidden.badge')
+            }}</Chip>
             <span v-if="hiderName" class="text-sm text-muted">{{
               $t('comments.hidden.by', { name: hiderName })
             }}</span>
           </template>
           <a
             :href="`#${anchor}`"
-            class="font-mono text-caption leading-4 text-muted hover:underline"
+            class="relative font-mono text-caption leading-4 text-muted hover:underline touch:after:absolute touch:after:-inset-3.5 touch:after:content-['']"
             :aria-label="$t('comments.permalink', { number: entry.number })"
           >
             #{{ entry.number }}
@@ -204,6 +190,7 @@ const TEXT_BUTTON =
           :score="comment.score"
           :viewer-vote="comment.viewerVote"
           :can-vote="canVote && !comment.deleted && !comment.hidden"
+          :disabled-reason="voteDisabledReason"
           :send="send"
         />
       </header>
@@ -241,53 +228,25 @@ const TEXT_BUTTON =
         :class="comment.hidden && 'text-muted'"
       />
       <div v-if="hasActionRow" class="-ml-2.5 flex flex-wrap items-center gap-0.5 py-1">
-        <button
+        <AppButton
           v-if="canReply && !comment.deleted"
-          type="button"
-          :class="TEXT_BUTTON"
+          tone="ghost"
+          size="sm"
           @click="emit('reply')"
         >
           {{ $t('comments.action.reply') }}
-        </button>
+        </AppButton>
         <span
           v-else-if="isPastReplyWindow && !comment.deleted"
           class="px-2.5 text-caption leading-4 text-muted"
         >
           {{ $t('comments.tooOld') }}
         </span>
-        <template v-if="isPhone && actions.length">
-          <button
-            type="button"
-            :class="TEXT_BUTTON"
-            :aria-label="$t('comments.action.more')"
-            aria-haspopup="menu"
-            :aria-expanded="isMenuOpen"
-            @click="menu?.toggle($event)"
-          >
-            <MoreHorizontal aria-hidden="true" class="size-4" />
-          </button>
-          <Menu
-            ref="menu"
-            :model="menuModel"
-            popup
-            :pt="{ root: { 'aria-label': $t('comments.action.more') } }"
-            @show="isMenuOpen = true"
-            @hide="isMenuOpen = false"
-          />
-        </template>
-        <template v-else>
-          <template v-for="action in actions" :key="action.id">
-            <span v-if="action.isModeration" aria-hidden="true" class="mx-1 h-5 w-px bg-line" />
-            <button
-              type="button"
-              :class="[TEXT_BUTTON, action.isModeration && 'font-semibold text-accent-text']"
-              @click="action.run"
-            >
-              {{ action.label }}
-            </button>
-          </template>
-        </template>
+        <RowMenu v-if="menuItems.length" :items="menuItems" :label="$t('common.moreActions')" />
       </div>
+      <Notice v-if="unhideFailed" tone="danger" inline class="mb-2">
+        {{ $t('comments.unhideFailed') }}
+      </Notice>
     </article>
   </li>
 </template>

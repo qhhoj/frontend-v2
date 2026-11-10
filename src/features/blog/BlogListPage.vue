@@ -3,7 +3,6 @@ import PageHeader from '@/components/ui/PageHeader.vue';
 import { ChevronRight, FilePen, Pencil, Rss } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import GlassCard from '@/components/GlassCard.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import StateBit from '@/components/StateBit.vue';
@@ -13,7 +12,9 @@ import NewProblemsCard from '@/features/community/NewProblemsCard.vue';
 import RecentCommentsCard from '@/features/community/RecentCommentsCard.vue';
 import TopContributorsCard from '@/features/community/TopContributorsCard.vue';
 import AppButton from '@/components/ui/AppButton.vue';
+import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
+import IconButton from '@/components/ui/IconButton.vue';
 import Tabs from '@/components/ui/Tabs.vue';
 import type { TabItem } from '@/components/ui/Tabs.vue';
 import { useSessionStore } from '@/stores/session.store';
@@ -69,10 +70,9 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
           <template #icon><Pencil aria-hidden="true" class="size-4" /></template>
           {{ $t('blog.write') }}
         </AppButton>
-        <AppButton href="/api/internal/feeds/blog/rss" :aria-label="$t('blog.rss')">
-          <template #icon><Rss aria-hidden="true" class="size-4" /></template>
-          RSS
-        </AppButton>
+        <IconButton href="/api/internal/feeds/blog/rss" :label="$t('blog.rss')">
+          <Rss aria-hidden="true" />
+        </IconButton>
       </div>
     </div>
     <section
@@ -98,7 +98,7 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
     </RouterLink>
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
       <div ref="listTop" class="scroll-mt-20">
-        <GlassCard as="div" data-testid="post-list" class="overflow-hidden">
+        <Card as="div" data-testid="post-list" class="overflow-hidden">
           <QueryState :loading="isPending" :error="error" @retry="refetch()">
             <template #skeleton>
               <div class="divide-y divide-line">
@@ -111,12 +111,9 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
             </div>
             <NumberedPager v-if="meta" class="p-4" :meta="meta" :label="$t('blog.pager')" />
           </QueryState>
-        </GlassCard>
+        </Card>
       </div>
-      <GlassCard
-        as="aside"
-        class="relative divide-y divide-line [&>section]:p-4 sm:[&>section]:p-5"
-      >
+      <Card as="aside" class="relative divide-y divide-line [&>section]:p-4 sm:[&>section]:p-5">
         <StateBit
           variant="community"
           size="tiny"
@@ -125,7 +122,7 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
         <RecentCommentsCard embedded :limit="3" />
         <NewProblemsCard embedded :limit="4" />
         <TopContributorsCard embedded :limit="3" />
-      </GlassCard>
+      </Card>
     </div>
   </div>
 </template>

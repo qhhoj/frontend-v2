@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { useQueryClient } from '@tanstack/vue-query';
 import { EllipsisVertical, Pencil, Pin, Trash2 } from 'lucide-vue-next';
-import Menu from 'primevue/menu';
-import type { MenuItem } from 'primevue/menuitem';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -11,7 +9,9 @@ import type { PostDetail } from '@/api/types/blog';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import IconButton from '@/components/ui/IconButton.vue';
-import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
+import Menu from '@/components/ui/Menu.vue';
+import type { MenuEntry } from '@/components/ui/Menu.vue';
+import Notice from '@/components/ui/Notice.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
 import { useAdminMutation } from '@/features/admin/ui/use-admin-mutation';
 import { hasPermission } from '@/lib/permissions';
@@ -54,36 +54,29 @@ const openDelete = () => {
 const toEdit = () => router.push({ name: 'post-edit', params: { id: props.post.id } });
 const pinLabel = computed(() => t(props.post.sticky ? 'blogPost.unpin' : 'blogPost.pin'));
 
-const menu = ref<InstanceType<typeof Menu>>();
-const isMenuOpen = ref(false);
-const menuModel = computed<MenuItem[]>(() => [
-  ...(props.post.canEdit ? [{ label: t('common.edit'), command: toEdit }] : []),
-  ...(canPin.value ? [{ label: pinLabel.value, command: () => void pinner.run(undefined) }] : []),
-  ...(props.post.canDelete ? [{ label: t('common.delete'), command: openDelete }] : []),
+const menuItems = computed<MenuEntry[]>(() => [
+  ...(props.post.canEdit ? [{ label: t('common.edit'), run: toEdit }] : []),
+  ...(canPin.value ? [{ label: pinLabel.value, run: () => void pinner.run(undefined) }] : []),
+  ...(props.post.canDelete ? [{ label: t('common.delete'), run: openDelete, danger: true }] : []),
 ]);
 </script>
 
 <template>
-  <div v-if="menuModel.length" class="flex flex-wrap items-center gap-2">
-    <template v-if="isPhone">
-      <IconButton
-        tone="secondary"
-        :label="$t('blogPost.actions')"
-        aria-haspopup="menu"
-        :aria-expanded="isMenuOpen"
-        @click="menu?.toggle($event)"
-      >
-        <EllipsisVertical aria-hidden="true" class="size-4" />
-      </IconButton>
-      <Menu
-        ref="menu"
-        :model="menuModel"
-        popup
-        :pt="{ root: { 'aria-label': $t('blogPost.actions') } }"
-        @show="isMenuOpen = true"
-        @hide="isMenuOpen = false"
-      />
-    </template>
+  <div v-if="menuItems.length" class="flex flex-wrap items-center gap-2">
+    <Menu v-if="isPhone" :items="menuItems" :label="$t('blogPost.actions')">
+      <template #trigger="{ toggle, open, setOpener }">
+        <IconButton
+          :ref="(el) => setOpener((el as { $el?: HTMLElement } | null)?.$el ?? null)"
+          tone="secondary"
+          :label="$t('blogPost.actions')"
+          aria-haspopup="menu"
+          :aria-expanded="open"
+          @click="toggle"
+        >
+          <EllipsisVertical aria-hidden="true" class="size-4" />
+        </IconButton>
+      </template>
+    </Menu>
     <template v-else>
       <AppButton v-if="post.canEdit" :to="{ name: 'post-edit', params: { id: post.id } }">
         <template #icon><Pencil aria-hidden="true" class="size-4" /></template>
@@ -98,11 +91,9 @@ const menuModel = computed<MenuItem[]>(() => [
         {{ $t('common.delete') }}
       </AppButton>
     </template>
-    <AdminStatus
-      v-if="pinner.failure.value"
-      kind="refused"
-      :text="failureTextOf(pinner.failure.value)"
-    />
+    <Notice v-if="pinner.failure.value" tone="danger">
+      {{ failureTextOf(pinner.failure.value) }}
+    </Notice>
     <ConfirmDialog
       v-model:visible="isDeleteOpen"
       tone="danger"
@@ -113,11 +104,9 @@ const menuModel = computed<MenuItem[]>(() => [
       @confirm="remover.run(undefined)"
     >
       <template #error>
-        <AdminStatus
-          v-if="remover.failure.value"
-          kind="refused"
-          :text="failureTextOf(remover.failure.value)"
-        />
+        <Notice v-if="remover.failure.value" tone="danger">
+          {{ failureTextOf(remover.failure.value) }}
+        </Notice>
       </template>
     </ConfirmDialog>
   </div>

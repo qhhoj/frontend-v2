@@ -35,10 +35,13 @@ describe('comments: hide', () => {
     const calls = mockApi(hideRoutes());
     const { wrapper } = await mountApp(`/blog/${postDetail().id}`);
     const card = () => wrapper.get(`#comment-${comment().id}`);
-    await card()
-      .findAll('button')
-      .find((button) => button.text() === 'Ẩn')!
-      .trigger('click');
+    const menuItem = (label: string) =>
+      [...document.body.querySelectorAll<HTMLElement>('[role="menuitem"]')].find(
+        (item) => item.textContent?.trim() === label,
+      );
+    await card().get('button[aria-label="Thêm thao tác"]').trigger('click');
+    await flushPromises();
+    menuItem('Ẩn')!.querySelector('a')!.click();
     await flushPromises();
     const dialog = () => document.body.querySelector('[role="dialog"]');
     dialog()!.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
@@ -57,10 +60,8 @@ describe('comments: hide', () => {
       'Người dùng không thấy bình luận này; chỉ người kiểm duyệt thấy.',
     );
     expect(card().text()).toContain('bởi admin');
-    expect(
-      card()
-        .findAll('button')
-        .map((button) => button.text()),
-    ).toContain('Bỏ ẩn');
+    await card().get('button[aria-label="Thêm thao tác"]').trigger('click');
+    await flushPromises();
+    expect(menuItem('Bỏ ẩn')).toBeDefined();
   });
 });

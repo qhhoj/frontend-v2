@@ -7,6 +7,8 @@ import { ApiError } from '@/api/client';
 import type { CommentPageType } from '@/api/types/comments';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AppButton from '@/components/ui/AppButton.vue';
+import Notice from '@/components/ui/Notice.vue';
+import { voteDisabledKey } from '@/features/vote/vote-rules';
 import EmptyState from '@/components/EmptyState.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -100,6 +102,13 @@ const quoteFor = (entry: NumberedComment) =>
 const lastPage = computed(() => (data.value ? lastPageOf(data.value.pagination) : 1));
 const canReplyToEntry = (entry: NumberedComment) =>
   canReplyTo(entry.comment.createdAt, now.value, moderates.value);
+/** Why the arrows of a comment are inert, said in their tooltip; null where they are live or the comment cannot be voted on. */
+const voteReasonOf = (entry: NumberedComment) =>
+  entry.comment.deleted ||
+  entry.comment.hidden ||
+  (isSignedIn.value && entry.comment.author?.id !== session.user?.id)
+    ? undefined
+    : t(voteDisabledKey(isSignedIn.value));
 const authorOf = (entry: NumberedComment | null) =>
   entry?.comment.author?.username ?? t('comments.deletedAccount');
 
@@ -257,17 +266,16 @@ useCommentJump({
     class="flex scroll-mt-20 flex-col gap-4"
   >
     <h2 v-if="isFolded" id="comments-heading">
-      <button
-        type="button"
+      <AppButton
+        block
         data-testid="comments-fold"
         aria-expanded="false"
-        class="flex min-h-11 w-full items-center gap-2 rounded-card border border-line bg-surface-solid px-5 py-3 text-left hover:bg-surface-hover"
+        class="justify-start text-left"
         @click="unfold"
       >
         <span class="section-title">{{ $t('comments.title') }}</span>
-        <span class="font-mono text-sm text-muted">(0)</span>
         <ChevronDown aria-hidden="true" class="ml-auto size-5 text-muted" />
-      </button>
+      </AppButton>
     </h2>
     <template v-else>
       <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -316,12 +324,7 @@ useCommentJump({
       <p v-if="reportSent" role="status" class="text-sm text-muted">
         {{ $t('comments.report.sent') }}
       </p>
-      <p v-if="unhideFailedId" role="alert" class="text-sm text-negative">
-        {{ $t('comments.unhideFailed') }}
-      </p>
-      <p v-if="lockFailed" role="alert" class="text-sm text-negative">
-        {{ $t('comments.lockFailed') }}
-      </p>
+      <Notice v-if="lockFailed" tone="danger" inline>{{ $t('comments.lockFailed') }}</Notice>
 
       <CommentGate v-if="isOfficialClosed" reason="official" />
       <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
@@ -346,7 +349,8 @@ useCommentJump({
                 :moderates="moderates"
                 :can-report="isSignedIn && entry.comment.author?.id !== session.user?.id"
                 :is-editing="editingId === entry.comment.id"
-                :is-phone="isPhone"
+                :vote-disabled-reason="voteReasonOf(entry)"
+                :unhide-failed="unhideFailedId === entry.comment.id"
                 @reply="startReply(entry)"
                 @edit="startEdit(entry)"
                 @history="showHistory(entry)"
@@ -366,20 +370,9 @@ useCommentJump({
                 />
               </CommentItem>
             </ol>
-            <div
-              v-else
-              data-testid="comments-empty"
-              class="rounded-card border border-line bg-surface-solid"
-            >
-              <EmptyState>
-                <span class="block font-display font-semibold text-content">
-                  {{ $t('comments.empty') }}
-                </span>
-                <span v-if="composerState === 'ready'" class="mt-1 block text-sm">
-                  {{ $t('comments.emptyBody') }}
-                </span>
-              </EmptyState>
-            </div>
+            <EmptyState v-else-if="composerState === 'ready'" compact data-testid="comments-empty">
+              {{ $t('comments.empty') }}
+            </EmptyState>
             <p v-if="data.truncatedThreads.length" class="text-sm text-muted">
               {{ $t('comments.truncatedReplies') }}
             </p>
@@ -429,9 +422,7 @@ useCommentJump({
       @confirm="confirmHide"
     >
       <template #error>
-        <p v-if="hideFailed" role="alert" class="text-sm text-negative">
-          {{ $t('comments.hide.failed') }}
-        </p>
+        <Notice v-if="hideFailed" tone="danger" inline>{{ $t('comments.hide.failed') }}</Notice>
       </template>
     </ConfirmDialog>
     <ConfirmDialog
@@ -444,9 +435,7 @@ useCommentJump({
       @confirm="confirmDelete"
     >
       <template #error>
-        <p v-if="deleteFailed" role="alert" class="text-sm text-negative">
-          {{ $t('comments.delete.failed') }}
-        </p>
+        <Notice v-if="deleteFailed" tone="danger" inline>{{ $t('comments.delete.failed') }}</Notice>
       </template>
     </ConfirmDialog>
     <CommentReportDialog
