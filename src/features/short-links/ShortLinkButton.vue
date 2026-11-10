@@ -55,6 +55,7 @@ const selectAll = (event: FocusEvent) => (event.target as HTMLInputElement).sele
       tone="secondary"
       data-testid="short-link-button"
       :label="compactName"
+      :pressed="state === 'copied' || undefined"
       :disabled="state === 'limited'"
       @click="copy"
     >
@@ -65,6 +66,7 @@ const selectAll = (event: FocusEvent) => (event.target as HTMLInputElement).sele
       v-else
       data-testid="short-link-button"
       class="max-sm:w-full"
+      :pressed="state === 'copied' || undefined"
       :disabled="state === 'limited'"
       @click="copy"
     >

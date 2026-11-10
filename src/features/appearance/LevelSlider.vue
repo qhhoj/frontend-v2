@@ -1,5 +1,7 @@
 <script setup lang="ts">
-withDefaults(
+import { computed } from 'vue';
+
+const props = withDefaults(
   defineProps<{
     id: string;
     label: string;
@@ -20,16 +22,19 @@ withDefaults(
 );
 const emit = defineEmits<{ input: [value: number]; commit: [] }>();
 /**
- * The native range drawn with tokens: a 24 px accent thumb ringed in the ground colour on an 8 px line, muted when
- * disabled. Spelled out in full because Tailwind finds a class only as written.
+ * The native range drawn with tokens: a 24 px accent thumb ringed in the ground colour on a 6 px line that fills with the
+ * accent up to the thumb (`--fill`), muted when disabled. Spelled out in full because Tailwind finds a class only as written.
  */
 const SLIDER =
   'mt-2 h-11 w-full cursor-pointer appearance-none bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed ' +
-  '[&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-pill [&::-webkit-slider-runnable-track]:bg-line-control ' +
-  '[&::-moz-range-track]:h-2 [&::-moz-range-track]:rounded-pill [&::-moz-range-track]:bg-line-control ' +
-  '[&::-webkit-slider-thumb]:-mt-2 [&::-webkit-slider-thumb]:size-6 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-surface-solid [&::-webkit-slider-thumb]:bg-accent ' +
+  '[&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-pill [&::-webkit-slider-runnable-track]:bg-[linear-gradient(to_right,var(--color-accent)_var(--fill),var(--color-line-control)_var(--fill))] ' +
+  'disabled:[&::-webkit-slider-runnable-track]:bg-[linear-gradient(to_right,var(--color-line-strong)_var(--fill),var(--color-line-control)_var(--fill))] ' +
+  '[&::-moz-range-track]:h-1.5 [&::-moz-range-track]:rounded-pill [&::-moz-range-track]:bg-line-control [&::-moz-range-progress]:h-1.5 [&::-moz-range-progress]:rounded-pill [&::-moz-range-progress]:bg-accent ' +
+  'disabled:[&::-moz-range-progress]:bg-line-strong ' +
+  '[&::-webkit-slider-thumb]:-mt-[9px] [&::-webkit-slider-thumb]:size-6 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-surface-solid [&::-webkit-slider-thumb]:bg-accent ' +
   '[&::-moz-range-thumb]:size-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-surface-solid [&::-moz-range-thumb]:bg-accent ' +
   'disabled:[&::-webkit-slider-thumb]:bg-line-strong disabled:[&::-moz-range-thumb]:bg-line-strong';
+const fill = computed(() => `${((props.value - props.min) / (props.max - props.min)) * 100}%`);
 </script>
 
 <template>
@@ -50,6 +55,7 @@ const SLIDER =
       :aria-valuetext="valueText"
       :aria-describedby="describedby"
       :class="SLIDER"
+      :style="{ '--fill': fill }"
       @input="emit('input', Number(($event.target as HTMLInputElement).value))"
       @change="emit('commit')"
     />

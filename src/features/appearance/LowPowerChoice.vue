@@ -42,6 +42,7 @@ const options = computed(() =>
       name="low-power"
       :legend="$t('lowPower.title')"
       legend-hidden
+      :cols="3"
       :options="options"
     >
       <template #extra="{ option }">

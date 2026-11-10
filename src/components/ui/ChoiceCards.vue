@@ -12,6 +12,8 @@ defineProps<{
   name: string;
   options: { value: T; label: string; description: string }[];
   legendHidden?: boolean;
+  /** Columns from `md` up (two by default; from `sm` always two). */
+  cols?: 2 | 3;
 }>();
 </script>
 
@@ -20,7 +22,7 @@ defineProps<{
     <legend class="mb-1.5 text-sm font-semibold" :class="{ 'sr-only': legendHidden }">
       {{ legend }}
     </legend>
-    <div class="grid gap-2 sm:grid-cols-2">
+    <div class="grid gap-2 sm:grid-cols-2" :class="{ 'md:grid-cols-3': cols === 3 }">
       <label
         v-for="option in options"
         :key="option.value"

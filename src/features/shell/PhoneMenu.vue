@@ -57,7 +57,7 @@ watch(
     :label="$t('nav.openMenu')"
     @click="isOpen = true"
   >
-    <Menu aria-hidden="true" />
+    <Menu aria-hidden="true" class="size-5" />
   </IconButton>
   <Drawer v-model:visible="isOpen" side="bottom" :title="$t('nav.menu')">
     <nav :aria-label="$t('nav.main')">

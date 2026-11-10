@@ -43,7 +43,7 @@ const lowPowerOptions = computed(() =>
     :label="$t('appearance.title')"
     @click="popover?.toggle($event)"
   >
-    <Palette aria-hidden="true" />
+    <Palette aria-hidden="true" class="size-5" />
   </IconButton>
   <Popover ref="popover" :labelledby="TITLE_ID" @show="isOpen = true" @hide="isOpen = false">
     <div class="flex w-[min(20rem,calc(100vw-4rem))] flex-col gap-4">

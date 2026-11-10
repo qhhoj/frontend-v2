@@ -19,6 +19,7 @@ const isPressed = (accent: string) => shown.value.accent === accent;
       v-for="preset in ACCENTS"
       :key="preset.id"
       tone="ghost"
+      class="aria-pressed:ring-2 aria-pressed:ring-content"
       :disabled="disabled"
       :label="$t(preset.labelKey)"
       :pressed="isPressed(preset.id)"
