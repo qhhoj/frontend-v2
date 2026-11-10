@@ -1647,6 +1647,8 @@
     "loadMore": "Xem thêm"
   },
   "vote": {
+    "signIn": "Đăng nhập để bình chọn.",
+    "own": "Bạn không thể bình chọn nội dung của chính mình.",
     "up": "Bình chọn lên",
     "down": "Bình chọn xuống",
     "refusedGate": "Cần giải ít nhất 5 bài để bình chọn.",
@@ -1962,7 +1964,6 @@
     "author": "Tác giả",
     "viewProfile": "Xem hồ sơ",
     "morePosts": "Bài viết khác",
-    "noMorePosts": "Chưa có bài viết khác.",
     "notFoundTitle": "Không tìm thấy bài viết",
     "notFoundBody": "Bài viết không tồn tại hoặc chưa được công khai.",
     "backToBlog": "Về blog",
@@ -1994,11 +1995,9 @@
     "collapsedReply": "#{number} · {author} · trả lời #{parent} · bị thu gọn vì điểm thấp ({score})",
     "tooOld": "Quá 1 năm, không nhận thêm trả lời",
     "empty": "Chưa có bình luận — hãy là người đầu tiên",
-    "emptyBody": "Đặt câu hỏi về đề, chia sẻ gợi ý hoặc báo lỗi. Ô soạn nằm ngay bên dưới.",
     "action": {
       "reply": "Trả lời",
       "history": "Lịch sử ({count})",
-      "more": "Thêm thao tác",
       "lock": "Khóa bình luận",
       "unlock": "Mở khóa",
       "report": "Báo cáo",
@@ -2833,15 +2832,26 @@
     "notInstalled": "chưa cài"
   },
   "postEditor": {
+    "staff": "Tùy chọn của ban quản trị",
+    "fields": {
+      "title": "Tiêu đề",
+      "globalPost": "Lên bảng tin trang chủ",
+      "ogImage": "Ảnh xem trước liên kết",
+      "authors": "Tác giả"
+    },
+    "hints": {
+      "globalPost": "Hiện ở trang chủ và bảng tin chung.",
+      "ogImage": "Một URL https hoặc đường dẫn trong trang như /static/banner.png. Để trống nếu không có."
+    },
+    "saved": "Đã lưu.",
+    "nothingToSave": "Không có gì thay đổi.",
+    "cannotEdit": "Bạn không thể sửa bài này.",
     "newTitle": "Viết bài mới",
     "editTitle": "Sửa bài viết",
     "backToPost": "Về bài viết",
     "body": {
       "label": "Nội dung (Markdown)",
-      "write": "Soạn",
-      "preview": "Xem trước",
       "toolbar": "Định dạng",
-      "empty": "Bản xem trước hiện ở đây khi bạn viết.",
       "tools": {
         "bold": "In đậm",
         "italic": "In nghiêng",
@@ -2890,6 +2900,10 @@
       "body": "Viết bài cá nhân cần giải ít nhất {count} bài và không bị cấm nói. Quản trị viên tổ chức có thể đăng bài cho tổ chức của mình."
     },
     "errors": {
+      "title": "Nhập tiêu đề tối đa {max} ký tự.",
+      "content": "Hãy viết nội dung bài.",
+      "ogImage": "Dùng URL http(s) hoặc đường dẫn bắt đầu bằng /, tối đa 150 ký tự.",
+      "publishOn": "Chọn ngày giờ hợp lệ.",
       "scheduleAhead": "Chọn một thời điểm trong tương lai."
     }
   },

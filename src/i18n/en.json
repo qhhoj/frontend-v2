@@ -1647,6 +1647,8 @@
     "loadMore": "Show more"
   },
   "vote": {
+    "signIn": "Sign in to vote.",
+    "own": "You cannot vote on your own content.",
     "up": "Vote up",
     "down": "Vote down",
     "refusedGate": "Solve at least 5 problems to vote.",
@@ -1962,7 +1964,6 @@
     "author": "Author",
     "viewProfile": "View profile",
     "morePosts": "More posts",
-    "noMorePosts": "No other posts yet.",
     "notFoundTitle": "Post not found",
     "notFoundBody": "The post does not exist or is not public yet.",
     "backToBlog": "Back to the blog",
@@ -1994,11 +1995,9 @@
     "collapsedReply": "#{number} · {author} · reply to #{parent} · folded for a low score ({score})",
     "tooOld": "Older than a year, no more replies",
     "empty": "No comments yet — be the first",
-    "emptyBody": "Ask about the statement, share a hint or report a mistake. The composer is right below.",
     "action": {
       "reply": "Reply",
       "history": "History ({count})",
-      "more": "More actions",
       "lock": "Lock comments",
       "unlock": "Unlock",
       "report": "Report",
@@ -2833,15 +2832,26 @@
     "notInstalled": "not installed"
   },
   "postEditor": {
+    "staff": "Staff options",
+    "fields": {
+      "title": "Title",
+      "globalPost": "On the home newsfeed",
+      "ogImage": "Link preview image",
+      "authors": "Authors"
+    },
+    "hints": {
+      "globalPost": "Listed on the home page and the global newsfeed.",
+      "ogImage": "An https URL or a site path such as /static/banner.png. Empty for none."
+    },
+    "saved": "Saved.",
+    "nothingToSave": "Nothing changed.",
+    "cannotEdit": "You cannot edit this post.",
     "newTitle": "New post",
     "editTitle": "Edit post",
     "backToPost": "Back to the post",
     "body": {
       "label": "Content (Markdown)",
-      "write": "Write",
-      "preview": "Preview",
       "toolbar": "Formatting",
-      "empty": "The preview shows here as you write.",
       "tools": {
         "bold": "Bold",
         "italic": "Italic",
@@ -2890,6 +2900,10 @@
       "body": "A personal post needs at least {count} solved problems and an unmuted account. Organization admins can post for their organization."
     },
     "errors": {
+      "title": "Enter a title of at most {max} characters.",
+      "content": "Write the post content.",
+      "ogImage": "Use an http(s) URL or a path starting with /, at most 150 characters.",
+      "publishOn": "Pick a valid date and time.",
       "scheduleAhead": "Pick a time in the future."
     }
   },

@@ -11,8 +11,10 @@ const props = withDefaults(
     canVote: boolean;
     send: (score: VoteScore) => Promise<VoteResponse>;
     orientation?: 'column' | 'row';
+    /** Why `canVote` is false: the arrows' tooltip (a page may also say it in words beside the control). */
+    disabledReason?: string;
   }>(),
-  { orientation: 'column' },
+  { orientation: 'column', disabledReason: undefined },
 );
 const emit = defineEmits<{ voted: [] }>();
 const vote = useVote(
@@ -38,6 +40,7 @@ const ARROW =
         :aria-label="$t('vote.up')"
         :aria-pressed="vote.viewerVote.value === 1"
         :aria-disabled="canVote ? undefined : 'true'"
+        :title="canVote ? undefined : disabledReason"
         :class="ARROW"
         @click="press(1)"
       >
@@ -54,6 +57,7 @@ const ARROW =
         :aria-label="$t('vote.down')"
         :aria-pressed="vote.viewerVote.value === -1"
         :aria-disabled="canVote ? undefined : 'true'"
+        :title="canVote ? undefined : disabledReason"
         :class="ARROW"
         @click="press(-1)"
       >

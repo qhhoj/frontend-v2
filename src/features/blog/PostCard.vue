@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import BitLoop from '@/components/BitLoop.vue';
 import UserLink from '@/components/UserLink.vue';
+import { voteDisabledKey } from '@/features/vote/vote-rules';
 import VoteControl from '@/components/VoteControl.vue';
 import type { PostListItem } from '@/api/types/blog';
 import type { VoteScore } from '@/api/types/votes';
@@ -40,7 +41,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
       <BitLoop v-else kind="writing" class="[--bit-px:5px]" />
     </RouterLink>
     <div class="flex flex-1 flex-col gap-2 p-4 sm:px-5">
-      <p class="text-caption leading-4 font-bold tracking-wide text-accent-text uppercase">
+      <p class="text-caption leading-4 font-semibold text-accent-text">
         {{ $t('blog.pinnedLabel') }}
       </p>
       <h2
@@ -75,6 +76,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
           :score="post.score"
           :viewer-vote="post.viewerVote"
           :can-vote="canVote"
+          :disabled-reason="$t(voteDisabledKey(session.user !== null))"
           :send="send"
           @voted="refreshPosts"
         />

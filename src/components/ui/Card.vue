@@ -35,7 +35,9 @@ const hasHeader = computed(() => Boolean(props.title || props.lead || slots.acti
 const headerClass = computed(() =>
   props.divided
     ? ['mb-4 border-b border-line pb-3', props.padding && CARD_HEADER_BLEED[props.padding]]
-    : 'mb-4',
+    : props.variant === 'plain'
+      ? 'mb-3'
+      : 'mb-4',
 );
 const cardClass = computed(() => [
   CARD_VARIANTS[props.variant],

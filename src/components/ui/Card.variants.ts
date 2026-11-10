@@ -1,11 +1,12 @@
 /**
  * Card recipes (docs/design-language.md). `glass` is the page card: the theme decides whether it is a white hairline card
- * (Clay) or frosted (Glass). `inset` is a tinted tile inside a card. `flat` is the admin form and table card.
+ * (Clay) or frosted (Glass). `inset` is a tinted tile inside a card. `flat` is the admin form and table card. `plain` has no chrome: one section inside a card that another part draws (the blog rail).
  */
 export const CARD_VARIANTS = {
   glass: 'glass rounded-card',
   inset: 'rounded-row bg-surface-strong',
   flat: 'rounded-row border border-line bg-surface',
+  plain: '',
 } as const;
 
 export type CardVariant = keyof typeof CARD_VARIANTS;

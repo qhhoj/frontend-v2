@@ -117,10 +117,10 @@ Not restricted, because they add behaviour the kit part lacks:
 | ---------------------------- | ------ | ---- | ----- |
 | `problems-submissions.json`  | M-PS   | 41 | 29 |
 | `contests.json`              | M-CT   | 44 | 27 |
-| `shell-home.json`            | M-SH   | 38 | 19 |
+| `shell-home.json`            | M-SH   | 33 | 14 |
 | `auth-account.json`          | M-AU   | 99 | 40 |
 | `profile-notifications.json` | M-PR   | 34 | 14 |
-| `blog-comments.json`         | M-BC   | 34 | 16 |
+| `blog-comments.json`         | M-BC   | 0  | 0 |
 | `organizations-tickets.json` | M-OT   | 69 | 37 |
 | `admin-problems.json`        | M-AP   | 380 | 71 |
 | `admin-tools.json`           | M-AT   | 115 | 34 |

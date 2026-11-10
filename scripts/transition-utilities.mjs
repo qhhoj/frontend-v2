@@ -31,7 +31,6 @@ export const ALLOWED = {
   'features/admin/problems/polygon/PolygonWizardPage.vue': { 'transition-transform': CHEVRON },
   'features/admin/shell/AdminNav.vue': { 'transition-transform': CHEVRON },
   'features/admin/tickets/TicketHandlingSection.vue': { 'transition-transform': CHEVRON },
-  'features/blog/editor/PostEditorPage.vue': { 'transition-transform': CHEVRON },
   'features/organizations/manage/OrganizationInfoForm.vue': { 'transition-transform': CHEVRON },
 };
 

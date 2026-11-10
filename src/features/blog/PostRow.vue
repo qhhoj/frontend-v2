@@ -2,6 +2,7 @@
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import UserLink from '@/components/UserLink.vue';
+import { voteDisabledKey } from '@/features/vote/vote-rules';
 import VoteControl from '@/components/VoteControl.vue';
 import Chip from '@/components/ui/Chip.vue';
 import type { PostListItem } from '@/api/types/blog';
@@ -13,7 +14,7 @@ import { useSessionStore } from '@/stores/session.store';
 import { summaryExcerpt } from './post-summary';
 import { postStateOf } from './post-state';
 
-/** One post as a row: a two-line title, a muted two-line excerpt, then author, date and comments, with the vote centred on the right. */
+/** One post as a row: a two-line title, a muted two-line excerpt, then author, date and comments with the vote at the end of that line, as on a pinned card. */
 const props = defineProps<{ post: PostListItem }>();
 const session = useSessionStore();
 const locale = useLocaleStore();
@@ -33,10 +34,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
 </script>
 
 <template>
-  <article
-    data-testid="post-row"
-    class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 px-4 py-4 sm:px-5 sm:py-5"
-  >
+  <article data-testid="post-row" class="px-4 py-4 sm:px-5 sm:py-5">
     <div class="flex min-w-0 flex-col gap-2">
       <h2 class="line-clamp-2 text-subtitle leading-snug font-semibold [overflow-wrap:anywhere]">
         <Chip v-if="post.sticky" tone="accent" class="mr-2 align-middle">{{
@@ -68,15 +66,17 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         >
           {{ $t('blog.comments', { count: post.commentCount }) }}
         </RouterLink>
+        <VoteControl
+          class="ml-auto"
+          orientation="row"
+          :score="post.score"
+          :viewer-vote="post.viewerVote"
+          :can-vote="canVote"
+          :disabled-reason="$t(voteDisabledKey(session.user !== null))"
+          :send="send"
+          @voted="refreshPosts"
+        />
       </footer>
     </div>
-    <VoteControl
-      orientation="row"
-      :score="post.score"
-      :viewer-vote="post.viewerVote"
-      :can-vote="canVote"
-      :send="send"
-      @voted="refreshPosts"
-    />
   </article>
 </template>

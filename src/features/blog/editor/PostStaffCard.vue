@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import FormField from '@/components/ui/FormField.vue';
 import TextInput from '@/components/ui/TextInput.vue';
 import UsernameChips from '@/features/admin/ui/UsernameChips.vue';
@@ -13,27 +14,23 @@ const authors = defineModel<UserChip[]>('authors', { required: true });
 </script>
 
 <template>
-  <section
-    class="flex flex-col gap-5 rounded-card border border-line bg-surface-solid p-4 sm:p-5"
-    aria-labelledby="post-staff"
-  >
-    <h2 id="post-staff" class="font-display text-base font-bold text-accent-text">
-      {{ $t('admin.postEditor.staff') }}
-    </h2>
-    <FormField
-      :label="$t('admin.postEditor.fields.ogImage')"
-      :hint="$t('admin.postEditor.hints.ogImage')"
-      :error="errors.ogImage"
-      input-id="post-og-image"
-    >
-      <TextInput v-model="ogImage" :maxlength="POST_LIMITS.ogImage" placeholder="https://…" />
-    </FormField>
-    <UsernameChips
-      v-if="!isNew"
-      v-model="authors"
-      :label="$t('admin.postEditor.fields.authors')"
-      :max="20"
-      :error="errors.authorIds"
-    />
-  </section>
+  <Card padding="md" :title="$t('postEditor.staff')">
+    <div class="flex flex-col gap-5">
+      <FormField
+        :label="$t('postEditor.fields.ogImage')"
+        :hint="$t('postEditor.hints.ogImage')"
+        :error="errors.ogImage"
+        input-id="post-og-image"
+      >
+        <TextInput v-model="ogImage" :maxlength="POST_LIMITS.ogImage" placeholder="https://…" />
+      </FormField>
+      <UsernameChips
+        v-if="!isNew"
+        v-model="authors"
+        :label="$t('postEditor.fields.authors')"
+        :max="20"
+        :error="errors.authorIds"
+      />
+    </div>
+  </Card>
 </template>

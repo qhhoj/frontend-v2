@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import PageHeader from '@/components/ui/PageHeader.vue';
+import { useI18n } from 'vue-i18n';
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed } from 'vue';
 import UserContent from '@/components/UserContent.vue';
 import Chip from '@/components/ui/Chip.vue';
 import UserLink from '@/components/UserLink.vue';
+import { voteDisabledKey } from '@/features/vote/vote-rules';
 import VoteControl from '@/components/VoteControl.vue';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
 import type { PostDetail } from '@/api/types/blog';
 import type { VoteScore } from '@/api/types/votes';
 import { votePost } from '@/api/blog.api';
+import PostActions from './PostActions.vue';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
@@ -20,6 +23,7 @@ const props = defineProps<{ post: PostDetail }>();
 const session = useSessionStore();
 const locale = useLocaleStore();
 const queryClient = useQueryClient();
+const { t } = useI18n();
 const isAuthor = computed(() =>
   props.post.authors.some((author) => author.id === session.user?.id),
 );
@@ -31,7 +35,12 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
 
 <template>
   <article class="flex min-w-0 flex-col gap-5">
-    <PageHeader data-testid="post-header" :title="post.title">
+    <PageHeader
+      data-testid="post-header"
+      :title="post.title"
+      :crumbs="[{ label: t('nav.blog'), to: { name: 'blog' } }, { label: post.title }]"
+      :back="{ to: { name: 'blog' }, label: t('blogPost.back') }"
+    >
       <template v-if="post.organization || post.sticky" #above>
         <div class="flex flex-wrap items-center gap-2">
           <RouterLink
@@ -56,6 +65,9 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
           <time :datetime="post.publishOn">{{ publishedOn }}</time>
         </div>
       </template>
+      <template v-if="post.canEdit || post.canDelete" #actions
+        ><PostActions :post="post"
+      /></template>
     </PageHeader>
     <UserContent :html="post.contentHtml" />
     <footer
@@ -67,10 +79,15 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         :score="post.score"
         :viewer-vote="post.viewerVote"
         :can-vote="canVote"
+        :disabled-reason="$t(voteDisabledKey(session.user !== null))"
         :send="send"
         @voted="refreshPosts"
       />
+      <span v-if="!canVote" class="text-meta text-muted">
+        {{ $t(voteDisabledKey(session.user !== null)) }}
+      </span>
       <RouterLink
+        v-if="post.commentCount > 0"
         :to="{ name: 'post', params: { id: post.id }, hash: '#comments' }"
         class="font-semibold text-accent-text hover:underline"
       >

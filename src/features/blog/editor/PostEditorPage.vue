@@ -6,7 +6,9 @@ import { useRoute } from 'vue-router';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import FormField from '@/components/ui/FormField.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import { provideDateValidity } from '@/components/ui/date-validity';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import AdminLeaveGuard from '@/features/admin/ui/form/AdminLeaveGuard.vue';
@@ -118,7 +120,7 @@ const fixedAuthor = computed(() =>
       <StatePanel
         v-if="editor.post.value && !editor.post.value.canEdit"
         kind="forbidden"
-        :title="$t('admin.postEditor.cannotEdit')"
+        :title="$t('postEditor.cannotEdit')"
       />
       <form
         v-else
@@ -130,19 +132,11 @@ const fixedAuthor = computed(() =>
         <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div class="flex min-w-0 flex-col gap-5">
             <FormField
-              v-slot="{ id, describedBy, invalid }"
-              :label="$t('admin.postEditor.fields.title')"
+              :label="$t('postEditor.fields.title')"
               :error="errors.title"
               input-id="post-title"
             >
-              <input
-                :id="id"
-                v-model="form.title"
-                :maxlength="POST_LIMITS.title"
-                class="min-h-13 w-full rounded-row border border-line-control bg-surface-solid px-4 font-display text-section leading-7 font-bold text-content"
-                :aria-describedby="describedBy"
-                :aria-invalid="invalid ? 'true' : undefined"
-              />
+              <TextInput v-model="form.title" :maxlength="POST_LIMITS.title" />
             </FormField>
             <PostBodyEditor
               v-model="form.content"
@@ -152,21 +146,22 @@ const fixedAuthor = computed(() =>
           </div>
 
           <div class="flex flex-col gap-6">
-            <button
+            <AppButton
               v-if="isPhone"
-              type="button"
-              class="flex min-h-12 items-center justify-between rounded-row border border-line bg-surface-strong px-4 font-semibold"
+              block
               :aria-expanded="isSettingsOpen"
               aria-controls="post-settings-column"
               @click="isSettingsOpen = !isSettingsOpen"
             >
+              <template #icon>
+                <ChevronDown
+                  aria-hidden="true"
+                  class="size-4"
+                  :class="isSettingsOpen && 'rotate-180'"
+                />
+              </template>
               {{ $t('postEditor.settings.toggle') }}
-              <ChevronDown
-                aria-hidden="true"
-                class="size-4 transition-transform"
-                :class="isSettingsOpen && 'rotate-180'"
-              />
-            </button>
+            </AppButton>
             <div
               v-show="!isPhone || isSettingsOpen"
               id="post-settings-column"

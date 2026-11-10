@@ -2,6 +2,8 @@
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import QueryState from '@/components/QueryState.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import DiffLines from '@/components/ui/DiffLines.vue';
 import Modal from '@/components/ui/Modal.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import UserLink from '@/components/UserLink.vue';
@@ -43,9 +45,14 @@ const viewOptions = computed(() =>
     label: t(`comments.revisions.${value}`),
   })),
 );
+const SIGN = { same: ' ', removed: '-', added: '+' } as const;
 const lines = computed(() => {
   const version = chosen.value;
-  return version && version.previous !== null ? unifiedDiff(version.previous, version.text) : [];
+  if (!version || version.previous === null) return [];
+  return unifiedDiff(version.previous, version.text).map((line) => ({
+    sign: SIGN[line.kind],
+    text: line.text,
+  }));
 });
 const nameOf = (version: CommentVersion) =>
   version.edit === 0
@@ -53,12 +60,6 @@ const nameOf = (version: CommentVersion) =>
     : version.edit === versions.value[0]?.edit
       ? t('comments.revisions.current', { n: version.edit })
       : t('comments.revisions.edit', { n: version.edit });
-const LINE_TONE = {
-  same: 'text-muted',
-  removed: 'bg-verdict-wa-bg text-verdict-wa',
-  added: 'bg-verdict-ac-bg text-verdict-ac',
-};
-const SIGN = { same: ' ', removed: '−', added: '+' };
 </script>
 
 <template>
@@ -77,27 +78,33 @@ const SIGN = { same: ' ', removed: '−', added: '+' };
       <template #skeleton>
         <p class="text-sm text-muted">{{ $t('comments.revisions.loading') }}</p>
       </template>
-      <div class="grid gap-4 md:grid-cols-[200px_minmax(0,1fr)]">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-[200px_minmax(0,1fr)]">
         <nav :aria-label="$t('comments.revisions.versions')">
           <ol class="flex gap-1 overflow-x-auto md:flex-col">
-            <li v-for="version in versions" :key="version.edit" class="shrink-0">
-              <button
-                type="button"
-                :aria-current="version.edit === chosen?.edit || undefined"
-                class="flex w-full flex-col items-start rounded-row px-3 py-2 text-left text-sm hover:bg-surface-hover aria-[current]:bg-accent-soft aria-[current]:text-accent-soft-text"
+            <li
+              v-for="version in versions"
+              :key="version.edit"
+              class="max-w-64 shrink-0 md:max-w-none"
+            >
+              <AppButton
+                tone="row"
+                :pressed="version.edit === chosen?.edit"
                 @click="chosenEdit = version.edit"
               >
-                <span class="font-semibold">{{ nameOf(version) }}</span>
-                <span v-if="version.at" class="text-caption leading-4 text-muted">
-                  {{ formatDate(version.at, 'datetime', locale.locale) }}
+                <span class="flex min-w-0 max-w-full flex-col items-start">
+                  <span class="font-semibold">{{ nameOf(version) }}</span>
+                  <span v-if="version.at" class="text-caption leading-4 text-muted">
+                    {{ formatDate(version.at, 'datetime', locale.locale) }}
+                  </span>
+                  <UserLink
+                    v-if="version.editor"
+                    :username="version.editor.username"
+                    :rating="version.editor.rating"
+                    :link="false"
+                    class="text-caption leading-4"
+                  />
                 </span>
-                <UserLink
-                  v-if="version.editor"
-                  :username="version.editor.username"
-                  :rating="version.editor.rating"
-                  class="text-caption leading-4"
-                />
-              </button>
+              </AppButton>
             </li>
           </ol>
         </nav>
@@ -116,26 +123,11 @@ const SIGN = { same: ' ', removed: '−', added: '+' };
             </h3>
             <p class="text-caption leading-4 text-muted">{{ $t('comments.revisions.legend') }}</p>
             <div
-              role="table"
+              role="group"
               :aria-label="$t('comments.revisions.diffLabel')"
-              class="max-h-96 overflow-auto rounded-row border border-line font-mono text-meta leading-relaxed"
+              class="max-h-96 overflow-auto rounded-row border border-line p-1"
             >
-              <div
-                v-for="(line, index) in lines"
-                :key="index"
-                role="row"
-                class="flex"
-                :class="LINE_TONE[line.kind]"
-              >
-                <span
-                  :aria-hidden="line.kind === 'same' || undefined"
-                  class="w-6 shrink-0 text-center select-none"
-                  >{{ SIGN[line.kind] }}</span
-                >
-                <span role="cell" class="pr-3 break-words whitespace-pre-wrap">{{
-                  line.text
-                }}</span>
-              </div>
+              <DiffLines :lines="lines" size="meta" />
             </div>
           </template>
           <pre

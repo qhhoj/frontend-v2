@@ -11,7 +11,7 @@ const preview = useDebouncedPreview(() => props.text, previewComment, {
 </script>
 
 <template>
-  <div class="min-h-[106px] rounded-row border border-line bg-surface-strong px-3 py-2.5">
+  <div class="min-h-28 rounded-row border border-line bg-surface-strong px-3 py-2.5">
     <p v-if="!text.trim()" class="text-sm text-muted">{{ $t('comments.preview.empty') }}</p>
     <template v-else>
       <p v-if="preview.isRateLimited.value" role="status" class="mb-2 text-sm text-muted">

@@ -5,9 +5,9 @@
  * Disabled is `aria-disabled` plus a muted token pair, never opacity. A button with `aria-pressed` is a toggle and wears the
  * accent-soft pair while pressed. `link` is an inline text action: no box, a 44 px hit area.
  */
-export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'link';
+export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'link' | 'row';
 export type ButtonSize = 'sm' | 'md' | 'lg';
-type BoxedTone = Exclude<ButtonTone, 'link'>;
+type BoxedTone = Exclude<ButtonTone, 'link' | 'row'>;
 
 const CURSOR = 'aria-disabled:cursor-not-allowed disabled:cursor-not-allowed';
 
@@ -22,6 +22,13 @@ const BOXED_TONES: Record<BoxedTone, string> = {
   danger:
     'border border-negative bg-surface-solid font-semibold text-negative hover:bg-surface-hover aria-disabled:text-muted',
 };
+
+/**
+ * `row`: a button that is a whole line of a list or form (a closed composer, a folded comment, a version in a history): full
+ * width, left aligned, regular muted text that wraps, on a card-radius hairline row. `pressed` takes the accent-soft pair.
+ */
+const ROW_CLASSES =
+  'inline-flex min-h-(--qh-control) w-full items-center justify-start gap-2 rounded-card border border-line bg-surface-solid px-4 py-2 text-left text-sm font-normal text-muted hover:bg-surface-hover aria-disabled:bg-surface-strong aria-disabled:text-muted aria-disabled:hover:bg-surface-strong';
 
 /** Inside `.qh-admin`, a boxed tone takes the admin look on top of the public one. */
 const ADMIN_SCOPE_TONES: Record<BoxedTone, string> = {
@@ -81,6 +88,7 @@ export function buttonClasses({
   iconOnly = false,
   block = false,
 }: ButtonClassOptions = {}) {
+  if (tone === 'row') return `${ROW_CLASSES} ${CURSOR} ${PRESSED}`;
   const classes =
     tone === 'link' ? `${LINK_CLASSES} ${CURSOR}` : boxedClasses(tone, size, iconOnly);
   return block ? `${classes} w-full` : classes;
