@@ -11,6 +11,7 @@ import { mountComponent } from '@/test/mount';
 import { useSessionStore } from '@/stores/session.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { readStorage, writeStorage } from '@/lib/storage';
+import { showToast, toasts } from '@/components/ui/toasts';
 import { useAccountCacheSync } from './use-account-cache';
 
 const CACHED_KEY = ['problems', 'list', { page: 1 }];
@@ -50,6 +51,16 @@ describe('account cache sync', () => {
     session.$patch({ user: accountB });
     await flushPromises();
     expect(isCached()).toBe(false);
+  });
+
+  it('closes the toasts of the previous viewer when the next one signs in', async () => {
+    const { session } = mountSync();
+    session.$patch({ status: 'anonymous', user: null });
+    await flushPromises();
+    showToast({ text: 'failed for the previous viewer', tone: 'danger' });
+    session.$patch({ status: 'authenticated', user: accountA });
+    await flushPromises();
+    expect(toasts).toHaveLength(0);
   });
 
   it('drops the cache when an anonymous visitor signs in', async () => {

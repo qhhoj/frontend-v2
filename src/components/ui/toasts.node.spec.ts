@@ -45,4 +45,10 @@ describe('toasts', () => {
     vi.advanceTimersByTime(1);
     expect(toasts).toHaveLength(0);
   });
+
+  it('pushes out an older success before a failure', () => {
+    showToast({ text: 'failed', tone: 'danger' });
+    for (const text of ['a', 'b', 'c']) showToast({ text });
+    expect(texts()).toEqual(['failed', 'b', 'c']);
+  });
 });

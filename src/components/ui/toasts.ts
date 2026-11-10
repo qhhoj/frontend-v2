@@ -20,7 +20,7 @@ export interface Toast {
   undoLabel?: string;
 }
 
-/** At most three toasts; a fourth pushes out the oldest. */
+/** At most three toasts; a fourth pushes out the oldest that is not a failure (the oldest of all if every one is). */
 export const MAX_TOASTS = 3;
 /** Success and info close themselves after 4 s (paused while hovered or focused); failures stay until closed. */
 export const TOAST_LIFETIME_MS = 4000;
@@ -65,7 +65,10 @@ export function showToast(input: ToastInput): number {
     undoLabel: input.undoLabel,
   };
   list.push(toast);
-  while (list.length > MAX_TOASTS) dismissToast(list[0]!.id);
+  while (list.length > MAX_TOASTS) {
+    const older = list.slice(0, -1);
+    dismissToast((older.find((entry) => entry.tone !== 'danger') ?? older[0]!).id);
+  }
   resumeToast(toast.id);
   return toast.id;
 }

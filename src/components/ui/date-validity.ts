@@ -31,6 +31,12 @@ export function useDateReset(): () => void {
   };
 }
 
+/** For a child of a form that reads dates itself: whether any date box of the form above holds unreadable text. */
+export function useHasUnreadableDate() {
+  const registry = inject(DATE_REGISTRY, null);
+  return computed(() => (registry?.unreadable.size ?? 0) > 0);
+}
+
 /** For `AdminDateTimeField`: reports whether its text is unreadable to the form above, and runs `onReset` when the form resets. */
 export function reportUnreadableDate(isUnreadable: Ref<boolean>, onReset: () => void) {
   const registry = inject(DATE_REGISTRY, null);
