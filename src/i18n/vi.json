@@ -231,6 +231,7 @@
         "count": "Số bài nộp",
         "ac": "AC"
       },
+      "resultErr": "Lỗi khác",
       "errNote": "ERR gồm MLE, OLE, IR, RTE, AB và IE. Tổng tính cả bài nộp đang chờ chấm.",
       "languageTitle": "Ngôn ngữ",
       "closedTitle": "Thống kê chưa mở",
@@ -271,12 +272,10 @@
       }
     },
     "list": {
-      "lead": "Chia theo giai đoạn: đang diễn ra, sắp tới và đã kết thúc.",
       "search": "Tìm kỳ thi",
       "ratedLabel": "Rating",
       "ratedAny": "Tất cả",
       "ratedOnly": "Chỉ tính rating",
-      "onlyGroup": "Xem riêng nhóm này",
       "allGroups": "Xem tất cả nhóm",
       "timeLeft": "còn {span}",
       "perParticipation": "{span} mỗi lượt kể từ lúc vào thi",
@@ -286,7 +285,6 @@
       "viewAndRegister": "Xem & đăng ký",
       "endedRegion": "Bảng kỳ thi đã kết thúc, cuộn ngang",
       "shownOf": "{shown} trong {total}",
-      "viewAllCount": "Xem tất cả {count} kỳ thi",
       "view": "Xem",
       "codeNeeded": "Cần mã",
       "badges": {
@@ -2535,8 +2533,7 @@
       "scrub": "Thời điểm phát lại",
       "marksLegend": "Chấm xanh: lần giải đầu của từng bài",
       "myRow": "Về hàng của tôi",
-      "finished": "Đã phát đến cuối.",
-      "speedOption": "x{speed} (tốc độ nhân {speed})"
+      "finished": "Đã phát đến cuối."
     },
     "feed": {
       "title": "Vừa xảy ra",

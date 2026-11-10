@@ -42,7 +42,7 @@ const tagName = computed(() => {
 
 <template>
   <div class="page-column">
-    <PageHeader :title="$t('contests.title')" :lead="$t('contests.list.lead')">
+    <PageHeader :title="$t('contests.title')">
       <template #actions>
         <SearchInput
           v-model="search"

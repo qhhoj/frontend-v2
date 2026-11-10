@@ -11,8 +11,7 @@
     "SubmissionPager": 1
   },
   "features/contests/ContestCountdown.vue": {
-    "uppercase": 2,
-    "verdict-tone": 1
+    "uppercase": 2
   },
   "features/contests/ContestDetailSkeleton.vue": {
     "fixed-size": 2
@@ -35,9 +34,6 @@
   },
   "features/contests/ContestTagFilter.vue": {
     "button": 2
-  },
-  "features/contests/ContestTimeBar.vue": {
-    "verdict-tone": 1
   },
   "features/contests/EndedContestSkeleton.vue": {
     "table": 1
@@ -70,7 +66,6 @@
     "fixed-size": 2
   },
   "features/contests/replay/ReplayPlayerBar.vue": {
-    "button": 1,
     "verdict-tone": 1
   },
   "features/contests/replay/ReplayTable.vue": {

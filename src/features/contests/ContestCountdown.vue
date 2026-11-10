@@ -99,7 +99,7 @@ const freezeClock = computed(() => {
       class="text-right text-caption text-muted md:hidden"
     >
       {{ $t('contests.detail.freeze')
-      }}<b class="block font-mono text-verdict-tle">{{ freezeClock }}</b>
+      }}<b class="block font-mono text-warning">{{ freezeClock }}</b>
     </p>
   </div>
 </template>

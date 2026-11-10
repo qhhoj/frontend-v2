@@ -9,11 +9,12 @@ import Notice from '@/components/ui/Notice.vue';
 import TextArea from '@/components/ui/TextArea.vue';
 import TextInput from '@/components/ui/TextInput.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
+import AnnouncementPreview from '@/features/admin/contests/announcements/AnnouncementPreview.vue';
 import { useAnnouncementComposer } from '@/features/admin/contests/announcements/use-announcement-composer';
 
 /**
  * The organisers' composer at the top of the public Announcements tab: the admin composer's draft and post, in the
- * public look. Says who it reaches: the contestants when the contest pushes announcements, else nobody until it is turned on.
+ * public look, with the admin one's preview and six rows. Says who it reaches: the contestants when the contest pushes announcements, else nobody until it is turned on.
  */
 const props = defineProps<{ contest: ContestDetail }>();
 const { title, description, post, errors, submit } = useAnnouncementComposer(
@@ -27,7 +28,6 @@ const isPushedLive = computed(() => props.contest.settings?.pushAnnouncements ??
   <Card
     as="form"
     padding="md"
-    class="border-accent!"
     :title="$t('contests.announcements.compose.title')"
     novalidate
     data-testid="announcement-composer"
@@ -56,8 +56,13 @@ const isPushedLive = computed(() => props.contest.settings?.pushAnnouncements ??
         :hint="$t('contests.announcements.compose.bodyHint')"
         :error="errors.description"
       >
-        <TextArea v-model="description" name="description" rows="3" />
+        <TextArea v-model="description" name="description" rows="6" />
       </FormField>
+      <AnnouncementPreview
+        v-if="description.trim()"
+        :contest-key="contest.key"
+        :markdown="description"
+      />
       <Notice v-if="post.failure.value && !hasFieldErrors" tone="danger" role="alert">
         {{ failureTextOf(post.failure.value) }}
       </Notice>

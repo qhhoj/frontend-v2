@@ -5,6 +5,7 @@ import { formatNumber } from '@/lib/format';
 import { VERDICT_TONE_CLASSES } from '@/lib/verdicts';
 import type { VerdictTone } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
+import { useI18n } from 'vue-i18n';
 import { RESULT_ORDER, RESULT_TONES, formatPercent, resultSegments } from './stats-summary';
 import type { ResultCode } from './stats-summary';
 
@@ -27,11 +28,14 @@ const SEGMENT_FILLS: Record<VerdictTone, string> = {
   ce: 'bg-verdict-ce',
   pending: 'bg-verdict-pending',
 };
+const { t } = useI18n();
 const locale = useLocaleStore();
 const count = (value: number) => formatNumber(value, locale.locale);
-/** A result nobody got stays muted, so only the results that happened draw the eye. */
-const chipClasses = (code: ResultCode, value: number) =>
-  value > 0 ? VERDICT_TONE_CLASSES[RESULT_TONES[code]] : 'text-muted';
+/** Only the results that happened are listed, each with its name ("WA Sai kết quả 4"). */
+const shownCodes = (problem: ContestProblemStats) =>
+  RESULT_ORDER.filter((code) => problem.results[code] > 0);
+const resultName = (code: ResultCode) =>
+  code === 'ERR' ? t('contests.stats.resultErr') : t(`verdicts.${code}`);
 </script>
 
 <template>
@@ -95,14 +99,14 @@ const chipClasses = (code: ResultCode, value: number) =>
               </div>
               <ul class="mt-2 flex flex-wrap gap-1.5">
                 <li
-                  v-for="code in RESULT_ORDER"
+                  v-for="code in shownCodes(problem)"
                   :key="code"
                   :class="[
                     'rounded-pill px-2 py-0.5 font-mono text-caption leading-4',
-                    chipClasses(code, problem.results[code]),
+                    VERDICT_TONE_CLASSES[RESULT_TONES[code]],
                   ]"
                 >
-                  {{ code }} {{ count(problem.results[code]) }}
+                  {{ code }} {{ resultName(code) }} {{ count(problem.results[code]) }}
                 </li>
               </ul>
             </td>

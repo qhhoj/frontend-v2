@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import { Pause, Play } from 'lucide-vue-next';
@@ -44,6 +45,7 @@ function onScrub(event: Event) {
   if (heldSecond.value !== null) heldSecond.value = second;
   emit('seek', second);
 }
+const speedOptions = REPLAY_SPEEDS.map((option) => ({ value: option, label: `x${option}` }));
 </script>
 
 <template>
@@ -64,28 +66,12 @@ function onScrub(event: Event) {
         {{ clock }} <span class="text-muted">/ {{ total }}</span>
       </p>
       <span class="hidden flex-1 sm:block" />
-      <div
-        role="group"
-        :aria-label="$t('replay.player.speed')"
-        class="flex rounded-pill bg-surface-strong p-1"
-      >
-        <button
-          v-for="option in REPLAY_SPEEDS"
-          :key="option"
-          type="button"
-          :aria-pressed="speed === option"
-          :aria-label="$t('replay.player.speedOption', { speed: option })"
-          class="min-h-11 min-w-11 rounded-pill px-3 text-sm"
-          :class="
-            speed === option
-              ? 'bg-gradient-accent font-bold text-on-accent'
-              : 'text-content hover:bg-surface-hover'
-          "
-          @click="emit('speed', option)"
-        >
-          x{{ option }}
-        </button>
-      </div>
+      <SegmentedControl
+        :label="$t('replay.player.speed')"
+        :options="speedOptions"
+        :model-value="speed"
+        @update:model-value="(option) => emit('speed', option)"
+      />
     </div>
     <div class="relative">
       <span
