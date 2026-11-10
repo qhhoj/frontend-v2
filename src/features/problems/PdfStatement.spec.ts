@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import { problemDetail } from '@/test/fixtures';
 import { mountComponent } from '@/test/mount';
 import PdfStatement from './PdfStatement.vue';
 
-const mountWith = (url: string) => mountComponent(PdfStatement, { props: { url } });
+const mountWith = (url: string) =>
+  mountComponent(PdfStatement, {
+    props: { problem: problemDetail({ pdfStatementUrl: url }), url },
+  });
 
 describe('PdfStatement', () => {
   it.each(['https://example.org/a.pdf', '//example.org/a.pdf', '/\\example.org/a.pdf'])(

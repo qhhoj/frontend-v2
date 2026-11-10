@@ -18,7 +18,11 @@ import PdfLink from './PdfLink.vue';
  * and whose rows are the links, each led by a small Bit in a fitting look (the viewer's own avatar for their submissions). One PDF control: the uploaded statement when there
  * is one, else the rendered text statement.
  */
-const props = defineProps<{ problem: ProblemDetail; hasEditorial: boolean }>();
+/** `showPdf` is off where the limit strip under the title already offers the PDF (phones, tablets). */
+const props = withDefaults(
+  defineProps<{ problem: ProblemDetail; hasEditorial: boolean; showPdf?: boolean }>(),
+  { showPdf: true },
+);
 const route = useRoute();
 const session = useSessionStore();
 
@@ -88,7 +92,7 @@ const ROW =
     data-testid="header-actions"
   >
     <template #actions>
-      <PdfLink :problem="problem" />
+      <PdfLink v-if="showPdf" :problem="problem" />
       <ShortLinkButton compact :path="shortLinkPath({ kind: 'problem', code: problem.code })" />
     </template>
     <ul class="m-0 list-none border-t border-line p-0 pt-1">

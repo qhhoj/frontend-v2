@@ -77,7 +77,6 @@ const panelCount = computed(() => panelFilterCount(props.filters));
         data-testid="problem-filter-panel-toggle"
         :aria-expanded="isPanelOpen"
         :aria-controls="panelId"
-        :pressed="panelCount > 0"
         @click="isPanelOpen = !isPanelOpen"
       >
         <template #icon><SlidersHorizontal class="size-4" aria-hidden="true" /></template>

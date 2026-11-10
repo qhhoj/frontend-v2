@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { problemTypeLabel } from './problem-type-label';
+import { UNCATEGORIZED_TYPE_NAME, problemTypeLabel } from './problem-type-label';
 import { computed, ref } from 'vue';
 import type { ContestDetail } from '@/api/types/contests';
 import type { ProblemDetail } from '@/api/types/problems';
@@ -79,6 +79,10 @@ const siteFacts = computed(() => [
     value: formatNumber(props.problem.userCount, locale.locale),
   },
 ]);
+/** The catch-all type says nothing (the header already shows the group), so the card lists named types only. */
+const types = computed(() =>
+  props.problem.types.filter((type) => type.name !== UNCATEGORIZED_TYPE_NAME),
+);
 const facts = computed(() => contestFacts.value ?? siteFacts.value);
 /** File I/O shows the exact names (the contestant types them into `freopen`/`assign`); standard I/O reads in words. */
 const ioFacts = computed(() => {
@@ -94,7 +98,7 @@ const status = computed(() => viewerStatusOf(props.problem.viewerStatus));
 </script>
 
 <template>
-  <Card :class="['p-4', !problem.types.length && narrow?.limits]" data-testid="problem-facts">
+  <Card :class="['p-4', !types.length && narrow?.limits]" data-testid="problem-facts">
     <dl data-testid="limits" :class="['grid grid-cols-2 gap-x-3 gap-y-3.5', narrow?.limits]">
       <div v-for="fact in facts" :key="fact.key">
         <dt class="text-meta text-muted">{{ $t(fact.label) }}</dt>
@@ -127,17 +131,14 @@ const status = computed(() => viewerStatusOf(props.problem.viewerStatus));
         </dd>
       </div>
     </dl>
-    <div
-      v-if="problem.types.length"
-      :class="[narrow?.typesDivider ?? 'mt-3.5 border-t border-line pt-3']"
-    >
+    <div v-if="types.length" :class="[narrow?.typesDivider ?? 'mt-3.5 border-t border-line pt-3']">
       <Disclosure
         v-model:open="typesShown"
         :label="$t('problems.columns.types')"
-        :count="problem.types.length"
+        :count="types.length"
       >
         <ul id="problem-types" class="flex flex-wrap gap-1.5">
-          <li v-for="type in problem.types" :key="type.id">
+          <li v-for="type in types" :key="type.id">
             <Chip size="md">{{ problemTypeLabel(type) }}</Chip>
           </li>
         </ul>

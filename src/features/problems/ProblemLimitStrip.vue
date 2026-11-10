@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router';
 import type { ContestDetail } from '@/api/types/contests';
 import type { ProblemDetail } from '@/api/types/problems';
 import Chip from '@/components/ui/Chip.vue';
+import PdfLink from './PdfLink.vue';
 import OwnResultChip from '@/features/contests/OwnResultChip.vue';
 import { formatMemoryLimit, formatNumber, formatTimeLimit } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -14,7 +15,7 @@ import { viewerStatusOf } from './viewer-status';
 /**
  * Where the rail is not beside the statement (phones, tablets), the limits and the viewer's status sit under the
  * title as chips, with one line of links (the editorial) and the solve counts, so nobody scrolls past the statement for them.
- * The chips are neutral: a tone means a status. The PDF control lives in the links card. Inside the viewer's contest, like the facts card, the points are the
+ * The chips are neutral: a tone means a status. The PDF control is here (rendered PDF) or inline in the statement (uploaded); beside the statement it is in the links card. Inside the viewer's contest, like the facts card, the points are the
  * contest's and the status is the viewer's own cell; the site-wide solve counts are left out.
  */
 const props = defineProps<{
@@ -75,6 +76,8 @@ const LINK = 'inline-flex min-h-11 items-center gap-1 font-semibold text-accent-
       </li>
     </ul>
     <p class="flex flex-wrap items-center gap-x-3 text-meta text-muted">
+      <!-- An uploaded PDF is shown inline right under the tabs; only the rendered one needs a button up here. -->
+      <PdfLink v-if="!problem.pdfStatementUrl" :problem="problem" />
       <RouterLink
         v-if="hasEditorial"
         :to="{ query: { ...route.query, tab: 'editorial' } }"
