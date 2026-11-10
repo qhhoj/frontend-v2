@@ -4,6 +4,7 @@ import { computed, ref, watch } from 'vue';
 import { PROBLEM_LIMITS } from '@/features/admin/problems/general/problem-form';
 import { translate } from '@/i18n';
 import { toolbarControlClass } from '@/components/toolbar-classes';
+import AppButton from '@/components/ui/AppButton.vue';
 import Popover from '@/components/ui/Popover.vue';
 import TextInput from '@/components/ui/TextInput.vue';
 
@@ -102,7 +103,7 @@ const commit = () => setRange(draftMin.value, draftMax.value);
             :min="SLIDER.min"
             :max="SLIDER.max"
             :step="SLIDER.step"
-            :placeholder="String(SLIDER.min)"
+            :placeholder="$t('problems.pointsAnyBound')"
             @change="setMin(numberOf($event))"
           />
         </label>
@@ -116,7 +117,7 @@ const commit = () => setRange(draftMin.value, draftMax.value);
             :min="SLIDER.min"
             :max="SLIDER.max"
             :step="SLIDER.step"
-            :placeholder="String(SLIDER.max)"
+            :placeholder="$t('problems.pointsAnyBound')"
             @change="setMax(numberOf($event))"
           />
         </label>
@@ -153,6 +154,10 @@ const commit = () => setRange(draftMin.value, draftMax.value);
         <span>{{ SLIDER.min }}</span
         ><span>{{ SLIDER.max }}</span>
       </p>
+      <!-- The range applies as it is set; "Xong" only closes the popover. -->
+      <AppButton tone="primary" block @click="popover?.hide()">{{
+        $t('problems.pointsDone')
+      }}</AppButton>
     </div>
   </Popover>
 </template>

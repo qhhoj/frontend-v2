@@ -16,7 +16,7 @@ const { open, pending, missing, failed } = useRandomProblem(toRef(props, 'filter
       <template v-if="missing">{{ $t('problems.randomNone') }}</template>
       <template v-else-if="failed">{{ $t('problems.randomFailed') }}</template>
     </span>
-    <AppButton tone="ghost" size="sm" :loading="pending" @click="open()">
+    <AppButton tone="ghost" :loading="pending" @click="open()">
       <template #icon><Zap class="size-4" aria-hidden="true" /></template>
       {{ $t('problems.random') }}
     </AppButton>

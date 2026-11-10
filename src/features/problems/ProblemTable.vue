@@ -134,7 +134,7 @@ const pointsText = (problem: ProblemListItem) =>
     </template>
     <template #cell-types="{ row }">{{ typesText(row) }}</template>
     <template #cell-points="{ row }">
-      <span class="inline-flex items-center gap-[7px] font-medium">
+      <span class="inline-flex items-center gap-2 font-medium">
         <ProblemTierMark :points="row.points" />
         {{ pointsText(row) }}
       </span>
@@ -153,9 +153,7 @@ const pointsText = (problem: ProblemListItem) =>
           />
         </template>
         <template #trail>
-          <span
-            class="inline-flex items-center gap-[7px] font-mono text-sm font-medium tabular-nums"
-          >
+          <span class="inline-flex items-center gap-2 font-mono text-sm font-medium tabular-nums">
             <ProblemTierMark :points="row.points" />
             {{ pointsText(row) }}
           </span>

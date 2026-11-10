@@ -3,6 +3,7 @@ import { computed, reactive, useId } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import CodeEditor from '@/components/CodeEditor.vue';
 import AppButton from '@/components/ui/AppButton.vue';
+import Notice from '@/components/ui/Notice.vue';
 import { formatMemoryLimit, formatNumber, formatTimeLimit } from '@/lib/format';
 import { MAX_SOURCE_LENGTH, acceptedExtension } from '@/lib/source';
 import { useContestQuery } from '@/features/contests/contests.queries';
@@ -35,6 +36,10 @@ const formatCount = (count: number) => formatNumber(count, locale.locale);
 const errorId = useId();
 /** Ties the error line to the control the viewer is working in. */
 const errorReference = computed(() => (state.errorText ? errorId : undefined));
+/** The button's reason, printed while the form is idle and blocked; a failure line replaces it. */
+const reasonId = useId();
+const blockedReason = computed(() => (state.errorText ? null : state.blockedReason));
+const submitDescribedBy = computed(() => (blockedReason.value ? reasonId : undefined));
 const submitLabelKey = computed(() => {
   if (state.submitting) return 'submit.submitting';
   return state.fileMode ? 'submit.submitFile' : 'submit.submit';
@@ -198,6 +203,7 @@ const hasSourceUpload = computed(() => !state.fileMode);
         v-bind="classes.submit"
         :disabled="!state.canSubmit"
         :loading="state.submitting"
+        :aria-describedby="submitDescribedBy"
         class="shrink-0"
         :class="isFull ? REGION_ORDER.submitLast : REGION_ORDER.submitTopRow"
         >{{ $t(submitLabelKey) }}</AppButton
@@ -235,14 +241,23 @@ const hasSourceUpload = computed(() => !state.fileMode);
         />
       </div>
     </div>
-    <p
+    <Notice
       v-if="state.errorText"
       :id="errorId"
-      role="alert"
-      class="basis-full text-sm text-negative"
+      tone="danger"
+      inline
+      class="basis-full"
       :class="REGION_ORDER.message"
     >
       {{ state.errorText }}
+    </Notice>
+    <p
+      v-else-if="blockedReason"
+      :id="reasonId"
+      class="basis-full text-sm text-muted"
+      :class="REGION_ORDER.message"
+    >
+      {{ blockedReason }}
     </p>
     <p
       v-if="state.resubmitUnavailable"
@@ -280,6 +295,7 @@ const hasSourceUpload = computed(() => !state.fileMode);
       v-bind="classes.submit"
       :disabled="!state.canSubmit"
       :loading="state.submitting"
+      :aria-describedby="submitDescribedBy"
       class="shrink-0"
       :class="REGION_ORDER.submit"
       >{{ $t(submitLabelKey) }}</AppButton

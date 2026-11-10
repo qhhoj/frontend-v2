@@ -27,19 +27,18 @@ async function openDock() {
 </script>
 
 <template>
-  <Card class="flex flex-col gap-3 rounded-card p-4" data-testid="rail-submit">
-    <div class="flex items-center justify-between gap-2">
-      <h2 class="section-title">{{ $t('problem.rail.submit.title') }}</h2>
-      <InlineBit kind="writing" />
+  <Card padding="sm" :title="$t('problem.rail.submit.title')" data-testid="rail-submit">
+    <template #actions><InlineBit kind="writing" /></template>
+    <div class="flex flex-col gap-3">
+      <slot name="context" />
+      <SubmitSignInLink v-if="!isSignedIn" />
+      <template v-else>
+        <AppButton tone="primary" block @click="openDock">
+          <template #icon><Send class="size-4" aria-hidden="true" /></template>
+          {{ $t('problem.rail.submit.open') }}
+        </AppButton>
+        <p class="text-meta text-muted">{{ $t('problem.rail.submit.hint') }}</p>
+      </template>
     </div>
-    <slot name="context" />
-    <SubmitSignInLink v-if="!isSignedIn" />
-    <template v-else>
-      <AppButton tone="primary" block @click="openDock">
-        <template #icon><Send class="size-4" aria-hidden="true" /></template>
-        {{ $t('problem.rail.submit.open') }}
-      </AppButton>
-      <p class="text-meta text-muted">{{ $t('problem.rail.submit.hint') }}</p>
-    </template>
   </Card>
 </template>

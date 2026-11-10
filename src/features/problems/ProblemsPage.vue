@@ -3,7 +3,6 @@ import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
-import NumberedPager from '@/components/NumberedPager.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
 import { translate } from '@/i18n';
 import { formatNumber, formatProblemPoints } from '@/lib/format';
@@ -116,17 +115,13 @@ const LEGEND_MARKS = [
     />
     <ProblemFilterChips :chips="chips" @remove="update" @clear-all="clearAll" />
     <div ref="listTop" class="flex scroll-mt-20 flex-col gap-3" :aria-busy="isPlaceholderData">
-      <div v-if="data" class="flex min-h-11 flex-wrap items-center justify-between gap-2">
-        <p data-testid="problems-count" class="text-sm text-muted">{{ countText }}</p>
-        <!-- A phone keeps the count, search, sort and "Bộ lọc" above the rows; its pager is the one under them (M-18). -->
-        <NumberedPager
-          stepper
-          align="end"
-          class="max-sm:hidden"
-          :meta="data.meta"
-          :label="$t('problems.pagerTop')"
-        />
-      </div>
+      <p
+        v-if="data"
+        data-testid="problems-count"
+        class="min-h-11 content-center text-sm text-muted"
+      >
+        {{ countText }}
+      </p>
       <ProblemTable
         :problems="problems"
         :sort="filters.sort"

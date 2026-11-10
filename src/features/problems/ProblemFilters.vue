@@ -3,7 +3,8 @@ import { SlidersHorizontal } from 'lucide-vue-next';
 import { computed, ref, useId } from 'vue';
 import { isProblemSort } from '@/api/types/problems';
 import type { CatalogItem } from '@/api/types/problems';
-import { toolbarControlClass } from '@/components/toolbar-classes';
+import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
 import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import ProblemFilterControls from './ProblemFilterControls.vue';
@@ -72,20 +73,17 @@ const panelCount = computed(() => panelFilterCount(props.filters));
     />
     <RandomProblemButton v-if="!isCompact" :filters="filters" class="ml-auto" />
     <template v-if="isCompact">
-      <button
-        type="button"
+      <AppButton
         data-testid="problem-filter-panel-toggle"
         :aria-expanded="isPanelOpen"
         :aria-controls="panelId"
-        :class="[toolbarControlClass(panelCount > 0), 'border-dashed']"
+        :pressed="panelCount > 0"
         @click="isPanelOpen = !isPanelOpen"
       >
-        <SlidersHorizontal class="size-4" aria-hidden="true" />
+        <template #icon><SlidersHorizontal class="size-4" aria-hidden="true" /></template>
         {{ $t('problems.filterPanel') }}
-        <span v-if="panelCount" class="font-mono text-caption leading-4 tabular-nums">{{
-          panelCount
-        }}</span>
-      </button>
+        <Chip v-if="panelCount" class="font-mono tabular-nums">{{ panelCount }}</Chip>
+      </AppButton>
       <div v-show="isPanelOpen" :id="panelId" class="flex basis-full flex-wrap items-center gap-2">
         <ProblemFilterControls
           :filters="filters"

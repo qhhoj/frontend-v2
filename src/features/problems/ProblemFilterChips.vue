@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { X } from 'lucide-vue-next';
+import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
 import type { FilterChip } from './problem-filter-chips';
 import type { ProblemFilters } from './use-problem-filters';
 
@@ -10,24 +11,17 @@ const emit = defineEmits<{ remove: [patch: Partial<ProblemFilters>]; clearAll: [
 <template>
   <ul v-if="chips.length" class="flex flex-wrap items-center gap-2 text-meta">
     <li class="text-muted">{{ $t('problems.filtering') }}</li>
-    <li v-for="chip in chips" :key="chip.key">
-      <button
-        type="button"
-        :aria-label="$t('problems.removeFilter', { name: chip.label })"
-        class="inline-flex min-h-8 items-center gap-1.5 rounded-pill bg-surface-strong py-1 pr-2 pl-3 hover:bg-surface-hover touch:min-h-11"
-        @click="emit('remove', chip.clear)"
+    <li v-for="chip in chips" :key="chip.key" class="min-w-0">
+      <Chip
+        size="md"
+        removable
+        :remove-label="$t('problems.removeFilter', { name: chip.label })"
+        @remove="emit('remove', chip.clear)"
+        >{{ chip.label }}</Chip
       >
-        {{ chip.label }}<X class="size-3.5" aria-hidden="true" />
-      </button>
     </li>
     <li>
-      <button
-        type="button"
-        class="min-h-8 px-1 font-medium text-accent-text hover:underline touch:min-h-11"
-        @click="emit('clearAll')"
-      >
-        {{ $t('problems.clearAll') }}
-      </button>
+      <AppButton tone="link" @click="emit('clearAll')">{{ $t('problems.clearAll') }}</AppButton>
     </li>
   </ul>
 </template>

@@ -5,6 +5,7 @@ import type { SubmissionListItem } from '@/api/types/submissions';
 import { IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import InlineBit from '@/components/InlineBit.vue';
 import Card from '@/components/ui/Card.vue';
+import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StateBit from '@/components/StateBit.vue';
@@ -74,18 +75,14 @@ const rows = computed(() =>
 </script>
 
 <template>
-  <Card class="flex flex-col gap-2 p-4" data-testid="rail-my-submissions">
-    <div class="flex items-center justify-between gap-2">
-      <h2 class="flex items-center gap-2 section-title">
-        {{ $t('problem.rail.mine.title') }}
-        <StateBit v-if="isJudging" variant="judging" size="tiny" />
-      </h2>
-      <RouterLink
+  <Card padding="sm" :title="$t('problem.rail.mine.title')" data-testid="rail-my-submissions">
+    <template #actions>
+      <StateBit v-if="isJudging" variant="judging" size="tiny" />
+      <SeeAllLink
         :to="{ name: 'submissions', query: { problem: code, user: session.user?.username } }"
-        class="inline-flex min-h-8 items-center text-meta font-bold text-accent-text hover:underline touch:min-h-11"
-        >{{ $t('common.viewAll') }}</RouterLink
+        >{{ $t('common.viewAll') }}</SeeAllLink
       >
-    </div>
+    </template>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <SkeletonBlock v-for="row in SHOWN" :key="row" class="h-11" />

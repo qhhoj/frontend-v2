@@ -348,3 +348,22 @@ describe('resubmit prefill', () => {
     expect(form.source.value).toContain('int main');
   });
 });
+
+describe('why submit is off', () => {
+  it('asks for source while it is empty and says nothing once there is some', () => {
+    const { form } = mountForm();
+    form.source.value = '';
+    expect(form.canSubmit.value).toBe(false);
+    expect(form.blockedReason.value).toBe('Dán mã nguồn để nộp.');
+    form.source.value = 'int main() {}';
+    expect(form.canSubmit.value).toBe(true);
+    expect(form.blockedReason.value).toBeNull();
+  });
+  it('asks for a file in a file-only language until one is chosen', () => {
+    const { form } = mountForm();
+    form.setLanguage(SCRATCH_ID);
+    expect(form.blockedReason.value).toBe('Chọn một tệp để nộp.');
+    form.chooseFile(new File([new Uint8Array(10)], 'cat.sb3'));
+    expect(form.blockedReason.value).toBeNull();
+  });
+});

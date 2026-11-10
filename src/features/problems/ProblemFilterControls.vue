@@ -2,8 +2,8 @@
 import { computed } from 'vue';
 import type { CatalogItem } from '@/api/types/problems';
 import ToolbarSelect from '@/components/ToolbarSelect.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { translate } from '@/i18n';
-import FilterToggle from './FilterToggle.vue';
 import ProblemPointsPicker from './ProblemPointsPicker.vue';
 import ProblemTypePicker from './ProblemTypePicker.vue';
 import type { ProblemFilters } from './use-problem-filters';
@@ -42,18 +42,17 @@ const groupOptions = computed(() => [
     :max="filters.pointsMax"
     @change="emit('update', $event)"
   />
-  <FilterToggle
+  <AppButton
+    v-if="signedIn"
     :pressed="filters.hideSolved"
-    :disabled="!signedIn"
-    :title="signedIn ? undefined : $t('problems.signInToHide')"
-    @toggle="emit('update', { hideSolved: !filters.hideSolved })"
+    @click="emit('update', { hideSolved: !filters.hideSolved })"
   >
     {{ $t('problems.hideSolved') }}
-  </FilterToggle>
-  <FilterToggle
+  </AppButton>
+  <AppButton
     :pressed="filters.hasEditorial"
-    @toggle="emit('update', { hasEditorial: !filters.hasEditorial })"
+    @click="emit('update', { hasEditorial: !filters.hasEditorial })"
   >
     {{ $t('problems.hasEditorial') }}
-  </FilterToggle>
+  </AppButton>
 </template>
