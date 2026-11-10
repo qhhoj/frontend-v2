@@ -97,7 +97,7 @@ const resultName = (code: ResultCode) =>
                   :style="{ width: `${segment.share * 100}%` }"
                 />
               </div>
-              <ul class="mt-2 flex flex-wrap gap-1.5">
+              <ul v-if="shownCodes(problem).length" class="mt-2 flex flex-wrap gap-1.5">
                 <li
                   v-for="code in shownCodes(problem)"
                   :key="code"
