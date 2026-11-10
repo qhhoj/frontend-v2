@@ -246,18 +246,20 @@ const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
               @click="toggle"
             >
               <template #icon><Ellipsis aria-hidden="true" class="size-4" /></template>
-              {{ triggerWord }}
+              <span class="relative">
+                {{ triggerWord }}
+                <StatusMark
+                  v-if="hiddenMark"
+                  aria-hidden="true"
+                  data-testid="tabs-more-mark"
+                  class="pointer-events-none absolute -top-1 -right-2.5"
+                  :tone="hiddenMark.tone"
+                  :label="hiddenMark.label"
+                />
+              </span>
             </AppButton>
           </template>
         </Menu>
-        <StatusMark
-          v-if="hiddenMark"
-          aria-hidden="true"
-          data-testid="tabs-more-mark"
-          class="pointer-events-none absolute -top-0.5 -right-0.5"
-          :tone="hiddenMark.tone"
-          :label="hiddenMark.label"
-        />
       </span>
     </div>
   </component>
