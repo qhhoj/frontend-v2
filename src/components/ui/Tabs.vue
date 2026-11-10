@@ -6,7 +6,7 @@ import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
 import { RouterLink, useRoute } from 'vue-router';
 import Chip from './Chip.vue';
-import IconButton from './IconButton.vue';
+import AppButton from './AppButton.vue';
 import Menu from './Menu.vue';
 import type { MenuEntry } from './Menu.vue';
 import StatusMark from './StatusMark.vue';
@@ -50,7 +50,7 @@ export interface TabItem {
  * A row of tabs. `pill` is the public look; `underline` switches an admin page's sections; `rail` is a vertical side nav
  * from `lg` and the pill row below it. Link tabs mark the open one `aria-current="page"` (the `v-model` key, else the
  * router's exact match); without links the row is a tablist with a roving tabindex and arrow keys. `overflow="menu"`
- * hides a tab that does not fit whole (never the current one) and lists it behind a "⋯" button; `scroll` lets the row
+ * hides a tab that does not fit whole (never the current one) and lists it behind a "⋯ Thêm" button; `scroll` lets the row
  * scroll sideways.
  */
 const props = withDefaults(
@@ -149,8 +149,10 @@ const hiddenMark = computed(() => {
   return null;
 });
 const moreName = computed(() => props.moreLabel ?? t('nav.more'));
+/** The button's own words stay short ("Thêm") so the room the list keeps for it holds in both languages; `moreLabel` names the menu. */
+const triggerWord = computed(() => t('nav.more'));
 const triggerName = computed(() =>
-  hiddenMark.value ? `${moreName.value}: ${hiddenMark.value.label}` : moreName.value,
+  hiddenMark.value ? `${triggerWord.value}: ${hiddenMark.value.label}` : triggerWord.value,
 );
 /** The count is a small Chip; `accent` (something waits for the viewer) is the filled one. */
 const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
@@ -227,17 +229,19 @@ const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
       >
         <Menu :items="moreItems" :label="moreName">
           <template #trigger="{ toggle, open, setOpener }">
-            <IconButton
+            <AppButton
               :ref="(el) => setOpener((el as { $el?: HTMLElement } | null)?.$el ?? null)"
-              :label="triggerName"
+              tone="ghost"
               :size="variant === 'underline' ? 'sm' : 'md'"
+              :aria-label="triggerName"
               :data-testid="moreTestid"
               aria-haspopup="menu"
               :aria-expanded="open"
               @click="toggle"
             >
-              <Ellipsis aria-hidden="true" />
-            </IconButton>
+              <template #icon><Ellipsis aria-hidden="true" class="size-4" /></template>
+              {{ triggerWord }}
+            </AppButton>
           </template>
         </Menu>
         <StatusMark

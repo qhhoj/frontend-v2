@@ -26,13 +26,13 @@ const LIST: Record<TabsVariant, string> = {
   rail: 'flex min-w-max gap-1 lg:min-w-0 lg:flex-col',
 };
 /**
- * With the menu the list keeps room at its end for the "⋯" button (its width plus a 4 px gap), so the last tab can
+ * With the menu the list keeps room at its end for the "⋯" button (icon, "Thêm" and a 4 px gap, under 96 px), so the last tab can
  * scroll clear of it and the button's showing never changes a measured size.
  */
 const MENU_ROOM: Record<TabsVariant, string> = {
-  pill: 'pe-12',
-  underline: 'pe-[calc(var(--qh-control-sm)+0.25rem)]',
-  rail: 'pe-12 lg:pe-0',
+  pill: 'pe-24',
+  underline: 'pe-24',
+  rail: 'pe-24 lg:pe-0',
 };
 
 export const tabsList = (variant: TabsVariant, hasMenu: boolean) =>

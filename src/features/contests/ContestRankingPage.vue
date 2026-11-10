@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import PageHeader from '@/components/ui/PageHeader.vue';
-import { LocateFixed, Search } from 'lucide-vue-next';
+import { LocateFixed } from 'lucide-vue-next';
 import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -10,7 +10,7 @@ import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import Notice from '@/components/ui/Notice.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
-import TextInput from '@/components/ui/TextInput.vue';
+import SearchInput from '@/components/ui/SearchInput.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { rankingSummary } from './ranking-summary';
@@ -235,19 +235,11 @@ async function goToMyRow() {
                   : $t('ranking.myRow', { rank: myRow.rank })
               }}
             </AppButton>
-            <label class="relative block w-48 text-muted">
-              <span class="sr-only">{{ $t('ranking.searchLabel') }}</span>
-              <Search
-                class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
-                aria-hidden="true"
-              />
-              <TextInput
-                v-model="search"
-                type="search"
-                :placeholder="$t('ranking.searchLabel')"
-                class="pl-9"
-              />
-            </label>
+            <SearchInput
+              v-model="search"
+              :label="$t('ranking.searchLabel')"
+              class="w-full sm:w-48"
+            />
           </template>
         </PageHeader>
         <RankingFreezeNotice :contest="contest" :is-board-frozen="ranking?.frozen ?? false" />

@@ -3,15 +3,11 @@ import { serverNow } from '@/lib/server-clock';
 import { computed, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
-import { Settings } from 'lucide-vue-next';
-import AppButton from '@/components/ui/AppButton.vue';
-import { contestEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import QueryState from '@/components/QueryState.vue';
 import CommentsSection from '@/features/comments/CommentsSection.vue';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { phaseAt } from '@/lib/contest-time';
-import { useSessionStore } from '@/stores/session.store';
 import { usePageTitle } from '@/router/page-title';
 import ContestActions from './ContestActions.vue';
 import { useCurrentContest } from './bar/use-current-contest';
@@ -31,7 +27,6 @@ import { useContestQuery } from './contests.queries';
 const SERVER_CATCH_UP_MS = 1500;
 
 const route = useRoute();
-const session = useSessionStore();
 const key = computed(() => String(route.params.key));
 const { data: contest, isPending, error, refetch } = useContestQuery(key);
 usePageTitle(() => contest.value?.name);
@@ -46,9 +41,6 @@ const run = computed(() =>
  */
 const isUnderway = computed(
   () => contest.value?.phase === 'running' || (run.value?.virtual ?? 0) > 0,
-);
-const manageTarget = computed(
-  () => contest.value && contestEditTarget(session.user, contest.value),
 );
 /** A contest that does not exist (or is hidden) is a dead end, not a failure to retry: the crying Bit says so. */
 const isMissing = computed(() => error.value instanceof ApiError && error.value.status === 404);
@@ -78,16 +70,7 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
         <ContestHeaderCard :contest="contest" :run="run" @elapsed="onCountdownElapsed">
           <template #actions>
             <ContestActions :contest="contest" :current="current" />
-            <div class="flex items-center gap-2">
-              <AppButton v-if="manageTarget" :to="manageTarget" size="sm">
-                <template #icon><Settings aria-hidden="true" class="size-4" /></template>
-                {{ $t('contests.tabs.manageContest') }}
-              </AppButton>
-              <ShortLinkButton
-                compact
-                :path="shortLinkPath({ kind: 'contest', key: contest.key })"
-              />
-            </div>
+            <ShortLinkButton compact :path="shortLinkPath({ kind: 'contest', key: contest.key })" />
           </template>
         </ContestHeaderCard>
         <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">

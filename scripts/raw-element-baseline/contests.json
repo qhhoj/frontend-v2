@@ -79,9 +79,6 @@
   "features/leaderboard/MyRankLine.vue": {
     "button": 1
   },
-  "features/leaderboard/UsernameJump.vue": {
-    "input": 1
-  },
   "features/official-mode/OfficialModeBanner.vue": {
     "SettingsNotice": 1
   },

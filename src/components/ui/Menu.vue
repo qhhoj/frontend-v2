@@ -23,7 +23,7 @@ export interface MenuEntry {
 /**
  * A popup list of actions, destructive ones last and separated. The `trigger` slot draws the opener and gets `toggle`,
  * `open` (aria-expanded) and `setOpener` (a template ref callback, so focus returns to it before an item runs).
- * `label` names the list. A row's "⋯" button is `RowMenu`, which fills the slot.
+ * `label` names the list. An item with `to` is a real link (`href`: open in a new tab, copy the address). A row's "⋯" button is `RowMenu`, which fills the slot.
  */
 const props = defineProps<{ items: MenuEntry[]; label: string }>();
 const router = useRouter();
@@ -65,13 +65,22 @@ function onShow() {
   isOpen.value = true;
 }
 
+/** A ctrl, cmd or shift click on a link item is the browser's (a new tab or window); the menu does not also navigate. */
+const isModified = (event?: Event) => {
+  const click = event as MouseEvent | undefined;
+  return Boolean(click && (click.ctrlKey || click.metaKey || click.shiftKey));
+};
+
 const toMenuItem = (item: MenuEntry): MenuItem => ({
   label: item.label,
+  href: item.to ? router.resolve(item.to).href : undefined,
   disabled: item.disabled,
   rowIcon: item.icon,
   danger: item.danger,
   hint: item.hint,
-  command: () => runItem(item),
+  command: ({ originalEvent }) => {
+    if (!(item.to && isModified(originalEvent))) runItem(item);
+  },
 });
 const model = computed<MenuItem[]>(() => {
   const plain = props.items.filter((item) => !item.danger).map(toMenuItem);
@@ -95,8 +104,10 @@ const model = computed<MenuItem[]>(() => {
     <template #item="{ item, props: itemProps }">
       <a
         v-bind="itemProps.action"
+        :href="item.href"
         class="flex min-h-10 cursor-pointer items-center gap-3 px-3 text-sm no-underline touch:min-h-11"
         :class="item.danger ? 'text-negative' : 'text-content'"
+        @click="(event: MouseEvent) => item.href && !isModified(event) && event.preventDefault()"
       >
         <component
           :is="item.rowIcon"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppButton from '@/components/ui/AppButton.vue';
-import { TOOLBAR_INPUT_CLASS } from '@/components/toolbar-classes';
+import SearchInput from '@/components/ui/SearchInput.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -17,15 +17,14 @@ const openProfile = () => {
 
 <template>
   <form data-testid="username-jump" class="flex items-center gap-2" @submit.prevent="openProfile">
-    <input
+    <SearchInput
       v-model="username"
       name="username"
-      type="text"
       autocomplete="off"
       :maxlength="USERNAME_MAX_LENGTH"
-      :aria-label="$t('leaderboard.jumpLabel')"
+      :label="$t('leaderboard.jumpLabel')"
       :placeholder="$t('leaderboard.jumpPlaceholder')"
-      :class="[TOOLBAR_INPUT_CLASS, 'min-w-0 flex-1 sm:w-64 sm:flex-none']"
+      class="min-w-0 flex-1 sm:w-64 sm:flex-none"
     />
     <AppButton type="submit">{{ $t('leaderboard.jumpSubmit') }}</AppButton>
   </form>

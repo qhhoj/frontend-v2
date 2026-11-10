@@ -1647,7 +1647,7 @@
     "refusedRate": "You are voting too fast. Try again in a few seconds."
   },
   "leaderboard": {
-    "lead": "{total} active users · 100 per page",
+    "lead": "{total} active users",
     "sortBy": "Sort by",
     "columns": {
       "rank": "Rank",
@@ -1662,8 +1662,8 @@
     "myRank": "Your rank",
     "findMe": "Find my rank",
     "jumpLabel": "Username",
-    "jumpPlaceholder": "Go to a profile by username",
-    "jumpSubmit": "View",
+    "jumpPlaceholder": "Username",
+    "jumpSubmit": "Open profile",
     "pagerLabel": "Leaderboard pages",
     "empty": "Nobody is on this board yet.",
     "title": "Leaderboard"

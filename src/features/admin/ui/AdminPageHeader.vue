@@ -49,7 +49,11 @@ const closeOverflow = () => overflowMenu.value?.hide();
     <template v-if="slots.meta" #meta><slot name="meta" /></template>
     <template v-if="slots.actions || slots.overflow" #actions>
       <template v-if="slots.overflow">
-        <AppButton aria-haspopup="true" @click="overflowMenu?.toggle($event)">
+        <AppButton
+          aria-haspopup="true"
+          data-testid="page-header-overflow"
+          @click="overflowMenu?.toggle($event)"
+        >
           <template #icon><Ellipsis aria-hidden="true" class="size-4" /></template>
           {{ $t('admin.shell.more') }}
         </AppButton>
