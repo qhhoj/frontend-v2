@@ -10,6 +10,7 @@
     "lint:plan-codes": "node scripts/check-plan-codes.mjs",
     "lint:dates": "node scripts/check-date-format.mjs",
     "lint:tokens": "node scripts/check-tokens.mjs",
+    "raw-elements:shrink": "node scripts/raw-elements.mjs --shrink",
     "lint:copy": "node scripts/check-vi-copy.mjs",
     "format": "prettier --write .",
     "test": "vitest run --project node --project dom",

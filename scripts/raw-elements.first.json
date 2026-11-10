@@ -1,0 +1,2021 @@
+{
+  "components/CodeEditor.vue": {
+    "textarea": 1
+  },
+  "components/CopyButton.vue": {
+    "button": 1
+  },
+  "components/CryingBit.vue": {
+    "fixed-size": 1
+  },
+  "components/SourceDiff.vue": {
+    "GlassCard": 1,
+    "button": 2,
+    "table": 2,
+    "verdict-tone": 12
+  },
+  "components/SourceDiffSkeleton.vue": {
+    "GlassCard": 1
+  },
+  "components/ToolbarSelect.vue": {
+    "select": 1
+  },
+  "components/VoteControl.vue": {
+    "button": 2
+  },
+  "features/account/data/DataExportCard.vue": {
+    "SettingsCard": 1,
+    "SettingsNotice": 1,
+    "verdict-tone": 6
+  },
+  "features/account/data/DataSettingsPage.vue": {
+    "SettingsCard": 3,
+    "SettingsNotice": 2,
+    "fixed-size": 1
+  },
+  "features/account/profile/AboutEditor.vue": {
+    "textarea": 1
+  },
+  "features/account/profile/DefaultsFields.vue": {
+    "AuthSelect": 2,
+    "fixed-size": 1
+  },
+  "features/account/profile/IdentityFields.vue": {
+    "AuthField": 1
+  },
+  "features/account/profile/OrganizationsEditor.vue": {
+    "SettingsCard": 1,
+    "fixed-size": 4,
+    "verdict-tone": 2
+  },
+  "features/account/profile/ProfileSettingsPage.vue": {
+    "SettingsCard": 1,
+    "SettingsNotice": 2,
+    "button": 1,
+    "fixed-size": 2
+  },
+  "features/account/profile/SaveErrorSummary.vue": {
+    "verdict-tone": 2
+  },
+  "features/account/security/AddSecurityKeyForm.vue": {
+    "AuthField": 2,
+    "SettingsCard": 1,
+    "SettingsNotice": 1
+  },
+  "features/account/security/ApiTokenSection.vue": {
+    "AuthField": 1,
+    "SettingsCard": 1,
+    "SettingsNotice": 1
+  },
+  "features/account/security/EnrollPasswordStep.vue": {
+    "AuthField": 1
+  },
+  "features/account/security/EnrollScanStep.vue": {
+    "SettingsNotice": 1
+  },
+  "features/account/security/LockedSecurity.vue": {
+    "SettingsCard": 1,
+    "SettingsNotice": 1
+  },
+  "features/account/security/LogoutEverywhereSection.vue": {
+    "SettingsCard": 1
+  },
+  "features/account/security/PasswordSection.vue": {
+    "SettingsCard": 1,
+    "SettingsNotice": 2
+  },
+  "features/account/security/QrCode.vue": {
+    "fixed-size": 1
+  },
+  "features/account/security/RegenerateCodesCard.vue": {
+    "SettingsCard": 1
+  },
+  "features/account/security/RemoveSecurityKeyDialog.vue": {
+    "AuthField": 1
+  },
+  "features/account/security/ScratchCodesPanel.vue": {
+    "SettingsNotice": 1,
+    "button": 1,
+    "checkbox": 1
+  },
+  "features/account/security/SecondFactorCodeField.vue": {
+    "AuthField": 1,
+    "button": 1
+  },
+  "features/account/security/SecurityKeys.vue": {
+    "fixed-size": 2
+  },
+  "features/account/security/SocialLinksSection.vue": {
+    "AuthField": 1,
+    "SettingsCard": 1
+  },
+  "features/account/security/TotpEnrollWizard.vue": {
+    "SettingsCard": 1,
+    "verdict-tone": 1
+  },
+  "features/account/security/TotpRow.vue": {
+    "fixed-size": 1,
+    "verdict-tone": 1
+  },
+  "features/account/security/TwoFactorSection.vue": {
+    "SettingsCard": 1,
+    "SettingsNotice": 1
+  },
+  "features/account/settings/SettingsLayout.vue": {
+    "fixed-size": 1
+  },
+  "features/admin/activity/ActivityFilters.vue": {
+    "AdminField": 2,
+    "controls": 4,
+    "input": 2
+  },
+  "features/admin/activity/ActivityIp.vue": {
+    "button": 1
+  },
+  "features/admin/activity/ActivityTable.vue": {
+    "AdminChip": 2,
+    "AdminDataTable": 1,
+    "AdminUserLabel": 1,
+    "button": 3,
+    "controls": 2
+  },
+  "features/admin/activity/DailyBars.vue": {
+    "table": 1
+  },
+  "features/admin/activity/LiveVisitorsCard.vue": {
+    "AdminUserLabel": 1,
+    "button": 2,
+    "controls": 3
+  },
+  "features/admin/activity/UserActivityPage.vue": {
+    "AdminNotice": 1,
+    "AdminPageHeader": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/activity/UserSummaryPanel.vue": {
+    "button": 2,
+    "controls": 3
+  },
+  "features/admin/audit/AuditEntryRow.vue": {
+    "AdminChip": 1,
+    "AdminUserLabel": 1
+  },
+  "features/admin/audit/AuditFeed.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/audit/AuditFilters.vue": {
+    "AdminDateTimeField": 2,
+    "AdminField": 2,
+    "button": 1,
+    "controls": 5,
+    "input": 1,
+    "select": 1
+  },
+  "features/admin/canned-replies/CannedRepliesPage.vue": {
+    "AdminDataTable": 1,
+    "AdminNotice": 1,
+    "AdminPageHeader": 1,
+    "AdminRowMenu": 1,
+    "button": 2,
+    "controls": 2,
+    "use-admin-toast": 1
+  },
+  "features/admin/canned-replies/CannedReplyDialog.vue": {
+    "AdminField": 3,
+    "controls": 5,
+    "input": 2,
+    "textarea": 1
+  },
+  "features/admin/catalogs/LicenseCatalogPanel.vue": {
+    "AdminDataTable": 1,
+    "AdminDrawer": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/catalogs/LicenseEditor.vue": {
+    "AdminField": 1,
+    "button": 1,
+    "controls": 3,
+    "input": 1
+  },
+  "features/admin/catalogs/ProblemCatalogsPage.vue": {
+    "AdminPageHeader": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/catalogs/TaxonCatalogPanel.vue": {
+    "AdminDataTable": 1,
+    "AdminDrawer": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/catalogs/TaxonEditor.vue": {
+    "AdminField": 2,
+    "button": 1,
+    "controls": 5,
+    "input": 2
+  },
+  "features/admin/comments/AdminCommentsTable.vue": {
+    "AdminChip": 3,
+    "AdminDataTable": 1,
+    "AdminRowMenu": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/comments/CommentEditDialog.vue": {
+    "AdminField": 1,
+    "controls": 1,
+    "textarea": 1
+  },
+  "features/admin/comments/CommentLocksPage.vue": {
+    "AdminDataTable": 1,
+    "AdminNotice": 1,
+    "button": 1,
+    "controls": 1,
+    "use-admin-toast": 1
+  },
+  "features/admin/comments/CommentReportsPage.vue": {
+    "AdminNotice": 2,
+    "button": 2,
+    "controls": 2,
+    "use-admin-toast": 1
+  },
+  "features/admin/comments/CommentReportsTable.vue": {
+    "AdminChip": 4,
+    "AdminDataTable": 1,
+    "AdminRowMenu": 2,
+    "button": 2,
+    "controls": 2
+  },
+  "features/admin/comments/CommentsAdminPage.vue": {
+    "AdminField": 2,
+    "AdminNotice": 1,
+    "button": 2,
+    "controls": 5,
+    "input": 1,
+    "select": 1,
+    "use-admin-toast": 1
+  },
+  "features/admin/comments/CommentsSectionHeader.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/contest-tags/ColorTokenPicker.vue": {
+    "radio": 1
+  },
+  "features/admin/contest-tags/ContestTagEditor.vue": {
+    "AdminDrawer": 1,
+    "AdminField": 4,
+    "button": 1,
+    "controls": 9,
+    "input": 4
+  },
+  "features/admin/contest-tags/ContestTagsPage.vue": {
+    "AdminDataTable": 1,
+    "AdminNotice": 1,
+    "AdminPageHeader": 1,
+    "AdminRowMenu": 2,
+    "button": 2,
+    "controls": 2
+  },
+  "features/admin/contest-tags/TagContestsPanel.vue": {
+    "AdminDrawer": 1,
+    "button": 2,
+    "checkbox": 2,
+    "controls": 6,
+    "input": 1
+  },
+  "features/admin/contests/ContestEditorPage.vue": {
+    "AdminChip": 1,
+    "AdminPageHeader": 1,
+    "button": 2,
+    "controls": 6,
+    "fixed-size": 2
+  },
+  "features/admin/contests/ContestsIndexPage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 1
+  },
+  "features/admin/contests/actions/ContestActionCard.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/contests/actions/ContestActionsTab.vue": {
+    "fixed-size": 7,
+    "uppercase": 1
+  },
+  "features/admin/contests/actions/ContestCloneCard.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/contests/actions/ContestDataCard.vue": {
+    "button": 1,
+    "controls": 3
+  },
+  "features/admin/contests/actions/ContestDeleteCard.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/contests/actions/ContestFreezeLockCard.vue": {
+    "button": 4,
+    "controls": 7,
+    "input": 1
+  },
+  "features/admin/contests/actions/ContestProblemOpsCard.vue": {
+    "button": 2,
+    "checkbox": 1,
+    "controls": 5,
+    "select": 1
+  },
+  "features/admin/contests/actions/ContestPublishCard.vue": {
+    "button": 2,
+    "checkbox": 1,
+    "controls": 3
+  },
+  "features/admin/contests/actions/PrepareDataDialog.vue": {
+    "checkbox": 1,
+    "controls": 3,
+    "input": 1
+  },
+  "features/admin/contests/actions/PublishResultTable.vue": {
+    "AdminDataTable": 1
+  },
+  "features/admin/contests/announcements/AnnouncementComposer.vue": {
+    "AdminField": 2,
+    "button": 1,
+    "controls": 5,
+    "input": 1,
+    "textarea": 1
+  },
+  "features/admin/contests/announcements/AnnouncementEditForm.vue": {
+    "AdminField": 2,
+    "button": 2,
+    "controls": 5,
+    "input": 1,
+    "textarea": 1
+  },
+  "features/admin/contests/announcements/AnnouncementItem.vue": {
+    "AdminRowMenu": 2,
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/contests/data/ContestExportCard.vue": {
+    "button": 1,
+    "controls": 3
+  },
+  "features/admin/contests/data/FeedKeyCard.vue": {
+    "button": 3,
+    "controls": 7,
+    "input": 1,
+    "radio": 1
+  },
+  "features/admin/contests/general/ContestAccessSection.vue": {
+    "AdminField": 3,
+    "controls": 6,
+    "input": 1,
+    "password": 2
+  },
+  "features/admin/contests/general/ContestBasicForm.vue": {
+    "AdminChoiceCards": 1,
+    "AdminField": 3,
+    "controls": 5,
+    "input": 2,
+    "select": 1
+  },
+  "features/admin/contests/general/ContestBasicTime.vue": {
+    "AdminDateTimeField": 2,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/contests/general/ContestCreatePage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 2
+  },
+  "features/admin/contests/general/ContestFormatSection.vue": {
+    "AdminField": 4,
+    "controls": 6,
+    "input": 2,
+    "select": 2
+  },
+  "features/admin/contests/general/ContestGeneralForm.vue": {
+    "controls": 1
+  },
+  "features/admin/contests/general/ContestGeneralTab.vue": {
+    "AdminNotice": 1
+  },
+  "features/admin/contests/general/ContestInfoSection.vue": {
+    "AdminField": 3,
+    "controls": 4,
+    "input": 1,
+    "textarea": 2
+  },
+  "features/admin/contests/general/ContestOperationsSection.vue": {
+    "AdminField": 1,
+    "controls": 1,
+    "textarea": 1
+  },
+  "features/admin/contests/general/ContestRatingSection.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/contests/general/ContestSummaryRail.vue": {
+    "button": 1,
+    "controls": 2,
+    "uppercase": 1
+  },
+  "features/admin/contests/general/ContestTimeSection.vue": {
+    "AdminDateTimeField": 3,
+    "AdminField": 2,
+    "controls": 4,
+    "input": 2
+  },
+  "features/admin/contests/general/SectionJumpSelect.vue": {
+    "controls": 1,
+    "select": 1
+  },
+  "features/admin/contests/general/TagChips.vue": {
+    "button": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/contests/ghosts/ContestGhostsTab.vue": {
+    "controls": 1
+  },
+  "features/admin/contests/ghosts/GhostCurrentCard.vue": {
+    "button": 1,
+    "controls": 3
+  },
+  "features/admin/contests/ghosts/GhostImportCard.vue": {
+    "button": 2,
+    "controls": 3
+  },
+  "features/admin/contests/ghosts/GhostPreviewTable.vue": {
+    "AdminDataTable": 1
+  },
+  "features/admin/contests/lifecycle/ContestCloneDialog.vue": {
+    "AdminDateTimeField": 1,
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/contests/lifecycle/ContestDeleteDialog.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/contests/list/ContestFlagChips.vue": {
+    "AdminChip": 2
+  },
+  "features/admin/contests/list/ContestList.vue": {
+    "AdminDataTable": 1,
+    "AdminRowMenu": 1,
+    "button": 2,
+    "controls": 2
+  },
+  "features/admin/contests/list/ContestListFilters.vue": {
+    "AdminField": 4,
+    "controls": 4,
+    "select": 4
+  },
+  "features/admin/contests/list/ContestPhaseChip.vue": {
+    "AdminChip": 2
+  },
+  "features/admin/contests/list/use-contest-row-menu.ts": {
+    "AdminRowMenu": 2
+  },
+  "features/admin/contests/participants/AddParticipationDialog.vue": {
+    "AdminDateTimeField": 1,
+    "AdminField": 1,
+    "controls": 4,
+    "input": 1,
+    "radio": 2
+  },
+  "features/admin/contests/participants/ContestParticipantsTab.vue": {
+    "AdminChip": 1,
+    "AdminDataTable": 1,
+    "AdminRowMenu": 1,
+    "AdminUserLabel": 1,
+    "button": 3,
+    "controls": 3
+  },
+  "features/admin/contests/participants/ParticipantsFilters.vue": {
+    "AdminField": 3,
+    "controls": 3,
+    "select": 3
+  },
+  "features/admin/contests/participants/ParticipationDialogs.vue": {
+    "AdminDateTimeField": 1
+  },
+  "features/admin/contests/participants/use-participation-actions.ts": {
+    "AdminRowMenu": 1
+  },
+  "features/admin/contests/problems/ContestProblemRow.vue": {
+    "button": 3,
+    "checkbox": 3,
+    "controls": 12,
+    "input": 4
+  },
+  "features/admin/contests/problems/ContestProblemsTab.vue": {
+    "button": 3,
+    "checkbox": 1,
+    "controls": 7,
+    "input": 1,
+    "table": 1
+  },
+  "features/admin/contests/problems/ProblemAddPicker.vue": {
+    "button": 1,
+    "controls": 2,
+    "disabled-opacity": 1,
+    "search": 1
+  },
+  "features/admin/contests/problems/ProblemCopyFrom.vue": {
+    "button": 1,
+    "controls": 3,
+    "input": 1
+  },
+  "features/admin/contests/ranking/OfficialRankingCard.vue": {
+    "button": 3,
+    "controls": 8,
+    "input": 1,
+    "radio": 2
+  },
+  "features/admin/contests/ranking/RankingLinkCard.vue": {
+    "AdminDateTimeField": 1,
+    "button": 3,
+    "controls": 12,
+    "input": 1,
+    "radio": 6
+  },
+  "features/admin/creation/CreationOwnerPicker.vue": {
+    "controls": 3,
+    "radio": 2,
+    "select": 1
+  },
+  "features/admin/integrations/IntegrationClientForm.vue": {
+    "AdminDateTimeField": 1,
+    "AdminField": 3,
+    "button": 1,
+    "checkbox": 1,
+    "controls": 8,
+    "input": 2,
+    "textarea": 1
+  },
+  "features/admin/integrations/IntegrationClientsPage.vue": {
+    "AdminDrawer": 1,
+    "AdminNotice": 1,
+    "AdminPageHeader": 1,
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/integrations/IntegrationClientsTable.vue": {
+    "AdminChip": 3,
+    "AdminDataTable": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/judges/DisconnectDialog.vue": {
+    "checkbox": 1
+  },
+  "features/admin/judges/JudgeAddPage.vue": {
+    "AdminField": 2,
+    "AdminPageHeader": 1,
+    "controls": 5,
+    "input": 1,
+    "textarea": 1
+  },
+  "features/admin/judges/JudgeDetails.vue": {
+    "AdminField": 1,
+    "button": 1,
+    "controls": 2,
+    "textarea": 1
+  },
+  "features/admin/judges/JudgeDrawer.vue": {
+    "AdminDrawer": 1
+  },
+  "features/admin/judges/JudgeQueueCard.vue": {
+    "controls": 1
+  },
+  "features/admin/judges/JudgeRuntimes.vue": {
+    "AdminDataTable": 1
+  },
+  "features/admin/judges/JudgeStats.vue": {
+    "button": 2,
+    "controls": 2
+  },
+  "features/admin/judges/JudgeStatusChip.vue": {
+    "AdminChip": 2
+  },
+  "features/admin/judges/JudgesPage.vue": {
+    "AdminNotice": 1,
+    "AdminPageHeader": 1,
+    "controls": 2
+  },
+  "features/admin/judges/JudgesTable.vue": {
+    "AdminDataTable": 1,
+    "AdminRowMenu": 2,
+    "button": 1,
+    "controls": 3,
+    "search": 1
+  },
+  "features/admin/languages/LanguageContentSection.vue": {
+    "AdminField": 3,
+    "controls": 3,
+    "textarea": 3
+  },
+  "features/admin/languages/LanguageEditorSection.vue": {
+    "AdminField": 4,
+    "checkbox": 2,
+    "controls": 10,
+    "input": 4
+  },
+  "features/admin/languages/LanguageForm.vue": {
+    "controls": 2
+  },
+  "features/admin/languages/LanguageFormPage.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/languages/LanguageIdentitySection.vue": {
+    "AdminChip": 1,
+    "AdminField": 4,
+    "controls": 8,
+    "input": 4
+  },
+  "features/admin/languages/LanguagesPage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 2
+  },
+  "features/admin/languages/LanguagesTable.vue": {
+    "AdminChip": 3,
+    "AdminDataTable": 1,
+    "details": 1
+  },
+  "features/admin/organizations/JoinRequestTable.vue": {
+    "AdminChip": 1,
+    "AdminDataTable": 1,
+    "AdminRowMenu": 1,
+    "AdminUserLabel": 1,
+    "button": 3,
+    "controls": 3,
+    "use-admin-toast": 1
+  },
+  "features/admin/organizations/MembersPanel.vue": {
+    "AdminChip": 1,
+    "AdminDataTable": 1,
+    "AdminRowMenu": 3,
+    "AdminUserLabel": 1,
+    "use-admin-toast": 1
+  },
+  "features/admin/organizations/OrganizationContext.vue": {
+    "button": 1,
+    "controls": 2,
+    "use-admin-toast": 1
+  },
+  "features/admin/organizations/OrganizationDeleteCard.vue": {
+    "AdminField": 1,
+    "button": 1,
+    "controls": 4,
+    "input": 1,
+    "use-admin-toast": 1
+  },
+  "features/admin/organizations/OrganizationDetail.vue": {
+    "AdminChip": 2,
+    "button": 2,
+    "controls": 2
+  },
+  "features/admin/organizations/OrganizationEditor.vue": {
+    "AdminField": 4,
+    "AdminNotice": 2,
+    "controls": 9,
+    "input": 4,
+    "use-admin-toast": 1
+  },
+  "features/admin/organizations/OrganizationFlagField.vue": {
+    "checkbox": 1
+  },
+  "features/admin/organizations/OrganizationHistoryPanel.vue": {
+    "AdminChip": 2,
+    "AdminUserLabel": 1,
+    "controls": 1,
+    "verdict-tone": 4
+  },
+  "features/admin/organizations/OrganizationList.vue": {
+    "AdminChip": 2,
+    "AdminDataTable": 1,
+    "AdminField": 1,
+    "controls": 1,
+    "select": 1
+  },
+  "features/admin/organizations/OrganizationLogoField.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/organizations/OrganizationsPage.vue": {
+    "AdminPageHeader": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/organizations/quotas/QuotaEditDialog.vue": {
+    "AdminField": 2,
+    "checkbox": 1,
+    "controls": 5,
+    "input": 2
+  },
+  "features/admin/organizations/quotas/QuotaMeter.vue": {
+    "verdict-tone": 2
+  },
+  "features/admin/organizations/quotas/QuotaOverviewPage.vue": {
+    "AdminDataTable": 1,
+    "AdminPageHeader": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/pages/ChangeLines.vue": {
+    "verdict-tone": 4
+  },
+  "features/admin/pages/DeletedFlatpagesList.vue": {
+    "button": 2
+  },
+  "features/admin/pages/FlatpageEditor.vue": {
+    "AdminField": 3,
+    "AdminNotice": 1,
+    "button": 1,
+    "checkbox": 1,
+    "controls": 10,
+    "input": 2,
+    "textarea": 1
+  },
+  "features/admin/pages/FlatpageHistoryPanel.vue": {
+    "button": 2,
+    "controls": 4,
+    "table": 1
+  },
+  "features/admin/pages/FlatpagePreview.vue": {
+    "AdminChip": 1
+  },
+  "features/admin/pages/FlatpageRevisionRow.vue": {
+    "AdminChip": 2,
+    "AdminUserLabel": 1,
+    "button": 2,
+    "controls": 3
+  },
+  "features/admin/pages/FlatpagesPage.vue": {
+    "AdminChip": 1,
+    "AdminPageHeader": 1,
+    "button": 2,
+    "controls": 4
+  },
+  "features/admin/posts/BlogModerationPage.vue": {
+    "AdminField": 1,
+    "AdminNotice": 1,
+    "AdminPageHeader": 1,
+    "button": 2,
+    "controls": 4,
+    "search": 1,
+    "use-admin-toast": 1
+  },
+  "features/admin/posts/PostsTable.vue": {
+    "AdminChip": 5,
+    "AdminDataTable": 1,
+    "AdminRowMenu": 2,
+    "AdminUserLabel": 1,
+    "button": 2,
+    "controls": 2
+  },
+  "features/admin/problems/ProblemEditorPage.vue": {
+    "AdminChip": 4,
+    "AdminPageHeader": 1,
+    "button": 1,
+    "controls": 2,
+    "fixed-size": 2
+  },
+  "features/admin/problems/ProblemImportMenu.vue": {
+    "button": 1,
+    "controls": 1,
+    "primevue": 2
+  },
+  "features/admin/problems/ProblemSetupChecklist.vue": {
+    "button": 1,
+    "controls": 3
+  },
+  "features/admin/problems/ProblemsIndexPage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 1
+  },
+  "features/admin/problems/data/CaseRow.vue": {
+    "button": 3,
+    "checkbox": 1,
+    "controls": 18,
+    "details": 1,
+    "input": 7,
+    "select": 2
+  },
+  "features/admin/problems/data/CasesAutofill.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/problems/data/CasesEditor.vue": {
+    "button": 2,
+    "controls": 2,
+    "table": 1
+  },
+  "features/admin/problems/data/CheckerPicker.vue": {
+    "AdminChoiceCards": 1
+  },
+  "features/admin/problems/data/CheckerRuleOptions.vue": {
+    "AdminField": 4,
+    "controls": 6,
+    "input": 2,
+    "select": 2
+  },
+  "features/admin/problems/data/CheckerSection.vue": {
+    "AdminField": 2,
+    "controls": 4,
+    "input": 2
+  },
+  "features/admin/problems/data/DataArchiveCard.vue": {
+    "AdminChip": 2,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/problems/data/DataFeedback.vue": {
+    "AdminNotice": 1
+  },
+  "features/admin/problems/data/DataSourceFiles.vue": {
+    "controls": 1
+  },
+  "features/admin/problems/data/DataSourceRow.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/problems/data/GraderPicker.vue": {
+    "AdminChoiceCards": 1
+  },
+  "features/admin/problems/data/InitYamlDialog.vue": {
+    "primevue": 1
+  },
+  "features/admin/problems/data/IoMethodPicker.vue": {
+    "AdminChoiceCards": 1,
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/problems/data/ProblemDataTab.vue": {
+    "controls": 3
+  },
+  "features/admin/problems/data/SourceCheckStatus.vue": {
+    "details": 1
+  },
+  "features/admin/problems/data/ZipAutofillDialog.vue": {
+    "AdminChip": 2,
+    "AdminField": 1,
+    "button": 2,
+    "controls": 7,
+    "details": 1,
+    "input": 1,
+    "primevue": 1,
+    "radio": 1,
+    "table": 1,
+    "verdict-tone": 1
+  },
+  "features/admin/problems/editorial/ProblemEditorialTab.vue": {
+    "AdminDateTimeField": 1,
+    "controls": 1
+  },
+  "features/admin/problems/external/ExternalJudgeNotConnected.vue": {
+    "controls": 1
+  },
+  "features/admin/problems/external/ExternalJudgeSearch.vue": {
+    "button": 2,
+    "controls": 3
+  },
+  "features/admin/problems/external/ExternalLanguageTable.vue": {
+    "controls": 1,
+    "select": 1,
+    "table": 1
+  },
+  "features/admin/problems/external/ProblemExternalTab.vue": {
+    "AdminField": 2,
+    "button": 3,
+    "controls": 10,
+    "input": 2
+  },
+  "features/admin/problems/files/ProblemUploadCard.vue": {
+    "button": 1,
+    "controls": 2,
+    "fixed-size": 1
+  },
+  "features/admin/problems/general/LanguageLimitsTable.vue": {
+    "button": 2,
+    "controls": 7,
+    "input": 2,
+    "select": 1
+  },
+  "features/admin/problems/general/ProblemBasicForm.vue": {
+    "AdminField": 2,
+    "controls": 4,
+    "input": 2
+  },
+  "features/admin/problems/general/ProblemBasicsSection.vue": {
+    "AdminDateTimeField": 1,
+    "AdminField": 3,
+    "controls": 5,
+    "input": 2,
+    "textarea": 1
+  },
+  "features/admin/problems/general/ProblemClassSection.vue": {
+    "AdminField": 2,
+    "button": 3,
+    "checkbox": 1,
+    "controls": 7,
+    "select": 3
+  },
+  "features/admin/problems/general/ProblemCloneDialog.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/problems/general/ProblemCodeField.vue": {
+    "AdminField": 1,
+    "input": 1
+  },
+  "features/admin/problems/general/ProblemCreateForm.vue": {
+    "AdminField": 6,
+    "button": 2,
+    "controls": 15,
+    "input": 4,
+    "select": 2
+  },
+  "features/admin/problems/general/ProblemCreatePage.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/problems/general/ProblemGeneralTab.vue": {
+    "controls": 1
+  },
+  "features/admin/problems/general/ProblemOrganizationsField.vue": {
+    "button": 1,
+    "controls": 1,
+    "select": 1
+  },
+  "features/admin/problems/general/ProblemPeopleSection.vue": {
+    "AdminUserLabel": 1
+  },
+  "features/admin/problems/general/ProblemStatusSection.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/problems/general/ProblemVisibilityCard.vue": {
+    "AdminChip": 4,
+    "checkbox": 1
+  },
+  "features/admin/problems/general/ProblemVisibilitySection.vue": {
+    "AdminField": 1,
+    "controls": 1,
+    "select": 1
+  },
+  "features/admin/problems/import/ImportCheckbox.vue": {
+    "button": 1,
+    "checkbox": 1
+  },
+  "features/admin/problems/import/ImportOptionsForm.vue": {
+    "AdminField": 3,
+    "button": 1,
+    "controls": 8,
+    "details": 1,
+    "input": 2,
+    "radio": 1,
+    "textarea": 1
+  },
+  "features/admin/problems/import/ImportProgress.vue": {
+    "controls": 2
+  },
+  "features/admin/problems/import/ImportStepList.vue": {
+    "verdict-tone": 4
+  },
+  "features/admin/problems/import/ZipImportPage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 1
+  },
+  "features/admin/problems/lifecycle/DeletedProblemsPage.vue": {
+    "AdminChip": 1,
+    "AdminDataTable": 1,
+    "AdminPageHeader": 1,
+    "AdminRowMenu": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/problems/lifecycle/ProblemDangerZone.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/problems/lifecycle/TypedCodeDialog.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/problems/package/ProblemPackageCard.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/problems/polygon/ImportOutcomeHeader.vue": {
+    "verdict-tone": 4
+  },
+  "features/admin/problems/polygon/ImportSummaryTable.vue": {
+    "table": 1
+  },
+  "features/admin/problems/polygon/PackageStatePill.vue": {
+    "AdminChip": 2
+  },
+  "features/admin/problems/polygon/PackageTypePill.vue": {
+    "AdminChip": 1
+  },
+  "features/admin/problems/polygon/PolygonConfigureStep.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/problems/polygon/PolygonLinkOptionsDrawer.vue": {
+    "AdminDrawer": 1
+  },
+  "features/admin/problems/polygon/PolygonLinkPanel.vue": {
+    "SettingsCard": 1
+  },
+  "features/admin/problems/polygon/PolygonLinkRefusal.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/problems/polygon/PolygonLinkStep.vue": {
+    "AdminChip": 1,
+    "button": 1,
+    "controls": 5,
+    "details": 1,
+    "input": 1
+  },
+  "features/admin/problems/polygon/PolygonNotConnected.vue": {
+    "AdminNotice": 1,
+    "controls": 2
+  },
+  "features/admin/problems/polygon/PolygonProgressStep.vue": {
+    "details": 1
+  },
+  "features/admin/problems/polygon/PolygonSourcePanel.vue": {
+    "uppercase": 3
+  },
+  "features/admin/problems/polygon/PolygonSyncHistory.vue": {
+    "AdminChip": 1,
+    "AdminDataTable": 1,
+    "AdminUserLabel": 1
+  },
+  "features/admin/problems/polygon/PolygonWizardPage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 2,
+    "details": 1
+  },
+  "features/admin/problems/polygon/WizardStepper.vue": {
+    "verdict-tone": 2
+  },
+  "features/admin/problems/statements/ProblemStatementsTab.vue": {
+    "AdminField": 1,
+    "button": 1,
+    "controls": 3,
+    "input": 1
+  },
+  "features/admin/rejudge/BulkRejudgePage.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/rejudge/RecentBatches.vue": {
+    "AdminDataTable": 1
+  },
+  "features/admin/rejudge/RejudgeCountPanel.vue": {
+    "AdminChip": 2
+  },
+  "features/admin/rejudge/RejudgeFilterForm.vue": {
+    "AdminDateTimeField": 1,
+    "AdminField": 1,
+    "AdminNotice": 1,
+    "button": 4,
+    "controls": 7,
+    "input": 1
+  },
+  "features/admin/rejudge/RejudgeSummary.vue": {
+    "controls": 1
+  },
+  "features/admin/search/IndexSearchBox.vue": {
+    "button": 1,
+    "controls": 4,
+    "search": 1
+  },
+  "features/admin/search/ProblemBulkVisibilityDialog.vue": {
+    "checkbox": 1,
+    "controls": 3,
+    "input": 1
+  },
+  "features/admin/search/ProblemListFilters.vue": {
+    "AdminField": 3,
+    "controls": 4,
+    "input": 1,
+    "select": 2
+  },
+  "features/admin/search/ProblemListTable.vue": {
+    "AdminChip": 5,
+    "AdminDataTable": 1,
+    "AdminRowMenu": 1,
+    "AdminUserLabel": 1
+  },
+  "features/admin/search/ProblemSearchList.vue": {
+    "button": 2,
+    "controls": 2,
+    "use-admin-toast": 1
+  },
+  "features/admin/settings/AdminLogPage.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/settings/ClearSecretButton.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/settings/DiscordWebhooksTable.vue": {
+    "button": 5,
+    "controls": 12,
+    "input": 1
+  },
+  "features/admin/settings/ExternalJudgeConnectionCheck.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/settings/OAuthClientField.vue": {
+    "AdminField": 1,
+    "controls": 2,
+    "input": 1
+  },
+  "features/admin/settings/PolygonConnectionCheck.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/settings/RevisionItem.vue": {
+    "AdminChip": 1,
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/settings/RevisionsPanel.vue": {
+    "button": 3,
+    "controls": 7
+  },
+  "features/admin/settings/ScalarSettingField.vue": {
+    "AdminField": 1,
+    "controls": 7,
+    "input": 3,
+    "select": 1
+  },
+  "features/admin/settings/SecretField.vue": {
+    "AdminChip": 1,
+    "AdminField": 1,
+    "button": 2,
+    "controls": 6,
+    "password": 1
+  },
+  "features/admin/settings/SettingBlock.vue": {
+    "AdminChip": 1,
+    "AdminNotice": 1,
+    "controls": 1,
+    "use-admin-toast": 1
+  },
+  "features/admin/settings/SettingInfo.vue": {
+    "button": 2,
+    "controls": 2
+  },
+  "features/admin/settings/SettingsLogPanel.vue": {
+    "AdminNotice": 1,
+    "controls": 1,
+    "select": 1
+  },
+  "features/admin/settings/SiteNoticeBlock.vue": {
+    "AdminChip": 1,
+    "AdminField": 1,
+    "AdminNotice": 1,
+    "button": 1,
+    "controls": 3,
+    "textarea": 1
+  },
+  "features/admin/settings/SiteSettingsPage.vue": {
+    "AdminPageHeader": 1,
+    "fixed-size": 2
+  },
+  "features/admin/shell/AdminDashboard.vue": {
+    "controls": 1
+  },
+  "features/admin/shell/AdminNav.vue": {
+    "button": 1,
+    "uppercase": 1,
+    "verdict-tone": 2
+  },
+  "features/admin/shell/AdminNavSheet.vue": {
+    "button": 1,
+    "dialog": 1
+  },
+  "features/admin/shell/AdminTopBar.vue": {
+    "button": 2
+  },
+  "features/admin/shell/overview/OverviewTile.vue": {
+    "AdminChip": 1,
+    "controls": 1,
+    "verdict-tone": 1
+  },
+  "features/admin/shell/search/AdminCommandPalette.vue": {
+    "controls": 2,
+    "input": 1,
+    "primevue": 1
+  },
+  "features/admin/shell/search/PaletteResults.vue": {
+    "uppercase": 1
+  },
+  "features/admin/short-links/ShortLinkCreateForm.vue": {
+    "AdminField": 2,
+    "button": 1,
+    "controls": 7,
+    "input": 2
+  },
+  "features/admin/short-links/ShortLinksPage.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/short-links/ShortLinksTable.vue": {
+    "AdminChip": 1,
+    "AdminDataTable": 1,
+    "AdminRowMenu": 1
+  },
+  "features/admin/similarity/FragmentList.vue": {
+    "button": 1
+  },
+  "features/admin/similarity/PairFilters.vue": {
+    "SettingsCard": 1,
+    "button": 1,
+    "controls": 5,
+    "input": 1,
+    "select": 2
+  },
+  "features/admin/similarity/PairSourcePane.vue": {
+    "AdminUserLabel": 1
+  },
+  "features/admin/similarity/PairsTable.vue": {
+    "AdminDataTable": 1,
+    "AdminUserLabel": 2,
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/similarity/SimilarityGroupsTable.vue": {
+    "AdminDataTable": 1
+  },
+  "features/admin/similarity/SimilarityNotFoundCard.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/similarity/SimilarityPairPage.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/similarity/SimilarityPairsPage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 1
+  },
+  "features/admin/similarity/SimilarityRunSummary.vue": {
+    "SettingsCard": 1
+  },
+  "features/admin/similarity/SimilarityRunsPage.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/similarity/SimilarityRunsTable.vue": {
+    "AdminChip": 2,
+    "AdminDataTable": 1,
+    "controls": 1
+  },
+  "features/admin/similarity/SimilarityScopeForm.vue": {
+    "AdminChip": 1,
+    "SettingsCard": 1,
+    "button": 2,
+    "controls": 6,
+    "input": 1,
+    "radio": 2
+  },
+  "features/admin/site/ConfigHistory.vue": {
+    "AdminUserLabel": 1,
+    "button": 2,
+    "controls": 4
+  },
+  "features/admin/submissions/AdminSubmissionFilterBar.vue": {
+    "AdminField": 2,
+    "controls": 3,
+    "input": 1,
+    "select": 1
+  },
+  "features/admin/submissions/AdminSubmissionTable.vue": {
+    "AdminDataTable": 1,
+    "AdminRowMenu": 2,
+    "use-admin-toast": 1
+  },
+  "features/admin/submissions/AdminSubmissionsPage.vue": {
+    "AdminPageHeader": 1,
+    "button": 3,
+    "controls": 4
+  },
+  "features/admin/tickets/TicketClaimButton.vue": {
+    "button": 2,
+    "controls": 2
+  },
+  "features/admin/tickets/TicketHandlingSection.vue": {
+    "AdminField": 4,
+    "button": 1,
+    "controls": 8,
+    "details": 1,
+    "input": 3,
+    "textarea": 1
+  },
+  "features/admin/tickets/TicketMarkGood.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/tickets/TicketQueueDetail.vue": {
+    "button": 2,
+    "checkbox": 1,
+    "controls": 2
+  },
+  "features/admin/tickets/TicketQueueFilters.vue": {
+    "AdminField": 1,
+    "checkbox": 2,
+    "controls": 6,
+    "input": 1
+  },
+  "features/admin/tickets/TicketQueuePage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 1
+  },
+  "features/admin/tickets/TicketQueueShortcuts.vue": {
+    "checkbox": 2,
+    "controls": 2
+  },
+  "features/admin/tickets/TicketQueueTable.vue": {
+    "AdminChip": 1,
+    "AdminDataTable": 1,
+    "AdminUserLabel": 1,
+    "button": 1
+  },
+  "features/admin/ui/AdminCheckChips.vue": {
+    "checkbox": 1,
+    "controls": 1
+  },
+  "features/admin/ui/ChipPicker.vue": {
+    "button": 1
+  },
+  "features/admin/ui/RevealKeyDialog.vue": {
+    "button": 1,
+    "checkbox": 1,
+    "controls": 2,
+    "primevue": 1
+  },
+  "features/admin/ui/controls.ts": {
+    "disabled-opacity": 1
+  },
+  "features/admin/ui/form/AdminSectionNav.vue": {
+    "controls": 1,
+    "select": 1,
+    "uppercase": 1
+  },
+  "features/admin/ui/table/standard-row-menu.ts": {
+    "AdminRowMenu": 3
+  },
+  "features/admin/ui/use-admin-mutation.ts": {
+    "use-admin-toast": 1
+  },
+  "features/admin/users/CreatedUsersTable.vue": {
+    "AdminDataTable": 1,
+    "verdict-tone": 1
+  },
+  "features/admin/users/NewUserFields.vue": {
+    "AdminField": 4,
+    "checkbox": 1,
+    "controls": 9,
+    "input": 3,
+    "password": 1
+  },
+  "features/admin/users/PermissionChecklist.vue": {
+    "AdminChip": 2,
+    "checkbox": 1,
+    "controls": 3,
+    "search": 1,
+    "uppercase": 1
+  },
+  "features/admin/users/RoleEditor.vue": {
+    "AdminField": 1,
+    "button": 1,
+    "controls": 4,
+    "input": 1
+  },
+  "features/admin/users/RolesDialog.vue": {
+    "AdminChip": 1,
+    "button": 3,
+    "controls": 6,
+    "primevue": 1
+  },
+  "features/admin/users/UserAccessSection.vue": {
+    "button": 1
+  },
+  "features/admin/users/UserAccountPanel.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/users/UserActivationRow.vue": {
+    "button": 2,
+    "controls": 4
+  },
+  "features/admin/users/UserCreateDialog.vue": {
+    "button": 2,
+    "controls": 4,
+    "primevue": 1,
+    "radio": 1,
+    "textarea": 1
+  },
+  "features/admin/users/UserDrawer.vue": {
+    "AdminDrawer": 1,
+    "AdminNotice": 2
+  },
+  "features/admin/users/UserDrawerChips.vue": {
+    "AdminChip": 4
+  },
+  "features/admin/users/UserModerationPanel.vue": {
+    "AdminField": 1,
+    "button": 2,
+    "controls": 5,
+    "textarea": 1
+  },
+  "features/admin/users/UserPasswordForm.vue": {
+    "AdminField": 3,
+    "AdminNotice": 1,
+    "button": 1,
+    "controls": 8,
+    "password": 3
+  },
+  "features/admin/users/UserProfileForm.vue": {
+    "AdminField": 7,
+    "checkbox": 1,
+    "controls": 12,
+    "input": 3,
+    "password": 1,
+    "select": 1,
+    "textarea": 2
+  },
+  "features/admin/users/UserRenameForm.vue": {
+    "AdminField": 1,
+    "button": 1,
+    "controls": 4,
+    "input": 1
+  },
+  "features/admin/users/UserResetLink.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/users/UserSecurityPanel.vue": {
+    "AdminNotice": 1
+  },
+  "features/admin/users/UserStatusChips.vue": {
+    "AdminChip": 2
+  },
+  "features/admin/users/UserTwoFactorReset.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/users/UsersPage.vue": {
+    "AdminPageHeader": 1,
+    "button": 2,
+    "controls": 4
+  },
+  "features/admin/users/UsersTable.vue": {
+    "AdminChip": 2,
+    "AdminDataTable": 1,
+    "AdminUserLabel": 1,
+    "button": 1,
+    "controls": 1
+  },
+  "features/appearance/AccentChoice.vue": {
+    "button": 1
+  },
+  "features/appearance/AppearancePanel.vue": {
+    "button": 2,
+    "uppercase": 3
+  },
+  "features/appearance/LowPowerChoice.vue": {
+    "radio": 1
+  },
+  "features/auth/AuthBadge.vue": {
+    "verdict-tone": 6
+  },
+  "features/auth/ChangePasswordForm.vue": {
+    "AuthField": 1,
+    "input": 1
+  },
+  "features/auth/ChangePasswordPage.vue": {
+    "AuthNotice": 2
+  },
+  "features/auth/EmailLinkRequest.vue": {
+    "AuthField": 1
+  },
+  "features/auth/InboxNotice.vue": {
+    "fixed-size": 1
+  },
+  "features/auth/LoginPage.vue": {
+    "AuthField": 2,
+    "AuthNotice": 1
+  },
+  "features/auth/NewPasswordField.vue": {
+    "AuthField": 1
+  },
+  "features/auth/NewPasswordPair.vue": {
+    "AuthField": 1
+  },
+  "features/auth/OtpInput.vue": {
+    "fixed-size": 1,
+    "input": 1
+  },
+  "features/auth/PasswordStrength.vue": {
+    "verdict-tone": 2
+  },
+  "features/auth/RegisterPage.vue": {
+    "AuthField": 1,
+    "button": 1,
+    "checkbox": 1
+  },
+  "features/auth/TwoFactorPage.vue": {
+    "AuthField": 1,
+    "button": 2,
+    "fixed-size": 1
+  },
+  "features/auth/UsernameField.vue": {
+    "AuthField": 1,
+    "fixed-size": 1
+  },
+  "features/auth/use-logout.ts": {
+    "use-admin-toast": 1
+  },
+  "features/bit-roam/BitRoamLayer.vue": {
+    "use-admin-toast": 1
+  },
+  "features/blog/AuthorCard.vue": {
+    "GlassCard": 1
+  },
+  "features/blog/BlogDraftsPage.vue": {
+    "GlassCard": 1
+  },
+  "features/blog/BlogListPage.vue": {
+    "GlassCard": 2
+  },
+  "features/blog/MorePostsCard.vue": {
+    "GlassCard": 1
+  },
+  "features/blog/PostActions.vue": {
+    "primevue": 2
+  },
+  "features/blog/PostCard.vue": {
+    "uppercase": 1
+  },
+  "features/blog/editor/PostBodyEditor.vue": {
+    "fixed-size": 2,
+    "textarea": 1
+  },
+  "features/blog/editor/PostEditorPage.vue": {
+    "button": 1,
+    "input": 1
+  },
+  "features/blog/editor/PostSaveBar.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/blog/editor/PostSettingsCard.vue": {
+    "radio": 1,
+    "uppercase": 1
+  },
+  "features/comments/CommentComposer.vue": {
+    "button": 1,
+    "textarea": 1
+  },
+  "features/comments/CommentItem.vue": {
+    "button": 5,
+    "primevue": 2
+  },
+  "features/comments/CommentPreview.vue": {
+    "fixed-size": 1
+  },
+  "features/comments/CommentReportDialog.vue": {
+    "textarea": 1
+  },
+  "features/comments/CommentRevisionsDialog.vue": {
+    "button": 1,
+    "verdict-tone": 4
+  },
+  "features/comments/CommentsSection.vue": {
+    "button": 1
+  },
+  "features/community/NewProblemsCard.vue": {
+    "CommunityCard": 1
+  },
+  "features/community/RecentCommentsCard.vue": {
+    "CommunityCard": 1
+  },
+  "features/community/TopContributorsCard.vue": {
+    "CommunityCard": 1
+  },
+  "features/contests/AccessCodeDialog.vue": {
+    "password": 1,
+    "uppercase": 1,
+    "verdict-tone": 1
+  },
+  "features/contests/ContestActions.vue": {
+    "verdict-tone": 1
+  },
+  "features/contests/ContestAnnouncementsPage.vue": {
+    "SubmissionPager": 1
+  },
+  "features/contests/ContestCountdown.vue": {
+    "uppercase": 2,
+    "verdict-tone": 1
+  },
+  "features/contests/ContestDetailSkeleton.vue": {
+    "fixed-size": 2
+  },
+  "features/contests/ContestGroup.vue": {
+    "SubmissionPager": 1
+  },
+  "features/contests/ContestProblemsTable.vue": {
+    "table": 1
+  },
+  "features/contests/ContestRankingPage.vue": {
+    "fixed-size": 1
+  },
+  "features/contests/ContestRulesDialog.vue": {
+    "checkbox": 1,
+    "verdict-tone": 1
+  },
+  "features/contests/ContestTabs.vue": {
+    "PillTabs": 2
+  },
+  "features/contests/ContestTagFilter.vue": {
+    "button": 2
+  },
+  "features/contests/ContestTimeBar.vue": {
+    "verdict-tone": 1
+  },
+  "features/contests/EndedContestSkeleton.vue": {
+    "table": 1
+  },
+  "features/contests/EndedContestTable.vue": {
+    "table": 1
+  },
+  "features/contests/InContestStatus.vue": {
+    "button": 2,
+    "verdict-tone": 1
+  },
+  "features/contests/LanguageStatsTable.vue": {
+    "table": 1
+  },
+  "features/contests/ProblemResultsTable.vue": {
+    "table": 1
+  },
+  "features/contests/RankingTable.vue": {
+    "table": 1
+  },
+  "features/contests/balloons/BalloonsPage.vue": {
+    "SubmissionPager": 1,
+    "verdict-tone": 1
+  },
+  "features/contests/print/ContestPrintPage.vue": {
+    "button": 3,
+    "uppercase": 1
+  },
+  "features/contests/replay/ContestReplayPage.vue": {
+    "fixed-size": 2
+  },
+  "features/contests/replay/ReplayPlayerBar.vue": {
+    "button": 1,
+    "verdict-tone": 1
+  },
+  "features/contests/replay/ReplayTable.vue": {
+    "table": 1
+  },
+  "features/external-judge/ExternalJudgeStatusCard.vue": {
+    "GlassCard": 1
+  },
+  "features/home/NewPostsCard.vue": {
+    "CommunityCard": 1
+  },
+  "features/home/RatingHeroCard.vue": {
+    "verdict-tone": 4
+  },
+  "features/home/RunningContestsCard.vue": {
+    "fixed-size": 2
+  },
+  "features/home/TopPerformersCard.vue": {
+    "CommunityCard": 1
+  },
+  "features/leaderboard/MyRankLine.vue": {
+    "button": 1
+  },
+  "features/leaderboard/UsernameJump.vue": {
+    "input": 1
+  },
+  "features/notifications/HighPriorityBanner.vue": {
+    "SettingsNotice": 1,
+    "uppercase": 1
+  },
+  "features/notifications/NotificationBell.vue": {
+    "SettingsNotice": 2,
+    "button": 2,
+    "primevue": 1
+  },
+  "features/notifications/NotificationList.vue": {
+    "uppercase": 1
+  },
+  "features/notifications/NotificationRow.vue": {
+    "button": 1,
+    "fixed-size": 2
+  },
+  "features/notifications/NotificationsPage.vue": {
+    "SettingsNotice": 4,
+    "uppercase": 2
+  },
+  "features/notifications/NotificationsPageSkeleton.vue": {
+    "uppercase": 1
+  },
+  "features/official-mode/OfficialModeBanner.vue": {
+    "SettingsNotice": 1
+  },
+  "features/official-mode/OfficialModePill.vue": {
+    "verdict-tone": 2
+  },
+  "features/organizations/MemberRows.vue": {
+    "table": 1
+  },
+  "features/organizations/MembershipPanel.vue": {
+    "use-admin-toast": 1
+  },
+  "features/organizations/OrganizationCardSkeleton.vue": {
+    "fixed-size": 3
+  },
+  "features/organizations/OrganizationContestsPage.vue": {
+    "GlassCard": 1
+  },
+  "features/organizations/OrganizationLogo.vue": {
+    "fixed-size": 1
+  },
+  "features/organizations/OrganizationMenu.vue": {
+    "primevue": 2,
+    "use-admin-toast": 1
+  },
+  "features/organizations/OrganizationTabsNav.vue": {
+    "PillTabs": 3
+  },
+  "features/organizations/manage/OrganizationAvatarField.vue": {
+    "button": 1
+  },
+  "features/organizations/problems/OrgBulkResult.vue": {
+    "SettingsNotice": 1
+  },
+  "features/organizations/problems/OrgBulkTagDialog.vue": {
+    "radio": 3
+  },
+  "features/organizations/problems/OrgProblemActions.vue": {
+    "button": 2
+  },
+  "features/organizations/problems/OrgProblemFilters.vue": {
+    "button": 3,
+    "search": 1
+  },
+  "features/organizations/problems/OrgProblemTable.vue": {
+    "table": 1
+  },
+  "features/organizations/problems/OrgProblemTableSkeleton.vue": {
+    "table": 1
+  },
+  "features/organizations/problems/OrgProblemTagsDialog.vue": {
+    "checkbox": 1
+  },
+  "features/organizations/problems/OrgProblemsPage.vue": {
+    "GlassCard": 1,
+    "SettingsNotice": 1,
+    "button": 1
+  },
+  "features/organizations/problems/OrgSelectBox.vue": {
+    "checkbox": 1
+  },
+  "features/organizations/problems/OrgTagCatalogue.vue": {
+    "GlassCard": 1
+  },
+  "features/organizations/problems/OrgTagDialog.vue": {
+    "radio": 1
+  },
+  "features/organizations/problems/ProblemArchivedNotice.vue": {
+    "SettingsNotice": 1
+  },
+  "features/organizations/quota/CreditLedger.vue": {
+    "GlassCard": 1,
+    "table": 1
+  },
+  "features/organizations/quota/OrgQuotaPage.vue": {
+    "fixed-size": 5
+  },
+  "features/organizations/quota/QuotaMeterCard.vue": {
+    "GlassCard": 1
+  },
+  "features/organizations/quota/QuotaNotice.vue": {
+    "SettingsNotice": 1
+  },
+  "features/problems/FileDropzone.vue": {
+    "file": 1
+  },
+  "features/problems/FilterToggle.vue": {
+    "button": 1,
+    "disabled-opacity": 1
+  },
+  "features/problems/PdfButton.vue": {
+    "button": 1
+  },
+  "features/problems/ProblemFactsCard.vue": {
+    "button": 1
+  },
+  "features/problems/ProblemFilterChips.vue": {
+    "button": 2
+  },
+  "features/problems/ProblemFilters.vue": {
+    "button": 1
+  },
+  "features/problems/ProblemPointsPicker.vue": {
+    "button": 1
+  },
+  "features/problems/ProblemTierMark.vue": {
+    "fixed-size": 1
+  },
+  "features/problems/ProblemTypePicker.vue": {
+    "button": 1
+  },
+  "features/problems/SourceUploadButton.vue": {
+    "file": 1
+  },
+  "features/profile/BanUserDialog.vue": {
+    "textarea": 1
+  },
+  "features/profile/ProfileHeaderSkeleton.vue": {
+    "fixed-size": 2
+  },
+  "features/profile/ProfileOverviewSkeleton.vue": {
+    "fixed-size": 5
+  },
+  "features/profile/ProfilePpTab.vue": {
+    "table": 1
+  },
+  "features/profile/ProfileTabSkeleton.vue": {
+    "table": 1
+  },
+  "features/profile/ProfileTabsNav.vue": {
+    "PillTabs": 4
+  },
+  "features/profile/RecentContests.vue": {
+    "table": 1
+  },
+  "features/profile/profile-geometry.ts": {
+    "fixed-size": 1
+  },
+  "features/runtimes/JudgeCard.vue": {
+    "verdict-tone": 1
+  },
+  "features/runtimes/LanguageRow.vue": {
+    "button": 1,
+    "uppercase": 1,
+    "verdict-tone": 1
+  },
+  "features/shell/BackgroundBlobs.vue": {
+    "fixed-size": 5
+  },
+  "features/shell/ImpersonationBanner.vue": {
+    "button": 1,
+    "fixed-size": 1
+  },
+  "features/shell/LocaleToggle.vue": {
+    "button": 1
+  },
+  "features/shell/NavOverflowMenu.vue": {
+    "button": 1,
+    "primevue": 2
+  },
+  "features/shell/PhoneMenu.vue": {
+    "button": 1,
+    "primevue": 1
+  },
+  "features/shell/UserMenu.vue": {
+    "button": 1,
+    "primevue": 2
+  },
+  "features/short-links/ShortLinkButton.vue": {
+    "button": 1,
+    "input": 1
+  },
+  "features/site-notice/SiteNoticeBanner.vue": {
+    "SettingsNotice": 1
+  },
+  "features/submissions/AdvancedFiltersButton.vue": {
+    "button": 1
+  },
+  "features/submissions/CasesTable.vue": {
+    "table": 1
+  },
+  "features/submissions/CasesTableSkeleton.vue": {
+    "table": 1
+  },
+  "features/submissions/CompareWithForm.vue": {
+    "button": 1,
+    "input": 1
+  },
+  "features/submissions/DiffSideHeader.vue": {
+    "uppercase": 1
+  },
+  "features/submissions/LiveToggle.vue": {
+    "button": 1
+  },
+  "features/submissions/ResultSummaryCard.vue": {
+    "button": 1
+  },
+  "features/submissions/SourceView.vue": {
+    "button": 1
+  },
+  "features/submissions/SubmissionLockControl.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/submissions/SubmissionPickBox.vue": {
+    "checkbox": 1
+  },
+  "features/submissions/SubmissionStaffPanel.vue": {
+    "button": 1,
+    "controls": 2
+  },
+  "features/submissions/SubmissionTable.vue": {
+    "table": 1
+  },
+  "features/submissions/SubmissionTableSkeleton.vue": {
+    "table": 1
+  },
+  "features/submissions/TestOverview.vue": {
+    "table": 1
+  },
+  "features/submissions/list/LiveListNotices.vue": {
+    "button": 1
+  },
+  "features/submissions/list/SubmissionFilterPanel.vue": {
+    "button": 1,
+    "checkbox": 2,
+    "input": 2
+  },
+  "features/tickets/NewTicketPage.vue": {
+    "GlassCard": 2,
+    "radio": 1
+  },
+  "features/tickets/TicketAlertsStrip.vue": {
+    "fixed-size": 1
+  },
+  "features/tickets/TicketHeader.vue": {
+    "GlassCard": 1
+  },
+  "features/tickets/TicketMessages.vue": {
+    "SettingsNotice": 1,
+    "details": 1
+  },
+  "features/tickets/TicketNotes.vue": {
+    "GlassCard": 1,
+    "textarea": 1
+  },
+  "features/tickets/TicketPageSkeleton.vue": {
+    "GlassCard": 2
+  },
+  "features/tickets/TicketReply.vue": {
+    "GlassCard": 1,
+    "textarea": 1
+  },
+  "features/tickets/TicketSidePanel.vue": {
+    "GlassCard": 1
+  },
+  "features/tickets/TicketStaffActions.vue": {
+    "GlassCard": 1,
+    "input": 1
+  },
+  "features/tickets/TicketTable.vue": {
+    "fixed-size": 2,
+    "table": 1
+  },
+  "features/tickets/TicketTableSkeleton.vue": {
+    "fixed-size": 3,
+    "table": 1
+  },
+  "features/tickets/TicketsPage.vue": {
+    "GlassCard": 1
+  },
+  "features/tickets/canned/CannedReplyPicker.vue": {
+    "button": 1,
+    "fixed-size": 1
+  }
+}

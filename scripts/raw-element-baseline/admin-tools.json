@@ -1,0 +1,145 @@
+{
+  "features/admin/rejudge/BulkRejudgePage.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/rejudge/RecentBatches.vue": {
+    "AdminDataTable": 1
+  },
+  "features/admin/rejudge/RejudgeCountPanel.vue": {
+    "AdminChip": 2
+  },
+  "features/admin/rejudge/RejudgeFilterForm.vue": {
+    "AdminDateTimeField": 1,
+    "AdminField": 1,
+    "AdminNotice": 1,
+    "button": 4,
+    "controls": 7,
+    "input": 1
+  },
+  "features/admin/rejudge/RejudgeSummary.vue": {
+    "controls": 1
+  },
+  "features/admin/shell/AdminDashboard.vue": {
+    "controls": 1
+  },
+  "features/admin/shell/AdminNav.vue": {
+    "button": 1,
+    "uppercase": 1,
+    "verdict-tone": 2
+  },
+  "features/admin/shell/AdminNavSheet.vue": {
+    "button": 1,
+    "dialog": 1
+  },
+  "features/admin/shell/AdminTopBar.vue": {
+    "button": 2
+  },
+  "features/admin/shell/overview/OverviewTile.vue": {
+    "AdminChip": 1,
+    "controls": 1,
+    "verdict-tone": 1
+  },
+  "features/admin/shell/search/AdminCommandPalette.vue": {
+    "controls": 2,
+    "input": 1,
+    "primevue": 1
+  },
+  "features/admin/shell/search/PaletteResults.vue": {
+    "uppercase": 1
+  },
+  "features/admin/similarity/FragmentList.vue": {
+    "button": 1
+  },
+  "features/admin/similarity/PairFilters.vue": {
+    "SettingsCard": 1,
+    "button": 1,
+    "controls": 5,
+    "input": 1,
+    "select": 2
+  },
+  "features/admin/similarity/PairSourcePane.vue": {
+    "AdminUserLabel": 1
+  },
+  "features/admin/similarity/PairsTable.vue": {
+    "AdminDataTable": 1,
+    "AdminUserLabel": 2,
+    "button": 1,
+    "controls": 2
+  },
+  "features/admin/similarity/SimilarityGroupsTable.vue": {
+    "AdminDataTable": 1
+  },
+  "features/admin/similarity/SimilarityNotFoundCard.vue": {
+    "button": 1,
+    "controls": 1
+  },
+  "features/admin/similarity/SimilarityPairPage.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/similarity/SimilarityPairsPage.vue": {
+    "AdminPageHeader": 1,
+    "controls": 1
+  },
+  "features/admin/similarity/SimilarityRunSummary.vue": {
+    "SettingsCard": 1
+  },
+  "features/admin/similarity/SimilarityRunsPage.vue": {
+    "AdminPageHeader": 1
+  },
+  "features/admin/similarity/SimilarityRunsTable.vue": {
+    "AdminChip": 2,
+    "AdminDataTable": 1,
+    "controls": 1
+  },
+  "features/admin/similarity/SimilarityScopeForm.vue": {
+    "AdminChip": 1,
+    "SettingsCard": 1,
+    "button": 2,
+    "controls": 6,
+    "input": 1,
+    "radio": 2
+  },
+  "features/admin/submissions/AdminSubmissionFilterBar.vue": {
+    "AdminField": 2,
+    "controls": 3,
+    "input": 1,
+    "select": 1
+  },
+  "features/admin/submissions/AdminSubmissionTable.vue": {
+    "AdminDataTable": 1,
+    "AdminRowMenu": 2,
+    "use-admin-toast": 1
+  },
+  "features/admin/submissions/AdminSubmissionsPage.vue": {
+    "AdminPageHeader": 1,
+    "button": 3,
+    "controls": 4
+  },
+  "features/admin/ui/AdminCheckChips.vue": {
+    "checkbox": 1,
+    "controls": 1
+  },
+  "features/admin/ui/ChipPicker.vue": {
+    "button": 1
+  },
+  "features/admin/ui/RevealKeyDialog.vue": {
+    "button": 1,
+    "checkbox": 1,
+    "controls": 2,
+    "primevue": 1
+  },
+  "features/admin/ui/controls.ts": {
+    "disabled-opacity": 1
+  },
+  "features/admin/ui/form/AdminSectionNav.vue": {
+    "controls": 1,
+    "select": 1,
+    "uppercase": 1
+  },
+  "features/admin/ui/table/standard-row-menu.ts": {
+    "AdminRowMenu": 3
+  },
+  "features/admin/ui/use-admin-mutation.ts": {
+    "use-admin-toast": 1
+  }
+}

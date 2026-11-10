@@ -1,0 +1,65 @@
+{
+  "features/appearance/AccentChoice.vue": {
+    "button": 1
+  },
+  "features/appearance/AppearancePanel.vue": {
+    "button": 2,
+    "uppercase": 3
+  },
+  "features/appearance/LowPowerChoice.vue": {
+    "radio": 1
+  },
+  "features/bit-roam/BitRoamLayer.vue": {
+    "use-admin-toast": 1
+  },
+  "features/community/NewProblemsCard.vue": {
+    "CommunityCard": 1
+  },
+  "features/community/RecentCommentsCard.vue": {
+    "CommunityCard": 1
+  },
+  "features/community/TopContributorsCard.vue": {
+    "CommunityCard": 1
+  },
+  "features/home/NewPostsCard.vue": {
+    "CommunityCard": 1
+  },
+  "features/home/RatingHeroCard.vue": {
+    "verdict-tone": 4
+  },
+  "features/home/RunningContestsCard.vue": {
+    "fixed-size": 2
+  },
+  "features/home/TopPerformersCard.vue": {
+    "CommunityCard": 1
+  },
+  "features/shell/BackgroundBlobs.vue": {
+    "fixed-size": 5
+  },
+  "features/shell/ImpersonationBanner.vue": {
+    "button": 1,
+    "fixed-size": 1
+  },
+  "features/shell/LocaleToggle.vue": {
+    "button": 1
+  },
+  "features/shell/NavOverflowMenu.vue": {
+    "button": 1,
+    "primevue": 2
+  },
+  "features/shell/PhoneMenu.vue": {
+    "button": 1,
+    "primevue": 1
+  },
+  "features/shell/UserMenu.vue": {
+    "button": 1,
+    "primevue": 2
+  },
+  "features/short-links/ShortLinkButton.vue": {
+    "button": 1,
+    "input": 1
+  },
+  "features/site-notice/SiteNoticeBanner.vue": {
+    "SettingsNotice": 1
+  }
+}

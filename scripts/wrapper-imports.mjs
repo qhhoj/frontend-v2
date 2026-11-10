@@ -1,283 +1,204 @@
-// The thin wrappers over the `src/components/ui/` kit, kept for old call sites (docs/wrapper-migration.md): eslint.config.js forbids new
-// imports of them, so only the files listed in WRAPPER_IMPORTERS may still import one. A file that migrates leaves the list;
-// scripts/wrapper-imports.spec.ts fails while an entry is stale. Never add a file: import the `ui/` part instead.
-const MESSAGE =
-  'A thin wrapper kept for old call sites: import the src/components/ui/ part instead (docs/wrapper-migration.md).';
+// Imports that bypass the src/components/ui/ kit (docs/wrapper-migration.md): the thin wrappers kept for old call sites, and
+// PrimeVue parts used directly. Each is a rule of the raw-element ratchet (scripts/raw-elements.mjs): a file may keep the
+// imports its area baseline (scripts/raw-element-baseline/<area>.json) counts, and gains none. eslint.config.js turns the
+// same rules into `no-restricted-imports` so the editor flags a new import as it is typed; a file listed for one wrapper
+// is still refused the others. Specs are not checked; the kit may import PrimeVue but no wrapper.
 
-/** `no-restricted-imports` patterns, matched against the import path as written (relative or `@/`). */
-export const WRAPPER_IMPORT_PATTERNS = [
+/** A wrapper rule: the wrapper's file under src/, and the kit part that replaces it. */
+const wrapper = (id, file, use, eslintTail) => ({ id, file, use, eslintTail });
+
+/** The thin wrappers, by rule id. `eslintTail` (default: the file name) is what an import path ends with. */
+export const WRAPPERS = [
+  wrapper(
+    'controls',
+    'features/admin/ui/controls.ts',
+    'AppButton/IconButton, TextInput/TextArea/SelectField, Card',
+  ),
+  wrapper('AdminField', 'features/admin/ui/AdminField.vue', 'FormField with a kit input'),
+  wrapper('AdminChip', 'features/admin/ui/AdminChip.vue', 'Chip'),
+  wrapper('AdminDataTable', 'features/admin/ui/table/AdminDataTable.vue', 'DataTable'),
+  wrapper('AdminPageHeader', 'features/admin/ui/AdminPageHeader.vue', 'PageHeader'),
+  wrapper('AdminNotice', 'features/admin/ui/feedback/AdminNotice.vue', 'Notice'),
+  wrapper('GlassCard', 'components/GlassCard.vue', 'Card'),
+  wrapper('AdminDrawer', 'features/admin/ui/AdminDrawer.vue', 'Drawer'),
+  wrapper('AdminRowMenu', 'features/admin/ui/table/AdminRowMenu.vue', 'RowMenu'),
+  wrapper(
+    'AdminChoiceCards',
+    'features/admin/ui/form/ChoiceCards.vue',
+    'ChoiceCards (components/ui)',
+    'form/ChoiceCards',
+  ),
+  wrapper(
+    'AdminDateTimeField',
+    'features/admin/ui/form/AdminDateTimeField.vue',
+    'DateTimeField scale="admin"',
+  ),
+  wrapper('AdminUserLabel', 'features/admin/ui/AdminUserLabel.vue', 'UserLink'),
+  wrapper('SettingsNotice', 'features/account/settings/SettingsNotice.vue', 'Notice'),
+  wrapper('AuthNotice', 'features/auth/AuthNotice.vue', 'Notice'),
+  wrapper(
+    'use-admin-toast',
+    'features/admin/ui/feedback/use-admin-toast.ts',
+    'useToast (components/ui/use-toast)',
+  ),
+  wrapper('admin-toasts', 'features/admin/ui/feedback/admin-toasts.ts', 'components/ui/toasts'),
+  wrapper('PillTabs', 'components/PillTabs.vue', 'Tabs'),
+  wrapper('SubmissionPager', 'features/submissions/SubmissionPager.vue', 'NumberedPager'),
+  wrapper('AuthField', 'features/auth/AuthField.vue', 'FormField with TextInput or PasswordInput'),
+  wrapper('AuthSelect', 'features/auth/AuthSelect.vue', 'FormField with SelectField'),
+  wrapper('SettingsCard', 'features/account/settings/SettingsCard.vue', 'Card'),
+  wrapper('CommunityCard', 'features/community/CommunityCard.vue', 'Card with QueryState'),
+];
+
+/** PrimeVue parts other than the config and its types are wrapped by the kit. */
+const PRIMEVUE = {
+  id: 'primevue',
+  use: 'the kit part over it: Modal/ConfirmDialog (dialog), Menu/RowMenu (menu), Drawer, Popover, ComboBox (select)',
+  bare: /^primevue\/(?!config$|menuitem$)/,
+};
+
+const EXTENSION = /\.(?:vue|ts|js|mjs)$/;
+const escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/** Every import rule: `test` takes an import path resolved under src/ (or a bare package name). */
+export const IMPORT_RULES = [
+  ...WRAPPERS.map(({ id, file, use, eslintTail }) => ({
+    id,
+    use,
+    test: (resolved) => resolved.replace(EXTENSION, '') === file.replace(EXTENSION, ''),
+    regex: `(^|/)${escape(eslintTail ?? file.replace(/^.*\//, '').replace(EXTENSION, ''))}(\\.(vue|ts|js))?$`,
+  })),
+  { ...PRIMEVUE, test: (resolved) => PRIMEVUE.bare.test(resolved), regex: PRIMEVUE.bare.source },
+];
+
+/** The kit may import PrimeVue (it wraps it) but no wrapper: a barrel there would hide one from every other file. */
+export const isKit = (rel) => rel.startsWith('components/ui/');
+
+/**
+ * An import path as a path under src/: `@/x` and `./x`/`../x` (from the file `rel`) resolve, with `.` and `..` segments
+ * folded and a `?query` or `#hash` dropped; a package name stays.
+ */
+export function resolveImport(path, rel) {
+  const clean = path.replace(/[?#].*$/, '');
+  if (!clean.startsWith('@/') && !clean.startsWith('.')) return clean;
+  const parts = clean.startsWith('@/') ? [] : rel.split('/').slice(0, -1);
+  for (const part of clean.replace(/^@\//, '').split('/')) {
+    if (part === '..') parts.pop();
+    else if (part !== '.' && part !== '') parts.push(part);
+  }
+  return parts.join('/');
+}
+
+/** `from '...'`, a bare `import '...'` and a dynamic `import('...')`. Comments are blanked before. */
+const IMPORT_PATH = /\b(?:from|import)\s*\(?\s*(['"`])([^'"`]+)\1/g;
+/** A static import with bindings: `import X, { a as B, type C } from '...'`, `import * as NS from '...'`. */
+const STATIC_IMPORT = /\bimport\s+(?:type\s+)?([\w$\s{},*]+?)\s+from\s*(['"])([^'"]+)\2/g;
+const COMMENT = /<!--[\s\S]*?-->|\/\*[\s\S]*?\*\/|(^|[^:'"\\])\/\/.*$/gm;
+const blank = (text) => text.replace(/[^\n]/g, ' ');
+/** The source with its comments as spaces (lines kept); the character before a `//` stays. */
+const withoutComments = (source) =>
+  source.replace(COMMENT, (comment, lead = '') => lead + blank(comment.slice(lead.length)));
+const lineOf = (source, index) => source.slice(0, index).split('\n').length;
+
+/** The local names an import clause binds: the default, each named one (its `as` name) and a namespace. */
+const boundNames = (clause) =>
+  clause
+    .replace(/[{}]/g, ',')
+    .split(',')
+    .map((part) => /(?:^|\s)([\w$]+)\s*$/.exec(part.trim())?.[1])
+    .filter((name) => name && name !== 'type');
+
+const kebab = (name) => name.replace(/(?<=[a-z0-9])([A-Z])/g, '-$1').toLowerCase();
+const escapeName = (name) => name.replace(/\$/g, '\\$');
+
+/**
+ * Where a file uses the names an import binds, outside the import: a reference or opening tag (`<Badge`, and
+ * `<badge-name` for a PascalCase name); a closing tag, a property (`x.Name`) or a path (`/Name.vue`) does not count.
+ */
+function nameUses(code, names) {
+  return names.flatMap((name) => {
+    const forms = [`(?<![\\w$./-])${escapeName(name)}(?![\\w$-])`];
+    if (/^[A-Z]/.test(name)) forms.push(`<${kebab(name)}(?![\\w-])`);
+    return [...code.matchAll(new RegExp(forms.join('|'), 'g'))].map((match) => ({
+      index: match.index,
+      name,
+    }));
+  });
+}
+
+/** The rule an import path breaks for the file `rel`, or undefined. */
+const ruleOf = (path, rel) =>
+  IMPORT_RULES.find(
+    ({ id, test }) => !(isKit(rel) && id === 'primevue') && test(resolveImport(path, rel)),
+  );
+
+/** One use per reference to what a static import binds (at least the import itself): a listed file adds none unseen. */
+function staticUses(code, rel) {
+  const imports = [...code.matchAll(STATIC_IMPORT)].filter((match) => ruleOf(match[3], rel));
+  const rest = imports.reduce(
+    (text, match) =>
+      text.slice(0, match.index) + blank(match[0]) + text.slice(match.index + match[0].length),
+    code,
+  );
+  const uses = imports.flatMap((match) => {
+    const rule = ruleOf(match[3], rel).id;
+    const named = nameUses(rest, boundNames(match[1]));
+    const at = named.length ? named : [{ index: match.index, name: match[3] }];
+    return at.map(({ index, name }) => ({ rule, line: lineOf(code, index), text: name }));
+  });
+  return { uses, rest };
+}
+
+/**
+ * Every use of one file that an import rule refuses, as `{ rule, line, text }`: each use of what a static import binds
+ * (its import when unused), and each dynamic import, re-export or bare import.
+ */
+export function importUses(source, rel) {
+  const { uses, rest } = staticUses(withoutComments(source), rel);
+  const others = [...rest.matchAll(IMPORT_PATH)].flatMap((match) => {
+    const rule = ruleOf(match[2], rel);
+    return rule ? [{ rule: rule.id, line: lineOf(rest, match.index), text: match[2] }] : [];
+  });
+  return [...uses, ...others];
+}
+
+const restricted = (rules) => [
+  'error',
   {
-    regex:
-      '(^|/)(AdminField|AdminChip|AdminPageHeader|AdminDataTable|AdminNotice|GlassCard)\\.vue$',
-    message: MESSAGE,
+    patterns: rules.map(({ regex, use }) => ({
+      regex,
+      message: `Use ${use} instead (src/components/ui; docs/wrapper-migration.md).`,
+    })),
   },
-  { regex: '(^|/)controls$', message: MESSAGE },
 ];
 
-/** Files that imported a wrapper when the rule was added. */
-export const WRAPPER_IMPORTERS = [
-  'src/components/SourceDiff.vue',
-  'src/components/SourceDiffSkeleton.vue',
-  'src/components/ui/Card.spec.ts',
-  'src/features/admin/activity/ActivityFilters.vue',
-  'src/features/admin/activity/ActivityTable.vue',
-  'src/features/admin/activity/LiveVisitorsCard.vue',
-  'src/features/admin/activity/UserActivityPage.vue',
-  'src/features/admin/activity/UserSummaryPanel.vue',
-  'src/features/admin/audit/AuditEntryRow.vue',
-  'src/features/admin/audit/AuditFeed.vue',
-  'src/features/admin/audit/AuditFilters.vue',
-  'src/features/admin/canned-replies/CannedRepliesPage.vue',
-  'src/features/admin/canned-replies/CannedReplyDialog.vue',
-  'src/features/admin/catalogs/LicenseCatalogPanel.vue',
-  'src/features/admin/catalogs/LicenseEditor.vue',
-  'src/features/admin/catalogs/ProblemCatalogsPage.vue',
-  'src/features/admin/catalogs/TaxonCatalogPanel.vue',
-  'src/features/admin/catalogs/TaxonEditor.vue',
-  'src/features/admin/comments/AdminCommentsTable.vue',
-  'src/features/admin/comments/CommentEditDialog.vue',
-  'src/features/admin/comments/CommentLocksPage.vue',
-  'src/features/admin/comments/CommentReportsPage.vue',
-  'src/features/admin/comments/CommentReportsTable.vue',
-  'src/features/admin/comments/CommentsAdminPage.vue',
-  'src/features/admin/comments/CommentsSectionHeader.vue',
-  'src/features/admin/contest-tags/ContestTagEditor.vue',
-  'src/features/admin/contest-tags/ContestTagsPage.vue',
-  'src/features/admin/contest-tags/TagContestsPanel.vue',
-  'src/features/admin/contests/ContestEditorPage.vue',
-  'src/features/admin/contests/ContestsIndexPage.vue',
-  'src/features/admin/contests/actions/ContestActionCard.vue',
-  'src/features/admin/contests/actions/ContestCloneCard.vue',
-  'src/features/admin/contests/actions/ContestDataCard.vue',
-  'src/features/admin/contests/actions/ContestDeleteCard.vue',
-  'src/features/admin/contests/actions/ContestFreezeLockCard.vue',
-  'src/features/admin/contests/actions/ContestProblemOpsCard.vue',
-  'src/features/admin/contests/actions/ContestPublishCard.vue',
-  'src/features/admin/contests/actions/PrepareDataDialog.vue',
-  'src/features/admin/contests/actions/PublishResultTable.vue',
-  'src/features/admin/contests/announcements/AnnouncementComposer.vue',
-  'src/features/admin/contests/announcements/AnnouncementEditForm.vue',
-  'src/features/admin/contests/announcements/AnnouncementItem.vue',
-  'src/features/admin/contests/data/ContestExportCard.vue',
-  'src/features/admin/contests/data/FeedKeyCard.vue',
-  'src/features/admin/contests/general/ContestAccessSection.vue',
-  'src/features/admin/contests/general/ContestBasicForm.vue',
-  'src/features/admin/contests/general/ContestBasicTime.vue',
-  'src/features/admin/contests/general/ContestCreatePage.vue',
-  'src/features/admin/contests/general/ContestFormatSection.vue',
-  'src/features/admin/contests/general/ContestGeneralForm.vue',
-  'src/features/admin/contests/general/ContestGeneralTab.vue',
-  'src/features/admin/contests/general/ContestInfoSection.vue',
-  'src/features/admin/contests/general/ContestOperationsSection.vue',
-  'src/features/admin/contests/general/ContestRatingSection.vue',
-  'src/features/admin/contests/general/ContestSummaryRail.vue',
-  'src/features/admin/contests/general/ContestTimeSection.vue',
-  'src/features/admin/contests/general/SectionJumpSelect.vue',
-  'src/features/admin/contests/general/TagChips.vue',
-  'src/features/admin/contests/ghosts/ContestGhostsTab.vue',
-  'src/features/admin/contests/ghosts/GhostCurrentCard.vue',
-  'src/features/admin/contests/ghosts/GhostImportCard.vue',
-  'src/features/admin/contests/ghosts/GhostPreviewTable.vue',
-  'src/features/admin/contests/lifecycle/ContestCloneDialog.vue',
-  'src/features/admin/contests/lifecycle/ContestDeleteDialog.vue',
-  'src/features/admin/contests/list/ContestFlagChips.vue',
-  'src/features/admin/contests/list/ContestList.vue',
-  'src/features/admin/contests/list/ContestListFilters.vue',
-  'src/features/admin/contests/list/ContestPhaseChip.vue',
-  'src/features/admin/contests/participants/AddParticipationDialog.vue',
-  'src/features/admin/contests/participants/ContestParticipantsTab.vue',
-  'src/features/admin/contests/participants/ParticipantsFilters.vue',
-  'src/features/admin/contests/problems/ContestProblemRow.vue',
-  'src/features/admin/contests/problems/ContestProblemsTab.vue',
-  'src/features/admin/contests/problems/ProblemAddPicker.vue',
-  'src/features/admin/contests/problems/ProblemCopyFrom.vue',
-  'src/features/admin/contests/ranking/OfficialRankingCard.vue',
-  'src/features/admin/contests/ranking/RankingLinkCard.vue',
-  'src/features/admin/creation/CreationOwnerPicker.vue',
-  'src/features/admin/integrations/IntegrationClientForm.vue',
-  'src/features/admin/integrations/IntegrationClientsPage.vue',
-  'src/features/admin/integrations/IntegrationClientsTable.vue',
-  'src/features/admin/judges/JudgeAddPage.vue',
-  'src/features/admin/judges/JudgeDetails.vue',
-  'src/features/admin/judges/JudgeQueueCard.vue',
-  'src/features/admin/judges/JudgeRuntimes.vue',
-  'src/features/admin/judges/JudgeStats.vue',
-  'src/features/admin/judges/JudgeStatusChip.vue',
-  'src/features/admin/judges/JudgesPage.vue',
-  'src/features/admin/judges/JudgesTable.vue',
-  'src/features/admin/languages/LanguageContentSection.vue',
-  'src/features/admin/languages/LanguageEditorSection.vue',
-  'src/features/admin/languages/LanguageForm.vue',
-  'src/features/admin/languages/LanguageFormPage.vue',
-  'src/features/admin/languages/LanguageIdentitySection.vue',
-  'src/features/admin/languages/LanguagesPage.vue',
-  'src/features/admin/languages/LanguagesTable.vue',
-  'src/features/admin/organizations/JoinRequestTable.vue',
-  'src/features/admin/organizations/MembersPanel.vue',
-  'src/features/admin/organizations/OrganizationContext.vue',
-  'src/features/admin/organizations/OrganizationDeleteCard.vue',
-  'src/features/admin/organizations/OrganizationDetail.vue',
-  'src/features/admin/organizations/OrganizationEditor.vue',
-  'src/features/admin/organizations/OrganizationHistoryPanel.vue',
-  'src/features/admin/organizations/OrganizationList.vue',
-  'src/features/admin/organizations/OrganizationLogoField.vue',
-  'src/features/admin/organizations/OrganizationsPage.vue',
-  'src/features/admin/organizations/quotas/QuotaEditDialog.vue',
-  'src/features/admin/organizations/quotas/QuotaOverviewPage.vue',
-  'src/features/admin/pages/FlatpageEditor.vue',
-  'src/features/admin/pages/FlatpageHistoryPanel.vue',
-  'src/features/admin/pages/FlatpagePreview.vue',
-  'src/features/admin/pages/FlatpageRevisionRow.vue',
-  'src/features/admin/pages/FlatpagesPage.vue',
-  'src/features/admin/posts/BlogModerationPage.vue',
-  'src/features/admin/posts/PostsTable.vue',
-  'src/features/admin/problems/ProblemEditorPage.vue',
-  'src/features/admin/problems/ProblemImportMenu.vue',
-  'src/features/admin/problems/ProblemSetupChecklist.vue',
-  'src/features/admin/problems/ProblemsIndexPage.vue',
-  'src/features/admin/problems/data/CaseRow.vue',
-  'src/features/admin/problems/data/CasesAutofill.vue',
-  'src/features/admin/problems/data/CasesEditor.vue',
-  'src/features/admin/problems/data/CheckerRuleOptions.vue',
-  'src/features/admin/problems/data/CheckerSection.vue',
-  'src/features/admin/problems/data/DataArchiveCard.vue',
-  'src/features/admin/problems/data/DataFeedback.vue',
-  'src/features/admin/problems/data/DataSourceFiles.vue',
-  'src/features/admin/problems/data/DataSourceRow.vue',
-  'src/features/admin/problems/data/IoMethodPicker.vue',
-  'src/features/admin/problems/data/ProblemDataTab.vue',
-  'src/features/admin/problems/data/ZipAutofillDialog.vue',
-  'src/features/admin/problems/editorial/ProblemEditorialTab.vue',
-  'src/features/admin/problems/external/ExternalJudgeNotConnected.vue',
-  'src/features/admin/problems/external/ExternalJudgeSearch.vue',
-  'src/features/admin/problems/external/ExternalLanguageTable.vue',
-  'src/features/admin/problems/external/ProblemExternalTab.vue',
-  'src/features/admin/problems/files/ProblemUploadCard.vue',
-  'src/features/admin/problems/general/LanguageLimitsTable.vue',
-  'src/features/admin/problems/general/ProblemBasicForm.vue',
-  'src/features/admin/problems/general/ProblemBasicsSection.vue',
-  'src/features/admin/problems/general/ProblemClassSection.vue',
-  'src/features/admin/problems/general/ProblemCloneDialog.vue',
-  'src/features/admin/problems/general/ProblemCodeField.vue',
-  'src/features/admin/problems/general/ProblemCreateForm.vue',
-  'src/features/admin/problems/general/ProblemCreatePage.vue',
-  'src/features/admin/problems/general/ProblemGeneralTab.vue',
-  'src/features/admin/problems/general/ProblemOrganizationsField.vue',
-  'src/features/admin/problems/general/ProblemStatusSection.vue',
-  'src/features/admin/problems/general/ProblemVisibilityCard.vue',
-  'src/features/admin/problems/general/ProblemVisibilitySection.vue',
-  'src/features/admin/problems/import/ImportOptionsForm.vue',
-  'src/features/admin/problems/import/ImportProgress.vue',
-  'src/features/admin/problems/import/ZipImportPage.vue',
-  'src/features/admin/problems/lifecycle/DeletedProblemsPage.vue',
-  'src/features/admin/problems/lifecycle/ProblemDangerZone.vue',
-  'src/features/admin/problems/lifecycle/TypedCodeDialog.vue',
-  'src/features/admin/problems/package/ProblemPackageCard.vue',
-  'src/features/admin/problems/polygon/PackageStatePill.vue',
-  'src/features/admin/problems/polygon/PackageTypePill.vue',
-  'src/features/admin/problems/polygon/PolygonConfigureStep.vue',
-  'src/features/admin/problems/polygon/PolygonLinkRefusal.vue',
-  'src/features/admin/problems/polygon/PolygonLinkStep.vue',
-  'src/features/admin/problems/polygon/PolygonNotConnected.vue',
-  'src/features/admin/problems/polygon/PolygonSyncHistory.vue',
-  'src/features/admin/problems/polygon/PolygonWizardPage.vue',
-  'src/features/admin/problems/statements/ProblemStatementsTab.vue',
-  'src/features/admin/rejudge/BulkRejudgePage.vue',
-  'src/features/admin/rejudge/RecentBatches.vue',
-  'src/features/admin/rejudge/RejudgeCountPanel.vue',
-  'src/features/admin/rejudge/RejudgeFilterForm.vue',
-  'src/features/admin/rejudge/RejudgeSummary.vue',
-  'src/features/admin/search/IndexSearchBox.vue',
-  'src/features/admin/search/ProblemBulkVisibilityDialog.vue',
-  'src/features/admin/search/ProblemListFilters.vue',
-  'src/features/admin/search/ProblemListTable.vue',
-  'src/features/admin/search/ProblemSearchList.vue',
-  'src/features/admin/settings/AdminLogPage.vue',
-  'src/features/admin/settings/ClearSecretButton.vue',
-  'src/features/admin/settings/DiscordWebhooksTable.vue',
-  'src/features/admin/settings/ExternalJudgeConnectionCheck.vue',
-  'src/features/admin/settings/OAuthClientField.vue',
-  'src/features/admin/settings/PolygonConnectionCheck.vue',
-  'src/features/admin/settings/RevisionItem.vue',
-  'src/features/admin/settings/RevisionsPanel.vue',
-  'src/features/admin/settings/ScalarSettingField.vue',
-  'src/features/admin/settings/SecretField.vue',
-  'src/features/admin/settings/SettingBlock.vue',
-  'src/features/admin/settings/SettingInfo.vue',
-  'src/features/admin/settings/SettingsLogPanel.vue',
-  'src/features/admin/settings/SiteNoticeBlock.vue',
-  'src/features/admin/settings/SiteSettingsPage.vue',
-  'src/features/admin/shell/AdminDashboard.vue',
-  'src/features/admin/shell/overview/OverviewTile.vue',
-  'src/features/admin/shell/search/AdminCommandPalette.vue',
-  'src/features/admin/short-links/ShortLinkCreateForm.vue',
-  'src/features/admin/short-links/ShortLinksPage.vue',
-  'src/features/admin/short-links/ShortLinksTable.vue',
-  'src/features/admin/similarity/PairFilters.vue',
-  'src/features/admin/similarity/PairsTable.vue',
-  'src/features/admin/similarity/SimilarityGroupsTable.vue',
-  'src/features/admin/similarity/SimilarityNotFoundCard.vue',
-  'src/features/admin/similarity/SimilarityPairPage.vue',
-  'src/features/admin/similarity/SimilarityPairsPage.vue',
-  'src/features/admin/similarity/SimilarityRunsPage.vue',
-  'src/features/admin/similarity/SimilarityRunsTable.vue',
-  'src/features/admin/similarity/SimilarityScopeForm.vue',
-  'src/features/admin/site/ConfigHistory.vue',
-  'src/features/admin/submissions/AdminSubmissionFilterBar.vue',
-  'src/features/admin/submissions/AdminSubmissionTable.vue',
-  'src/features/admin/submissions/AdminSubmissionsPage.vue',
-  'src/features/admin/tickets/TicketClaimButton.vue',
-  'src/features/admin/tickets/TicketHandlingSection.vue',
-  'src/features/admin/tickets/TicketMarkGood.vue',
-  'src/features/admin/tickets/TicketQueueDetail.vue',
-  'src/features/admin/tickets/TicketQueueFilters.vue',
-  'src/features/admin/tickets/TicketQueuePage.vue',
-  'src/features/admin/tickets/TicketQueueShortcuts.vue',
-  'src/features/admin/tickets/TicketQueueTable.vue',
-  'src/features/admin/ui/AdminCheckChips.vue',
-  'src/features/admin/ui/RevealKeyDialog.vue',
-  'src/features/admin/ui/form/AdminSectionNav.vue',
-  'src/features/admin/ui/table/AdminDataTable.spec.ts',
-  'src/features/admin/ui/ui.spec.ts',
-  'src/features/admin/users/CreatedUsersTable.vue',
-  'src/features/admin/users/NewUserFields.vue',
-  'src/features/admin/users/PermissionChecklist.vue',
-  'src/features/admin/users/RoleEditor.vue',
-  'src/features/admin/users/RolesDialog.vue',
-  'src/features/admin/users/UserAccountPanel.vue',
-  'src/features/admin/users/UserActivationRow.vue',
-  'src/features/admin/users/UserCreateDialog.vue',
-  'src/features/admin/users/UserDrawer.vue',
-  'src/features/admin/users/UserDrawerChips.vue',
-  'src/features/admin/users/UserModerationPanel.vue',
-  'src/features/admin/users/UserPasswordForm.vue',
-  'src/features/admin/users/UserProfileForm.vue',
-  'src/features/admin/users/UserRenameForm.vue',
-  'src/features/admin/users/UserResetLink.vue',
-  'src/features/admin/users/UserSecurityPanel.vue',
-  'src/features/admin/users/UserStatusChips.vue',
-  'src/features/admin/users/UserTwoFactorReset.vue',
-  'src/features/admin/users/UsersPage.vue',
-  'src/features/admin/users/UsersTable.vue',
-  'src/features/blog/AuthorCard.vue',
-  'src/features/blog/BlogDraftsPage.vue',
-  'src/features/blog/BlogListPage.vue',
-  'src/features/blog/MorePostsCard.vue',
-  'src/features/blog/editor/PostSaveBar.vue',
-  'src/features/external-judge/ExternalJudgeStatusCard.vue',
-  'src/features/organizations/OrganizationContestsPage.vue',
-  'src/features/organizations/problems/OrgProblemsPage.vue',
-  'src/features/organizations/problems/OrgTagCatalogue.vue',
-  'src/features/organizations/quota/CreditLedger.vue',
-  'src/features/organizations/quota/QuotaMeterCard.vue',
-  'src/features/submissions/SubmissionLockControl.vue',
-  'src/features/submissions/SubmissionStaffPanel.vue',
-  'src/features/tickets/NewTicketPage.vue',
-  'src/features/tickets/TicketHeader.vue',
-  'src/features/tickets/TicketNotes.vue',
-  'src/features/tickets/TicketPageSkeleton.vue',
-  'src/features/tickets/TicketReply.vue',
-  'src/features/tickets/TicketSidePanel.vue',
-  'src/features/tickets/TicketStaffActions.vue',
-  'src/features/tickets/TicketsPage.vue',
-];
+/**
+ * ESLint flat-config blocks: every app file is refused every import rule, and a file whose baseline counts some imports
+ * is refused all the others. A later block replaces the rule's options, so each file gets exactly one list.
+ * `baseline` is `{ '<path under src>': { '<rule id>': count } }`.
+ */
+export function eslintImportBlocks(baseline) {
+  const groups = new Map();
+  for (const [rel, counts] of Object.entries(baseline)) {
+    const allowed = IMPORT_RULES.filter(({ id }) => counts[id] > 0).map(({ id }) => id);
+    if (!allowed.length) continue;
+    const key = allowed.join(' ');
+    groups.set(key, [...(groups.get(key) ?? []), `src/${rel}`]);
+  }
+  const base = {
+    files: ['src/**/*.{ts,vue}'],
+    ignores: ['src/**/*.spec.ts', 'src/components/ui/**'],
+    rules: { 'no-restricted-imports': restricted(IMPORT_RULES) },
+  };
+  return [
+    base,
+    ...[...groups].map(([key, files]) => ({
+      files,
+      rules: {
+        'no-restricted-imports': restricted(
+          IMPORT_RULES.filter(({ id }) => !key.split(' ').includes(id)),
+        ),
+      },
+    })),
+  ];
+}
