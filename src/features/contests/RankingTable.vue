@@ -41,7 +41,8 @@ const props = defineProps<{
 }>();
 /** Rank and name stay while the problem columns scroll (the rank column is `RANK_COLUMN_REM` = 5 rem = `left-20`). */
 const RANK_STICKY = 'sticky left-0 z-10 bg-surface-solid';
-const NAME_STICKY = 'sticky left-20 z-10 bg-surface-solid';
+/** On a phone only the rank stays: rank + name would leave about 50 px of room for the scores. */
+const NAME_STICKY = 'sm:sticky sm:left-20 sm:z-10 sm:bg-surface-solid';
 /** The viewer's row keeps its tint over the opaque sticky cells. */
 const stickyBackground = (row: RankingRow) =>
   row.user.id === props.viewerId ? 'bg-linear-to-b from-surface-hover to-surface-hover' : '';

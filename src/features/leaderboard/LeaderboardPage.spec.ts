@@ -133,7 +133,7 @@ describe('leaderboard page: opens a profile by username', () => {
     await wrapper.get('input[name="username"]').setValue('  khoa.tran ');
     await wrapper.get('form[data-testid="username-jump"]').trigger('submit');
     // The profile route is a lazy chunk: the push settles after a few ticks, not one flush.
-    await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/users/khoa.tran'), 10_000);
+    await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/users/khoa.tran'));
   });
 
   it('does not navigate when the username box is blank', async () => {

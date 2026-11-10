@@ -149,8 +149,10 @@ const hiddenMark = computed(() => {
   return null;
 });
 const moreName = computed(() => props.moreLabel ?? t('nav.more'));
+/** The button's own words stay short ("Thêm") so the room the list keeps for it holds in both languages; `moreLabel` names the menu. */
+const triggerWord = computed(() => t('nav.more'));
 const triggerName = computed(() =>
-  hiddenMark.value ? `${moreName.value}: ${hiddenMark.value.label}` : moreName.value,
+  hiddenMark.value ? `${triggerWord.value}: ${hiddenMark.value.label}` : triggerWord.value,
 );
 /** The count is a small Chip; `accent` (something waits for the viewer) is the filled one. */
 const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
@@ -238,7 +240,7 @@ const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
               @click="toggle"
             >
               <template #icon><Ellipsis aria-hidden="true" class="size-4" /></template>
-              {{ moreName }}
+              {{ triggerWord }}
             </AppButton>
           </template>
         </Menu>
