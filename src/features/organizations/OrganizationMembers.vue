@@ -12,7 +12,7 @@ import type { TabItem } from '@/components/ui/Tabs.vue';
 import { formatNumber } from '@/lib/format';
 import { pageFromQuery } from '@/lib/paging';
 import { useLocaleStore } from '@/stores/locale.store';
-import MemberRows from './MemberRows.vue';
+import MemberTable from './MemberTable.vue';
 import type { MemberColumn } from './MemberRows.vue';
 import { useMembersQuery } from './organizations.queries';
 import { useOrganization } from './use-organization';
@@ -83,9 +83,7 @@ const footer = computed(() => {
         :title="$t('orgMembership.noMembers')"
       />
       <template v-else>
-        <div class="overflow-x-auto rounded-card border border-line bg-surface p-4">
-          <MemberRows :members="members" :columns="columns" />
-        </div>
+        <MemberTable :members="members" :columns="columns" />
         <p class="text-sm text-muted">
           {{ $t('orgMembership.membersFooter', footer) }}
         </p>

@@ -123,6 +123,29 @@ describe('Tabs overflow marks', () => {
     );
     expect(wrapper.find('[data-testid="tabs-more-mark"]').exists()).toBe(true);
   });
+
+  it('shows a hidden tab’s waiting count (accent) on the ⋯ button and its words in the menu, a plain count nowhere', async () => {
+    fakeStripLayout();
+    const waiting = SECTIONS.map((item) =>
+      item.key === 'history'
+        ? { ...item, count: 3, countTone: 'accent' as const, countLabel: '3 yêu cầu chờ duyệt' }
+        : item,
+    );
+    const wrapper = mountComponent(Tabs, {
+      props: { items: waiting, label: 'Mục', modelValue: 'statement' },
+    });
+    await nextTick();
+    expect(wrapper.get('[data-testid="tabs-more"]').attributes('aria-label')).toBe(
+      'Thêm: 3 yêu cầu chờ duyệt',
+    );
+    expect(wrapper.find('[data-testid="tabs-more-mark"]').exists()).toBe(true);
+    const plain = mountComponent(Tabs, {
+      props: { items: SECTIONS, label: 'Mục', modelValue: 'statement' },
+    });
+    await nextTick();
+    expect(plain.get('[data-testid="tabs-more"]').attributes('aria-label')).toBe('Thêm');
+    expect(plain.find('[data-testid="tabs-more-mark"]').exists()).toBe(false);
+  });
 });
 
 describe('Tabs as links', () => {

@@ -54,7 +54,12 @@ const hasNone = computed(() => anyContest.data.value?.meta.total === 0);
         :maxlength="100"
         class="w-full sm:w-64"
       />
-      <AppButton v-if="canCreate" data-testid="org-tab-create-contest" :to="createTarget">
+      <AppButton
+        v-if="canCreate"
+        tone="primary"
+        data-testid="org-tab-create-contest"
+        :to="createTarget"
+      >
         <template #icon><Plus class="size-4" aria-hidden="true" /></template>
         {{ $t('create.contest') }}
       </AppButton>

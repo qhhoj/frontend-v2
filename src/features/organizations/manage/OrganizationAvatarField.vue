@@ -2,7 +2,8 @@
 import { computed, ref, useId } from 'vue';
 import { IMAGE_ACCEPT, IMAGE_MAX_BYTES } from '@/features/admin/problems/limits';
 import { useLogoUpload } from '@/features/admin/organizations/use-logo-upload';
-import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import Notice from '@/components/ui/Notice.vue';
 import UploadButton from '@/components/ui/UploadButton.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
 import FormField from '@/components/ui/FormField.vue';
@@ -67,16 +68,15 @@ const hint = computed(() =>
             :is-pending="upload.isPending.value"
             @picked="upload.run"
           />
-          <button
+          <AppButton
             v-if="canUpload"
-            type="button"
-            class="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-accent-text hover:underline"
+            tone="link"
             :aria-expanded="isUrlShown"
             :aria-controls="urlBoxId"
             @click="isUrlOpen = !isUrlOpen"
           >
             {{ $t('orgAdmin.info.avatarUseUrl') }}
-          </button>
+          </AppButton>
         </div>
         <p class="text-caption leading-4 text-muted">{{ $t(hint) }}</p>
       </div>
@@ -96,10 +96,8 @@ const hint = computed(() =>
         placeholder="https://…"
       />
     </FormField>
-    <AdminStatus
-      v-if="upload.failure.value"
-      kind="refused"
-      :text="failureTextOf(upload.failure.value)"
-    />
+    <Notice v-if="upload.failure.value" tone="danger">
+      {{ failureTextOf(upload.failure.value) }}
+    </Notice>
   </div>
 </template>

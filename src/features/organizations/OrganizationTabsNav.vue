@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import PillTabs, { type PillTab } from '@/components/PillTabs.vue';
+import Tabs from '@/components/ui/Tabs.vue';
+import type { TabItem } from '@/components/ui/Tabs.vue';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -19,14 +20,16 @@ const { t } = useI18n();
 interface OrganizationTab {
   routeName: string;
   labelKey: string;
-  badge?: PillTab['badge'];
+  count?: number | string;
+  countLabel?: string;
+  countTone?: 'neutral' | 'accent';
 }
 const visibleTabs = computed<OrganizationTab[]>(() => {
   const about = { routeName: 'organization', labelKey: 'orgs.tabs.about' };
   const members: OrganizationTab = {
     routeName: 'organization-members',
     labelKey: 'orgs.tabs.members',
-    badge: { text: formatNumber(props.organization.memberCount, locale.locale), tone: 'neutral' },
+    count: formatNumber(props.organization.memberCount, locale.locale),
   };
   const posts = { routeName: 'organization-posts', labelKey: 'orgs.tabs.posts' };
   // Members also see the problems and submissions, administrators the quota and "Quản lý" (the API refuses the rest).
@@ -37,15 +40,11 @@ const visibleTabs = computed<OrganizationTab[]>(() => {
   const manage: OrganizationTab = {
     routeName: 'organization-manage',
     labelKey: 'orgs.tabs.manage',
-    badge: pendingTotal.value
-      ? {
-          text: formatNumber(pendingTotal.value, locale.locale),
-          tone: 'accent',
-          srLabel: t('orgAdmin.pendingBadge', {
-            count: formatNumber(pendingTotal.value, locale.locale),
-          }),
-        }
-      : undefined,
+    count: pendingTotal.value ? formatNumber(pendingTotal.value, locale.locale) : undefined,
+    countTone: 'accent',
+    countLabel: t('orgAdmin.pendingBadge', {
+      count: formatNumber(pendingTotal.value, locale.locale),
+    }),
   };
   const viewer = props.organization.viewer;
   if (viewer?.canAdminister)
@@ -53,16 +52,18 @@ const visibleTabs = computed<OrganizationTab[]>(() => {
   if (viewer?.isMember) return [about, members, problems, contests, posts, submissions];
   return [about, members, contests, posts];
 });
-const tabs = computed<PillTab[]>(() =>
+const tabs = computed<TabItem[]>(() =>
   visibleTabs.value.map((tab) => ({
     key: tab.routeName,
     label: t(tab.labelKey),
     to: { name: tab.routeName, params: { slug: props.organization.slug } },
-    badge: tab.badge,
+    count: tab.count,
+    countLabel: tab.countLabel,
+    countTone: tab.countTone,
   })),
 );
 </script>
 
 <template>
-  <PillTabs :tabs="tabs" :label="t('orgs.tabsLabel')" />
+  <Tabs :items="tabs" :label="t('orgs.tabsLabel')" overflow="menu" />
 </template>

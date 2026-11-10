@@ -34,5 +34,6 @@ export function useOrgBulk(slug: Ref<string>, selected: Ref<string[]>) {
     mutation.error.value ? orgFailureText(mutation.error.value) : '',
   );
   const action = computed(() => mutation.variables.value?.action ?? null);
-  return { run, result, action, failureText, isPending: mutation.isPending };
+  const dismiss = () => (result.value = null);
+  return { run, dismiss, result, action, failureText, isPending: mutation.isPending };
 }

@@ -1893,6 +1893,7 @@
     "sortLabel": "Sắp xếp thành viên",
     "membersFooter": "Hạng {first} – {last} trong {total} · 100 người mỗi trang",
     "membersPager": "Trang thành viên",
+    "membersTable": "Bảng thành viên",
     "noMembers": "Tổ chức chưa có thành viên.",
     "postsPager": "Trang bài viết",
     "noPosts": "Chưa có bài viết.",
@@ -2646,7 +2647,6 @@
     },
     "searchLabel": "Tìm theo mã hoặc tên bài",
     "searchPlaceholder": "Mã hoặc tên bài",
-    "searchSubmit": "Tìm",
     "tableCaption": "Bài tập của tổ chức",
     "columns": {
       "code": "Mã",

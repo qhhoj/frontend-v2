@@ -3,12 +3,12 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import FormField from '@/components/ui/FormField.vue';
+import Notice from '@/components/ui/Notice.vue';
 import TextArea from '@/components/ui/TextArea.vue';
 import TextInput from '@/components/ui/TextInput.vue';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import { useOrganizationEditor } from '@/features/admin/organizations/use-organization-editor';
 import { useSlugFromName } from '@/features/admin/organizations/use-slug-from-name';
-import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
 import JoinModeField from '../manage/JoinModeField.vue';
 
@@ -73,11 +73,9 @@ async function create() {
       <p class="text-caption leading-4 text-muted">{{ $t('orgAdmin.create.unlistedNote') }}</p>
     </div>
     <template #error>
-      <AdminStatus
-        v-if="mutation.failure.value"
-        kind="refused"
-        :text="failureTextOf(mutation.failure.value)"
-      />
+      <Notice v-if="mutation.failure.value" tone="danger">
+        {{ failureTextOf(mutation.failure.value) }}
+      </Notice>
     </template>
   </ConfirmDialog>
 </template>

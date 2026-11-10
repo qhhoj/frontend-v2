@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronDown, TriangleAlert } from 'lucide-vue-next';
+import { ChevronDown } from 'lucide-vue-next';
 import { computed, ref, useId } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { OrganizationDetail } from '@/api/types/organizations';
@@ -7,9 +7,9 @@ import FormField from '@/components/ui/FormField.vue';
 import SaveBar from '@/components/ui/SaveBar.vue';
 import TextInput from '@/components/ui/TextInput.vue';
 import Card from '@/components/ui/Card.vue';
+import Notice from '@/components/ui/Notice.vue';
 import { useOrganizationEditor } from '@/features/admin/organizations/use-organization-editor';
 import AdminLeaveGuard from '@/features/admin/ui/form/AdminLeaveGuard.vue';
-import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import MarkdownField from '@/features/admin/ui/MarkdownField.vue';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
 import JoinModeField from './JoinModeField.vue';
@@ -78,7 +78,6 @@ function reset() {
         <ChevronDown
           aria-hidden="true"
           class="size-4 shrink-0 -rotate-90 text-muted transition-transform group-open:rotate-0"
-          :stroke-width="1.75"
         />
         <span class="text-muted">{{ $t('orgAdmin.info.foldLead') }}</span>
       </summary>
@@ -124,18 +123,9 @@ function reset() {
                     }}</span>
                   </template>
                 </TextInput>
-                <p
-                  v-if="isSlugChanged"
-                  role="status"
-                  class="flex items-start gap-1.5 text-caption leading-4"
-                >
-                  <TriangleAlert
-                    class="mt-0.5 size-3.5 shrink-0 text-caution-strong"
-                    aria-hidden="true"
-                    :stroke-width="1.75"
-                  />
-                  <span>{{ $t('orgAdmin.info.slugWarning') }}</span>
-                </p>
+                <Notice v-if="isSlugChanged" tone="warning" inline role="status">
+                  {{ $t('orgAdmin.info.slugWarning') }}
+                </Notice>
               </template>
             </FormField>
           </OrganizationSettingsSection>
@@ -164,11 +154,9 @@ function reset() {
         >
           {{ $t('orgAdmin.info.staffLink') }}
         </RouterLink>
-        <AdminStatus
-          v-if="mutation.failure.value"
-          kind="refused"
-          :text="failureTextOf(mutation.failure.value)"
-        />
+        <Notice v-if="mutation.failure.value" tone="danger">
+          {{ failureTextOf(mutation.failure.value) }}
+        </Notice>
         <SaveBar
           :dirty-count="editor.dirtyCount.value"
           :pending="mutation.isPending.value"

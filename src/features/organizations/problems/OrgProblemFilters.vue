@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
 import type { ProblemTag } from '@/api/types/organization-problems';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import AppButton from '@/components/ui/AppButton.vue';
+import SearchInput from '@/components/ui/SearchInput.vue';
 import { formatNumber } from '@/lib/format';
+import { useDebouncedText } from '@/lib/use-debounced-text';
 import { useLocaleStore } from '@/stores/locale.store';
 import { ARCHIVE_FILTERS } from './org-problem-filters';
 import type { OrgProblemFilters } from './org-problems.queries';
 import { TAG_DOT_CLASSES } from './org-tag-classes';
 
-/** Tag chips, the archive switch and the search box; every change goes to the URL through `change`. */
+/** The toolbar (search left, the `actions` slot right: the one create), tag chips and the archive switch; every change goes to the URL through `change`. */
 const props = defineProps<{
   filters: OrgProblemFilters;
   tags: ProblemTag[];
@@ -18,12 +18,9 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ change: [change: Partial<Omit<OrgProblemFilters, 'page'>>] }>();
 const locale = useLocaleStore();
-const text = ref(props.filters.q);
-watch(
+const text = useDebouncedText(
   () => props.filters.q,
-  (value) => {
-    text.value = value;
-  },
+  (value) => emit('change', { q: value }),
 );
 const CHIP =
   'inline-flex min-h-11 items-center gap-1.5 rounded-pill border border-line px-3 text-sm font-semibold hover:bg-surface-hover aria-pressed:border-accent aria-pressed:bg-accent-soft aria-pressed:text-accent-soft-text';
@@ -31,6 +28,16 @@ const CHIP =
 
 <template>
   <div class="flex flex-col gap-3" role="group" :aria-label="$t('orgProblems.filtersLabel')">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <SearchInput
+        v-model="text"
+        :label="$t('orgProblems.searchLabel')"
+        :placeholder="$t('orgProblems.searchPlaceholder')"
+        maxlength="50"
+        class="w-full sm:w-80"
+      />
+      <div class="ml-auto"><slot name="actions" /></div>
+    </div>
     <div class="flex flex-wrap gap-2" role="group" :aria-label="$t('orgProblems.tagFilter')">
       <button
         type="button"
@@ -77,22 +84,6 @@ const CHIP =
           /></span>
         </button>
       </div>
-      <form
-        role="search"
-        class="ml-auto flex min-w-0 flex-1 gap-2 sm:max-w-80"
-        @submit.prevent="emit('change', { q: text.trim() })"
-      >
-        <label for="org-problem-search" class="sr-only">{{ $t('orgProblems.searchLabel') }}</label>
-        <input
-          id="org-problem-search"
-          v-model="text"
-          type="search"
-          maxlength="50"
-          :placeholder="$t('orgProblems.searchPlaceholder')"
-          class="min-h-11 min-w-0 flex-1 rounded-row border border-line-control bg-surface-solid px-3 text-content"
-        />
-        <AppButton type="submit">{{ $t('orgProblems.searchSubmit') }}</AppButton>
-      </form>
     </div>
   </div>
 </template>
