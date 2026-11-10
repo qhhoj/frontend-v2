@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import SwarmBit from '@/components/SwarmBit.vue';
-import { useAdminToast } from '@/features/admin/ui/feedback/use-admin-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { translate } from '@/i18n';
 import { useMotionOff } from '@/lib/use-motion-off';
 import { cheer, isResting, spawnRoamers, stepLeavers, stepRoamers } from '@/mascot/bit-roam';
@@ -32,7 +32,7 @@ const store = useBitRoamStore();
 const route = useRoute();
 const loading = useLoadingStore();
 const motionOff = useMotionOff();
-const toast = useAdminToast({ lazy: true });
+const toast = useToast({ lazy: true });
 const isInLiveContest = useInLiveContest(() => store.choice.on);
 const viewportWidth = ref(viewportSize().width);
 

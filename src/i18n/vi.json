@@ -386,7 +386,8 @@
   },
   "notFound": {
     "title": "Không tìm thấy trang",
-    "body": "Bit khóc cả một vũng nước mắt. Trang này không tồn tại, thử một trong các lối sau.",
+    "body": "Trang này không tồn tại hoặc đã được chuyển đi. Thử một trong các lối sau.",
+    "back": "Quay lại",
     "home": "Về trang chủ",
     "problems": "Xem danh sách bài",
     "bitLabel": "Bit đang khóc"
@@ -2350,15 +2351,6 @@
       "on": "Bật",
       "off": "Tắt"
     },
-    "footer": "Chế độ tiết kiệm: {state}",
-    "footerState": {
-      "on": "Bật",
-      "off": "Tắt",
-      "autoOn": "Tự động (bật)",
-      "autoOff": "Tự động (tắt)"
-    },
-    "footerChange": "Đổi",
-    "footerChangeLabel": "Đổi chế độ tiết kiệm",
     "title": "Chế độ tiết kiệm"
   },
   "adminEdit": {
@@ -2798,6 +2790,7 @@
     "noticeBody": "Bài “{name}” đã bị xóa khỏi hệ thống. Bài nộp và mã nguồn vẫn được giữ, nhưng không còn chi tiết từng test."
   },
   "footer": {
+    "version": "Phiên bản giao diện",
     "versionTitle": "Bản dựng giao diện đang chạy (commit và ngày)",
     "source": "Mã nguồn (AGPL)",
     "runtimes": "Máy chấm"
@@ -2905,8 +2898,7 @@
     }
   },
   "siteNotice": {
-    "region": "Thông báo trang",
-    "dismiss": "Đóng thông báo"
+    "region": "Thông báo trang"
   },
   "orgAdmin": {
     "pendingBadge": "{count} yêu cầu đang chờ",

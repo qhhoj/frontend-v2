@@ -10,6 +10,10 @@ withDefaults(defineProps<{ to?: RouteLocationRaw; size?: 'sm' | 'md' | 'lg' }>()
 });
 const SIZES = { sm: 'text-subtitle', md: 'text-section', lg: 'text-display lg:text-page' } as const;
 const LOOK: BitLook = { headgear: 'none', palette: 'terracotta' };
+/** A 1 px halo in the theme's `--qh-bit-halo` (none on light grounds): on a dark header the sprite's brown outline would otherwise vanish and the mark read "QHHJ". */
+const HALO = ['1px 0', '-1px 0', '0 1px', '0 -1px']
+  .map((offset) => `drop-shadow(${offset} 0 var(--qh-bit-halo))`)
+  .join(' ');
 /** The visible part of the 16x16 sprite: 13 columns from column 1, 9 rows from row 5 (outline, body, legs). */
 const COLUMNS = 13;
 const ROWS = 9;
@@ -34,6 +38,7 @@ const PIXEL = `${0.7 / ROWS}em`;
             '--bit-px': PIXEL,
             width: `calc(${COLUMNS} * ${PIXEL})`,
             height: `calc(${ROWS} * ${PIXEL})`,
+            filter: HALO,
           }"
         >
           <BitSprite

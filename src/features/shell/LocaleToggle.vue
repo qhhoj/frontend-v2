@@ -1,18 +1,19 @@
 <script setup lang="ts">
+import IconButton from '@/components/ui/IconButton.vue';
 import { useLocaleStore } from '@/stores/locale.store';
 
 const locale = useLocaleStore();
 </script>
 
 <template>
-  <button
-    type="button"
-    class="inline-flex size-11 items-center justify-center rounded-pill border border-line bg-surface-strong font-mono text-caption leading-4 font-semibold hover:bg-surface-hover"
-    :aria-label="$t('locale.switchTo')"
-    :title="$t('locale.switchTo')"
+  <IconButton
+    tone="secondary"
+    :label="$t('locale.switchTo')"
     :lang="locale.locale === 'vi' ? 'en' : 'vi'"
     @click="locale.toggle()"
   >
-    {{ locale.locale.toUpperCase() }}
-  </button>
+    <span class="font-mono text-caption leading-4 font-semibold">{{
+      locale.locale.toUpperCase()
+    }}</span>
+  </IconButton>
 </template>

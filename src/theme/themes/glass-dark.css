@@ -23,6 +23,7 @@
   --qh-accent-soft-text: #fed7ff;
   --qh-on-accent: #140a1f;
   --qh-focus-ring: #fdb8ff;
+  --qh-bit-halo: var(--qh-text-muted);
   --qh-gradient-accent: linear-gradient(90deg, #fc72ff, #7b61ff);
   --qh-glow: 0 0 12px #fc72ff;
   --qh-shadow-float: 0 8px 24px rgba(0, 0, 0, 0.5);

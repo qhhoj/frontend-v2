@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import IconButton from '@/components/ui/IconButton.vue';
 import { ACCENTS } from '@/theme/appearance';
 import { useAppearanceChoice } from './use-appearance-choice';
 
@@ -14,22 +15,18 @@ const isPressed = (accent: string) => shown.value.accent === accent;
     :aria-label="$t('appearance.accentTitle')"
     class="grid grid-cols-[repeat(4,2.75rem)] gap-1"
   >
-    <button
+    <IconButton
       v-for="preset in ACCENTS"
       :key="preset.id"
-      type="button"
+      tone="ghost"
+      class="aria-pressed:ring-2 aria-pressed:ring-content"
       :disabled="disabled"
-      :aria-label="$t(preset.labelKey)"
-      :title="$t(preset.labelKey)"
-      :aria-pressed="isPressed(preset.id)"
-      class="inline-flex size-11 items-center justify-center rounded-full border-2 disabled:cursor-not-allowed disabled:border-dashed disabled:bg-surface-strong"
-      :class="
-        isPressed(preset.id) ? 'border-content' : 'border-transparent disabled:border-line-strong'
-      "
+      :label="$t(preset.labelKey)"
+      :pressed="isPressed(preset.id)"
       @click="update({ accent: preset.id })"
     >
       <!-- The swatch carries its own preset's tokens (themes/*.css match any descendant [data-accent]). -->
       <span :data-accent="preset.id" class="bg-gradient-accent size-7 rounded-full" />
-    </button>
+    </IconButton>
   </div>
 </template>

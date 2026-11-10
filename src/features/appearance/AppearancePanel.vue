@@ -2,6 +2,8 @@
 import { Palette } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import BitMascot from '@/components/BitMascot.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import IconButton from '@/components/ui/IconButton.vue';
 import Popover from '@/components/ui/Popover.vue';
 import { translate } from '@/i18n';
 import { useMediaQuery } from '@/lib/use-media-query';
@@ -34,17 +36,15 @@ const lowPowerOptions = computed(() =>
 </script>
 
 <template>
-  <button
-    type="button"
-    class="inline-flex size-11 items-center justify-center rounded-pill border border-line bg-surface-strong hover:bg-surface-hover"
+  <IconButton
+    tone="secondary"
     aria-haspopup="dialog"
     :aria-expanded="isOpen"
-    :aria-label="$t('appearance.title')"
-    :title="$t('appearance.title')"
+    :label="$t('appearance.title')"
     @click="popover?.toggle($event)"
   >
-    <Palette class="size-5" aria-hidden="true" />
-  </button>
+    <Palette aria-hidden="true" class="size-5" />
+  </IconButton>
   <Popover ref="popover" :labelledby="TITLE_ID" @show="isOpen = true" @hide="isOpen = false">
     <div class="flex w-[min(20rem,calc(100vw-4rem))] flex-col gap-4">
       <div class="flex items-center justify-between gap-3">
@@ -56,13 +56,13 @@ const lowPowerOptions = computed(() =>
       <!-- ModeChoice's two groups (Style, Mode) name themselves. -->
       <ModeChoice />
       <div>
-        <p class="mb-2 text-caption leading-4 font-medium tracking-wider text-muted uppercase">
+        <p class="mb-2 text-caption leading-4 font-semibold text-muted">
           {{ $t('appearance.accentTitle') }}
         </p>
         <AccentChoice />
       </div>
       <div>
-        <p class="mb-2 text-caption leading-4 font-medium tracking-wider text-muted uppercase">
+        <p class="mb-2 text-caption leading-4 font-semibold text-muted">
           {{ $t('appearance.glass') }}
         </p>
         <SegmentedChoice
@@ -80,7 +80,7 @@ const lowPowerOptions = computed(() =>
         </p>
       </div>
       <div>
-        <p class="mb-2 text-caption leading-4 font-medium tracking-wider text-muted uppercase">
+        <p class="mb-2 text-caption leading-4 font-semibold text-muted">
           {{ $t('lowPower.title') }}
         </p>
         <SegmentedChoice
@@ -91,13 +91,9 @@ const lowPowerOptions = computed(() =>
         />
       </div>
       <div class="flex items-center justify-between gap-3 border-t border-line pt-3">
-        <button
-          type="button"
-          class="inline-flex min-h-11 items-center px-1 text-meta text-muted underline hover:text-content"
-          @click="reset"
-        >
-          {{ $t('appearance.useSite') }}
-        </button>
+        <AppButton tone="link" class="text-meta" @click="reset">{{
+          $t('appearance.useSite')
+        }}</AppButton>
         <RouterLink
           :to="{ name: 'settings-appearance' }"
           class="inline-flex min-h-11 items-center text-meta text-accent-text underline"
