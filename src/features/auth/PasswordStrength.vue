@@ -40,8 +40,8 @@ const STRONG_SCORE = 3;
         :class="step <= score ? FILLS[score] : 'bg-line'"
       />
     </div>
-    <!-- Always rendered; from `sm` its height is reserved (the two-column signup keeps both columns level), on a phone it takes no room until there is a level. -->
-    <span data-testid="strength-level" class="sm:min-h-5 text-meta" :class="TEXTS[score]">
+    <!-- The level line appears with the first keystroke; no height is held for it. -->
+    <span data-testid="strength-level" class="text-meta" :class="TEXTS[score]">
       <template v-if="password">
         {{ $t(`auth.strength.level.${score}`)
         }}<template v-if="score < STRONG_SCORE"> — {{ $t('auth.strength.tip') }}</template>
