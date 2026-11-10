@@ -107,18 +107,11 @@
     "AuthField": 1,
     "input": 1
   },
-  "features/auth/ChangePasswordPage.vue": {
-    "AuthNotice": 2
-  },
   "features/auth/EmailLinkRequest.vue": {
     "AuthField": 1
   },
-  "features/auth/InboxNotice.vue": {
-    "fixed-size": 1
-  },
   "features/auth/LoginPage.vue": {
-    "AuthField": 2,
-    "AuthNotice": 1
+    "AuthField": 2
   },
   "features/auth/NewPasswordField.vue": {
     "AuthField": 1
@@ -134,18 +127,13 @@
     "verdict-tone": 2
   },
   "features/auth/RegisterPage.vue": {
-    "AuthField": 1,
-    "button": 1,
-    "checkbox": 1
+    "AuthField": 1
   },
   "features/auth/TwoFactorPage.vue": {
-    "AuthField": 1,
-    "button": 2,
-    "fixed-size": 1
+    "AuthField": 1
   },
   "features/auth/UsernameField.vue": {
-    "AuthField": 1,
-    "fixed-size": 1
+    "AuthField": 1
   },
   "features/auth/use-logout.ts": {
     "use-admin-toast": 1

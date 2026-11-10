@@ -15,6 +15,11 @@ const organizationId = defineModel<string>('organizationId', { required: true })
 /** Not shown: `undefined` until the languages load, then C++17, so the account starts with the ruled default. */
 const languageId = defineModel<string | undefined>('languageId');
 const schools = useOpenOrganizationsQuery();
+/** An empty school list leaves no cell, so the grid has no blank row. */
+const hasChoices = computed(
+  () =>
+    schools.isPending.value || Boolean(schools.error.value) || Boolean(schools.data.value?.length),
+);
 const meta = useProblemMetaQuery();
 /** A file-only language (output only) cannot be somebody's default; the problem list's own filter applies too. */
 const isSignupLanguage = (language: Language) => language.includeInProblem && !language.fileOnly;
@@ -34,7 +39,7 @@ watch(
 
 <template>
   <!-- One full row of the signup grid. No language picker here; new accounts start at C++17 (set above), changed later in the settings or by the submit box, which remembers the last one. -->
-  <div class="sm:col-span-2">
+  <div v-if="hasChoices" class="sm:col-span-2">
     <QueryState
       :loading="schools.isPending.value"
       :error="schools.error.value"

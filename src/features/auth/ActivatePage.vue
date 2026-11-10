@@ -12,6 +12,7 @@ import { authErrorText } from './auth-errors';
 import AuthError from './AuthError.vue';
 import AuthLayout from './AuthLayout.vue';
 import EmailLinkRequest from './EmailLinkRequest.vue';
+import { AUTH_LINK } from './auth-link';
 import { useNoReferrer } from './use-no-referrer';
 
 type ActivationState = 'pending' | 'activated' | 'linkDead' | 'linkResent' | 'failed';
@@ -94,6 +95,7 @@ onMounted(() => {
     :lead="card.leadKey ? $t(card.leadKey) : undefined"
     :lead-role="card.leadRole"
     :centered="card.bit !== undefined"
+    brand
   >
     <template v-if="card.bit" #badge>
       <InlineBit :kind="card.bit" class="self-center" />
@@ -117,5 +119,10 @@ onMounted(() => {
         {{ $t('common.retry') }}
       </AppButton>
     </template>
+    <p v-if="state !== 'activated'" class="text-center text-sm">
+      <RouterLink :to="{ name: 'login' }" :class="AUTH_LINK">{{
+        $t('auth.backToLogin')
+      }}</RouterLink>
+    </p>
   </AuthLayout>
 </template>

@@ -58,7 +58,7 @@ async function submit() {
   <form
     ref="formElement"
     data-step="change-password"
-    class="flex flex-col gap-[18px]"
+    class="flex flex-col gap-5"
     @submit.prevent="submit"
   >
     <!-- Password managers file the saved entry under the username; this field is never shown or edited. -->
@@ -79,7 +79,6 @@ async function submit() {
         name="currentPassword"
         :label="$t('auth.changePassword.currentPassword')"
         autocomplete="current-password"
-        placeholder="••••••••"
         :error="fieldErrors.currentPassword"
         required
         @input="dismiss('currentPassword')"

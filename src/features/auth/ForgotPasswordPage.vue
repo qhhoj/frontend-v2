@@ -16,11 +16,6 @@ const sent = ref(false);
     :centered="sent"
     brand
   >
-    <template #header-end>
-      <RouterLink :to="{ name: 'login' }" :class="AUTH_LINK">{{
-        $t('auth.submitLogin')
-      }}</RouterLink>
-    </template>
     <template v-if="sent" #badge>
       <InlineBit kind="envelope" class="self-center" />
     </template>

@@ -12,6 +12,7 @@ import AuthLayout from './AuthLayout.vue';
 import AuthSubmit from './AuthSubmit.vue';
 import NewPasswordPair from './NewPasswordPair.vue';
 import { useAuthAction } from './use-auth-action';
+import { AUTH_LINK } from './auth-link';
 import { useNoReferrer } from './use-no-referrer';
 
 /** After a dead-link answer the address is replaced by this word: the token leaves the address bar and history, and a reload shows the dead card. */
@@ -66,6 +67,7 @@ async function submit() {
     :lead="linkDead ? $t('auth.resetPassword.deadLead') : undefined"
     :lead-role="linkDead ? 'alert' : undefined"
     :centered="linkDead"
+    brand
   >
     <template v-if="linkDead" #badge>
       <InlineBit kind="sweat" class="self-center" />
@@ -73,7 +75,7 @@ async function submit() {
     <AppButton v-if="linkDead" tone="primary" block :to="{ name: 'forgot-password' }">{{
       $t('auth.resetPassword.requestNew')
     }}</AppButton>
-    <form v-else ref="formElement" class="flex flex-col gap-[18px]" @submit.prevent="submit">
+    <form v-else ref="formElement" class="flex flex-col gap-5" @submit.prevent="submit">
       <NewPasswordPair
         v-model:password="form.newPassword"
         v-model:confirmation="form.confirmation"
@@ -83,5 +85,10 @@ async function submit() {
       <AuthError :text="summary" />
       <AuthSubmit :pending="pending">{{ $t('auth.resetPassword.submit') }}</AuthSubmit>
     </form>
+    <p class="text-center text-sm">
+      <RouterLink :to="{ name: 'login' }" :class="AUTH_LINK">{{
+        $t('auth.backToLogin')
+      }}</RouterLink>
+    </p>
   </AuthLayout>
 </template>
