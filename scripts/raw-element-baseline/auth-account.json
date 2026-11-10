@@ -1,104 +1,39 @@
 {
-  "features/account/data/DataExportCard.vue": {
-    "SettingsCard": 1,
-    "SettingsNotice": 1,
-    "verdict-tone": 6
-  },
-  "features/account/data/DataSettingsPage.vue": {
-    "SettingsCard": 3,
-    "SettingsNotice": 2,
-    "fixed-size": 1
-  },
-  "features/account/profile/AboutEditor.vue": {
-    "textarea": 1
-  },
-  "features/account/profile/DefaultsFields.vue": {
-    "AuthSelect": 2,
-    "fixed-size": 1
-  },
   "features/account/profile/IdentityFields.vue": {
     "AuthField": 1
   },
   "features/account/profile/OrganizationsEditor.vue": {
-    "SettingsCard": 1,
-    "fixed-size": 4,
     "verdict-tone": 2
-  },
-  "features/account/profile/ProfileSettingsPage.vue": {
-    "SettingsCard": 1,
-    "SettingsNotice": 2,
-    "button": 1,
-    "fixed-size": 2
   },
   "features/account/profile/SaveErrorSummary.vue": {
     "verdict-tone": 2
   },
   "features/account/security/AddSecurityKeyForm.vue": {
-    "AuthField": 2,
-    "SettingsCard": 1,
-    "SettingsNotice": 1
+    "AuthField": 2
   },
   "features/account/security/ApiTokenSection.vue": {
-    "AuthField": 1,
-    "SettingsCard": 1,
-    "SettingsNotice": 1
+    "AuthField": 1
   },
   "features/account/security/EnrollPasswordStep.vue": {
     "AuthField": 1
-  },
-  "features/account/security/EnrollScanStep.vue": {
-    "SettingsNotice": 1
-  },
-  "features/account/security/LockedSecurity.vue": {
-    "SettingsCard": 1,
-    "SettingsNotice": 1
-  },
-  "features/account/security/LogoutEverywhereSection.vue": {
-    "SettingsCard": 1
-  },
-  "features/account/security/PasswordSection.vue": {
-    "SettingsCard": 1,
-    "SettingsNotice": 2
-  },
-  "features/account/security/QrCode.vue": {
-    "fixed-size": 1
-  },
-  "features/account/security/RegenerateCodesCard.vue": {
-    "SettingsCard": 1
   },
   "features/account/security/RemoveSecurityKeyDialog.vue": {
     "AuthField": 1
   },
   "features/account/security/ScratchCodesPanel.vue": {
-    "SettingsNotice": 1,
-    "button": 1,
-    "checkbox": 1
-  },
-  "features/account/security/SecondFactorCodeField.vue": {
-    "AuthField": 1,
     "button": 1
   },
-  "features/account/security/SecurityKeys.vue": {
-    "fixed-size": 2
+  "features/account/security/SecondFactorCodeField.vue": {
+    "AuthField": 1
   },
   "features/account/security/SocialLinksSection.vue": {
-    "AuthField": 1,
-    "SettingsCard": 1
+    "AuthField": 1
   },
   "features/account/security/TotpEnrollWizard.vue": {
-    "SettingsCard": 1,
     "verdict-tone": 1
   },
   "features/account/security/TotpRow.vue": {
-    "fixed-size": 1,
     "verdict-tone": 1
-  },
-  "features/account/security/TwoFactorSection.vue": {
-    "SettingsCard": 1,
-    "SettingsNotice": 1
-  },
-  "features/account/settings/SettingsLayout.vue": {
-    "fixed-size": 1
   },
   "features/auth/AuthBadge.vue": {
     "verdict-tone": 6

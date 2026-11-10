@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import Notice from '@/components/ui/Notice.vue';
 import type { RouteLocationNormalized } from 'vue-router';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { onBeforeRouteLeave, useRouter } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import CopyButton from '@/components/CopyButton.vue';
 import AppButton from '@/components/ui/AppButton.vue';
+import Checkbox from '@/components/ui/Checkbox.vue';
 import { buttonClasses } from '@/components/ui/button-classes';
 import { useSessionStore } from '@/stores/session.store';
-import SettingsNotice from '../settings/SettingsNotice.vue';
 import { formatScratchCode, scratchCodesText } from './totp-setup';
 
 /** Not an AppButton: while the box is unticked a click still reminds and moves focus to it. */
@@ -24,7 +25,7 @@ watch(sessionEnded, (ended) => ended && emit('done'));
 const acknowledged = ref(false);
 const reminded = ref(false);
 const leaveOpen = ref(false);
-const checkbox = ref<HTMLInputElement | null>(null);
+const checkbox = ref<{ $el: HTMLElement } | null>(null);
 const text = computed(() => scratchCodesText(props.codes, props.username));
 /** The destination the viewer was heading to while the dialog asks; set only while it is open. */
 let pendingLeave: RouteLocationNormalized | null = null;
@@ -60,7 +61,7 @@ function clearPrintScope() {
 function finish() {
   if (acknowledged.value) return emit('done');
   reminded.value = true;
-  checkbox.value?.focus();
+  checkbox.value?.$el.querySelector('input')?.focus();
 }
 /** Leaving is held back until the viewer answers the dialog. Leave repeats the navigation once: a Back goes back, anything else pushes. */
 function leaveAnyway() {
@@ -101,7 +102,7 @@ onBeforeRouteLeave((to) => {
 
 <template>
   <div class="flex flex-col gap-4">
-    <SettingsNotice tone="success" bit="crown">{{ notice }}</SettingsNotice>
+    <Notice tone="success" bit="crown">{{ notice }}</Notice>
     <p class="text-sm text-muted">{{ $t('settings.codes.warning') }}</p>
     <ul
       data-print-target
@@ -125,10 +126,7 @@ onBeforeRouteLeave((to) => {
         {{ $t('settings.codes.print') }}
       </AppButton>
     </div>
-    <label class="flex min-h-11 items-center gap-3 text-sm font-semibold">
-      <input ref="checkbox" v-model="acknowledged" type="checkbox" class="size-5 accent-accent" />
-      {{ $t('settings.codes.acknowledge') }}
-    </label>
+    <Checkbox ref="checkbox" v-model="acknowledged" :label="$t('settings.codes.acknowledge')" />
     <p v-if="reminded && !acknowledged" class="text-meta text-negative">
       {{ $t('settings.codes.acknowledgeFirst') }}
     </p>

@@ -420,12 +420,10 @@
       "languageHint": "Chọn sẵn ở trang nộp bài.",
       "noLanguage": "Chưa chọn",
       "timezoneHint": "Dùng cho giờ bắt đầu kỳ thi và thời điểm nộp bài.",
-      "interfaceLanguage": "Ngôn ngữ giao diện",
-      "deviceOnly": "Chỉ áp dụng cho trình duyệt này, không lưu vào tài khoản."
-    },
-    "locales": {
-      "vi": "Tiếng Việt",
-      "en": "English"
+      "browserZone": "Theo trình duyệt",
+      "timezoneFilter": "Tìm múi giờ",
+      "timezoneSearch": "Gõ để tìm múi giờ",
+      "timezoneNone": "Không có múi giờ nào khớp"
     },
     "organizations": {
       "title": "Tổ chức",
@@ -446,13 +444,6 @@
       "lead": "Thông tin công khai và lựa chọn mặc định khi bạn nộp bài.",
       "viewPublic": "Xem hồ sơ công khai",
       "firstNameHint": "Hiện trên trang cá nhân, bảng xếp hạng và bình luận. Tên đăng nhập {username} không đổi được.",
-      "aboutViews": "Cách xem phần giới thiệu",
-      "aboutTab": {
-        "write": "Soạn thảo",
-        "saved": "Bản đã lưu"
-      },
-      "aboutHelp": "Hỗ trợ Markdown. Tab “Bản đã lưu” cập nhật sau khi bạn lưu.",
-      "aboutEmpty": "Chưa có phần giới thiệu.",
       "fixToSave": "Sửa {count} lỗi rồi bấm Lưu lại.",
       "fieldName": {
         "firstName": "Tên hiển thị",

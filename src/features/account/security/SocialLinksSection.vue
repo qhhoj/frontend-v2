@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import { removeSocialLink } from '@/api/account.api';
@@ -11,7 +12,6 @@ import AuthField from '@/features/auth/AuthField.vue';
 import { SOCIAL_PROVIDER_LABELS } from '@/features/auth/social-providers';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import { translate } from '@/i18n';
-import SettingsCard from '../settings/SettingsCard.vue';
 import { SOCIAL_LINKS_KEY, useSocialLinksQuery } from './security.queries';
 
 /** The social accounts that sign in to this account, each with "Gỡ liên kết". Left out while there is none. */
@@ -59,8 +59,10 @@ async function remove() {
 </script>
 
 <template>
-  <SettingsCard
+  <Card
     v-if="providers.length || done"
+    padding="lg"
+    class="flex flex-col gap-5"
     :title="$t('settings.social.title')"
     :lead="$t('settings.social.lead')"
   >
@@ -105,5 +107,5 @@ async function remove() {
       </div>
       <template #error><AuthError :text="errorText" /></template>
     </ConfirmDialog>
-  </SettingsCard>
+  </Card>
 </template>

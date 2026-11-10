@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import AuthField from '@/features/auth/AuthField.vue';
 import OtpInput from '@/features/auth/OtpInput.vue';
 import { normalizeBackupCode } from '@/lib/otp';
@@ -43,12 +44,8 @@ async function switchMode() {
       :label="$t('settings.secondFactor.backupLabel')"
       :error="error"
     />
-    <button
-      type="button"
-      class="inline-flex min-h-11 items-center self-start text-sm font-semibold text-accent-text"
-      @click="switchMode"
-    >
+    <AppButton tone="link" class="self-start font-semibold" @click="switchMode">
       {{ backupMode ? $t('settings.secondFactor.useApp') : $t('settings.secondFactor.useBackup') }}
-    </button>
+    </AppButton>
   </div>
 </template>

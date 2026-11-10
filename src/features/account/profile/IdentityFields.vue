@@ -7,7 +7,7 @@ import { profileFieldId } from './profile-field-ids';
 import { FIRST_NAME_MAX_LENGTH, storedLength } from './profile-draft';
 
 /** Board SetProfile, first card: the public name, then the default slot (the submit defaults), then the about text. */
-defineProps<{ username: string; savedAboutHtml: string; errors: Record<string, string> }>();
+defineProps<{ username: string; errors: Record<string, string> }>();
 const firstName = defineModel<string>('firstName', { required: true });
 const about = defineModel<string>('about', { required: true });
 const aboutEditor = ref<{ showWriteTab: () => void } | null>(null);
@@ -21,6 +21,7 @@ defineExpose({ showAboutWriteTab: () => aboutEditor.value?.showWriteTab() });
     name="firstName"
     class="scroll-mb-28"
     autocomplete="nickname"
+    :placeholder="username"
     :label="$t('settings.profile.fieldName.firstName')"
     :hint="$t('settings.profile.firstNameHint', { username })"
     :error="errors.firstName"
@@ -30,10 +31,5 @@ defineExpose({ showAboutWriteTab: () => aboutEditor.value?.showWriteTab() });
     </template>
   </AuthField>
   <slot />
-  <AboutEditor
-    ref="aboutEditor"
-    v-model="about"
-    :saved-html="savedAboutHtml"
-    :error="errors.about"
-  />
+  <AboutEditor ref="aboutEditor" v-model="about" :error="errors.about" />
 </template>

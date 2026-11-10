@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
+import Notice from '@/components/ui/Notice.vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import type { SecurityKey } from '@/api/types/account';
@@ -7,8 +9,6 @@ import AuthError from '@/features/auth/AuthError.vue';
 import AuthField from '@/features/auth/AuthField.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import { useSessionStore } from '@/stores/session.store';
-import SettingsCard from '../settings/SettingsCard.vue';
-import SettingsNotice from '../settings/SettingsNotice.vue';
 import { addSecurityKey } from './security-key';
 import { SECURITY_KEYS_KEY } from './security.queries';
 
@@ -42,7 +42,12 @@ async function submit() {
 </script>
 
 <template>
-  <SettingsCard :title="$t('settings.keys.addTitle')" :lead="$t('settings.keys.addLead')">
+  <Card
+    padding="lg"
+    class="flex flex-col gap-5"
+    :title="$t('settings.keys.addTitle')"
+    :lead="$t('settings.keys.addLead')"
+  >
     <form
       ref="formElement"
       data-step="add-key"
@@ -70,7 +75,7 @@ async function submit() {
         required
         @input="dismiss('currentPassword')"
       />
-      <SettingsNotice v-if="pending" tone="info">{{ $t('settings.keys.waiting') }}</SettingsNotice>
+      <Notice v-if="pending" tone="info">{{ $t('settings.keys.waiting') }}</Notice>
       <AuthError :text="summary" />
       <div class="flex flex-wrap gap-2.5">
         <AppButton type="submit" tone="primary" :disabled="!canSubmit" :loading="pending">
@@ -81,5 +86,5 @@ async function submit() {
         </AppButton>
       </div>
     </form>
-  </SettingsCard>
+  </Card>
 </template>

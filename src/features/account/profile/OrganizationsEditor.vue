@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { ArrowDown, ArrowUp, Building2, X } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import type { ProfileOrganization } from '@/api/types/profile';
@@ -6,7 +7,6 @@ import IconButton from '@/components/ui/IconButton.vue';
 import { translate } from '@/i18n';
 import OfficialLockNote from '@/features/official-mode/OfficialLockNote.vue';
 import { useOfficialLock } from '@/features/official-mode/use-official-lock';
-import SettingsCard from '../settings/SettingsCard.vue';
 import { moveItem, withoutItem } from './organization-order';
 import { profileFieldId } from './profile-field-ids';
 
@@ -55,7 +55,9 @@ function leave(organization: ProfileOrganization) {
 </script>
 
 <template>
-  <SettingsCard
+  <Card
+    padding="lg"
+    class="flex flex-col gap-5"
     :title="$t('settings.organizations.title')"
     :lead="$t('settings.organizations.lead')"
   >
@@ -76,7 +78,7 @@ function leave(organization: ProfileOrganization) {
           aria-hidden="true"
           class="flex size-10 shrink-0 items-center justify-center rounded-cell bg-accent-soft text-accent-text"
         >
-          <Building2 class="size-[18px]" />
+          <Building2 class="size-5" />
         </span>
         <span class="flex min-w-0 flex-1 flex-col gap-1">
           <strong class="font-semibold">{{ organization.name }}</strong>
@@ -105,7 +107,7 @@ function leave(organization: ProfileOrganization) {
             :aria-describedby="describedBy"
             @click="move(organization, -1)"
           >
-            <ArrowUp aria-hidden="true" class="size-[18px]" />
+            <ArrowUp aria-hidden="true" class="size-5" />
           </IconButton>
           <IconButton
             tone="secondary"
@@ -115,7 +117,7 @@ function leave(organization: ProfileOrganization) {
             :aria-describedby="describedBy"
             @click="move(organization, 1)"
           >
-            <ArrowDown aria-hidden="true" class="size-[18px]" />
+            <ArrowDown aria-hidden="true" class="size-5" />
           </IconButton>
           <IconButton
             v-if="!organization.isAdmin"
@@ -126,7 +128,7 @@ function leave(organization: ProfileOrganization) {
             :aria-describedby="describedBy"
             @click="leave(organization)"
           >
-            <X aria-hidden="true" class="size-[18px]" />
+            <X aria-hidden="true" class="size-5" />
           </IconButton>
         </span>
         <p v-if="organization.isAdmin" class="w-full text-meta text-muted">
@@ -147,5 +149,5 @@ function leave(organization: ProfileOrganization) {
     >
       {{ $t('settings.organizations.browse') }}
     </RouterLink>
-  </SettingsCard>
+  </Card>
 </template>

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
+import Chip from '@/components/ui/Chip.vue';
+import Notice from '@/components/ui/Notice.vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed, useId } from 'vue';
 import { DATA_EXPORT_DOWNLOAD_URL, requestDataExport } from '@/api/account.api';
@@ -12,18 +15,16 @@ import { formatFileSize } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
-import SettingsCard from '../settings/SettingsCard.vue';
-import SettingsNotice from '../settings/SettingsNotice.vue';
 import { daysLeft, exportFileOf, requestRuleOf, timeLeft } from './data-export';
 import { DATA_EXPORT_KEY } from './data.queries';
 
 /** The file (or why there is none), the last request, and the request button with the rule that governs it. */
 const props = defineProps<{ status: DataExportStatus; username: string }>();
 const CHIPS = {
-  none: 'bg-verdict-pending-bg text-verdict-pending',
-  expired: 'bg-verdict-tle-bg text-verdict-tle',
-  preparing: 'bg-accent-soft text-accent-soft-text',
-  ready: 'bg-verdict-ac-bg text-verdict-ac',
+  none: 'neutral',
+  expired: 'warning',
+  preparing: 'accent',
+  ready: 'success',
 } as const;
 const locale = useLocaleStore();
 const now = useNow(60_000);
@@ -68,13 +69,14 @@ async function request() {
 </script>
 
 <template>
-  <SettingsCard :title="$t('settings.data.title')" :lead="$t('settings.data.lead')">
-    <template #header-end>
-      <span
-        class="rounded-pill px-2.5 py-0.5 text-caption leading-4 font-semibold"
-        :class="CHIPS[file.kind]"
-        >{{ $t(`settings.data.state.${file.kind}`) }}</span
-      >
+  <Card
+    padding="lg"
+    class="flex flex-col gap-5"
+    :title="$t('settings.data.title')"
+    :lead="$t('settings.data.lead')"
+  >
+    <template #actions>
+      <Chip size="sm" :tone="CHIPS[file.kind]">{{ $t(`settings.data.state.${file.kind}`) }}</Chip>
     </template>
     <div
       v-if="file.kind === 'ready'"
@@ -118,11 +120,11 @@ async function request() {
         <dd class="m-0">{{ when(status.nextPrepareAt) }}</dd>
       </template>
     </dl>
-    <SettingsNotice v-if="failureText" tone="error" bit="sweat">{{ failureText }}</SettingsNotice>
+    <Notice v-if="failureText" tone="danger" bit="sweat">{{ failureText }}</Notice>
     <div class="flex flex-col items-start gap-1.5">
       <AppButton
         data-request-export
-        tone="primary"
+        :tone="file.kind === 'ready' ? 'secondary' : 'primary'"
         :disabled="!canRequest"
         :aria-describedby="ruleText ? ruleId : undefined"
         @click="request"
@@ -131,5 +133,5 @@ async function request() {
       </AppButton>
       <p v-if="ruleText" :id="ruleId" class="text-meta text-muted">{{ ruleText }}</p>
     </div>
-  </SettingsCard>
+  </Card>
 </template>

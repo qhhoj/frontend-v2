@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
@@ -6,7 +7,6 @@ import AppButton from '@/components/ui/AppButton.vue';
 import AuthError from '@/features/auth/AuthError.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import { useSessionStore } from '@/stores/session.store';
-import SettingsCard from '../settings/SettingsCard.vue';
 
 /** Never rendered while viewing as another user: the page leaves it out then (Decision 16). */
 const session = useSessionStore();
@@ -26,8 +26,13 @@ async function logoutEverywhere() {
 </script>
 
 <template>
-  <SettingsCard :title="$t('settings.logoutAll.title')" :lead="$t('settings.logoutAll.lead')">
-    <template #header-end>
+  <Card
+    padding="lg"
+    class="flex flex-col gap-5"
+    :title="$t('settings.logoutAll.title')"
+    :lead="$t('settings.logoutAll.lead')"
+  >
+    <template #actions>
       <AppButton tone="danger" @click="open">
         {{ $t('settings.logoutAll.action') }}
       </AppButton>
@@ -43,5 +48,5 @@ async function logoutEverywhere() {
     >
       <template #error><AuthError :text="summary" /></template>
     </ConfirmDialog>
-  </SettingsCard>
+  </Card>
 </template>

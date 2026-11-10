@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
+import Notice from '@/components/ui/Notice.vue';
 import AppButton from '@/components/ui/AppButton.vue';
-import SettingsCard from '../settings/SettingsCard.vue';
-import SettingsNotice from '../settings/SettingsNotice.vue';
 
 /**
  * Board SetImpersonation: what the owner could do, each with the reason it is locked. The backend refuses all four while
@@ -15,7 +15,7 @@ const LOCKED_ACTIONS = [
   },
   {
     titleKey: 'settings.twoFactor.title',
-    actionKey: 'settings.totp.enable',
+    actionKey: 'settings.totp.wizardTitle',
     reasonKey: 'settings.locked.reason',
   },
   {
@@ -32,10 +32,13 @@ const LOCKED_ACTIONS = [
 </script>
 
 <template>
-  <SettingsCard :title="$t('settings.locked.title')" :lead="$t('settings.locked.lead')">
-    <SettingsNotice tone="warning" bit="security">{{
-      $t('settings.locked.notice')
-    }}</SettingsNotice>
+  <Card
+    padding="lg"
+    class="flex flex-col gap-5"
+    :title="$t('settings.locked.title')"
+    :lead="$t('settings.locked.lead')"
+  >
+    <Notice tone="warning" bit="security">{{ $t('settings.locked.notice') }}</Notice>
     <ul class="m-0 flex list-none flex-col p-0">
       <li
         v-for="action in LOCKED_ACTIONS"
@@ -50,5 +53,5 @@ const LOCKED_ACTIONS = [
         <AppButton disabled>{{ $t(action.actionKey) }}</AppButton>
       </li>
     </ul>
-  </SettingsCard>
+  </Card>
 </template>

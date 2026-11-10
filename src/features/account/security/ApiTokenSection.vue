@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
+import Notice from '@/components/ui/Notice.vue';
 import { ref } from 'vue';
 import { regenerateApiToken } from '@/api/account.api';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
@@ -7,8 +9,6 @@ import AppButton from '@/components/ui/AppButton.vue';
 import AuthError from '@/features/auth/AuthError.vue';
 import AuthField from '@/features/auth/AuthField.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
-import SettingsCard from '../settings/SettingsCard.vue';
-import SettingsNotice from '../settings/SettingsNotice.vue';
 
 /** The new token lives in this component only: leaving the page drops it for good (board SetSecurityA). */
 const token = ref<string | null>(null);
@@ -36,14 +36,19 @@ async function regenerate() {
 </script>
 
 <template>
-  <SettingsCard :title="$t('settings.token.title')" :lead="$t('settings.token.lead')">
-    <template #header-end>
+  <Card
+    padding="lg"
+    class="flex flex-col gap-5"
+    :title="$t('settings.token.title')"
+    :lead="$t('settings.token.lead')"
+  >
+    <template #actions>
       <AppButton @click="open">
         {{ $t('settings.token.create') }}
       </AppButton>
     </template>
     <template v-if="token">
-      <SettingsNotice tone="warning">{{ $t('settings.token.copyNow') }}</SettingsNotice>
+      <Notice tone="warning">{{ $t('settings.token.copyNow') }}</Notice>
       <div class="flex flex-wrap items-center gap-3">
         <code
           class="min-w-0 flex-1 rounded-cell border border-line bg-surface-strong px-3.5 py-3 font-mono text-sm font-semibold break-all"
@@ -75,5 +80,5 @@ async function regenerate() {
       </div>
       <template #error><AuthError :text="summary" /></template>
     </ConfirmDialog>
-  </SettingsCard>
+  </Card>
 </template>

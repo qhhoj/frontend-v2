@@ -31,7 +31,7 @@ function askToRemove(key: SecurityKey) {
         aria-hidden="true"
         class="flex size-10 shrink-0 items-center justify-center rounded-cell bg-accent-soft text-accent-text"
       >
-        <KeyRound class="size-[18px]" />
+        <KeyRound class="size-5" />
       </span>
       <span class="flex min-w-0 flex-1 flex-col gap-0.5">
         <strong class="font-semibold">{{ $t('settings.keys.title') }}</strong>
@@ -49,7 +49,7 @@ function askToRemove(key: SecurityKey) {
       :registers-wait="false"
       @retry="keys.refetch()"
     >
-      <template #skeleton><SkeletonBlock class="h-[60px] w-full" /></template>
+      <template #skeleton><SkeletonBlock class="h-15 w-full" /></template>
       <EmptyState v-if="!keys.data.value?.length" compact kind="security">
         {{ $t('settings.keys.empty') }}
       </EmptyState>

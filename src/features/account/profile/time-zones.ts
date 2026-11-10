@@ -18,12 +18,23 @@ function optionLabel(zone: string, at: Date): string {
   }
 }
 
+export interface TimeZoneOption {
+  value: string;
+  label: string;
+}
+
 /**
- * Every zone the browser lists, plus the stored one first when the browser does not list it (a legacy alias).
- * Node 22 lists `Asia/Saigon`, not `Asia/Ho_Chi_Minh`, so the default Vietnamese zone takes the first branch.
+ * Every zone the browser lists, with the `pinned` zones first (the site's, the browser's) and the stored one next when the
+ * browser does not list it (a legacy alias). Node 22 lists `Asia/Saigon`, not `Asia/Ho_Chi_Minh`, so a pinned or stored
+ * zone is always added by name, and every zone appears once.
  */
-export function timeZoneOptions(current: string, at: Date): { value: string; label: string }[] {
+export function timeZoneOptions(
+  current: string,
+  at: Date,
+  pinned: readonly string[] = [],
+): TimeZoneOption[] {
   const listed = Intl.supportedValuesOf('timeZone');
-  const zones = listed.includes(current) ? listed : [current, ...listed];
+  const head = [...pinned, current].filter((zone, index, all) => all.indexOf(zone) === index);
+  const zones = [...head, ...listed.filter((zone) => !head.includes(zone))];
   return zones.map((zone) => ({ value: zone, label: optionLabel(zone, at) }));
 }
