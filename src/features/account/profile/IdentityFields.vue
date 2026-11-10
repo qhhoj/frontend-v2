@@ -21,7 +21,6 @@ defineExpose({ showAboutWriteTab: () => aboutEditor.value?.showWriteTab() });
     name="firstName"
     class="scroll-mb-28"
     autocomplete="nickname"
-    :placeholder="username"
     :label="$t('settings.profile.fieldName.firstName')"
     :hint="$t('settings.profile.firstNameHint', { username })"
     :error="errors.firstName"

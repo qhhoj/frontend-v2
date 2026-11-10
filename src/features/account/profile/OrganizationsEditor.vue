@@ -57,7 +57,7 @@ function leave(organization: ProfileOrganization) {
 <template>
   <Card
     padding="lg"
-    class="flex flex-col gap-5"
+    class="flex flex-col gap-5 [&>header]:mb-0"
     :title="$t('settings.organizations.title')"
     :lead="$t('settings.organizations.lead')"
   >

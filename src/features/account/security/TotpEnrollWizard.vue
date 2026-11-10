@@ -49,7 +49,7 @@ function onConfirmed(value: string[]) {
 <template>
   <Card
     padding="lg"
-    class="flex flex-col gap-5"
+    class="flex flex-col gap-5 [&>header]:mb-0"
     :title="$t('settings.totp.wizardTitle')"
     :lead="$t('settings.totp.wizardLead')"
   >

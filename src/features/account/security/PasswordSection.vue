@@ -13,12 +13,18 @@ const formKey = ref(0);
 const reloadSession = () => session.refresh();
 
 const card = ref<{ $el: HTMLElement } | null>(null);
+/** The card's `h2` takes the focus, so a screen reader reads the heading, not the whole card. */
+function focusHeading() {
+  const heading = card.value?.$el.querySelector<HTMLElement>('h2');
+  heading?.setAttribute('tabindex', '-1');
+  heading?.focus();
+}
 
 /** The remounted form takes the focus with it, so the focus goes to the card heading instead. */
 function finished() {
   reloadFailed.value = false;
   formKey.value += 1;
-  void nextTick(() => card.value?.$el.focus());
+  void nextTick(() => focusHeading());
 }
 </script>
 
@@ -26,8 +32,7 @@ function finished() {
   <Card
     ref="card"
     padding="lg"
-    class="flex flex-col gap-5 focus-visible:outline-none"
-    tabindex="-1"
+    class="flex flex-col gap-5 [&>header]:mb-0"
     :title="$t('settings.password.title')"
     :lead="$t('settings.password.lead')"
   >

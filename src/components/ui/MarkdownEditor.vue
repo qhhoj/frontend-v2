@@ -52,7 +52,11 @@ const tab = ref<'write' | 'preview'>('write');
 const rendered = useDebouncedPreview(
   () => text.value,
   (markdown) => props.preview(markdown),
-  { alsoWatch: [() => props.previewKey] },
+  {
+    // A hidden preview pane sends nothing (a one-pane editor on its Write tab); the split view shows both from `lg`.
+    isActive: () => props.split || tab.value === 'preview',
+    alsoWatch: [() => props.previewKey],
+  },
 );
 const tabItems = computed(() =>
   (['write', 'preview'] as const).map((key) => ({

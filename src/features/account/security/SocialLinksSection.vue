@@ -62,7 +62,7 @@ async function remove() {
   <Card
     v-if="providers.length || done"
     padding="lg"
-    class="flex flex-col gap-5"
+    class="flex flex-col gap-5 [&>header]:mb-0"
     :title="$t('settings.social.title')"
     :lead="$t('settings.social.lead')"
   >

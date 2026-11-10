@@ -24,7 +24,7 @@ const unavailable = computed(
     <Card
       v-if="session.impersonatorId !== null"
       padding="lg"
-      class="flex flex-col gap-5"
+      class="flex flex-col gap-5 [&>header]:mb-0"
       :title="$t('settings.data.title')"
     >
       <Notice tone="warning" bit="security">{{ $t('settings.data.locked') }}</Notice>
@@ -33,7 +33,7 @@ const unavailable = computed(
       <Card
         v-if="unavailable"
         padding="lg"
-        class="flex flex-col gap-5"
+        class="flex flex-col gap-5 [&>header]:mb-0"
         :title="$t('settings.data.title')"
       >
         <Notice tone="info">{{ $t('settings.data.unavailable') }}</Notice>
@@ -50,7 +50,7 @@ const unavailable = computed(
       </QueryState>
       <Card
         padding="lg"
-        class="flex flex-col gap-5"
+        class="flex flex-col gap-5 [&>header]:mb-0"
         :title="$t('settings.data.limitsTitle')"
         :lead="$t('settings.data.limitsLead')"
       >

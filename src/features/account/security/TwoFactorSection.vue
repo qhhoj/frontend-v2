@@ -41,9 +41,15 @@ function totpDisabled() {
 }
 /** The wizard's codes step is gone once it closes: the focus goes to this card's heading, not the body. */
 const card = ref<{ $el: HTMLElement } | null>(null);
+/** The card's `h2` takes the focus, so a screen reader reads the heading, not the whole card. */
+function focusHeading() {
+  const heading = card.value?.$el.querySelector<HTMLElement>('h2');
+  heading?.setAttribute('tabindex', '-1');
+  heading?.focus();
+}
 function enrolled() {
   panel.value = 'none';
-  void nextTick(() => card.value?.$el.focus());
+  void nextTick(() => focusHeading());
 }
 </script>
 
@@ -51,8 +57,7 @@ function enrolled() {
   <Card
     ref="card"
     padding="lg"
-    class="flex flex-col gap-5 focus-visible:outline-none"
-    tabindex="-1"
+    class="flex flex-col gap-5 [&>header]:mb-0"
     :title="$t('settings.twoFactor.title')"
     :lead="$t('settings.twoFactor.lead')"
   >
