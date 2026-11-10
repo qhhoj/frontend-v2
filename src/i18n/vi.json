@@ -947,6 +947,7 @@
     "package_too_large": "Gói đề lớn hơn 512 MiB nên không tạo được.",
     "package_unavailable": "Chưa tạo được gói đề. Thử lại sau ít phút.",
     "package_not_built": "Gói đề chưa được yêu cầu. Bấm “Tải gói đề” lần nữa.",
+    "package_data_unsaved": "Lần lưu dữ liệu test gần nhất chưa xong nên chưa đóng gói được. Hãy lưu lại dữ liệu test rồi thử lại.",
     "tag_limit_reached": "Tổ chức đã đủ 100 thẻ bài tập.",
     "unexpected_tag": "Chỉ thao tác gắn hoặc gỡ thẻ mới cần chọn thẻ.",
     "quota_exceeded": "Tổ chức đã hết hạn mức. Liên hệ quản trị để tăng hạn mức.",

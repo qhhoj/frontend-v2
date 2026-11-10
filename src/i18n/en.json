@@ -947,6 +947,7 @@
     "package_too_large": "The package is larger than 512 MiB, so it cannot be built.",
     "package_unavailable": "The package could not be built. Try again in a few minutes.",
     "package_not_built": "No package was requested yet. Press “Download package” again.",
+    "package_data_unsaved": "The last test-data save did not finish, so no package can be built. Save the test data again, then retry.",
     "tag_limit_reached": "The organization already has 100 problem tags.",
     "unexpected_tag": "Only adding or removing a tag takes a tag.",
     "quota_exceeded": "The organization has used up its quota. Ask an administrator to raise it.",

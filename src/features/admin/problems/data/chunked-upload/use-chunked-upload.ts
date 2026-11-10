@@ -50,13 +50,16 @@ export interface InterruptedUpload {
 const sameFile = (left: File, right: File) =>
   left.name === right.name && left.size === right.size && left.lastModified === right.lastModified;
 
-/** The refusals after which the session is useless: it is gone, its bytes are wrong, or the zip itself is refused. */
-const endsSession = (error: unknown) =>
+/** The refusals after which the session is useless: it is gone, its bytes are wrong, the zip itself is refused, or the problem was renamed (the session only resumes under the old code, which 404s). */
+export const endsSession = (error: unknown) =>
   !(error instanceof ApiError) ||
   error.code === FILE_UNREADABLE ||
   error.code === 'not_found' ||
   error.issues.some(
-    (issue) => issue.code === 'upload_hash_mismatch' || issue.code.startsWith('zip_'),
+    (issue) =>
+      issue.code === 'upload_hash_mismatch' ||
+      issue.code === 'problem_renamed' ||
+      issue.code.startsWith('zip_'),
   );
 
 /** The wait before the next `finishing` round: the backoff (capped), or the server's `Retry-After` when longer. */
