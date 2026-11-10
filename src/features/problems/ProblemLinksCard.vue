@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { FileText } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
@@ -11,20 +10,20 @@ import { shortLinkPath } from '@/features/short-links/short-link-path';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import type { BitLook } from '@/mascot/bit-sprite';
-import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
-import { HEADER_BUTTON_IDLE_CLASS, PDF_PILL_CLASS } from './links-card-classes';
-import PdfButton from './PdfButton.vue';
-import { hasTextStatement } from './statement-presence';
+import PdfLink from './PdfLink.vue';
 
 /**
- * Where else this problem leads (board C): a titled card whose header holds the actions (the PDF pill, the copy-link icon)
+ * Where else this problem leads (board C): a titled card whose header holds the actions (the PDF link, the copy-link icon)
  * and whose rows are the links, each led by a small Bit in a fitting look (the viewer's own avatar for their submissions). One PDF control: the uploaded statement when there
  * is one, else the rendered text statement.
  */
-const props = defineProps<{ problem: ProblemDetail; hasEditorial: boolean }>();
+/** `showPdf` is off where the limit strip under the title already offers the PDF (phones, tablets). */
+const props = withDefaults(
+  defineProps<{ problem: ProblemDetail; hasEditorial: boolean; showPdf?: boolean }>(),
+  { showPdf: true },
+);
 const route = useRoute();
-const locale = useLocaleStore();
 const session = useSessionStore();
 
 const PLAIN_LOOK: BitLook = { headgear: 'none', palette: 'terracotta' };
@@ -87,29 +86,15 @@ const ROW =
 <template>
   <Card
     as="nav"
+    padding="sm"
+    :title="$t('problem.rail.links.title')"
     :aria-label="$t('problem.rail.links.label')"
     data-testid="header-actions"
-    class="p-2"
   >
-    <div class="flex items-center gap-2 py-1.5 pr-1.5 pl-3">
-      <h2 class="flex-1 section-title">
-        {{ $t('problem.rail.links.title') }}
-      </h2>
-      <a
-        v-if="problem.pdfStatementUrl"
-        :href="problem.pdfStatementUrl"
-        target="_blank"
-        rel="noopener"
-        data-testid="pdf-statement-link"
-        :title="$t('problem.rail.links.pdfStatement')"
-        :aria-label="$t('problem.rail.links.pdfStatement')"
-        :class="[PDF_PILL_CLASS, HEADER_BUTTON_IDLE_CLASS]"
-      >
-        <FileText aria-hidden="true" class="size-4" />PDF
-      </a>
-      <PdfButton v-else-if="hasTextStatement(problem)" :code="problem.code" :lang="locale.locale" />
+    <template #actions>
+      <PdfLink v-if="showPdf" :problem="problem" />
       <ShortLinkButton compact :path="shortLinkPath({ kind: 'problem', code: problem.code })" />
-    </div>
+    </template>
     <ul class="m-0 list-none border-t border-line p-0 pt-1">
       <li v-for="row in rows" :key="row.key" :class="DIVIDED">
         <RouterLink :to="row.to" :data-testid="`${row.key}-link`" :class="ROW">

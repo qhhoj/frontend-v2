@@ -17,8 +17,8 @@ const uptime = computed(() =>
   <Card
     as="article"
     :data-testid="`judge-card-${judge.name}`"
-    class="flex flex-col gap-3 p-5"
-    :class="{ 'opacity-80': !judge.online }"
+    padding="md"
+    class="flex flex-col gap-3"
   >
     <header class="flex items-center justify-between gap-2">
       <h3 class="font-display text-subtitle leading-7 font-bold">{{ judge.name }}</h3>

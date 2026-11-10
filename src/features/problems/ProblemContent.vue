@@ -112,6 +112,7 @@ function panelIdOf(tabId: string) {
           <StatementNote v-if="!problem.translated && !problem.pdfStatementUrl" class="mt-4" />
           <PdfStatement
             v-if="problem.pdfStatementUrl"
+            :problem="problem"
             :url="problem.pdfStatementUrl"
             :untranslated="!problem.translated"
             class="mt-4 mb-6 last:mb-0"
@@ -146,7 +147,7 @@ function panelIdOf(tabId: string) {
         :narrow="layout.facts"
       />
       <ProblemMySubmissions v-if="isSignedIn" :code="problem.code" :scale="scoreScale" />
-      <ProblemLinksCard :problem="problem" :has-editorial="hasEditorial" />
+      <ProblemLinksCard :problem="problem" :has-editorial="hasEditorial" :show-pdf="!usesSheet" />
     </aside>
     <div :class="['min-w-0', layout.left]">
       <CommentsSection

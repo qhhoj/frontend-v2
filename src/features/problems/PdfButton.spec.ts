@@ -143,13 +143,11 @@ describe('PdfButton', () => {
     await flushPromises();
     const retry = () => wrapper.get('button');
     expect(retry().attributes('aria-disabled')).toBe('true');
-    expect(retry().classes()).toContain('cursor-not-allowed');
     expect(retry().text()).toContain('30');
     await retry().trigger('click');
     expect(probe).toHaveBeenCalledTimes(1);
     await vi.advanceTimersByTimeAsync(30_000);
-    expect(retry().attributes('aria-disabled')).toBe('false');
-    expect(retry().classes()).not.toContain('cursor-not-allowed');
+    expect(retry().attributes('aria-disabled')).toBeUndefined();
     expect(retry().attributes('aria-label')).toBe('Thử lại');
     expect(vi.getTimerCount()).toBe(0);
   });

@@ -2,6 +2,7 @@ import { computed, ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import type { ContestDetail } from '@/api/types/contests';
 import type { ProblemDetail } from '@/api/types/problems';
+import { translate } from '@/i18n';
 import { MAX_SOURCE_LENGTH, codePointCount } from '@/lib/source';
 import { useSubmitMessage } from './submit-message';
 import { useResubmitPrefill } from './use-resubmit-prefill';
@@ -62,6 +63,17 @@ export function useSubmitForm(
     useScoreScale(() => problem.value, contest),
   );
   const canSubmit = computed(() => isReady.value && !submitting.value);
+  /**
+   * Why the submit button is off, for the states that print nothing else: no language, nothing typed, no file picked. A file-only
+   * language without uploads, no attempts left and an over-long source each have their own visible line already.
+   */
+  const blockedReason = computed(() => {
+    if (submitting.value) return null;
+    if (languageId.value === null) return translate('submit.blocked.noLanguage');
+    if (uploadsOff.value || attemptsLeft.value === 0 || tooLong.value) return null;
+    if (hasInput.value) return null;
+    return translate(fileMode.value ? 'submit.blocked.noFile' : 'submit.blocked.noSource');
+  });
 
   // The viewer's code decides the language: once they have typed, a profile arriving late must not relabel it.
   watch(hasViewerCode, (hasCode) => hasCode && languageState.keepLanguage());
@@ -84,6 +96,7 @@ export function useSubmitForm(
     clearFile,
     loadFile,
     canSubmit,
+    blockedReason,
     length,
     tooLong,
     attemptsLeft,

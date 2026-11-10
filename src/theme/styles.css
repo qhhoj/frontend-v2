@@ -669,7 +669,7 @@
 }
 
 /* The copy button itself. */
-/* Compact (28px) so it fits a title row or a one-line block; ::before widens the touch target to 44px without growing the pill. */
+/* Compact (28px) so it fits a title row or a one-line block; ::before widens the mouse target; on touch the pill is 44px. */
 @utility copy-block {
   position: relative;
   display: inline-flex;
@@ -690,6 +690,11 @@
     position: absolute;
     inset: -0.5rem -0.25rem;
   }
+  /* Touch: the pill itself is the 44 px target (the standard's touch rule), not only its ::before. */
+  @media (pointer: coarse), (max-width: 40rem) {
+    min-height: 2.75rem;
+    padding-inline: 0.9rem;
+  }
 }
 @utility copy-icon {
   width: 0.9em;
@@ -697,25 +702,6 @@
   fill: none;
   stroke: currentColor;
   stroke-width: 1.5;
-}
-
-@keyframes qh-pdf-ring-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-/* Indeterminate: the PDF backend reports no progress. */
-@utility pdf-ring {
-  width: 1.25rem;
-  height: 1.25rem;
-  flex-shrink: 0;
-  border-radius: 9999px;
-  background: conic-gradient(var(--qh-accent) 0 28%, var(--qh-line-strong) 28% 100%);
-  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black calc(100% - 2px));
-  animation: qh-pdf-ring-spin 1s linear infinite;
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
 }
 
 /* Code editor: the CodeMirror host and the textarea fallback share one box, font and line height, so the swap does not jump (code-editor-cm.ts reads the same variables). */

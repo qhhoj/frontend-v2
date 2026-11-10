@@ -4,7 +4,7 @@ import { computed, onScopeDispose, ref, toRef, watch } from 'vue';
 import { problemPdfUrl } from '@/api/problems.api';
 import type { StatementLanguage } from '@/api/types/problems';
 import { translate } from '@/i18n';
-import { HEADER_BUTTON_IDLE_CLASS, PDF_PILL_CLASS } from './links-card-classes';
+import AppButton from '@/components/ui/AppButton.vue';
 import { usePdfStatement } from './use-pdf-statement';
 import type { PdfFailure } from './use-pdf-statement';
 
@@ -21,8 +21,10 @@ const { phase, failure, retryAt, start } = usePdfStatement(
   toRef(props, 'lang'),
 );
 const root = ref<HTMLElement | null>(null);
-const button = ref<HTMLButtonElement | null>(null);
-const link = ref<HTMLAnchorElement | null>(null);
+/** AppButton exposes `focus`; the swap below moves the user's focus between the two. */
+type Focusable = { focus: (options?: FocusOptions) => void };
+const button = ref<Focusable | null>(null);
+const link = ref<Focusable | null>(null);
 const href = computed(() => problemPdfUrl(props.code, props.lang));
 const failureKey = computed(() => FAILURE_KEYS[failure.value ?? 'failed']);
 
@@ -47,14 +49,7 @@ const mustWait = computed(() => retryAt.value > now.value);
 const secondsToRetry = computed(() => Math.max(1, Math.floor((retryAt.value - now.value) / 1000)));
 const busy = computed(() => phase.value === 'preparing');
 const unavailable = computed(() => busy.value || mustWait.value);
-const buttonClass = computed(() => {
-  if (busy.value) return 'border-line-accent bg-accent-soft text-accent-soft-text';
-  if (mustWait.value) return 'cursor-not-allowed border-line bg-surface text-muted';
-  if (phase.value === 'failed')
-    return 'cursor-pointer border-line bg-surface text-negative hover:bg-surface-hover';
-  return HEADER_BUTTON_IDLE_CLASS;
-});
-/** The pill shows only "PDF", so its name and tooltip say what it does in the current phase. */
+/** The button shows only "PDF", so its name and tooltip say what it does in the current phase. */
 const name = computed(() => {
   if (busy.value) return translate('problem.pdfPreparing');
   if (mustWait.value) return translate('problem.pdfRetryIn', { seconds: secondsToRetry.value });
@@ -88,36 +83,35 @@ watch(
 
 <template>
   <div ref="root" class="relative">
-    <a
+    <AppButton
       v-if="phase === 'ready'"
       ref="link"
+      tone="primary"
+      size="sm"
       :href="href"
       target="_blank"
       rel="noopener"
       :title="$t('problem.pdfOpen')"
       :aria-label="$t('problem.pdfOpen')"
-      :class="PDF_PILL_CLASS"
-      class="border-transparent bg-gradient-accent text-on-accent"
     >
-      <ExternalLink class="size-4" aria-hidden="true" />PDF
-    </a>
-    <button
+      <template #icon><ExternalLink class="size-4" aria-hidden="true" /></template>
+      PDF
+    </AppButton>
+    <AppButton
       v-else
       ref="button"
-      type="button"
+      size="sm"
+      :tone="phase === 'failed' ? 'danger' : 'secondary'"
       data-testid="pdf-button"
       :title="name"
       :aria-label="name"
-      :aria-busy="busy ? 'true' : undefined"
-      :aria-disabled="unavailable"
-      :class="[PDF_PILL_CLASS, buttonClass]"
+      :loading="busy"
+      :disabled="mustWait"
       @click="onClick"
     >
-      <span v-if="busy" class="pdf-ring" aria-hidden="true" />
-      <FileText v-else class="size-4" aria-hidden="true" />{{
-        mustWait ? `${secondsToRetry}s` : 'PDF'
-      }}
-    </button>
+      <template #icon><FileText class="size-4" aria-hidden="true" /></template>
+      {{ mustWait ? `${secondsToRetry}s` : 'PDF' }}
+    </AppButton>
     <span
       v-if="phase === 'failed'"
       class="absolute top-full right-0 z-10 mt-2 w-56 rounded-row border border-line bg-surface-solid p-3 text-sm text-negative"

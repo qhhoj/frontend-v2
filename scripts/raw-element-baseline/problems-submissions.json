@@ -1,25 +1,10 @@
 {
-  "features/external-judge/ExternalJudgeStatusCard.vue": {
-    "GlassCard": 1
-  },
   "features/problems/FileDropzone.vue": {
     "file": 1
   },
   "features/problems/FilterToggle.vue": {
     "button": 1,
     "disabled-opacity": 1
-  },
-  "features/problems/PdfButton.vue": {
-    "button": 1
-  },
-  "features/problems/ProblemFactsCard.vue": {
-    "button": 1
-  },
-  "features/problems/ProblemFilterChips.vue": {
-    "button": 2
-  },
-  "features/problems/ProblemFilters.vue": {
-    "button": 1
   },
   "features/problems/ProblemPointsPicker.vue": {
     "button": 1
@@ -38,7 +23,6 @@
   },
   "features/runtimes/LanguageRow.vue": {
     "button": 1,
-    "uppercase": 1,
     "verdict-tone": 1
   },
   "features/submissions/AdvancedFiltersButton.vue": {

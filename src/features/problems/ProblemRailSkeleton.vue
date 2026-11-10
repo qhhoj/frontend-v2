@@ -10,11 +10,14 @@ const session = useSessionStore();
 
 <template>
   <div class="flex flex-col gap-3.5">
-    <Card class="flex flex-col gap-3 p-4">
-      <SkeletonBlock class="h-12 w-full" />
-      <SkeletonBlock pill class="h-11 w-full" />
+    <Card padding="sm">
+      <SkeletonBlock text class="mb-4 w-1/2 text-title" />
+      <div class="flex flex-col gap-3">
+        <SkeletonBlock pill class="h-11 w-full" />
+        <SkeletonBlock text class="w-3/4 text-meta" />
+      </div>
     </Card>
-    <Card class="p-4">
+    <Card padding="sm">
       <div data-skeleton-region="limits" class="grid grid-cols-2 gap-x-3 gap-y-3.5">
         <div v-for="fact in FACT_COUNT" :key="fact" data-skeleton-region="limit">
           <SkeletonBlock text class="w-16 text-meta" />
@@ -22,9 +25,13 @@ const session = useSessionStore();
         </div>
       </div>
     </Card>
-    <Card v-if="session.status === 'authenticated'" class="flex flex-col gap-2 p-4">
+    <Card v-if="session.status === 'authenticated'" padding="sm">
+      <SkeletonBlock text class="mb-4 w-1/2 text-title" />
       <SkeletonBlock v-for="row in 3" :key="row" class="h-11" />
     </Card>
-    <Card class="p-2"><SkeletonBlock class="h-11 w-full" /></Card>
+    <Card padding="sm">
+      <SkeletonBlock text class="mb-4 w-1/3 text-title" />
+      <SkeletonBlock v-for="row in 3" :key="row" class="h-11" />
+    </Card>
   </div>
 </template>

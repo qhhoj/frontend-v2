@@ -1194,8 +1194,6 @@
         "stdio": "Standard I/O",
         "status": "Status",
         "untried": "Not tried",
-        "hideTypes": "Hide problem types",
-        "showTypes": "Show problem types",
         "contestPoints": "Contest points"
       },
       "mine": {
@@ -1229,6 +1227,8 @@
     "pointsFilter": "Filter by points",
     "listName": "Problem list",
     "pointsRange": "Points {min}–{max}",
+    "pointsAnyBound": "Any",
+    "pointsDone": "Done",
     "pointsMin": "Points from",
     "pointsMax": "Points to",
     "columns": {
@@ -1257,7 +1257,6 @@
     "randomFailed": "Could not pick a problem, try again.",
     "hideSolved": "Hide solved",
     "hasEditorial": "Has editorial",
-    "signInToHide": "Sign in to hide solved problems",
     "filtering": "Filtering:",
     "clearAll": "Clear all",
     "removeFilter": "Remove filter: {name}",
@@ -1265,7 +1264,6 @@
     "count": "{n} problem | {n} problems",
     "legendPartial": "= partial scoring",
     "legend": "Legend",
-    "pagerTop": "Problem pages, top of the list",
     "uncategorized": "Uncategorized",
     "attemptedLong": "Attempted, not solved",
     "notTried": "Not tried",
@@ -1486,6 +1484,11 @@
     "inContest": "Contest: {name}",
     "attemptsLeft": "{count} attempt left | {count} attempts left",
     "attemptsNone": "No attempts left for this problem.",
+    "blocked": {
+      "noLanguage": "No language available to submit this problem.",
+      "noSource": "Paste your source code to submit.",
+      "noFile": "Choose a file to submit."
+    },
     "resubmitUnavailable": "The submission to resubmit could not be loaded.",
     "file": {
       "limit": "Up to {size}",

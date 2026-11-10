@@ -1194,8 +1194,6 @@
         "stdio": "Bàn phím / màn hình",
         "status": "Trạng thái",
         "untried": "Chưa thử",
-        "hideTypes": "Ẩn dạng bài",
-        "showTypes": "Hiện dạng bài",
         "contestPoints": "Điểm kỳ thi"
       },
       "mine": {
@@ -1229,6 +1227,8 @@
     "pointsFilter": "Lọc theo điểm",
     "listName": "Danh sách bài",
     "pointsRange": "Điểm {min}–{max}",
+    "pointsAnyBound": "Bất kỳ",
+    "pointsDone": "Xong",
     "pointsMin": "Điểm từ",
     "pointsMax": "Điểm đến",
     "columns": {
@@ -1257,7 +1257,6 @@
     "randomFailed": "Chưa chọn được bài, thử lại.",
     "hideSolved": "Ẩn bài đã giải",
     "hasEditorial": "Có lời giải",
-    "signInToHide": "Đăng nhập để ẩn bài đã giải",
     "filtering": "Đang lọc:",
     "clearAll": "Xóa tất cả",
     "removeFilter": "Bỏ lọc: {name}",
@@ -1265,7 +1264,6 @@
     "count": "{n} bài",
     "legendPartial": "= chấm từng phần",
     "legend": "Chú giải",
-    "pagerTop": "Các trang bài tập, đầu danh sách",
     "uncategorized": "Chưa phân loại",
     "attemptedLong": "Đã thử, chưa đúng",
     "notTried": "Chưa thử",
@@ -1486,6 +1484,11 @@
     "inContest": "Kỳ thi: {name}",
     "attemptsLeft": "Còn {count} lượt nộp | Còn {count} lượt nộp",
     "attemptsNone": "Đã hết lượt nộp cho bài này.",
+    "blocked": {
+      "noLanguage": "Chưa có ngôn ngữ nào để nộp bài này.",
+      "noSource": "Dán mã nguồn để nộp.",
+      "noFile": "Chọn một tệp để nộp."
+    },
     "resubmitUnavailable": "Không lấy được bài nộp để nộp lại.",
     "file": {
       "limit": "Tối đa {size}",

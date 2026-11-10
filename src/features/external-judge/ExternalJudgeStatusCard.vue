@@ -1,52 +1,53 @@
 <script setup lang="ts">
-import GlassCard from '@/components/GlassCard.vue';
+import { computed } from 'vue';
+import Card from '@/components/ui/Card.vue';
+import Chip from '@/components/ui/Chip.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
+import { useSessionStore } from '@/stores/session.store';
 import { useExternalJudgeStatusQuery } from './external-judge.queries';
 
 /** Whether the external judge is set up and reachable, and the OJs it serves. Mounted by the runtimes page. */
 const query = useExternalJudgeStatusQuery();
 const locale = useLocaleStore();
+const session = useSessionStore();
+/** Visitors have no use for "not set up" (or a card that may vanish): they see it only once the judge is known to be on; staff always. */
+const isHidden = computed(() => !session.isStaff && query.data.value?.enabled !== true);
 </script>
 
 <template>
-  <GlassCard class="p-5" data-testid="external-judge-status">
-    <h2 class="font-display text-subtitle leading-7 font-bold">
-      {{ $t('externalJudge.status.title') }}
-    </h2>
+  <Card
+    v-if="!isHidden"
+    padding="md"
+    :title="$t('externalJudge.status.title')"
+    data-testid="external-judge-status"
+  >
     <QueryState
       :loading="query.isPending.value"
       :error="query.error.value"
       @retry="() => void query.refetch()"
     >
       <template #skeleton>
-        <SkeletonBlock text class="mt-3 w-40" />
+        <SkeletonBlock text class="w-40" />
         <SkeletonBlock text class="mt-2 w-64" />
       </template>
       <template v-if="query.data.value">
-        <p v-if="!query.data.value.enabled" class="mt-2 text-muted">
+        <p v-if="!query.data.value.enabled" class="text-muted">
           {{ $t('externalJudge.status.disabled') }}
         </p>
         <template v-else>
-          <p
-            class="mt-2 font-semibold"
-            :class="query.data.value.reachable ? 'text-positive' : 'text-negative'"
-          >
+          <Chip :tone="query.data.value.reachable ? 'success' : 'danger'" size="md" dot>
             {{
               query.data.value.reachable
                 ? $t('externalJudge.status.reachable')
                 : $t('externalJudge.status.unreachable')
             }}
-          </p>
+          </Chip>
           <ul v-if="query.data.value.ojs.length > 0" class="mt-3 flex flex-wrap gap-2">
-            <li
-              v-for="oj in query.data.value.ojs"
-              :key="oj"
-              class="rounded-pill border border-line px-3 py-1 text-sm"
-            >
-              {{ oj }}
+            <li v-for="oj in query.data.value.ojs" :key="oj">
+              <Chip size="md">{{ oj }}</Chip>
             </li>
           </ul>
           <p v-if="query.data.value.checkedAt" class="mt-3 text-caption leading-4 text-muted">
@@ -59,5 +60,5 @@ const locale = useLocaleStore();
         </template>
       </template>
     </QueryState>
-  </GlassCard>
+  </Card>
 </template>

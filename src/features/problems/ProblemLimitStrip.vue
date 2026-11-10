@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { Award, Check, Clock, Cpu, FileText } from 'lucide-vue-next';
+import { Award, Check, Clock, Cpu } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { ContestDetail } from '@/api/types/contests';
 import type { ProblemDetail } from '@/api/types/problems';
 import Chip from '@/components/ui/Chip.vue';
+import PdfLink from './PdfLink.vue';
 import OwnResultChip from '@/features/contests/OwnResultChip.vue';
 import { formatMemoryLimit, formatNumber, formatTimeLimit } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -13,8 +14,8 @@ import { viewerStatusOf } from './viewer-status';
 
 /**
  * Where the rail is not beside the statement (phones, tablets), the limits and the viewer's status sit under the
- * title as chips, with one line of links (PDF, editorial) and the solve counts, so nobody scrolls past the statement for them.
- * The chips use the limit colours of the facts card. Inside the viewer's contest, like the facts card, the points are the
+ * title as chips, with one line of links (the editorial) and the solve counts, so nobody scrolls past the statement for them.
+ * The chips are neutral: a tone means a status. The PDF control is here (rendered PDF) or inline in the statement (uploaded); beside the statement it is in the links card. Inside the viewer's contest, like the facts card, the points are the
  * contest's and the status is the viewer's own cell; the site-wide solve counts are left out.
  */
 const props = defineProps<{
@@ -40,17 +41,17 @@ const LINK = 'inline-flex min-h-11 items-center gap-1 font-semibold text-accent-
   <div data-testid="problem-limit-strip" class="mt-3 flex flex-col gap-1">
     <ul class="m-0 flex list-none flex-wrap gap-1.5 p-0">
       <li>
-        <Chip size="md" tone="tag-5" :icon="Clock" :title="$t('problem.limits.time')">
+        <Chip size="md" :icon="Clock" :title="$t('problem.limits.time')">
           <span class="font-mono tabular-nums">{{ formatTimeLimit(problem.timeLimit) }}</span>
         </Chip>
       </li>
       <li>
-        <Chip size="md" tone="tag-6" :icon="Cpu" :title="$t('problem.limits.memory')">
+        <Chip size="md" :icon="Cpu" :title="$t('problem.limits.memory')">
           <span class="font-mono tabular-nums">{{ formatMemoryLimit(problem.memoryLimit) }}</span>
         </Chip>
       </li>
       <li>
-        <Chip size="md" tone="tag-8" :icon="Award" :title="$t('problem.limits.points')">
+        <Chip size="md" :icon="Award" :title="$t('problem.limits.points')">
           <span class="font-mono tabular-nums">{{ contestPoints ?? points }}</span>
           <template v-if="contestPoints === null && problem.partial">
             · {{ $t('problem.strip.partial') }}</template
@@ -75,14 +76,8 @@ const LINK = 'inline-flex min-h-11 items-center gap-1 font-semibold text-accent-
       </li>
     </ul>
     <p class="flex flex-wrap items-center gap-x-3 text-meta text-muted">
-      <a
-        v-if="problem.pdfStatementUrl"
-        :href="problem.pdfStatementUrl"
-        target="_blank"
-        rel="noopener"
-        :class="LINK"
-        ><FileText aria-hidden="true" class="size-4" />PDF</a
-      >
+      <!-- An uploaded PDF is shown inline right under the tabs; only the rendered one needs a button up here. -->
+      <PdfLink v-if="!problem.pdfStatementUrl" :problem="problem" />
       <RouterLink
         v-if="hasEditorial"
         :to="{ query: { ...route.query, tab: 'editorial' } }"

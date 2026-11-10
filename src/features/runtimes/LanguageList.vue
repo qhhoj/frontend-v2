@@ -2,6 +2,8 @@
 import { computed, ref } from 'vue';
 import type { RuntimeJudge, RuntimeLanguage } from '@/api/types/runtimes';
 import { LANGUAGE_LOGO_LICENCES_URL } from '@/components/language/language-icons';
+import EmptyState from '@/components/EmptyState.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
 import Card from '@/components/ui/Card.vue';
 import LanguageRow from './LanguageRow.vue';
@@ -47,7 +49,12 @@ const toggle = (key: string) => (openKey.value = openKey.value === key ? null : 
         @toggle="toggle(language.key)"
       />
     </ul>
-    <p v-else class="px-6 py-6 text-muted">{{ $t('runtimes.noMatch') }}</p>
+    <EmptyState v-else compact>
+      {{ $t('runtimes.noMatch') }}
+      <template #action>
+        <AppButton @click="search = ''">{{ $t('common.clearSearch') }}</AppButton>
+      </template>
+    </EmptyState>
     <p class="border-t border-line px-4 py-3 text-meta text-muted sm:px-6">
       {{ $t('runtimes.logoCredit') }}
       <a

@@ -53,7 +53,7 @@ const detailId = computed(() => `language-${props.language.key}`);
         <Chip tone="accent" class="font-mono">.{{ language.extension }}</Chip>
         <span v-if="language.fileOnly" class="ml-2">{{ $t('submit.fileOnly') }}</span>
       </p>
-      <h4 class="text-caption leading-4 font-semibold text-muted uppercase">
+      <h4 class="text-caption leading-4 font-semibold text-muted">
         {{ $t('runtimes.perJudge') }}
       </h4>
       <ul class="flex flex-col gap-1">
