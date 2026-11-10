@@ -14,10 +14,9 @@ defineEmits<{ toggle: [] }>();
 <template>
   <AppButton
     data-testid="advanced-filters"
-    class="shrink-0"
+    class="shrink-0 max-sm:px-3.5"
     :aria-expanded="open"
     :aria-controls="panelId"
-    :pressed="count > 0"
     @click="$emit('toggle')"
   >
     <template #icon><SlidersHorizontal class="size-4" aria-hidden="true" /></template>

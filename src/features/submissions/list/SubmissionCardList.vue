@@ -56,7 +56,7 @@ type PhoneMetaPart =
   | { kind: 'user' }
   | { kind: 'time'; text: string }
   | { kind: 'language'; key: string; name: string };
-/** The phone's second line: the age first (a cut line must keep it), then the submitter, the run time once judged and the language. */
+/** The phone's second line: the age first, then the submitter (never dropped: its name ellipsizes in its rating colour), then the run time and language as far as the row has room. */
 const phoneMeta = (row: SubmissionListItem): PhoneMetaPart[] => [
   ...(isShown('when') ? [{ kind: 'when' as const }] : []),
   ...(isShown('user') && row.user ? [{ kind: 'user' as const }] : []),
@@ -104,29 +104,33 @@ const PILL =
           :label="contestProblemOf(row)?.label"
           show-code
         />
-        <p class="mt-0.5 min-w-0 truncate text-meta text-muted md:hidden">
+        <p class="mt-0.5 flex min-w-0 items-center overflow-hidden text-meta text-muted md:hidden">
           <template v-for="(part, index) in phoneMeta(row)" :key="part.kind">
-            <span v-if="index > 0" aria-hidden="true" class="mx-1">·</span>
+            <span v-if="index > 0" aria-hidden="true" class="mx-0.5 shrink-0">·</span>
             <time
               v-if="part.kind === 'when'"
-              class="whitespace-nowrap"
+              class="shrink-0 whitespace-nowrap"
               :datetime="row.date"
               :title="formatDate(row.date, 'datetime', locale.locale)"
               >{{ formatAgoCompact(row.date, now, locale.locale) }}</time
             >
+            <!-- The name is the one part that shrinks (ellipsis, rating colour kept): the line never drops the submitter. -->
             <UserLink
               v-else-if="part.kind === 'user'"
+              class="shrink-[2] !min-w-32"
               :username="row.user!.username"
               :rating="row.user!.rating"
             />
             <!-- Icon and name inline, not one box: a cut line ends in "…" after the icon instead of dropping both. -->
-            <template v-else-if="part.kind === 'language'"
-              ><LanguageIcon :language-key="part.key" class="mr-1 align-text-bottom" /><span
-                class="font-mono whitespace-nowrap"
+            <span
+              v-else-if="part.kind === 'language'"
+              class="flex min-w-0 shrink-[8] items-center gap-1"
+              ><LanguageIcon :language-key="part.key" class="shrink-0" /><span
+                class="truncate font-mono"
                 >{{ part.name }}</span
-              ></template
+              ></span
             >
-            <span v-else class="font-mono whitespace-nowrap">{{ part.text }}</span>
+            <span v-else class="shrink-0 font-mono whitespace-nowrap">{{ part.text }}</span>
           </template>
         </p>
         <div
@@ -157,11 +161,11 @@ const PILL =
         <RouterLink
           :to="{ name: 'submission', params: { id: row.id } }"
           :aria-label="rowLabel(row)"
-          class="relative inline-flex min-h-8 items-center rounded-pill px-2.5 touch:after:absolute touch:after:-inset-y-1.5 touch:after:inset-x-0 font-mono text-caption leading-4 font-bold whitespace-nowrap hover:brightness-95 md:justify-center md:px-3"
+          class="relative inline-flex min-h-8 items-center gap-1 rounded-pill px-2.5 touch:after:absolute touch:after:-inset-y-1.5 touch:after:inset-x-0 font-mono text-caption leading-4 font-bold whitespace-nowrap hover:brightness-95 md:justify-center md:px-3"
           :class="VERDICT_TONE_CLASSES[submissionVerdictOf(row).tone]"
           >{{ submissionVerdictOf(row).code
           }}<span class="max-md:hidden"
-            >{{ ' · ' }}{{ $t(submissionVerdictOf(row).labelKey) }}</span
+            >· {{ $t(submissionVerdictOf(row).labelKey) }}</span
           ></RouterLink
         >
         <div

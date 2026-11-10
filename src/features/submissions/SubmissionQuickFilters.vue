@@ -58,7 +58,7 @@ const toggle = (chip: QuickFilter) =>
     <AppButton
       v-for="chip in chips"
       :key="chip"
-      class="shrink-0 whitespace-nowrap"
+      class="shrink-0 whitespace-nowrap max-sm:px-3.5"
       :data-quick-filter="chip"
       :pressed="isOn(chip)"
       @click="toggle(chip)"
@@ -86,7 +86,7 @@ const toggle = (chip: QuickFilter) =>
     <AppButton
       v-if="comparing !== null"
       data-testid="compare-mode"
-      class="shrink-0 whitespace-nowrap"
+      class="shrink-0 whitespace-nowrap max-sm:px-3.5"
       :pressed="comparing"
       @click="emit('toggleCompare')"
     >

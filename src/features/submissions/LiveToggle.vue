@@ -10,7 +10,7 @@ const emit = defineEmits<{ 'update:live': [live: boolean] }>();
   <AppButton
     tone="ghost"
     data-testid="live-toggle"
-    class="shrink-0"
+    class="shrink-0 aria-pressed:!border-transparent aria-pressed:!bg-transparent aria-pressed:!text-positive"
     :pressed="live"
     :title="$t('submissions.rail.live')"
     @click="emit('update:live', !live)"
