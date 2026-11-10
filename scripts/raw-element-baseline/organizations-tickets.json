@@ -1,4 +1,7 @@
 {
+  "features/organizations/MemberRows.vue": {
+    "table": 1
+  },
   "features/organizations/OrganizationCardSkeleton.vue": {
     "fixed-size": 3
   },

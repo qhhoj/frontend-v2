@@ -1,65 +1,82 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import type { OrganizationMember } from '@/api/types/organizations';
 import UserName from '@/components/UserName.vue';
-import DataTable from '@/components/ui/DataTable.vue';
-import type { DataTableColumn } from '@/components/ui/DataTableColumns';
-import { formatNumber } from '@/lib/format';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
+import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 
 /** The number columns a list can show, in the order given. */
 export type MemberColumn = 'performancePoints' | 'points' | 'problemCount';
 
-/** Columns after the first hide below `md`: a narrow screen keeps rank, user and the first number. A row opens the profile. */
-const props = defineProps<{ members: OrganizationMember[]; columns: MemberColumn[] }>();
-const { t } = useI18n();
+/** Columns after the first hide below `md`: a narrow screen keeps rank, user and the first number. */
+defineProps<{ members: OrganizationMember[]; columns: MemberColumn[] }>();
 const locale = useLocaleStore();
-const AVATAR_PX = 24;
-const tableColumns = computed<DataTableColumn[]>(() => [
-  { key: 'rank', label: t('orgs.columns.rank'), align: 'end' },
-  { key: 'user', label: t('orgs.columns.user'), priority: 'primary' },
-  ...props.columns.map((column, index) => ({
-    key: column,
-    label: t(`orgs.columns.${column}`),
-    align: 'end' as const,
-    hideBelow: index > 0 ? ('md' as const) : undefined,
-  })),
-]);
+const narrowClass = (index: number) => (index > 0 ? 'hidden md:table-cell' : '');
 const formattedValue = (member: OrganizationMember, column: MemberColumn) =>
   formatNumber(member[column], locale.locale);
 </script>
 
 <template>
-  <DataTable
-    :columns="tableColumns"
-    :rows="members"
-    :row-key="(member) => member.id"
-    :row-to="(member) => ({ name: 'user', params: { username: member.username } })"
-    :label="$t('orgMembership.membersTable')"
-    stack="scroll"
-    :sticky-columns="0"
-  >
-    <template #cell-rank="{ row }">{{ formatNumber(row.rank, locale.locale) }}</template>
-    <template #cell-user="{ row }">
-      <span class="flex min-w-0 items-center gap-2">
-        <UserAvatar :username="row.username" :size="AVATAR_PX" class="shrink-0" />
-        <span class="flex min-w-0 flex-col">
-          <UserName
-            :username="row.username"
-            :rating="row.rating"
-            class="truncate"
-            :title="row.username"
-          />
-          <span v-if="row.displayName !== row.username" class="truncate text-sm text-muted">
-            {{ row.displayName }}
-          </span>
-        </span>
-      </span>
-    </template>
-    <template v-for="column in columns" :key="column" #[`cell-${column}`]="{ row }">
-      {{ formattedValue(row, column) }}
-    </template>
-  </DataTable>
+  <table class="w-full table-fixed text-sm">
+    <colgroup>
+      <col class="w-12" />
+      <col />
+      <col
+        v-for="(column, index) in columns"
+        :key="column"
+        class="w-20"
+        :class="narrowClass(index)"
+      />
+    </colgroup>
+    <thead>
+      <tr class="text-left text-muted">
+        <th scope="col" class="py-2 pr-3 text-right font-semibold">
+          <RankColumnHeader :label="$t('orgs.columns.rank')" />
+        </th>
+        <th scope="col" class="py-2 font-semibold">{{ $t('orgs.columns.user') }}</th>
+        <th
+          v-for="(column, index) in columns"
+          :key="column"
+          scope="col"
+          class="py-2 pl-3 text-right font-semibold"
+          :class="narrowClass(index)"
+        >
+          {{ $t(`orgs.columns.${column}`) }}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="member in members" :key="member.id" class="border-t border-line">
+        <td class="py-2 pr-3 text-right font-mono">{{ member.rank }}</td>
+        <td class="py-2">
+          <div class="flex min-w-0 items-center gap-2">
+            <UserAvatar :username="member.username" :size="24" class="shrink-0" />
+            <div class="flex min-w-0 flex-col">
+              <UserName
+                :username="member.username"
+                :rating="member.rating"
+                class="truncate"
+                :title="member.username"
+              />
+              <span
+                v-if="member.displayName !== member.username"
+                class="truncate text-sm text-muted"
+              >
+                {{ member.displayName }}
+              </span>
+            </div>
+          </div>
+        </td>
+        <td
+          v-for="(column, index) in columns"
+          :key="column"
+          class="py-2 pl-3 text-right font-mono"
+          :class="narrowClass(index)"
+        >
+          {{ formattedValue(member, column) }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </template>

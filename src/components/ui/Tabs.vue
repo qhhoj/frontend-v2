@@ -125,10 +125,14 @@ async function onTabKeydown(event: KeyboardEvent, index: number) {
   scroller.value?.querySelectorAll<HTMLElement>('[role="tab"]')[target]?.focus();
 }
 
-/** What a hidden tab carries besides its count: unsaved changes, else something to fix. */
+/** An accent count says something waits for the viewer. */
+const isWaiting = (item: TabItem) => item.countTone === 'accent' && Boolean(item.count);
+
+/** What a hidden tab carries besides its count: unsaved changes, else something to fix, else what its accent count says. */
 function hintOf(item: TabItem): string | undefined {
   if (item.dirty) return t('form.saveBar.unsaved', item.dirty);
-  return item.alertLabel;
+  if (item.alertLabel) return item.alertLabel;
+  return isWaiting(item) ? (item.countLabel ?? String(item.count)) : undefined;
 }
 
 const moreItems = computed<MenuEntry[]>(() =>
@@ -139,13 +143,15 @@ const moreItems = computed<MenuEntry[]>(() =>
     ...(item.to ? { to: item.to } : { run: () => (current.value = item.key) }),
   })),
 );
-/** The strongest state among the hidden tabs, shown on the "⋯" button: something to fix, else unsaved edits. */
+/** The strongest state among the hidden tabs, shown on the "⋯" button: something to fix, else unsaved edits, else something waiting (an accent count). */
 const hiddenMark = computed(() => {
   const hidden = props.items.filter(isHidden);
   if (hidden.some((item) => item.alertLabel))
     return { tone: 'danger' as const, label: t('common.hiddenAlert') };
   if (hidden.some((item) => item.dirty))
     return { tone: 'accent' as const, label: t('common.hiddenUnsaved') };
+  const waiting = hidden.find(isWaiting);
+  if (waiting) return { tone: 'accent' as const, label: hintOf(waiting)! };
   return null;
 });
 const moreName = computed(() => props.moreLabel ?? t('nav.more'));

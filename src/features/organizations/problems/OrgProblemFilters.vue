@@ -36,7 +36,7 @@ const CHIP =
         maxlength="50"
         class="w-full sm:w-80"
       />
-      <slot name="actions" />
+      <div class="ml-auto"><slot name="actions" /></div>
     </div>
     <div class="flex flex-wrap gap-2" role="group" :aria-label="$t('orgProblems.tagFilter')">
       <button
