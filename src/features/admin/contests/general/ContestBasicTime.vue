@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { spanMessage } from '@/lib/contest-time';
 import { buttonClass } from '../../ui/controls';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
-import { useDateReset } from '@/components/ui/date-validity';
+import { useDateReset, useHasUnreadableDate } from '@/components/ui/date-validity';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import type { ContestForm } from '../contest-form';
@@ -21,7 +21,10 @@ const start = timeModel(form, 'startTime');
 const end = timeModel(form, 'endTime');
 
 const resetDates = useDateReset();
+const hasUnreadableDate = useHasUnreadableDate();
+/** Does nothing while a box holds text that does not read: it stays as typed, with its error, and the save stays refused. */
 function lastFor(minutes: number) {
+  if (hasUnreadableDate.value) return;
   const startMs = Date.parse(form.value.startTime);
   if (Number.isFinite(startMs))
     form.value.endTime = new Date(startMs + minutes * 60_000).toISOString();

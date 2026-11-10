@@ -67,3 +67,53 @@ describe('useLeaveGuard', () => {
     expect(cleanEvent.defaultPrevented).toBe(false);
   });
 });
+
+describe('useLeaveGuard with two dirty forms on one route', () => {
+  const dirty = [ref(true), ref(true)];
+  const guards: ReturnType<typeof useLeaveGuard>[] = [];
+  const Form = (index: number) =>
+    defineComponent({
+      setup() {
+        guards[index] = useLeaveGuard(dirty[index]!);
+        return () => h('form');
+      },
+    });
+  const TwoForms = defineComponent({ render: () => [h(Form(0)), h(Form(1))] });
+
+  async function mountTwoForms() {
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: '/form', component: TwoForms },
+        { path: '/other', component: { render: () => h('p') } },
+      ],
+    });
+    await router.push('/form');
+    mount(RouterView, { global: { plugins: [router] } });
+    await flushPromises();
+    return router;
+  }
+
+  it('leaves after one answer, whichever form asked', async () => {
+    dirty.forEach((flag) => (flag.value = true));
+    const router = await mountTwoForms();
+    await router.push('/other');
+    guards[0]!.leaveAnyway();
+    await flushPromises();
+    expect(router.currentRoute.value.path).toBe('/other');
+  });
+
+  it('asks again on the next attempt after the approved move was cancelled', async () => {
+    dirty.forEach((flag) => (flag.value = true));
+    const router = await mountTwoForms();
+    let blockOnce = true;
+    router.beforeEach(() => !blockOnce || ((blockOnce = false), false));
+    await router.push('/other');
+    guards[0]!.leaveAnyway();
+    await flushPromises();
+    expect(router.currentRoute.value.path).toBe('/form');
+    await router.push('/other');
+    expect(router.currentRoute.value.path).toBe('/form');
+    expect(guards[0]!.isLeaveOpen.value).toBe(true);
+  });
+});
