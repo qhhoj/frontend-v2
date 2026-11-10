@@ -56,6 +56,7 @@ const set = (field: keyof ContestFilterPatch, event: Event) =>
   <DateTimeField
     :model-value="instantOf(filters.from)"
     date-only
+    class="lg:col-span-2 xl:col-span-1"
     scale="admin"
     :label="$t('admin.contests.list.from')"
     :hint="''"
@@ -64,6 +65,7 @@ const set = (field: keyof ContestFilterPatch, event: Event) =>
   <DateTimeField
     :model-value="instantOf(filters.before)"
     date-only
+    class="lg:col-span-2 xl:col-span-1"
     scale="admin"
     :label="$t('admin.contests.list.before')"
     :hint="''"

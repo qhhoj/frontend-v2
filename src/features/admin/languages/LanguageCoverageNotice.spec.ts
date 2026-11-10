@@ -39,13 +39,13 @@ describe('LanguageCoverageNotice', () => {
     expect(wrapper.text()).toContain('1 ngôn ngữ cần thêm máy chấm');
   });
 
-  it('turns danger when a language has no online judge, and lists it once, not again as a single-judge one', () => {
+  it('stays a warning (a standing state, not an alert) when a language has no online judge, and lists it once, not again as a single-judge one', () => {
     const wrapper = mountFor([
       judgeRunning('a', { languages: ['CPP17', 'CPP20', 'PY3'] }),
       judgeRunning('b', { languages: ['CPP17', 'CPP20', 'PY3'] }),
       judgeRunning('c', { languages: ['PAS'], online: false }),
     ]);
-    expect(wrapper.findComponent(Notice).props('tone')).toBe('danger');
+    expect(wrapper.findComponent(Notice).props('tone')).toBe('warning');
     expect(wrapper.findAll('li')).toHaveLength(1);
     expect(wrapper.get('li').text()).toContain('PAS');
   });
@@ -57,7 +57,7 @@ describe('LanguageCoverageNotice', () => {
       judgeRunning('c', { languages: ['PAS'], online: false }),
     ]);
     const [unserved, single] = wrapper.findAll('li');
-    expect(wrapper.findComponent(Notice).props('tone')).toBe('danger');
+    expect(wrapper.findComponent(Notice).props('tone')).toBe('warning');
     expect(wrapper.findAll('li')).toHaveLength(2);
     expect(unserved!.text()).toBe('Không máy chấm trực tuyến nào chạy PAS: bài nộp sẽ nằm chờ.');
     expect(single!.text()).toBe(

@@ -18,8 +18,10 @@ import {
 } from '@/lib/site-time';
 
 /**
- * A date and time typed and shown in the site's time zone as `dd/mm/yyyy hh:mm`, with the zone ("GMT+7") inside the box
- * a "Bây giờ" shortcut and a calendar button that opens the browser's picker (set to the site's wall clock, not the viewer's). The model is an ISO instant (UTC) or null, the value the API sends and takes.
+ * A date and time typed and shown in the site's time zone as `dd/mm/yyyy hh:mm`, a calendar button that opens the browser's picker
+ * (set to the site's wall clock, not the viewer's) and a "Bây giờ" shortcut. The zone ("GMT+7") is the hint under the box, so the
+ * box needs only its text. The box fills its container; the box and calendar button stay together and "Bây giờ" wraps under
+ * them first. The model is an ISO instant (UTC) or null, the value the API sends and takes.
  * With `dateOnly` the box takes `dd/mm/yyyy` alone (the model is the instant that day starts, and there is no "Bây giờ").
  * Text that does not read as a date leaves the model alone, says so when the box loses focus (or Enter is pressed), and tells
  * the form above at once (`provideDateValidity`), which refuses to save or confirm while any of its date fields is unreadable.
@@ -59,6 +61,12 @@ reportUnreadableDate(isTextUnreadable, showModel);
 const zone = computed(() =>
   zoneLabel(props.timeZone, model.value ? new Date(model.value) : new Date()),
 );
+/** The zone sits in the hint under the box: the default hint is the zone alone, a custom one gets it appended (an empty one stays empty). */
+const zoneHint = computed(() => t('admin.form.dateTime.zoneHint', { zone: zone.value }));
+const shownHint = computed(() => {
+  if (props.hint === undefined) return zoneHint.value;
+  return props.hint && !props.dateOnly ? `${props.hint} · ${zoneHint.value}` : props.hint;
+});
 const shownError = computed(
   () =>
     props.error ??
@@ -116,51 +124,53 @@ function setNow() {
 <template>
   <FormField
     :label="label"
-    :hint="hint ?? $t('admin.form.dateTime.zoneHint', { zone })"
+    :hint="shownHint"
     :error="shownError"
     :input-id="inputId"
     :required="required"
     :scale="scale"
   >
     <div class="flex flex-wrap items-center gap-2">
-      <TextInput
-        v-model="text"
-        class="min-w-48 flex-1 font-mono tabular-nums"
-        autocomplete="off"
-        spellcheck="false"
-        :placeholder="
-          $t(dateOnly ? 'admin.form.dateTime.placeholderDate' : 'admin.form.dateTime.placeholder')
-        "
-        :aria-required="required || undefined"
-        :disabled="disabled"
-        @input="onInput"
-        @blur="onBlur"
-        @keydown.enter="onBlur"
+      <div
+        class="flex min-w-0 flex-1 items-center gap-2"
+        :class="dateOnly ? 'basis-44' : 'basis-60'"
       >
-        <template #suffix>
-          <span aria-hidden="true" class="font-mono text-caption leading-4">{{ zone }}</span>
-        </template>
-      </TextInput>
-      <span class="relative shrink-0">
-        <IconButton
-          :label="$t(dateOnly ? 'admin.form.dateTime.pickDate' : 'admin.form.dateTime.pick')"
-          tone="secondary"
+        <TextInput
+          v-model="text"
+          class="min-w-0 flex-1 font-mono tabular-nums"
+          autocomplete="off"
+          spellcheck="false"
+          :placeholder="
+            $t(dateOnly ? 'admin.form.dateTime.placeholderDate' : 'admin.form.dateTime.placeholder')
+          "
+          :aria-required="required || undefined"
           :disabled="disabled"
-          @click="openPicker"
+          @input="onInput"
+          @blur="onBlur"
+          @keydown.enter="onBlur"
         >
-          <CalendarDays aria-hidden="true" />
-        </IconButton>
-        <!-- The browser's picker, set to the site's wall clock and read back through the same parser as the typed box. -->
-        <input
-          ref="picker"
-          :type="dateOnly ? 'date' : 'datetime-local'"
-          :value="pickerValue"
-          tabindex="-1"
-          aria-hidden="true"
-          class="pointer-events-none absolute right-0 bottom-0 size-px opacity-0"
-          @change="onPick"
-        />
-      </span>
+        </TextInput>
+        <span class="relative shrink-0">
+          <IconButton
+            :label="$t(dateOnly ? 'admin.form.dateTime.pickDate' : 'admin.form.dateTime.pick')"
+            tone="secondary"
+            :disabled="disabled"
+            @click="openPicker"
+          >
+            <CalendarDays aria-hidden="true" />
+          </IconButton>
+          <!-- The browser's picker, set to the site's wall clock and read back through the same parser as the typed box. -->
+          <input
+            ref="picker"
+            :type="dateOnly ? 'date' : 'datetime-local'"
+            :value="pickerValue"
+            tabindex="-1"
+            aria-hidden="true"
+            class="pointer-events-none absolute right-0 bottom-0 size-px opacity-0"
+            @change="onPick"
+          />
+        </span>
+      </div>
       <AppButton
         v-if="hasNowButton"
         tone="secondary"
