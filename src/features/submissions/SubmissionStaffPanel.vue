@@ -6,9 +6,9 @@ import { ApiError } from '@/api/client';
 import { abortSubmission, rejectSubmission, rejudgeSubmission } from '@/api/submission-actions.api';
 import type { SubmissionDetail } from '@/api/types/submissions';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
 import SubmissionLockControl from './SubmissionLockControl.vue';
-import { BUTTON } from '@/features/admin/ui/controls';
+import AppButton from '@/components/ui/AppButton.vue';
+import Notice from '@/components/ui/Notice.vue';
 import { failureTextOf, hasIssueCode } from '@/features/admin/ui/admin-errors';
 import { useAdminMutation } from '@/features/admin/ui/use-admin-mutation';
 import { hasPermission } from '@/lib/permissions';
@@ -179,17 +179,18 @@ async function confirmAction() {
 
     <div class="flex flex-wrap gap-3">
       <template v-for="action in order" :key="action">
-        <button
+        <AppButton
           v-if="actions[action] !== 'hidden'"
-          type="button"
-          :class="BUTTON.danger"
-          :aria-disabled="!isReady(action) || undefined"
+          tone="danger"
+          :disabled="!isReady(action)"
           :aria-describedby="!isReady(action) ? reasonIdOf(action) : undefined"
           @click="openAction(action)"
         >
-          <component :is="STAFF_ICONS[action]" class="size-4 shrink-0" aria-hidden="true" />
+          <template #icon>
+            <component :is="STAFF_ICONS[action]" class="size-4 shrink-0" aria-hidden="true" />
+          </template>
           {{ $t(`admin.staff.buttons.${action}`) }}
-        </button>
+        </AppButton>
       </template>
     </div>
     <ul class="flex flex-col gap-1 text-sm text-muted">
@@ -200,7 +201,9 @@ async function confirmAction() {
 
     <SubmissionLockControl v-if="submission.viewer.canLock" :submission="submission" />
 
-    <AdminStatus v-if="outcome" :kind="outcome.kind" :text="outcome.text" />
+    <Notice v-if="outcome" :tone="outcome.kind === 'done' ? 'success' : 'danger'">{{
+      outcome.text
+    }}</Notice>
 
     <ConfirmDialog
       v-if="pending"

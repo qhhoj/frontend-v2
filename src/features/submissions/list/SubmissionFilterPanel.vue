@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import type { Language } from '@/api/types/problems';
 import type { SubmissionResult } from '@/api/types/submissions';
+import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
-import { TOOLBAR_INPUT_CLASS } from '@/components/toolbar-classes';
+import Checkbox from '@/components/ui/Checkbox.vue';
+import FormField from '@/components/ui/FormField.vue';
+import TextInput from '@/components/ui/TextInput.vue';
+import { translate } from '@/i18n';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import { MAX_PROBLEM_CODE_LENGTH, MAX_USERNAME_LENGTH } from '../use-submission-filters';
 import type { StatusGroup, SubmissionFilters } from '../use-submission-filters';
@@ -27,7 +31,6 @@ const emit = defineEmits<{ update: [patch: Partial<SubmissionFilters>]; reset: [
 /** The mock-up's six; a URL may carry any other valid result, the table's empty state then names it. */
 const RESULT_CHOICES: readonly SubmissionResult[] = ['AC', 'WA', 'TLE', 'MLE', 'RTE', 'CE'];
 const STATUS_GROUPS: readonly StatusGroup[] = ['grading', 'final'];
-const TEXT_INPUT_CLASSES = `${TOOLBAR_INPUT_CLASS} w-full`;
 
 const problemText = useDebouncedText(
   () => props.filters.problem,
@@ -41,7 +44,7 @@ const userText = useDebouncedText(
 /** The list with `value` ticked or unticked. */
 const toggled = <T,>(list: readonly T[], value: T, isChecked: boolean) =>
   isChecked ? [...list, value] : list.filter((selected) => selected !== value);
-const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
+const resultLabel = (code: SubmissionResult) => `${code} ${translate(`verdicts.${code}`)}`;
 </script>
 
 <template>
@@ -51,37 +54,25 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
     class="grid gap-x-6 gap-y-4 p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)]"
   >
     <div class="flex items-center justify-between md:col-span-2">
-      <h2 class="font-display text-base font-bold">{{ $t('submissions.quick.advanced') }}</h2>
-      <button
-        type="button"
-        data-testid="filters-reset"
-        class="min-h-11 rounded-row px-3 font-semibold text-accent-text hover:bg-surface-hover"
-        @click="emit('reset')"
-      >
+      <h2 class="text-title leading-5.5 font-semibold">{{ $t('submissions.quick.advanced') }}</h2>
+      <AppButton tone="link" data-testid="filters-reset" @click="emit('reset')">
         {{ $t('submissions.rail.reset') }}
-      </button>
+      </AppButton>
     </div>
     <div class="flex min-w-0 flex-col gap-4" :class="{ 'md:row-span-2': showUser }">
       <fieldset class="m-0 min-w-0 border-0 p-0">
         <legend class="mb-1 text-sm text-muted">{{ $t('submissions.rail.results') }}</legend>
         <div class="grid grid-cols-2 gap-x-3 sm:grid-cols-3">
-          <label
+          <Checkbox
             v-for="code in RESULT_CHOICES"
             :key="code"
-            class="flex min-h-11 cursor-pointer items-center gap-2"
-          >
-            <input
-              type="checkbox"
-              :value="code"
-              :checked="filters.results.includes(code)"
-              class="size-4 accent-accent"
-              @change="
-                emit('update', { results: toggled(filters.results, code, checkedOf($event)) })
-              "
-            />
-            <span class="w-9 font-mono text-sm font-bold">{{ code }}</span>
-            <span class="text-sm">{{ $t(`verdicts.${code}`) }}</span>
-          </label>
+            :model-value="filters.results.includes(code)"
+            :label="resultLabel(code)"
+            :value="code"
+            @update:model-value="
+              emit('update', { results: toggled(filters.results, code, $event) })
+            "
+          />
         </div>
       </fieldset>
       <fieldset v-if="showStatusGroups" class="m-0 min-w-0 border-0 p-0">
@@ -89,24 +80,16 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
           {{ $t('contests.submissions.statusTitle') }}
         </legend>
         <div class="grid gap-x-3 sm:grid-cols-2">
-          <label
+          <Checkbox
             v-for="group in STATUS_GROUPS"
             :key="group"
-            class="flex min-h-11 cursor-pointer items-center gap-2.5"
-          >
-            <input
-              type="checkbox"
-              class="size-4 accent-accent"
-              :value="group"
-              :checked="filters.statusGroups.includes(group)"
-              @change="
-                emit('update', {
-                  statusGroups: toggled(filters.statusGroups, group, checkedOf($event)),
-                })
-              "
-            />
-            <span class="text-sm">{{ $t(`contests.submissions.status.${group}`) }}</span>
-          </label>
+            :model-value="filters.statusGroups.includes(group)"
+            :label="$t(`contests.submissions.status.${group}`)"
+            :value="group"
+            @update:model-value="
+              emit('update', { statusGroups: toggled(filters.statusGroups, group, $event) })
+            "
+          />
         </div>
       </fieldset>
     </div>
@@ -116,35 +99,29 @@ const checkedOf = (event: Event) => (event.target as HTMLInputElement).checked;
       :languages="languages"
       @update="emit('update', $event)"
     />
-    <label v-if="problemSource.kind === 'code'" class="flex flex-col gap-1 text-sm text-muted">
-      {{ $t('submissions.rail.problemLabel') }}
-      <input
+    <FormField v-if="problemSource.kind === 'code'" :label="$t('submissions.rail.problemLabel')">
+      <TextInput
         v-model="problemText"
         name="problem"
-        type="text"
         :maxlength="MAX_PROBLEM_CODE_LENGTH"
         autocomplete="off"
         :placeholder="$t('submissions.rail.problem')"
-        :class="TEXT_INPUT_CLASSES"
       />
-    </label>
+    </FormField>
     <SubmissionProblemPicker
       v-else
       :source="problemSource"
       :code="filters.problem"
       @pick="emit('update', { problem: $event })"
     />
-    <label v-if="showUser" class="flex flex-col gap-1 text-sm text-muted">
-      {{ $t('submissions.rail.userLabel') }}
-      <input
+    <FormField v-if="showUser" :label="$t('submissions.rail.userLabel')">
+      <TextInput
         v-model="userText"
         name="user"
-        type="text"
         :maxlength="MAX_USERNAME_LENGTH"
         autocomplete="off"
         :placeholder="$t('submissions.rail.user')"
-        :class="TEXT_INPUT_CLASSES"
       />
-    </label>
+    </FormField>
   </Card>
 </template>

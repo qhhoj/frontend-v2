@@ -27,7 +27,7 @@ import type { SubmissionScope } from './submission-scope';
 import { useSubmissionList } from './use-submission-list';
 
 /**
- * The one submission list: stats strip, quick filters, "Bộ lọc nâng cao", live notices, the list, its pager at the foot, and its loading,
+ * The one submission list: stats strip, quick filters, "Bộ lọc nâng cao", live notices, the list, its one pager at the foot, and its loading,
  * empty and error states. A page passes only its scope and what differs there: the problem box's choices, the
  * judging-state boxes, the columns and the unfiltered empty text. A contest's problem box also gives the rows their
  * letters and contest scores. The contest tab drops the site-wide stats (`showStats`); the live pill moves beside the chips.
@@ -175,13 +175,6 @@ watch(
         :new-count="live.newCount.value"
         @reconnect="live.reconnect()"
         @show-new="live.showNew()"
-      />
-      <NumberedPager
-        v-if="list && rows.length"
-        class="max-md:hidden"
-        :meta="list.meta"
-        :label="$t('submissions.pager.top')"
-        align="end"
       />
       <p v-if="mineTotal !== null" data-testid="mine-summary" class="text-meta text-muted">
         {{ $t('submissions.mineSummary', { count: formatNumber(mineTotal, locale.locale) }) }}

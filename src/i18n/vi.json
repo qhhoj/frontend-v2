@@ -1328,8 +1328,7 @@
       "previous": "Trước",
       "next": "Sau",
       "position": "Trang {page} / {total}",
-      "positionOpen": "Trang {page}",
-      "top": "Trang, đầu danh sách"
+      "positionOpen": "Trang {page}"
     },
     "stats": {
       "judgedToday": "đã chấm hôm nay",

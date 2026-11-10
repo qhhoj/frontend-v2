@@ -1328,8 +1328,7 @@
       "previous": "Previous",
       "next": "Next",
       "position": "Page {page} / {total}",
-      "positionOpen": "Page {page}",
-      "top": "Pages, top of the list"
+      "positionOpen": "Page {page}"
     },
     "stats": {
       "judgedToday": "judged today",
