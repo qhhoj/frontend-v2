@@ -36,7 +36,8 @@ import { NO_VALUE } from '@/lib/format';
  * the primary cell is the link, so keyboard and screen readers use that.
  *
  * Slots: `toolbar`, `bulk` (actions while rows are selected), `cell-<key>` ({ row }), `actions` ({ row }), `card` ({ row },
- * a stacked row), `empty`, `footer`.
+ * a stacked row), `emptyAction` (the next step under the empty text, e.g. "Tạo thẻ"; a `filtered` list offers "Xóa bộ lọc"
+ * itself), `empty` (replaces the whole empty state), `footer`.
  * Models: `sort` (the `?sort=` value), `selected` (row keys). `selectable` adds the checkbox column.
  */
 const props = withDefaults(
@@ -94,6 +95,7 @@ defineSlots<
     bulk?: (scope: { count: number }) => unknown;
     actions?: (scope: { row: Row }) => unknown;
     card?: (scope: { row: Row }) => unknown;
+    emptyAction?: () => unknown;
     empty?: () => unknown;
     footer?: () => unknown;
   } & Record<`cell-${string}`, (scope: { row: Row }) => unknown>
@@ -322,13 +324,18 @@ const offset = computed(() => (props.selectable ? 1 : 0));
           :query-key="pager.queryKey"
         />
         <slot v-else name="empty">
-          <div v-if="filtered" class="flex flex-col items-center gap-3 px-4 py-8 text-center">
-            <p class="text-muted">{{ $t('common.table.emptyFiltered') }}</p>
-            <AppButton size="sm" @click="$emit('clear-filters')">
-              {{ $t('common.clearFilters') }}
-            </AppButton>
-          </div>
-          <EmptyState v-else>{{ emptyText ?? $t('common.table.empty') }}</EmptyState>
+          <EmptyState v-if="filtered" compact>
+            {{ $t('common.table.emptyFiltered') }}
+            <template #action>
+              <AppButton size="sm" @click="$emit('clear-filters')">
+                {{ $t('common.clearFilters') }}
+              </AppButton>
+            </template>
+          </EmptyState>
+          <EmptyState v-else>
+            {{ emptyText ?? $t('common.table.empty') }}
+            <template v-if="$slots.emptyAction" #action><slot name="emptyAction" /></template>
+          </EmptyState>
         </slot>
       </template>
 

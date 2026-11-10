@@ -189,7 +189,7 @@ defineExpose({ save, discard: discardEdits });
       </div>
       <slot />
     </div>
-    <div v-if="notice?.tone === 'refused'" role="alert" class="px-4 pb-3 sm:px-5">
+    <div v-if="notice?.tone === 'refused'" class="px-4 pb-3 sm:px-5">
       <AdminNotice tone="danger" :title="notice.text" />
     </div>
     <p

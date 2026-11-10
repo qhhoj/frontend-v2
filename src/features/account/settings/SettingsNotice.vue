@@ -5,7 +5,11 @@ import type { BitMood } from '@/mascot/bit-moods';
 
 type SettingsTone = 'success' | 'error' | 'warning' | 'info';
 const TONES = { success: 'success', error: 'danger', warning: 'warning', info: 'info' } as const;
-/** `bit`: Bit in place of the icon, any `InlineBit` kind (crown = done, sweat = failed, security = locked or security notice). */
+/**
+ * A thin wrapper kept for old call sites (use `Notice` in new code; `error` is its `danger`).
+ * `bit`: Bit in place of the icon, any `InlineBit` kind (crown = done, sweat = failed, security = locked or security
+ * notice).
+ */
 withDefaults(defineProps<{ tone: SettingsTone; bit?: BitMood | BitKind }>(), { bit: undefined });
 </script>
 

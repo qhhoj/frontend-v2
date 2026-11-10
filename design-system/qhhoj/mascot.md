@@ -42,7 +42,7 @@ These are sprite colours, not theme tokens: Bit keeps them in every theme (they 
 | Accepted | crown | open | terracotta |
 | Wrong answer / errors | sweat drop (highlight colour) beside the head | closed | terracotta |
 | 404 | crying: no headgear; one highlight tear pixel under each eye, two falling drops (highlight colour, outline), 1 px sob in steps | closed | terracotta |
-| Empty lists | nightcap | closed | charcoal |
+| Empty lists | nightcap | closed | terracotta (charcoal vanished on dark cards) |
 | Loading swarm | cap, nightcap (charcoal twin), crown, antenna, none, one per Bit; 5 on desktop, 3 under 768 px (cap, nightcap, crown), 1 under reduced motion (cap) | open, blink once when the Bits stop | terracotta (one charcoal) |
 | Judging (submission pending or grading; `judging`) | hourglass held above the head, sand drains (rows 0–5) | blink in the loop | terracotta |
 | Contest running (`contest`) | stopwatch above the head, hand ticks round the dial | blink in the loop | terracotta |

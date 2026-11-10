@@ -123,9 +123,7 @@ defineExpose({ save, discard });
         {{ $t('admin.site.notice.takeDownHint') }}
       </p>
     </div>
-    <div v-if="failure" role="alert">
-      <AdminNotice tone="danger" :title="failure" />
-    </div>
+    <AdminNotice v-if="failure" tone="danger" :title="failure" />
     <ConfigHistory v-if="isHistoryOpen" :config-key="SITE_NOTICE_KEY" />
   </section>
 </template>

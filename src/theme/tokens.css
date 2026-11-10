@@ -20,6 +20,9 @@
   --qh-warning-bg: var(--qh-verdict-tle-bg);
   --qh-info: var(--qh-tag-5);
   --qh-info-bg: var(--qh-tag-5-bg);
+  /* The info notice tint (Notice, every look) follows the user's accent (owner pick 2026-11-10); switch both lines together. */
+  --qh-notice-info: var(--qh-accent-soft-text);
+  --qh-notice-info-bg: var(--qh-accent-soft);
   --qh-page-max: 80rem;
   --qh-sidebar-width: 20rem;
   --qh-radius-cell: 12px;

@@ -230,7 +230,7 @@ describe('membership header: member and join', () => {
       expect(wrapper.get('[data-testid="membership-chip"]').text()).toBe('Thành viên'),
     );
     expect(wrapper.find('[data-testid="membership-panel"]').exists()).toBe(false);
-    expect(document.body.querySelector('[data-testid="admin-toasts"]')!.textContent).toContain(
+    expect(document.body.querySelector('[data-testid="toasts"]')!.textContent).toContain(
       'Đã tham gia',
     );
   });
