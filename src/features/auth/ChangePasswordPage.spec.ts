@@ -49,6 +49,13 @@ const describedText = (wrapper: Wrapper, name: string) =>
     .map((id) => wrapper.get(`[id="${id}"]`).text());
 
 describe('change-password page', () => {
+  it('keeps a sign-out button in the header, the only way out besides changing the password', async () => {
+    changeApi();
+    const { wrapper } = await mountApp('/account/password');
+    const buttons = wrapper.findAll('header button').map((button) => button.text());
+    expect(buttons).toContain('Đăng xuất');
+  });
+
   it('catches a viewer with a breached password on any page and says why, naming the account', async () => {
     changeApi();
     const { wrapper, router } = await mountApp('/blog');

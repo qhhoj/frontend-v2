@@ -33,7 +33,7 @@ const signOut = useLogout(() => router.push({ name: 'login' }));
 
 <template>
   <AuthLayout :title="$t('auth.changePassword.titleForced')" width="medium">
-    <template #actions>
+    <template #header-end>
       <AppButton @click="signOut">
         <template #icon><LogOut aria-hidden="true" class="size-4" /></template>
         {{ $t('account.logout') }}
