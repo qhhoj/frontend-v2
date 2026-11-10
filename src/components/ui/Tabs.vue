@@ -240,7 +240,12 @@ const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
               @click="toggle"
             >
               <template #icon><Ellipsis aria-hidden="true" class="size-4" /></template>
-              {{ triggerWord }}
+              <!-- Drawn by CSS, not text: the button is named by `aria-label`, and an unused (invisible) trigger holds no "Thêm" text for a page to trip over. -->
+              <span
+                aria-hidden="true"
+                :data-word="triggerWord"
+                class="after:content-[attr(data-word)]"
+              />
             </AppButton>
           </template>
         </Menu>
