@@ -132,6 +132,7 @@
     "chunk_size_mismatch": "A chunk had the wrong length; upload the file again.",
     "upload_hash_mismatch": "The received file differs from the chosen one; upload it again.",
     "problem_renamed": "The problem was renamed during the upload; upload the file again.",
+    "data_save_unfinished": "The last test-data save did not finish, so no package can be built. Save the test data again, then retry.",
     "chunks_missing": "Some chunks of the file have not been sent yet.",
     "upload_sessions_full": "You already have 2 unfinished archive uploads; cancel one or wait for it to expire."
   },

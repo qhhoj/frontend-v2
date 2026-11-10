@@ -132,6 +132,7 @@
     "chunk_size_mismatch": "Một phần tệp gửi lên có độ dài sai; hãy tải lại.",
     "upload_hash_mismatch": "Tệp nhận được khác tệp đã chọn; hãy tải lại.",
     "problem_renamed": "Bài đã được đổi mã trong lúc tải lên; hãy tải lại tệp.",
+    "data_save_unfinished": "Lần lưu dữ liệu test gần nhất chưa xong nên chưa đóng gói được. Hãy lưu lại dữ liệu test rồi thử lại.",
     "chunks_missing": "Còn phần tệp chưa gửi xong.",
     "upload_sessions_full": "Bạn đang có 2 lượt tải gói test chưa xong; hãy hủy bớt hoặc đợi chúng hết hạn."
   },
