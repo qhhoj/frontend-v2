@@ -268,6 +268,7 @@ useCommentJump({
     <h2 v-if="isFolded" id="comments-heading">
       <AppButton tone="row" data-testid="comments-fold" aria-expanded="false" @click="unfold">
         <span class="section-title text-content">{{ $t('comments.title') }}</span>
+        <span class="font-mono text-sm text-muted">(0)</span>
         <ChevronDown aria-hidden="true" class="ml-auto size-5 text-muted" />
       </AppButton>
     </h2>

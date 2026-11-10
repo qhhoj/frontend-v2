@@ -78,16 +78,20 @@ const nameOf = (version: CommentVersion) =>
       <template #skeleton>
         <p class="text-sm text-muted">{{ $t('comments.revisions.loading') }}</p>
       </template>
-      <div class="grid gap-4 md:grid-cols-[200px_minmax(0,1fr)]">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-[200px_minmax(0,1fr)]">
         <nav :aria-label="$t('comments.revisions.versions')">
           <ol class="flex gap-1 overflow-x-auto md:flex-col">
-            <li v-for="version in versions" :key="version.edit" class="shrink-0">
+            <li
+              v-for="version in versions"
+              :key="version.edit"
+              class="max-w-64 shrink-0 md:max-w-none"
+            >
               <AppButton
                 tone="row"
                 :pressed="version.edit === chosen?.edit"
                 @click="chosenEdit = version.edit"
               >
-                <span class="flex flex-col items-start">
+                <span class="flex min-w-0 max-w-full flex-col items-start">
                   <span class="font-semibold">{{ nameOf(version) }}</span>
                   <span v-if="version.at" class="text-caption leading-4 text-muted">
                     {{ formatDate(version.at, 'datetime', locale.locale) }}

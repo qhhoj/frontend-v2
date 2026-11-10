@@ -28,7 +28,7 @@ const BOXED_TONES: Record<BoxedTone, string> = {
  * width, left aligned, regular muted text that wraps, on a card-radius hairline row. `pressed` takes the accent-soft pair.
  */
 const ROW_CLASSES =
-  'inline-flex min-h-(--qh-control) w-full items-center justify-start gap-2 rounded-card border border-line bg-surface-solid px-4 py-2 text-left text-sm font-normal text-muted hover:bg-surface-hover';
+  'inline-flex min-h-(--qh-control) w-full items-center justify-start gap-2 rounded-card border border-line bg-surface-solid px-4 py-2 text-left text-sm font-normal text-muted hover:bg-surface-hover aria-disabled:bg-surface-strong aria-disabled:text-muted aria-disabled:hover:bg-surface-strong';
 
 /** Inside `.qh-admin`, a boxed tone takes the admin look on top of the public one. */
 const ADMIN_SCOPE_TONES: Record<BoxedTone, string> = {
