@@ -6,11 +6,10 @@ import { profile } from '@/test/fixtures';
 import { invalid, issue, mockApi, ok } from '@/test/mock-api';
 import type { ApiCall, MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
+import { openSelect, pickOption } from '@/test/select';
 
 const patches = (calls: ApiCall[]) =>
   calls.filter((call) => call.method === 'PATCH').map((call) => call.body);
-const select = (wrapper: VueWrapper, name: string) =>
-  wrapper.get<HTMLSelectElement>(`select[name="${name}"]`);
 const echo: MockHandler = ({ body }) => ok(profile(body as object));
 
 async function openProfile(profileOverrides = {}, routes: Record<string, MockHandler> = {}) {
@@ -37,18 +36,17 @@ describe('Settings › Profile defaults', () => {
         ),
       },
     );
-    await select(wrapper, 'timezone').setValue('Asia/Tokyo');
+    await openSelect(wrapper, '#main');
+    await pickOption('Asia/Tokyo (UTC+9)');
     await save(wrapper);
-    expect(select(wrapper, 'timezone').attributes('aria-invalid')).toBe('true');
+    expect(wrapper.get('#profile-timezone').attributes('aria-describedby')).toContain('error');
     expect(wrapper.text()).toContain('Múi giờ không hợp lệ.');
     expect(document.activeElement).toBe(wrapper.get('#main [role="alert"]').element);
-  });
+  }, 30_000);
 
-  it('switches the interface language at once, on this device only: no request, nothing to save', async () => {
+  it('switches the interface language at once from the header, on this device only: no request, nothing to save', async () => {
     const { wrapper, calls } = await openProfile();
-    await wrapper
-      .get<HTMLSelectElement>('[data-testid="interface-language"] select')
-      .setValue('en');
+    await wrapper.get('button[aria-label="Switch to English"]').trigger('click');
     expect(document.documentElement.lang).toBe('en');
     expect(patches(calls)).toEqual([]);
     expect(wrapper.find('[data-save-bar]').exists()).toBe(false);

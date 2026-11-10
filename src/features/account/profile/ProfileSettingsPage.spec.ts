@@ -149,10 +149,10 @@ describe('Settings › Profile', () => {
     await saveButton(wrapper).trigger('submit');
     await flushPromises();
     await wrapper.findAll('[role="tab"]')[1]!.trigger('click');
-    expect(wrapper.get('[role="tab"][aria-selected="true"]').text()).toBe('Bản đã lưu');
+    expect(wrapper.get('[role="tab"][aria-selected="true"]').text()).toBe('Xem trước');
     await wrapper.get('#main [role="alert"] a[href="#profile-about"]').trigger('click');
     await flushPromises();
-    expect(wrapper.get('[role="tab"][aria-selected="true"]').text()).toBe('Soạn thảo');
+    expect(wrapper.get('[role="tab"][aria-selected="true"]').text()).toBe('Viết');
     expect(document.activeElement).toBe(wrapper.get('textarea').element);
   });
 });

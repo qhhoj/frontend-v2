@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Chip from '@/components/ui/Chip.vue';
 import { Smartphone } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
@@ -48,7 +47,7 @@ function regenerate() {
       class="flex size-10 shrink-0 items-center justify-center rounded-cell"
       :class="enabled ? 'bg-verdict-ac-bg text-positive' : 'bg-accent-soft text-accent-text'"
     >
-      <Smartphone class="size-[18px]" />
+      <Smartphone class="size-5" />
     </span>
     <span class="flex min-w-0 flex-1 flex-col gap-0.5">
       <strong class="font-semibold">{{ $t('settings.totp.title') }}</strong>
@@ -62,7 +61,6 @@ function regenerate() {
         >{{ remainingText }}</span
       >
     </span>
-    <Chip v-if="enabled" tone="success">{{ $t('settings.twoFactor.on') }}</Chip>
     <span class="flex flex-wrap gap-2">
       <AppButton v-if="!enabled" :disabled="busy" @click="emit('enable')">
         {{ $t('settings.totp.enable') }}

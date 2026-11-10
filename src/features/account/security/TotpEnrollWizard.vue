@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { Check } from 'lucide-vue-next';
 import { computed, nextTick, ref, watch } from 'vue';
 import type { TotpEnrollment } from '@/api/types/account';
 import InlineBit from '@/components/InlineBit.vue';
 import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
-import SettingsCard from '../settings/SettingsCard.vue';
 import EnrollPasswordStep from './EnrollPasswordStep.vue';
 import EnrollScanStep from './EnrollScanStep.vue';
 import ScratchCodesPanel from './ScratchCodesPanel.vue';
@@ -47,8 +47,13 @@ function onConfirmed(value: string[]) {
 </script>
 
 <template>
-  <SettingsCard :title="$t('settings.totp.wizardTitle')" :lead="$t('settings.totp.wizardLead')">
-    <template #header-end><InlineBit kind="security" /></template>
+  <Card
+    padding="lg"
+    class="flex flex-col gap-5 [&>header]:mb-0"
+    :title="$t('settings.totp.wizardTitle')"
+    :lead="$t('settings.totp.wizardLead')"
+  >
+    <template #actions><InlineBit kind="security" /></template>
     <ol
       :aria-label="$t('settings.totp.steps')"
       class="m-0 flex list-none flex-wrap items-center gap-2.5 p-0 text-sm"
@@ -90,5 +95,5 @@ function onConfirmed(value: string[]) {
       :notice="$t('settings.totp.enabled')"
       @done="emit('done')"
     />
-  </SettingsCard>
+  </Card>
 </template>

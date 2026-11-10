@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { translate } from '@/i18n';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import AuthSelect from '@/features/auth/AuthSelect.vue';
+import ComboBox from '@/components/ui/ComboBox.vue';
+import FormField from '@/components/ui/FormField.vue';
+import SelectField from '@/components/ui/SelectField.vue';
 import { useProblemMetaQuery } from '@/features/problems/problems.queries';
 import { profileFieldId } from './profile-field-ids';
 import { timeZoneOptions } from './time-zones';
+import { SITE_TIME_ZONE, viewerTimeZone } from '@/lib/format-date';
 
 /** The submit defaults inside the profile card, right under the name: the setting every pupil needs comes first. */
 defineProps<{ errors: Record<string, string> }>();
@@ -23,7 +27,16 @@ const languageChoice = computed({
     languageId.value = value || null;
   },
 });
-const zones = computed(() => timeZoneOptions(timezone.value, new Date()));
+/** The site's zone and the browser's come first, then every zone (searchable). */
+const browserZone = viewerTimeZone();
+const zones = computed(() => {
+  const options = timeZoneOptions(timezone.value, new Date(), [SITE_TIME_ZONE, browserZone]);
+  return options.map((zone) =>
+    zone.value === browserZone && browserZone !== SITE_TIME_ZONE
+      ? { ...zone, label: `${zone.label} · ${translate('settings.defaults.browserZone')}` }
+      : zone,
+  );
+});
 </script>
 
 <template>
@@ -35,36 +48,40 @@ const zones = computed(() => timeZoneOptions(timezone.value, new Date()));
       :registers-wait="false"
       @retry="meta.refetch()"
     >
-      <template #skeleton><SkeletonBlock class="h-[98px] w-full" /></template>
-      <AuthSelect
-        :id="profileFieldId('languageId')"
-        v-model="languageChoice"
-        name="languageId"
+      <template #skeleton><SkeletonBlock class="h-24.5 w-full" /></template>
+      <FormField
+        :input-id="profileFieldId('languageId')"
         class="scroll-mb-28"
-        :optional="false"
         :label="$t('settings.profile.fieldName.languageId')"
-        :placeholder="languageId === null ? $t('settings.defaults.noLanguage') : undefined"
         :hint="$t('settings.defaults.languageHint')"
         :error="errors.languageId"
       >
-        <option v-for="language in languages" :key="language.id" :value="language.id">
-          {{ language.name }}
-        </option>
-      </AuthSelect>
+        <SelectField
+          v-model="languageChoice"
+          name="languageId"
+          :placeholder="languageId === null ? $t('settings.defaults.noLanguage') : undefined"
+        >
+          <option v-for="language in languages" :key="language.id" :value="language.id">
+            {{ language.name }}
+          </option>
+        </SelectField>
+      </FormField>
     </QueryState>
-    <AuthSelect
-      :id="profileFieldId('timezone')"
-      v-model="timezone"
-      name="timezone"
+    <FormField
+      :input-id="profileFieldId('timezone')"
       class="scroll-mb-28"
-      :optional="false"
       :label="$t('settings.profile.fieldName.timezone')"
       :hint="$t('settings.defaults.timezoneHint')"
       :error="errors.timezone"
     >
-      <option v-for="zone in zones" :key="zone.value" :value="zone.value">
-        {{ zone.label }}
-      </option>
-    </AuthSelect>
+      <ComboBox
+        v-model="timezone"
+        :options="zones"
+        filter
+        :filter-label="$t('settings.defaults.timezoneFilter')"
+        :filter-placeholder="$t('settings.defaults.timezoneSearch')"
+        :empty-filter-message="$t('settings.defaults.timezoneNone')"
+      />
+    </FormField>
   </div>
 </template>

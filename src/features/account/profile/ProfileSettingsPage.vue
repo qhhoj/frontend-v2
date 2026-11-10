@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Notice from '@/components/ui/Notice.vue';
 import { UserRound } from 'lucide-vue-next';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
@@ -11,9 +12,7 @@ import { useOfficialMode } from '@/features/official-mode/official-mode.queries'
 import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
-import SettingsCard from '../settings/SettingsCard.vue';
 import SettingsLayout from '../settings/SettingsLayout.vue';
-import SettingsNotice from '../settings/SettingsNotice.vue';
 import DefaultsFields from './DefaultsFields.vue';
 import IdentityFields from './IdentityFields.vue';
 import OrganizationsEditor from './OrganizationsEditor.vue';
@@ -100,10 +99,10 @@ async function submit() {
   <SettingsLayout>
     <QueryState :loading="isPending" :error="loadError" @retry="refetch()">
       <template #skeleton>
-        <Card as="div" class="flex flex-col gap-5 p-5 md:p-7">
+        <Card as="div" padding="lg" class="flex flex-col gap-5">
           <SkeletonBlock class="h-6 w-32" />
-          <SkeletonBlock class="h-[76px] w-full" />
-          <SkeletonBlock class="h-[230px] w-full" />
+          <SkeletonBlock class="h-19 w-full" />
+          <SkeletonBlock class="h-57.5 w-full" />
         </Card>
       </template>
       <form v-if="draft && profile" class="flex flex-col gap-5" novalidate @submit.prevent="submit">
@@ -113,8 +112,13 @@ async function submit() {
           :title="fieldSummary.title"
           :items="fieldSummary.items"
         />
-        <SettingsCard :title="$t('settings.nav.profile')" :lead="$t('settings.profile.lead')">
-          <template v-if="session.user" #header-end>
+        <Card
+          padding="lg"
+          class="flex flex-col gap-5 [&>header]:mb-0"
+          :title="$t('settings.nav.profile')"
+          :lead="$t('settings.profile.lead')"
+        >
+          <template v-if="session.user" #actions>
             <AppButton
               size="sm"
               :to="{ name: 'user', params: { username: session.user.username } }"
@@ -123,31 +127,20 @@ async function submit() {
               {{ $t('settings.profile.viewPublic') }}
             </AppButton>
           </template>
-          <SettingsNotice v-if="saveErrorSentence" tone="error" bit="sweat">
+          <Notice v-if="saveErrorSentence" tone="danger" bit="sweat">
             {{ saveErrorSentence }}
             <template v-if="offline" #action>
-              <button
-                type="button"
-                class="min-h-11 rounded-pill px-3 font-semibold underline"
-                @click="submit"
-              >
-                {{ $t('common.retry') }}
-              </button>
+              <AppButton tone="link" @click="submit">{{ $t('common.retry') }}</AppButton>
             </template>
-          </SettingsNotice>
-          <SettingsNotice
-            v-if="officialMode.isLocked.value"
-            tone="warning"
-            :bit="NOTIFICATION_BITS.locked"
-          >
+          </Notice>
+          <Notice v-if="officialMode.isLocked.value" tone="warning" :bit="NOTIFICATION_BITS.locked">
             {{ $t('officialMode.profileNote') }}
-          </SettingsNotice>
+          </Notice>
           <IdentityFields
             ref="identityFields"
             v-model:first-name="draft.firstName"
             v-model:about="draft.about"
             :username="session.user?.username ?? ''"
-            :saved-about-html="profile.aboutHtml"
             :errors="fieldErrors"
           >
             <DefaultsFields
@@ -156,7 +149,7 @@ async function submit() {
               :errors="fieldErrors"
             />
           </IdentityFields>
-        </SettingsCard>
+        </Card>
         <OrganizationsEditor
           v-model="draft.organizationIds"
           :organizations="profile.organizations"

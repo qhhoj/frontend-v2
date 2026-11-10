@@ -420,12 +420,10 @@
       "languageHint": "Preselected on the submit page.",
       "noLanguage": "Not chosen",
       "timezoneHint": "Used for contest start times and submission times.",
-      "interfaceLanguage": "Interface language",
-      "deviceOnly": "This browser only, not saved to your account."
-    },
-    "locales": {
-      "vi": "Tiếng Việt",
-      "en": "English"
+      "browserZone": "Browser zone",
+      "timezoneFilter": "Search time zones",
+      "timezoneSearch": "Type to search time zones",
+      "timezoneNone": "No matching time zone"
     },
     "organizations": {
       "title": "Organizations",
@@ -446,13 +444,6 @@
       "lead": "Public details and the defaults used when you submit.",
       "viewPublic": "View public profile",
       "firstNameHint": "Shown on your profile page, the rankings and comments. The username {username} cannot change.",
-      "aboutViews": "About text views",
-      "aboutTab": {
-        "write": "Write",
-        "saved": "Saved version"
-      },
-      "aboutHelp": "Markdown supported. The “Saved” tab updates after you save.",
-      "aboutEmpty": "No about text yet.",
       "fixToSave": "Fix {count} error(s), then save again.",
       "fieldName": {
         "firstName": "Display name",

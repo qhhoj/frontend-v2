@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
+import Notice from '@/components/ui/Notice.vue';
 import Chip from '@/components/ui/Chip.vue';
 import { computed, nextTick, ref } from 'vue';
 import type { SecurityKey } from '@/api/types/account';
 import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
-import SettingsCard from '../settings/SettingsCard.vue';
-import SettingsNotice from '../settings/SettingsNotice.vue';
 import AddSecurityKeyForm from './AddSecurityKeyForm.vue';
 import RegenerateCodesCard from './RegenerateCodesCard.vue';
 import SecurityKeys from './SecurityKeys.vue';
@@ -40,25 +40,33 @@ function totpDisabled() {
   notice.value = translate('settings.totp.disabled');
 }
 /** The wizard's codes step is gone once it closes: the focus goes to this card's heading, not the body. */
-const card = ref<{ focusHeading: () => void } | null>(null);
+const card = ref<{ $el: HTMLElement } | null>(null);
+/** The card's `h2` takes the focus, so a screen reader reads the heading, not the whole card. */
+function focusHeading() {
+  const heading = card.value?.$el.querySelector<HTMLElement>('h2');
+  heading?.setAttribute('tabindex', '-1');
+  heading?.focus();
+}
 function enrolled() {
   panel.value = 'none';
-  void nextTick(() => card.value?.focusHeading());
+  void nextTick(() => focusHeading());
 }
 </script>
 
 <template>
-  <SettingsCard
+  <Card
     ref="card"
+    padding="lg"
+    class="flex flex-col gap-5 [&>header]:mb-0"
     :title="$t('settings.twoFactor.title')"
     :lead="$t('settings.twoFactor.lead')"
   >
-    <template #header-end>
+    <template #actions>
       <Chip :tone="enabled ? 'success' : 'neutral'">{{
         enabled ? $t('settings.twoFactor.on') : $t('settings.twoFactor.off')
       }}</Chip>
     </template>
-    <SettingsNotice v-if="notice" tone="success">{{ notice }}</SettingsNotice>
+    <Notice v-if="notice" tone="success">{{ notice }}</Notice>
     <ul :aria-label="$t('settings.twoFactor.methods')" class="m-0 flex list-none flex-col p-0">
       <TotpRow
         :busy="panel !== 'none'"
@@ -68,7 +76,7 @@ function enrolled() {
       />
       <SecurityKeys :busy="panel !== 'none'" @add="open('addKey')" @removed="keyRemoved" />
     </ul>
-  </SettingsCard>
+  </Card>
   <TotpEnrollWizard v-if="panel === 'enrol'" @close="panel = 'none'" @done="enrolled" />
   <RegenerateCodesCard v-if="panel === 'regenerate'" @close="panel = 'none'" />
   <AddSecurityKeyForm v-if="panel === 'addKey'" @added="keyAdded" @close="panel = 'none'" />

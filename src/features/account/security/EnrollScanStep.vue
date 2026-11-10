@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Notice from '@/components/ui/Notice.vue';
 import { computed, ref } from 'vue';
 import { confirmTotp } from '@/api/account.api';
 import { ApiError } from '@/api/client';
@@ -11,7 +12,6 @@ import { useAuthAction } from '@/features/auth/use-auth-action';
 import { translate } from '@/i18n';
 import { OTP_LENGTH } from '@/lib/otp';
 import { useSessionStore } from '@/stores/session.store';
-import SettingsNotice from '../settings/SettingsNotice.vue';
 import QrCode from './QrCode.vue';
 import { groupSecret } from './totp-setup';
 
@@ -50,7 +50,7 @@ async function submit() {
 
 <template>
   <div class="flex flex-col gap-5">
-    <SettingsNotice tone="info">{{ $t('settings.totp.passwordConfirmed') }}</SettingsNotice>
+    <Notice tone="info">{{ $t('settings.totp.passwordConfirmed') }}</Notice>
     <div class="flex flex-col gap-5 md:flex-row md:items-start">
       <QrCode
         class="hidden md:block"

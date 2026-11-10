@@ -17,6 +17,8 @@ const props = withDefaults(
   defineProps<{
     /** The textarea's accessible name. */
     label: string;
+    /** The textarea's id, when a page links to it (an error summary); generated when left out. */
+    inputId?: string;
     /** Renders Markdown to sanitised HTML; a failure is shown under the preview and the last preview is kept. */
     preview: (markdown: string) => Promise<string>;
     /** Anything else the rendering depends on (a problem style): a change renders the preview again. */
@@ -31,6 +33,7 @@ const props = withDefaults(
     failureText?: (error: unknown) => string;
   }>(),
   {
+    inputId: undefined,
     previewKey: undefined,
     hint: undefined,
     error: undefined,
@@ -42,13 +45,18 @@ const props = withDefaults(
 );
 defineOptions({ name: 'UiMarkdownEditor' });
 
-const id = useId();
+const generatedId = useId();
+const id = props.inputId ?? generatedId;
 const { t } = useI18n();
 const tab = ref<'write' | 'preview'>('write');
 const rendered = useDebouncedPreview(
   () => text.value,
   (markdown) => props.preview(markdown),
-  { alsoWatch: [() => props.previewKey] },
+  {
+    // A hidden preview pane sends nothing (a one-pane editor on its Write tab); the split view shows both from `lg`.
+    isActive: () => props.split || tab.value === 'preview',
+    alsoWatch: [() => props.previewKey],
+  },
 );
 const tabItems = computed(() =>
   (['write', 'preview'] as const).map((key) => ({
@@ -89,6 +97,8 @@ function grow() {
   box.style.height = `${box.scrollHeight + box.offsetHeight - box.clientHeight}px`;
 }
 watch([text, tab], () => nextTick(grow));
+/** An error summary's link needs the text on screen before it can take the focus. */
+defineExpose({ showWrite: () => (tab.value = 'write') });
 /** A width change (resize, or the pane becoming visible) re-wraps the text, so the height is measured again. */
 let width = 0;
 const observer = new ResizeObserver(([entry]) => {

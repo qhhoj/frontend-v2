@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { ref } from 'vue';
 import { regenerateScratchCodes } from '@/api/account.api';
@@ -7,7 +8,6 @@ import AuthError from '@/features/auth/AuthError.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import { OTP_LENGTH } from '@/lib/otp';
 import { useSessionStore } from '@/stores/session.store';
-import SettingsCard from '../settings/SettingsCard.vue';
 import ScratchCodesPanel from './ScratchCodesPanel.vue';
 import SecondFactorCodeField from './SecondFactorCodeField.vue';
 import { SCRATCH_CODES_REMAINING_KEY } from './security.queries';
@@ -36,7 +36,9 @@ async function regenerate() {
 </script>
 
 <template>
-  <SettingsCard
+  <Card
+    padding="lg"
+    class="flex flex-col gap-5 [&>header]:mb-0"
     :title="$t('settings.totp.regenerate')"
     :lead="codes.length ? undefined : $t('settings.totp.regenerateLead')"
   >
@@ -65,5 +67,5 @@ async function regenerate() {
         </AppButton>
       </div>
     </form>
-  </SettingsCard>
+  </Card>
 </template>

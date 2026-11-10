@@ -83,7 +83,6 @@ Uses, then files. The last M lane updates this table; the M lanes before it only
 | `PillTabs`           | `components/PillTabs.vue`                         | 9 | 3 | `Tabs`                                                   |
 | `SubmissionPager`    | `features/submissions/SubmissionPager.vue`        | 3 | 3 | `NumberedPager`                                          |
 | `AuthNotice`         | `features/auth/AuthNotice.vue`                    | 3 | 2 | `Notice`                                                 |
-| `AuthSelect`         | `features/auth/AuthSelect.vue`                    | 2 | 1 | `FormField` + `SelectField`                              |
 | `admin-toasts`       | `features/admin/ui/feedback/admin-toasts.ts`      | 0 | 0 | `components/ui/toasts`                                   |
 
 A use is each reference to a name the import binds: a tag in either case (`<Badge>`, `<badge>`), a class constant, a
