@@ -4,7 +4,12 @@ import { apiSend, apiUrl } from './typed';
 import type { PackageStatus } from './types/problem-lifecycle';
 
 export type PackageFailure =
-  'package_too_large' | 'package_unavailable' | 'package_not_built' | 'rate_limited' | 'generic';
+  | 'package_too_large'
+  | 'package_unavailable'
+  | 'package_not_built'
+  | 'package_data_unsaved'
+  | 'rate_limited'
+  | 'generic';
 export type PackageProbe =
   | { state: 'ready' }
   | { state: 'building'; retryAfterMs: number }
@@ -14,6 +19,7 @@ const KNOWN_FAILURES: PackageFailure[] = [
   'package_too_large',
   'package_unavailable',
   'package_not_built',
+  'package_data_unsaved',
   'rate_limited',
 ];
 
