@@ -1,6 +1,7 @@
 import { flushPromises } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { resetToastHost } from '@/components/ui/use-toast';
 import { mockApi, noContent, ok, page } from '@/test/mock-api';
 import type { ApiCall, MockHandler } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
@@ -31,7 +32,10 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
   vi.setSystemTime(NOTIFICATION_NOW);
 });
-afterEach(() => vi.useRealTimers());
+afterEach(() => {
+  vi.useRealTimers();
+  resetToastHost();
+});
 
 describe('NotificationsPage', () => {
   it('asks only the chosen state and marks its filter current', async () => {
@@ -64,7 +68,7 @@ describe('NotificationsPage', () => {
     await button.trigger('click');
     await flushPromises();
     expect(calls.filter((call) => call.path === '/notifications/read-all')).toHaveLength(1);
-    expect(main(wrapper).text()).toContain('Đã đánh dấu tất cả là đã đọc.');
+    expect(document.body.textContent).toContain('Đã đánh dấu tất cả là đã đọc.');
   });
 
   it('offers no read action while viewing as another user', async () => {

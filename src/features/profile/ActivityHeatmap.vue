@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, useTemplateRef } from 'vue';
 import type { ActivityResponse } from '@/api/types/users';
 import { heatmapWeeks, monthStarts, todayIn, totalSubmissions } from '@/lib/activity-heatmap';
 import type { HeatmapLevel } from '@/lib/activity-heatmap';
@@ -19,6 +19,11 @@ const months = computed(() =>
   ),
 );
 const total = computed(() => totalSubmissions(props.activity.days));
+/** On a phone the grid is wider than the card: open on the newest week, the one that matters. */
+const scroller = useTemplateRef<HTMLElement>('scroller');
+onMounted(() => {
+  if (scroller.value) scroller.value.scrollLeft = scroller.value.scrollWidth;
+});
 const HEAT_CLASSES: Record<HeatmapLevel, string> = {
   0: 'fill-surface-strong',
   1: 'fill-accent/30',
@@ -37,16 +42,19 @@ const cellY = (row: number) => LABEL_ROW + row * STEP;
 </script>
 
 <template>
-  <div class="flex flex-col gap-3">
+  <p v-if="total === 0" data-testid="heatmap-empty" class="text-sm text-muted">
+    {{ $t('ratingChart.activityNone') }}
+  </p>
+  <div v-else class="flex flex-col gap-3">
     <p class="text-sm text-muted">
       {{ $t('ratingChart.activityLine', { count: total, zone: activity.timezone }) }}
     </p>
-    <div class="overflow-x-auto">
+    <div ref="scroller" class="overflow-x-auto">
       <svg
         role="img"
         :aria-label="$t('ratingChart.heatmapLabel')"
         viewBox="0 0 739 115"
-        class="h-auto w-full min-w-[46rem]"
+        class="h-auto w-full min-w-184"
       >
         <text
           v-for="mark in months"

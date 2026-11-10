@@ -92,7 +92,7 @@ describe('NotificationBell', () => {
     const { wrapper, router } = await mountApp(START);
     await openDrawer(wrapper);
     expect(drawer()!.textContent).toContain('Đang xem dưới tên người khác');
-    expect(drawer()!.textContent).not.toContain('Đọc hết');
+    expect(drawer()!.textContent).not.toContain('Đánh dấu tất cả đã đọc');
     expect(drawer()!.querySelector('[aria-label^="Đánh dấu đã đọc"]')).toBeNull();
     drawerRows()[0]!.querySelector('button')!.click();
     await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/notifications'));

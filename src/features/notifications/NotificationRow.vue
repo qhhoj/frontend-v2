@@ -35,7 +35,7 @@ const hasChips = computed(() => !props.isStale);
       aria-hidden="true"
       class="flex size-10 shrink-0 items-center justify-center rounded-cell bg-accent-soft text-accent-soft-text"
     >
-      <component :is="icon" class="size-[18px]" />
+      <component :is="icon" class="size-5" />
     </span>
     <button
       type="button"
@@ -52,12 +52,9 @@ const hasChips = computed(() => !props.isStale);
         <span class="min-w-0 break-words text-content" :class="item.unread ? 'font-semibold' : ''">
           {{ title }}
         </span>
-        <span
-          v-if="hasChips && item.count > 1"
-          class="rounded-pill bg-surface-hover px-2 text-caption leading-4 font-semibold text-content"
-        >
+        <Chip v-if="hasChips && item.count > 1">
           {{ $t('notifications.merged', { count: item.count }) }}
-        </span>
+        </Chip>
         <Chip v-if="hasChips && item.priority === 'high'" tone="warning">
           {{ $t('notifications.important') }}
         </Chip>
@@ -74,7 +71,7 @@ const hasChips = computed(() => !props.isStale);
       :label="$t('notifications.markRead', { title })"
       @click="emit('markRead', item)"
     >
-      <Check aria-hidden="true" class="size-[18px]" />
+      <Check aria-hidden="true" class="size-5" />
     </IconButton>
   </li>
 </template>

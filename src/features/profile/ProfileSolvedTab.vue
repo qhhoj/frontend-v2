@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import type { SolvedGroup } from '@/api/types/users';
 import EmptyState from '@/components/EmptyState.vue';
 import Card from '@/components/ui/Card.vue';
+import Chip from '@/components/ui/Chip.vue';
 import QueryState from '@/components/QueryState.vue';
 import { useSolvedQuery } from '@/features/users/users.queries';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -58,18 +59,14 @@ const isFullScore = (points: number, total: number) => points >= total;
                 </RouterLink>
                 <span class="font-mono text-caption leading-4 text-muted">{{ problem.code }}</span>
               </div>
-              <span
-                class="rounded-pill px-2.5 py-1 font-mono text-caption leading-4 font-semibold"
-                :class="
-                  isFullScore(problem.points, problem.total)
-                    ? 'bg-verdict-ac-bg text-verdict-ac'
-                    : 'bg-partial-bg-2'
-                "
+              <Chip
+                :tone="isFullScore(problem.points, problem.total) ? 'success' : 'warning'"
+                class="font-mono"
               >
                 {{
                   formatNumber(scoreBelowFull(problem.points, problem.total, 1), locale.locale, 1)
                 }}/{{ formatNumber(problem.total, locale.locale, 1) }}
-              </span>
+              </Chip>
             </li>
           </ul>
         </Card>

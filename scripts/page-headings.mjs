@@ -24,8 +24,6 @@ export const ALLOWED = {
   'features/admin/similarity/SimilarityPairPage.vue': 'a centred not-found state under Bit',
   'features/home/AnonymousHero.vue':
     'the signed-out hero card: title, pitch and calls to action beside Bit',
-  'features/profile/ProfileHeader.vue':
-    'the profile card: the username takes the rating tier colour beside avatar, tier and own chips',
   'features/contests/print/ContestPrintPage.vue':
     'the printed sheet title, centred between rules, not a screen header',
 };

@@ -2,6 +2,7 @@
 import { formatDelta } from '@/lib/rating-delta';
 import { computed, ref } from 'vue';
 import type { RatingHistoryEntry } from '@/api/types/users';
+import Chip from '@/components/ui/Chip.vue';
 import { translate } from '@/i18n';
 import { formatDate, formatMonthYear } from '@/lib/format-date';
 import {
@@ -22,11 +23,10 @@ import type { ChartBox, ChartPoint } from '@/lib/rating-chart';
 import { ratingTier, tierColor } from '@/lib/rating-tiers';
 import { TIER_FILL_CLASSES, TIER_STROKE_CLASSES } from '@/lib/tier-classes';
 import { useLocaleStore } from '@/stores/locale.store';
-import RatingStats from './RatingStats.vue';
 import { useElementWidth } from './use-element-width';
 
 /**
- * Rating over the contests a viewer may see: a row of four figures, then faint tier bands behind a line with a hollow dot per contest.
+ * Rating over the contests a viewer may see: the latest change, then faint tier bands behind a line with a hollow dot per contest.
  * Hovering or focusing a contest shows its name, date, place, rating change and tier. Draws nothing without a rated contest.
  */
 const props = defineProps<{ history: RatingHistoryEntry[] }>();
@@ -39,6 +39,7 @@ const NAME_SLOT = 80; // px per contest needed to print the contest name (cut to
 const AXIS_LEFT = 44;
 const TOP = 18;
 const LABEL_CHAR = 6.4;
+const LABEL_INSET = 16; // the tier names stay clear of the card's edge
 const TOOLTIP_HEIGHT = 70;
 const isPhone = computed(() => width.value < PHONE_WIDTH);
 const height = computed(() => (isPhone.value ? 280 : 300));
@@ -53,7 +54,8 @@ const bandName = (low: number) => {
 /** The right margin holds the widest tier name. */
 const rightMargin = computed(
   () =>
-    Math.max(...tierBands(range.value).map((band) => bandName(band.low).length)) * LABEL_CHAR + 8,
+    Math.max(...tierBands(range.value).map((band) => bandName(band.low).length)) * LABEL_CHAR +
+    LABEL_INSET,
 );
 const baseBox = computed<ChartBox>(() => ({
   width: width.value,
@@ -179,12 +181,19 @@ const hitWidth = computed(() => Math.max(spacing.value, 24));
 
 <template>
   <div v-if="points.length" ref="root" class="flex flex-col gap-3">
-    <RatingStats
-      :current="current.rating"
-      :max="best.rating"
-      :count="points.length"
-      :delta="current.delta"
-    />
+    <p
+      v-if="current.delta !== null"
+      data-testid="rating-delta"
+      class="flex items-center gap-2 text-sm text-muted"
+    >
+      {{ $t('ratingChart.delta') }}
+      <Chip
+        size="md"
+        :tone="current.delta > 0 ? 'success' : current.delta < 0 ? 'danger' : 'neutral'"
+      >
+        {{ formatDelta(current.delta) }}
+      </Chip>
+    </p>
     <svg
       role="group"
       :aria-label="label"
