@@ -105,9 +105,9 @@ const model = computed<MenuItem[]>(() => {
       <a
         v-bind="itemProps.action"
         :href="item.href"
-        @click="(event: MouseEvent) => item.href && !isModified(event) && event.preventDefault()"
         class="flex min-h-10 cursor-pointer items-center gap-3 px-3 text-sm no-underline touch:min-h-11"
         :class="item.danger ? 'text-negative' : 'text-content'"
+        @click="(event: MouseEvent) => item.href && !isModified(event) && event.preventDefault()"
       >
         <component
           :is="item.rowIcon"
