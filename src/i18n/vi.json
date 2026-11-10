@@ -1647,7 +1647,7 @@
     "refusedRate": "Bạn bình chọn quá nhanh. Hãy thử lại sau ít giây."
   },
   "leaderboard": {
-    "lead": "{total} người dùng đang hoạt động · 100 người mỗi trang",
+    "lead": "{total} người dùng đang hoạt động",
     "sortBy": "Sắp xếp theo",
     "columns": {
       "rank": "Hạng",
@@ -1662,8 +1662,8 @@
     "myRank": "Hạng của bạn",
     "findMe": "Tìm hạng của tôi",
     "jumpLabel": "Tên đăng nhập",
-    "jumpPlaceholder": "Đến hồ sơ theo tên đăng nhập",
-    "jumpSubmit": "Xem",
+    "jumpPlaceholder": "Tên đăng nhập",
+    "jumpSubmit": "Mở hồ sơ",
     "pagerLabel": "Trang bảng xếp hạng",
     "empty": "Chưa có ai trên bảng xếp hạng này.",
     "title": "Bảng xếp hạng"

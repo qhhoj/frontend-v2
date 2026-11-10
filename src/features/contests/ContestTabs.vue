@@ -81,28 +81,23 @@ const tabs = computed<PillTab[]>(() => {
           }
         : undefined,
   }));
-  if (!canViewBalloons.value) return own;
   const balloons = {
     key: 'contest-balloons',
     label: t('balloons.tab'),
     to: { name: 'contest-balloons', params: { key: props.contestKey } },
   };
-  return [...own, balloons];
+  const manage = manageTarget.value && {
+    key: 'contest-manage',
+    label: t('contests.tabs.manage'),
+    to: manageTarget.value,
+    icon: Settings,
+    testid: 'contest-manage-tab',
+  };
+  return [...own, ...(canViewBalloons.value ? [balloons] : []), ...(manage ? [manage] : [])];
 });
 </script>
 
 <template>
-  <div class="flex items-center gap-2">
-    <PillTabs class="min-w-0 flex-1" :tabs="tabs" :label="t('contests.tabs.label')" />
-    <RouterLink
-      v-if="manageTarget"
-      :to="manageTarget"
-      data-testid="contest-manage-tab"
-      class="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-pill border border-dashed border-line-strong px-4 text-sm font-semibold whitespace-nowrap text-muted hover:bg-surface-hover hover:text-content max-sm:px-3"
-    >
-      <Settings aria-hidden="true" class="size-4" />
-      <span class="max-sm:sr-only">{{ t('contests.tabs.manage') }}</span>
-    </RouterLink>
-  </div>
+  <PillTabs :tabs="tabs" :label="t('contests.tabs.label')" />
   <AnnouncementLiveRegion :contest-key="contestKey" :is-streaming="isStreaming" />
 </template>

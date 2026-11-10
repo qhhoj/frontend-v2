@@ -43,8 +43,8 @@ function scrollIntoStrip(strip: HTMLElement, tabs: HTMLElement[], tab: HTMLEleme
  * The tab strip's overflow: which tabs (`data-tab-key`) do not fit whole (the strip hides them and lists them behind
  * the "⋯" `trigger`), and the current tab kept in view. The trigger sits over the strip and the list keeps room for it,
  * so neither its showing nor the hiding changes a measured size: a resize never loops. The strip or its tabs changing
- * size (a drawer finishing its layout, a font loading, a count appearing) re-fits the current tab. Inactive when
- * `enabled` is false: the strip just scrolls.
+ * size (a drawer finishing its layout, a font loading, a count appearing) re-fits the current tab. Without the menu
+ * (`enabled` false) the strip still scrolls the current tab into view but hides and lists nothing.
  */
 export function useTabsOverflow(
   scroller: Ref<HTMLElement | null>,
@@ -68,7 +68,7 @@ export function useTabsOverflow(
 
   function revealCurrent() {
     const strip = scroller.value;
-    if (!strip || !enabled) return;
+    if (!strip) return;
     const tabs = tabsOf(strip);
     const { fits, width } = tabWindow(strip, tabs, trigger.value);
     const tab = strip.querySelector<HTMLElement>(CURRENT_TAB);
@@ -80,7 +80,7 @@ export function useTabsOverflow(
   let observer: ResizeObserver | undefined;
   onMounted(() => {
     revealCurrent();
-    if (!enabled || typeof ResizeObserver === 'undefined' || !scroller.value) return;
+    if (typeof ResizeObserver === 'undefined' || !scroller.value) return;
     observer = new ResizeObserver(revealCurrent);
     observer.observe(scroller.value);
     if (scroller.value.firstElementChild) observer.observe(scroller.value.firstElementChild);

@@ -92,6 +92,7 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
     :rows="entries"
     :row-key="(entry) => entry.id"
     :row-attrs="rowAttrs"
+    :row-to="(entry) => ({ name: 'user', params: { username: entry.username } })"
     :label="$t('leaderboard.title')"
     stack="scroll"
     :sticky-columns="0"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import type { Component } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import Tabs from './ui/Tabs.vue';
 import type { TabItem } from './ui/Tabs.vue';
@@ -10,6 +11,9 @@ export interface PillTab {
   to: RouteLocationRaw;
   /** Lights the tab on a page that is not its own route; otherwise the router marks the exact match. */
   isCurrent?: boolean;
+  /** A 16 px icon before the label. */
+  icon?: Component;
+  testid?: string;
   badge?: {
     text: string;
     /** `neutral` is a count; `accent` says something waits for the viewer. */

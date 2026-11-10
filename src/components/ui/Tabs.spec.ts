@@ -148,3 +148,22 @@ describe('Tabs as links', () => {
     expect(wrapper.findAll('[aria-current="page"]').map((link) => link.text())).toEqual(['Tất cả']);
   });
 });
+
+describe('Tabs that scroll', () => {
+  it('scrolls the current tab into view, on mount and when it changes', async () => {
+    fakeStripLayout();
+    const wrapper = mountComponent(Tabs, {
+      props: { items: SECTIONS, label: 'Mục', modelValue: 'history', overflow: 'scroll' },
+    });
+    document.body.append(wrapper.element);
+    await nextTick();
+    const strip = wrapper.get('ul').element.parentElement!;
+    expect(strip.scrollLeft).toBe(80);
+    // Tabs' defineModel prop is not in the mounted type; the cast only satisfies setProps.
+    await wrapper.setProps({ modelValue: 'statement' } as never);
+    await nextTick();
+    await nextTick();
+    expect(strip.scrollLeft).toBe(0);
+    wrapper.unmount();
+  });
+});

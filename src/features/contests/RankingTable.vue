@@ -39,6 +39,12 @@ const props = defineProps<{
   /** The viewer may only see own submissions (backend narrows the list), so only their own row links. */
   ownSubmissionsOnly?: boolean;
 }>();
+/** Rank and name stay while the problem columns scroll (the rank column is `RANK_COLUMN_REM` = 5 rem = `left-20`). */
+const RANK_STICKY = 'sticky left-0 z-10 bg-surface-solid';
+const NAME_STICKY = 'sticky left-20 z-10 bg-surface-solid';
+/** The viewer's row keeps its tint over the opaque sticky cells. */
+const stickyBackground = (row: RankingRow) =>
+  row.user.id === props.viewerId ? 'bg-linear-to-b from-surface-hover to-surface-hover' : '';
 const penalty = computed(() => isPenaltyFormat(props.context.formatName));
 const root = ref<HTMLElement | null>(null);
 const isMotionAllowed = useMotionAllowed();
@@ -113,10 +119,10 @@ const scoreHeaderKey = computed(() =>
         </caption>
         <thead>
           <tr class="text-center text-meta text-muted">
-            <th scope="col" class="w-14 px-3 py-4 text-right font-medium">
+            <th scope="col" :class="[RANK_STICKY, 'w-14 px-3 py-4 text-right font-medium']">
               <RankColumnHeader :label="$t('ranking.columns.rank')" />
             </th>
-            <th scope="col" class="px-2.5 py-4 text-left font-medium">
+            <th scope="col" :class="[NAME_STICKY, 'px-2.5 py-4 text-left font-medium']">
               {{ $t('ranking.columns.user') }}
             </th>
             <th scope="col" class="px-2.5 py-4 font-medium">
@@ -148,11 +154,20 @@ const scoreHeaderKey = computed(() =>
           >
             <td
               class="w-14 px-3 py-2.5 text-right"
-              :class="row.rank && !row.isDisqualified ? medalClass(row.rank) : ''"
+              :class="[
+                RANK_STICKY,
+                stickyBackground(row),
+                row.rank && !row.isDisqualified ? medalClass(row.rank) : '',
+              ]"
             >
               {{ row.isDisqualified ? '—' : (row.rank ?? '—') }}
             </td>
-            <th scope="row" tabindex="-1" class="overflow-hidden px-2.5 py-2.5 text-left font-body">
+            <th
+              scope="row"
+              tabindex="-1"
+              class="overflow-hidden px-2.5 py-2.5 text-left font-body"
+              :class="[NAME_STICKY, stickyBackground(row)]"
+            >
               <span class="flex items-center gap-2">
                 <UserLink
                   :username="row.user.username"
