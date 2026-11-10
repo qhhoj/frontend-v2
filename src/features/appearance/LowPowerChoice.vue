@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { translate } from '@/i18n';
 import BitLoop from '@/components/BitLoop.vue';
 import BitMascot from '@/components/BitMascot.vue';
 import Card from '@/components/ui/Card.vue';
-import { RADIO_INPUT } from '@/components/ui/choice-classes';
+import ChoiceCards from '@/components/ui/ChoiceCards.vue';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { LOW_POWER_PREFERENCES } from '@/theme/low-power';
 import type { LowPowerPreference } from '@/theme/low-power';
@@ -14,10 +15,20 @@ const lowPower = useLowPowerStore();
 const EFFECT_KEYS = ['blur', 'blobs', 'motion', 'bit', 'replay', 'ranking', 'editor'] as const;
 const machineKey = computed(() => (lowPower.isWeak ? 'lowPower.machineOn' : 'lowPower.machineOff'));
 const isSaved = ref(false);
-function choose(preference: LowPowerPreference) {
-  lowPower.choose(preference);
-  isSaved.value = true;
-}
+const preference = computed<LowPowerPreference>({
+  get: () => lowPower.preference,
+  set: (next) => {
+    lowPower.choose(next);
+    isSaved.value = true;
+  },
+});
+const options = computed(() =>
+  LOW_POWER_PREFERENCES.map((value) => ({
+    value,
+    label: translate(`lowPower.option.${value}.title`),
+    description: translate(`lowPower.option.${value}.body`),
+  })),
+);
 </script>
 
 <template>
@@ -26,40 +37,31 @@ function choose(preference: LowPowerPreference) {
       <h2 class="section-title">{{ $t('lowPower.title') }}</h2>
       <p class="mt-1 text-meta text-muted">{{ $t('lowPower.lead') }}</p>
     </div>
-    <fieldset class="grid gap-3 md:grid-cols-3">
-      <legend class="sr-only">{{ $t('lowPower.title') }}</legend>
-      <label
-        v-for="option in LOW_POWER_PREFERENCES"
-        :key="option"
-        :data-testid="`low-power-${option}`"
-        class="flex cursor-pointer flex-col gap-2 rounded-row border-2 bg-surface-strong p-4"
-        :class="lowPower.preference === option ? 'border-accent' : 'border-line-control'"
-      >
-        <span class="flex min-h-11 items-center gap-3 font-semibold">
-          <input
-            type="radio"
-            name="low-power"
-            :class="RADIO_INPUT"
-            :value="option"
-            :checked="lowPower.preference === option"
-            @change="choose(option)"
-          />
-          {{ $t(`lowPower.option.${option}.title`) }}
-        </span>
-        <span class="text-sm text-muted">{{ $t(`lowPower.option.${option}.body`) }}</span>
+    <ChoiceCards
+      v-model="preference"
+      name="low-power"
+      :legend="$t('lowPower.title')"
+      legend-hidden
+      :options="options"
+    >
+      <template #extra="{ option }">
         <span
-          v-if="option === 'auto'"
+          v-if="option.value === 'auto'"
           data-testid="low-power-machine"
           class="text-sm font-semibold"
           >{{ $t(machineKey) }}</span
         >
         <span v-else class="flex items-center gap-3 text-caption leading-4 text-muted">
-          <BitMascot v-if="option === 'on'" :look="PLACEMENT_LOOKS.hero" class="[--bit-px:2px]" />
+          <BitMascot
+            v-if="option.value === 'on'"
+            :look="PLACEMENT_LOOKS.hero"
+            class="[--bit-px:2px]"
+          />
           <BitLoop v-else kind="welcome" class="[--bit-px:2px]" />
-          {{ $t(`lowPower.option.${option}.preview`) }}
+          {{ $t(`lowPower.option.${option.value}.preview`) }}
         </span>
-      </label>
-    </fieldset>
+      </template>
+    </ChoiceCards>
     <div>
       <p class="text-sm font-semibold">{{ $t('lowPower.effectsTitle') }}</p>
       <ul class="mt-2 grid list-disc gap-1 pl-5 text-sm text-muted md:grid-cols-2">

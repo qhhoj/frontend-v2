@@ -386,7 +386,8 @@
   },
   "notFound": {
     "title": "Page not found",
-    "body": "Bit cried a whole puddle. This page does not exist, try one of these instead.",
+    "body": "This page does not exist or has moved. Try one of these instead.",
+    "back": "Go back",
     "home": "Back to home",
     "problems": "Browse problems",
     "bitLabel": "Bit crying"
@@ -2350,15 +2351,6 @@
       "on": "On",
       "off": "Off"
     },
-    "footer": "Low-power mode: {state}",
-    "footerState": {
-      "on": "On",
-      "off": "Off",
-      "autoOn": "Auto (on)",
-      "autoOff": "Auto (off)"
-    },
-    "footerChange": "Change",
-    "footerChangeLabel": "Change low-power mode",
     "title": "Low-power mode"
   },
   "adminEdit": {
@@ -2798,6 +2790,7 @@
     "noticeBody": "“{name}” was deleted. The submission and its source are kept, but the per-test details are gone."
   },
   "footer": {
+    "version": "Frontend version",
     "versionTitle": "Frontend build being served (commit and date)",
     "source": "Source code (AGPL)",
     "runtimes": "Judges"
@@ -2905,8 +2898,7 @@
     }
   },
   "siteNotice": {
-    "region": "Site notice",
-    "dismiss": "Close the notice"
+    "region": "Site notice"
   },
   "orgAdmin": {
     "pendingBadge": "{count} pending requests",

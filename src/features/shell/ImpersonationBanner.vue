@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Eye } from 'lucide-vue-next';
+import AppButton from '@/components/ui/AppButton.vue';
 import { useAuthAction } from '@/features/auth/use-auth-action';
 import { useSessionStore } from '@/stores/session.store';
 
@@ -17,19 +18,12 @@ const stop = () => run(() => session.stopImpersonating());
     :aria-label="$t('impersonation.region')"
     class="sticky top-0 z-40 flex min-h-14 flex-wrap items-center gap-x-3.5 gap-y-1 bg-caution-strong px-4 py-2 text-sm text-on-caution-strong md:px-8"
   >
-    <Eye aria-hidden="true" class="size-[18px] shrink-0" />
+    <Eye aria-hidden="true" class="size-5 shrink-0" />
     <p class="m-0 min-w-0 flex-1">
       <strong>{{ $t('impersonation.title') }}</strong>
       {{ $t('impersonation.body', { username: session.user.username }) }}
     </p>
-    <button
-      type="button"
-      class="min-h-11 rounded-pill border border-on-caution-strong px-4 font-semibold"
-      :aria-disabled="pending"
-      @click="pending || stop()"
-    >
-      {{ $t('impersonation.stop') }}
-    </button>
+    <AppButton :loading="pending" @click="stop()">{{ $t('impersonation.stop') }}</AppButton>
     <p v-if="summary" role="alert" class="m-0 w-full font-semibold">{{ summary }}</p>
   </div>
 </template>

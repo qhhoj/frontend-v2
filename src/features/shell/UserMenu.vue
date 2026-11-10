@@ -24,7 +24,7 @@ const isOpen = ref(false);
 
 const links = useAccountLinks();
 
-/** Pages are real links (`to`, rendered by the item slot below); sign-out is a command. */
+/** Pages are real links (`to`, rendered by the item slot below, so a modified click opens a tab); sign-out is a command. */
 const items = computed<MenuItem[]>(() => [
   ...links.value.map((link) => ({
     label: translate(link.labelKey),
@@ -38,9 +38,9 @@ const items = computed<MenuItem[]>(() => [
 
 <template>
   <template v-if="session.user">
-    <button
-      type="button"
-      class="flex h-11 max-w-[9rem] items-center gap-2.5 sm:max-w-[12rem] rounded-pill border border-line bg-surface-strong pr-1.5 pl-4 text-sm font-semibold hover:bg-surface-hover"
+    <AppButton
+      tone="secondary"
+      class="max-w-36 gap-2.5 pr-1.5 pl-4 sm:max-w-48"
       aria-haspopup="menu"
       :aria-expanded="isOpen"
       :aria-label="$t('account.menu', { username: session.user.username })"
@@ -52,7 +52,7 @@ const items = computed<MenuItem[]>(() => [
         >{{ session.user.username }}</span
       >
       <UserAvatar :username="session.user.username" :size="28" class="shrink-0" />
-    </button>
+    </AppButton>
     <Menu ref="menu" :model="items" popup @show="isOpen = true" @hide="isOpen = false">
       <template #item="{ item, props: itemProps }">
         <RouterLink v-if="item.to" v-slot="{ href, navigate }" :to="item.to" custom>

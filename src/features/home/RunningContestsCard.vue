@@ -47,8 +47,21 @@ const timeLeftOf = (contest: ContestListItem) =>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <div data-skeleton-region="running-contest" class="grid gap-3 md:grid-cols-2">
-          <!-- Measured against the loaded articles: one column on a phone, two on desktop. -->
-          <SkeletonBlock v-for="row in 2" :key="row" class="h-[264px] w-full md:h-[232px]" />
+          <!-- The loaded article's own rows, so the card keeps its height when the contests arrive. -->
+          <div
+            v-for="row in 2"
+            :key="row"
+            class="flex flex-col gap-2.5 rounded-card border border-line p-4"
+          >
+            <SkeletonBlock pill class="h-7 w-24" />
+            <p class="font-display text-subtitle leading-7 font-semibold">
+              <SkeletonBlock text class="w-3/4" />
+            </p>
+            <p class="font-mono text-meta"><SkeletonBlock text class="w-1/2" /></p>
+            <SkeletonBlock pill class="h-2 w-full" />
+            <p class="text-sm font-semibold"><SkeletonBlock text class="w-1/3" /></p>
+            <SkeletonBlock pill class="h-(--qh-control) w-32" />
+          </div>
         </div>
       </template>
       <div v-if="contests.length" class="grid gap-3 md:grid-cols-2">

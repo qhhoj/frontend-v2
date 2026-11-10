@@ -12,6 +12,7 @@ import { GLASS_STOPS, nearestGlassStop } from '@/theme/appearance';
 import { useAppearanceStore } from '@/theme/appearance.store';
 import { useThemeStore } from '@/theme/theme.store';
 import BitRoamCard from '@/features/bit-roam/BitRoamCard.vue';
+import BuildInfo from '@/features/shell/BuildInfo.vue';
 import AccentChoice from './AccentChoice.vue';
 import AppearancePreview from './AppearancePreview.vue';
 import LevelSlider from './LevelSlider.vue';
@@ -128,5 +129,6 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
     </div>
     <BitRoamCard />
     <LowPowerChoice />
+    <BuildInfo />
   </SettingsLayout>
 </template>

@@ -3,6 +3,9 @@ import { Check, Link } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { SHORT_LINK_DAILY_LIMIT } from '@/api/types/short-links';
 import InlineBit from '@/components/InlineBit.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import IconButton from '@/components/ui/IconButton.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
 import { useSessionStore } from '@/stores/session.store';
@@ -13,7 +16,7 @@ import { useShortLink } from './use-short-link';
 /** "Sao chép liên kết ngắn" in a header's action row; full width on a phone. Signed-out viewers cannot create links. */
 const props = defineProps<{
   path: string;
-  /** A 40 px round icon button (a card header); its notices open as a small panel below it. */
+  /** An icon-only button (a card header); its notices open as a small panel below it. */
   compact?: boolean;
 }>();
 const session = useSessionStore();
@@ -47,29 +50,30 @@ const selectAll = (event: FocusEvent) => (event.target as HTMLInputElement).sele
     data-testid="short-link"
     :class="compact ? 'relative' : 'flex flex-col gap-2 max-sm:w-full'"
   >
-    <button
-      type="button"
+    <IconButton
+      v-if="compact"
+      tone="secondary"
       data-testid="short-link-button"
-      class="inline-flex items-center justify-center rounded-pill border font-semibold"
-      :class="[
-        compact
-          ? 'size-10 cursor-pointer touch:size-11'
-          : 'min-h-11 gap-2 px-4 text-sm max-sm:w-full',
-        state === 'copied'
-          ? 'border-accent bg-accent-soft text-accent-soft-text'
-          : compact
-            ? 'border-line bg-surface text-content hover:bg-surface-hover'
-            : 'border-line-strong bg-surface-solid text-content hover:bg-surface-hover',
-      ]"
-      :aria-label="compact ? compactName : undefined"
-      :title="compact ? compactName : undefined"
-      :aria-disabled="state === 'limited' || undefined"
+      :label="compactName"
+      :disabled="state === 'limited'"
       @click="copy"
     >
-      <Check v-if="state === 'copied'" aria-hidden="true" class="size-4" />
-      <Link v-else aria-hidden="true" class="size-4" />
-      <span v-if="!compact">{{ $t(labelKey) }}</span>
-    </button>
+      <Check v-if="state === 'copied'" aria-hidden="true" />
+      <Link v-else aria-hidden="true" />
+    </IconButton>
+    <AppButton
+      v-else
+      data-testid="short-link-button"
+      class="max-sm:w-full"
+      :disabled="state === 'limited'"
+      @click="copy"
+    >
+      <template #icon>
+        <Check v-if="state === 'copied'" aria-hidden="true" class="size-4" />
+        <Link v-else aria-hidden="true" class="size-4" />
+      </template>
+      {{ $t(labelKey) }}
+    </AppButton>
     <p class="sr-only" aria-live="polite">{{ announcement }}</p>
     <p
       v-if="state === 'limited'"
@@ -91,11 +95,11 @@ const selectAll = (event: FocusEvent) => (event.target as HTMLInputElement).sele
       <p class="flex items-center gap-2">
         <InlineBit :kind="SHORT_LINK_BITS.manual" />{{ $t('shortLink.clipboardBlocked') }}
       </p>
-      <input
+      <TextInput
         readonly
-        :value="url"
+        :model-value="url"
         :aria-label="$t('shortLink.manualLabel')"
-        class="min-h-11 rounded-row border border-line-control bg-surface-solid px-3 font-mono text-content"
+        class="font-mono"
         @focus="selectAll"
       />
     </div>

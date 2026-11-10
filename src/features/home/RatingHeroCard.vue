@@ -4,9 +4,12 @@ import { computed, useId } from 'vue';
 import BitLoop from '@/components/BitLoop.vue';
 import BitMascot from '@/components/BitMascot.vue';
 import Card from '@/components/ui/Card.vue';
+import Chip from '@/components/ui/Chip.vue';
+import StatGrid from '@/components/ui/StatGrid.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useRatingHistoryQuery, useUserPageQuery } from '@/features/users/users.queries';
+import { translate } from '@/i18n';
 import { formatNumber, greetingKey } from '@/lib/format';
 import { ratingTier } from '@/lib/rating-tiers';
 import { sparklineAreaPath, sparklinePath } from '@/lib/sparkline';
@@ -56,16 +59,16 @@ const tiles = computed(() =>
         ...(isRated.value
           ? [
               {
-                labelKey: 'home.solved',
+                label: translate('home.solved'),
                 value: formatNumber(user.value.problemCount, locale.locale),
               },
             ]
           : []),
         {
-          labelKey: 'home.points',
+          label: translate('home.points'),
           value: formatNumber(user.value.performancePoints, locale.locale, 1),
         },
-        { labelKey: 'home.rank', value: `#${user.value.rank}` },
+        { label: translate('home.rank'), value: `#${user.value.rank}` },
       ]
     : [],
 );
@@ -136,21 +139,14 @@ const tiles = computed(() =>
                   v-if="isRated && delta !== null"
                   class="mb-3 flex flex-nowrap items-center gap-2"
                 >
-                  <span
-                    class="inline-flex items-center gap-1.5 rounded-pill px-3 py-1.5 font-mono text-sm font-semibold"
-                    :class="
-                      delta >= 0
-                        ? 'bg-verdict-ac-bg text-verdict-ac'
-                        : 'bg-verdict-wa-bg text-verdict-wa'
-                    "
+                  <Chip
+                    size="md"
+                    :tone="delta >= 0 ? 'success' : 'danger'"
+                    :icon="delta >= 0 ? TrendingUp : TrendingDown"
+                    class="font-mono font-semibold"
                   >
-                    <component
-                      :is="delta >= 0 ? TrendingUp : TrendingDown"
-                      class="size-4"
-                      aria-hidden="true"
-                    />
                     {{ $t('home.ratingDelta', { delta: delta >= 0 ? `+${delta}` : `${delta}` }) }}
-                  </span>
+                  </Chip>
                   <BitLoop
                     v-if="delta > 0"
                     data-testid="rank-up-bit"
@@ -220,16 +216,7 @@ const tiles = computed(() =>
               />
             </svg>
           </div>
-          <dl class="mt-3 grid grid-cols-[repeat(auto-fit,minmax(6.5rem,1fr))] gap-3">
-            <div
-              v-for="tile in tiles"
-              :key="tile.labelKey"
-              class="min-w-0 rounded-row bg-surface-strong p-4"
-            >
-              <dt class="text-meta text-muted">{{ $t(tile.labelKey) }}</dt>
-              <dd class="m-0 font-mono text-stat font-semibold tabular-nums">{{ tile.value }}</dd>
-            </div>
-          </dl>
+          <StatGrid mode="stat" :items="tiles" class="mt-3" />
           <ContinueButton :username="username" class="mt-4" />
         </template>
       </QueryState>

@@ -45,12 +45,14 @@ usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : page.value?
   </StatePanel>
   <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
     <template #skeleton>
-      <div data-skeleton-region="flatpage" class="mx-auto flex max-w-3xl flex-col gap-3 px-4 py-6">
+      <div data-skeleton-region="flatpage" class="page-column">
         <SkeletonBlock text class="h-8 w-2/3" />
-        <SkeletonBlock v-for="line in 10" :key="line" text class="h-4 w-full" />
+        <div class="flex max-w-3xl flex-col gap-3">
+          <SkeletonBlock v-for="line in 10" :key="line" text class="h-4 w-full" />
+        </div>
       </div>
     </template>
-    <article v-if="page" class="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-6 sm:px-8">
+    <article v-if="page" class="page-column">
       <PageHeader
         :title="page.title"
         :crumbs="[{ label: $t('flatpage.home'), to: '/' }, { label: page.title }]"
@@ -58,7 +60,7 @@ usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : page.value?
       >
         <template #actions><AdminEditLink :to="flatpageEditTarget(session.user)" /></template>
       </PageHeader>
-      <UserContent :html="page.contentHtml" class="overflow-x-auto" />
+      <UserContent :html="page.contentHtml" class="max-w-3xl overflow-x-auto" />
     </article>
   </QueryState>
 </template>

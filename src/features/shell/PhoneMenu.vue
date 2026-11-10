@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { LogOut, Menu } from 'lucide-vue-next';
-import Drawer from 'primevue/drawer';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import AppButton from '@/components/ui/AppButton.vue';
-import BrandWordmark from '@/components/ui/BrandWordmark.vue';
+import Drawer from '@/components/ui/Drawer.vue';
+import IconButton from '@/components/ui/IconButton.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import ModeChoice from '@/features/appearance/ModeChoice.vue';
 import { useLogout } from '@/features/auth/use-logout';
 import OfficialModePill from '@/features/official-mode/OfficialModePill.vue';
-import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
 import { ratingTextClass } from '@/lib/tier-classes';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
@@ -20,11 +19,11 @@ import { useAccountLinks } from './account-links';
 import { NAV_ITEMS, useIsNavCurrent } from './nav-items';
 
 /**
- * The phone header's menu. A sheet drops from the top: the seven sections (the current one marked), then what the
+ * The phone header's menu. A sheet rises from the bottom: the seven sections (the current one marked), then what the
  * desktop row shows beside the navigation: the official-mode pill, the account (who is signed in, its pages in the
  * desktop menu's order and sign-out, or register for a visitor; sign-in and the bell stay in the header), the language
  * and the light/dark mode (the rest of the look is one link away). The drawer traps focus and closes on Esc; any
- * navigation closes it; focus goes back to the menu button.
+ * navigation closes it; focus goes back to the menu button (the kit `Drawer`).
  */
 const LANGUAGES: ReadonlyArray<{ value: Locale; label: string }> = [
   { value: 'vi', label: 'Tiếng Việt' },
@@ -43,56 +42,24 @@ const logout = useLogout();
 const isSessionPending = useIsFirstNavigationPending();
 const isOpen = ref(false);
 const isCurrent = useIsNavCurrent();
-const opener = ref<HTMLButtonElement | null>(null);
 watch(
   () => route.fullPath,
   () => (isOpen.value = false),
 );
-
-/**
- * Drawer is unstyled: these classes are its whole look (a card under the top edge, the page dimmed below). Computed, so
- * its name follows a language switched from inside it.
- */
-const drawerPt = computed(() => ({
-  root: {
-    class:
-      'flex max-h-full w-full flex-col rounded-card border border-line-strong bg-surface-solid text-content',
-    'aria-label': translate('nav.menu'),
-  },
-  header: { class: 'flex items-center justify-between gap-3 px-4 pt-2' },
-  pcCloseButton: {
-    root: {
-      class: 'inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-hover',
-    },
-  },
-  content: { class: 'flex flex-col gap-4 overflow-y-auto px-4 py-3' },
-  footer: { class: 'px-4 pb-4' },
-  mask: { class: 'page-gutter fixed inset-0 z-overlay flex items-start bg-ground/70 py-2' },
-}));
 </script>
 
 <template>
-  <button
-    ref="opener"
-    type="button"
+  <IconButton
+    tone="secondary"
     data-testid="phone-menu"
-    class="relative inline-flex size-11 items-center justify-center rounded-pill border border-line bg-surface-strong hover:bg-surface-hover"
     aria-haspopup="dialog"
     :aria-expanded="isOpen"
-    :aria-label="$t('nav.openMenu')"
+    :label="$t('nav.openMenu')"
     @click="isOpen = true"
   >
-    <Menu aria-hidden="true" class="size-5" />
-  </button>
-  <Drawer
-    v-model:visible="isOpen"
-    position="top"
-    block-scroll
-    :pt="drawerPt"
-    :close-button-props="{ 'aria-label': $t('common.close') }"
-    @hide="opener?.focus()"
-  >
-    <template #header><BrandWordmark /></template>
+    <Menu aria-hidden="true" />
+  </IconButton>
+  <Drawer v-model:visible="isOpen" side="bottom" :title="$t('nav.menu')">
     <nav :aria-label="$t('nav.main')">
       <RouterLink
         v-for="item in NAV_ITEMS"

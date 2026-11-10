@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import CryingBit from '@/components/CryingBit.vue';
 import ShortLinkNotFoundHint from '@/components/ShortLinkNotFoundHint.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 
 const route = useRoute();
+const router = useRouter();
+/** The router records the previous in-app page; a visitor who opened the address directly has none to go back to. */
+const canGoBack = computed(() => typeof window.history.state?.back === 'string');
 /** Pixel font for the giant 404; X is a filled block. */
 const DIGIT_ROWS = {
   '4': ['X..X', 'X..X', 'XXXX', '...X', '...X'],
@@ -16,15 +20,13 @@ const digitCells = (digit: keyof typeof DIGIT_ROWS) =>
 </script>
 
 <template>
-  <section
-    class="mx-auto flex max-w-3xl flex-col items-center gap-4 px-4 py-10 text-center sm:py-16"
-  >
-    <div class="relative flex flex-col items-center">
-      <!-- The pale 404 is decoration: token-coloured blocks, 16 px on a phone and 28 px from sm up. -->
+  <section class="page-column items-center text-center sm:py-16">
+    <div class="flex flex-col items-center gap-4">
+      <!-- The 404 is decoration: line-coloured blocks above Bit, 16 px on a phone and 28 px from sm up. -->
       <div
         data-testid="pale-404"
         aria-hidden="true"
-        class="-mb-[3.75rem] flex gap-3 [--block:16px] sm:gap-6 sm:[--block:28px]"
+        class="flex gap-3 [--block:16px] sm:gap-6 sm:[--block:28px]"
       >
         <div
           v-for="(digit, position) in DIGITS"
@@ -35,20 +37,23 @@ const digitCells = (digit: keyof typeof DIGIT_ROWS) =>
             v-for="(filled, cell) in digitCells(digit)"
             :key="cell"
             class="rounded-[4px]"
-            :class="filled ? 'bg-skeleton' : ''"
+            :class="filled ? 'bg-line-strong' : ''"
           />
         </div>
       </div>
       <CryingBit class="[--bit-px:8px] sm:[--bit-px:12px]" :label="$t('notFound.bitLabel')" />
     </div>
-    <h1 class="mt-2 page-title">
+    <h1 class="page-title">
       {{ $t('notFound.title') }}
     </h1>
     <p class="max-w-md text-base leading-relaxed text-muted">{{ $t('notFound.body') }}</p>
     <ShortLinkNotFoundHint />
-    <div class="flex flex-wrap justify-center gap-2.5">
-      <AppButton tone="primary" to="/">{{ $t('notFound.home') }}</AppButton>
+    <div class="flex flex-wrap justify-center gap-2">
+      <AppButton v-if="canGoBack" data-testid="not-found-back" @click="router.back()">{{
+        $t('notFound.back')
+      }}</AppButton>
       <AppButton to="/problems">{{ $t('notFound.problems') }}</AppButton>
+      <AppButton tone="primary" to="/">{{ $t('notFound.home') }}</AppButton>
     </div>
     <p data-testid="requested-path" class="max-w-full font-mono text-meta break-all text-muted">
       {{ route.path }}
