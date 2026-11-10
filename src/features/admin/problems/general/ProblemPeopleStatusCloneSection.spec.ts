@@ -25,12 +25,12 @@ const mountAdmin = async (path: string) => {
   return mounted;
 };
 
+/** The editor header's "Thêm" menu button (not the editor tabs' own "⋯ Thêm"). */
+const HEADER_MENU = '[data-testid="page-header-overflow"]';
+
 /** "Thêm" in the editor header, then "Nhân bản bài…" in its menu (both menus render into `document.body`). */
 async function openClone(wrapper: Mounted['wrapper']) {
-  await wrapper
-    .findAll('button')
-    .find((button) => button.text() === 'Thêm')!
-    .trigger('click');
+  await wrapper.get(HEADER_MENU).trigger('click');
   await flushPromises();
   [...document.body.querySelectorAll('button')]
     .find((button) => button.textContent?.trim() === 'Nhân bản bài…')!
@@ -110,7 +110,7 @@ describe('problem people, status and clone', () => {
   it('hides clone without judge.clone_problem', async () => {
     mockApi({ ...staffViewer(['judge.edit_own_problem']), ...problemEditorRoutes() });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/general');
-    expect(wrapper.findAll('button').some((button) => button.text() === 'Thêm')).toBe(false);
+    expect(wrapper.find(HEADER_MENU).exists()).toBe(false);
   });
 
   it('keeps the clone box out of the save form, so Enter there can never save the problem', async () => {
