@@ -11,11 +11,10 @@ const props = withDefaults(
     canVote: boolean;
     send: (score: VoteScore) => Promise<VoteResponse>;
     orientation?: 'column' | 'row';
-    /** Why `canVote` is false; the arrows' tooltip, and the line under the score when `showReason`. */
+    /** Why `canVote` is false: the arrows' tooltip (a page may also say it in words beside the control). */
     disabledReason?: string;
-    showReason?: boolean;
   }>(),
-  { orientation: 'column', disabledReason: undefined, showReason: false },
+  { orientation: 'column', disabledReason: undefined },
 );
 const emit = defineEmits<{ voted: [] }>();
 const vote = useVote(
@@ -65,12 +64,6 @@ const ARROW =
         <ChevronDown aria-hidden="true" class="size-5" />
       </button>
     </div>
-    <p
-      v-if="!canVote && disabledReason && showReason"
-      class="max-w-40 text-center text-caption leading-4 text-muted"
-    >
-      {{ disabledReason }}
-    </p>
     <p
       v-if="vote.errorKey.value"
       role="alert"

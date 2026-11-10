@@ -1964,7 +1964,6 @@
     "author": "Author",
     "viewProfile": "View profile",
     "morePosts": "More posts",
-    "noMorePosts": "No other posts yet.",
     "notFoundTitle": "Post not found",
     "notFoundBody": "The post does not exist or is not public yet.",
     "backToBlog": "Back to the blog",
@@ -1996,11 +1995,9 @@
     "collapsedReply": "#{number} · {author} · reply to #{parent} · folded for a low score ({score})",
     "tooOld": "Older than a year, no more replies",
     "empty": "No comments yet — be the first",
-    "emptyBody": "Ask about the statement, share a hint or report a mistake. The composer is right below.",
     "action": {
       "reply": "Reply",
       "history": "History ({count})",
-      "more": "More actions",
       "lock": "Lock comments",
       "unlock": "Unlock",
       "report": "Report",
@@ -2854,10 +2851,7 @@
     "backToPost": "Back to the post",
     "body": {
       "label": "Content (Markdown)",
-      "write": "Write",
-      "preview": "Preview",
       "toolbar": "Formatting",
-      "empty": "The preview shows here as you write.",
       "tools": {
         "bold": "Bold",
         "italic": "Italic",

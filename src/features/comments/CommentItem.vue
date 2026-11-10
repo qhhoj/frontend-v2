@@ -70,7 +70,8 @@ const menuItems = computed<RowMenuItem[]>(() => {
   const items: RowMenuItem[] = [];
   if (shown.canEdit && !props.isEditing)
     items.push({ label: t('common.edit'), run: () => emit('edit') });
-  if (shown.deleted ? props.moderates : shown.revisions)
+  // A live comment's history opens from its "đã sửa" link; only a deleted one needs the menu item.
+  if (shown.deleted && props.moderates)
     items.push({
       label: t('comments.action.history', { count: shown.revisions }),
       run: () => emit('history'),
@@ -100,14 +101,13 @@ const hasActionRow = computed(
   <li :id="anchor" class="scroll-mt-24">
     <AppButton
       v-if="isFolded"
-      tone="ghost"
-      block
+      tone="row"
       :aria-expanded="false"
-      class="justify-start border-dashed border-line text-left text-sm font-normal text-muted"
+      class="border-dashed"
       @click="isExpanded = true"
     >
       <template #icon><ChevronRight aria-hidden="true" class="size-4 shrink-0" /></template>
-      <span class="min-w-0 flex-1">
+      <span class="min-w-0 flex-1 [overflow-wrap:anywhere]">
         {{
           quote?.number
             ? $t('comments.collapsedReply', {

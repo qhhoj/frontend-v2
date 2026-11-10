@@ -47,7 +47,6 @@ export const WRAPPERS = [
   wrapper('AuthField', 'features/auth/AuthField.vue', 'FormField with TextInput or PasswordInput'),
   wrapper('AuthSelect', 'features/auth/AuthSelect.vue', 'FormField with SelectField'),
   wrapper('SettingsCard', 'features/account/settings/SettingsCard.vue', 'Card'),
-  wrapper('CommunityCard', 'features/community/CommunityCard.vue', 'Card with QueryState'),
 ];
 
 /** PrimeVue parts other than the config and its types are wrapped by the kit. */

@@ -83,10 +83,8 @@ const nameOf = (version: CommentVersion) =>
           <ol class="flex gap-1 overflow-x-auto md:flex-col">
             <li v-for="version in versions" :key="version.edit" class="shrink-0">
               <AppButton
-                tone="ghost"
-                block
+                tone="row"
                 :pressed="version.edit === chosen?.edit"
-                class="h-auto justify-start py-2 text-left text-sm"
                 @click="chosenEdit = version.edit"
               >
                 <span class="flex flex-col items-start">

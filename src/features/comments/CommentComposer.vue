@@ -84,13 +84,7 @@ function submit() {
 </script>
 
 <template>
-  <AppButton
-    v-if="!isExpanded"
-    block
-    data-testid="composer-open"
-    class="justify-start text-left text-muted"
-    @click="focus"
-  >
+  <AppButton v-if="!isExpanded" tone="row" data-testid="composer-open" @click="focus">
     {{ $t('comments.composer.open') }}
   </AppButton>
   <form

@@ -1964,7 +1964,6 @@
     "author": "Tác giả",
     "viewProfile": "Xem hồ sơ",
     "morePosts": "Bài viết khác",
-    "noMorePosts": "Chưa có bài viết khác.",
     "notFoundTitle": "Không tìm thấy bài viết",
     "notFoundBody": "Bài viết không tồn tại hoặc chưa được công khai.",
     "backToBlog": "Về blog",
@@ -1996,11 +1995,9 @@
     "collapsedReply": "#{number} · {author} · trả lời #{parent} · bị thu gọn vì điểm thấp ({score})",
     "tooOld": "Quá 1 năm, không nhận thêm trả lời",
     "empty": "Chưa có bình luận — hãy là người đầu tiên",
-    "emptyBody": "Đặt câu hỏi về đề, chia sẻ gợi ý hoặc báo lỗi. Ô soạn nằm ngay bên dưới.",
     "action": {
       "reply": "Trả lời",
       "history": "Lịch sử ({count})",
-      "more": "Thêm thao tác",
       "lock": "Khóa bình luận",
       "unlock": "Mở khóa",
       "report": "Báo cáo",
@@ -2854,10 +2851,7 @@
     "backToPost": "Về bài viết",
     "body": {
       "label": "Nội dung (Markdown)",
-      "write": "Soạn",
-      "preview": "Xem trước",
       "toolbar": "Định dạng",
-      "empty": "Bản xem trước hiện ở đây khi bạn viết.",
       "tools": {
         "bold": "In đậm",
         "italic": "In nghiêng",

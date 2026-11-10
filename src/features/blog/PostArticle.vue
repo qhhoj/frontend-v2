@@ -80,10 +80,12 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         :viewer-vote="post.viewerVote"
         :can-vote="canVote"
         :disabled-reason="$t(voteDisabledKey(session.user !== null))"
-        show-reason
         :send="send"
         @voted="refreshPosts"
       />
+      <span v-if="!canVote" class="text-meta text-muted">
+        {{ $t(voteDisabledKey(session.user !== null)) }}
+      </span>
       <RouterLink
         v-if="post.commentCount > 0"
         :to="{ name: 'post', params: { id: post.id }, hash: '#comments' }"
