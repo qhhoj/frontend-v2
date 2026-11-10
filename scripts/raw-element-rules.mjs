@@ -6,7 +6,7 @@
 // - imports that bypass the kit (scripts/wrapper-imports.mjs);
 // - class words the standard retires (PLAN §1.9): `uppercase` labels, fixed `size-/h-/min-h-[N px|rem]`, opacity on a
 //   disabled state, and `verdict-*` colours outside the verdict parts.
-import { classTokens, utilityOf } from './class-tokens.mjs';
+import { classTokens, COMMENT_LINE, utilityOf } from './class-tokens.mjs';
 import { importUses, isKit } from './wrapper-imports.mjs';
 
 /** Element rules: the tag (lower case) or `input` type they match, and the kit part. */
@@ -58,6 +58,13 @@ export const VERDICT_PARTS = [
   'features/appearance/AppearancePreview.vue',
 ];
 
+const STATE_WORD = /(?<![\w:@-])(?:disabled|busy|pending)(?![\w-])/;
+/** `:disabled="disabled"` is the control's own attribute, not a class condition; neither are quoted words. */
+const BOUND_STATE = /[:@\w.-]+\s*=\s*"\s*(?:disabled|busy|pending)\s*"/g;
+/** Whether a line's expression (not its quoted class words) names a disabled, busy or pending state. */
+const mentionsDisabledState = (line) =>
+  STATE_WORD.test(line.replace(BOUND_STATE, '').replace(/(['`])(?:(?!\1).)*\1/g, ''));
+
 /** Class rules: whether a class word breaks it (for the file `rel`), and what to use instead. */
 export const CLASS_RULES = {
   uppercase: {
@@ -70,12 +77,13 @@ export const CLASS_RULES = {
   },
   'disabled-opacity': {
     use: 'the muted disabled pair of the kit control (AppButton disabledReason), never opacity',
-    breaks: (token) =>
+    breaks: (token, rel, line) =>
       /^opacity-/.test(utilityOf(token)) &&
-      token
+      (token
         .split(':')
         .slice(0, -1)
-        .some((variant) => /disabled/.test(variant)),
+        .some((variant) => /disabled/.test(variant)) ||
+        mentionsDisabledState(line)),
   },
   'verdict-tone': {
     use: 'the status tones success/danger/warning (positive-bg, negative-bg); verdict-* is for verdict parts',
@@ -139,13 +147,20 @@ export function elementUses(source, rel) {
 /** A line without these words holds no class a CLASS_RULES rule refuses (it saves reading every line's classes). */
 const CLASS_HINT = /uppercase|\[|opacity-|verdict-/;
 
+/** Unquoted object keys of a line (`{ uppercase: on }`), which `:class` objects may use as class words. */
+const bareKeys = (line) =>
+  [...line.matchAll(/(?<=[{,]\s*)([A-Za-z][\w-]*)\s*:(?!:)/g)].map((match) => match[1]);
+
 /** Every retired class word of one file, as `{ rule, line, text }`; HTML comments are skipped. */
 export function classUses(source, rel) {
   const code = source.replace(/<!--[\s\S]*?-->/g, (comment) => comment.replace(/[^\n]/g, ' '));
   return code.split('\n').flatMap((line, index) =>
-    (CLASS_HINT.test(line) ? classTokens(line) : []).flatMap((token) =>
+    (CLASS_HINT.test(line) && !COMMENT_LINE.test(line)
+      ? [...classTokens(line), ...bareKeys(line)]
+      : []
+    ).flatMap((token) =>
       Object.entries(CLASS_RULES)
-        .filter(([, { breaks }]) => breaks(token, rel))
+        .filter(([, { breaks }]) => breaks(token, rel, line))
         .map(([rule]) => ({ rule, line: index + 1, text: token })),
     ),
   );

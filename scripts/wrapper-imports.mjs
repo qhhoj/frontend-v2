@@ -2,7 +2,7 @@
 // PrimeVue parts used directly. Each is a rule of the raw-element ratchet (scripts/raw-elements.mjs): a file may keep the
 // imports its area baseline (scripts/raw-element-baseline/<area>.json) counts, and gains none. eslint.config.js turns the
 // same rules into `no-restricted-imports` so the editor flags a new import as it is typed; a file listed for one wrapper
-// is still refused the others. Specs and the kit itself are not checked.
+// is still refused the others. Specs are not checked; the kit may import PrimeVue but no wrapper.
 
 /** A wrapper rule: the wrapper's file under src/, and the kit part that replaces it. */
 const wrapper = (id, file, use, eslintTail) => ({ id, file, use, eslintTail });
@@ -71,17 +71,20 @@ export const IMPORT_RULES = [
   { ...PRIMEVUE, test: (resolved) => PRIMEVUE.bare.test(resolved), regex: PRIMEVUE.bare.source },
 ];
 
-/** The kit imports PrimeVue and never a wrapper, so it is not checked. */
+/** The kit may import PrimeVue (it wraps it) but no wrapper: a barrel there would hide one from every other file. */
 export const isKit = (rel) => rel.startsWith('components/ui/');
 
-/** An import path as a path under src/: `@/x` and `./x`/`../x` (from the file `rel`) resolve; a package name stays. */
+/**
+ * An import path as a path under src/: `@/x` and `./x`/`../x` (from the file `rel`) resolve, with `.` and `..` segments
+ * folded and a `?query` or `#hash` dropped; a package name stays.
+ */
 export function resolveImport(path, rel) {
-  if (path.startsWith('@/')) return path.slice(2);
-  if (!path.startsWith('.')) return path;
-  const parts = rel.split('/').slice(0, -1);
-  for (const part of path.split('/')) {
+  const clean = path.replace(/[?#].*$/, '');
+  if (!clean.startsWith('@/') && !clean.startsWith('.')) return clean;
+  const parts = clean.startsWith('@/') ? [] : rel.split('/').slice(0, -1);
+  for (const part of clean.replace(/^@\//, '').split('/')) {
     if (part === '..') parts.pop();
-    else if (part !== '.') parts.push(part);
+    else if (part !== '.' && part !== '') parts.push(part);
   }
   return parts.join('/');
 }
@@ -124,7 +127,10 @@ function nameUses(code, names) {
 }
 
 /** The rule an import path breaks for the file `rel`, or undefined. */
-const ruleOf = (path, rel) => IMPORT_RULES.find(({ test }) => test(resolveImport(path, rel)));
+const ruleOf = (path, rel) =>
+  IMPORT_RULES.find(
+    ({ id, test }) => !(isKit(rel) && id === 'primevue') && test(resolveImport(path, rel)),
+  );
 
 /** One use per reference to what a static import binds (at least the import itself): a listed file adds none unseen. */
 function staticUses(code, rel) {
@@ -148,7 +154,6 @@ function staticUses(code, rel) {
  * (its import when unused), and each dynamic import, re-export or bare import.
  */
 export function importUses(source, rel) {
-  if (isKit(rel)) return [];
   const { uses, rest } = staticUses(withoutComments(source), rel);
   const others = [...rest.matchAll(IMPORT_PATH)].flatMap((match) => {
     const rule = ruleOf(match[2], rel);

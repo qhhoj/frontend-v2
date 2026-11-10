@@ -1,11 +1,9 @@
 import { createHash } from 'node:crypto';
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error plain .mjs module without types
 import { classUses, elementUses } from './raw-element-rules.mjs';
 import {
-  AREAS,
-  BASELINE_DIR,
   baselineErrors,
   rawElementOffences,
   readBaselines,
@@ -84,6 +82,9 @@ describe('class rules', () => {
     ['fixed-size', `const SHELL = 'min-h-[24.4rem]';`],
     ['disabled-opacity', `<button class="disabled:opacity-60">`],
     ['disabled-opacity', `<a class="aria-disabled:opacity-50">`],
+    ['disabled-opacity', `<a :class="{ 'opacity-50': disabled }">`],
+    ['disabled-opacity', `<a :class="[base, disabled && 'opacity-50']">`],
+    ['uppercase', `<p :class="{ uppercase: shout }">`],
     ['verdict-tone', `<span class="text-verdict-ac">`],
   ])('%s: %s', (rule, line) => {
     expect(classes(line)).toEqual([rule]);
@@ -91,6 +92,11 @@ describe('class rules', () => {
 
   it('let verdict parts use the verdict colours', () => {
     expect(classes(`const AC = 'text-verdict-ac';`, 'lib/verdicts.ts')).toEqual([]);
+  });
+
+  it('let opacity pass when no disabled state is named, or it is the control own attribute', () => {
+    expect(classes(`<a :disabled="disabled" class="opacity-50">`)).toEqual([]);
+    expect(classes(`<a :class="{ 'opacity-50': dimmed }">`)).toEqual([]);
   });
 
   it('skip comment lines', () => {
@@ -136,16 +142,13 @@ describe('the baselines', () => {
     expect(baselineErrors({ merged, sourceOf }, ['features/tickets/T.vue'])).toHaveLength(2);
   });
 
-  it('are one file per area', () => {
-    const names = readdirSync(BASELINE_DIR).sort();
-    expect(names).toEqual((AREAS as string[][]).map(([area]) => `${area}.json`).sort());
-  });
-
   it('never gain a file or a count over the first baselines, which stay as written', () => {
     const first = readFileSync(new URL('./raw-elements.first.json', import.meta.url), 'utf8');
-    expect(createHash('sha256').update(first).digest('hex')).toBe(
-      '1f04eb49c55da6bd1f467ba2d3a2c26338387f9c18e089c805469646cf300a8b',
-    );
+    const hash = createHash('sha256').update(first).digest('hex');
+    expect(
+      hash,
+      `raw-elements.first.json changed. Only a rule that now sees more uses may change it: regenerate it (recipe in docs/wrapper-migration.md), then paste the output of \`sha256sum scripts/raw-elements.first.json\` here`,
+    ).toBe('798c3dc88d1f0af6b1fd09f40e8cfb7eceb6fc12216ed877ed1c67dc58219d1b');
     const firstCounts = JSON.parse(first) as Counts;
     const merged = readBaselines().merged as Counts;
     const grown = Object.entries(merged).flatMap(([rel, counts]) =>

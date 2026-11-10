@@ -12,12 +12,22 @@ const rules = (source: string, rel = 'features/x/XPage.vue') =>
   (importUses(source, rel) as Use[]).map(({ rule }) => rule);
 
 describe('import rules', () => {
-  it.each(WRAPPERS as Array<{ id: string; file: string }>)(
-    'count an import of the $id wrapper',
-    ({ id, file }) => {
-      expect(rules(`import Part from '@/${file}';`)).toEqual([id]);
-    },
-  );
+  it('count an import of every wrapper', () => {
+    for (const { id, file } of WRAPPERS as Array<{ id: string; file: string }>) {
+      expect(rules(`import Part from '@/${file}';`), id).toEqual([id]);
+    }
+  });
+
+  it('count a wrapper re-exported by a kit barrel, but let the kit import PrimeVue', () => {
+    const barrel = `export { default as AdminChip } from '@/features/admin/ui/AdminChip.vue'; export * from '@/features/admin/ui/controls';`;
+    expect(rules(barrel, 'components/ui/zz-barrel.ts')).toEqual(['AdminChip', 'controls']);
+  });
+
+  it('fold ./, x/../ and ?query in an @/ path before matching', () => {
+    for (const path of ['ui/./AdminChip.vue', 'ui/x/../AdminChip.vue', 'ui/AdminChip.vue?x']) {
+      expect(rules(`import Chip from '@/features/admin/${path}';`), path).toEqual(['AdminChip']);
+    }
+  });
 
   it('count a direct PrimeVue part, but not its types or the kit wrapping it', () => {
     expect(rules(`import Dialog from 'primevue/dialog';`)).toEqual(['primevue']);

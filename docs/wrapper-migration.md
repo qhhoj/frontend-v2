@@ -19,9 +19,9 @@ No file may gain a use, and every fix lowers its count.
     wrong area's file.
   - ESLint (`no-restricted-imports`, built from the same baselines) flags a new wrapper import as you type. A file
     listed for one wrapper is still refused the others.
-- **Only shrink:** `scripts/raw-elements.first.json` keeps the first baselines (its hash is pinned).
+- **Only shrink:** `scripts/raw-elements.first.json` keeps the first baselines (its hash is pinned: a deliberate edit, such as a rule that now sees more uses, needs the new `sha256sum scripts/raw-elements.first.json` in the spec; the failure message says so).
   `scripts/raw-elements.spec.ts` fails when a baseline holds a file or a count that the first one does not.
-- **Not checked:** specs, and the kit itself (raw elements and PrimeVue are its job).
+- **Not checked:** specs, and the kit for raw elements and PrimeVue (its job); a kit file importing a wrapper (a barrel) counts like any file. Opacity beside a `disabled`/`busy`/`pending` word in the same line counts as `disabled-opacity`; `{ uppercase: x }` counts as `uppercase`.
 - **Bypasses closed:**
   - tags in any letter case (`<BUTTON>` renders a button);
   - `<component :is="'button'">`;
@@ -105,7 +105,7 @@ Not restricted, because they add behaviour the kit part lacks:
 | `verdict-tone`     | 77   | 31    | the status tones (`positive-bg`, `negative-bg`, success/danger/warning)      |
 | `fixed-size`       | 75   | 38    | the size steps (icons `size-3.5/4/5`, controls `min-h-(--qh-control)`); a skeleton copies the real markup |
 | `uppercase`        | 25   | 19    | sentence case, `text-caption font-semibold`                                  |
-| `disabled-opacity` | 2    | 2     | the kit control's muted disabled pair (`AppButton disabledReason`)           |
+| `disabled-opacity` | 3    | 3     | the kit control's muted disabled pair (`AppButton disabledReason`)           |
 
 - `fixed-size` is `size-`, `h-` or `min-h-` with a `[N px|rem]` value.
 - `verdict-tone` is any `*-verdict-*` colour outside the verdict parts. Those parts are listed in `VERDICT_PARTS` and
