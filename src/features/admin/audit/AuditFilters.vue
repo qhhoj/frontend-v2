@@ -35,7 +35,7 @@ function clear() {
 
 <template>
   <section
-    class="grid grid-cols-2 gap-3 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] lg:items-end"
+    class="grid grid-cols-2 gap-3 xl:grid-cols-[repeat(4,minmax(0,1fr))_auto] xl:items-end"
     :aria-label="$t('admin.audit.filters.label')"
   >
     <AdminField
@@ -74,7 +74,7 @@ function clear() {
       :model-value="dayStartInstant(filter.from, zone)"
       :label="$t('admin.audit.filters.from')"
       :time-zone="zone"
-      hint=""
+      class="col-span-2 sm:col-span-1"
       date-only
       @update:model-value="change({ from: dayOfInstant($event, zone) })"
     />
@@ -83,7 +83,7 @@ function clear() {
       :label="$t('admin.audit.filters.to')"
       :time-zone="zone"
       :error="isRangeInverted ? $t('admin.audit.filters.rangeInverted') : undefined"
-      hint=""
+      class="col-span-2 sm:col-span-1"
       date-only
       @update:model-value="change({ to: dayOfInstant($event, zone) })"
     />
@@ -91,7 +91,7 @@ function clear() {
       v-if="isFiltered"
       type="button"
       :class="BUTTON.secondary"
-      class="col-span-2 self-end justify-self-start lg:col-span-1"
+      class="col-span-2 self-end justify-self-start xl:col-span-1"
       @click="clear"
     >
       {{ $t('common.clearFilters') }}

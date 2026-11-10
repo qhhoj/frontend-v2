@@ -125,6 +125,7 @@ const expiresError = computed(() =>
         </AdminField>
         <DateTimeField
           v-model="expires"
+          class="md:col-span-3 xl:col-span-1"
           input-id="short-link-expires"
           :label="$t('admin.shortlinks.form.expires')"
           :hint="$t('admin.shortlinks.form.expiresHint')"
