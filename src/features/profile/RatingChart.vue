@@ -68,7 +68,7 @@ const baseBox = computed<ChartBox>(() => ({
 const spacing = computed(() => pointSpacing(rated.value.length, baseBox.value));
 /** Few contests: each dot is named (name and date, two rows); many: dates only (one row). */
 const showNames = computed(() => rated.value.length < 2 || spacing.value >= NAME_SLOT);
-const box = computed<ChartBox>(() => ({ ...baseBox.value, bottom: showNames.value ? 44 : 30 }));
+const box = computed<ChartBox>(() => ({ ...baseBox.value, bottom: showNames.value ? 58 : 30 }));
 const plotRight = computed(() => box.value.width - box.value.right);
 
 const points = computed(() => chartPoints(props.history, box.value));
@@ -105,6 +105,14 @@ const best = computed(() =>
 const current = computed(() => points.value.at(-1)!);
 
 const dateOf = (point: ChartPoint) => formatDate(point.endTime, 'date', locale.locale);
+/** A contest name on up to two lines, broken at a space; what still does not fit on the second line is cut with "…". */
+function wrapLabel(text: string, maxWidth: number): string[] {
+  const fit = Math.max(1, Math.floor(maxWidth / LABEL_CHAR));
+  if (text.length <= fit) return [text];
+  const cut = text.lastIndexOf(' ', fit);
+  const first = cut > 0 ? text.slice(0, cut) : text.slice(0, fit);
+  return [first, truncateLabel(text.slice(first.length).trim(), maxWidth)];
+}
 const xLabels = computed(() => {
   const labelled = labelledIndices(
     points.value.length,
@@ -116,12 +124,9 @@ const xLabels = computed(() => {
     return {
       key: index,
       x: point.x,
-      name: showNames.value
-        ? truncateLabel(
-            point.contestName ?? translate('ratingChart.hiddenContest'),
-            spacing.value - 16,
-          )
-        : null,
+      names: showNames.value
+        ? wrapLabel(point.contestName ?? translate('ratingChart.hiddenContest'), spacing.value - 16)
+        : [],
       date: showNames.value ? dateOf(point) : formatMonthYear(point.endTime),
     };
   });
@@ -273,12 +278,18 @@ const hitWidth = computed(() => Math.max(spacing.value, 24));
         stroke-dasharray="2 2"
       />
       <g v-for="mark in xLabels" :key="mark.key" class="fill-muted text-caption">
-        <text v-if="mark.name" :x="mark.x" :y="box.height - 28" text-anchor="middle">
-          {{ mark.name }}
+        <text
+          v-for="(line, row) in mark.names"
+          :key="row"
+          :x="mark.x"
+          :y="box.height - 28 - (mark.names.length - 1 - row) * 14"
+          text-anchor="middle"
+        >
+          {{ line }}
         </text>
         <text
           :x="mark.x"
-          :y="box.height - (mark.name ? 13 : 12)"
+          :y="box.height - (mark.names.length ? 13 : 12)"
           text-anchor="middle"
           class="tabular-nums"
         >

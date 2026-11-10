@@ -6,6 +6,7 @@ import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
+import { ratingTextClass } from '@/lib/tier-classes';
 import { usePageTitle } from '@/router/page-title';
 import ProfileHeader from './ProfileHeader.vue';
 import ProfileHeaderSkeleton from './ProfileHeaderSkeleton.vue';
@@ -49,6 +50,7 @@ watch(user, (shown) => {
       <template v-if="user">
         <PageHeader
           :title="user.username"
+          :title-class="ratingTextClass(user.rating)"
           :crumbs="[{ label: $t('nav.users'), to: '/users' }]"
           :back="{ to: '/users', label: $t('nav.users') }"
         />
