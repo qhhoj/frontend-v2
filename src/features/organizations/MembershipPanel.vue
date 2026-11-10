@@ -4,10 +4,10 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { MAX_OPEN_ORGANIZATIONS } from '@/api/types/organizations';
 import type { OrganizationDetail } from '@/api/types/organizations';
-import StatePanel from '@/components/StatePanel.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Modal from '@/components/ui/Modal.vue';
-import { useAdminToast } from '@/features/admin/ui/feedback/use-admin-toast';
+import Notice from '@/components/ui/Notice.vue';
+import { useToast } from '@/components/ui/use-toast';
 import OfficialLockNote from '@/features/official-mode/OfficialLockNote.vue';
 import { useOfficialLock } from '@/features/official-mode/use-official-lock';
 import { safeRedirect } from '@/router/safe-redirect';
@@ -25,7 +25,7 @@ import { useMembership } from './use-membership';
 const props = defineProps<{ organization: OrganizationDetail; state: MembershipState }>();
 const { t } = useI18n();
 const route = useRoute();
-const toast = useAdminToast({ lazy: true });
+const toast = useToast({ lazy: true });
 const reason = ref('');
 const isRequestOpen = ref(false);
 const membership = useMembership(
@@ -78,14 +78,12 @@ const retry = () => {
     tabindex="-1"
     class="flex w-full flex-col gap-2 md:w-auto md:max-w-72 md:items-end"
   >
-    <StatePanel
-      v-if="errorCopy && !isRequestOpen"
-      kind="error"
-      :title="$t(errorCopy.title)"
-      :body="$t(errorCopy.body)"
-    >
-      <AppButton @click="retry">{{ $t('common.retry') }}</AppButton>
-    </StatePanel>
+    <Notice v-if="errorCopy && !isRequestOpen" tone="danger" :title="$t(errorCopy.title)">
+      {{ $t(errorCopy.body) }}
+      <template #action>
+        <AppButton size="sm" @click="retry">{{ $t('common.retry') }}</AppButton>
+      </template>
+    </Notice>
 
     <AppButton v-if="state === 'signedOut'" tone="primary" :to="signInTo" class="max-md:w-full">
       {{ $t('orgMembership.signIn') }}
@@ -128,9 +126,9 @@ const retry = () => {
         :busy="membership.isPending.value"
         @submit="membership.request(reason)"
       />
-      <p v-if="errorCopy" role="alert" class="mt-3 text-sm text-negative">
-        <strong>{{ $t(errorCopy.title) }}</strong> {{ $t(errorCopy.body) }}
-      </p>
+      <Notice v-if="errorCopy" tone="danger" :title="$t(errorCopy.title)" class="mt-3">
+        {{ $t(errorCopy.body) }}
+      </Notice>
     </Modal>
   </section>
 </template>

@@ -83,9 +83,7 @@ const footer = computed(() => {
         :title="$t('orgMembership.noMembers')"
       />
       <template v-else>
-        <div class="overflow-x-auto rounded-card border border-line bg-surface p-4">
-          <MemberRows :members="members" :columns="columns" />
-        </div>
+        <MemberRows :members="members" :columns="columns" />
         <p class="text-sm text-muted">
           {{ $t('orgMembership.membersFooter', footer) }}
         </p>

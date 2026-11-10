@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { translate } from '@/i18n';
-import SegmentedChoice from '@/features/appearance/SegmentedChoice.vue';
+import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 
 type Mode = 'open' | 'approval';
 
@@ -18,12 +18,12 @@ const options = computed(() =>
 
 <template>
   <div class="flex flex-col gap-2">
-    <SegmentedChoice
+    <SegmentedControl
       class="max-w-xs"
       :label="$t('orgAdmin.joinMode.label')"
       :options="options"
-      :selected="mode"
-      @pick="(picked) => (isOpen = picked === 'open')"
+      :model-value="mode"
+      @update:model-value="(picked) => (isOpen = picked === 'open')"
     />
     <p class="text-caption leading-4 text-muted" aria-live="polite">
       {{ $t(`orgAdmin.joinMode.${mode}Hint`) }}

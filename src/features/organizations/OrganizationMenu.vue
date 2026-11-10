@@ -8,7 +8,8 @@ import { useRoute, useRouter } from 'vue-router';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import IconButton from '@/components/ui/IconButton.vue';
-import { useAdminToast } from '@/features/admin/ui/feedback/use-admin-toast';
+import Notice from '@/components/ui/Notice.vue';
+import { useToast } from '@/components/ui/use-toast';
 import OfficialLockNote from '@/features/official-mode/OfficialLockNote.vue';
 import { useOfficialLock } from '@/features/official-mode/use-official-lock';
 import { useSessionStore } from '@/stores/session.store';
@@ -26,7 +27,7 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
-const toast = useAdminToast({ lazy: true });
+const toast = useToast({ lazy: true });
 const isLeaveOpen = ref(false);
 /** One of this organization's administrators: site staff administer through a permission and keep it after leaving. */
 const isOwnAdmin = computed(() =>
@@ -116,9 +117,9 @@ const body = computed(() => {
     >
       <template #error>
         <OfficialLockNote v-if="lock.isLocked.value" :id="lock.noteId" />
-        <p v-else-if="errorCopy" role="alert" class="text-sm text-negative">
-          <strong>{{ $t(errorCopy.title) }}</strong> {{ $t(errorCopy.body) }}
-        </p>
+        <Notice v-else-if="errorCopy" tone="danger" :title="$t(errorCopy.title)">
+          {{ $t(errorCopy.body) }}
+        </Notice>
       </template>
     </ConfirmDialog>
   </div>

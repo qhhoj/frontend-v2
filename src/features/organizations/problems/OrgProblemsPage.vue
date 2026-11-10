@@ -119,19 +119,20 @@ function saveTags(tagIds: string[]) {
         data-testid="org-problem-list"
         class="flex min-w-0 flex-col gap-4 p-5"
       >
-        <div v-if="canCreate && listState !== 'empty'" class="flex justify-end">
-          <AppButton data-testid="org-tab-create-problem" :to="createTarget">
-            <template #icon><Plus class="size-4" aria-hidden="true" /></template>
-            {{ $t('create.problem') }}
-          </AppButton>
-        </div>
         <OrgProblemFiltersBar
           :filters="filters"
           :tags="tagList"
           :total="problems.data.value?.meta.total ?? null"
           :is-loading="problems.isLoading.value"
           @change="applyFilters"
-        />
+        >
+          <template v-if="canCreate && listState !== 'empty'" #actions>
+            <AppButton tone="primary" data-testid="org-tab-create-problem" :to="createTarget">
+              <template #icon><Plus class="size-4" aria-hidden="true" /></template>
+              {{ $t('create.problem') }}
+            </AppButton>
+          </template>
+        </OrgProblemFiltersBar>
         <QueryState
           :loading="problems.isLoading.value"
           :error="problems.error.value"
@@ -208,6 +209,7 @@ function saveTags(tagIds: string[]) {
       v-if="bulk.result.value && bulk.action.value"
       :result="bulk.result.value"
       :action="bulk.action.value"
+      @dismiss="bulk.dismiss()"
     />
     <p
       v-if="bulk.failureText.value"

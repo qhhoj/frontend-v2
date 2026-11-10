@@ -1893,6 +1893,7 @@
     "sortLabel": "Sort members",
     "membersFooter": "Ranks {first} – {last} of {total} · 100 per page",
     "membersPager": "Member pages",
+    "membersTable": "Member table",
     "noMembers": "No members yet.",
     "postsPager": "Post pages",
     "noPosts": "No posts yet.",
@@ -2646,7 +2647,6 @@
     },
     "searchLabel": "Search by problem code or name",
     "searchPlaceholder": "Code or name",
-    "searchSubmit": "Search",
     "tableCaption": "Organization problems",
     "columns": {
       "code": "Code",

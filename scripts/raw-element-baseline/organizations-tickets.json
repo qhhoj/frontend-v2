@@ -1,10 +1,4 @@
 {
-  "features/organizations/MemberRows.vue": {
-    "table": 1
-  },
-  "features/organizations/MembershipPanel.vue": {
-    "use-admin-toast": 1
-  },
   "features/organizations/OrganizationCardSkeleton.vue": {
     "fixed-size": 3
   },
@@ -15,14 +9,7 @@
     "fixed-size": 1
   },
   "features/organizations/OrganizationMenu.vue": {
-    "primevue": 2,
-    "use-admin-toast": 1
-  },
-  "features/organizations/OrganizationTabsNav.vue": {
-    "PillTabs": 3
-  },
-  "features/organizations/manage/OrganizationAvatarField.vue": {
-    "button": 1
+    "primevue": 2
   },
   "features/organizations/problems/OrgBulkResult.vue": {
     "SettingsNotice": 1
@@ -34,8 +21,7 @@
     "button": 2
   },
   "features/organizations/problems/OrgProblemFilters.vue": {
-    "button": 3,
-    "search": 1
+    "button": 3
   },
   "features/organizations/problems/OrgProblemTable.vue": {
     "table": 1
