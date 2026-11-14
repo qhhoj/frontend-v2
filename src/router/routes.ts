@@ -46,6 +46,18 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.submission' },
   },
   {
+    path: '/paste',
+    name: 'paste',
+    component: () => import('@/features/shares/PastePage.vue'),
+    meta: { titleKey: 'pages.paste' },
+  },
+  {
+    path: '/c/:code',
+    name: 'share',
+    component: () => import('@/features/shares/SharePage.vue'),
+    meta: { titleKey: 'pages.share' },
+  },
+  {
     path: '/runtimes',
     name: 'runtimes',
     component: () => import('@/features/runtimes/RuntimesPage.vue'),
@@ -360,6 +372,12 @@ export const routes: RouteRecordRaw[] = [
     name: 'settings-data',
     component: () => import('@/features/account/data/DataSettingsPage.vue'),
     meta: { titleKey: 'pages.settingsData', requiresAuth: true },
+  },
+  {
+    path: '/settings/shares',
+    name: 'settings-shares',
+    component: () => import('@/features/shares/MySharesPage.vue'),
+    meta: { titleKey: 'pages.settingsShares', requiresAuth: true },
   },
   {
     path: '/settings/appearance',

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Download, Palette, ShieldCheck, UserRound } from 'lucide-vue-next';
+import { Download, Link, Palette, ShieldCheck, UserRound } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import PageHeader from '@/components/ui/PageHeader.vue';
@@ -9,7 +9,7 @@ import type { PageCrumb } from '@/components/ui/PageHeader.vue';
 import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
 
-/** The four sections; only Appearance is open to anonymous visitors. */
+/** The sections; only Appearance is open to anonymous visitors. */
 const SECTIONS = [
   { route: 'settings', labelKey: 'settings.nav.profile', icon: UserRound, signedInOnly: true },
   {
@@ -24,6 +24,7 @@ const SECTIONS = [
     icon: ShieldCheck,
     signedInOnly: true,
   },
+  { route: 'settings-shares', labelKey: 'settings.nav.shares', icon: Link, signedInOnly: true },
   { route: 'settings-data', labelKey: 'settings.nav.data', icon: Download, signedInOnly: true },
 ] as const;
 const session = useSessionStore();
