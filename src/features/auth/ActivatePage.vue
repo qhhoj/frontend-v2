@@ -13,6 +13,7 @@ import AuthError from './AuthError.vue';
 import AuthLayout from './AuthLayout.vue';
 import EmailLinkRequest from './EmailLinkRequest.vue';
 import { AUTH_LINK } from './auth-link';
+import { signupReturnQuery } from './signup-return';
 import { useNoReferrer } from './use-no-referrer';
 
 type ActivationState = 'pending' | 'activated' | 'linkDead' | 'linkResent' | 'failed';
@@ -45,6 +46,8 @@ const CARDS: Record<
 
 // Set before the activation request below (onMounted), so that request already carries no Referer.
 useNoReferrer();
+/** The path the user registered from, so the sign-in after activation lands there (kept per browser, see `signup-return.ts`). */
+const returnQuery = signupReturnQuery();
 const route = useRoute();
 const router = useRouter();
 const state = ref<ActivationState>(route.params.key === DONE_KEY ? 'activated' : 'pending');
@@ -126,7 +129,7 @@ onMounted(() => {
       v-if="state === 'activated'"
       tone="primary"
       block
-      :to="{ name: passwordVoided ? 'forgot-password' : 'login' }"
+      :to="{ name: passwordVoided ? 'forgot-password' : 'login', query: returnQuery }"
       >{{ $t(passwordVoided ? 'auth.activation.setPassword' : 'auth.submitLogin') }}</AppButton
     >
     <EmailLinkRequest
@@ -146,7 +149,7 @@ onMounted(() => {
       </AppButton>
     </template>
     <p v-if="state !== 'activated'" class="text-center text-sm">
-      <RouterLink :to="{ name: 'login' }" :class="AUTH_LINK">{{
+      <RouterLink :to="{ name: 'login', query: returnQuery }" :class="AUTH_LINK">{{
         $t('auth.backToLogin')
       }}</RouterLink>
     </p>

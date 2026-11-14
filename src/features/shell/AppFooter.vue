@@ -22,5 +22,11 @@ const SOURCE_URL = 'https://github.com/qhhoj';
       class="inline-flex min-h-11 items-center text-accent-text underline"
       >{{ $t('footer.runtimes') }}</RouterLink
     >
+    <RouterLink
+      :to="{ name: 'tickets' }"
+      data-testid="support-footer"
+      class="inline-flex min-h-11 items-center text-accent-text underline"
+      >{{ $t('footer.support') }}</RouterLink
+    >
   </footer>
 </template>

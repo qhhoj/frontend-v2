@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, reactive, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { register, resendActivation } from '@/api/auth.api';
 import { ApiError } from '@/api/client';
 import InlineBit from '@/components/InlineBit.vue';
@@ -19,6 +20,7 @@ import UsernameField from './UsernameField.vue';
 import { chosenIds } from './signup-choices';
 import { useAuthAction } from './use-auth-action';
 import { AUTH_LINK } from './auth-link';
+import { rememberSignupReturn, useReturnQuery } from './signup-return';
 
 /** RegisterA, then CheckEmail after a send, or Activation's "registration unavailable" card when the mailer is down. */
 type Phase = 'form' | 'sent' | 'mailUnavailable';
@@ -32,6 +34,8 @@ const form = reactive({
   organizationId: '',
   languageId: undefined as string | undefined,
 });
+const route = useRoute();
+const returnQuery = useReturnQuery();
 const phase = ref<Phase>('form');
 /** A client-side gate: the backend stores no consent and the rules pages do not exist yet. */
 const acceptedRules = ref(false);
@@ -78,7 +82,10 @@ async function submit() {
   }
   const { username, email, password } = form;
   const registered = await run(() => register({ username, email, password, ...chosenIds(form) }));
-  if (registered) return showPhase('sent');
+  if (registered) {
+    rememberSignupReturn(route.query.redirect);
+    return showPhase('sent');
+  }
   if (mailerDown()) return showPhase('mailUnavailable');
 }
 </script>
@@ -113,7 +120,9 @@ async function submit() {
     <template #badge>
       <InlineBit kind="sweat" class="self-center" />
     </template>
-    <AppButton block :to="{ name: 'login' }">{{ $t('auth.toLogin') }}</AppButton>
+    <AppButton block :to="{ name: 'login', query: returnQuery }">{{
+      $t('auth.toLogin')
+    }}</AppButton>
   </AuthLayout>
   <AuthLayout
     v-else
@@ -174,7 +183,7 @@ async function submit() {
       <AuthSubmit :pending="pending">{{ $t('auth.submitRegister') }}</AuthSubmit>
       <p class="text-center text-sm text-muted">
         {{ $t('auth.haveAccountPrompt') }}
-        <RouterLink :to="{ name: 'login' }" :class="AUTH_LINK">{{
+        <RouterLink :to="{ name: 'login', query: returnQuery }" :class="AUTH_LINK">{{
           $t('auth.submitLogin')
         }}</RouterLink>
       </p>

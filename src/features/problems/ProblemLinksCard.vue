@@ -76,6 +76,12 @@ const rows = computed<LinkRow[]>(() => [
         },
       ]
     : []),
+  {
+    key: 'report',
+    to: { name: 'ticket-new', query: { problem: props.problem.code } },
+    labelKey: 'problem.rail.links.report',
+    look: PLAIN_LOOK,
+  },
 ]);
 /** A hairline between rows, as on board C. */
 const DIVIDED = 'border-line not-first:border-t';
