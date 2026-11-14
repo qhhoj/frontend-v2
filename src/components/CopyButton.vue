@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref } from 'vue';
-import { Copy } from 'lucide-vue-next';
+import { Check, Copy } from 'lucide-vue-next';
 import { COPIED_FEEDBACK_MS, clipboardAvailable, copyText } from '@/lib/clipboard';
 
 /** `iconOnlyOnPhone` drops the visible word below `sm`; the label stays for assistive tech. */
@@ -26,7 +26,12 @@ onBeforeUnmount(() => clearTimeout(resetTimer));
       :aria-label="label"
       @click="copy"
     >
-      <Copy aria-hidden="true" class="size-4" />
+      <component
+        :is="copied ? Check : Copy"
+        aria-hidden="true"
+        class="size-4 transition-colors"
+        :class="{ 'text-positive': copied }"
+      />
       <span :class="{ 'max-sm:sr-only': iconOnlyOnPhone }">{{ $t('common.copy') }}</span>
     </button>
     <span class="text-sm text-muted" aria-live="polite">{{

@@ -69,7 +69,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         ><PostActions :post="post"
       /></template>
     </PageHeader>
-    <UserContent :html="post.contentHtml" />
+    <UserContent class="post-body" :html="post.contentHtml" />
     <footer
       data-testid="post-actions"
       class="flex flex-wrap items-center gap-4 border-t border-line pt-4"
@@ -89,7 +89,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
       <RouterLink
         v-if="post.commentCount > 0"
         :to="{ name: 'post', params: { id: post.id }, hash: '#comments' }"
-        class="font-semibold text-accent-text hover:underline"
+        class="font-semibold text-accent-text hover:underline touch:-my-3.5 touch:py-3.5"
       >
         {{ $t('blogPost.comments', { count: post.commentCount }) }}
       </RouterLink>

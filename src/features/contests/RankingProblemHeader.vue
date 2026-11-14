@@ -13,7 +13,7 @@ defineProps<{ problem: Pick<RankingProblem, 'code' | 'label'> }>();
     v-if="problem.code"
     :to="{ name: 'problem', params: { code: problem.code } }"
     :title="problem.code"
-    class="inline-block min-w-6 cursor-pointer hover:text-accent-text hover:underline"
+    class="inline-block min-w-6 cursor-pointer hover:text-accent-text hover:underline touch:-mx-2.5 touch:-my-3 touch:min-w-11 touch:px-2.5 touch:py-3"
     >{{ problem.label }}</RouterLink
   >
   <span v-else>{{ problem.label }}</span>

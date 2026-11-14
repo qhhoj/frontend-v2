@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from
 import { useRoute } from 'vue-router';
 import { translate } from '@/i18n';
 import NavOverflowMenu from './NavOverflowMenu.vue';
-import { NAV_ITEMS, useIsNavCurrent } from './nav-items';
+import { NAV_ITEMS, useIsNavCurrent, useNavLinkEvents } from './nav-items';
 import { NAV_ITEM_CLASS, splitNavItems } from './nav-overflow';
 
 /**
@@ -12,6 +12,7 @@ import { NAV_ITEM_CLASS, splitNavItems } from './nav-overflow';
  */
 const route = useRoute();
 const isCurrent = useIsNavCurrent();
+const linkEvents = useNavLinkEvents();
 /** The current item gets an underline in the glass bar. */
 const itemClass = (path: string) => [
   NAV_ITEM_CLASS,
@@ -97,6 +98,7 @@ watch(() => route.path, refresh, { flush: 'post' });
           :to="item.path"
           :aria-current="isCurrent(item.path) ? 'page' : undefined"
           :class="itemClass(item.path)"
+          v-on="linkEvents(item.path)"
         >
           {{ $t(item.labelKey) }}
         </RouterLink>

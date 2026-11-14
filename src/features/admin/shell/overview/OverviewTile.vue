@@ -8,7 +8,7 @@ import { CARD } from '../../ui/controls';
 
 /**
  * One figure on the dashboard, linking to its filtered list: `value` null is not loaded yet. A `needsAttention` figure gets
- * a caution border, the accent figure and a "Cần xử lý" chip, so the state never rests on colour alone. `linkText` says
+ * a caution border, a larger accent figure (the others are one step smaller) and a "Cần xử lý" chip, so the state never rests on colour alone. `linkText` says
  * where the tile goes ("Xem 3 phiếu →"), so it reads as a link.
  */
 const props = defineProps<{
@@ -45,8 +45,8 @@ const hasCount = computed(() => typeof props.value === 'number' && props.value >
       </span>
       <span class="flex items-baseline gap-2">
         <span
-          class="font-display text-stat leading-9 font-semibold tabular-nums"
-          :class="needsAttention && 'text-accent-text'"
+          class="font-display leading-9 font-semibold tabular-nums"
+          :class="needsAttention ? 'text-stat text-accent-text' : 'text-section'"
         >
           {{ value ?? '…' }}
         </span>

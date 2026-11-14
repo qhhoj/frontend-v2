@@ -121,7 +121,7 @@ const menuItems = (row: SubmissionListItem): RowMenuItem[] => [
     <template #cell-verdict="{ row }">
       <RouterLink
         :to="{ name: 'submission', params: { id: row.id } }"
-        class="inline-flex rounded-full hover:brightness-110"
+        class="inline-flex rounded-full transition-opacity hover:opacity-90"
       >
         <VerdictBadge :verdict="submissionVerdictOf(row)" size="sm" class="min-w-12" />
       </RouterLink>
