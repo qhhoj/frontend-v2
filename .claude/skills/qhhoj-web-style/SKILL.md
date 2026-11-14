@@ -129,8 +129,8 @@ The kit part for each job is in `src/components/ui/README.md` (the one table; a 
 
 ## 5. Process
 
-- Public visual changes: build several mock-ups and wait for the user's pick before implementing. Admin screens: pick yourself.
-- Follow the ui-ux-pro-max skill and its pre-delivery checklist.
+- Explore visual changes as mock-ups built with the stageshow skill (faux product UI, stills or short animations, kept outside the repo in `.batch/`). Pick the option yourself, record it in `docs/decisions.md`, then port it to real Vue components with the tokens and primitives above. The mock-up is the reference for the port, not code to copy: stageshow is React; this app is Vue.
+- Check a port against its mock-up: screenshot the real page at the mock-up's width and compare.
 - Pure UI fixes need no new tests, but fix every spec the change breaks.
 - Take screenshots at 390 and 1440 px and look at them before calling it done.
 - Run `npm run lint && npm run lint:tokens` before a PR.
