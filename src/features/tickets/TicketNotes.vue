@@ -22,7 +22,7 @@ const save = () => patch({ notes: draft.value }, () => (isEdited.value = false))
 
 <template>
   <GlassCard as="section" class="flex flex-col gap-3 p-5">
-    <h2 class="font-display text-base font-bold">
+    <h2 class="text-sm font-semibold">
       {{ ticket.can.assign ? $t('ticket.notesInternal') : $t('ticket.notes') }}
     </h2>
     <form v-if="ticket.can.editNotes" class="flex flex-col gap-3" novalidate @submit.prevent="save">

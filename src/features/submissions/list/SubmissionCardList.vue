@@ -161,7 +161,7 @@ const PILL =
         <RouterLink
           :to="{ name: 'submission', params: { id: row.id } }"
           :aria-label="rowLabel(row)"
-          class="relative inline-flex min-h-8 items-center gap-1 rounded-pill px-2.5 touch:after:absolute touch:after:-inset-y-1.5 touch:after:inset-x-0 font-mono text-caption leading-4 font-bold whitespace-nowrap hover:brightness-95 md:justify-center md:px-3"
+          class="relative inline-flex min-h-8 items-center gap-1 rounded-pill px-2.5 touch:after:absolute touch:after:-inset-y-1.5 touch:after:inset-x-0 font-mono text-caption leading-4 font-bold whitespace-nowrap transition-opacity hover:opacity-90 md:justify-center md:px-3"
           :class="VERDICT_TONE_CLASSES[submissionVerdictOf(row).tone]"
           >{{ submissionVerdictOf(row).code
           }}<span class="max-md:hidden"

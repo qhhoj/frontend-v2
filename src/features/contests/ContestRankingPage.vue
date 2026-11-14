@@ -131,6 +131,8 @@ const skeletonHasTimeColumn = computed(
     showsCumtime(contest.value.formatName),
 );
 const podium = computed(() => podiumRows(ranking.value?.rows ?? []));
+/** A podium of people who all scored nothing says nothing the board does not: it is shown once someone has points. */
+const hasPodium = computed(() => podium.value.some((row) => row.score > 0));
 const summary = computed(() =>
   contest.value
     ? rankingSummary(
@@ -189,10 +191,10 @@ async function goToMyRow() {
         <SkeletonBlock data-skeleton-region="nav" pill class="h-[52px] w-72 max-w-full" />
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div data-skeleton-region="title">
-            <p class="text-muted"><SkeletonBlock text class="w-56" /></p>
-            <div class="mt-1 page-title">
+            <div class="page-title">
               <SkeletonBlock text class="w-80 max-w-full" />
             </div>
+            <p class="mt-1 text-meta text-muted"><SkeletonBlock text class="w-56" /></p>
           </div>
           <div data-skeleton-region="controls" class="flex flex-wrap items-center gap-2.5">
             <SkeletonBlock pill class="h-(--qh-control) w-44" />
@@ -203,9 +205,7 @@ async function goToMyRow() {
       <template v-if="contest">
         <ContestTabs :contest-key="key" :phase="contest.phase" />
         <PageHeader :title="contest.name">
-          <template #above
-            ><p class="text-muted">{{ summary }}</p></template
-          >
+          <template #meta>{{ summary }}</template>
           <template #actions>
             <p
               v-if="running"
@@ -227,7 +227,12 @@ async function goToMyRow() {
               class="whitespace-nowrap"
               @update:model-value="setViewMode"
             />
-            <AppButton v-if="myRow && !isComparing" data-testid="my-row" @click="goToMyRow">
+            <AppButton
+              v-if="myRow && !isComparing"
+              tone="primary"
+              data-testid="my-row"
+              @click="goToMyRow"
+            >
               <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
               {{
                 myRow.rank === null || myRow.isDisqualified
@@ -289,7 +294,7 @@ async function goToMyRow() {
           {{ $t('ranking.refreshFailed') }}
         </Notice>
         <RankingPodium
-          v-if="podium.length"
+          v-if="hasPodium"
           :rows="podium"
           :problems="ranking.problems"
           :context="rankingContext"

@@ -562,6 +562,23 @@
   }
 }
 
+/* Blog post body (PostArticle): authors' headings sit one step up the type scale (h2 20, h3 18, h4 17), bold, with more room above, so a long post shows its structure against 14 px text. */
+.user-content.post-body {
+  & :where(h2, h3, h4) {
+    margin-block: 1.75em 0.5em;
+    font-weight: 700;
+  }
+  & :where(h2) {
+    font-size: var(--text-section);
+  }
+  & :where(h3) {
+    font-size: var(--text-subtitle);
+  }
+  & :where(h4) {
+    font-size: var(--text-title);
+  }
+}
+
 /* Problem statement typography (StatementBody). Scoped to .statement so other user content keeps its own rhythm. */
 .user-content.statement {
   font-family: var(--qh-font-body);

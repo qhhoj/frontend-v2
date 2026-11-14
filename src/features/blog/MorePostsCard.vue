@@ -29,7 +29,7 @@ const posts = computed(() =>
       <li v-for="post in posts" :key="post.id">
         <RouterLink
           :to="{ name: 'post', params: { id: post.id } }"
-          class="font-semibold text-accent-text hover:underline [overflow-wrap:anywhere]"
+          class="font-semibold text-accent-text hover:underline touch:-my-3.5 touch:py-3.5 [overflow-wrap:anywhere]"
         >
           {{ post.title }}
         </RouterLink>

@@ -8,7 +8,7 @@ defineProps<{ problem: SubmissionListItem['problem']; label?: string; showCode?:
 </script>
 
 <template>
-  <div v-if="problem" class="truncate" :title="problem.code">
+  <div v-if="problem" class="truncate touch:-my-3.5 touch:py-3.5" :title="problem.code">
     <span v-if="label" class="mr-1.5 font-display font-bold">{{ label }}</span>
     <span v-if="problem.isDeleted" class="font-semibold text-content"
       >{{ problem.name }} <DeletedProblemChip
@@ -16,7 +16,7 @@ defineProps<{ problem: SubmissionListItem['problem']; label?: string; showCode?:
     <RouterLink
       v-else
       :to="{ name: 'problem', params: { code: problem.code } }"
-      class="font-semibold text-content hover:underline"
+      class="font-semibold text-content hover:underline touch:py-3.5"
       >{{ problem.name }}</RouterLink
     >
     <!-- Only a wide card has room for the code; a narrower one keeps it for the name. -->

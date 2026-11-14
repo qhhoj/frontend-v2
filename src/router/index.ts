@@ -11,6 +11,7 @@ import { i18n, translate } from '@/i18n';
 import { useLoadingStore } from '@/stores/loading.store';
 import { useSessionStore } from '@/stores/session.store';
 import { takeSocialReturn } from '@/features/auth/social-return';
+import { clearPendingNav } from '@/features/shell/nav-items';
 import { focusMain } from './focus-main';
 import { resolveNavigation } from './guards';
 import { trackFirstPage } from '@/lib/arrived-by-redirect';
@@ -51,8 +52,14 @@ function installNavigationLoading(router: Router) {
     return resolveNavigation(to, useSessionStore());
   });
   // afterEach also runs for cancelled and duplicate navigations; onError covers a failed chunk or a throwing guard.
-  router.afterEach(endNavigation);
-  router.onError((_error, to) => endNavigation(to));
+  router.afterEach((to) => {
+    endNavigation(to);
+    clearPendingNav();
+  });
+  router.onError((_error, to) => {
+    endNavigation(to);
+    clearPendingNav();
+  });
 }
 
 /**

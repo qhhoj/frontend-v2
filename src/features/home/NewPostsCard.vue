@@ -44,7 +44,7 @@ const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
           </div>
           <RouterLink
             :to="{ name: 'post', params: { id: post.id } }"
-            class="font-semibold hover:underline"
+            class="font-semibold hover:underline touch:-my-3.5 touch:py-3.5"
             >{{ post.title }}</RouterLink
           >
           <p class="line-clamp-2 text-sm text-muted">{{ summaryExcerpt(post.summaryHtml) }}</p>

@@ -12,7 +12,7 @@ const colourClass = computed(() => ratingTextClass(props.rating));
 <template>
   <RouterLink
     :to="to ?? { name: 'user', params: { username } }"
-    class="font-semibold hover:underline"
+    class="font-semibold hover:underline touch:-my-4 touch:py-4"
     :class="colourClass"
   >
     {{ username }}

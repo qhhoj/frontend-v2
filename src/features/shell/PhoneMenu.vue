@@ -16,7 +16,7 @@ import { useIsFirstNavigationPending } from '@/router/first-navigation';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { useAccountLinks } from './account-links';
-import { NAV_ITEMS, useIsNavCurrent } from './nav-items';
+import { NAV_ITEMS, useIsNavCurrent, useNavLinkEvents } from './nav-items';
 
 /**
  * The phone header's menu. A sheet rises from the bottom: the seven sections (the current one marked), then what the
@@ -42,6 +42,7 @@ const logout = useLogout();
 const isSessionPending = useIsFirstNavigationPending();
 const isOpen = ref(false);
 const isCurrent = useIsNavCurrent();
+const linkEvents = useNavLinkEvents();
 watch(
   () => route.fullPath,
   () => (isOpen.value = false),
@@ -67,6 +68,7 @@ watch(
         :to="item.path"
         :aria-current="isCurrent(item.path) ? 'page' : undefined"
         :class="[ROW, isCurrent(item.path) ? 'bg-accent-soft text-accent-soft-text' : '']"
+        v-on="linkEvents(item.path)"
       >
         <component :is="item.icon" aria-hidden="true" class="size-5 shrink-0" />
         {{ $t(item.labelKey) }}

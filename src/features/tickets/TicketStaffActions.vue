@@ -32,7 +32,7 @@ const markGood = () => patch({ isContributive: !props.ticket.isContributive });
 
 <template>
   <GlassCard as="section" class="flex flex-col gap-4 p-5">
-    <h2 class="font-display text-base font-bold">{{ $t('ticket.handle') }}</h2>
+    <h2 class="text-sm font-semibold">{{ $t('ticket.handle') }}</h2>
     <AppButton
       v-if="ticket.can.markGood"
       data-testid="mark-good"

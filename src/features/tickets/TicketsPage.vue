@@ -82,7 +82,7 @@ const isDefaultList = computed(
             :title="$t('tickets.emptyTitle')"
             :body="$t('tickets.emptyBody')"
           >
-            <AppButton tone="primary" :to="{ name: 'ticket-new' }">
+            <AppButton :to="{ name: 'ticket-new' }">
               {{ $t('tickets.newTicket') }}
             </AppButton>
           </StatePanel>

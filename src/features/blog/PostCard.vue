@@ -47,7 +47,10 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
       <h2
         class="line-clamp-2 max-h-[2lh] text-subtitle leading-snug font-semibold [overflow-wrap:anywhere]"
       >
-        <RouterLink :to="{ name: 'post', params: { id: post.id } }" class="hover:underline">
+        <RouterLink
+          :to="{ name: 'post', params: { id: post.id } }"
+          class="hover:underline touch:-my-3.5 touch:py-3.5"
+        >
           {{ post.title }}
         </RouterLink>
       </h2>
@@ -66,7 +69,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         </time>
         <RouterLink
           :to="{ name: 'post', params: { id: post.id }, hash: '#comments' }"
-          class="hover:underline"
+          class="hover:underline touch:-my-3.5 touch:py-3.5"
         >
           {{ $t('blog.comments', { count: post.commentCount }) }}
         </RouterLink>

@@ -35,6 +35,7 @@ const chips = computed(() =>
 );
 
 const problems = computed(() => data.value?.items ?? []);
+const listedCodes = computed(() => problems.value.map((problem) => problem.code));
 
 /** A page past the end (a stale link, a shrunk list) or an unusable `?page=` is replaced by the nearest valid one. */
 watch([data, isPlaceholderData, () => router.currentRoute.value.query.page], () => {
@@ -111,6 +112,7 @@ const LEGEND_MARKS = [
       :types="meta?.types ?? []"
       :groups="meta?.groups ?? []"
       :signed-in="session.user !== null"
+      :listed-codes="listedCodes"
       @update="update"
     />
     <ProblemFilterChips :chips="chips" @remove="update" @clear-all="clearAll" />

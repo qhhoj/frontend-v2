@@ -34,7 +34,7 @@ const openable = computed(() =>
     class="flex min-w-0 flex-wrap items-center gap-2"
     data-testid="admin-recent"
   >
-    <h2 id="admin-recent-title" class="mr-1 font-display text-sm font-semibold text-muted">
+    <h2 id="admin-recent-title" class="mr-1 text-sm font-semibold">
       {{ $t('admin.shell.recent.title') }}
     </h2>
     <RouterLink

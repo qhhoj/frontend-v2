@@ -44,7 +44,7 @@ const rowLabel = computed(() =>
     :to="{ name: 'submission', params: { id: row.id } }"
     :aria-label="rowLabel"
     :title="$t(verdict.labelKey)"
-    class="relative flex min-h-12 flex-col justify-center gap-0.5 overflow-hidden rounded-cell px-2.5 py-1.5 hover:brightness-110"
+    class="relative flex min-h-12 flex-col justify-center gap-0.5 overflow-hidden rounded-cell px-2.5 py-1.5 transition-opacity hover:opacity-90"
     :class="[BLOCK_TONE_CLASSES[blockToneOf(verdict)], compact ? 'w-24' : 'w-[7.875rem]']"
   >
     <span class="font-display text-sm leading-[1.1] font-bold whitespace-nowrap">{{ label }}</span>

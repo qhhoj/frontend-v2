@@ -50,9 +50,11 @@ const LINK_CLASS = 'inline-flex flex-wrap items-center gap-2 text-sm hover:under
       ]"
       :back="{ to: { name: 'tickets' }, label: $t('ticket.list') }"
     >
+      <template #meta>
+        <TicketStatusPill :is-open="ticket.isOpen" :is-contributive="ticket.isContributive" />
+      </template>
       <template #above>
         <div class="flex flex-wrap items-center gap-2">
-          <TicketStatusPill :is-open="ticket.isOpen" :is-contributive="ticket.isContributive" />
           <RouterLink
             v-if="ticket.link.type === 'problem' && ticket.link.url"
             :to="ticket.link.url"

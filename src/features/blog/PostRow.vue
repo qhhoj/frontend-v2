@@ -43,7 +43,10 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         <Chip v-if="unpublished" class="mr-2 align-middle">{{
           $t(`blog.drafts.state.${unpublished}`)
         }}</Chip>
-        <RouterLink :to="{ name: 'post', params: { id: post.id } }" class="hover:underline">
+        <RouterLink
+          :to="{ name: 'post', params: { id: post.id } }"
+          class="hover:underline touch:-my-3.5 touch:py-3.5"
+        >
           {{ post.title }}
         </RouterLink>
       </h2>
@@ -62,7 +65,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         </time>
         <RouterLink
           :to="{ name: 'post', params: { id: post.id }, hash: '#comments' }"
-          class="hover:underline"
+          class="hover:underline touch:-my-3.5 touch:py-3.5"
         >
           {{ $t('blog.comments', { count: post.commentCount }) }}
         </RouterLink>
