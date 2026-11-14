@@ -17,3 +17,9 @@ export const statsWidthRem = (problemCount: number, hasTimeColumn: boolean) =>
 
 export const tableMinWidthRem = (problemCount: number, hasTimeColumn: boolean) =>
   RANK_COLUMN_REM + NAME_COLUMN_MIN_REM + statsWidthRem(problemCount, hasTimeColumn);
+
+/** Below `sm` the score moves under the name and the name column is capped, so rank, name and score never scroll away. */
+export const NAME_COLUMN_PHONE_REM = 9;
+
+export const phoneMinWidthRem = (problemCount: number) =>
+  RANK_COLUMN_REM + NAME_COLUMN_PHONE_REM + problemCount * PROBLEM_COLUMN_REM;

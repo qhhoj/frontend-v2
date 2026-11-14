@@ -183,8 +183,8 @@
   },
   "features/admin/tickets/TicketQueueFilters.vue": {
     "AdminField": 1,
-    "checkbox": 2,
-    "controls": 6,
+    "checkbox": 1,
+    "controls": 4,
     "input": 1
   },
   "features/admin/tickets/TicketQueuePage.vue": {

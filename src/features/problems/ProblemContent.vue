@@ -39,6 +39,8 @@ const props = defineProps<{
   layout: (typeof PROBLEM_LAYOUT)[keyof typeof PROBLEM_LAYOUT];
   /** The viewer's contest holding this problem (its points and the viewer's cell replace the site-wide facts). */
   contest?: ContestDetail | null;
+  /** False for an ended contest shown for context: submissions are practice ones, so they score on the site's scale. */
+  contestIsLive?: boolean;
 }>();
 const tab = defineModel<string>('tab', { required: true });
 defineEmits<{ gone: [] }>();
@@ -63,11 +65,9 @@ watch(
   },
   { immediate: true },
 );
-const submitForm = useSubmitForm(toRef(props, 'problem'), resubmitId, () => props.contest);
-const scoreScale = useScoreScale(
-  () => props.problem,
-  () => props.contest,
-);
+const scaleContest = () => (props.contestIsLive === false ? null : props.contest);
+const submitForm = useSubmitForm(toRef(props, 'problem'), resubmitId, scaleContest);
+const scoreScale = useScoreScale(() => props.problem, scaleContest);
 const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id === 'editorial'));
 const { t } = useI18n();
 const tabItems = computed(() =>

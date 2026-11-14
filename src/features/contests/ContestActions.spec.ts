@@ -205,6 +205,47 @@ describe('contest refusals', () => {
   });
 });
 
+describe('contest actions: a personal clock without rules', () => {
+  afterEach(() => vi.useRealTimers());
+  const joinCalls = (calls: ReturnType<typeof mockApi>) =>
+    calls.filter((call) => call.path === '/contests/r42/join');
+
+  it('asks once before a virtual run starts, and joins only on confirm', async () => {
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(
+        contestDetail({ phase: 'ended', viewer: contestViewer({ liveStatus: 'finished' }) }),
+      ),
+      'POST /contests/r42/join': ok(participationSummary({ virtual: 1 })),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Bắt đầu thi ảo').trigger('click');
+    await flushPromises();
+    expect(dialog()!.textContent).toContain('Bắt đầu ngay?');
+    expect(joinCalls(calls)).toEqual([]);
+    dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
+    await flushPromises();
+    expect(joinCalls(calls)).toHaveLength(1);
+  });
+
+  it('asks before a windowed contest starts the personal clock', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const calls = mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contestDetail({ timeLimit: 3 * 3600 })),
+      'POST /contests/r42/join': ok(participationSummary()),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await buttonNamed(wrapper, 'Vào thi').trigger('click');
+    await flushPromises();
+    expect(dialog()!.textContent).toContain('3 giờ');
+    expect(joinCalls(calls)).toEqual([]);
+    dialog()!.querySelector('form')!.dispatchEvent(new Event('submit'));
+    await flushPromises();
+    expect(joinCalls(calls)).toHaveLength(1);
+  });
+});
+
 describe('contest actions with rules', () => {
   afterEach(() => vi.useRealTimers());
   const ruled = (overrides: Parameters<typeof contestDetail>[0] = {}) =>

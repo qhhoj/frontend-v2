@@ -371,6 +371,11 @@
       "body": "You are in a virtual run of {other} ({left} left). Entering this contest will {ends}; your submissions are kept.",
       "ends": "end the virtual run",
       "stay": "Stay in the virtual run"
+    },
+    "startNow": {
+      "title": "Start now?",
+      "body": "The {span} clock runs from the moment you click and cannot be paused.",
+      "wait": "Not yet"
     }
   },
   "placeholder": {

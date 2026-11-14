@@ -21,6 +21,7 @@ import type { ContestActionKind } from './contest-action';
 import { participationKind } from './bar/current-contest';
 import type { ParticipationKind } from './bar/current-contest';
 import ContestRulesDialog from './ContestRulesDialog.vue';
+import ContestStartDialog from './ContestStartDialog.vue';
 import ContestSwitchDialog from './ContestSwitchDialog.vue';
 import InContestStatus from './InContestStatus.vue';
 import { acceptanceOf, hasRules, needsRulesAcceptance } from './join-rules';
@@ -64,6 +65,7 @@ const now = useNow();
 const facts = computed(() => actionFactsOf(props.contest, session.user !== null, now.value));
 const chosen = computed(() => contestAction(facts.value));
 const isSwitchOpen = ref(false);
+const isStartOpen = ref(false);
 /** The request the viewer chose when the dialogs opened: a phase change while they ask must not swap it. */
 const confirmedCommand = ref<ReturnType<typeof commandOf>>(null);
 /** The viewer's running participation here, or null while `/contests/current` has not said so. */
@@ -95,6 +97,10 @@ const startClock = computed(() => formatClock(props.contest.startTime));
 const virtualLength = computed(() =>
   spanMessage((Date.parse(props.contest.endTime) - Date.parse(props.contest.startTime)) / 1000),
 );
+/** The personal clock a start begins: a virtual run's length, or the windowed contest's time per participation. */
+const startSpan = computed(() =>
+  props.contest.timeLimit ? spanMessage(props.contest.timeLimit) : virtualLength.value,
+);
 const signInTarget = computed(() => ({
   path: '/login',
   query: { redirect: safeRedirect(route.fullPath) },
@@ -115,6 +121,13 @@ const needsRules = computed(
   () =>
     hasRules(props.contest.rules) &&
     needsRulesAcceptance(chosen.value.kind, props.contest.viewer.liveStatus),
+);
+/** Without a rules dialog to be deliberate in, a virtual run or a windowed first join asks before its clock starts. */
+const needsStartConfirm = computed(
+  () =>
+    !needsRules.value &&
+    (chosen.value.kind === 'virtual' ||
+      (chosen.value.kind === 'join' && !!props.contest.timeLimit)),
 );
 /** Only the live participation carries the acceptance a virtual run is compared with; virtual runs never feed it. */
 const previousAcceptance = computed(() => acceptanceOf(props.contest.viewer.liveParticipation));
@@ -183,7 +196,13 @@ function proceed() {
   reset();
   acceptance.value = null;
   if (needsRules.value) isRulesOpen.value = true;
+  else if (needsStartConfirm.value) isStartOpen.value = true;
   else askCodeOrPerform();
+}
+/** The viewer is ready: the code dialog follows when the action needs a code, else the request goes now. */
+function confirmStart() {
+  isStartOpen.value = false;
+  askCodeOrPerform();
 }
 /** Ticked and confirmed: the code dialog follows when the action needs a code, else the request goes now. */
 function acceptRules() {
@@ -264,6 +283,12 @@ watch(isRulesOpen, (isOpen) => {
       :replaced="replacedRun"
       :confirm-label="actionLabel"
       @confirm="proceed"
+    />
+    <ContestStartDialog
+      v-model:visible="isStartOpen"
+      :span="startSpan"
+      :confirm-label="actionLabel"
+      @confirm="confirmStart"
     />
     <AccessCodeDialog
       v-model:visible="isDialogOpen"

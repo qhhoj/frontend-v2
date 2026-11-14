@@ -10,7 +10,7 @@
     "own": "Phiếu tôi gửi hoặc được giao",
     "assignee": "Người phụ trách",
     "peopleHint": "Nhiều tên cách nhau bằng dấu phẩy.",
-    "awaiting": "Đang chờ ban quản trị trả lời",
+    "awaiting": "Chờ trả lời",
     "assigneeChip": "Phụ trách: {names}",
     "mine": "Phiếu của tôi",
     "aboutMine": "Về bài của tôi",

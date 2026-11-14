@@ -2,19 +2,22 @@ import type { LocationQuery, LocationQueryRaw } from 'vue-router';
 import type { TicketDetail, TicketListQuery, TicketPatch } from '@/api/types/tickets';
 import { routeQueryFromFilters } from '@/features/tickets/ticket-filters';
 
-export type QueueStatus = 'open' | 'closed' | 'all';
+/** `awaiting` = open tickets whose last word is not staff's: the staff triage view. */
+export type QueueStatus = 'awaiting' | 'open' | 'closed' | 'all';
 
 /** The keys of 8e's ticket-list URL format that filter the list (`?ticket=` only picks one ticket). */
 const FILTER_KEYS = ['scope', 'open', 'awaiting', 'about', 'q', 'user', 'assignee'] as const;
 
 /** Backend: `open=true` lists open tickets, `open=false` closed ones, and an unset flag lists both. */
 const OPEN_FLAG: Record<QueueStatus, boolean | undefined> = {
+  awaiting: true,
   open: true,
   closed: false,
   all: undefined,
 };
 
 export const statusOf = (query: TicketListQuery): QueueStatus => {
+  if (query.awaiting === true) return 'awaiting';
   if (query.open === true) return 'open';
   return query.open === false ? 'closed' : 'all';
 };
@@ -23,20 +26,24 @@ export const statusOf = (query: TicketListQuery): QueueStatus => {
 export const withStatus = (query: TicketListQuery, status: QueueStatus): TicketListQuery => ({
   ...query,
   open: OPEN_FLAG[status],
-  // Waiting for staff are open tickets only: another status drops it.
-  awaiting: status === 'open' ? query.awaiting : undefined,
+  awaiting: status === 'awaiting' ? true : undefined,
   page: 1,
 });
 
 /**
- * The first visit opens on everyone's open tickets by writing 8e's own `scope=all&open=1`; a problem setter without the
+ * The first visit opens ticket staff on the tickets awaiting a reply (`scope=all&open=1&awaiting=1`, 8e's own keys); a problem setter without the
  * ticket right (`isStaff` false) opens on the open tickets about their problems (`about=mine`). A URL that already filters
  * is left alone.
  */
 export function seedQueueQuery(query: LocationQuery, isStaff = true): LocationQuery {
   const hasFilter = FILTER_KEYS.some((key) => key in query);
   if (hasFilter) return query;
-  return { ...query, scope: 'all', open: '1', ...(isStaff ? {} : { about: 'mine' }) };
+  return {
+    ...query,
+    scope: 'all',
+    open: '1',
+    ...(isStaff ? { awaiting: '1' } : { about: 'mine' }),
+  };
 }
 
 /**

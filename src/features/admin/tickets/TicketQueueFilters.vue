@@ -15,9 +15,10 @@ import TicketQueueShortcuts from './TicketQueueShortcuts.vue';
 import { isMineOnly, queueLocation, seedQueueQuery, statusOf, withStatus } from './ticket-queue';
 import type { QueueStatus } from './ticket-queue';
 
+const QUEUE_STATUSES: QueueStatus[] = ['awaiting', 'open', 'closed', 'all'];
+
 /**
- * The queue's filter row: title or creator search, the "mine" shortcuts, the status switch, and a panel with "waiting for
- * staff" (ticket staff only), own tickets and assignee.
+ * The queue's filter row: title or creator search, the "mine" shortcuts, the status switch, and a panel with own tickets and assignee.
  */
 const props = defineProps<{
   filters: TicketListQuery;
@@ -33,10 +34,12 @@ const summary = useTicketSummaryQuery();
 /** Every change writes the whole filter into the URL, with the open ticket kept. */
 const show = (next: TicketListQuery) =>
   router.replace({ query: queueLocation(next, props.ticketId) });
+/** "Chờ trả lời" leads for ticket staff, with the count of tickets waiting. */
 const statusTabs = computed<AdminFilterTab[]>(() =>
-  (['open', 'closed', 'all'] as const).map((status) => ({
+  (props.isStaff ? QUEUE_STATUSES : QUEUE_STATUSES.slice(1)).map((status) => ({
     key: status,
     label: t(`admin.tickets.filters.${status}`),
+    ...(status === 'awaiting' ? { count: summary.data.value?.awaitingStaff ?? 0 } : {}),
   })),
 );
 const chooseStatus = (status: string) => show(withStatus(props.filters, status as QueueStatus));
@@ -44,14 +47,6 @@ const searchModel = computed({
   get: () => props.filters.q ?? '',
   set: (text: string) => void show({ ...props.filters, q: text.trim() || undefined, page: 1 }),
 });
-/** Waiting for staff are open tickets only, so the status follows. */
-const setAwaiting = (isOn: boolean) =>
-  show({
-    ...props.filters,
-    awaiting: isOn || undefined,
-    open: isOn ? true : props.filters.open,
-    page: 1,
-  });
 const setOwn = (own: boolean) => show({ ...props.filters, own, page: 1 });
 const assigneeText = ref(props.filters.assignee.join(', '));
 watch(
@@ -67,9 +62,6 @@ const hasAssigneeChip = computed(
     props.filters.assignee.length > 0 && !isMineOnly(props.filters, session.user?.username ?? ''),
 );
 const chips = computed(() => [
-  ...(props.filters.awaiting
-    ? [{ key: 'awaiting', label: t('admin.tickets.filters.awaiting') }]
-    : []),
   ...(props.filters.own ? [{ key: 'own', label: t('admin.tickets.filters.own') }] : []),
   ...(hasAssigneeChip.value
     ? [
@@ -92,8 +84,7 @@ const chips = computed(() => [
     : []),
 ]);
 function removeChip(key: string) {
-  if (key === 'awaiting') void setAwaiting(false);
-  else if (key === 'own') void setOwn(false);
+  if (key === 'own') void setOwn(false);
   else if (key === 'user') void show({ ...props.filters, user: [], page: 1 });
   else void show({ ...props.filters, assignee: [], page: 1 });
 }
@@ -126,21 +117,6 @@ const reset = () =>
       />
     </template>
     <template #filters>
-      <label v-if="isStaff" :class="[CHECK_CHIP, 'self-end']">
-        <input
-          type="checkbox"
-          name="awaiting"
-          class="size-4 accent-accent"
-          :checked="filters.awaiting === true"
-          @change="setAwaiting(($event.target as HTMLInputElement).checked)"
-        />
-        {{ $t('admin.tickets.filters.awaiting') }}
-        <span
-          v-if="summary.data.value?.awaitingStaff"
-          class="rounded-pill bg-surface-strong px-1.5 font-mono text-caption leading-4 tabular-nums"
-          >{{ summary.data.value.awaitingStaff }}</span
-        >
-      </label>
       <label :class="[CHECK_CHIP, 'self-end']">
         <input
           type="checkbox"
