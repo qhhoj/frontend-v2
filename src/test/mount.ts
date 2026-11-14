@@ -2,8 +2,8 @@ import { afterEach } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import type { VueWrapper } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
-import { createMemoryHistory } from 'vue-router';
-import type { RouterHistory } from 'vue-router';
+import { createMemoryHistory, loadRouteLocation } from 'vue-router';
+import type { Router, RouterHistory } from 'vue-router';
 import App from '@/App.vue';
 import { appPlugins } from '@/app-plugins';
 import { createQueryClient } from '@/api/query-client';
@@ -38,6 +38,10 @@ export async function mountApp(path: string, history: RouterHistory = createMemo
   await flushPromises();
   return { wrapper, router, queryClient };
 }
+
+/** Loads the lazy chunks of `path`, so a later navigation there settles without waiting on a cold transform. */
+export const preloadRoute = (router: Router, path: string) =>
+  loadRouteLocation(router.resolve(path));
 
 const mounted: VueWrapper[] = [];
 afterEach(() => mounted.splice(0).forEach((wrapper) => wrapper.unmount()));

@@ -6,7 +6,7 @@ import { organizationSummary } from '@/test/community-fixtures';
 import { fail, hangRequestsExcept, mockApi, ok, page } from '@/test/mock-api';
 import { WIDE_QUERY } from '@/lib/use-media-query';
 import { stubMatchMedia } from '@/test/match-media';
-import { mountApp } from '@/test/mount';
+import { mountApp, preloadRoute } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 
@@ -130,9 +130,9 @@ describe('leaderboard page: opens a profile by username', () => {
       'GET /submissions': page([]),
     });
     const { wrapper, router } = await mountApp('/users');
+    await preloadRoute(router, '/users/khoa.tran');
     await wrapper.get('input[name="username"]').setValue('  khoa.tran ');
     await wrapper.get('form[data-testid="username-jump"]').trigger('submit');
-    // The profile route is a lazy chunk: the push settles after a few ticks, not one flush.
     await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/users/khoa.tran'));
   });
 

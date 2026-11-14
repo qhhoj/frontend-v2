@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { mockApi, ok, page } from '@/test/mock-api';
-import { mountApp } from '@/test/mount';
+import { mountApp, preloadRoute } from '@/test/mount';
 import { problemItem, problemMeta } from '@/test/fixtures';
 import { staffViewer } from '@/test/admin-routes';
 import { ticketItem } from '@/test/community-fixtures';
@@ -49,6 +49,7 @@ describe('admin search palette', () => {
       'GET /tickets': page([]),
     });
     const { router, box } = await openPalette('/admin');
+    await preloadRoute(router, '/admin/problems/aplusb/general');
     type(box, 'ap');
     await vi.waitFor(() => expect(optionTexts().join()).toContain('A cộng B'));
     // The dashboard's setter tiles count problems too: one-row pages of public or private problems, never a search.
@@ -95,6 +96,7 @@ describe('admin search palette', () => {
       'GET /tickets/t-1': { status: 404, body: { error: { code: 'not_found', message: '' } } },
     });
     const { router, box } = await openPalette('/admin');
+    await preloadRoute(router, '/admin/tickets');
     type(box, 'sai');
     await vi.waitFor(() => expect(optionTexts().join()).toContain('Test 7 sai đáp án'));
     const search = calls.find((call) => call.path === '/tickets' && call.query.has('q'))!;
