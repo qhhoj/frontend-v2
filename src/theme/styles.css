@@ -430,10 +430,11 @@
   transition: none !important;
 }
 
-/* Container for backend-sanitized user HTML (UserContent.vue): nothing inside may paint, size or stack outside it. */
+/* Container for backend-sanitized user HTML (UserContent.vue): nothing inside may paint, size, position or stack outside it
+   (layout containment makes it the containing block of every positioned descendant). */
 @utility user-content {
   overflow: clip;
-  contain: paint inline-size;
+  contain: layout paint inline-size;
   isolation: isolate;
   width: 100%;
   min-width: 0;

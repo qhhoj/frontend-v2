@@ -210,6 +210,23 @@
       },
       "yes": "{slot}: đã có",
       "no": "{slot}: chưa có"
+    },
+    "trust": {
+      "trustedTitle": "Nội dung đã được tin cậy",
+      "trustedSummary": "Bài dùng markup đầy đủ: HTML trong nội dung này hiển thị không lọc trên trang đề.",
+      "untrustedTitle": "Nội dung chưa được tin cậy",
+      "untrustedSummary": "HTML trong nội dung này được lọc khi hiển thị, cả trong bản xem trước. Chỉ người có quyền “Dùng markup không lọc trong đề bài” mới tin cậy được.",
+      "review": "Xem và tin cậy",
+      "revoke": "Bỏ tin cậy",
+      "unsavedReason": "Lưu hoặc hủy thay đổi trước khi đổi mức tin cậy.",
+      "dialogTitle": "Tin cậy nội dung này?",
+      "dialogBody": "Mọi người xem trang đề sẽ thấy HTML dưới đây không lọc, kể cả mã chạy được. Chỉ tin cậy khi bạn đã đọc hết nội dung.",
+      "confirm": "Tin cậy nội dung",
+      "trustedToast": "Đã tin cậy nội dung.",
+      "untrustedToast": "Đã bỏ tin cậy nội dung.",
+      "trustedIdleSummary": "Bài chưa bật markup đầy đủ: khi bật, HTML trong nội dung này sẽ hiển thị không lọc trên trang đề.",
+      "revokeTitle": "Bỏ tin cậy nội dung này?",
+      "revokeBody": "HTML trong nội dung sẽ được lọc khi hiển thị trên trang đề, với mọi người xem."
     }
   },
   "editorial": {

@@ -210,6 +210,23 @@
       },
       "yes": "{slot}: written",
       "no": "{slot}: missing"
+    },
+    "trust": {
+      "trustedTitle": "This text is trusted",
+      "trustedSummary": "The problem uses full markup: HTML in this text renders unsanitised on the problem page.",
+      "untrustedTitle": "This text is not trusted",
+      "untrustedSummary": "HTML in this text is sanitised when shown, the preview included. Only holders of “Use unsanitised problem markup” can trust it.",
+      "review": "Review and trust",
+      "revoke": "Stop trusting",
+      "unsavedReason": "Save or discard your changes before changing the trust.",
+      "dialogTitle": "Trust this text?",
+      "dialogBody": "Everyone who opens the problem page will get the HTML below unsanitised, runnable code included. Trust it only after reading all of it.",
+      "confirm": "Trust text",
+      "trustedToast": "Text trusted.",
+      "untrustedToast": "Text no longer trusted.",
+      "trustedIdleSummary": "Full markup is off: once it is on, HTML in this text renders unsanitised on the problem page.",
+      "revokeTitle": "Stop trusting this text?",
+      "revokeBody": "HTML in this text will be sanitised on the problem page, for every reader."
     }
   },
   "editorial": {

@@ -1,4 +1,5 @@
 import { apiGet, apiSend } from './typed';
+import type { JsonBodyOf } from './typed';
 import { fileBody } from './problem-data.api';
 import type { StatementLanguage } from './types/problems';
 import type {
@@ -31,7 +32,7 @@ export const updateProblem = (code: string, patch: ProblemPatch): Promise<Editab
 export const putTranslation = (
   code: string,
   lang: StatementLanguage,
-  body: { name: string; description: string },
+  body: JsonBodyOf<'/problems/{code}/translations/{lang}', 'put'>,
 ): Promise<void> =>
   apiSend('put', '/problems/{code}/translations/{lang}', { path: { code, lang }, body });
 export const putEditorial = (code: string, body: EditorialDraftBody): Promise<void> =>

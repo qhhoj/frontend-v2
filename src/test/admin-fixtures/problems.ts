@@ -46,11 +46,13 @@ export const problemEditingMeta = (): ProblemEditingMeta => ({
 export const problemEditor = (): ProblemEditor => ({
   baseName: 'Đường đi ngắn nhất có ràng buộc',
   description: 'Cho đồ thị vô hướng gồm $n$ đỉnh.',
+  isDescriptionMarkupTrusted: false,
   translations: [
     {
       language: 'vi',
       name: 'Đường đi ngắn nhất có ràng buộc',
       description: 'Cho đồ thị vô hướng gồm $n$ đỉnh.',
+      isMarkupTrusted: false,
     },
   ],
   solution: null,

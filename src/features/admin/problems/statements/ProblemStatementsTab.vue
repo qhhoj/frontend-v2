@@ -12,6 +12,7 @@ import { needsPermissionText } from '../../ui/permission-text';
 import UploadButton from '@/components/ui/UploadButton.vue';
 import { failureReasonOf } from '../failure-reason';
 import { IMAGE_ACCEPT, IMAGE_MAX_BYTES } from '../limits';
+import StatementTrust from './StatementTrust.vue';
 import { STATEMENT_SLOTS } from './statement-drafts';
 import { useImageInsert } from './use-image-insert';
 import { FULL_MARKUP_PERMISSION, useStatementDrafts } from './use-statement-drafts';
@@ -36,13 +37,26 @@ const {
   save,
   discard,
   saveMutation,
+  canSetTrust,
+  setTrust,
+  trustMutation,
 } = useStatementDrafts(() => props.problem);
 const imageMutation = useImageInsert(
   drafts,
   slot,
   () => root.value?.querySelector('textarea') ?? undefined,
 );
-const isFullMarkupHidden = computed(() => props.problem.isFullMarkup && !canFullMarkup.value);
+const isFullMarkupHidden = computed(
+  () => props.problem.isFullMarkup && current.value.isMarkupTrusted && !canFullMarkup.value,
+);
+/** Trust shows for a written slot that is trusted or on a full-markup problem (where it decides the render). */
+const isTrustShown = computed(
+  () => current.value.exists && (props.problem.isFullMarkup || current.value.isMarkupTrusted),
+);
+const trustBlockedReason = computed(() =>
+  canSetTrust.value ? undefined : t('admin.problems.statements.trust.unsavedReason'),
+);
+const savedSource = computed(() => drafts.value[slot.value].storedDescription);
 const slotName = computed(() => `admin.problems.statements.slots.${slot.value}`);
 const lockText = computed(() =>
   isLocked.value ? needsPermissionText(FULL_MARKUP_PERMISSION) : undefined,
@@ -147,6 +161,21 @@ const SEGMENT =
         v-if="imageMutation.failure.value"
         kind="refused"
         :text="failureReasonOf(imageMutation.failure.value)"
+      />
+      <StatementTrust
+        v-if="isTrustShown"
+        :is-trusted="current.isMarkupTrusted"
+        :is-full-markup="problem.isFullMarkup"
+        :can-manage="canFullMarkup"
+        :blocked-reason="trustBlockedReason"
+        :source="savedSource"
+        :busy="trustMutation.isPending.value"
+        @set-trust="setTrust"
+      />
+      <AdminStatus
+        v-if="trustMutation.failure.value"
+        kind="refused"
+        :text="failureReasonOf(trustMutation.failure.value)"
       />
       <p v-if="isFullMarkupHidden" class="text-sm text-muted">
         {{ $t('admin.problems.statements.fullMarkupNote') }}

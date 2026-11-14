@@ -19,13 +19,20 @@ export interface StatementDraft {
   exists: boolean;
   /** The description as the backend stores it (maybe `\r\n`): sent back while the edit leaves it unchanged. */
   storedDescription: string;
+  /** Whether a holder of `judge.problem_full_markup` trusted the stored text: on a full-markup problem only trusted text renders unsanitized. Changed only by the trust action, never by a save. */
+  isMarkupTrusted: boolean;
 }
 
-const storedDraft = (name: string, description: string): StatementDraft => ({
+const storedDraft = (
+  name: string,
+  description: string,
+  isMarkupTrusted: boolean,
+): StatementDraft => ({
   name,
   description: normalizeNewlines(description),
   exists: true,
   storedDescription: description,
+  isMarkupTrusted,
 });
 
 /**
@@ -36,12 +43,18 @@ const storedDraft = (name: string, description: string): StatementDraft => ({
 export function statementDraftOf(problem: EditableProblem, slot: StatementSlot): StatementDraft {
   const editor = problem.editor!;
   if (slot === 'original') {
-    return storedDraft(editor.baseName, editor.description);
+    return storedDraft(editor.baseName, editor.description, editor.isDescriptionMarkupTrusted);
   }
   const translation = editor.translations.find((candidate) => candidate.language === slot);
   if (!translation)
-    return { name: editor.baseName, description: '', exists: false, storedDescription: '' };
-  return storedDraft(translation.name, translation.description);
+    return {
+      name: editor.baseName,
+      description: '',
+      exists: false,
+      storedDescription: '',
+      isMarkupTrusted: false,
+    };
+  return storedDraft(translation.name, translation.description, translation.isMarkupTrusted);
 }
 
 /** The description a save of the draft sends: the stored text while only its line breaks differ. */
@@ -54,9 +67,16 @@ export const initialSlotOf = (problem: EditableProblem): StatementSlot =>
     ? 'vi'
     : 'original';
 
-/** `problem-full` only for a full-markup problem and a viewer allowed to see it; the backend refuses it otherwise. */
-export const previewStyleFor = (problem: EditableProblem, canFullMarkup: boolean): PreviewStyle =>
-  problem.isFullMarkup && canFullMarkup ? 'problem-full' : 'problem';
+/**
+ * The style the public page renders the slot's stored text with: `problem-full` only for trusted text of a full-markup
+ * problem. The viewer's permission only narrows it (the backend refuses `problem-full` without `judge.problem_full_markup`).
+ */
+export const previewStyleFor = (
+  problem: EditableProblem,
+  draft: StatementDraft,
+  canFullMarkup: boolean,
+): PreviewStyle =>
+  problem.isFullMarkup && draft.isMarkupTrusted && canFullMarkup ? 'problem-full' : 'problem';
 
 /** Backend: a full-markup problem's description is written only with `judge.problem_full_markup` (else 403). */
 export const isOriginalLocked = (problem: EditableProblem, canFullMarkup: boolean): boolean =>

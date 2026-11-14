@@ -55,7 +55,12 @@ describe('ProblemStatementsTab', () => {
   it('opens an imported problem (base statement + English) on the base statement with no error until a save is tried', async () => {
     const imported = editableProblem();
     imported.editor!.translations = [
-      { language: 'en', name: 'Constrained path', description: 'Given a graph.' },
+      {
+        language: 'en',
+        name: 'Constrained path',
+        description: 'Given a graph.',
+        isMarkupTrusted: false,
+      },
     ];
     const calls = mockApi({ ...staffViewer(EDIT), ...problemEditorRoutes(imported), ...PREVIEW });
     const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/statements');
@@ -86,6 +91,40 @@ describe('ProblemStatementsTab', () => {
       .filter((call) => call.path === '/problems/render-preview')
       .map((call) => (call.body as { style: string }).style);
     expect(styles).toEqual(['problem']);
+  });
+
+  it('previews an untrusted slot sanitized for a full-markup holder, keeps its trust on a save, and trusts it only after review', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const calls = mockApi({
+      ...staffViewer([...EDIT, 'judge.problem_full_markup']),
+      ...problemEditorRoutes(editableProblem({ isFullMarkup: true })),
+      ...PREVIEW,
+      'PUT /problems/hcmus41c/translations/vi': { status: 204 },
+    });
+    const { wrapper } = await mountAdmin('/admin/problems/hcmus41c/statements');
+    await vi.advanceTimersByTimeAsync(600);
+    await flushPromises();
+    expect(
+      calls
+        .filter((call) => call.path === '/problems/render-preview')
+        .map((call) => (call.body as { style: string }).style),
+    ).toEqual(['problem']);
+    expect(wrapper.get('[data-testid="statement-trust"]').text()).toContain('chưa được tin cậy');
+    await wrapper.get('#statement-name').setValue('Tên mới');
+    expect(buttonLabelled(wrapper, 'Xem và tin cậy').attributes('aria-disabled')).toBe('true');
+    await buttonLabelled(wrapper, 'Lưu bản dịch tiếng Việt').trigger('click');
+    await flushPromises();
+    const stored = 'Cho đồ thị vô hướng gồm $n$ đỉnh.';
+    const puts = () => calls.filter((call) => call.method === 'PUT').map((call) => call.body);
+    expect(puts()).toEqual([{ name: 'Tên mới', description: stored }]);
+    await buttonLabelled(wrapper, 'Xem và tin cậy').trigger('click');
+    await flushPromises();
+    expect(openDialog().querySelector('[data-testid="statement-trust-source"]')?.textContent).toBe(
+      stored,
+    );
+    await confirmDialog('Tin cậy nội dung');
+    await flushPromises();
+    expect(puts()[1]).toEqual({ name: 'Tên mới', description: stored, isMarkupTrusted: true });
   });
 
   it('will not send the original description of a full-markup problem for a viewer without judge.problem_full_markup', async () => {
