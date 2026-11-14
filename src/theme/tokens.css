@@ -5,6 +5,8 @@
   --qh-font-body: Verdana, 'DejaVu Sans', 'Bitstream Vera Sans', Geneva, sans-serif;
   /* Headings keep Space Grotesk (product owner's decision). */
   --qh-font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  /* Page background strength (theme/backgrounds.css): one fixed subtle level, no control. */
+  --qh-background-level: 0.45;
   --qh-font-mono: 'JetBrains Mono', ui-monospace, monospace;
   /* Limit chips by meaning: time blue, memory violet, points amber. They reuse the tag colours, so their contrast is the tag pairs' (themes.node.spec.ts). */
   --qh-limit-time: var(--qh-tag-5);

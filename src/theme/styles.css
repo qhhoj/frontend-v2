@@ -9,6 +9,7 @@
 @import './themes/clay-dark.css';
 @import './themes/glass-dark.css';
 @import './themes/glass-light.css';
+@import './backgrounds.css';
 
 /* Phones and touch screens: a coarse pointer, or a viewport up to 640 px (a phone held either way is never wider than that in portrait). */
 @custom-variant touch (@media (pointer: coarse), (max-width: 40rem));

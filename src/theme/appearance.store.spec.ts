@@ -2,8 +2,8 @@ import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useAppearanceStore } from './appearance.store';
 
-const OCEAN = { accent: 'ocean', glass: 40, glow: 60 } as const;
-const MINT = { accent: 'mint', glass: 10, glow: 20 } as const;
+const OCEAN = { accent: 'ocean', glass: 40, glow: 60, background: 'contour' } as const;
+const MINT = { accent: 'mint', glass: 10, glow: 20, background: 'none' } as const;
 const root = document.documentElement;
 
 beforeEach(() => setActivePinia(createPinia()));
@@ -13,6 +13,7 @@ describe('appearance store', () => {
     const store = useAppearanceStore();
     store.choose(OCEAN);
     expect(root.dataset.accent).toBe('ocean');
+    expect(root.dataset.background).toBe('contour');
     expect(root.style.getPropertyValue('--qh-glass-level')).toBe('40');
     expect(root.style.getPropertyValue('--qh-blob-strength')).toBe('0.6');
     expect(JSON.parse(localStorage.getItem('qhhoj.appearance')!)).toEqual(OCEAN);
@@ -30,6 +31,20 @@ describe('appearance store', () => {
     const store = useAppearanceStore();
     expect(store.look).toBeNull();
     expect(root.dataset.accent).toBeUndefined();
+  });
+
+  it('paints the default background (blueprint) for the site look and for a stored look that has none', () => {
+    const store = useAppearanceStore();
+    expect(store.look).toBeNull();
+    expect(root.dataset.background).toBe('blueprint');
+    store.choose(OCEAN);
+    store.adopt(null);
+    expect(root.dataset.background).toBe('blueprint');
+    const old = '{"accent":"mint","glass":10,"glow":20}';
+    localStorage.setItem('qhhoj.appearance', old);
+    localStorage.setItem('qhhoj.paintedAppearance', old);
+    setActivePinia(createPinia());
+    expect(useAppearanceStore().look?.background).toBe('blueprint');
   });
 
   it("lets the account's look outrank this browser's, and null mean the site look", () => {

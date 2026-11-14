@@ -651,6 +651,19 @@
       "dark": "Dark",
       "auto": "Device"
     },
+    "backgroundTitle": "Page background",
+    "backgroundHelp": "A faint pattern behind the page; cards, tables and text stay on solid surfaces. Low-power mode shows a flat tint.",
+    "background": {
+      "none": "None",
+      "paper": "Paper",
+      "grainy": "Grainy gradient",
+      "blueprint": "Blueprint",
+      "contour": "Contour lines",
+      "halftone": "Halftone",
+      "dither": "Dithered",
+      "stipple": "Stippled",
+      "landscape": "Landscape"
+    },
     "accentTitle": "Accent",
     "accentHelp": "Every preset is checked for readable text in light and dark.",
     "accent": {
