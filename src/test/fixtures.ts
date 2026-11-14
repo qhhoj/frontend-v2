@@ -642,6 +642,7 @@ export const submissionDetail = (overrides: Partial<SubmissionDetail> = {}): Sub
     canReject: false,
     canLock: false,
     canOverrideScore: false,
+    canShare: false,
   },
   externalRun: null,
   lockedAfter: null,

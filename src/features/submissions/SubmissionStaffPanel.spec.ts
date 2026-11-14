@@ -16,6 +16,7 @@ const finished = submissionDetail({
     canReject: true,
     canLock: false,
     canOverrideScore: false,
+    canShare: false,
   },
 });
 const pageRoutes = (detail = finished) => ({
@@ -36,6 +37,7 @@ describe('SubmissionStaffPanel', () => {
         canReject: false,
         canLock: false,
         canOverrideScore: false,
+        canShare: false,
       },
     });
     mockApi({ ...signedInViewer(), ...pageRoutes(running) });
@@ -104,6 +106,7 @@ describe('SubmissionStaffPanel', () => {
       canReject: false,
       canLock: false,
       canOverrideScore: false,
+      canShare: false,
     },
   });
 

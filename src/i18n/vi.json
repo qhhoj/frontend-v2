@@ -62,7 +62,10 @@
     "runtimes": "Máy chấm và ngôn ngữ",
     "postDrafts": "Bài nháp của tôi",
     "contestAll": "Tất cả đề",
-    "contestProblemBest": "Bài nộp tốt nhất của bài"
+    "contestProblemBest": "Bài nộp tốt nhất của bài",
+    "paste": "Dán mã",
+    "share": "Liên kết chia sẻ",
+    "settingsShares": "Liên kết của tôi"
   },
   "contests": {
     "title": "Kỳ thi",
@@ -404,7 +407,8 @@
     "menu": "Tài khoản của {username}",
     "profile": "Hồ sơ của tôi",
     "settings": "Cài đặt",
-    "admin": "Quản trị"
+    "admin": "Quản trị",
+    "paste": "Dán mã"
   },
   "settings": {
     "sections": "Các mục cài đặt",
@@ -412,7 +416,8 @@
       "profile": "Hồ sơ",
       "appearance": "Giao diện",
       "security": "Bảo mật",
-      "data": "Dữ liệu"
+      "data": "Dữ liệu",
+      "shares": "Liên kết"
     },
     "defaults": {
       "languageHint": "Chọn sẵn ở trang nộp bài.",
@@ -2982,6 +2987,189 @@
       "discardTitle": "Hủy {count} thay đổi? | Hủy {count} thay đổi?",
       "discardBody": "Các thay đổi chưa lưu sẽ mất.",
       "keepEditing": "Tiếp tục sửa"
+    }
+  },
+  "share": {
+    "button": "Chia sẻ",
+    "link": {
+      "label": "Liên kết công khai",
+      "copy": "Sao chép liên kết"
+    },
+    "kind": {
+      "submission": "Bản chụp bài nộp",
+      "paste": "Đoạn mã dán"
+    },
+    "expiry": {
+      "label": "Hết hạn",
+      "never": "Không hết hạn",
+      "expired": "Đã hết hạn",
+      "days": "Hết hạn sau {count} ngày | Hết hạn sau {count} ngày",
+      "hours": "Hết hạn sau {count} giờ | Hết hạn sau {count} giờ",
+      "soon": "Hết hạn trong vài phút",
+      "option": {
+        "never": "Không bao giờ",
+        "1d": "1 ngày",
+        "7d": "7 ngày",
+        "30d": "30 ngày"
+      }
+    },
+    "dialog": {
+      "title": "Chia sẻ bài nộp",
+      "blockedTitle": "Chưa thể chia sẻ",
+      "snapshot": "Bản chụp lúc {time}. Chấm lại hoặc xóa bài nộp sau này không làm đổi trang được chia sẻ.",
+      "includes": "Có:",
+      "includesList": "mã nguồn, ngôn ngữ, kết quả từng test, thời điểm chấm.",
+      "excludes": "Không có:",
+      "excludesList": "phản hồi của checker, đầu ra chương trình, thông báo lỗi nội bộ.",
+      "publicHint": "Ai có liên kết đều xem được, không cần đăng nhập.",
+      "create": "Tạo liên kết",
+      "created": "Đã tạo liên kết.",
+      "existing": "Bạn đã chia sẻ bài nộp này lúc {time}. Dùng lại liên kết đó, hoặc chụp bản mới.",
+      "takeNew": "Chụp bản mới",
+      "done": "Xong",
+      "contestTitle": "Kỳ thi đang diễn ra.",
+      "contestBody": "Bài nộp vào đề dùng trong kỳ thi chỉ chia sẻ được sau khi kỳ thi kết thúc và bảng điểm không còn đóng băng.",
+      "hiddenTitle": "Mã nguồn không được công khai.",
+      "hiddenBody": "Người ra đề chỉ cho chủ bài nộp và người kiểm thử xem mã nguồn của đề này, nên không tạo được liên kết."
+    },
+    "delete": {
+      "title": "Xóa liên kết này?",
+      "body": "Ai đang giữ liên kết sẽ không mở được nữa. Không hoàn tác được.",
+      "confirm": "Xóa liên kết",
+      "done": "Đã xóa liên kết"
+    },
+    "error": {
+      "share_limit": "Bạn đang có quá nhiều liên kết còn hạn. Hãy xóa bớt trong Cài đặt rồi thử lại.",
+      "submission_not_shareable": "Chỉ chia sẻ được bài nộp đã chấm xong hoặc lỗi biên dịch, bằng ngôn ngữ nhập được bằng chữ.",
+      "source_too_large": "Mã quá lớn: tối đa 64 KB.",
+      "source_empty": "Hãy dán mã trước khi tạo liên kết.",
+      "source_invalid": "Mã chứa ký tự không dùng được.",
+      "language_unknown": "Ngôn ngữ này không dùng được. Hãy chọn ngôn ngữ khác.",
+      "language_takes_file": "Ngôn ngữ này chỉ nhận tệp, hãy chọn ngôn ngữ khác.",
+      "muted": "Tài khoản đang bị cấm phát ngôn nên chưa tạo được liên kết."
+    },
+    "paste": {
+      "title": "Dán mã",
+      "lead": "Tạo liên kết ngắn tới một đoạn mã. Tối đa 64 KB. Ai có liên kết đều xem được.",
+      "signInTitle": "Đăng nhập để tạo liên kết.",
+      "signInBody": "Mã bạn dán được giữ lại trong trình duyệt này.",
+      "signInFirst": "Đăng nhập để tạo liên kết",
+      "empty": "Dán mã trước khi tạo liên kết",
+      "tooLarge": "Mã quá lớn, tối đa 64 KB",
+      "noLanguage": "Chọn ngôn ngữ",
+      "editor": "Mã cần chia sẻ",
+      "size": "{size} / {max} · {lines} dòng",
+      "fromClipboard": "Dán từ bộ nhớ tạm",
+      "clipboardDenied": "Trình duyệt không cho đọc bộ nhớ tạm. Hãy dán thẳng vào khung mã.",
+      "language": "Ngôn ngữ",
+      "titleLabel": "Tiêu đề",
+      "titlePlaceholder": "Ví dụ: dãy Fibonacci",
+      "create": "Tạo liên kết"
+    },
+    "code": {
+      "title": "Mã nguồn"
+    },
+    "result": {
+      "passed": "{done} / {total} test",
+      "judgedAt": "Chấm lúc {time}",
+      "points": "điểm",
+      "snapshot": "Bản chụp",
+      "snapshotAt": "lúc {time}. Kết quả không đổi khi bài nộp được chấm lại."
+    },
+    "details": {
+      "title": "Chi tiết",
+      "author": "Tác giả",
+      "problem": "Đề bài",
+      "createdAt": "Tạo lúc",
+      "language": "Ngôn ngữ",
+      "size": "Kích thước",
+      "expiry": "Hết hạn",
+      "public": "Công khai, không lập chỉ mục."
+    },
+    "hidden": {
+      "author_unavailable": "Tài khoản của tác giả không còn dùng được, nên người khác không mở được liên kết này.",
+      "contest_running": "Một kỳ thi dùng đề này chưa kết thúc, nên người khác không mở được liên kết này.",
+      "source_hidden": "Người ra đề giờ chỉ cho chủ bài nộp và người kiểm thử xem mã, nên người khác không mở được liên kết này.",
+      "taken_down": "Nhân viên đã gỡ liên kết này: {reason}"
+    },
+    "state": {
+      "goneTitle": "Liên kết không còn",
+      "goneBody": "Liên kết này không tồn tại, đã hết hạn hoặc đã bị gỡ.",
+      "newPaste": "Dán mã mới",
+      "home": "Về trang chủ",
+      "contestTitle": "Chưa xem được lúc này",
+      "contestBody": "Bài nộp này thuộc đề đang dùng trong một kỳ thi chưa kết thúc. Hãy quay lại sau khi kỳ thi kết thúc.",
+      "hiddenTitle": "Mã nguồn không được công khai",
+      "hiddenBody": "Người ra đề chỉ cho chủ bài nộp và người kiểm thử xem mã nguồn của đề này."
+    },
+    "report": {
+      "open": "Báo cáo nội dung này",
+      "title": "Báo cáo nội dung",
+      "body": "Nhân viên sẽ xem lại liên kết này. Mỗi người báo cáo một lần cho mỗi liên kết.",
+      "reasonLabel": "Lý do",
+      "noteLabel": "Ghi chú",
+      "confirm": "Gửi báo cáo",
+      "duplicate": "Bạn đã báo cáo liên kết này rồi.",
+      "sent": "Đã gửi báo cáo",
+      "reason": {
+        "contest": "Lộ lời giải kỳ thi đang diễn ra",
+        "abuse": "Nội dung lạm dụng",
+        "spam": "Spam",
+        "other": "Lý do khác"
+      }
+    },
+    "takedown": {
+      "open": "Gỡ liên kết",
+      "restore": "Khôi phục",
+      "title": "Gỡ liên kết này?",
+      "body": "Liên kết ngừng mở được với mọi người. Chủ liên kết đọc lý do trong danh sách của mình. Có thể khôi phục sau.",
+      "reasonLabel": "Lý do",
+      "confirm": "Gỡ liên kết"
+    },
+    "edit": {
+      "title": "Sửa liên kết",
+      "expiryHint": "Hiện tại: {current}. Chọn một mức để tính lại từ bây giờ."
+    },
+    "list": {
+      "heading": "Liên kết của tôi",
+      "lead": "Bản chụp bài nộp và đoạn mã bạn đã chia sẻ.",
+      "title": "Tiêu đề",
+      "kind": "Loại",
+      "createdAt": "Tạo lúc",
+      "expiresAt": "Hết hạn",
+      "caption": "Liên kết đã chia sẻ",
+      "pager": "Trang liên kết",
+      "empty": "Bạn chưa chia sẻ liên kết nào.",
+      "newPaste": "Dán mã",
+      "takenDown": "Bị gỡ",
+      "copyFailed": "Không sao chép được"
+    },
+    "reports": {
+      "lead": "Báo cáo về liên kết chia sẻ, mới nhất trước.",
+      "tabs": {
+        "label": "Trạng thái báo cáo",
+        "open": "Chưa xử lý",
+        "settled": "Đã xử lý"
+      },
+      "table": {
+        "share": "Liên kết",
+        "reason": "Lý do",
+        "note": "Ghi chú",
+        "reporter": "Người báo cáo",
+        "createdAt": "Lúc báo cáo",
+        "pager": "Trang báo cáo",
+        "caption": "Báo cáo liên kết chia sẻ"
+      },
+      "settled": {
+        "resolved": "Đã đánh dấu đã xử lý",
+        "dismissed": "Đã bỏ qua báo cáo"
+      },
+      "settleFailed": "Chưa xử lý được báo cáo",
+      "open": "Mở liên kết",
+      "resolve": "Đã xử lý",
+      "dismiss": "Bỏ qua",
+      "gone": "Liên kết đã hết hạn hoặc bị xóa",
+      "empty": "Không có báo cáo nào."
     }
   }
 }
