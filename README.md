@@ -22,16 +22,16 @@ API_ORIGIN=http://localhost:3001 npm run dev
 
 - `npm run api:gen` copies `../backend-v2/openapi.json` (or `OPENAPI_SPEC=/path/to/openapi.json`) to `src/api/generated/openapi.json`, records the backend commit in `openapi.source` and regenerates `schema.d.ts`; commit all three. `npm run api:check` (CI) fails when they disagree; `npm run api:check -- --backend` also fails when the snapshot lags the backend checkout.
 
-| Command                | Purpose                                                                                                                                            |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run dev`          | dev server on :5173                                                                                                                                |
-| `npm run build`        | typecheck (`vue-tsc --build`) and production build to `dist/`                                                                                      |
-| `npm run preview`      | serve `dist/` on :4173                                                                                                                             |
-| `npm test`             | Vitest: `*.node.spec.ts` in Node, the other specs in jsdom                                                                                         |
-| `npm run test:scripts` | Vitest: the specs of `scripts/` (api-gen, build helpers)                                                                                           |
-| `npm run lint`         | ESLint, `prettier --check`, `lint:tokens` (no colour literals outside themes), `lint:copy` (vi spelling, quotes), `lint:dates` (`formatDate` only) |
-| `npm run typecheck`    | `vue-tsc --build`                                                                                                                                  |
-| `npm run check`        | lint, typecheck, test                                                                                                                              |
+| Command                | Purpose                                                                                                                                                                                                         |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`          | dev server on :5173                                                                                                                                                                                             |
+| `npm run build`        | typecheck (`vue-tsc --build`) and production build to `dist/`                                                                                                                                                   |
+| `npm run preview`      | serve `dist/` on :4173                                                                                                                                                                                          |
+| `npm test`             | Vitest: `*.node.spec.ts` in Node, the other specs in jsdom                                                                                                                                                      |
+| `npm run test:scripts` | Vitest: the specs of `scripts/` (api-gen, build helpers)                                                                                                                                                        |
+| `npm run lint`         | ESLint, `prettier --check`, `lint:tokens` (no colour literals outside the palette), `lint:palette` (contrast proof, generated files fresh), `lint:copy` (vi spelling, quotes), `lint:dates` (`formatDate` only) |
+| `npm run typecheck`    | `vue-tsc --build`                                                                                                                                                                                               |
+| `npm run check`        | lint, typecheck, test                                                                                                                                                                                           |
 
 UI journeys are checked by agent-run Markdown click-by-click test scripts, kept outside this repo; there is no browser test suite here.
 
@@ -43,11 +43,11 @@ src/
   router/                   route table, guards (session, 2FA, password change, admin area), safe redirects
   api/                      fetch client, SSE, DTO types, one <area>.api.ts per backend area
   stores/                   Pinia: session, locale (the theme store lives in theme/)
-  theme/                    tokens, one CSS file per theme, registry, theme store, PrimeVue preset
+  theme/                    tokens, generated palette/, registry, theme and look stores, PrimeVue preset
   i18n/                     vi.json (default), en.json
   lib/                      pure helpers (verdicts, rating tiers, formats, dates, ranking cells)
   components/               shared UI parts
-  components/ui/            the Clay kit (AppButton, Card, DataTable, ...): see its README
+  components/ui/            the Workbench kit (AppButton, Card, DataTable, ...): see its README
   mascot/                   Bit, the pixel mascot: sprites, moods, placements
   assets/languages/         language logos and their licences
   features/<area>/          pages, their parts, <area>.queries.ts
@@ -56,7 +56,7 @@ src/
 scripts/check-tokens.mjs    lint:tokens
 scripts/check-vi-copy.mjs   lint:copy
 scripts/check-date-format.mjs  lint:dates (the rule and its allow-list: date-format-calls.mjs)
-design-system/qhhoj/        design notes (Clay & ivory default, Glass optional)
+design-system/qhhoj/        design notes (Workbench, palette A)
 ```
 
 Data flow: page -> `features/<area>/<area>.queries.ts` (vue-query) -> `api/<area>.api.ts` -> `api/client.ts`. Client state (session, theme, locale) is Pinia; server state is vue-query only.
@@ -65,8 +65,8 @@ Data flow: page -> `features/<area>/<area>.queries.ts` (vue-query) -> `api/<area
 
 | To change                                                    | Look in                                                                                                                                                                                  |
 | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A colour, radius, blur or font                               | `src/theme/themes/<id>.css`, `src/theme/tokens.css`                                                                                                                                      |
-| Add a theme                                                  | [CONTRIBUTING.md](CONTRIBUTING.md#add-a-theme)                                                                                                                                           |
+| A colour, radius or font                                     | `scripts/palette/paper.mjs` then `npm run palette`, `src/theme/tokens.css`                                                                                                               |
+| Change the palette                                           | [CONTRIBUTING.md](CONTRIBUTING.md#change-the-palette)                                                                                                                                    |
 | A utility name used by components                            | `src/theme/styles.css` (`@theme inline`)                                                                                                                                                 |
 | PrimeVue component styling                                   | `src/theme/primevue-preset.ts`                                                                                                                                                           |
 | A route or who may open it                                   | `src/router/routes.ts`, `src/router/guards.ts`                                                                                                                                           |
@@ -92,7 +92,7 @@ Data flow: page -> `features/<area>/<area>.queries.ts` (vue-query) -> `api/<area
 | Security actions                                             | one component each in `src/features/account/security/`; destructive ones confirm in `ConfirmDialog`                                                                                      |
 | Data export states and polling                               | `src/features/account/data/data-export.ts`                                                                                                                                               |
 | Bit in settings                                              | `SettingsNotice`'s `bit` prop, `EmptyState`'s `kind` and `InlineBit` (one word per placement)                                                                                            |
-| Contest tag colours                                          | `src/theme/themes/<id>.css` (`--qh-tag-1..8`, `-bg`), classes in `src/features/contests/tag-colors.ts`                                                                                   |
+| Contest tag colours                                          | `scripts/palette/paper.mjs` (`--qh-tag-1..6`, `-bg`; 7 and 8 alias 5), classes in `src/features/contests/tag-colors.ts`                                                                  |
 | Contest tag filter and chips                                 | `src/features/contests/tag-chips.ts`, `ContestTagFilter.vue`; catalogue admin in `src/features/admin/contest-tags/`                                                                      |
 | Which joins ask for the contest rules                        | `src/features/contests/join-rules.ts`                                                                                                                                                    |
 | Balloon queue, print sheet                                   | `src/features/contests/balloons/`                                                                                                                                                        |

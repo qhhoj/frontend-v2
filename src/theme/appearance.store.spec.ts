@@ -1,9 +1,11 @@
 import { createPinia, setActivePinia } from 'pinia';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { stubMatchMedia } from '@/test/match-media';
+import { MORE_CONTRAST_QUERY } from './appearance';
 import { useAppearanceStore } from './appearance.store';
 
-const OCEAN = { accent: 'ocean', glass: 40, glow: 60, background: 'contour' } as const;
-const MINT = { accent: 'mint', glass: 10, glow: 20, background: 'none' } as const;
+const HIGH = { accent: 'ultramarine', contrast: 'high', background: 'contour' } as const;
+const PLAIN = { accent: 'teal', contrast: 'standard', background: 'none' } as const;
 const root = document.documentElement;
 
 beforeEach(() => setActivePinia(createPinia()));
@@ -11,48 +13,62 @@ beforeEach(() => setActivePinia(createPinia()));
 describe('appearance store', () => {
   it('applies a chosen look at once and remembers it for this browser and for the pre-paint script', () => {
     const store = useAppearanceStore();
-    store.choose(OCEAN);
-    expect(root.dataset.accent).toBe('ocean');
+    store.choose(HIGH);
+    expect(root.dataset.accent).toBe('ultramarine');
     expect(root.dataset.background).toBe('contour');
-    expect(root.style.getPropertyValue('--qh-glass-level')).toBe('40');
-    expect(root.style.getPropertyValue('--qh-blob-strength')).toBe('0.6');
-    expect(JSON.parse(localStorage.getItem('qhhoj.appearance')!)).toEqual(OCEAN);
-    expect(JSON.parse(localStorage.getItem('qhhoj.paintedAppearance')!)).toEqual(OCEAN);
+    expect(root.dataset.contrast).toBe('high');
+    expect(JSON.parse(localStorage.getItem('qhhoj.appearance')!)).toEqual(HIGH);
+    expect(JSON.parse(localStorage.getItem('qhhoj.paintedAppearance')!)).toEqual(HIGH);
   });
 
-  it.each([
-    'not json',
-    '{"accent":"violet","glass":1,"glow":1}',
-    '{"accent":"mint","glass":5.5,"glow":1}',
-    '"x"',
-  ])('reads a stored look that is not valid (%s) as the site look', (stored) => {
-    localStorage.setItem('qhhoj.appearance', stored);
-    localStorage.setItem('qhhoj.paintedAppearance', stored);
-    const store = useAppearanceStore();
-    expect(store.look).toBeNull();
-    expect(root.dataset.accent).toBeUndefined();
-  });
+  it.each(['not json', '{"accent":"violet"}', '{"contrast":"high"}', '"x"'])(
+    'reads a stored look that is not valid (%s) as the site look',
+    (stored) => {
+      localStorage.setItem('qhhoj.appearance', stored);
+      localStorage.setItem('qhhoj.paintedAppearance', stored);
+      const store = useAppearanceStore();
+      expect(store.look).toBeNull();
+      expect(root.dataset.accent).toBeUndefined();
+    },
+  );
 
   it('paints the default background (blueprint) for the site look and for a stored look that has none', () => {
     const store = useAppearanceStore();
     expect(store.look).toBeNull();
     expect(root.dataset.background).toBe('blueprint');
-    store.choose(OCEAN);
+    store.choose(HIGH);
     store.adopt(null);
     expect(root.dataset.background).toBe('blueprint');
     const old = '{"accent":"mint","glass":10,"glow":20}';
     localStorage.setItem('qhhoj.appearance', old);
     localStorage.setItem('qhhoj.paintedAppearance', old);
     setActivePinia(createPinia());
-    expect(useAppearanceStore().look?.background).toBe('blueprint');
+    expect(useAppearanceStore().look).toEqual({
+      accent: 'teal',
+      contrast: 'standard',
+      background: 'blueprint',
+    });
+  });
+
+  it('follows the device contrast without a look, and the look own contrast with one', () => {
+    const media = stubMatchMedia();
+    media.setQuery(MORE_CONTRAST_QUERY, true);
+    const store = useAppearanceStore();
+    expect(root.dataset.contrast).toBe('high');
+    expect(store.shown.contrast).toBe('high');
+    store.choose(PLAIN);
+    expect(root.dataset.contrast).toBeUndefined();
+    store.choose(null);
+    media.setQuery(MORE_CONTRAST_QUERY, false);
+    expect(root.dataset.contrast).toBeUndefined();
   });
 
   it("lets the account's look outrank this browser's, and null mean the site look", () => {
     const store = useAppearanceStore();
-    store.choose(MINT);
-    store.adopt(OCEAN);
-    expect(store.look).toEqual(OCEAN);
-    expect(root.dataset.accent).toBe('ocean');
+    store.choose(PLAIN);
+    store.adopt(HIGH);
+    expect(store.look).toEqual(HIGH);
+    expect(root.dataset.accent).toBe('ultramarine');
     store.adopt(null);
     expect(store.look).toBeNull();
     expect(root.dataset.accent).toBeUndefined();
@@ -60,47 +76,47 @@ describe('appearance store', () => {
 
   it("hands back to this browser's look on sign-out (adopt undefined)", () => {
     const store = useAppearanceStore();
-    store.choose(MINT);
-    store.adopt(OCEAN);
+    store.choose(PLAIN);
+    store.adopt(HIGH);
     store.adopt(undefined);
-    expect(store.look).toEqual(MINT);
+    expect(store.look).toEqual(PLAIN);
   });
 
   it('keeps the pre-painted look until the account, this browser or a choice speaks', () => {
-    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(OCEAN));
-    localStorage.setItem('qhhoj.appearance', JSON.stringify(MINT));
+    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(HIGH));
+    localStorage.setItem('qhhoj.appearance', JSON.stringify(PLAIN));
     const store = useAppearanceStore();
-    expect(store.look).toEqual(OCEAN);
-    expect(root.dataset.accent).toBe('ocean');
+    expect(store.look).toEqual(HIGH);
+    expect(root.dataset.accent).toBe('ultramarine');
     store.adopt(undefined);
-    expect(store.look).toEqual(MINT);
+    expect(store.look).toEqual(PLAIN);
   });
 
   it('writes the painted copy when the account look is the first thing to speak', () => {
     const store = useAppearanceStore();
-    store.adopt(OCEAN);
-    expect(JSON.parse(localStorage.getItem('qhhoj.paintedAppearance')!)).toEqual(OCEAN);
+    store.adopt(HIGH);
+    expect(JSON.parse(localStorage.getItem('qhhoj.paintedAppearance')!)).toEqual(HIGH);
   });
 
   it('writes the painted copy once, with the final look, when adopting over a held painted look', () => {
-    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(MINT));
+    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(PLAIN));
     const store = useAppearanceStore();
     const write = vi.spyOn(Storage.prototype, 'setItem');
-    store.adopt(OCEAN);
+    store.adopt(HIGH);
     expect(write.mock.calls.filter(([key]) => key === 'qhhoj.paintedAppearance')).toEqual([
-      ['qhhoj.paintedAppearance', JSON.stringify(OCEAN)],
+      ['qhhoj.paintedAppearance', JSON.stringify(HIGH)],
     ]);
     write.mockRestore();
   });
 
   it('writes the painted copy once, with the final look, when choosing over a held painted look', () => {
-    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(MINT));
-    localStorage.setItem('qhhoj.appearance', JSON.stringify(OCEAN));
+    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(PLAIN));
+    localStorage.setItem('qhhoj.appearance', JSON.stringify(HIGH));
     const store = useAppearanceStore();
     const write = vi.spyOn(Storage.prototype, 'setItem');
-    store.choose(MINT);
+    store.choose(PLAIN);
     expect(write.mock.calls.filter(([key]) => key === 'qhhoj.paintedAppearance')).toEqual([
-      ['qhhoj.paintedAppearance', JSON.stringify(MINT)],
+      ['qhhoj.paintedAppearance', JSON.stringify(PLAIN)],
     ]);
     write.mockRestore();
   });

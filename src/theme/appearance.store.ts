@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
-import { computed, ref, watch } from 'vue';
+import { computed, onScopeDispose, ref, watch } from 'vue';
 import { readStorage, writeStorage } from '@/lib/storage';
-import { appearanceVariables, DEFAULT_BACKGROUND, parseAppearance } from './appearance';
-import type { Appearance } from './appearance';
+import { DEFAULT_BACKGROUND, MORE_CONTRAST_QUERY, parseAppearance, siteLook } from './appearance';
+import type { Appearance, ContrastId } from './appearance';
 
 /** This browser's own choice. */
-const CHOICE_KEY = 'qhhoj.appearance';
+export const CHOICE_KEY = 'qhhoj.appearance';
 /** The look last painted, whatever chose it. Read by the pre-paint script in index.html to avoid a flash. */
-const PAINTED_KEY = 'qhhoj.paintedAppearance';
+export const PAINTED_KEY = 'qhhoj.paintedAppearance';
 
 const readLook = (key: string): Appearance | null => {
   try {
@@ -19,21 +19,14 @@ const readLook = (key: string): Appearance | null => {
 const rememberLook = (key: string, look: Appearance | null) =>
   writeStorage(key, JSON.stringify(look));
 
-/** `null` removes everything but the default background: the page is the site's own look. */
-function paint(look: Appearance | null) {
+/** `null` is the site's own look: no accent attribute, the default background, and the contrast the device asks for. */
+function paint(look: Appearance | null, deviceContrast: ContrastId) {
   const root = document.documentElement;
-  if (!look) {
-    root.dataset.background = DEFAULT_BACKGROUND;
-    delete root.dataset.accent;
-    root.style.removeProperty('--qh-glass-level');
-    root.style.removeProperty('--qh-blob-strength');
-    return;
-  }
-  const variables = appearanceVariables(look);
-  root.dataset.accent = variables.accent;
-  root.dataset.background = variables.background;
-  root.style.setProperty('--qh-glass-level', variables.glass);
-  root.style.setProperty('--qh-blob-strength', variables.blobStrength);
+  root.dataset.background = look?.background ?? DEFAULT_BACKGROUND;
+  if (look) root.dataset.accent = look.accent;
+  else delete root.dataset.accent;
+  if ((look?.contrast ?? deviceContrast) === 'high') root.dataset.contrast = 'high';
+  else delete root.dataset.contrast;
 }
 
 /** Where the look comes from. One object, so each action changes it in a single assignment. */
@@ -55,6 +48,12 @@ export const useAppearanceStore = defineStore('appearance', () => {
     account: undefined,
     holdingPainted: true,
   });
+  const media = typeof matchMedia === 'function' ? matchMedia(MORE_CONTRAST_QUERY) : undefined;
+  const deviceContrast = ref<ContrastId>(media?.matches ? 'high' : 'standard');
+  const onDeviceChange = (event: { matches: boolean }) =>
+    (deviceContrast.value = event.matches ? 'high' : 'standard');
+  media?.addEventListener('change', onDeviceChange);
+  onScopeDispose(() => media?.removeEventListener('change', onDeviceChange));
 
   /** The account outranks this browser; `null` from the account means the site look. */
   const look = computed(() => {
@@ -62,12 +61,14 @@ export const useAppearanceStore = defineStore('appearance', () => {
     if (account !== undefined) return account;
     return holdingPainted ? paintedLook : browser;
   });
+  /** What the controls show: the look, else the site's own look at the device's contrast. */
+  const shown = computed(() => look.value ?? siteLook(deviceContrast.value));
   // Synchronous: the page must show a choice before the call returns, not on a later tick. Each action assigns
   // `sources` once, so this runs once with the final look.
   watch(
-    look,
-    (active) => {
-      paint(active);
+    [look, deviceContrast],
+    ([active, contrast]) => {
+      paint(active, contrast);
       if (!sources.value.holdingPainted) rememberLook(PAINTED_KEY, active);
     },
     { immediate: true, flush: 'sync' },
@@ -84,5 +85,5 @@ export const useAppearanceStore = defineStore('appearance', () => {
     sources.value = { ...sources.value, account: next, holdingPainted: false };
   }
 
-  return { look, choose, adopt };
+  return { look, shown, choose, adopt };
 });

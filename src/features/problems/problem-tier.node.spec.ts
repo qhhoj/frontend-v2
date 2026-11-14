@@ -15,9 +15,9 @@ describe('problem difficulty tier', () => {
     expect(tierOf(points)).toBe(tier);
   });
 
-  it('is defined as a colour in every theme', () => {
+  it('is defined as a colour in both modes', () => {
     const themes = Object.entries(
-      import.meta.glob<string>('../../theme/themes/*.css', {
+      import.meta.glob<string>('../../theme/palette/paper-*.css', {
         query: '?raw',
         import: 'default',
         eager: true,

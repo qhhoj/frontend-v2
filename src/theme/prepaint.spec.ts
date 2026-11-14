@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest';
 import indexHtml from '/index.html?raw';
 import { createPinia, setActivePinia } from 'pinia';
 import { stubMatchMedia } from '@/test/match-media';
-import { appearanceVariables, BACKGROUNDS, DEFAULT_BACKGROUND } from './appearance';
+import {
+  ACCENTS,
+  BACKGROUNDS,
+  DEFAULT_BACKGROUND,
+  LEGACY_ACCENTS,
+  MORE_CONTRAST_QUERY,
+} from './appearance';
 import { useAppearanceStore } from './appearance.store';
 import { useThemeStore } from './theme.store';
 import {
@@ -15,25 +21,27 @@ import {
 } from './low-power';
 import type { HintSource } from './low-power';
 import { useLowPowerStore } from './low-power.store';
-import { AUTO_THEME, GLASS_AUTO_THEME, resolveTheme, THEMES } from './registry';
+import { AUTO_THEME, LEGACY_PREFERENCES, resolveTheme, THEMES } from './registry';
 
 const script = /<script>([\s\S]*?)<\/script>/.exec(indexHtml)![1]!;
-const themeFiles = import.meta.glob<string>('./themes/*.css', {
+const paletteFiles = import.meta.glob<string>('./palette/paper-*.css', {
   query: '?raw',
   import: 'default',
   eager: true,
 });
-const groundOfThemeFile = (id: string) =>
-  /--qh-ground:\s*(#\w+)/.exec(themeFiles[`./themes/${id}.css`]!)![1];
-const firstThemeOf = (scheme: string) => THEMES.find((theme) => theme.scheme === scheme)!.id;
+const groundOfTheme = (id: string) =>
+  /--qh-ground:\s*(#\w+)/.exec(paletteFiles[`./palette/paper-${id}.css`]!)![1];
+/** The object literal or array the script assigns to `name`, as data. */
+const listed = (name: string): unknown =>
+  // The script is the page's own source under test, so evaluating its literals here is the point.
+  // eslint-disable-next-line @typescript-eslint/no-implied-eval
+  new Function(`return ${new RegExp(`var ${name} = ([\\[{][^;]*);`).exec(script)![1]}`)();
 
-/** Every value `siteTheme` or the browser preference can hold, the legacy aliases and a retired one included. */
+/** Every value `siteTheme` or the browser preference can hold: current, retired, unknown and inherited-looking. */
 const PREFERENCES = [
   AUTO_THEME,
-  GLASS_AUTO_THEME,
   ...THEMES.map((theme) => theme.id),
-  'light',
-  'dark',
+  ...Object.keys(LEGACY_PREFERENCES),
   'neon-retired',
   'constructor',
   'toString',
@@ -47,16 +55,13 @@ function prepaint({
   preference = null as string | null,
   painted = null as string | null,
   dark = false,
+  moreContrast = false,
   lowPower = null as string | null,
   device = {} as HintSource,
   storageThrows = false,
   mediaThrows = false,
 }) {
-  const properties: Record<string, string> = {};
-  const root = {
-    dataset: {} as Record<string, string>,
-    style: { setProperty: (name: string, value: string) => (properties[name] = value) },
-  };
+  const root = { dataset: {} as Record<string, string> };
   const themeColor = {
     content: '',
     setAttribute: (_name: string, value: string) => (themeColor.content = value),
@@ -73,9 +78,12 @@ function prepaint({
   };
   const matchMediaStub = (query: string) => {
     if (mediaThrows) throw new Error('no matchMedia');
-    return { matches: dark && query.includes('prefers-color-scheme: dark') };
+    return {
+      matches:
+        (dark && query.includes('prefers-color-scheme: dark')) ||
+        (moreContrast && query === MORE_CONTRAST_QUERY),
+    };
   };
-  // The script is the page's own source under test, so evaluating it here is the point.
   // eslint-disable-next-line @typescript-eslint/no-implied-eval
   new Function('document', 'localStorage', 'matchMedia', 'navigator', script)(
     { documentElement: root, querySelector: () => themeColor },
@@ -88,16 +96,18 @@ function prepaint({
     themeColor: themeColor.content,
     accent: root.dataset.accent,
     background: root.dataset.background,
+    contrast: root.dataset.contrast,
     lowPower: root.dataset.lowPower !== undefined,
-    properties,
   };
 }
 
 describe('pre-paint script in index.html', () => {
-  it('paints the last applied theme whatever the OS says', () => {
-    expect(prepaint({ stored: 'glass-light', dark: true }).theme).toBe('glass-light');
-    expect(prepaint({ stored: 'glass-dark', dark: false }).theme).toBe('glass-dark');
-    expect(prepaint({ stored: 'clay-dark', dark: false }).theme).toBe('clay-dark');
+  it('drift guard: lists the same themes, retired ids, accents and backgrounds as the app', () => {
+    expect(Object.keys(listed('grounds') as object)).toEqual(THEMES.map((theme) => theme.id));
+    expect(listed('legacy')).toEqual(LEGACY_PREFERENCES);
+    expect(listed('accents')).toEqual(ACCENTS.map((accent) => accent.id));
+    expect(listed('legacyAccents')).toEqual(LEGACY_ACCENTS);
+    expect(listed('backgrounds')).toEqual(BACKGROUNDS.map((choice) => choice.id));
   });
 
   it('resolves every stored preference like the app does when nothing was painted yet', () => {
@@ -108,41 +118,18 @@ describe('pre-paint script in index.html', () => {
         );
   });
 
-  it('paints the last painted theme only when the account chose it; a local paint resolves by the OS today', () => {
-    expect(prepaint({ stored: 'clay-dark', resolvedBy: 'local', dark: false }).theme).toBe(
-      'clay-light',
+  it('paints the last painted theme only when the account chose it, a Glass one as its successor', () => {
+    expect(prepaint({ stored: 'dark', resolvedBy: 'account', dark: false }).theme).toBe('dark');
+    expect(prepaint({ stored: 'glass-dark', resolvedBy: 'account', dark: false }).theme).toBe(
+      'dark',
     );
-    expect(prepaint({ stored: 'clay-dark', resolvedBy: null, dark: false }).theme).toBe(
-      'clay-light',
-    );
-    expect(
-      prepaint({ stored: 'clay-dark', resolvedBy: 'local', preference: 'glass-auto', dark: false })
-        .theme,
-    ).toBe('glass-light');
-    expect(prepaint({ stored: 'clay-dark', resolvedBy: 'account', dark: false }).theme).toBe(
-      'clay-dark',
-    );
-  });
-
-  it('keeps the last painted theme for every preference, as the store does', () => {
-    for (const preference of [null, ...PREFERENCES])
-      expect(prepaint({ stored: 'glass-light', preference, dark: true }).theme).toBe('glass-light');
-  });
-
-  it('falls back to the default theme of the OS scheme for a missing or retired id', () => {
-    expect(prepaint({ stored: null, dark: false }).theme).toBe(firstThemeOf('light'));
-    expect(prepaint({ stored: null, dark: true }).theme).toBe(firstThemeOf('dark'));
-    expect(prepaint({ stored: 'neon-retired', dark: true }).theme).toBe(firstThemeOf('dark'));
-  });
-
-  it('falls back to a flat Clay theme, never to Glass', () => {
-    for (const dark of [false, true])
-      expect(THEMES.find((theme) => theme.id === prepaint({ dark }).theme)?.glass).toBe(false);
+    expect(prepaint({ stored: 'dark', resolvedBy: 'local', dark: false }).theme).toBe('light');
+    expect(prepaint({ stored: 'dark', resolvedBy: null, dark: false }).theme).toBe('light');
   });
 
   it('paints what the store resolves at start-up, for every preference, cache and OS scheme', () => {
     for (const preference of [null, ...PREFERENCES])
-      for (const cache of [null, ...THEMES.map((theme) => theme.id)])
+      for (const cache of [null, 'light', 'dark', 'glass-dark', 'clay-light'])
         for (const resolvedBy of ['account', 'local', null])
           for (const dark of [false, true]) {
             localStorage.clear();
@@ -158,90 +145,58 @@ describe('pre-paint script in index.html', () => {
               painted.theme,
               `preference ${preference}, cache ${cache} by ${resolvedBy}, OS dark ${dark}`,
             ).toBe(fromStore);
-            expect(painted.themeColor).toBe(groundOfThemeFile(fromStore));
+            expect(painted.themeColor).toBe(groundOfTheme(fromStore));
           }
+  });
+
+  it('still paints the OS theme and the site look when storage is blocked', () => {
+    const result = prepaint({ storageThrows: true, dark: true });
+    expect(result.theme).toBe('dark');
+    expect(result.accent).toBeUndefined();
+    expect(result.background).toBe(DEFAULT_BACKGROUND);
   });
 });
 
 describe('pre-paint script: personal look', () => {
-  const look = { accent: 'sunset', glass: 40, glow: 35, background: 'halftone' } as const;
+  const PAINTED = [
+    null,
+    'null',
+    'not json',
+    '"teal"',
+    '{"accent":"violet"}',
+    '{"contrast":"high"}',
+    '{"accent":"teal"}',
+    '{"accent":"plum","contrast":"high","background":"halftone"}',
+    '{"accent":"graphite","background":"plaid"}',
+    '{"accent":"sunset","glass":40,"glow":35}',
+    '{"accent":"orchid","contrast":"high"}',
+  ];
 
-  it('paints the last painted look exactly as the store would', () => {
-    const { accent, properties } = prepaint({ painted: JSON.stringify(look) });
-    const expected = appearanceVariables(look);
-    expect(accent).toBe(expected.accent);
-    expect(prepaint({ painted: JSON.stringify(look) }).background).toBe(expected.background);
-    expect(properties).toEqual({
-      '--qh-glass-level': expected.glass,
-      '--qh-blob-strength': expected.blobStrength,
-    });
+  it('paints the look the store starts with, for every painted value and device contrast', () => {
+    for (const painted of PAINTED)
+      for (const moreContrast of [false, true]) {
+        localStorage.clear();
+        if (painted !== null) localStorage.setItem('qhhoj.paintedAppearance', painted);
+        delete document.documentElement.dataset.accent;
+        delete document.documentElement.dataset.contrast;
+        const media = stubMatchMedia();
+        media.setQuery(MORE_CONTRAST_QUERY, moreContrast);
+        setActivePinia(createPinia());
+        useAppearanceStore();
+        const root = document.documentElement.dataset;
+        const label = `painted ${painted}, more contrast ${moreContrast}`;
+        expect(prepaint({ painted, moreContrast }), label).toMatchObject({
+          accent: root.accent,
+          background: root.background,
+          contrast: root.contrast,
+        });
+      }
   });
 
-  it('paints nothing when there is no look or it was turned off', () => {
-    expect(prepaint({ painted: null }).accent).toBeUndefined();
-    expect(prepaint({ painted: 'null' }).accent).toBeUndefined();
-  });
-
-  it('paints the default background without a look, with a look that has none, and for an unknown one', () => {
-    const base = '{"accent":"mint","glass":1,"glow":1';
-    for (const painted of [null, 'null', 'not json', `${base}}`, `${base},"background":"plaid"}`])
-      expect(prepaint({ painted }).background, String(painted)).toBe(DEFAULT_BACKGROUND);
-  });
-
-  it('drift guard: the pre-paint script lists the same backgrounds as BACKGROUNDS', () => {
-    const listed = /var backgrounds = \[([^\]]*)\]/.exec(script)![1]!;
-    expect(listed.match(/'[a-z]+'/g)!.map((id) => id.slice(1, -1))).toEqual(
-      BACKGROUNDS.map((choice) => choice.id),
+  it('paints a Clay or Glass accent as its successor', () => {
+    expect(prepaint({ painted: '{"accent":"sunset","glass":40,"glow":35}' }).accent).toBe(
+      'terracotta',
     );
-  });
-
-  it.each([
-    ['broken JSON', 'not json'],
-    ['an unknown accent', '{"accent":"violet","glass":1,"glow":1}'],
-    ['a fractional glass', '{"accent":"mint","glass":5.5,"glow":1}'],
-    ['a glow above 100', '{"accent":"mint","glass":1,"glow":101}'],
-    ['a numeric string', '{"accent":"mint","glass":"1","glow":1}'],
-  ])('falls back to the site look for %s', (_name, painted) => {
-    const result = prepaint({ painted });
-    expect(result.accent).toBeUndefined();
-    expect(result.properties).toEqual({});
-  });
-
-  it('still paints the theme when storage is blocked, and no look', () => {
-    const result = prepaint({ storageThrows: true, dark: false });
-    expect(result.theme).toBe(firstThemeOf('light'));
-    expect(result.accent).toBeUndefined();
-  });
-
-  it('paints the look the store starts with, for no, a valid and an invalid painted look', () => {
-    const paintedValues = [
-      null,
-      'null',
-      JSON.stringify(look),
-      'not json',
-      '{"accent":"violet","glass":1,"glow":1}',
-      '{"accent":"mint","glass":5.5,"glow":1}',
-    ];
-    for (const painted of paintedValues) {
-      localStorage.clear();
-      if (painted !== null) localStorage.setItem('qhhoj.paintedAppearance', painted);
-      delete document.documentElement.dataset.accent;
-      setActivePinia(createPinia());
-      const fromStore = useAppearanceStore().look;
-      const result = prepaint({ painted });
-      expect(result.accent, `painted ${painted}`).toBe(fromStore?.accent);
-      expect(result.background, `painted ${painted}`).toBe(
-        fromStore?.background ?? DEFAULT_BACKGROUND,
-      );
-      expect(result.properties, `painted ${painted}`).toEqual(
-        fromStore
-          ? {
-              '--qh-glass-level': appearanceVariables(fromStore).glass,
-              '--qh-blob-strength': appearanceVariables(fromStore).blobStrength,
-            }
-          : {},
-      );
-    }
   });
 });
 

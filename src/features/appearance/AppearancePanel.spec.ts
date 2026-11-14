@@ -6,8 +6,6 @@ import { blogListRoutes } from '@/test/community-routes';
 import { mountApp } from '@/test/mount';
 
 const root = document.documentElement;
-/** Glass and Glow only act on a Glass theme; the site default is a Clay theme. */
-const useGlassTheme = () => localStorage.setItem('qhhoj.theme', 'glass-dark');
 const openPanel = async () => {
   mockApi({ ...blogListRoutes, 'GET /auth/me': signedOut });
   const { wrapper, router } = await mountApp('/blog');
@@ -16,56 +14,37 @@ const openPanel = async () => {
   return { wrapper, router };
 };
 const panel = () => document.body.querySelector<HTMLElement>('[role="dialog"]')!;
-/** A button by its visible text: Style, Mode, Glass stops and the footer. */
+/** A button by its visible text: Mode, Contrast and the footer. */
 const buttonNamed = (text: string) =>
   [...panel().querySelectorAll<HTMLButtonElement>('button')].find(
     (button) => button.textContent?.trim() === text,
   )!;
-/** An accent swatch by its preset name (`aria-label`; "Clay" is also a Style button's text). */
+/** An accent swatch by its name (`aria-label`). */
 const accentNamed = (name: string) =>
   panel().querySelector<HTMLButtonElement>(`button[aria-label="${name}"]`)!;
 
 describe('appearance panel', () => {
-  it("turns the look on with the first accent or glass change, from the theme's own look", async () => {
-    useGlassTheme();
+  it('paints the mode, the contrast and the accent', async () => {
     await openPanel();
-    expect(accentNamed('Orchid').getAttribute('aria-pressed')).toBe('true'); // the Glass themes' own preset; the look is still off
-    expect(root.dataset.accent).toBeUndefined();
-    accentNamed('Ocean').click();
+    expect(accentNamed('Lam').getAttribute('aria-pressed')).toBe('true'); // the site's accent; the look is still off
+    accentNamed('Xanh két').click();
+    buttonNamed('Cao').click();
+    buttonNamed('Tối').click();
     await flushPromises();
-    expect(root.dataset.accent).toBe('ocean');
-    expect(accentNamed('Ocean').getAttribute('aria-pressed')).toBe('true');
-    expect(buttonNamed('Trong').getAttribute('aria-pressed')).toBe('true');
-    buttonNamed('Mờ').click();
-    await flushPromises();
-    expect(root.style.getPropertyValue('--qh-glass-level')).toBe('50');
-    expect(buttonNamed('Mờ').getAttribute('aria-pressed')).toBe('true');
-    buttonNamed('Đặc').click();
-    await flushPromises();
-    expect(root.style.getPropertyValue('--qh-glass-level')).toBe('100');
+    expect(root.dataset.accent).toBe('teal');
+    expect(root.dataset.contrast).toBe('high');
+    expect(root.dataset.theme).toBe('dark');
   });
 
-  it('disables the Glass segments in a Clay theme and says why', async () => {
+  it('uses the site default: look off and mode back to automatic', async () => {
     await openPanel();
-    expect(root.dataset.theme).toBe('clay-light');
-    expect(buttonNamed('Mờ').disabled).toBe(true);
-    expect(panel().textContent).toContain('Glass và quầng sáng chỉ áp dụng cho giao diện Glass');
-    expect(accentNamed('Ocean').disabled).toBe(false);
-  });
-
-  it('uses the site default: look off and mode back to Clay, automatic', async () => {
-    await openPanel();
-    accentNamed('Gold').click();
-    buttonNamed('Glass').click();
-    await flushPromises();
+    accentNamed('Than chì').click();
     buttonNamed('Sáng').click();
     await flushPromises();
-    expect(root.dataset.theme).toBe('glass-light');
     buttonNamed('Dùng mặc định của trang').click();
     await flushPromises();
     expect(root.dataset.accent).toBeUndefined();
-    expect(root.dataset.theme).toBe('clay-light');
-    expect(buttonNamed('Clay').getAttribute('aria-pressed')).toBe('true');
     expect(buttonNamed('Theo máy').getAttribute('aria-pressed')).toBe('true');
+    expect(accentNamed('Lam').getAttribute('aria-pressed')).toBe('true');
   });
 });

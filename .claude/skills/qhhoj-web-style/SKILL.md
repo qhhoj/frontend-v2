@@ -1,16 +1,17 @@
 ---
 name: qhhoj-web-style
-description: Use for any QHHOJ frontend UI work — building or changing Vue components, pages, styles, Tailwind classes, layouts, mock-ups or screenshots, public or admin. Describes Clay, the site's design language: tokens, primitives, layout, phone rules, copy, and the mock-up process.
+description: Use for any QHHOJ frontend UI work — building or changing Vue components, pages, styles, Tailwind classes, layouts, mock-ups or screenshots, public or admin. Describes Workbench, the site's design language (palette A, Paper & Ultramarine): tokens, primitives, layout, phone rules, copy, and the mock-up process.
 ---
 
-# Clay — QHHOJ web style
+# Workbench — QHHOJ web style
 
 Follow this for every change that affects what the site looks like. Long form: `docs/design-language.md` (tokens, primitives, phases) and `design-system/qhhoj/MASTER.md` (themes, colour roles, checklist); page overrides in `design-system/qhhoj/pages/*.md`; Bit mascot in `design-system/qhhoj/mascot.md`.
 
 ## 1. Identity
 
-- Clay is the QHHOJ design language. Clay & ivory is its default theme (light-first, ivory ground, white cards, hairline borders, solid clay primary, warm charcoal dark twin). Glass is an optional theme family (`glass-dark`, `glass-light`).
-- Components never know the theme. Use semantic utilities (`glass rounded-card`, `bg-surface`, `bg-gradient-accent`, `text-muted`, `border-line`); the theme decides what they render.
+- Workbench is the QHHOJ design language (since 2026-11-15; it replaced Clay and Glass). Palette A, Paper & Ultramarine: warm paper ground, opaque cards, hairline borders, small radii, IBM Plex Sans for UI and headings, IBM Plex Mono for code and figures. Modes `light` and `dark` (`html[data-theme]`), contrast `standard` or `high` (`data-contrast`), five accents: ultramarine (default), teal, plum, terracotta, graphite (`data-accent`). Plus a page background (`data-background`, Blueprint by default).
+- Colours are generated: `npm run palette` writes `src/theme/palette/*.css` from `scripts/palette/paper.mjs`, solving every pair to its WCAG floor; `npm run lint:palette` (in `npm run lint`) fails on a failing pair or a stale file. Never hand-edit those files; never add a colour elsewhere.
+- Components never know the mode, contrast or accent. Use semantic utilities (`glass rounded-card` is an opaque card, `bg-surface`, `bg-accent`, `text-muted`, `text-secondary`, `border-line`).
 - Bit, the pixel mascot, keeps its sprite colours in every theme. Rules: `mascot.md`.
 
 ## 2. Tokens
@@ -27,21 +28,23 @@ Type scale (font size only; leading comes from the primitive or a `leading-*` cl
 | `text-title`                       | 17  | card titles (with `font-semibold`/`font-bold`)                                              |
 | `text-subtitle`                    | 18  | lead lines, dialog titles (add a `leading-*`)                                               |
 | `text-section`                     | 20  | section titles outside cards (add a `leading-*`)                                            |
-| `text-display`                     | 24  | display headings, big numbers (add a `leading-*`)                                           |
-| `page-title` utility / `text-page` | 26  | the one h1 per page                                                                         |
-| `text-stat`                        | 26  | stat values: `font-mono tabular-nums`; profile rating and overview tiles use `font-display` |
+| `text-display`                     | 28  | display headings, big numbers (add a `leading-*`)                                           |
+| `page-title` utility / `text-page` | 20  | the one h1 per page                                                                         |
+| `text-stat`                        | 28  | stat values: `font-mono tabular-nums`; profile rating and overview tiles use `font-display` |
 | `text-hero`                        | 40  | countdowns only                                                                             |
-| `text-score`                       | 56  | the submission score, the home rating figure                                                |
+| `text-score`                       | 40  | the submission score, the home rating figure                                                |
 
 Other tokens:
 
 - Control height, three steps only: `md` 44 px `--qh-control` (every public control, toolbars included) · `sm` 36 px, 44 on coarse pointers `--qh-control-sm` (every control under `.qh-admin`, and any control inside a table or list row) · `lg` 56 px `--qh-control-lg` (submit swap card only). The scope sets the height: page-level controls pass no `size`, and `size="sm"` appears only inside a row. Use as `h-(--qh-control)`.
 - Chips: `sm` 22 / `md` 28 px; an interactive chip gets its 44 px hit area from `::after`.
 - Dialog widths: `Modal` `sm` 480 · `md` 640 · `lg` 760, full screen under 640 px. No other widths.
-- Radius by role: controls `rounded-control` (pill on public pages; 12 px under `.qh-admin`) · inputs and code `rounded-cell` 12 · inset tiles and notices `rounded-row` 16 · cards and dialogs `rounded-card` 24 · chips, tabs, segmented `rounded-pill`. A menu or popover is `rounded-row`.
+- Body text is 13 px (`body`); `font-display` is the body face (Plex Sans).
+- Radius by role: controls `rounded-control` 4 · inputs, code and cells `rounded-cell` 4 · inset tiles, rows and notices `rounded-row` 6 · cards and dialogs `rounded-card` 6 (8 on phones) · `rounded-pill` only for switches, dots and avatars (chips and tabs still use it until the kit restyle, build plan step 3). A menu or popover is `rounded-row`.
+- Workbench sizes (for the shell and table steps): `--qh-row` 32 px rows, `--qh-row-dense` 36 px board rows, `--qh-rail` 224 px side rail.
 - Spacing: page blocks 24 (`gap-6`) · card padding from `Card padding` (16/20/24, up to 32) · form fields 20 apart (`gap-5`) · label to input 6 · button groups 8 (`gap-2`). Titles: card `text-title` (through `Card title`), section `section-title`, dialog `text-subtitle`; `text-caption` is the 12 px step.
 - Z: `z-sticky` 10 · `z-savebar` 20 · `z-header` 30 · `z-bit` 40 · `z-overlay` 50 · `z-toast` 1200.
-- Colour roles: `content`, `muted`, `line`, `accent*`, `positive`, `negative`, `warning`/`warning-bg`, `info`/`info-bg`, `tag-1..8`, `verdict-*` (verdicts only), `tier-*`.
+- Colour roles: `content`, `secondary`, `muted`, `line`, `accent*`, `positive`, `negative`, `warning`/`warning-bg`, `info`/`info-bg`, `tag-1..6` (7 and 8 show as 5), `verdict-*` with `-bg`, `-solid` and the label `-on` (verdicts only), `tier-*`, `diff-1..4`.
 - Control border: `border-line-control` on inputs, selects, textareas and secondary buttons (3:1 on their ground, WCAG 1.4.11); `border-line` stays the hairline of cards and dividers, `border-line-strong` the edge of menus and popovers.
 - Elevation: `shadow-float` on floating surfaces only (Modal, menus, popovers, toasts get it from the kit); everything else is flat.
 - Icons (Lucide): 14 dense admin chrome and small chips · 16 default · 20 hero and empty states, stroke 2 (Lucide's default; pass no `:stroke-width`). `IconButton` and `Chip` size an icon with no `size-*` class themselves. Glyphs (✓ ✗ ⋯ ↵) are icons.
@@ -50,7 +53,7 @@ Other tokens:
 - Motion: `--qh-duration-fast` 150 ms, `--qh-duration` 200 ms, on colour, border and opacity only: `transition-colors`, never bare `transition`/`transition-all`/`transition-transform` (real motion such as a chevron turning is allowlisted with a reason in `scripts/transition-utilities.mjs`).
 - Admin density: `--qa-row`, `--qa-control`, `--qa-chip`, `--qa-gap` are global (`src/theme/tokens.css`); `--qa-gutter` and `--qa-sidebar` are admin-shell only (`src/features/admin/ui/admin-density.css`).
 
-`npm run lint:tokens` fails on: raw colours outside `src/theme/themes/`, stock `rounded`/`rounded-lg`/`shadow-*` (the theme resets them, they render nothing; `shadow-float` and `shadow-glow` are ours), stock `text-lg` … `text-9xl` (use the steps above; a swapped `text-xl` keeps its line with `leading-7`), `rounded-tile`/`rounded-panel`, bare `transition`/`transition-all`/`transition-transform`, `uppercase` on a table header, `border-line`/`border-line-strong` on a form control (its border is `border-line-control`), `text-[<n>px]`, `rounded-[…]`, `z-[…]`. The only exceptions are listed per file in `ALLOWED` in `scripts/arbitrary-utilities.mjs`; do not add to it without a reason line in the PR.
+`npm run lint:tokens` fails on: raw colours outside `src/theme/palette/`, stock `rounded`/`rounded-lg`/`shadow-*` (the theme resets them, they render nothing; `shadow-float` is ours), stock `text-lg` … `text-9xl` (use the steps above; a swapped `text-xl` keeps its line with `leading-7`), `rounded-tile`/`rounded-panel`, bare `transition`/`transition-all`/`transition-transform`, `uppercase` on a table header, `border-line`/`border-line-strong` on a form control (its border is `border-line-control`), `text-[<n>px]`, `rounded-[…]`, `z-[…]`. The only exceptions are listed per file in `ALLOWED` in `scripts/arbitrary-utilities.mjs`; do not add to it without a reason line in the PR.
 
 ## 3. Primitives
 

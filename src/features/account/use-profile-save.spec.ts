@@ -11,7 +11,7 @@ import { mountComponent } from '@/test/mount';
 import { profileKey } from './profile.queries';
 import { useProfileSave, useProfileUpdate } from './use-profile-save';
 
-const OCEAN = { accent: 'ocean', glass: 40, glow: 60 } as const;
+const PLUM = { accent: 'plum', contrast: 'high' } as const;
 
 function mountSavers({ signedIn = true } = {}) {
   const wrapper = mountComponent(
@@ -60,24 +60,24 @@ describe('profile save', () => {
   it('sends nothing for an anonymous visitor', async () => {
     const calls = mockApi({ 'GET /auth/me': signedOut });
     const { saveProfile } = mountSavers({ signedIn: false });
-    await saveProfile({ siteTheme: 'clay-dark' });
+    await saveProfile({ siteTheme: 'dark' });
     expect(calls.filter((call) => call.method === 'PATCH')).toEqual([]);
   });
 
   it('never lets an older answer overwrite a newer one, whichever saver sent it', async () => {
     const answers = holdPatches();
     const { saveProfile, chooseTheme, queryClient } = mountSavers();
-    const themeSave = chooseTheme('glass-dark');
-    const lookSave = saveProfile({ appearance: OCEAN });
+    const themeSave = chooseTheme('dark');
+    const lookSave = saveProfile({ appearance: PLUM });
     await flushPromises(); // both requests are on the wire
     expect(answers).toHaveLength(2);
-    answers[1]!(profile({ siteTheme: 'glass-dark', appearance: OCEAN }));
+    answers[1]!(profile({ siteTheme: 'dark', appearance: PLUM }));
     await lookSave;
     // The theme answer arrives last, carrying the look as it was before: it must not undo the newer look.
-    answers[0]!(profile({ siteTheme: 'glass-dark', appearance: null }));
+    answers[0]!(profile({ siteTheme: 'dark', appearance: null }));
     await themeSave;
     expect(queryClient.getQueryData(profileKey(sessionUser().id))).toEqual(
-      profile({ siteTheme: 'glass-dark', appearance: OCEAN }),
+      profile({ siteTheme: 'dark', appearance: PLUM }),
     );
   });
 
@@ -85,17 +85,17 @@ describe('profile save', () => {
     const calls = mockApi({ 'PATCH /profile': ok(profile()) });
     const { saveProfile } = mountSavers();
     useSessionStore().$patch({ passwordChangeRequired: true });
-    await saveProfile({ siteTheme: 'clay-dark' });
+    await saveProfile({ siteTheme: 'dark' });
     expect(calls.filter((call) => call.method === 'PATCH')).toEqual([]);
   });
 
   it('drops an answer that arrives after sign-out', async () => {
     const answers = holdPatches();
     const { saveProfile, queryClient } = mountSavers();
-    const save = saveProfile({ siteTheme: 'glass-dark' });
+    const save = saveProfile({ siteTheme: 'dark' });
     await flushPromises();
     useSessionStore().$patch({ status: 'anonymous', user: null });
-    answers[0]!(profile({ siteTheme: 'glass-dark' }));
+    answers[0]!(profile({ siteTheme: 'dark' }));
     await save;
     expect(queryClient.getQueryData(profileKey(sessionUser().id))).toBeUndefined();
   });
@@ -103,11 +103,11 @@ describe('profile save', () => {
   it('drops an answer that arrives after the signed-in account changed', async () => {
     const answers = holdPatches();
     const { saveProfile, queryClient } = mountSavers();
-    const save = saveProfile({ siteTheme: 'glass-dark' });
+    const save = saveProfile({ siteTheme: 'dark' });
     await flushPromises();
     const otherId = '0192a000-0000-7000-8000-00000000000b';
     useSessionStore().$patch({ user: sessionUser({ id: otherId }) });
-    answers[0]!(profile({ siteTheme: 'glass-dark' }));
+    answers[0]!(profile({ siteTheme: 'dark' }));
     await save;
     expect(queryClient.getQueryData(profileKey(otherId))).toBeUndefined();
     expect(queryClient.getQueryData(profileKey(sessionUser().id))).toBeUndefined();
@@ -121,7 +121,7 @@ describe('useProfileUpdate', () => {
     });
     const { update, saveProfile, queryClient } = mountSavers();
     const invalidate = vi.spyOn(queryClient, 'invalidateQueries');
-    await Promise.all([update({ firstName: 'Thư' }), saveProfile({ siteTheme: 'clay-dark' })]);
+    await Promise.all([update({ firstName: 'Thư' }), saveProfile({ siteTheme: 'dark' })]);
     // The older answer was dropped and the newer save failed: the cache must be refetched, not kept stale.
     expect(invalidate).toHaveBeenCalledWith({ queryKey: profileKey(sessionUser().id) });
   });

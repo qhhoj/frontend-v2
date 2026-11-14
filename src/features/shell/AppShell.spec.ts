@@ -20,7 +20,7 @@ const openPanel = async (wrapper: VueWrapper) => {
   await wrapper.get('button[aria-label="Giao diện"]').trigger('click');
   await flushPromises();
 };
-/** A Style, Mode or Glass button of the open panel by its visible text. */
+/** A Mode or Contrast button of the open panel by its visible text. */
 const clickInPanel = async (label: string) => {
   const button = [
     ...document.body.querySelectorAll<HTMLButtonElement>('[role="dialog"] button'),
@@ -82,9 +82,8 @@ describe('app shell', () => {
     });
     const { wrapper } = await mountApp('/blog');
     await openPanel(wrapper);
-    await clickInPanel('Glass');
-    await clickInPanel('Sáng');
-    expect(document.documentElement.dataset.theme).toBe('glass-light');
+    await clickInPanel('Tối');
+    expect(document.documentElement.dataset.theme).toBe('dark');
   });
 
   it("adopts the account's theme after sign-in and drops it on sign-out", async () => {
@@ -96,23 +95,23 @@ describe('app shell', () => {
       'POST /auth/logout': noContent(),
     });
     const { wrapper } = await mountApp('/blog');
-    expect(document.documentElement.dataset.theme).toBe('clay-light');
+    expect(document.documentElement.dataset.theme).toBe('light');
     await wrapper.get('button[aria-label="Tài khoản của user_01"]').trigger('click');
     await clickMenuItem('Đăng xuất');
-    expect(document.documentElement.dataset.theme).toBe('clay-dark');
+    expect(document.documentElement.dataset.theme).toBe('dark');
   });
 
   it('keeps the pre-painted account theme while the profile is still loading', async () => {
-    localStorage.setItem('qhhoj.resolvedTheme', 'glass-light');
+    localStorage.setItem('qhhoj.resolvedTheme', 'dark');
     localStorage.setItem('qhhoj.resolvedBy', 'account');
-    document.documentElement.dataset.theme = 'glass-light';
+    document.documentElement.dataset.theme = 'dark';
     mockApi({
       ...blogListRoutes,
       'GET /auth/me': signedIn(),
       'GET /profile': { status: 500, body: { error: { code: 'internal_error', message: 'x' } } },
     });
     await mountApp('/blog');
-    expect(document.documentElement.dataset.theme).toBe('glass-light');
+    expect(document.documentElement.dataset.theme).toBe('dark');
   });
 
   it("reads the next account's theme after the previous session expired", async () => {
@@ -131,13 +130,13 @@ describe('app shell', () => {
       },
     });
     await mountApp('/blog');
-    expect(document.documentElement.dataset.theme).toBe('clay-light');
+    expect(document.documentElement.dataset.theme).toBe('light');
     const session = useSessionStore();
     session.$patch({ status: 'anonymous', user: null }); // what a 401 on any request does
     await flushPromises();
     await session.login({ username: 'user_02', password: 'secret-password' });
     await flushPromises();
-    expect(document.documentElement.dataset.theme).toBe('clay-dark');
+    expect(document.documentElement.dataset.theme).toBe('dark');
   });
 
   it('does not read the profile while a password change is required', async () => {

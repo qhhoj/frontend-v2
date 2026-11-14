@@ -8,8 +8,8 @@ import { mountApp, mountComponent } from '@/test/mount';
 import { useAccountAppearanceSync } from './use-account-appearance';
 import { useAppearanceChoice } from './use-appearance-choice';
 
-const OCEAN = { accent: 'ocean', glass: 40, glow: 60 };
-const MINT = { accent: 'mint', glass: 10, glow: 20 };
+const PLUM = { accent: 'plum', contrast: 'high', background: 'none' };
+const TEAL = { accent: 'teal', contrast: 'standard', background: 'grainy' };
 const root = document.documentElement;
 const failedProfile = { status: 500, body: { error: { code: 'internal_error', message: 'x' } } };
 
@@ -50,8 +50,8 @@ function mountSyncedChoice() {
 
 describe('account appearance sync', () => {
   it("lets the account outrank this browser, and null mean the site's own look", async () => {
-    localStorage.setItem('qhhoj.appearance', JSON.stringify(MINT));
-    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(MINT));
+    localStorage.setItem('qhhoj.appearance', JSON.stringify(TEAL));
+    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(TEAL));
     mockApi({
       ...blogListRoutes,
       'GET /auth/me': signedIn(),
@@ -62,33 +62,18 @@ describe('account appearance sync', () => {
   });
 
   it('keeps the pre-painted look while the profile fails to load', async () => {
-    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(OCEAN));
+    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(PLUM));
     mockApi({ ...blogListRoutes, 'GET /auth/me': signedIn(), 'GET /profile': failedProfile });
     await mountApp('/blog');
-    expect(root.dataset.accent).toBe('ocean');
+    expect(root.dataset.accent).toBe('plum');
   });
 
   it("uses this browser's look while a password change blocks the profile, not the painted account look", async () => {
-    localStorage.setItem('qhhoj.appearance', JSON.stringify(MINT));
-    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(OCEAN));
+    localStorage.setItem('qhhoj.appearance', JSON.stringify(TEAL));
+    localStorage.setItem('qhhoj.paintedAppearance', JSON.stringify(PLUM));
     mockApi({ ...blogListRoutes, 'GET /auth/me': signedIn({ passwordChangeRequired: true }) });
     await mountApp('/blog');
-    expect(root.dataset.accent).toBe('mint');
-  });
-
-  it('does not snap the controls back to a save answer after the user painted another look', async () => {
-    mockApi({ ...blogListRoutes, 'GET /auth/me': signedIn(), 'GET /profile': ok(profile()) });
-    const answers = holdProfileSaves();
-    const choice = mountSyncedChoice();
-    await flushPromises();
-    const saved = choice.update({ accent: 'mint' }); // the answer will carry the look sent: mint, glass 0, glow 100
-    await flushPromises();
-    choice.apply({ glass: 30 }); // painted, not saved, while the answer is on its way
-    answers[0]!(profile({ appearance: { accent: 'mint', glass: 0, glow: 100 } }));
-    await saved;
-    await flushPromises();
-    expect(root.dataset.accent).toBe('mint');
-    expect(root.style.getPropertyValue('--qh-glass-level')).toBe('30');
+    expect(root.dataset.accent).toBe('teal');
   });
 
   it("keeps the newest choice when an older save's answer arrives", async () => {
@@ -96,17 +81,17 @@ describe('account appearance sync', () => {
     const answers = holdProfileSaves();
     const choice = mountSyncedChoice();
     await flushPromises();
-    const first = choice.update({ accent: 'mint' });
+    const first = choice.update({ accent: 'teal' });
     await flushPromises();
-    const second = choice.update({ accent: 'ocean' });
+    const second = choice.update({ accent: 'plum' });
     await flushPromises();
-    answers[0]!(profile({ appearance: { accent: 'mint', glass: 0, glow: 100 } }));
+    answers[0]!(profile({ appearance: { accent: 'teal' } }));
     await first;
     await flushPromises();
-    expect(root.dataset.accent).toBe('ocean');
-    answers[1]!(profile({ appearance: { accent: 'ocean', glass: 0, glow: 100 } }));
+    expect(root.dataset.accent).toBe('plum');
+    answers[1]!(profile({ appearance: { accent: 'plum' } }));
     await second;
     await flushPromises();
-    expect(root.dataset.accent).toBe('ocean');
+    expect(root.dataset.accent).toBe('plum');
   });
 });

@@ -104,7 +104,7 @@ watch(
     </div>
     <div>
       <p :class="HEADING">{{ $t('appearance.title') }}</p>
-      <ModeChoice mode-only />
+      <ModeChoice />
       <RouterLink
         :to="{ name: 'settings-appearance' }"
         class="mt-1 inline-flex min-h-11 items-center text-meta text-accent-text underline"

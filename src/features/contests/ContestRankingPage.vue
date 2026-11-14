@@ -211,7 +211,7 @@ async function goToMyRow() {
               v-if="running"
               class="glass flex h-(--qh-control) items-center gap-2.5 rounded-pill px-4.5"
             >
-              <span aria-hidden="true" class="size-2 rounded-full bg-accent shadow-glow" />
+              <span aria-hidden="true" class="size-2 rounded-full bg-accent" />
               <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
               <CountdownTimer
                 :key="ownEndTime(contest.endTime, liveRun)"

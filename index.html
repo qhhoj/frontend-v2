@@ -7,48 +7,60 @@
     <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico?v=2" sizes="16x16 32x32 48x48" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
-    <meta name="theme-color" content="#faf9f5" />
+    <meta name="theme-color" content="#f6f1e7" />
     <script>
       // Pre-paint: the theme last painted when the account chose it (src/theme/theme.store.ts), else the stored
       // preference, else the OS scheme (`auto` follows today's scheme, not the last visit's). Then the personal
-      // look last painted (src/theme/appearance.store.ts), if every part is valid.
-      // `grounds` (theme id -> its --qh-ground, for the address bar), the aliases and the fallbacks must match
-      // src/theme/registry.ts and src/theme/themes/; the fallbacks are the default (first) theme of each scheme.
-      // prepaint.spec.ts enforces it.
-      var grounds = {
-        'clay-light': '#faf9f5',
-        'clay-dark': '#1a1816',
-        'glass-light': '#f6f2ff',
-        'glass-dark': '#0d0a1a',
+      // look last painted (src/theme/appearance.store.ts): accent, contrast and page background.
+      // `grounds` (theme id -> its --qh-ground, for the address bar), `legacy` and the accent lists must match
+      // src/theme/registry.ts, src/theme/palette/ and src/theme/appearance.ts; prepaint.spec.ts enforces it.
+      var grounds = { light: '#f6f1e7', dark: '#15120f' };
+      var legacy = {
+        'clay-light': 'light',
+        'glass-light': 'light',
+        'clay-dark': 'dark',
+        'glass-dark': 'dark',
+        'glass-auto': 'auto',
       };
-      var legacy = { light: 'clay-light', dark: 'clay-dark' };
+      var canonical = function (id) {
+        return Object.prototype.hasOwnProperty.call(legacy, id) ? legacy[id] : id;
+      };
       var known = Object.keys(grounds);
       var stored = null;
       var resolvedBy = null;
       var preference = null;
       var prefersDark = false;
+      var prefersMoreContrast = false;
       try {
-        stored = localStorage.getItem('qhhoj.resolvedTheme');
+        stored = canonical(localStorage.getItem('qhhoj.resolvedTheme'));
         resolvedBy = localStorage.getItem('qhhoj.resolvedBy');
-        preference = localStorage.getItem('qhhoj.theme');
+        preference = canonical(localStorage.getItem('qhhoj.theme'));
       } catch {}
       try {
         prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
+        prefersMoreContrast = matchMedia('(prefers-contrast: more)').matches;
       } catch {}
-      var scheme = prefersDark ? 'dark' : 'light';
       var theme =
         resolvedBy === 'account' && known.includes(stored)
           ? stored
           : known.includes(preference)
             ? preference
-            : Object.prototype.hasOwnProperty.call(legacy, preference)
-              ? legacy[preference]
-              : (preference === 'glass-auto' ? 'glass-' : 'clay-') + scheme;
+            : prefersDark
+              ? 'dark'
+              : 'light';
       document.documentElement.dataset.theme = theme;
       document.querySelector('meta[name="theme-color"]').setAttribute('content', grounds[theme]);
-      // `accents` must match ACCENTS in src/theme/appearance.ts; prepaint.spec.ts enforces it.
-      var accents = ['clay', 'orchid', 'ocean', 'mint', 'sunset', 'gold', 'mono', 'red'];
-      // `backgrounds` and the default must match BACKGROUNDS and DEFAULT_BACKGROUND in src/theme/appearance.ts.
+      var accents = ['ultramarine', 'teal', 'plum', 'terracotta', 'graphite'];
+      var legacyAccents = {
+        clay: 'terracotta',
+        orchid: 'plum',
+        ocean: 'ultramarine',
+        mint: 'teal',
+        sunset: 'terracotta',
+        gold: 'terracotta',
+        mono: 'graphite',
+        red: 'terracotta',
+      };
       var backgrounds = [
         'none',
         'paper',
@@ -66,17 +78,16 @@
       } catch {
         // Blocked or malformed storage: paint the site look.
       }
-      var isPercent = function (value) {
-        return Number.isInteger(value) && value >= 0 && value <= 100;
-      };
-      var validLook =
-        look && accents.includes(look.accent) && isPercent(look.glass) && isPercent(look.glow);
+      var accent =
+        look && Object.prototype.hasOwnProperty.call(legacyAccents, look.accent)
+          ? legacyAccents[look.accent]
+          : look && look.accent;
+      var validLook = accents.includes(accent);
       document.documentElement.dataset.background =
         validLook && backgrounds.includes(look.background) ? look.background : 'blueprint';
-      if (validLook) {
-        document.documentElement.dataset.accent = look.accent;
-        document.documentElement.style.setProperty('--qh-glass-level', String(look.glass));
-        document.documentElement.style.setProperty('--qh-blob-strength', String(look.glow / 100));
+      if (validLook) document.documentElement.dataset.accent = accent;
+      if (validLook ? look.contrast === 'high' : prefersMoreContrast) {
+        document.documentElement.dataset.contrast = 'high';
       }
       // Low-power mode: `auto` turns on for <= 2 GB memory, <= 2 cores or Save-Data. The key, the values and the thresholds
       // must match src/theme/low-power.ts (prepaint.spec.ts enforces it). `data-low-power` is the contract every reader uses.
