@@ -36,6 +36,7 @@ const searchText = useDebouncedText(
   (search) => emit('update', { search }),
 );
 const router = useRouter();
+const IME_KEY_CODE = 229;
 /** A code Enter asked for before the list had it: opened when the list for that search arrives. */
 let awaitedCode: string | null = null;
 const openProblem = (code: string) => {
@@ -46,15 +47,31 @@ const openAwaited = () => {
   const code = awaitedCode === null ? null : listedCode(props.listedCodes, awaitedCode);
   if (code !== null && props.filters.search === awaitedCode) openProblem(code);
 };
-watch(() => props.listedCodes, openAwaited);
+/** The list for the awaited search arrived without that code: the wish ends, so a later list never opens it. */
+const settleAwaited = () => {
+  openAwaited();
+  if (props.filters.search === awaitedCode) awaitedCode = null;
+};
+watch(() => props.listedCodes, settleAwaited);
+/** Any other change of the query drops the wish too. */
+watch(
+  () => props.filters.search,
+  (search) => {
+    if (search !== awaitedCode) awaitedCode = null;
+  },
+);
 /** Enter opens a pasted problem link, or the problem whose code was typed in full; any other text stays a search. */
-function openExact() {
+function openExact(event: KeyboardEvent) {
+  // An Enter that confirms an IME candidate (Vietnamese Telex, VNI) is not a submit.
+  if (event.isComposing || event.keyCode === IME_KEY_CODE) return;
+  event.preventDefault();
   const { code, isLink } = problemSearchIntent(searchText.value);
   if (code === '') return;
   const listed = listedCode(props.listedCodes, code);
   if (isLink || listed !== null) return openProblem(listed ?? code);
-  awaitedCode = code;
+  if (props.filters.search === code) return;
   searchText.commitNow(code);
+  awaitedCode = code;
 }
 /** Orders the column headers can show: the name and the three number columns. */
 const HEADER_SORT_FIELDS: readonly string[] = ['name', 'points', 'acRate', 'userCount'];
@@ -80,7 +97,7 @@ const panelCount = computed(() => panelFilterCount(props.filters));
       :label="$t('problems.searchLabel')"
       :placeholder="$t('problems.search')"
       :class="isCompact ? 'basis-full' : 'max-w-[320px] min-w-[180px] flex-1'"
-      @keydown.enter.prevent="openExact"
+      @keydown.enter="openExact"
     />
     <ProblemFilterControls
       v-if="!isCompact"

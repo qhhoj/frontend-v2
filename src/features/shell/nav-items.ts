@@ -61,10 +61,10 @@ export function useNavLinkEvents() {
   const router = useRouter();
   const route = useRoute();
   return (path: string) => ({
-    onPointerdown: () => preloadRoute(router, path),
-    onClick: (event: MouseEvent) => {
+    pointerdown: () => preloadRoute(router, path),
+    click: (event: MouseEvent) => {
       const opensHere =
-        event.button === 0 && !(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey);
+        !(event.button > 0) && !(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey);
       if (opensHere && !isSameLocation(route, path)) pendingPath.value = path;
     },
   });
