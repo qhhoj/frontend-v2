@@ -7857,6 +7857,11 @@ export interface components {
              * @enum {string}
              */
             accent: "clay" | "gold" | "mint" | "mono" | "ocean" | "orchid" | "red" | "sunset";
+            /**
+             * @description Page background style; omit for the default (`blueprint`).
+             * @enum {string}
+             */
+            background?: "blueprint" | "contour" | "dither" | "grainy" | "halftone" | "landscape" | "none" | "paper" | "stipple";
             /** @description Glass effect strength, 0-100. */
             glass: number;
             /** @description Glow effect strength, 0-100. */
@@ -7865,6 +7870,8 @@ export interface components {
         AppearanceResponse: {
             /** @description Accent colour preset. */
             accent: string;
+            /** @description Page background style; absent means the default (`blueprint`). */
+            background?: string;
             /** @description Glass effect strength, 0-100. */
             glass: number;
             /** @description Glow effect strength, 0-100. */

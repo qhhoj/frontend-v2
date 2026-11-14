@@ -33,6 +33,29 @@ describe('Settings › Appearance', () => {
     expect(patches(calls)).toEqual([]);
   });
 
+  it('shows Blueprint as the background until one is picked, then paints and saves the pick', async () => {
+    const calls = mockApi({ 'GET /auth/me': signedIn(), ...echoProfile });
+    const { wrapper } = await mountApp('/settings/appearance');
+    const pressed = () =>
+      wrapper
+        .findAll('[role="group"][aria-label="Nền trang"] button[aria-pressed="true"]')
+        .map((button) => button.text());
+    expect(pressed()).toEqual(['Bản vẽ']);
+    expect(root.dataset.background).toBe('blueprint');
+    await choiceIn(wrapper, 'Nền trang', 'Đường đồng mức').trigger('click');
+    await flushPromises();
+    expect(pressed()).toEqual(['Đường đồng mức']);
+    expect(root.dataset.background).toBe('contour');
+    expect(patches(calls)).toEqual([
+      { appearance: { accent: 'clay', glass: 0, glow: 100, background: 'contour' } },
+    ]);
+    await choiceIn(wrapper, 'Nền trang', 'Bản vẽ').trigger('click');
+    await flushPromises();
+    expect(patches(calls).at(-1)).toEqual({
+      appearance: { accent: 'clay', glass: 0, glow: 100 },
+    });
+  });
+
   it('a slider paints while it moves and saves once when released', async () => {
     // The account's mode outranks the browser's, so the account itself is on a Glass theme (the sliders are inert in Clay).
     const calls = mockApi({

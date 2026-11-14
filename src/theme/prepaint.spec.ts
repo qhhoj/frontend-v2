@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import indexHtml from '/index.html?raw';
 import { createPinia, setActivePinia } from 'pinia';
 import { stubMatchMedia } from '@/test/match-media';
-import { appearanceVariables } from './appearance';
+import { appearanceVariables, BACKGROUNDS, DEFAULT_BACKGROUND } from './appearance';
 import { useAppearanceStore } from './appearance.store';
 import { useThemeStore } from './theme.store';
 import {
@@ -87,6 +87,7 @@ function prepaint({
     theme: root.dataset.theme,
     themeColor: themeColor.content,
     accent: root.dataset.accent,
+    background: root.dataset.background,
     lowPower: root.dataset.lowPower !== undefined,
     properties,
   };
@@ -163,12 +164,13 @@ describe('pre-paint script in index.html', () => {
 });
 
 describe('pre-paint script: personal look', () => {
-  const look = { accent: 'sunset', glass: 40, glow: 35 } as const;
+  const look = { accent: 'sunset', glass: 40, glow: 35, background: 'halftone' } as const;
 
   it('paints the last painted look exactly as the store would', () => {
     const { accent, properties } = prepaint({ painted: JSON.stringify(look) });
     const expected = appearanceVariables(look);
     expect(accent).toBe(expected.accent);
+    expect(prepaint({ painted: JSON.stringify(look) }).background).toBe(expected.background);
     expect(properties).toEqual({
       '--qh-glass-level': expected.glass,
       '--qh-blob-strength': expected.blobStrength,
@@ -178,6 +180,19 @@ describe('pre-paint script: personal look', () => {
   it('paints nothing when there is no look or it was turned off', () => {
     expect(prepaint({ painted: null }).accent).toBeUndefined();
     expect(prepaint({ painted: 'null' }).accent).toBeUndefined();
+  });
+
+  it('paints the default background without a look, with a look that has none, and for an unknown one', () => {
+    const base = '{"accent":"mint","glass":1,"glow":1';
+    for (const painted of [null, 'null', 'not json', `${base}}`, `${base},"background":"plaid"}`])
+      expect(prepaint({ painted }).background, String(painted)).toBe(DEFAULT_BACKGROUND);
+  });
+
+  it('drift guard: the pre-paint script lists the same backgrounds as BACKGROUNDS', () => {
+    const listed = /var backgrounds = \[([^\]]*)\]/.exec(script)![1]!;
+    expect(listed.match(/'[a-z]+'/g)!.map((id) => id.slice(1, -1))).toEqual(
+      BACKGROUNDS.map((choice) => choice.id),
+    );
   });
 
   it.each([
@@ -215,6 +230,9 @@ describe('pre-paint script: personal look', () => {
       const fromStore = useAppearanceStore().look;
       const result = prepaint({ painted });
       expect(result.accent, `painted ${painted}`).toBe(fromStore?.accent);
+      expect(result.background, `painted ${painted}`).toBe(
+        fromStore?.background ?? DEFAULT_BACKGROUND,
+      );
       expect(result.properties, `painted ${painted}`).toEqual(
         fromStore
           ? {

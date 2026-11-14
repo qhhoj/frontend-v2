@@ -662,6 +662,19 @@
       "dark": "Tối",
       "auto": "Theo máy"
     },
+    "backgroundTitle": "Nền trang",
+    "backgroundHelp": "Họa tiết mờ sau trang; thẻ, bảng và chữ vẫn nằm trên nền đặc. Chế độ tiết kiệm pin hiện một màu phẳng.",
+    "background": {
+      "none": "Không",
+      "paper": "Giấy",
+      "grainy": "Hạt mịn",
+      "blueprint": "Bản vẽ",
+      "contour": "Đường đồng mức",
+      "halftone": "Chấm bán sắc",
+      "dither": "Điểm ảnh rải",
+      "stipple": "Chấm li ti",
+      "landscape": "Đồi núi"
+    },
     "accentTitle": "Màu nhấn",
     "accentHelp": "Mỗi màu đều được kiểm tra để chữ đủ rõ ở cả nền sáng lẫn tối.",
     "accent": {

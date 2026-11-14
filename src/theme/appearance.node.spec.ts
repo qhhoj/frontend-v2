@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseAppearance } from './appearance';
+import { parseAppearance, toWireAppearance } from './appearance';
 
 describe('parseAppearance', () => {
   it('accepts a complete look, boundaries included, and drops unknown keys', () => {
@@ -7,12 +7,31 @@ describe('parseAppearance', () => {
       accent: 'mono',
       glass: 0,
       glow: 100,
+      background: 'blueprint',
     });
     expect(parseAppearance({ accent: 'gold', glass: 100, glow: 0, hue: 300 })).toEqual({
       accent: 'gold',
       glass: 100,
       glow: 0,
+      background: 'blueprint',
     });
+  });
+
+  it('reads a missing or unknown background as the default and keeps a known one', () => {
+    const base = { accent: 'mint', glass: 10, glow: 10 };
+    expect(parseAppearance({ ...base, background: 'none' })?.background).toBe('none');
+    expect(parseAppearance({ ...base, background: 'plaid' })?.background).toBe('blueprint');
+    expect(parseAppearance({ ...base, background: 7 })?.background).toBe('blueprint');
+  });
+
+  it('sends the background only when it is not the default', () => {
+    const look = { accent: 'mint', glass: 10, glow: 10 } as const;
+    expect(toWireAppearance({ ...look, background: 'blueprint' })).toEqual(look);
+    expect(toWireAppearance({ ...look, background: 'stipple' })).toEqual({
+      ...look,
+      background: 'stipple',
+    });
+    expect(toWireAppearance(null)).toBeNull();
   });
 
   it.each([

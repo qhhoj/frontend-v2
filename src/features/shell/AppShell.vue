@@ -33,10 +33,10 @@ const { current: currentContest } = useCurrentContest(
 </script>
 
 <template>
-  <!-- `isolate` keeps the fixed blobs (-z-10) above this ground and below the content. -->
+  <!-- The ground is on <html> (with the page background, theme/backgrounds.css); `isolate` keeps the fixed blobs (-z-10) above it and below the content. -->
   <!-- `viewport-fit=cover` lets the page reach under the notch and home bar; the root keeps its content out of the insets. -->
   <div
-    class="relative isolate flex min-h-dvh flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] bg-ground font-body text-content print:bg-white print:text-black"
+    class="relative isolate flex min-h-dvh flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] font-body text-content print:bg-white print:text-black"
   >
     <BackgroundBlobs class="print:hidden" />
     <a

@@ -48,6 +48,18 @@
       document.querySelector('meta[name="theme-color"]').setAttribute('content', grounds[theme]);
       // `accents` must match ACCENTS in src/theme/appearance.ts; prepaint.spec.ts enforces it.
       var accents = ['clay', 'orchid', 'ocean', 'mint', 'sunset', 'gold', 'mono', 'red'];
+      // `backgrounds` and the default must match BACKGROUNDS and DEFAULT_BACKGROUND in src/theme/appearance.ts.
+      var backgrounds = [
+        'none',
+        'paper',
+        'grainy',
+        'blueprint',
+        'contour',
+        'halftone',
+        'dither',
+        'stipple',
+        'landscape',
+      ];
       var look = null;
       try {
         look = JSON.parse(localStorage.getItem('qhhoj.paintedAppearance'));
@@ -57,7 +69,11 @@
       var isPercent = function (value) {
         return Number.isInteger(value) && value >= 0 && value <= 100;
       };
-      if (look && accents.includes(look.accent) && isPercent(look.glass) && isPercent(look.glow)) {
+      var validLook =
+        look && accents.includes(look.accent) && isPercent(look.glass) && isPercent(look.glow);
+      document.documentElement.dataset.background =
+        validLook && backgrounds.includes(look.background) ? look.background : 'blueprint';
+      if (validLook) {
         document.documentElement.dataset.accent = look.accent;
         document.documentElement.style.setProperty('--qh-glass-level', String(look.glass));
         document.documentElement.style.setProperty('--qh-blob-strength', String(look.glow / 100));

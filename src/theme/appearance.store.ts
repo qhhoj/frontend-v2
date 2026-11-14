@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref, watch } from 'vue';
 import { readStorage, writeStorage } from '@/lib/storage';
-import { appearanceVariables, parseAppearance } from './appearance';
+import { appearanceVariables, DEFAULT_BACKGROUND, parseAppearance } from './appearance';
 import type { Appearance } from './appearance';
 
 /** This browser's own choice. */
@@ -19,10 +19,11 @@ const readLook = (key: string): Appearance | null => {
 const rememberLook = (key: string, look: Appearance | null) =>
   writeStorage(key, JSON.stringify(look));
 
-/** `null` removes everything: the page is the site's own look. */
+/** `null` removes everything but the default background: the page is the site's own look. */
 function paint(look: Appearance | null) {
   const root = document.documentElement;
   if (!look) {
+    root.dataset.background = DEFAULT_BACKGROUND;
     delete root.dataset.accent;
     root.style.removeProperty('--qh-glass-level');
     root.style.removeProperty('--qh-blob-strength');
@@ -30,6 +31,7 @@ function paint(look: Appearance | null) {
   }
   const variables = appearanceVariables(look);
   root.dataset.accent = variables.accent;
+  root.dataset.background = variables.background;
   root.style.setProperty('--qh-glass-level', variables.glass);
   root.style.setProperty('--qh-blob-strength', variables.blobStrength);
 }

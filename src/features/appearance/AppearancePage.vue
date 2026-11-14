@@ -15,6 +15,7 @@ import BitRoamCard from '@/features/bit-roam/BitRoamCard.vue';
 import BuildInfo from '@/features/shell/BuildInfo.vue';
 import AccentChoice from './AccentChoice.vue';
 import AppearancePreview from './AppearancePreview.vue';
+import BackgroundChoice from './BackgroundChoice.vue';
 import LevelSlider from './LevelSlider.vue';
 import LowPowerChoice from './LowPowerChoice.vue';
 import ModeChoice from './ModeChoice.vue';
@@ -77,6 +78,12 @@ const toggle = () => (isOn.value ? turnOff() : update({}));
           <p class="font-semibold">{{ $t('appearance.accentTitle') }}</p>
           <p class="mt-1 text-meta text-muted">{{ $t('appearance.accentHelp') }}</p>
           <div class="mt-3"><AccentChoice :disabled="!isOn" /></div>
+        </div>
+
+        <div>
+          <p class="font-semibold">{{ $t('appearance.backgroundTitle') }}</p>
+          <p class="mt-1 text-meta text-muted">{{ $t('appearance.backgroundHelp') }}</p>
+          <div class="mt-3"><BackgroundChoice /></div>
         </div>
 
         <LevelSlider

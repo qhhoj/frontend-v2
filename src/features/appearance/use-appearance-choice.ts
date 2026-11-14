@@ -1,7 +1,7 @@
 import { computed } from 'vue';
 import type { ProfilePatch } from '@/api/types/profile';
 import { useProfileSave } from '@/features/account/use-profile-save';
-import { siteLook } from '@/theme/appearance';
+import { siteLook, toWireAppearance } from '@/theme/appearance';
 import type { Appearance } from '@/theme/appearance';
 import { useAppearanceStore } from '@/theme/appearance.store';
 import { AUTO_THEME } from '@/theme/registry';
@@ -9,7 +9,7 @@ import { useThemeStore } from '@/theme/theme.store';
 
 /** Compares looks by their values: the store and the backend write the same fields in different key orders. */
 const lookKey = (look: Appearance | null) =>
-  JSON.stringify(look && [look.accent, look.glass, look.glow]);
+  JSON.stringify(look && [look.accent, look.glass, look.glow, look.background]);
 
 /** The look the latest save sent (as `lookKey`); its answer is the one that may arrive while the user keeps choosing. */
 let latestSentKey: string | undefined;
@@ -43,7 +43,7 @@ export function useAppearanceChoice() {
   /** Saves what is painted to the account in one request, plus `extra`; `appearance` is always the painted look. Anonymous visitors keep it in this browser. */
   const save = (extra: Omit<ProfilePatch, 'appearance'> = {}) => {
     latestSentKey = lookKey(appearance.look);
-    return saveProfile({ ...extra, appearance: appearance.look });
+    return saveProfile({ ...extra, appearance: toWireAppearance(appearance.look) });
   };
 
   /** Paints the change and saves the whole look. */
