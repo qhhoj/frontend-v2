@@ -50,11 +50,15 @@ const router = useRouter();
 const state = ref<ActivationState>(route.params.key === DONE_KEY ? 'activated' : 'pending');
 /** The signup password was voided: the account sets a new one through a reset link, not by signing in. */
 const passwordVoided = ref(false);
-const card = computed(() =>
-  state.value === 'activated' && passwordVoided.value
-    ? { ...CARDS.activated, leadKey: 'auth.activation.resetLead' }
-    : CARDS[state.value],
-);
+/** The reset link went out with the activation; when false the viewer has to request one. */
+const resetSent = ref(false);
+const card = computed(() => {
+  if (state.value !== 'activated' || !passwordVoided.value) return CARDS[state.value];
+  const leadKey = resetSent.value
+    ? 'auth.activation.resetLead'
+    : 'auth.activation.resetRequestLead';
+  return { ...CARDS.activated, leadKey };
+});
 const errorText = ref<string | null>(null);
 const asksForEmail = computed(() => state.value === 'linkDead' || state.value === 'linkResent');
 // The page shows nothing until the key is checked, so it is waiting on first data: the shell announces it and walks the Bits.
@@ -75,7 +79,9 @@ function showFailure(caught: unknown) {
 
 async function activateKey() {
   try {
-    passwordVoided.value = (await activate(String(route.params.key))).passwordResetSent;
+    const result = await activate(String(route.params.key));
+    passwordVoided.value = result.passwordVoided;
+    resetSent.value = result.passwordResetSent;
   } catch (caught) {
     showFailure(caught);
     return;

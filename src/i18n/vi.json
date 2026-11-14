@@ -834,6 +834,7 @@
       "doneTitle": "Tài khoản đã kích hoạt",
       "doneLead": "Email của bạn đã được xác nhận. Bạn có thể đăng nhập ngay.",
       "resetLead": "Email của bạn đã được xác nhận. Mật khẩu đặt lúc đăng ký không còn dùng được: chúng tôi đã gửi liên kết đặt lại mật khẩu tới email của bạn. Hãy đặt mật khẩu mới qua liên kết đó.",
+      "resetRequestLead": "Email của bạn đã được xác nhận. Mật khẩu đặt lúc đăng ký không còn dùng được và chúng tôi chưa gửi được liên kết đặt lại mật khẩu. Hãy yêu cầu đặt lại mật khẩu để tạo mật khẩu mới.",
       "setPassword": "Đặt mật khẩu mới",
       "deadTitle": "Liên kết đã hết hạn",
       "deadLead": "Liên kết kích hoạt chỉ dùng được trong 7 ngày. Nhập email để nhận liên kết mới."

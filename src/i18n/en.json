@@ -834,6 +834,7 @@
       "doneTitle": "Account activated",
       "doneLead": "Your email is confirmed. You can sign in now.",
       "resetLead": "Your email is confirmed. The password you chose at signup no longer works: we sent a password-reset link to your email. Set a new password with it.",
+      "resetRequestLead": "Your email is confirmed. The password you chose at signup no longer works, and we could not send a password-reset link. Request a password reset to set a new one.",
       "setPassword": "Set a new password",
       "deadTitle": "The link has expired",
       "deadLead": "An activation link works for 7 days. Enter your email to get a new one."
