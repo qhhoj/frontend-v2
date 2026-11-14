@@ -1257,7 +1257,7 @@ export interface paths {
         put?: never;
         /**
          * Activate an account
-         * @description Public. Consumes the single-use key from the activation mail and turns the account on. A password chosen at signup stops working in the same write (sessions and API token end with it), and a password-reset link is mailed to set one: `passwordResetSent` says whether it went out (when false for such an account, the reset form sends one). Errors: 400 `invalid_token` for an unknown, used or expired key. Returns 200.
+         * @description Public. Consumes the single-use key from the activation mail and turns the account on. A password chosen at signup stops working in the same write (sessions and API token end with it), and a password-reset link is mailed to set one: `passwordResetSent` says whether it went out and `passwordVoided` whether the password was voided (when voided but not sent, the reset form sends a link). Errors: 400 `invalid_token` for an unknown, used or expired key. Returns 200.
          */
         post: operations["RegistrationController_activate"];
         delete?: never;
@@ -7710,6 +7710,8 @@ export interface components {
         ActivationResponse: {
             /** @description A password-reset link was mailed: the password chosen at signup no longer works, and the account sets one through that link. False when the account had no such password, or the mail could not be sent (the reset form sends another). */
             passwordResetSent: boolean;
+            /** @description The password chosen at signup was voided and no longer signs in, whether or not the reset mail went out. False when the account had no such password. */
+            passwordVoided: boolean;
         };
         ActivityCountResponse: {
             /** @description Number of requests. */
@@ -11714,7 +11716,7 @@ export interface components {
              * @description When the longest-waiting one was submitted or rejudged.
              */
             oldestSince: string;
-            /** @description 0 contest, 1 normal, 2 rejudge, 3 batch rejudge. */
+            /** @description 0 contest, 1 normal, 2 rejudge, 3 batch rejudge, 4 backlog (older pending rows of a final-submission contest). */
             priority: number;
         };
         QuotaMeterResponse: {

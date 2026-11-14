@@ -48,13 +48,24 @@ useNoReferrer();
 const route = useRoute();
 const router = useRouter();
 const state = ref<ActivationState>(route.params.key === DONE_KEY ? 'activated' : 'pending');
-/** The signup password was voided: the account sets a new one through a reset link, not by signing in. */
-const passwordVoided = ref(false);
-const card = computed(() =>
-  state.value === 'activated' && passwordVoided.value
-    ? { ...CARDS.activated, leadKey: 'auth.activation.resetLead' }
-    : CARDS[state.value],
+/**
+ * How activation left the signup password: `sent` (voided, reset link mailed), `required` (voided, no mail) or none.
+ * It rides in the done address's `reset` query, so a reload shows the same card.
+ */
+type ResetOutcome = 'sent' | 'required';
+const resetOutcome = ref<ResetOutcome | undefined>(
+  route.query.reset === 'sent' || route.query.reset === 'required' ? route.query.reset : undefined,
 );
+/** The signup password was voided: the account sets a new one through a reset link, not by signing in. */
+const passwordVoided = computed(() => resetOutcome.value !== undefined);
+const card = computed(() => {
+  if (state.value !== 'activated' || !resetOutcome.value) return CARDS[state.value];
+  const leadKey =
+    resetOutcome.value === 'sent'
+      ? 'auth.activation.resetLead'
+      : 'auth.activation.resetRequestLead';
+  return { ...CARDS.activated, leadKey };
+});
 const errorText = ref<string | null>(null);
 const asksForEmail = computed(() => state.value === 'linkDead' || state.value === 'linkResent');
 // The page shows nothing until the key is checked, so it is waiting on first data: the shell announces it and walks the Bits.
@@ -75,14 +86,19 @@ function showFailure(caught: unknown) {
 
 async function activateKey() {
   try {
-    passwordVoided.value = (await activate(String(route.params.key))).passwordResetSent;
+    const result = await activate(String(route.params.key));
+    if (result.passwordVoided) resetOutcome.value = result.passwordResetSent ? 'sent' : 'required';
   } catch (caught) {
     showFailure(caught);
     return;
   }
   state.value = 'activated';
   // The used key does not stay in the address bar or the history (same page instance, no reload).
-  await router.replace({ name: 'activate', params: { key: DONE_KEY } });
+  await router.replace({
+    name: 'activate',
+    params: { key: DONE_KEY },
+    query: resetOutcome.value ? { reset: resetOutcome.value } : {},
+  });
 }
 
 function retryActivation() {

@@ -25,7 +25,7 @@ describe('activate page', () => {
     const calls = mockApi({
       'GET /auth/me': signedOut,
       ...brandRoutes,
-      'POST /auth/activate': ok({ passwordResetSent: false }),
+      'POST /auth/activate': ok({ passwordResetSent: false, passwordVoided: false }),
     });
     await mountApp('/activate/k123', history);
     expect(calls.filter((call) => call.path === '/auth/activate').map((call) => call.body)).toEqual(
@@ -39,12 +39,29 @@ describe('activate page', () => {
     mockApi({
       'GET /auth/me': signedOut,
       ...brandRoutes,
-      'POST /auth/activate': ok({ passwordResetSent: true }),
+      'POST /auth/activate': ok({ passwordResetSent: true, passwordVoided: true }),
     });
     const { wrapper } = await mountApp('/activate/k123');
     await flushPromises();
     expect(wrapper.get('#main [role="status"]').text()).toContain('liên kết đặt lại mật khẩu');
     expect(wrapper.get('#main a[href="/forgot-password"]').text()).toBe('Đặt mật khẩu mới');
+  });
+
+  it('tells an account whose password was voided but got no mail to request a reset', async () => {
+    mockApi({
+      'GET /auth/me': signedOut,
+      ...brandRoutes,
+      'POST /auth/activate': ok({ passwordResetSent: false, passwordVoided: true }),
+    });
+    const { wrapper } = await mountApp('/activate/k123');
+    await flushPromises();
+    const lead = wrapper.get('#main [role="status"]').text();
+    expect(lead).toContain('chưa gửi được liên kết');
+    expect(lead).not.toContain('đăng nhập ngay');
+    expect(wrapper.get('#main a[href="/forgot-password"]').text()).toBe('Đặt mật khẩu mới');
+    expect(wrapper.get('#main a[href="/forgot-password"]').attributes('href')).toBe(
+      '/forgot-password',
+    );
   });
 
   it('explains a dead link and sends a new one to the address typed', async () => {
@@ -74,7 +91,10 @@ describe('activate page', () => {
     const calls = mockApi({
       'GET /auth/me': signedOut,
       ...brandRoutes,
-      'POST /auth/activate': sequence(fail(429, 'rate_limited'), ok({ passwordResetSent: false })),
+      'POST /auth/activate': sequence(
+        fail(429, 'rate_limited'),
+        ok({ passwordResetSent: false, passwordVoided: false }),
+      ),
     });
     const { wrapper } = await mountApp('/activate/k123');
     await wrapper
