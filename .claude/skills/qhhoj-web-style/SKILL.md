@@ -35,10 +35,10 @@ Type scale (font size only; leading comes from the primitive or a `leading-*` cl
 
 Other tokens:
 
-- Control height, three steps only: `md` 44 px `--qh-control` (every public control, toolbars included) · `sm` 36 px, 44 on coarse pointers `--qh-control-sm` (every control under `.qh-admin`, and any control inside a table or list row) · `lg` 56 px `--qh-control-lg` (submit swap card only). The scope sets the height: page-level controls pass no `size`, and `size="sm"` appears only inside a row. Use as `h-(--qh-control)`. Target (not done yet, lane K0): the `--qa-*` density tokens move out of the lazy admin chunk into the global theme tokens, so a control's size never depends on the page opened first.
+- Control height, three steps only: `md` 44 px `--qh-control` (every public control, toolbars included) · `sm` 36 px, 44 on coarse pointers `--qh-control-sm` (every control under `.qh-admin`, and any control inside a table or list row) · `lg` 56 px `--qh-control-lg` (submit swap card only). The scope sets the height: page-level controls pass no `size`, and `size="sm"` appears only inside a row. Use as `h-(--qh-control)`.
 - Chips: `sm` 22 / `md` 28 px; an interactive chip gets its 44 px hit area from `::after`.
 - Dialog widths: `Modal` `sm` 480 · `md` 640 · `lg` 760, full screen under 640 px. No other widths.
-- Radius by role: controls `rounded-control` (pill on public pages; 12 px under `.qh-admin`) · inputs and code `rounded-cell` 12 · inset tiles and notices `rounded-row` 16 · cards and dialogs `rounded-card` 24 · chips, tabs, segmented `rounded-pill`. `rounded-tile` and `rounded-panel` no longer exist (lint-banned); a menu or popover is `rounded-row`.
+- Radius by role: controls `rounded-control` (pill on public pages; 12 px under `.qh-admin`) · inputs and code `rounded-cell` 12 · inset tiles and notices `rounded-row` 16 · cards and dialogs `rounded-card` 24 · chips, tabs, segmented `rounded-pill`. A menu or popover is `rounded-row`.
 - Spacing: page blocks 24 (`gap-6`) · card padding from `Card padding` (16/20/24, up to 32) · form fields 20 apart (`gap-5`) · label to input 6 · button groups 8 (`gap-2`). Titles: card `text-title` (through `Card title`), section `section-title`, dialog `text-subtitle`; `text-caption` is the 12 px step.
 - Z: `z-sticky` 10 · `z-savebar` 20 · `z-header` 30 · `z-bit` 40 · `z-overlay` 50 · `z-toast` 1200.
 - Colour roles: `content`, `muted`, `line`, `accent*`, `positive`, `negative`, `warning`/`warning-bg`, `info`/`info-bg`, `tag-1..8`, `verdict-*` (verdicts only), `tier-*`.
@@ -48,7 +48,7 @@ Other tokens:
 - Language marks: the one exception to Lucide-only. A programming language is shown as `LanguageLabel` (icon + name) or `LanguageIcon` (`src/components/language/`): a monochrome logo in the text colour, 16 px inline or a 32 px tile; versions share their language's icon; a language without a logo gets a Lucide icon or a short glyph in the same box. Never print `language.name` bare (native options and sentences excepted), never use a brand mark for anything but a language, never as a control. New logos and their licences: `src/assets/languages/LICENSES.md`.
 - Placeholder: muted text, never the content colour at 50 %.
 - Motion: `--qh-duration-fast` 150 ms, `--qh-duration` 200 ms, on colour, border and opacity only: `transition-colors`, never bare `transition`/`transition-all`/`transition-transform` (real motion such as a chevron turning is allowlisted with a reason in `scripts/transition-utilities.mjs`).
-- Admin density: `--qa-row`, `--qa-control`, `--qa-gap`, `--qa-gutter` (`src/features/admin/ui/admin-density.css`).
+- Admin density: `--qa-row`, `--qa-control`, `--qa-chip`, `--qa-gap` are global (`src/theme/tokens.css`); `--qa-gutter` and `--qa-sidebar` are admin-shell only (`src/features/admin/ui/admin-density.css`).
 
 `npm run lint:tokens` fails on: raw colours outside `src/theme/themes/`, stock `rounded`/`rounded-lg`/`shadow-*` (the theme resets them, they render nothing; `shadow-float` and `shadow-glow` are ours), stock `text-lg` … `text-9xl` (use the steps above; a swapped `text-xl` keeps its line with `leading-7`), `rounded-tile`/`rounded-panel`, bare `transition`/`transition-all`/`transition-transform`, `uppercase` on a table header, `border-line`/`border-line-strong` on a form control (its border is `border-line-control`), `text-[<n>px]`, `rounded-[…]`, `z-[…]`. The only exceptions are listed per file in `ALLOWED` in `scripts/arbitrary-utilities.mjs`; do not add to it without a reason line in the PR.
 
@@ -56,7 +56,7 @@ Other tokens:
 
 The kit lives in `src/components/ui/`; new code imports from there. The part for each need, its key props and the wrapper it replaces: `src/components/ui/README.md` (the one copy; keep it current when a kit prop changes).
 
-Thin wrappers kept for old call sites (ESLint rejects a new import of `AdminField`, `AdminChip`, `AdminPageHeader`, `AdminDataTable`, `AdminNotice`, `GlassCard` and the `controls.ts` classes; ledger in `docs/wrapper-migration.md`): `GlassCard`, `PillTabs`, `AdminPageHeader`, `AdminField`, `AdminChip`, `AdminTabs`, `AdminFilterTabs`, `AdminDataTable`, `AdminFilterBar`, `AdminSaveBar`, `AdminNotice`, `AdminSwitch` (adds `lockedBy`), `SettingsNotice`, `AuthNotice`, `SettingsCard`, `AuthField`, `use-admin-toast` (re-exports `useToast`), `controls.ts` and `settings/buttons.ts` classes. Use the `ui/` part in new code.
+Thin wrappers kept for old call sites (ESLint rejects a new import of `AdminField`, `AdminChip`, `AdminPageHeader`, `AdminDataTable`, `AdminNotice`, `GlassCard` and the `controls.ts` classes; ledger in `docs/wrapper-migration.md`): `GlassCard`, `PillTabs`, `AdminPageHeader`, `AdminField`, `AdminChip`, `AdminTabs`, `AdminFilterTabs`, `AdminDataTable`, `AdminFilterBar`, `AdminSaveBar`, `AdminNotice`, `AdminSwitch` (adds `lockedBy`), `SettingsNotice`, `AuthNotice`, `SettingsCard`, `AuthField`, `use-admin-toast` (re-exports `useToast`), `controls.ts` classes. Use the `ui/` part in new code.
 
 ## 4. Rules
 
@@ -133,4 +133,4 @@ The kit part for each job is in `src/components/ui/README.md` (the one table; a 
 - Check a port against its mock-up: screenshot the real page at the mock-up's width and compare.
 - Pure UI fixes need no new tests, but fix every spec the change breaks.
 - Take screenshots at 390 and 1440 px and look at them before calling it done.
-- Run `npm run lint && npm run lint:tokens` before a PR.
+- Run `npm run lint` before a PR.
