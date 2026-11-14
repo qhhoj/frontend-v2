@@ -18,6 +18,7 @@ const draft = (description: string): StatementDraft => ({
   name: 'Tên',
   description,
   exists: true,
+  isMarkupTrusted: false,
   storedDescription: description,
 });
 

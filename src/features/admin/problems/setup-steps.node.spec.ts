@@ -20,7 +20,9 @@ describe('setupSteps', () => {
       editor: {
         ...problemEditor(),
         description: '',
-        translations: [{ language: 'vi', name: 'Tổng', description: 'Cho $a$, $b$.' }],
+        translations: [
+          { language: 'vi', name: 'Tổng', description: 'Cho $a$, $b$.', isMarkupTrusted: false },
+        ],
       },
     });
     expect(nextStep(setupSteps(vietnameseOnly, []))?.id).toBe('tests');
@@ -28,7 +30,7 @@ describe('setupSteps', () => {
       editor: {
         ...problemEditor(),
         description: ' ',
-        translations: [{ language: 'en', name: 'Sum', description: '  ' }],
+        translations: [{ language: 'en', name: 'Sum', description: '  ', isMarkupTrusted: false }],
       },
     });
     expect(nextStep(setupSteps(blankTranslation, []))?.id).toBe('statement');

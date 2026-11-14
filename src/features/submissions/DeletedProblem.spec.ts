@@ -18,6 +18,7 @@ const tombstoned = submissionDetail({
     canReject: true,
     canLock: false,
     canOverrideScore: false,
+    canShare: false,
   },
 });
 

@@ -40,6 +40,22 @@ function saveSlot(code: string, target: StatementSlot, draft: StatementDraft): P
   return putTranslation(code, target, { name: draft.name, description });
 }
 
+/** Sets the slot's trust for the text last saved (the text the holder was shown), never for unsaved edits. */
+function saveSlotTrust(
+  code: string,
+  target: StatementSlot,
+  { saved, isTrusted }: { saved: StatementDraft; isTrusted: boolean },
+): Promise<unknown> {
+  const description = saved.storedDescription;
+  if (target === 'original')
+    return updateProblem(code, { description, isDescriptionMarkupTrusted: isTrusted });
+  return putTranslation(code, target, {
+    name: saved.name,
+    description,
+    isMarkupTrusted: isTrusted,
+  });
+}
+
 /** How many of a slot's two texts (name, description) differ from what was last saved. */
 const changedFields = (draft: StatementDraft, saved: StatementDraft) =>
   Number(draft.name !== saved.name) + Number(draft.description !== saved.description);
@@ -96,7 +112,9 @@ export function useStatementDrafts(problem: () => EditableProblem) {
       isOriginalLocked(problem(), canFullMarkup.value) &&
       isDescriptionWrite(slot.value, drafts.value, saved.value),
   );
-  const previewStyle = computed(() => previewStyleFor(problem(), canFullMarkup.value));
+  const previewStyle = computed(() =>
+    previewStyleFor(problem(), current.value, canFullMarkup.value),
+  );
   const errors = computed(() => checkStatementDraft(current.value, slot.value));
   /** Slots whose save was tried since their last save or discard: their errors all show. */
   const triedSlots = ref(new Set<StatementSlot>());
@@ -148,6 +166,33 @@ export function useStatementDrafts(problem: () => EditableProblem) {
     await saveMutation.run({ code, target: slot.value });
   }
 
+  const trustMutation = useAdminMutation({
+    mutate: ({ code, target, isTrusted }: SlotSave & { isTrusted: boolean }) =>
+      saveSlotTrust(code, target, { saved: saved.value[target], isTrusted }),
+    invalidates: ({ code }: SlotSave) => [['admin', 'problem', code], PUBLIC_PROBLEMS_KEY],
+    successText: (_saved: unknown, { isTrusted }: { isTrusted: boolean }) =>
+      translate(
+        isTrusted
+          ? 'admin.problems.statements.trust.trustedToast'
+          : 'admin.problems.statements.trust.untrustedToast',
+      ),
+    onSuccess: (_saved: unknown, { target, isTrusted }: SlotSave & { isTrusted: boolean }) => {
+      drafts.value[target].isMarkupTrusted = isTrusted;
+      saved.value[target].isMarkupTrusted = isTrusted;
+    },
+  });
+  /** A holder may set the trust of a saved slot with no unsaved change: the trust then covers exactly the text shown. */
+  const canSetTrust = computed(
+    () => canFullMarkup.value && current.value.exists && dirtyCount.value === 0,
+  );
+
+  /** Sets the trust of the slot on screen, for its last saved text. */
+  async function setTrust(isTrusted: boolean) {
+    const code = seededCode();
+    if (!canSetTrust.value || !code) return;
+    await trustMutation.run({ code, target: slot.value, isTrusted });
+  }
+
   /** Puts the slot on screen back to its last saved text. */
   function discard() {
     drafts.value[slot.value] = { ...saved.value[slot.value] };
@@ -170,5 +215,8 @@ export function useStatementDrafts(problem: () => EditableProblem) {
     save,
     discard,
     saveMutation,
+    canSetTrust,
+    setTrust,
+    trustMutation,
   };
 }
