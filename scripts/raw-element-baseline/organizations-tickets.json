@@ -11,9 +11,6 @@
   "features/organizations/OrganizationLogo.vue": {
     "fixed-size": 1
   },
-  "features/organizations/OrganizationMenu.vue": {
-    "primevue": 2
-  },
   "features/organizations/problems/OrgBulkResult.vue": {
     "SettingsNotice": 1
   },

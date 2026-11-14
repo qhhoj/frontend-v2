@@ -13,8 +13,7 @@
   },
   "features/admin/problems/ProblemImportMenu.vue": {
     "button": 1,
-    "controls": 1,
-    "primevue": 2
+    "controls": 1
   },
   "features/admin/problems/ProblemSetupChecklist.vue": {
     "button": 1,
@@ -73,9 +72,6 @@
   "features/admin/problems/data/GraderPicker.vue": {
     "AdminChoiceCards": 1
   },
-  "features/admin/problems/data/InitYamlDialog.vue": {
-    "primevue": 1
-  },
   "features/admin/problems/data/IoMethodPicker.vue": {
     "AdminChoiceCards": 1,
     "AdminField": 1,
@@ -95,7 +91,6 @@
     "controls": 7,
     "details": 1,
     "input": 1,
-    "primevue": 1,
     "radio": 1,
     "table": 1,
     "verdict-tone": 1

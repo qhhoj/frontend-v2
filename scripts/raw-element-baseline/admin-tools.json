@@ -41,8 +41,7 @@
   },
   "features/admin/shell/search/AdminCommandPalette.vue": {
     "controls": 2,
-    "input": 1,
-    "primevue": 1
+    "input": 1
   },
   "features/admin/shell/search/PaletteResults.vue": {
     "uppercase": 1
@@ -125,8 +124,7 @@
   "features/admin/ui/RevealKeyDialog.vue": {
     "button": 1,
     "checkbox": 1,
-    "controls": 2,
-    "primevue": 1
+    "controls": 2
   },
   "features/admin/ui/controls.ts": {
     "disabled-opacity": 1
