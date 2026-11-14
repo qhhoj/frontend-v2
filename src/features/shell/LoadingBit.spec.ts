@@ -164,7 +164,9 @@ describe('LoadingBit', () => {
     stubMatchMedia({ reducedMotion: true });
     const wrapper = mountBits('walking');
     expect(bits(wrapper)).toHaveLength(1);
-    expect(bits(wrapper)[0]!.classes()).toEqual(expect.arrayContaining(['bottom-4', 'left-4']));
+    expect(bits(wrapper)[0]!.classes()).toEqual(
+      expect.arrayContaining(['bottom-[calc(1rem+var(--tab-bar-height,0px))]', 'left-4']),
+    );
     expect(frames.request).not.toHaveBeenCalled();
     await wrapper.setProps({ phase: 'fading' });
     expect(frames.request).not.toHaveBeenCalled();

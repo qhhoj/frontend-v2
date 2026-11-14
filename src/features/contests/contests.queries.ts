@@ -107,10 +107,12 @@ export const useRankingQuery = (
   key: MaybeRefOrGetter<string>,
   withVirtual: Ref<boolean>,
   running: Ref<boolean>,
+  isEnabled: MaybeRefOrGetter<boolean> = true,
 ) => {
   const viewerId = useViewerId();
   const isLowPower = useLowPowerPainted();
   return useQuery({
+    enabled: () => toValue(isEnabled),
     queryKey: computed(() => rankingKey(viewerId.value, toValue(key), withVirtual.value)),
     queryFn: () => fetchRanking(toValue(key), withVirtual.value),
     /** Switching the virtual toggle keeps the old board on screen (never another contest's or viewer's). */

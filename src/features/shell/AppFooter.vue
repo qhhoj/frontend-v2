@@ -9,7 +9,7 @@ const session = useSessionStore();
 <template>
   <footer
     data-testid="app-footer"
-    class="page-gutter flex flex-wrap items-center gap-x-4 pt-2 pb-[calc(max(1.5rem,env(safe-area-inset-bottom))+var(--dock-height,0px))] text-meta text-muted"
+    class="page-gutter flex flex-wrap items-center gap-x-4 pt-2 pb-[calc(max(1.5rem,env(safe-area-inset-bottom))+var(--dock-height,0px)+var(--tab-bar-height,0px))] text-meta text-muted"
   >
     <span>© QHHOJ</span>
     <a

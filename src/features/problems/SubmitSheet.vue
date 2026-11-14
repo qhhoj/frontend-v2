@@ -8,9 +8,9 @@ import { useDockHeight } from './use-dock-height';
 import type { useSubmitForm } from './use-submit-form';
 
 const SHEET_ID = 'submit-sheet';
-/** The bar and the open sheet are one surface in two sizes. */
+/** The bar and the open sheet are one surface in two sizes, on the page column: beside the rail, above the phone's tab bar. */
 const SHEET_SURFACE =
-  'fixed inset-x-0 bottom-0 z-30 rounded-t-card border-t border-line-accent bg-surface-solid pb-[env(safe-area-inset-bottom)]';
+  'fixed right-0 bottom-[var(--tab-bar-height,0px)] left-[var(--shell-rail,0px)] z-30 rounded-t-card border-t border-line-accent bg-surface-solid pb-(--shell-inset-bottom)';
 defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;

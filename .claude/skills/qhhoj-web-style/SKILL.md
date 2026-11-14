@@ -61,6 +61,13 @@ The kit lives in `src/components/ui/`; new code imports from there. The part for
 
 Thin wrappers kept for old call sites (ESLint rejects a new import of `AdminField`, `AdminChip`, `AdminPageHeader`, `AdminDataTable`, `AdminNotice`, `GlassCard` and the `controls.ts` classes; ledger in `docs/wrapper-migration.md`): `GlassCard`, `PillTabs`, `AdminPageHeader`, `AdminField`, `AdminChip`, `AdminTabs`, `AdminFilterTabs`, `AdminDataTable`, `AdminFilterBar`, `AdminSaveBar`, `AdminNotice`, `AdminSwitch` (adds `lockedBy`), `SettingsNotice`, `AuthNotice`, `SettingsCard`, `AuthField`, `use-admin-toast` (re-exports `useToast`), `controls.ts` classes. Use the `ui/` part in new code.
 
+**Shell** (`src/features/shell/`, build plan step 2). `AppShell` lays out the public pages; the admin area keeps `AdminShell`, the auth pages their own bar.
+
+- Desktop (from `md`): `AppRail` (224 px from 1100 px, `rail-wide:`; a 56 px icon column below, `max-rail-wide:`) beside the page column: brand, search button, the seven sections from `nav-items.ts` (Kỳ thi with "N đang thi"), the live contest card (`RailLiveContest`), the account row (`UserMenu variant="row"`). Then `TopBar` (48 px): crumbs from `useCurrentSection()` plus the page's name (`usePageTitle` or `meta.titleKey`; never an h1), the page actions target `#top-bar-actions` (a page adds its actions with `<Teleport defer to="#top-bar-actions">`), then the bell, language and look.
+- Phone (under `md`): `TopBar` is 56 px (back to the section, the page name or the brand, search, bell or sign-in) and `TabBar` (4 sections + "Tôi", which opens the `PhoneMenu` sheet) is the navigation.
+- Rail, top bar and tab bar are opaque: the page background shows behind the page column only. A bar fixed to the page column sits at `left-[var(--shell-rail,0px)]` and `bottom-[var(--tab-bar-height,0px)]`, and clears the home bar with `pb-(--shell-inset-bottom)` (the tab bar keeps it on a phone).
+- Search: `CommandPalette` (Ctrl K or ⌘K; the rail button; the phone's search icon) finds sections, account pages, problems, contests and (signed in) users. `/` focuses the page's own search (the first `input[type=search]` in `main`, i.e. a `FilterBar`), else opens the palette. Shell bars draw their own controls with `AppButton tone="plain"`.
+
 ## 4. Rules
 
 The kit part for each job is in `src/components/ui/README.md` (the one table; a job with a part never gets a hand-built recipe).

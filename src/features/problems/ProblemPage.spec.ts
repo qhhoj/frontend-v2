@@ -274,7 +274,7 @@ describe('problem page inside a contest', () => {
     const bar = wrapper.get('[data-testid="contest-bar"]');
     expect(bar.text()).toContain(`Bạn đang thi · ${solved.name}`);
     expect(bar.get('[aria-current="page"]').attributes('href')).toBe('/contests/r42');
-    const nav = wrapper.get('header nav[aria-label]');
+    const nav = wrapper.get('nav[aria-label="Điều hướng chính"]');
     expect(nav.get('[aria-current="page"]').text()).toBe('Kỳ thi');
     await vi.waitFor(() =>
       expect(wrapper.find('[data-testid="viewer-own-result"]').exists()).toBe(true),
@@ -316,7 +316,9 @@ describe('problem page inside a contest', () => {
       expect.stringContaining('?contest=r42'),
       expect.stringContaining('?contest=r42'),
     ]);
-    expect(wrapper.get('header nav[aria-label] [aria-current="page"]').text()).toBe('Kỳ thi');
+    expect(wrapper.get('nav[aria-label="Điều hướng chính"] [aria-current="page"]').text()).toBe(
+      'Kỳ thi',
+    );
     expect(wrapper.get('[data-testid="problem-facts"]').text()).toContain('Điểm kỳ thi250');
     expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(false);
   });

@@ -48,6 +48,19 @@ export const SHELL_DEFAULTS: Readonly<Record<string, MockResponse>> = {
   },
 };
 
+/**
+ * The rail's "N đang thi" (`useRunningContestCount`): a one-row page of running contests on every public page. It shares
+ * its path with the contest list, so it is told apart by its query and always answered here (no running contest),
+ * unrecorded, even where a test routes `GET /contests`.
+ */
+const RUNNING_COUNT: MockResponse = {
+  body: { data: [], meta: { page: 1, pageSize: 1, total: 0 } },
+};
+const isRunningCount = (call: { method: string; path: string; query: URLSearchParams }) =>
+  call.method === 'GET' &&
+  call.path === '/contests' &&
+  call.query.toString() === new URLSearchParams({ phase: 'running', pageSize: '1' }).toString();
+
 const responseOf = ({ status = 200, body, headers }: MockResponse) =>
   new Response(body === undefined ? null : JSON.stringify(body), {
     status,
@@ -82,6 +95,7 @@ export function mockApi(routes: Record<string, MockHandler>): ApiCall[] {
         headers: new Headers(init.headers),
       };
       const key = `${call.method} ${call.path}`;
+      if (isRunningCount(call)) return Promise.resolve(responseOf(RUNNING_COUNT));
       const shellDefault = routes[key] ? undefined : SHELL_DEFAULTS[key];
       if (shellDefault) return Promise.resolve(responseOf(shellDefault));
       calls.push(call);

@@ -88,7 +88,7 @@ function onPanelEscape(event: KeyboardEvent) {
     v-else-if="open && isSignedIn"
     ref="dock"
     :aria-label="$t('submit.title')"
-    class="fixed inset-x-0 bottom-0 z-30 border-t border-line-accent bg-surface-solid pb-[env(safe-area-inset-bottom)]"
+    class="fixed right-0 bottom-[var(--tab-bar-height,0px)] left-[var(--shell-rail,0px)] z-30 border-t border-line-accent bg-surface-solid pb-(--shell-inset-bottom)"
   >
     <div class="mx-auto max-h-[70dvh] max-w-[920px] overflow-x-hidden overflow-y-auto px-4 py-2">
       <SubmitForm :id="BODY_ID" :problem="problem" :form="form" layout="dock">

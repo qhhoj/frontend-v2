@@ -5,9 +5,9 @@
  * Disabled is `aria-disabled` plus a muted token pair, never opacity. A button with `aria-pressed` is a toggle and wears the
  * accent-soft pair while pressed. `link` is an inline text action: no box, a 44 px hit area.
  */
-export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'link' | 'row';
+export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'link' | 'row' | 'plain';
 export type ButtonSize = 'sm' | 'md' | 'lg';
-type BoxedTone = Exclude<ButtonTone, 'link' | 'row'>;
+type BoxedTone = Exclude<ButtonTone, 'link' | 'row' | 'plain'>;
 
 const CURSOR = 'aria-disabled:cursor-not-allowed disabled:cursor-not-allowed';
 
@@ -89,6 +89,8 @@ export function buttonClasses({
   block = false,
 }: ButtonClassOptions = {}) {
   if (tone === 'row') return `${ROW_CLASSES} ${CURSOR} ${PRESSED}`;
+  // `plain`: a control its container draws (the rail's search and account row, a phone tab): the caller's classes are its look.
+  if (tone === 'plain') return block ? `${CURSOR} w-full` : CURSOR;
   const classes =
     tone === 'link' ? `${LINK_CLASSES} ${CURSOR}` : boxedClasses(tone, size, iconOnly);
   return block ? `${classes} w-full` : classes;

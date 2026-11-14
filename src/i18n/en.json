@@ -14,7 +14,10 @@
     "organizations": "Organizations",
     "more": "More",
     "menu": "Menu",
-    "openMenu": "Open the menu"
+    "runningCount": "{count} running",
+    "me": "Me",
+    "back": "Back",
+    "breadcrumb": "Breadcrumb"
   },
   "pages": {
     "problem": "Problem",
@@ -3189,5 +3192,29 @@
         "body": "The setter shows this problem's source code only to the submission's owner and testers."
       }
     }
+  },
+  "rail": {
+    "live": "In contest",
+    "rank": "rank {rank}"
+  },
+  "search": {
+    "title": "Search",
+    "label": "Search pages, problems, contests, users",
+    "placeholder": "Page name, problem code, contest name…",
+    "results": "Search results",
+    "searching": "Searching…",
+    "failed": "A source could not be searched; results may be incomplete.",
+    "empty": "No results.",
+    "emptyAdvice": "Nothing matches. Try a problem code, a contest name or the start of a username.",
+    "tooShort": "Type at least {count} characters to search problems, contests and users.",
+    "count": "{count} result | {count} results",
+    "keys": "↑ ↓ to choose · Enter to open · Esc to close",
+    "groups": {
+      "pages": "Pages",
+      "problems": "Problems",
+      "contests": "Contests",
+      "users": "Users"
+    },
+    "inProblems": "Search the problem list"
   }
 }

@@ -18,6 +18,9 @@
 
 /* Phones and touch screens: a coarse pointer, or a viewport up to 640 px (a phone held either way is never wider than that in portrait). */
 @custom-variant touch (@media (pointer: coarse), (max-width: 40rem));
+/* The public rail (AppRail): 56 px icons from md, the full 224 px from 1100 px. */
+@custom-variant rail-wide (@media (min-width: 68.75rem));
+@custom-variant max-rail-wide (@media (max-width: 68.7499rem));
 
 /* Only semantic names exist: Tailwind's palette, fonts, radii and shadows are dropped. */
 @theme {
@@ -186,7 +189,20 @@
   --default-transition-timing-function: var(--qh-ease);
 }
 
-/* Page width: the header, every page's column and the footer share one left and right edge. */
+/* The public shell: `--shell-rail` is the rail's width beside the page column, for bars fixed to the column (SubmitDock, SubmitSheet). */
+/* `--shell-inset-bottom` is the home-bar inset a bar at the screen's foot keeps clear: none on a phone, where the tab bar (TabBar) sits below it and keeps it. */
+@utility app-shell {
+  --shell-rail: 0px;
+  --shell-inset-bottom: 0px;
+  @media (min-width: 48rem) {
+    --shell-rail: 3.5rem;
+    --shell-inset-bottom: env(safe-area-inset-bottom);
+  }
+  @media (min-width: 68.75rem) {
+    --shell-rail: var(--qh-rail);
+  }
+}
+/* Page width: the top bar, every page's column and the footer share one left and right edge. */
 @utility page-gutter {
   margin-inline: auto;
   width: 100%;

@@ -14,7 +14,10 @@
     "organizations": "Tổ chức",
     "more": "Thêm",
     "menu": "Menu",
-    "openMenu": "Mở menu"
+    "runningCount": "{count} đang thi",
+    "me": "Tôi",
+    "back": "Quay lại",
+    "breadcrumb": "Vị trí trang"
   },
   "pages": {
     "problem": "Bài tập",
@@ -3189,5 +3192,29 @@
         "body": "Người ra đề chỉ cho chủ bài nộp và người kiểm thử xem mã nguồn của đề này."
       }
     }
+  },
+  "rail": {
+    "live": "Đang thi",
+    "rank": "hạng {rank}"
+  },
+  "search": {
+    "title": "Tìm kiếm",
+    "label": "Tìm trang, bài tập, kỳ thi, người dùng",
+    "placeholder": "Tên trang, mã bài, tên kỳ thi…",
+    "results": "Kết quả tìm kiếm",
+    "searching": "Đang tìm…",
+    "failed": "Có nguồn không tìm được; kết quả có thể thiếu.",
+    "empty": "Không có kết quả.",
+    "emptyAdvice": "Không thấy gì khớp. Thử mã bài, tên kỳ thi hoặc phần đầu tên đăng nhập.",
+    "tooShort": "Gõ ít nhất {count} ký tự để tìm bài tập, kỳ thi và người dùng.",
+    "count": "{count} kết quả",
+    "keys": "↑ ↓ để chọn · Enter để mở · Esc để đóng",
+    "groups": {
+      "pages": "Trang",
+      "problems": "Bài tập",
+      "contests": "Kỳ thi",
+      "users": "Người dùng"
+    },
+    "inProblems": "Tìm trong danh sách bài tập"
   }
 }
