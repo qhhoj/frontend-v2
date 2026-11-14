@@ -37,8 +37,7 @@ const { data: share, isPending, error, refetch } = useShareQuery(code);
 const failure = computed(() => (error.value ? shareFailureOf(error.value) : null));
 const isGone = computed(() => error.value instanceof ApiError && error.value.code === 'not_found');
 const blockedKey = computed(() => {
-  if (failure.value?.kind === 'contest') return 'share.state.contest';
-  return failure.value?.kind === 'hidden' ? 'share.state.hidden' : null;
+  return failure.value?.kind === 'blocked' ? `share.refusal.${failure.value.reason}` : null;
 });
 const isSubmission = computed(() => share.value?.kind === 'submission' && !!share.value.copy);
 const heading = computed(() => {
@@ -61,16 +60,14 @@ const STACK = 'min-w-0 xl:col-start-2';
         :body="$t('share.state.goneBody')"
         is-page-heading
       >
-        <AppButton tone="primary" :to="{ name: 'paste' }">{{
-          $t('share.state.newPaste')
-        }}</AppButton>
+        <AppButton tone="primary" :to="{ name: 'home' }">{{ $t('share.state.home') }}</AppButton>
       </StatePanel>
     </Card>
     <Card v-else-if="blockedKey" as="div">
       <StatePanel
         kind="forbidden"
-        :title="$t(`${blockedKey}Title`)"
-        :body="$t(`${blockedKey}Body`)"
+        :title="$t(`${blockedKey}.title`)"
+        :body="$t(`${blockedKey}.body`)"
         is-page-heading
       >
         <AppButton :to="{ name: 'home' }">{{ $t('share.state.home') }}</AppButton>
@@ -84,7 +81,11 @@ const STACK = 'min-w-0 xl:col-start-2';
       <template v-if="share">
         <PageHeader
           :title="heading"
-          :back="{ to: { name: 'paste' }, label: $t('share.paste.title') }"
+          :back="
+            share.viewer.isOwner
+              ? { to: { name: 'settings-shares' }, label: $t('share.list.heading') }
+              : undefined
+          "
         >
           <template #meta>
             <Chip tone="neutral">{{ $t(`share.kind.${share.kind}`) }}</Chip>

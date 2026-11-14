@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import { Check, ExternalLink, X } from 'lucide-vue-next';
+import { Check, Eye, X } from 'lucide-vue-next';
 import type { ShareReport, ShareReportOutcome, ShareReportQueue } from '@/api/types/shares';
 import UserLink from '@/components/UserLink.vue';
 import { useSettleShareReports, useShareReportsQuery } from '@/features/shares/shares.queries';
@@ -54,9 +54,8 @@ const columns = computed<DataTableColumn[]>(() => [
 ]);
 
 async function settleReport(report: ShareReport, outcome: ShareReportOutcome) {
-  if (!report.share) return;
   try {
-    await settle.mutateAsync({ code: report.share.code, outcome });
+    await settle.mutateAsync({ code: report.code, outcome });
     toast.show({ text: t(`share.reports.settled.${outcome}`) });
   } catch {
     toast.show({ text: t('share.reports.settleFailed'), tone: 'danger' });
@@ -67,12 +66,12 @@ const menuItems = (report: ShareReport) => [
     ? [
         {
           label: t('share.reports.open'),
-          icon: ExternalLink,
+          icon: Eye,
           to: { name: 'share', params: { code: report.share.code } },
         },
       ]
     : []),
-  ...(report.status === 'open' && report.share
+  ...(report.status === 'open'
     ? [
         {
           label: t('share.reports.resolve'),
@@ -87,7 +86,7 @@ const menuItems = (report: ShareReport) => [
       ]
     : []),
 ];
-const codeOf = (report: ShareReport) => report.share?.code ?? '';
+const codeOf = (report: ShareReport) => report.code;
 </script>
 
 <template>
@@ -114,7 +113,10 @@ const codeOf = (report: ShareReport) => report.share?.code ?? '';
           class="font-mono font-semibold text-accent-text hover:underline"
           >/c/{{ row.share.code }}</RouterLink
         >
-        <span v-else class="text-muted">{{ $t('share.reports.gone') }}</span>
+        <span v-else class="flex flex-col">
+          <span class="font-mono font-semibold">/c/{{ row.code }}</span>
+          <span class="text-meta text-muted">{{ $t('share.reports.gone') }}</span>
+        </span>
       </template>
       <template #cell-reason="{ row }">
         <Chip :tone="row.reason === 'contest' ? 'danger' : 'neutral'">

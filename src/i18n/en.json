@@ -3030,11 +3030,7 @@
       "created": "Link created.",
       "existing": "You shared this submission at {time}. Reuse that link, or take a new snapshot.",
       "takeNew": "Take a new snapshot",
-      "done": "Done",
-      "contestTitle": "A contest is running.",
-      "contestBody": "A submission to a problem used in a contest can be shared only after the contest ends and its board is no longer frozen.",
-      "hiddenTitle": "Source code is not public.",
-      "hiddenBody": "The setter shows this problem's source code only to the submission's owner and testers, so no link can be made."
+      "done": "Done"
     },
     "delete": {
       "title": "Delete this link?",
@@ -3043,14 +3039,15 @@
       "done": "Link deleted"
     },
     "error": {
-      "share_limit": "You have too many live links. Delete some in Settings and try again.",
-      "submission_not_shareable": "Only judged or compile-error submissions in a text language can be shared.",
+      "share_limit": "You have 200 live links, the maximum. Delete some and try again.",
+      "submission_not_shareable": "Only judged or compile-error submissions in a language that is not file-upload can be shared.",
       "source_too_large": "The code is too large: 64 KB at most.",
       "source_empty": "Paste some code before creating a link.",
       "source_invalid": "The code contains characters that cannot be used.",
       "language_unknown": "This language cannot be used. Pick another one.",
       "language_takes_file": "This language takes files only, pick another one.",
-      "muted": "Your account is muted, so links cannot be created."
+      "muted": "Your account is muted, so links cannot be created.",
+      "busy": "Another link of yours is being created. Try again in a few seconds."
     },
     "paste": {
       "title": "Paste code",
@@ -3068,7 +3065,11 @@
       "language": "Language",
       "titleLabel": "Title",
       "titlePlaceholder": "Example: Fibonacci sequence",
-      "create": "Create link"
+      "create": "Create link",
+      "contestWarning": "Do not paste solutions of a running contest. Admins take down links that leak them and may lock the account.",
+      "replaceTitle": "Replace the current code?",
+      "replaceBody": "The editor already has code. The clipboard text will replace it.",
+      "replaceConfirm": "Replace code"
     },
     "code": {
       "title": "Source code"
@@ -3088,28 +3089,25 @@
       "language": "Language",
       "size": "Size",
       "expiry": "Expires",
-      "public": "Public, not indexed."
+      "public": "Anyone with the link can view it. It is not shown in search engines."
     },
     "hidden": {
       "author_unavailable": "The author's account is no longer usable, so others cannot open this link.",
       "contest_running": "A contest using this problem has not ended, so others cannot open this link.",
       "source_hidden": "The setter now shows source code only to the owner and testers, so others cannot open this link.",
-      "taken_down": "Staff took this link down: {reason}"
+      "taken_down": "Admins took this link down: {reason}",
+      "problem_hidden": "This submission's problem is no longer public, so others cannot open the link."
     },
     "state": {
-      "goneTitle": "This link is gone",
+      "goneTitle": "This link no longer works",
       "goneBody": "This link does not exist, has expired or was taken down.",
       "newPaste": "Paste new code",
-      "home": "Back to home",
-      "contestTitle": "Cannot be viewed right now",
-      "contestBody": "This submission belongs to a problem used in a contest that has not ended. Come back after the contest ends.",
-      "hiddenTitle": "Source code is not public",
-      "hiddenBody": "The setter shows this problem's source code only to the submission's owner and testers."
+      "home": "Back to home"
     },
     "report": {
       "open": "Report this content",
       "title": "Report content",
-      "body": "Staff will review this link. Each person can report a link once.",
+      "body": "Admins will review this link. Each person can report a link once.",
       "reasonLabel": "Reason",
       "noteLabel": "Note",
       "confirm": "Send report",
@@ -3117,8 +3115,8 @@
       "sent": "Report sent",
       "reason": {
         "contest": "Leaks a running contest's solution",
-        "abuse": "Abusive content",
-        "spam": "Spam",
+        "abuse": "Abusive or harassing content",
+        "spam": "Spam or advertising",
         "other": "Another reason"
       }
     },
@@ -3140,13 +3138,14 @@
       "title": "Title",
       "kind": "Type",
       "createdAt": "Created",
-      "expiresAt": "Expires",
+      "expiresAt": "Lifetime",
       "caption": "Shared links",
       "pager": "Link pages",
       "empty": "You have not shared any link yet.",
       "newPaste": "Paste code",
       "takenDown": "Taken down",
-      "copyFailed": "Could not copy"
+      "copyFailed": "Could not copy",
+      "takenDownReason": "Taken down: {reason}"
     },
     "reports": {
       "lead": "Reports about shared links, newest first.",
@@ -3174,6 +3173,20 @@
       "dismiss": "Dismiss",
       "gone": "The link expired or was deleted",
       "empty": "No reports."
+    },
+    "refusal": {
+      "contest_running": {
+        "title": "Cannot be shared right now",
+        "body": "This problem is used in a contest that has not ended (running, upcoming or with a frozen board). Try again after the contest ends."
+      },
+      "problem_hidden": {
+        "title": "Problem is not public",
+        "body": "Only submissions to public problems can be shared. This one is hidden, private to an organization or deleted."
+      },
+      "source_hidden": {
+        "title": "Source code is not public",
+        "body": "The setter shows this problem's source code only to the submission's owner and testers."
+      }
     }
   }
 }

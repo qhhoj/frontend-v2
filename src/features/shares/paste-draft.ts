@@ -7,10 +7,12 @@ export interface PasteDraft {
   title: string;
   languageId: string | null;
   expiry: ShareExpiry | null;
+  /** Who typed it; null for a visitor. Another account on the same browser never gets it back. */
+  userId: string | null;
 }
 
 export const PASTE_DRAFT_KEY = 'qhhoj.paste-draft';
-const EMPTY: PasteDraft = { source: '', title: '', languageId: null, expiry: null };
+const EMPTY: PasteDraft = { source: '', title: '', languageId: null, expiry: null, userId: null };
 
 const isExpiry = (value: unknown): value is ShareExpiry =>
   SHARE_EXPIRIES.includes(value as ShareExpiry);
@@ -27,6 +29,7 @@ export function parseDraft(raw: string | null): PasteDraft {
       title: typeof record.title === 'string' ? record.title : '',
       languageId: typeof record.languageId === 'string' ? record.languageId : null,
       expiry: isExpiry(record.expiry) ? record.expiry : null,
+      userId: typeof record.userId === 'string' ? record.userId : null,
     };
   } catch {
     return EMPTY;
@@ -44,9 +47,11 @@ function storage(): Storage | null {
   }
 }
 
-export function loadDraft(): PasteDraft {
+/** The stored draft, unless a different account typed it (a visitor's draft goes to whoever signs in). */
+export function loadDraft(viewerId: string | null): PasteDraft {
   try {
-    return parseDraft(storage()?.getItem(PASTE_DRAFT_KEY) ?? null);
+    const draft = parseDraft(storage()?.getItem(PASTE_DRAFT_KEY) ?? null);
+    return draft.userId !== null && draft.userId !== viewerId ? EMPTY : draft;
   } catch {
     return EMPTY;
   }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Copy, Pencil, Trash2 } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import type { ShareListItem } from '@/api/types/shares';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
@@ -32,6 +32,19 @@ const page = computed(() => pageFromQuery(route.query.page));
 const { data, isPending, error, refetch } = useMySharesQuery(page);
 const rows = computed(() => data.value?.items ?? []);
 const editing = ref<ShareListItem | null>(null);
+/** The "Sửa" button that opened the dialog: it takes focus back when the dialog closes (the dialog is unmounted by then). */
+let editOpener: HTMLElement | null = null;
+function openEdit(share: ShareListItem, event: MouseEvent) {
+  editOpener = event.currentTarget as HTMLElement;
+  editing.value = share;
+}
+function closeEdit() {
+  editing.value = null;
+  void nextTick(() => editOpener?.isConnected && editOpener.focus());
+}
+/** The whole row opens the share; a taken-down row has nowhere to go, so it points at this page. */
+const rowTarget = (share: ShareListItem) =>
+  share.takenDown ? route.fullPath : { name: 'share', params: { code: share.code } };
 const deleting = ref<ShareListItem | null>(null);
 const failureKey = ref<string | null>(null);
 const remove = useDeleteShare();
@@ -84,7 +97,7 @@ async function removeShare() {
         :columns="columns"
         :rows="rows"
         :row-key="(share) => share.code"
-        :row-to="(share) => ({ name: 'share', params: { code: share.code } })"
+        :row-to="rowTarget"
         :label="$t('share.list.caption')"
         :loading="isPending"
         :error="error"
@@ -93,33 +106,47 @@ async function removeShare() {
         @retry="refetch()"
       >
         <template #cell-title="{ row }">
+          <!-- A taken-down link opens to the "gone" panel for everyone but staff: no link, the reason instead. -->
+          <span v-if="row.takenDown" class="flex flex-col gap-1" data-testid="share-taken-down-row">
+            <span class="font-semibold [overflow-wrap:anywhere]">{{ nameOf(row) }}</span>
+            <Chip tone="warning" size="sm" class="self-start">{{
+              $t('share.list.takenDown')
+            }}</Chip>
+            <span class="text-meta text-muted [overflow-wrap:anywhere]">{{
+              $t('share.list.takenDownReason', { reason: row.takenDown.reason })
+            }}</span>
+          </span>
           <RouterLink
+            v-else
             :to="{ name: 'share', params: { code: row.code } }"
             class="font-semibold [overflow-wrap:anywhere] hover:underline"
             >{{ nameOf(row) }}</RouterLink
           >
-          <Chip v-if="row.takenDown" tone="warning" size="sm" class="ml-2">{{
-            $t('share.list.takenDown')
-          }}</Chip>
         </template>
         <template #cell-kind="{ row }">
           <Chip tone="neutral">{{ $t(`share.kind.${row.kind}`) }}</Chip>
         </template>
-        <template #cell-createdAt="{ row }">{{
-          formatDate(row.createdAt, 'datetime', locale.locale)
-        }}</template>
-        <template #cell-expiresAt="{ row }">{{
-          expiryMessage(row.expiresAt, Date.now())
-        }}</template>
+        <template #cell-createdAt="{ row }"
+          ><span class="whitespace-nowrap">{{
+            formatDate(row.createdAt, 'datetime', locale.locale)
+          }}</span></template
+        >
+        <template #cell-expiresAt="{ row }"
+          ><span class="whitespace-nowrap">{{
+            expiryMessage(row.expiresAt, Date.now())
+          }}</span></template
+        >
         <template #actions="{ row }">
-          <AppButton size="sm" @click="editing = row">
-            <template #icon><Pencil aria-hidden="true" class="size-4" /></template>
-            {{ $t('common.edit') }}
-          </AppButton>
-          <RowMenu
-            :label="$t('common.table.rowMenu', { name: nameOf(row) })"
-            :items="menuItems(row)"
-          />
+          <template v-if="!row.takenDown">
+            <AppButton size="sm" @click="openEdit(row, $event)">
+              <template #icon><Pencil aria-hidden="true" class="size-4" /></template>
+              {{ $t('common.edit') }}
+            </AppButton>
+            <RowMenu
+              :label="$t('common.table.rowMenu', { name: nameOf(row) })"
+              :items="menuItems(row)"
+            />
+          </template>
         </template>
         <template #emptyAction>
           <AppButton tone="primary" :to="{ name: 'paste' }">{{
@@ -128,12 +155,7 @@ async function removeShare() {
         </template>
       </DataTable>
     </Card>
-    <EditShareDialog
-      v-if="editing"
-      :visible="true"
-      :share="editing"
-      @update:visible="editing = null"
-    />
+    <EditShareDialog v-if="editing" :visible="true" :share="editing" @update:visible="closeEdit" />
     <ConfirmDialog
       :visible="deleting !== null"
       tone="danger"

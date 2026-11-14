@@ -11,6 +11,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import ShareExpiryPicker from './ShareExpiryPicker.vue';
+import ShareFailureNotice from './ShareFailureNotice.vue';
 import ShareLinkBox from './ShareLinkBox.vue';
 import { SUBMISSION_DEFAULT_EXPIRY, expiryMessage } from './share-expiry';
 import { shareFailureOf } from './share-failure';
@@ -51,10 +52,16 @@ watch(visible, (isOpen) => {
   isTakingNew.value = false;
 });
 
-const earlierShare = computed(() => earlier.data.value?.items[0] ?? null);
+/** A link staff took down is dead for everyone: never offered for reuse. */
+const earlierShare = computed(
+  () => earlier.data.value?.items.find((item) => item.takenDown === null) ?? null,
+);
+const blockedKey = computed(() =>
+  failure.value?.kind === 'blocked' ? `share.refusal.${failure.value.reason}` : '',
+);
 const state = computed(() => {
   if (created.value) return 'created';
-  if (failure.value && failure.value.kind !== 'other') return 'blocked';
+  if (failure.value?.kind === 'blocked') return 'blocked';
   if (earlierShare.value && !isTakingNew.value) return 'existing';
   return 'form';
 });
@@ -95,7 +102,7 @@ async function removeLink() {
     size="sm"
     :title="state === 'blocked' ? $t('share.dialog.blockedTitle') : $t('share.dialog.title')"
   >
-    <QueryState v-if="earlier.isPending.value" :loading="true" :error="null">
+    <QueryState v-if="earlier.isLoading.value" :loading="true" :error="null">
       <template #skeleton><SkeletonBlock class="h-40 w-full" /></template>
     </QueryState>
     <div v-else-if="state === 'form'" class="flex flex-col gap-5" data-testid="share-form">
@@ -119,18 +126,11 @@ async function removeLink() {
         </li>
       </ul>
       <ShareExpiryPicker v-model="expiry" :hint="$t('share.dialog.publicHint')" />
-      <Notice v-if="failureKey" tone="danger" inline>{{ $t(failureKey) }}</Notice>
+      <ShareFailureNotice v-if="failureKey" :message-key="failureKey" />
     </div>
     <div v-else-if="state === 'blocked'" data-testid="share-blocked">
-      <Notice
-        tone="warning"
-        :title="
-          $t(failure?.kind === 'hidden' ? 'share.dialog.hiddenTitle' : 'share.dialog.contestTitle')
-        "
-      >
-        {{
-          $t(failure?.kind === 'hidden' ? 'share.dialog.hiddenBody' : 'share.dialog.contestBody')
-        }}
+      <Notice tone="warning" :title="$t(`${blockedKey}.title`)">
+        {{ $t(`${blockedKey}.body`) }}
       </Notice>
     </div>
     <div v-else-if="shownShare" class="flex flex-col gap-4" :data-testid="`share-${state}`">
@@ -145,10 +145,10 @@ async function removeLink() {
         }}
       </p>
       <ShareLinkBox :code="shownShare.code" />
-      <Notice v-if="failureKey" tone="danger" inline>{{ $t(failureKey) }}</Notice>
+      <ShareFailureNotice v-if="failureKey" :message-key="failureKey" />
     </div>
     <template #footer>
-      <div class="flex flex-wrap justify-end gap-2">
+      <div v-if="!earlier.isLoading.value" class="flex flex-wrap justify-end gap-2">
         <template v-if="state === 'form'">
           <AppButton @click="visible = false">{{ $t('common.cancel') }}</AppButton>
           <AppButton
@@ -164,7 +164,12 @@ async function removeLink() {
           <AppButton tone="primary" @click="visible = false">{{ $t('common.close') }}</AppButton>
         </template>
         <template v-else>
-          <AppButton tone="danger" data-testid="share-delete" @click="isDeleteOpen = true">
+          <AppButton
+            tone="danger"
+            class="sm:mr-auto"
+            data-testid="share-delete"
+            @click="isDeleteOpen = true"
+          >
             {{ $t('share.delete.confirm') }}
           </AppButton>
           <AppButton v-if="state === 'existing'" @click="isTakingNew = true">

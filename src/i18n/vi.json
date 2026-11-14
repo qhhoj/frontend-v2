@@ -3011,7 +3011,7 @@
       "hours": "Hết hạn sau {count} giờ | Hết hạn sau {count} giờ",
       "soon": "Hết hạn trong vài phút",
       "option": {
-        "never": "Không bao giờ",
+        "never": "Mãi mãi",
         "1d": "1 ngày",
         "7d": "7 ngày",
         "30d": "30 ngày"
@@ -3030,11 +3030,7 @@
       "created": "Đã tạo liên kết.",
       "existing": "Bạn đã chia sẻ bài nộp này lúc {time}. Dùng lại liên kết đó, hoặc chụp bản mới.",
       "takeNew": "Chụp bản mới",
-      "done": "Xong",
-      "contestTitle": "Kỳ thi đang diễn ra.",
-      "contestBody": "Bài nộp vào đề dùng trong kỳ thi chỉ chia sẻ được sau khi kỳ thi kết thúc và bảng điểm không còn đóng băng.",
-      "hiddenTitle": "Mã nguồn không được công khai.",
-      "hiddenBody": "Người ra đề chỉ cho chủ bài nộp và người kiểm thử xem mã nguồn của đề này, nên không tạo được liên kết."
+      "done": "Xong"
     },
     "delete": {
       "title": "Xóa liên kết này?",
@@ -3043,14 +3039,15 @@
       "done": "Đã xóa liên kết"
     },
     "error": {
-      "share_limit": "Bạn đang có quá nhiều liên kết còn hạn. Hãy xóa bớt trong Cài đặt rồi thử lại.",
-      "submission_not_shareable": "Chỉ chia sẻ được bài nộp đã chấm xong hoặc lỗi biên dịch, bằng ngôn ngữ nhập được bằng chữ.",
+      "share_limit": "Bạn đang có 200 liên kết còn hạn, mức tối đa. Hãy xóa bớt rồi thử lại.",
+      "submission_not_shareable": "Chỉ chia sẻ được bài nộp đã chấm xong hoặc lỗi biên dịch, và không phải ngôn ngữ nộp tệp.",
       "source_too_large": "Mã quá lớn: tối đa 64 KB.",
       "source_empty": "Hãy dán mã trước khi tạo liên kết.",
       "source_invalid": "Mã chứa ký tự không dùng được.",
       "language_unknown": "Ngôn ngữ này không dùng được. Hãy chọn ngôn ngữ khác.",
       "language_takes_file": "Ngôn ngữ này chỉ nhận tệp, hãy chọn ngôn ngữ khác.",
-      "muted": "Tài khoản đang bị cấm phát ngôn nên chưa tạo được liên kết."
+      "muted": "Tài khoản đang bị tắt tiếng nên chưa tạo được liên kết.",
+      "busy": "Đang tạo một liên kết khác của bạn. Hãy thử lại sau ít giây."
     },
     "paste": {
       "title": "Dán mã",
@@ -3068,7 +3065,11 @@
       "language": "Ngôn ngữ",
       "titleLabel": "Tiêu đề",
       "titlePlaceholder": "Ví dụ: dãy Fibonacci",
-      "create": "Tạo liên kết"
+      "create": "Tạo liên kết",
+      "contestWarning": "Đừng dán lời giải của kỳ thi đang diễn ra. Ban quản trị gỡ liên kết lộ đề và có thể khóa tài khoản.",
+      "replaceTitle": "Thay mã đang có?",
+      "replaceBody": "Khung mã đã có nội dung. Mã trong bộ nhớ tạm sẽ thay thế nó.",
+      "replaceConfirm": "Thay mã"
     },
     "code": {
       "title": "Mã nguồn"
@@ -3088,28 +3089,25 @@
       "language": "Ngôn ngữ",
       "size": "Kích thước",
       "expiry": "Hết hạn",
-      "public": "Công khai, không lập chỉ mục."
+      "public": "Ai có liên kết đều xem được. Không hiện trên công cụ tìm kiếm."
     },
     "hidden": {
       "author_unavailable": "Tài khoản của tác giả không còn dùng được, nên người khác không mở được liên kết này.",
       "contest_running": "Một kỳ thi dùng đề này chưa kết thúc, nên người khác không mở được liên kết này.",
       "source_hidden": "Người ra đề giờ chỉ cho chủ bài nộp và người kiểm thử xem mã, nên người khác không mở được liên kết này.",
-      "taken_down": "Nhân viên đã gỡ liên kết này: {reason}"
+      "taken_down": "Ban quản trị đã gỡ liên kết này: {reason}",
+      "problem_hidden": "Đề của bài nộp này không còn công khai, nên người khác không mở được liên kết."
     },
     "state": {
-      "goneTitle": "Liên kết không còn",
+      "goneTitle": "Liên kết không còn dùng được",
       "goneBody": "Liên kết này không tồn tại, đã hết hạn hoặc đã bị gỡ.",
       "newPaste": "Dán mã mới",
-      "home": "Về trang chủ",
-      "contestTitle": "Chưa xem được lúc này",
-      "contestBody": "Bài nộp này thuộc đề đang dùng trong một kỳ thi chưa kết thúc. Hãy quay lại sau khi kỳ thi kết thúc.",
-      "hiddenTitle": "Mã nguồn không được công khai",
-      "hiddenBody": "Người ra đề chỉ cho chủ bài nộp và người kiểm thử xem mã nguồn của đề này."
+      "home": "Về trang chủ"
     },
     "report": {
       "open": "Báo cáo nội dung này",
       "title": "Báo cáo nội dung",
-      "body": "Nhân viên sẽ xem lại liên kết này. Mỗi người báo cáo một lần cho mỗi liên kết.",
+      "body": "Ban quản trị sẽ xem lại liên kết này. Mỗi người báo cáo một lần cho mỗi liên kết.",
       "reasonLabel": "Lý do",
       "noteLabel": "Ghi chú",
       "confirm": "Gửi báo cáo",
@@ -3117,8 +3115,8 @@
       "sent": "Đã gửi báo cáo",
       "reason": {
         "contest": "Lộ lời giải kỳ thi đang diễn ra",
-        "abuse": "Nội dung lạm dụng",
-        "spam": "Spam",
+        "abuse": "Nội dung xúc phạm, quấy rối",
+        "spam": "Spam hoặc quảng cáo",
         "other": "Lý do khác"
       }
     },
@@ -3140,13 +3138,14 @@
       "title": "Tiêu đề",
       "kind": "Loại",
       "createdAt": "Tạo lúc",
-      "expiresAt": "Hết hạn",
+      "expiresAt": "Thời hạn",
       "caption": "Liên kết đã chia sẻ",
       "pager": "Trang liên kết",
       "empty": "Bạn chưa chia sẻ liên kết nào.",
       "newPaste": "Dán mã",
       "takenDown": "Bị gỡ",
-      "copyFailed": "Không sao chép được"
+      "copyFailed": "Không sao chép được",
+      "takenDownReason": "Bị gỡ: {reason}"
     },
     "reports": {
       "lead": "Báo cáo về liên kết chia sẻ, mới nhất trước.",
@@ -3174,6 +3173,20 @@
       "dismiss": "Bỏ qua",
       "gone": "Liên kết đã hết hạn hoặc bị xóa",
       "empty": "Không có báo cáo nào."
+    },
+    "refusal": {
+      "contest_running": {
+        "title": "Chưa chia sẻ được lúc này",
+        "body": "Đề này đang dùng trong một kỳ thi chưa kết thúc (đang diễn ra, sắp diễn ra hoặc bảng điểm còn đóng băng). Hãy thử lại sau khi kỳ thi kết thúc."
+      },
+      "problem_hidden": {
+        "title": "Đề bài chưa công khai",
+        "body": "Chỉ chia sẻ được bài nộp của đề công khai. Đề này đang ẩn, thuộc riêng một tổ chức hoặc đã bị xóa."
+      },
+      "source_hidden": {
+        "title": "Mã nguồn không được công khai",
+        "body": "Người ra đề chỉ cho chủ bài nộp và người kiểm thử xem mã nguồn của đề này."
+      }
     }
   }
 }

@@ -11,20 +11,27 @@ const NAMED_ISSUES = [
   'language_unknown',
   'language_takes_file',
   'muted',
+  'busy',
 ] as const;
 
-export type ShareFailure =
-  /** A contest lists the problem and is not over: the backend does not say which. */
-  | { kind: 'contest' }
-  /** The setter now shows sources to owners and testers only. */
-  | { kind: 'hidden' }
-  | { kind: 'other'; key: string };
+/** The three rules that refuse to show or make a copy of a submission. */
+export type CopyRefusal = 'contest_running' | 'problem_hidden' | 'source_hidden';
 
-/** What a failed create or read means to the person: the two blocks get their own state, the rest a message key. */
+export type ShareFailure =
+  { kind: 'blocked'; reason: CopyRefusal } | { kind: 'other'; key: string };
+
+/** The backend sends `hidden` for two rules and tells them apart only in its message (backend `copyRefusalError`). */
+const PROBLEM_HIDDEN_MESSAGE = /public problems/i;
+
+/** What a failed create or read means to the person: a refusal gets its own state, the rest a message key. */
 export function shareFailureOf(error: unknown): ShareFailure {
   if (error instanceof ApiError) {
-    if (error.code === 'contest_running') return { kind: 'contest' };
-    if (error.code === 'hidden') return { kind: 'hidden' };
+    if (error.code === 'contest_running') return { kind: 'blocked', reason: 'contest_running' };
+    if (error.code === 'hidden')
+      return {
+        kind: 'blocked',
+        reason: PROBLEM_HIDDEN_MESSAGE.test(error.message) ? 'problem_hidden' : 'source_hidden',
+      };
     const issue = NAMED_ISSUES.find((code) => error.issues.some((entry) => entry.code === code));
     if (issue) return { kind: 'other', key: `share.error.${issue}` };
   }

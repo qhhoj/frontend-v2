@@ -3,6 +3,8 @@ import { ClipboardPaste } from 'lucide-vue-next';
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import CodeEditor from '@/components/CodeEditor.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import { errorMessageKey } from '@/i18n/error-message';
 import AppButton from '@/components/ui/AppButton.vue';
 import FormField from '@/components/ui/FormField.vue';
 import Notice from '@/components/ui/Notice.vue';
@@ -15,11 +17,11 @@ import { useProblemMetaQuery } from '@/features/problems/problems.queries';
 import { normalizeNewlines } from '@/lib/source';
 import { safeRedirect } from '@/router/safe-redirect';
 import { useSessionStore } from '@/stores/session.store';
-import { PASTE_MAX_BYTES } from '@/api/types/shares';
 import type { ShareExpiry } from '@/api/types/shares';
 import { clearDraft, loadDraft, saveDraft } from './paste-draft';
-import { pasteSize, sizeText } from './paste-size';
+import { counterText, pasteSize } from './paste-size';
 import { PASTE_DEFAULT_EXPIRY, SHARE_EXPIRIES } from './share-expiry';
+import ShareFailureNotice from './ShareFailureNotice.vue';
 import { shareFailureOf } from './share-failure';
 import { useCreatePasteShare } from './shares.queries';
 
@@ -32,7 +34,7 @@ const route = useRoute();
 const router = useRouter();
 const session = useSessionStore();
 const isSignedIn = computed(() => session.status === 'authenticated');
-const draft = loadDraft();
+const draft = loadDraft(session.user?.id ?? null);
 const source = ref(draft.source);
 const title = ref(draft.title);
 const expiry = ref<ShareExpiry>(draft.expiry ?? PASTE_DEFAULT_EXPIRY);
@@ -51,6 +53,7 @@ const language = computed(
 );
 
 const size = computed(() => pasteSize(source.value));
+const counter = computed(() => counterText(size.value.bytes));
 const failureKey = ref<string | null>(null);
 const create = useCreatePasteShare();
 const blockedReason = computed(() => {
@@ -69,6 +72,7 @@ const saveNow = () =>
     title: title.value,
     languageId: language.value?.id ?? null,
     expiry: expiry.value,
+    userId: session.user?.id ?? null,
   });
 watch([source, title, expiry, pickedLanguageId], () => {
   clearTimeout(saveTimer);
@@ -81,13 +85,25 @@ onBeforeUnmount(() => {
 
 const canReadClipboard = typeof navigator !== 'undefined' && !!navigator.clipboard?.readText;
 const clipboardDenied = ref(false);
+/** What the clipboard held, waiting for "Thay mã" when the editor already has code: a click must not erase typing. */
+const clipboardText = ref<string | null>(null);
+const isReplaceOpen = computed({
+  get: () => clipboardText.value !== null,
+  set: () => (clipboardText.value = null),
+});
 async function pasteFromClipboard() {
   clipboardDenied.value = false;
   try {
-    source.value = normalizeNewlines(await navigator.clipboard.readText());
+    const text = normalizeNewlines(await navigator.clipboard.readText());
+    if (source.value.trim() === '') source.value = text;
+    else clipboardText.value = text;
   } catch {
     clipboardDenied.value = true;
   }
+}
+function replaceWithClipboard() {
+  if (clipboardText.value !== null) source.value = clipboardText.value;
+  clipboardText.value = null;
 }
 
 async function submit() {
@@ -122,6 +138,17 @@ const loginTo = computed(() => ({
         <AppButton size="sm" class="mt-2" :to="loginTo">{{ $t('account.login') }}</AppButton>
       </template>
     </Notice>
+    <Notice tone="warning" compact data-testid="paste-contest-warning">{{
+      $t('share.paste.contestWarning')
+    }}</Notice>
+    <Notice v-if="meta.error.value" tone="danger">
+      {{ $t(errorMessageKey(meta.error.value)) }}
+      <template #action>
+        <AppButton size="sm" class="mt-2" @click="meta.refetch()">{{
+          $t('common.retry')
+        }}</AppButton>
+      </template>
+    </Notice>
     <form class="flex flex-col gap-4" @submit.prevent="submit">
       <CodeEditor
         v-model="source"
@@ -137,8 +164,7 @@ const loginTo = computed(() => ({
         >
           {{
             $t('share.paste.size', {
-              size: sizeText(size.bytes),
-              max: sizeText(PASTE_MAX_BYTES),
+              ...counter,
               lines: size.lines,
             })
           }}
@@ -191,7 +217,14 @@ const loginTo = computed(() => ({
           {{ $t('share.paste.create') }}
         </AppButton>
       </div>
-      <Notice v-if="failureKey" tone="danger" inline>{{ $t(failureKey) }}</Notice>
+      <ShareFailureNotice v-if="failureKey" :message-key="failureKey" />
     </form>
+    <ConfirmDialog
+      v-model:visible="isReplaceOpen"
+      :title="$t('share.paste.replaceTitle')"
+      :body="$t('share.paste.replaceBody')"
+      :confirm-label="$t('share.paste.replaceConfirm')"
+      @confirm="replaceWithClipboard"
+    />
   </div>
 </template>

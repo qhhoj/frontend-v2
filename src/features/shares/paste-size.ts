@@ -24,3 +24,10 @@ export function pasteSize(source: string): PasteSize {
 
 /** "132 B": under a KiB in bytes, else the file-size text. */
 export const sizeText = (bytes: number) => (bytes < 1024 ? `${bytes} B` : formatFileSize(bytes));
+
+/** The counter's two figures; over the limit they are bytes, since "64 KB / 64 KB" would hide the excess. */
+export function counterText(bytes: number): { size: string; max: string } {
+  return bytes > PASTE_MAX_BYTES
+    ? { size: `${bytes} B`, max: `${PASTE_MAX_BYTES} B` }
+    : { size: sizeText(bytes), max: sizeText(PASTE_MAX_BYTES) };
+}

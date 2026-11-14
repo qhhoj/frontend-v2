@@ -9,8 +9,19 @@ const refusal = (code: string, status: number, issueCode?: string) =>
 
 describe('shareFailureOf', () => {
   it('tells the two blocks from other failures', () => {
-    expect(shareFailureOf(refusal('contest_running', 403))).toEqual({ kind: 'contest' });
-    expect(shareFailureOf(refusal('hidden', 403))).toEqual({ kind: 'hidden' });
+    expect(shareFailureOf(refusal('contest_running', 403))).toEqual({
+      kind: 'blocked',
+      reason: 'contest_running',
+    });
+    expect(shareFailureOf(refusal('hidden', 403))).toEqual({
+      kind: 'blocked',
+      reason: 'source_hidden',
+    });
+    expect(
+      shareFailureOf(
+        new ApiError('hidden', 403, 'Only submissions to public problems can be shared'),
+      ),
+    ).toEqual({ kind: 'blocked', reason: 'problem_hidden' });
   });
 
   it('names a refusal by its issue, whatever the code around it', () => {

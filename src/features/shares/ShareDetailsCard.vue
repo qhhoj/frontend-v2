@@ -105,7 +105,9 @@ const restoreShare = () => run(() => restore.mutateAsync(props.share.code));
     </Notice>
     <ShareLinkBox v-if="share.viewer.isOwner" :code="share.code" />
     <Notice v-if="failureKey" tone="danger" inline>{{ $t(failureKey) }}</Notice>
-    <p class="m-0 text-meta text-muted">{{ $t('share.details.public') }}</p>
+    <p v-if="!share.hiddenReason && !isTakenDown" class="m-0 text-meta text-muted">
+      {{ $t('share.details.public') }}
+    </p>
     <div class="flex flex-wrap gap-2">
       <AppButton
         v-if="share.viewer.canReport"
