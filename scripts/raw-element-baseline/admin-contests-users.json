@@ -288,8 +288,7 @@
   "features/admin/users/RolesDialog.vue": {
     "AdminChip": 1,
     "button": 3,
-    "controls": 6,
-    "primevue": 1
+    "controls": 6
   },
   "features/admin/users/UserAccessSection.vue": {
     "button": 1
@@ -305,7 +304,6 @@
   "features/admin/users/UserCreateDialog.vue": {
     "button": 2,
     "controls": 4,
-    "primevue": 1,
     "radio": 1,
     "textarea": 1
   },

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Search } from 'lucide-vue-next';
-import Dialog from 'primevue/dialog';
 import { computed, nextTick, ref, useId, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import EmptyState from '@/components/EmptyState.vue';
+import Modal from '@/components/ui/Modal.vue';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import { useSessionStore } from '@/stores/session.store';
 import { INPUT } from '../../ui/controls';
@@ -67,11 +67,12 @@ function onKeydown(event: KeyboardEvent) {
     if (active) choose(active);
   }
 }
-/** Each opening starts from an empty box; the Dialog focuses it (`autofocus`) and later returns focus to the opener. */
-function onShow() {
+/** Each opening starts from an empty box; the Modal focuses it (`autofocus`) and later returns focus to the opener. */
+watch(visible, (isOpen) => {
+  if (!isOpen) return;
   text.commitNow('');
   activeKey.value = entries.value[0]?.key ?? null;
-}
+});
 /** Between a key and the debounced lookup the records are about to be asked for, not missing. */
 const isWaiting = computed(
   () => records.isSearching.value || text.value.trim() !== searchTerm.value,
@@ -89,17 +90,11 @@ const status = computed(() => {
 </script>
 
 <template>
-  <Dialog
+  <Modal
     v-model:visible="visible"
-    modal
-    dismissable-mask
-    position="top"
-    :header="$t('admin.shell.search.title')"
-    :draggable="false"
-    :style="{ width: '640px', maxWidth: 'calc(100vw - 2rem)' }"
-    :close-button-props="{ 'aria-label': $t('common.close') }"
+    :title="$t('admin.shell.search.title')"
+    size="md"
     data-testid="admin-palette"
-    @show="onShow"
   >
     <div class="flex flex-col gap-3">
       <div class="relative">
@@ -149,5 +144,5 @@ const status = computed(() => {
         {{ $t('admin.shell.search.keys') }}
       </p>
     </div>
-  </Dialog>
+  </Modal>
 </template>

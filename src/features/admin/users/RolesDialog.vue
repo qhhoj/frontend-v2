@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Dialog from 'primevue/dialog';
+import Modal from '@/components/ui/Modal.vue';
 import { computed, ref, useId } from 'vue';
 import type { Role } from '@/api/types/users-admin';
 import QueryState from '@/components/QueryState.vue';
@@ -23,18 +23,15 @@ const retry = () => Promise.all([rolesQuery.refetch(), catalogQuery.refetch()]);
 const permissionLabel = usePermissionLabel();
 const labelOf = (code: string) =>
   permissionLabel(code, catalogQuery.data.value?.find((entry) => entry.codename === code)?.label);
-/** The custom header slot loses PrimeVue's own label, so the dialog is named by its heading here. */
+/** The custom header slot has no title of the Modal's own, so the dialog is named by its heading here. */
 const titleId = useId();
 </script>
 
 <template>
-  <Dialog
+  <Modal
     v-model:visible="visible"
-    modal
-    :draggable="false"
     :style="{ width: '760px', maxWidth: 'calc(100vw - 2rem)' }"
-    :close-button-props="{ 'aria-label': $t('common.close') }"
-    :pt="{ root: { 'aria-labelledby': titleId } }"
+    :aria-labelledby="titleId"
   >
     <template #header>
       <h2 :id="titleId" class="font-display text-subtitle leading-7 font-semibold">
@@ -113,5 +110,5 @@ const titleId = useId();
         </ul>
       </div>
     </QueryState>
-  </Dialog>
+  </Modal>
 </template>
