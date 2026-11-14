@@ -48,7 +48,7 @@ describe('contest announcements', () => {
       'Thông báo mới: Làm rõ đề bài C',
     );
     expect(tabLink(wrapper).text()).toContain('1 chưa đọc');
-    expect(wrapper.get('aside').text()).toContain('Làm rõ đề bài C');
+    expect(wrapper.get('#main aside').text()).toContain('Làm rõ đề bài C');
   });
 
   it('refetches without announcing after a resync, and closes the stream when the page goes', async () => {

@@ -80,10 +80,13 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
     return text.value === label ? label : `${label} · ${text.value}`;
   });
 
-  // A finished grading can change the viewer's status on the problem and its solver count.
+  // A finished grading can change the viewer's status on the problem and its solver count, and the solved count of the
+  // contest it was sent in (the rail's live card reads the contest's problem list).
   watch(isFinished, (finished, before) => {
-    if (finished && before === false)
+    if (finished && before === false) {
       void queryClient.invalidateQueries({ queryKey: ['problems', 'detail'] });
+      void queryClient.invalidateQueries({ queryKey: ['contests', 'detail'] });
+    }
   });
 
   return {

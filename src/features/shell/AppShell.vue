@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAccountAppearanceSync } from '@/features/appearance/use-account-appearance';
 import BitRoamLayer from '@/features/bit-roam/BitRoamLayer.vue';
@@ -7,13 +7,16 @@ import ContestBar from '@/features/contests/bar/ContestBar.vue';
 import { useCurrentContest } from '@/features/contests/bar/use-current-contest';
 import { useAccountBitRoamSync } from '@/features/bit-roam/use-bit-roam-choice';
 import AppFooter from './AppFooter.vue';
-import AppHeader from './AppHeader.vue';
+import AppRail from './AppRail.vue';
 import ImpersonationBanner from './ImpersonationBanner.vue';
 import HighPriorityBanner from '@/features/notifications/HighPriorityBanner.vue';
 import LiveAnnouncementAlert from '@/features/contests/live/LiveAnnouncementAlert.vue';
 import OfficialModeBanner from '@/features/official-mode/OfficialModeBanner.vue';
 import SiteNoticeBanner from '@/features/site-notice/SiteNoticeBanner.vue';
 import LoadingLayer from './LoadingLayer.vue';
+import CommandPalette from './search/CommandPalette.vue';
+import TabBar from './TabBar.vue';
+import TopBar from './TopBar.vue';
 import { useAccountCacheSync } from './use-account-cache';
 import { useAccountThemeSync } from './use-account-theme';
 
@@ -25,17 +28,18 @@ useAccountThemeSync();
 useAccountAppearanceSync();
 useAccountBitRoamSync();
 const route = useRoute();
-/** While the viewer takes part in a contest, every public page carries its bar. */
+/** While the viewer takes part in a contest, every public page carries its bar (and the rail its card). */
 const { current: currentContest } = useCurrentContest(
   () => route.meta.layout !== 'admin' && route.meta.layout !== 'auth',
 );
+const isSearchOpen = ref(false);
 </script>
 
 <template>
   <!-- The ground is on <html> (with the page background, theme/backgrounds.css); `isolate` keeps the background's fixed layers below the content. -->
   <!-- `viewport-fit=cover` lets the page reach under the notch and home bar; the root keeps its content out of the insets. -->
   <div
-    class="relative isolate flex min-h-dvh flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] font-body text-content print:bg-white print:text-black"
+    class="app-shell relative isolate flex min-h-dvh flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] font-body text-content print:bg-white print:text-black"
   >
     <a
       href="#main"
@@ -47,20 +51,32 @@ const { current: currentContest } = useCurrentContest(
     <AdminShell v-if="route.meta.layout === 'admin'">
       <slot />
     </AdminShell>
-    <template v-else>
-      <template v-if="route.meta.layout !== 'auth'">
-        <AppHeader class="print:hidden" />
+    <main
+      v-else-if="route.meta.layout === 'auth'"
+      id="main"
+      tabindex="-1"
+      class="relative flex-1 focus-visible:outline-none"
+    >
+      <slot />
+    </main>
+    <!-- Workbench: the rail (from md) beside the page column; on a phone the top bar and the tab bar. The rail and the bars are opaque, so the page background shows behind the page column only. -->
+    <div v-else class="flex flex-1">
+      <AppRail :current="currentContest" @search="isSearchOpen = true" />
+      <div class="flex min-w-0 flex-1 flex-col">
+        <TopBar @search="isSearchOpen = true" />
         <ContestBar v-if="currentContest" :current="currentContest" />
         <LiveAnnouncementAlert class="print:hidden" />
         <SiteNoticeBanner class="print:hidden" />
         <OfficialModeBanner class="print:hidden" />
         <HighPriorityBanner class="print:hidden" />
-      </template>
-      <main id="main" tabindex="-1" class="relative flex-1 focus-visible:outline-none">
-        <slot />
-      </main>
-      <AppFooter v-if="route.meta.layout !== 'auth'" class="print:hidden" />
-    </template>
+        <main id="main" tabindex="-1" class="relative flex-1 focus-visible:outline-none">
+          <slot />
+        </main>
+        <AppFooter class="print:hidden" />
+      </div>
+      <TabBar />
+      <CommandPalette v-model:visible="isSearchOpen" />
+    </div>
     <LoadingLayer />
     <BitRoamLayer />
   </div>

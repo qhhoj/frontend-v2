@@ -1,7 +1,4 @@
 {
-  "features/shell/NavOverflowMenu.vue": {
-    "button": 1
-  },
   "features/shell/UserMenu.vue": {
     "primevue": 2
   }

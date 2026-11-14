@@ -29,8 +29,8 @@ export interface PaletteEntry {
   to: RouteLocationRaw;
 }
 
-/** Options carry DOM ids so the input can point at the active one (`aria-activedescendant`). */
-export const paletteOptionId = (listboxId: string, key: string) => `${listboxId}-${key}`;
+/** The listbox helpers live in `lib/palette-list.ts`, shared with the public site search. */
+export { paletteOptionId, steppedKey } from '@/lib/palette-list';
 
 /** A case-insensitive substring of the label (as the lists highlight it) or of the screen's path. */
 export const matchesText = (text: string, term: string): boolean =>
@@ -136,15 +136,3 @@ export const PALETTE_GROUPS: readonly PaletteGroupId[] = [
   'screens',
   ...RECORD_SOURCES.map((source) => source.group),
 ];
-
-/** The option after (`step` 1) or before (`step` -1) the active one, wrapping around; the first one when none is active. */
-export function steppedKey(
-  entries: readonly PaletteEntry[],
-  activeKey: string | null,
-  step: 1 | -1,
-): string | null {
-  if (entries.length === 0) return null;
-  const index = entries.findIndex((candidate) => candidate.key === activeKey);
-  if (index === -1) return entries[step === 1 ? 0 : entries.length - 1]!.key;
-  return entries[(index + step + entries.length) % entries.length]!.key;
-}

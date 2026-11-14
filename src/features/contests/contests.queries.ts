@@ -103,19 +103,29 @@ const keepBoardOfContest = (viewerId: string, contestKey: string) => {
       : undefined;
 };
 
+/** A reader that is not the ranking tab: it may stay off, and may re-read a running board less often. */
+interface RankingReader {
+  isEnabled?: MaybeRefOrGetter<boolean>;
+  pollMs?: number;
+}
+
 export const useRankingQuery = (
   key: MaybeRefOrGetter<string>,
   withVirtual: Ref<boolean>,
   running: Ref<boolean>,
+  { isEnabled = true, pollMs }: RankingReader = {},
 ) => {
   const viewerId = useViewerId();
   const isLowPower = useLowPowerPainted();
   return useQuery({
+    enabled: () => toValue(isEnabled),
     queryKey: computed(() => rankingKey(viewerId.value, toValue(key), withVirtual.value)),
     queryFn: () => fetchRanking(toValue(key), withVirtual.value),
     /** Switching the virtual toggle keeps the old board on screen (never another contest's or viewer's). */
     placeholderData: computed(() => keepBoardOfContest(viewerId.value, toValue(key))),
-    refetchInterval: computed(() => (running.value ? rankingPollMs(isLowPower.value) : false)),
+    refetchInterval: computed(() =>
+      running.value ? (pollMs ?? rankingPollMs(isLowPower.value)) : false,
+    ),
     /** A hidden tab does not poll; it refetches when it becomes visible again. */
     refetchIntervalInBackground: false,
   });

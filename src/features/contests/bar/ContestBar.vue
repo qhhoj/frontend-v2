@@ -75,11 +75,14 @@ const LINK = [
     ref="root"
     data-testid="contest-bar"
     :class="[
-      'z-header border-b border-line bg-accent-soft print:hidden',
+      'z-header border-b border-line bg-surface-solid print:hidden',
       !session.impersonatorId && 'sticky top-0',
     ]"
   >
-    <div class="page-gutter flex h-10 items-center gap-2 touch:h-11 md:h-12 md:gap-3">
+    <!-- The tint sits on an opaque surface: the page background stays behind main only. -->
+    <div
+      class="page-gutter flex h-10 items-center gap-2 bg-accent-soft touch:h-11 md:h-12 md:gap-3"
+    >
       <RouterLink
         :to="{ name: 'contest', params: { key: contestKey } }"
         :class="[

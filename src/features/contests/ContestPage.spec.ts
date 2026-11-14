@@ -211,7 +211,7 @@ describe('contest page rules card', () => {
   it('shows the "Quy định" card in the aside only for a contest with rules', async () => {
     mockApi({ ...anonymousViewer, ...contestPageRoutes(ruled()) });
     const { wrapper } = await mountApp('/contests/r42');
-    expect(wrapper.get('aside [data-testid="join-rules-card"]').text()).toContain('bản 2');
+    expect(wrapper.get('#main aside [data-testid="join-rules-card"]').text()).toContain('bản 2');
     wrapper.unmount();
     mockApi({ ...anonymousViewer, ...contestPageRoutes(contestDetail()) });
     const second = await mountApp('/contests/r42');
@@ -236,7 +236,7 @@ describe('contest page while it runs', () => {
   const ruled = (phase: 'running' | 'upcoming') =>
     contestDetail({ phase, rules: RULES_MARKDOWN, rulesHtml: RULES_HTML, rulesRevision: 2 });
   const asideHeadings = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
-    wrapper.findAll('aside h2').map((heading) => heading.text());
+    wrapper.findAll('#main aside h2').map((heading) => heading.text());
   afterEach(() => vi.useRealTimers());
 
   it('hides the comments and puts the announcements first', async () => {
@@ -275,7 +275,7 @@ describe('contest page while it runs', () => {
     mockApi({ ...anonymousViewer, ...contestPageRoutes(ruled('upcoming')) });
     const { wrapper } = await mountApp('/contests/r42');
     await vi.waitFor(() => expect(wrapper.find('#comments-heading').exists()).toBe(true));
-    expect(wrapper.get('aside').element.firstElementChild!.getAttribute('data-testid')).toBe(
+    expect(wrapper.get('#main aside').element.firstElementChild!.getAttribute('data-testid')).toBe(
       'join-rules-card',
     );
     expect(asideHeadings(wrapper).at(-1)).toBe('Thông báo');
