@@ -52,6 +52,7 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   pages: () => import('./pages/FlatpagesPage.vue'),
   log: () => import('./settings/AdminLogPage.vue'),
   shortLinks: () => import('./short-links/ShortLinksPage.vue'),
+  shareReports: () => import('./shares/ShareReportsPage.vue'),
   integrations: () => import('./integrations/IntegrationClientsPage.vue'),
   problemsDeleted: () => import('./problems/lifecycle/DeletedProblemsPage.vue'),
   organizationQuotas: () => import('./organizations/quotas/QuotaOverviewPage.vue'),

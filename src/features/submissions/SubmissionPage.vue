@@ -175,6 +175,7 @@ const hasResultSummary = computed(() => {
             :is-live="isLive"
             :can-resubmit="canResubmit"
             :contest-score="contestScore"
+            :share-id="row.viewer.canShare ? row.id : null"
           >
             <SubmissionStaffPanel :key="row.id" :submission="row" />
           </SubmissionHero>

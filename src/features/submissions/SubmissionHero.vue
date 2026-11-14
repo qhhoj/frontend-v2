@@ -17,6 +17,7 @@ import { PARTIAL_CODE, verdictOfCode, type Verdict } from '@/lib/verdicts';
 import { BIT_MOODS } from '@/mascot/bit-moods';
 import { verdictBitMood } from '@/mascot/verdict-bit';
 import { useLocaleStore } from '@/stores/locale.store';
+import ShareButton from '@/features/shares/ShareButton.vue';
 import { heroParts } from './hero-line';
 import VerdictRing from './VerdictRing.vue';
 
@@ -42,6 +43,8 @@ const props = defineProps<{
   canResubmit: boolean;
   /** A judged contest submission: the contest points lead, the problem's score moves to the line below. */
   contestScore?: { points: string; max: string } | null;
+  /** The submission's id when the viewer may share it (`viewer.canShare`): adds "Chia sẻ" to the actions. */
+  shareId?: string | null;
 }>();
 const locale = useLocaleStore();
 const format = (points: number) =>
@@ -179,8 +182,9 @@ const problem = computed(() => {
         :closed-eyes="bit.eyesShut"
         class="ml-auto [--bit-px:4px] @2xl:[--bit-px:6px]"
       />
-      <div v-if="problem" class="order-2 flex w-full flex-wrap gap-2 @xl:order-none">
+      <div v-if="problem || shareId" class="order-2 flex w-full flex-wrap gap-2 @xl:order-none">
         <AppButton
+          v-if="problem"
           :tone="canResubmit ? 'secondary' : 'primary'"
           :to="{ name: 'problem', params: { code: problem } }"
         >
@@ -194,6 +198,7 @@ const problem = computed(() => {
           <template #icon><Send aria-hidden="true" class="size-4" /></template>
           {{ $t('submission.actions.resubmit') }}
         </AppButton>
+        <ShareButton v-if="shareId" :submission-id="shareId" />
       </div>
     </div>
     <slot />

@@ -84,7 +84,8 @@
     "cannedReplies": "Ticket reply templates",
     "polygonImport": "Import from Polygon",
     "problemExternal": "Edit problem: external judge",
-    "commentLocks": "Locked comment pages"
+    "commentLocks": "Locked comment pages",
+    "shareReports": "Link reports"
   },
   "waiting": "waiting",
   "queued": "in the judge queue",

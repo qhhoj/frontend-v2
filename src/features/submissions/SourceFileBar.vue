@@ -10,7 +10,10 @@ import { sourceLineCount } from '@/lib/source';
 
 /** The file under the code (kept when the code is folded): its name, language, size and the three things to do with the file. */
 const props = defineProps<{
-  id: string;
+  /** The submission whose source this is; a share passes `base` instead. */
+  id?: string;
+  /** The API path that has `/raw` and `/download` under it, for a file that is not a submission's source (a share). */
+  base?: string;
   filename: string | null;
   languageKey: string | null;
   languageName: string | null;
@@ -21,7 +24,9 @@ const bytes = computed(() => new TextEncoder().encode(props.text).length);
 const sizeText = computed(() =>
   bytes.value < 1024 ? `${bytes.value} B` : formatFileSize(bytes.value),
 );
-const base = computed(() => `${API_BASE}/submissions/${encodeURIComponent(props.id)}/source`);
+const fileBase = computed(
+  () => props.base ?? `${API_BASE}/submissions/${encodeURIComponent(props.id ?? '')}/source`,
+);
 </script>
 
 <template>
@@ -41,7 +46,7 @@ const base = computed(() => `${API_BASE}/submissions/${encodeURIComponent(props.
     <template v-if="filename">
       <AppButton
         data-testid="source-raw"
-        :href="`${base}/raw`"
+        :href="`${fileBase}/raw`"
         target="_blank"
         rel="noopener"
         :aria-label="$t('submission.source.raw')"
@@ -52,7 +57,7 @@ const base = computed(() => `${API_BASE}/submissions/${encodeURIComponent(props.
       </AppButton>
       <AppButton
         data-testid="source-download"
-        :href="`${base}/download`"
+        :href="`${fileBase}/download`"
         :download="filename"
         :aria-label="$t('submission.source.download')"
       >
