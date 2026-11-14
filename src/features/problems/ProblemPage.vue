@@ -24,11 +24,24 @@ const code = computed(() => String(route.params.code));
 const { data: problem, isPending, error, refetch } = useProblemQuery(code, toRef(locale, 'locale'));
 
 /** The viewer's current participation holds this problem: the page gains the contest's problem rail. */
-const contestKey = computed(() => problem.value?.contest?.contestKey ?? null);
-/** Two columns only once the rail has its rows; while the contest loads or fails the statement keeps the full width. */
-const { contest, entries: railEntries } = useProblemRail(contestKey, () => code.value);
-/** A problem solved inside the viewer's contest belongs to "Kỳ thi" in the nav. */
-useNavSection(() => (contestKey.value ? '/contests' : null));
+const liveContestKey = computed(() => problem.value?.contest?.contestKey ?? null);
+/** `?contest=` names the ended contest the reader came from; a live participation wins over it. */
+const queriedContestKey = computed(() =>
+  typeof route.query.contest === 'string' && route.query.contest ? route.query.contest : null,
+);
+const contestKey = computed(() => liveContestKey.value ?? queriedContestKey.value);
+const { contest: loadedContest, entries: railEntries } = useProblemRail(
+  contestKey,
+  () => code.value,
+);
+/** A queried contest gives context only once it has ended; a running one is reached through a participation. */
+const contest = computed(() =>
+  liveContestKey.value || loadedContest.value?.phase === 'ended' ? loadedContest.value : null,
+);
+/** The ended-contest context: the rail is shown for reading, and submitting stays a practice submission. */
+const isReadOnlyContest = computed(() => liveContestKey.value === null);
+/** A problem of a contest (live or opened from an ended one) belongs to "Kỳ thi" in the nav. */
+useNavSection(() => (contest.value && railEntries.value ? '/contests' : null));
 
 const isNotFound = computed(
   () => error.value instanceof ApiError && error.value.code === 'not_found',
@@ -89,6 +102,7 @@ watch(
       :contest-key="contestKey"
       :contest-name="contest.name"
       :entries="railEntries"
+      :carries-contest="isReadOnlyContest"
     />
     <div class="flex min-w-0 flex-col gap-5">
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
@@ -106,6 +120,7 @@ watch(
           :tabs="tabs"
           :layout="layout"
           :contest="contest && railEntries ? contest : null"
+          :contest-is-live="!isReadOnlyContest"
           @gone="editorialGone = true"
         />
       </QueryState>

@@ -21,6 +21,7 @@ const pointsOf = (problem: ContestProblem) =>
 const problemLink = (problem: ContestProblem) => ({
   name: 'problem',
   params: { code: problem.code },
+  query: { contest: props.contest.key },
 });
 /** Why the statements are not listed yet, per phase. */
 const HIDDEN_KEYS: Record<ContestPhase, string> = {

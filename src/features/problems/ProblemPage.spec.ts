@@ -297,6 +297,30 @@ describe('problem page inside a contest', () => {
     );
   });
 
+  it('keeps the ended contest from ?contest= as a read-only rail with the contest points', async () => {
+    const ended = contestDetail({
+      phase: 'ended',
+      problems: [contestProblem(0), contestProblem(1, { points: 250 })],
+    });
+    mockApi({
+      ...signedInViewer(),
+      ...problemPageRoutes(problemDetail({ code: 'r42b' })),
+      'GET /contests/r42': ok(ended),
+    });
+    const { wrapper } = await openProblem('/problems/r42b?contest=r42');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="problem-switcher"]').exists()).toBe(true),
+    );
+    const links = wrapper.findAll('[data-testid="problem-switcher"] ul a');
+    expect(links.map((link) => link.attributes('href'))).toEqual([
+      expect.stringContaining('?contest=r42'),
+      expect.stringContaining('?contest=r42'),
+    ]);
+    expect(wrapper.get('header nav[aria-label] [aria-current="page"]').text()).toBe('Kỳ thi');
+    expect(wrapper.get('[data-testid="problem-facts"]').text()).toContain('Điểm kỳ thi250');
+    expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(false);
+  });
+
   it('has no rail outside a contest and asks for no contest', async () => {
     const calls = mockApi({ ...anonymousViewer, ...problemPageRoutes() });
     const { wrapper } = await openProblem();

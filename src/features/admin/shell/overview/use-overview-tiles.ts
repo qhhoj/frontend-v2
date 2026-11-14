@@ -21,6 +21,7 @@ import { useFrozenTileOrder } from './use-frozen-tile-order';
 /** Who sees the queue and judge figures: the staff who can act on judging. */
 export const JUDGING_STAFF = ['judge.change_judge', 'judge.rejudge_submission'];
 const LABEL = 'admin.shell.overview';
+const AWAITING_QUEUE = { scope: 'all', open: '1', awaiting: '1' };
 const ABOUT_MINE_QUEUE = { scope: 'all', open: '1', about: 'mine' };
 
 /**
@@ -93,7 +94,7 @@ function useQueueTiles(counts: AdminCounts) {
       ? [
           {
             ...waiting('tickets', LifeBuoy, counts.awaitingTickets.value),
-            to: { name: adminRouteName('tickets') },
+            to: { name: adminRouteName('tickets'), query: AWAITING_QUEUE },
           },
         ]
       : []),

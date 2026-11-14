@@ -5,7 +5,18 @@ import type { SwitcherEntry, SwitcherStatus } from './problem-switcher';
  * The contest's problems beside the statement, while the viewer's participation holds this one. The page decides when
  * it is ready (`useProblemRail`). Below `lg` the contest bar above already names the contest: the strip is the chips alone.
  */
-defineProps<{ contestKey: string; contestName: string; entries: SwitcherEntry[] }>();
+const props = defineProps<{
+  contestKey: string;
+  contestName: string;
+  entries: SwitcherEntry[];
+  /** An ended contest opened from `?contest=`: its links carry the key so the context follows the reader. */
+  carriesContest?: boolean;
+}>();
+const problemLink = (code: string) => ({
+  name: 'problem',
+  params: { code },
+  query: props.carriesContest ? { contest: props.contestKey } : {},
+});
 const STATUS_CLASSES: Record<SwitcherStatus, string> = {
   solved: 'text-verdict-ac',
   tried: 'text-verdict-wa',
@@ -30,7 +41,7 @@ const LINK =
     <ul class="m-0 flex list-none gap-1 overflow-x-auto p-0 lg:flex-col lg:overflow-visible">
       <li v-for="entry in entries" :key="entry.code" class="shrink-0">
         <RouterLink
-          :to="{ name: 'problem', params: { code: entry.code } }"
+          :to="problemLink(entry.code)"
           :aria-current="entry.isCurrent ? 'page' : undefined"
           :class="LINK"
         >

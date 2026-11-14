@@ -371,6 +371,11 @@
       "body": "Bạn đang thi ảo {other} (còn {left}). Vào kỳ thi này sẽ {ends}; kết quả đã nộp vẫn được giữ.",
       "ends": "kết thúc lượt thi ảo",
       "stay": "Ở lại lượt ảo"
+    },
+    "startNow": {
+      "title": "Bắt đầu ngay?",
+      "body": "Đồng hồ {span} chạy từ lúc bạn bấm và không dừng lại được.",
+      "wait": "Chưa bắt đầu"
     }
   },
   "placeholder": {

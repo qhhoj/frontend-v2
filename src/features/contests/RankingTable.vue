@@ -22,6 +22,7 @@ import RankingCell from './RankingCell.vue';
 import RankingProblemHeader from './RankingProblemHeader.vue';
 import {
   PROBLEM_COLUMN_REM,
+  phoneMinWidthRem,
   RANK_COLUMN_REM,
   RATING_COLUMN_REM,
   SCORE_COLUMN_REM,
@@ -41,8 +42,8 @@ const props = defineProps<{
 }>();
 /** Rank and name stay while the problem columns scroll (the rank column is `RANK_COLUMN_REM` = 5 rem = `left-20`). */
 const RANK_STICKY = 'sticky left-0 z-10 bg-surface-solid';
-/** On a phone only the rank stays: rank + name would leave about 50 px of room for the scores. */
-const NAME_STICKY = 'sm:sticky sm:left-20 sm:z-10 sm:bg-surface-solid';
+/** Name sticks next to the rank at every width; below `sm` the score is printed under it and the score column is hidden. */
+const NAME_STICKY = 'sticky left-20 z-10 bg-surface-solid';
 /** The viewer's row keeps its tint over the opaque sticky cells. */
 const stickyBackground = (row: RankingRow) =>
   row.user.id === props.viewerId ? 'bg-linear-to-b from-surface-hover to-surface-hover' : '';
@@ -88,10 +89,19 @@ const hasCombinedScore = computed(
 const hasTimeColumn = computed(() => penalty.value && showsCumtime(props.context.formatName));
 /** Rated contests carry each row's rating change once the ratings are applied. */
 const hasRatingColumn = computed(() => props.ranking.rows.some((row) => row.ratingChange));
-const minWidth = computed(
-  () =>
-    `${tableMinWidthRem(props.ranking.problems.length, hasTimeColumn.value) + (hasRatingColumn.value ? RATING_COLUMN_REM : 0)}rem`,
-);
+const ratingRem = computed(() => (hasRatingColumn.value ? RATING_COLUMN_REM : 0));
+/** Table min-widths as CSS variables: the phone one has no score column and a capped name column. */
+const widthVars = computed(() => ({
+  '--board-min': `${tableMinWidthRem(props.ranking.problems.length, hasTimeColumn.value) + ratingRem.value}rem`,
+  '--board-min-phone': `${phoneMinWidthRem(props.ranking.problems.length) + ratingRem.value}rem`,
+}));
+/** The phone's line under the name: the score, and the penalty where the board has its own penalty column. */
+const phoneScoreText = (row: RankingRow) => {
+  if (row.isDisqualified) return '—';
+  const score = totalScoreText(row.score, props.ranking.problems, props.context);
+  if (!hasTimeColumn.value) return score;
+  return `${score} · ${formatCumtime(props.context.formatName, row.cumtime, props.context.locale)}`;
+};
 const scoreHeaderKey = computed(() =>
   hasCombinedScore.value ? 'ranking.columns.scoreTime' : 'ranking.columns.score',
 );
@@ -100,12 +110,19 @@ const scoreHeaderKey = computed(() =>
 <template>
   <div ref="root" class="contents">
     <ScrollRegion :label="$t('ranking.scrollRegion')" :hint="$t('ranking.scrollHint')">
-      <table class="w-full table-fixed border-collapse" :style="{ minWidth }">
+      <table
+        class="w-full min-w-(--board-min-phone) table-fixed border-collapse sm:min-w-(--board-min)"
+        :style="widthVars"
+      >
         <colgroup>
           <col :style="{ width: `${RANK_COLUMN_REM}rem` }" />
           <col />
-          <col :style="{ width: `${SCORE_COLUMN_REM}rem` }" />
-          <col v-if="hasTimeColumn" :style="{ width: `${TIME_COLUMN_REM}rem` }" />
+          <col class="max-sm:hidden" :style="{ width: `${SCORE_COLUMN_REM}rem` }" />
+          <col
+            v-if="hasTimeColumn"
+            class="max-sm:hidden"
+            :style="{ width: `${TIME_COLUMN_REM}rem` }"
+          />
           <col v-if="hasRatingColumn" :style="{ width: `${RATING_COLUMN_REM}rem` }" />
           <col
             v-for="problem in ranking.problems"
@@ -126,10 +143,10 @@ const scoreHeaderKey = computed(() =>
             <th scope="col" :class="[NAME_STICKY, 'px-2.5 py-4 text-left font-medium']">
               {{ $t('ranking.columns.user') }}
             </th>
-            <th scope="col" class="px-2.5 py-4 font-medium">
+            <th scope="col" class="px-2.5 py-4 font-medium max-sm:hidden">
               {{ $t(scoreHeaderKey) }}
             </th>
-            <th v-if="hasTimeColumn" scope="col" class="px-2.5 py-4 font-medium">
+            <th v-if="hasTimeColumn" scope="col" class="px-2.5 py-4 font-medium max-sm:hidden">
               {{ $t('ranking.columns.penalty') }}
             </th>
             <th v-if="hasRatingColumn" scope="col" class="px-2.5 py-4 font-medium">
@@ -141,7 +158,7 @@ const scoreHeaderKey = computed(() =>
               scope="col"
               class="px-1.5 py-4 font-bold text-content"
             >
-              <RankingProblemHeader :problem="problem" />
+              <RankingProblemHeader :problem="problem" :contest-key="contestKey" />
             </th>
           </tr>
         </thead>
@@ -181,8 +198,11 @@ const scoreHeaderKey = computed(() =>
                   $t('ranking.disqualified')
                 }}</Chip>
               </span>
+              <span class="mt-0.5 block font-mono text-sm font-bold tabular-nums sm:hidden">{{
+                phoneScoreText(row)
+              }}</span>
             </th>
-            <td class="font-bold">
+            <td class="font-bold max-sm:hidden">
               <template v-if="row.isDisqualified">—</template>
               <template v-else>{{ totalScoreText(row.score, ranking.problems, context) }}</template>
               <small
@@ -191,7 +211,7 @@ const scoreHeaderKey = computed(() =>
                 >{{ formatCumtime(context.formatName, row.cumtime, context.locale) }}</small
               >
             </td>
-            <td v-if="hasTimeColumn">
+            <td v-if="hasTimeColumn" class="max-sm:hidden">
               {{
                 row.isDisqualified
                   ? '—'
