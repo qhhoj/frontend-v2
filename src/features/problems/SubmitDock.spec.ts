@@ -43,6 +43,7 @@ const pickLanguage = async (name: string) => {
 };
 
 beforeEach(() => {
+  localStorage.clear(); // a language picked in one test is remembered for the next
   vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 });
 
@@ -135,8 +136,9 @@ describe('another problem', () => {
     await vi.waitFor(() => expect(wrapper.get('#main h1').text()).toBe('Đường đi ngắn nhất'));
     await flushPromises();
     await openDock(wrapper);
-    expect(dockOf(wrapper).get('textarea').element.value).toContain('int main');
-    expect(dockOf(wrapper).text()).toContain('C++17');
+    // The code starts fresh; the language is the one the viewer picked last, remembered in this browser.
+    expect(dockOf(wrapper).get('textarea').element.value).toBe('print()\n');
+    expect(dockOf(wrapper).text()).toContain('Python 3');
   });
 });
 

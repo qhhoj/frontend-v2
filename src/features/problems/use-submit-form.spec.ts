@@ -22,6 +22,7 @@ import type { Profile } from '@/api/types/profile';
 import type { ProblemDetail } from '@/api/types/problems';
 import { MAX_SOURCE_LENGTH } from '@/lib/source';
 import { useSubmitForm } from './use-submit-form';
+import { LANGUAGE_STORAGE_KEY } from './use-submit-language';
 
 const { profileData } = await vi.hoisted(async () => {
   const { ref: createRef } = await import('vue');
@@ -83,6 +84,16 @@ describe('language default and templates', () => {
     profileData.value = profile({ languageId: PY3_ID });
     await flushPromises();
     expect(picked.form.languageId.value).toBe(CPP17_ID);
+  });
+  it('remembers the last pick in this browser, ahead of the account language, and ignores one the problem does not allow', () => {
+    localStorage.clear();
+    profileData.value = profile({ languageId: CPP17_ID });
+    mountForm().form.setLanguage(PY3_ID);
+    expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe(PY3_ID);
+    expect(mountForm().form.languageId.value).toBe(PY3_ID);
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, 'not-allowed-here');
+    expect(mountForm().form.languageId.value).toBe(CPP17_ID);
+    localStorage.clear();
   });
   it('ignores an account language the problem does not allow', async () => {
     profileData.value = profile({ languageId: 'not-allowed-here' });

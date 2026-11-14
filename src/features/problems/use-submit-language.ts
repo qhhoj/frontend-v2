@@ -3,15 +3,19 @@ import type { Ref } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import { useProfileQuery } from '@/features/account/profile.queries';
 import { uploadCapBytes } from '@/lib/source';
+import { readStorage, writeStorage } from '@/lib/storage';
+
+export const LANGUAGE_STORAGE_KEY = 'qhhoj.submit.language';
 
 /**
- * Which allowed language is selected: the viewer's pick, else the account's language (whenever the profile loads),
- * else the first text language. A file-only language is never a default, only a pick. A pick the problem does not
- * allow (the problem changed under the form) counts as no pick. `onSwitch` runs when a pick changes the language.
+ * Which allowed language is selected: the viewer's pick, else the language they picked last (remembered in this
+ * browser), else the account's language (whenever the profile loads), else the first text language. A file-only language is never a default, only a pick. A pick or a remembered language the
+ * problem does not allow counts as none. `onSwitch` runs when a pick changes the language.
  */
 export function useSubmitLanguage(problem: Ref<ProblemDetail>, onSwitch: () => void) {
   const { data: profile } = useProfileQuery();
   const pickedLanguageId = ref<string | null>(null);
+  const rememberedLanguageId = readStorage(LANGUAGE_STORAGE_KEY);
   const textLanguages = computed(() =>
     problem.value.allowedLanguages.filter((candidate) => !candidate.fileOnly),
   );
@@ -20,6 +24,7 @@ export function useSubmitLanguage(problem: Ref<ProblemDetail>, onSwitch: () => v
   const languageId = computed(
     () =>
       (isAllowed(pickedLanguageId.value) ? pickedLanguageId.value : null) ??
+      textLanguages.value.find((candidate) => candidate.id === rememberedLanguageId)?.id ??
       textLanguages.value.find((candidate) => candidate.id === profile.value?.languageId)?.id ??
       textLanguages.value[0]?.id ??
       null,
@@ -39,9 +44,11 @@ export function useSubmitLanguage(problem: Ref<ProblemDetail>, onSwitch: () => v
   );
   const isPicked = computed(() => isAllowed(pickedLanguageId.value));
 
-  function setLanguage(id: string) {
+  /** `remember` is false for a language that came with a resubmit, which is not the viewer's own choice. */
+  function setLanguage(id: string, remember = true) {
     const isSwitch = id !== languageId.value;
     pickedLanguageId.value = id; // also when equal to the default: a pick must outlive a late profile
+    if (remember) writeStorage(LANGUAGE_STORAGE_KEY, id);
     if (isSwitch) onSwitch();
   }
   /** Freezes the language as it is now, so a profile arriving later cannot change it under the viewer's code. */

@@ -6,7 +6,7 @@ import { useViewerId } from '@/stores/use-viewer-id';
 import { useSubmissionQuery } from './submissions.queries';
 
 /** Test-case events come in bursts; the row is read once after the burst. */
-const ROW_REFETCH_DEBOUNCE_MS = 400;
+const ROW_REFETCH_DEBOUNCE_MS = 250;
 /** A judge faster than the debounce would otherwise never let the rows move until the end. */
 const ROW_REFETCH_MAX_WAIT_MS = 2000;
 

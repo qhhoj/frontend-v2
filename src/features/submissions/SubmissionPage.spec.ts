@@ -46,7 +46,7 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers());
 
 describe('submission page', () => {
-  it('refetches the row once, 400 ms after a burst of test-case events, and shows the new rows', async () => {
+  it('refetches the row once, 250 ms after a burst of test-case events, and shows the new rows', async () => {
     const calls = mockApi({
       ...signedInViewer(),
       ...problemPageRoutes(),
@@ -68,7 +68,7 @@ describe('submission page', () => {
         status: 'G',
         currentTestcase: testcase,
       });
-    await vi.advanceTimersByTimeAsync(399);
+    await vi.advanceTimersByTimeAsync(249);
     expect(detailCalls(calls)).toHaveLength(1);
     await vi.advanceTimersByTimeAsync(1);
     await flushPromises();

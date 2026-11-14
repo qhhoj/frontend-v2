@@ -82,7 +82,7 @@ export function useSubmitForm(
   // never replaces it, whichever line comes first.
   function prefill(earlier: ResubmitPrefill) {
     source.value = earlier.source;
-    if (earlier.languageId) setLanguage(earlier.languageId);
+    if (earlier.languageId) setLanguage(earlier.languageId, false);
   }
   const { resubmitUnavailable } = useResubmitPrefill(resubmitId, prefill);
   watch(source, () => (resubmitUnavailable.value = false));
