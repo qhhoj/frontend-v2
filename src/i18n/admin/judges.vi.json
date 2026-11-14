@@ -101,7 +101,8 @@
       "contest": "Kỳ thi",
       "normal": "Thường",
       "rejudge": "Chấm lại",
-      "batch": "Chấm lại hàng loạt"
+      "batch": "Chấm lại hàng loạt",
+      "backlog": "Hàng chờ cuối"
     },
     "alerts": {
       "noJudge": "{count} bài nộp {subject} đang chờ nhưng không máy chấm trực tuyến nào chạy được ngôn ngữ này.",

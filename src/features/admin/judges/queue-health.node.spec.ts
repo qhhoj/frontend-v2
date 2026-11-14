@@ -14,6 +14,8 @@ const queue = (overrides: Partial<JudgeQueue> = {}): JudgeQueue => ({
   ...overrides,
 });
 
+const waitingSince = (ms: number) => new Date(NOW - ms).toISOString();
+
 describe('queueAlerts', () => {
   it('flags a queued language with no usable online judge, and only that one', () => {
     const alerts = queueAlerts(
@@ -31,7 +33,7 @@ describe('queueAlerts', () => {
   it('flags rows pinned to an offline judge and a wait past the stale limit', () => {
     const alerts = queueAlerts(
       queue({
-        oldestQueuedSince: new Date(NOW - STALE_WAIT_MS - 1).toISOString(),
+        byPriority: [{ priority: 1, count: 3, oldestSince: waitingSince(STALE_WAIT_MS + 1) }],
         pinned: [
           { judge: 'alpha', count: 4, online: false },
           { judge: 'beta', count: 1, online: true },
@@ -41,6 +43,19 @@ describe('queueAlerts', () => {
     );
     expect(alerts.map((alert) => alert.kind)).toEqual(['pinnedOffline', 'stale']);
     expect(alerts[0]).toMatchObject({ subject: 'alpha', count: 4 });
+  });
+
+  it('does not call a queue stuck because only backlog rows are old', () => {
+    const alerts = queueAlerts(
+      queue({
+        byPriority: [
+          { priority: 1, count: 1, oldestSince: waitingSince(1000) },
+          { priority: 4, count: 9, oldestSince: waitingSince(STALE_WAIT_MS * 10) },
+        ],
+      }),
+      NOW,
+    );
+    expect(alerts).toEqual([]);
   });
 
   it('is quiet for an empty queue', () => {

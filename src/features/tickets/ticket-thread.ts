@@ -21,7 +21,7 @@ const TYPE_KEYS: Readonly<Record<TicketTimelineType, string>> = {
   'unmarked-good': 'unmarkedGood',
 };
 
-/** "Đóng góp tốt" rows are staff-only; the backend sends them to everyone. */
+/** "Đóng góp tốt" rows are staff-only; the backend already omits them for readers who may not mark good, this guards the view. */
 const isShown = (entry: TicketTimelineEntry, canSeeGood: boolean) =>
   canSeeGood || entry.event === null || !GOOD_TYPES.includes(entry.event.type);
 

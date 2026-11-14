@@ -1,6 +1,7 @@
 /** Every refusal the backend names for register, join and leave (participation-refusals.ts). Each one has its own `errors.<code>` text. */
 export const PARTICIPATION_REFUSALS = [
   'editor_cannot_register',
+  'not_invited',
   'banned_from_contest',
   'registration_not_required',
   'registration_closed',
