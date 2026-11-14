@@ -1,5 +1,5 @@
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
-import { Compartment, EditorState, type Extension } from '@codemirror/state';
+import { Compartment, EditorState, Prec, type Extension } from '@codemirror/state';
 import { EditorView, drawSelection, keymap, lineNumbers } from '@codemirror/view';
 import { syntaxHighlight } from './code-syntax';
 
@@ -10,6 +10,8 @@ export interface EditorOptions {
   /** Carried over from the fallback textarea so the caret does not move when the editor takes over. */
   selection?: { anchor: number; head: number };
   onChange(doc: string): void;
+  /** Ctrl/Cmd+Enter. Without it the key keeps CodeMirror's default (a blank line below). */
+  onSubmit?: () => void;
 }
 
 export interface EditorHandle {
@@ -42,6 +44,20 @@ const tokenTheme = EditorView.theme({
     { backgroundColor: 'var(--qh-accent-soft)' },
 });
 
+function submitKeymap(onSubmit: EditorOptions['onSubmit']) {
+  return onSubmit
+    ? [
+        {
+          key: 'Mod-Enter',
+          run: () => {
+            onSubmit();
+            return true;
+          },
+        },
+      ]
+    : [];
+}
+
 /** Tab is deliberately not bound (only the default and history keymaps): binding it would trap keyboard users. */
 export function createEditor(host: HTMLElement, options: EditorOptions): EditorHandle {
   const editable = new Compartment();
@@ -55,6 +71,8 @@ export function createEditor(host: HTMLElement, options: EditorOptions): EditorH
         lineNumbers(),
         drawSelection(),
         history(),
+        // Ahead of the default keymap, which binds Mod-Enter to "insert blank line".
+        Prec.highest(keymap.of(submitKeymap(options.onSubmit))),
         keymap.of([...defaultKeymap, ...historyKeymap]),
         tokenTheme,
         syntaxHighlight,

@@ -67,7 +67,7 @@ function onPanelEscape(event: KeyboardEvent) {
         <template #actions>
           <IconButton
             :label="$t('submit.exitFullscreen')"
-            tone="secondary"
+            tone="ghost"
             @click="wantsFullscreen = false"
           >
             <Minimize2 class="size-5" aria-hidden="true" />
@@ -97,13 +97,12 @@ function onPanelEscape(event: KeyboardEvent) {
             <IconButton
               :id="FULLSCREEN_TOGGLE_ID"
               :label="$t('submit.fullscreen')"
-              tone="secondary"
-              class="mr-2"
+              tone="ghost"
               @click="wantsFullscreen = true"
             >
               <Maximize2 class="size-5" aria-hidden="true" />
             </IconButton>
-            <IconButton :label="$t('submit.close')" tone="secondary" @click="closeDock">
+            <IconButton :label="$t('submit.close')" tone="ghost" @click="closeDock">
               <X class="size-5" aria-hidden="true" />
             </IconButton>
           </div>

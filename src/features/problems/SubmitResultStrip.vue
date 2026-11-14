@@ -7,7 +7,8 @@ import type { SubmitResult } from './use-submit-result';
  * The strip on top of the submit form (dock, sheet, full screen): a small ring with the verdict, the score and the failing test, and a link to
  * the full result. Screen readers hear the final result once, not every test.
  */
-const props = defineProps<{ result: SubmitResult; submissionId: string }>();
+/** `submissionId` is `null` while the request is on its way: the strip shows a "sending" state at once. */
+const props = defineProps<{ result: SubmitResult; submissionId: string | null }>();
 const result = reactive(props.result);
 </script>
 
@@ -21,13 +22,14 @@ const result = reactive(props.result);
       :progress="result.progress"
       :verdict="result.verdict"
       :share="result.partialShare"
-      :is-empty="result.isEmpty"
+      :is-empty="submissionId === null || result.isEmpty"
     />
     <p aria-hidden="true" class="min-w-0 flex-1 truncate font-mono text-sm tabular-nums">
-      {{ result.text }}
+      {{ submissionId === null ? $t('submit.submitting') : result.text }}
     </p>
-    <p role="status" class="sr-only">{{ result.announcement }}</p>
+    <p role="status" class="sr-only">{{ submissionId === null ? '' : result.announcement }}</p>
     <RouterLink
+      v-if="submissionId !== null"
       :to="{ name: 'submission', params: { id: submissionId } }"
       data-testid="submit-result-link"
       class="inline-flex min-h-11 shrink-0 items-center text-sm font-semibold text-accent-text underline"

@@ -20,6 +20,8 @@ const props = withDefaults(
   },
 );
 const source = defineModel<string>({ required: true });
+/** Ctrl/Cmd+Enter inside the editor (CodeMirror and the textarea fallback alike). */
+const emit = defineEmits<{ requestSubmit: [] }>();
 
 const host = ref<HTMLElement>();
 const textarea = ref<HTMLTextAreaElement>();
@@ -83,6 +85,7 @@ async function loadEditor() {
       label: props.label,
       disabled: props.disabled,
       selection,
+      onSubmit: () => emit('requestSubmit'),
       onChange: (doc) => {
         if (!isApplyingExternalValue) source.value = doc;
       },
@@ -119,6 +122,11 @@ function unloadEditor() {
 }
 
 function onTextareaKeydown(event: KeyboardEvent) {
+  if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+    event.preventDefault();
+    emit('requestSubmit');
+    return;
+  }
   if (!isLowPower.value) return;
   if (MODIFIER_KEYS.has(event.key)) return; // Escape, then Shift, then Shift+Tab must still leave (WCAG 2.1.2)
   const isPlainTab = event.key === 'Tab' && !event.altKey && !event.ctrlKey && !event.metaKey;

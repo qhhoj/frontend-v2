@@ -8,10 +8,12 @@ import { formatMemoryLimit, formatNumber, formatTimeLimit } from '@/lib/format';
 import { MAX_SOURCE_LENGTH, acceptedExtension } from '@/lib/source';
 import { useContestQuery } from '@/features/contests/contests.queries';
 import FileDropzone from './FileDropzone.vue';
+import KeyHint from './KeyHint.vue';
 import LanguagePicker from './LanguagePicker.vue';
 import SourceUploadButton from './SourceUploadButton.vue';
 import SubmitResultStrip from './SubmitResultStrip.vue';
 import { useLocaleStore } from '@/stores/locale.store';
+import { submitShortcutHint } from './submit-shortcuts';
 import type { useSubmitForm } from './use-submit-form';
 
 const props = defineProps<{
@@ -46,35 +48,30 @@ const submitLabelKey = computed(() => {
 });
 
 /**
- * Where each region sits, top to bottom (dock: left to right, wrapping). The dock keeps the actions and the submit
- * button in its top row beside the language, so it stays short; the sheet puts them below the editor.
+ * Where each region sits, top to bottom (dock: left to right, wrapping). The dock and the full-screen panel keep the
+ * actions and the submit button in their top row beside the language, so it stays short: actions right-aligned, then a
+ * 16 px gap and the submit button last, so a dismiss button is never next to it; the sheet puts the button below the editor.
  */
 const REGION_ORDER = {
   languageRow: 'order-1',
   info: 'order-2',
   upload: 'order-3',
   actions: 'order-4 ml-auto',
-  actionsTopRow: 'order-5',
+  submitTopRow: 'order-5 ml-1',
   body: 'order-6',
   message: 'order-7',
   counterRow: 'order-8',
   submit: 'order-9',
-  submitTopRow: 'order-4 ml-auto',
-  /** Full screen: the actions sit right-aligned and the submit button ends the row. */
-  submitLast: 'order-5',
 } as const;
 
 /**
- * Everything that differs between the layouts, so the template reads the same for all. `versionsLink` is the link to the
- * runtimes page: beside the language on the dock and full screen, on its own line under the picker and the upload button
- * on the sheet (a grid: the picker takes the row's width, whether or not the upload button is there), so the picker stays
- * usable on a 320 px phone.
+ * Everything that differs between the layouts, so the template reads the same for all. The limits and the link to the
+ * runtimes page sit under the editor beside the counter.
  */
 const LAYOUTS = {
   dock: {
     form: 'flex flex-wrap items-center gap-x-3 gap-y-2',
     languageRow: 'flex items-center gap-x-2',
-    versionsLink: 'shrink-0',
     body: 'basis-full',
     editor: 'max-h-[30dvh] overflow-auto rounded-cell',
     editorMinLines: 4,
@@ -85,8 +82,7 @@ const LAYOUTS = {
   },
   sheet: {
     form: 'flex min-h-min flex-1 flex-col gap-3',
-    languageRow: 'grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-y-1',
-    versionsLink: 'col-span-2 justify-self-start',
+    languageRow: 'grid w-full grid-cols-[minmax(0,1fr)_auto] items-center',
     // A short viewport (a phone in landscape) scrolls the sheet instead of squeezing the editor to one line.
     body: 'flex min-h-40 flex-1 flex-col',
     editor: 'min-h-0 flex-1 overflow-auto rounded-cell',
@@ -99,7 +95,6 @@ const LAYOUTS = {
   full: {
     form: 'flex h-full min-h-0 flex-col gap-3',
     languageRow: 'flex items-center gap-x-2',
-    versionsLink: 'shrink-0',
     body: 'flex min-h-0 flex-1 flex-col',
     editor: 'min-h-0 flex-1 overflow-auto rounded-cell',
     editorMinLines: 6,
@@ -113,17 +108,31 @@ const LAYOUTS = {
 const classes = computed(() => LAYOUTS[props.layout]);
 const isSheet = computed(() => props.layout === 'sheet');
 /** Where the actions and submit sit: the top row of the dock and the full-screen panel, or under the sheet's editor. */
-const isFull = computed(() => props.layout === 'full');
 const isTopRow = computed(() => props.layout !== 'sheet');
+const shortcutHint = submitShortcutHint();
 const hasSourceUpload = computed(() => !state.fileMode);
+
+const hasFiles = (event: DragEvent) => event.dataTransfer?.types.includes('Files') ?? false;
+/** A file dragged over the editor may be dropped; dragged text keeps the editor's own behaviour. */
+function allowFileDrop(event: DragEvent) {
+  if (hasFiles(event)) event.preventDefault();
+}
+/** A dropped file goes through the same check as the upload button; captured so CodeMirror does not insert it itself. */
+function loadDroppedFile(event: DragEvent) {
+  const file = event.dataTransfer?.files[0];
+  if (!file) return;
+  event.preventDefault();
+  event.stopPropagation();
+  void state.loadFile(file);
+}
 </script>
 
 <template>
   <form :class="classes.form" @submit.prevent="state.submitNow()">
     <SubmitResultStrip
-      v-if="state.lastSubmissionId"
+      v-if="state.lastSubmissionId || state.submitting"
       :result="form.result"
-      :submission-id="state.lastSubmissionId"
+      :submission-id="state.submitting ? null : state.lastSubmissionId"
       class="order-first w-full shrink-0"
     />
     <div :class="classes.header">
@@ -147,20 +156,7 @@ const hasSourceUpload = computed(() => !state.fileMode);
           class="ml-2"
           @pick="(file) => state.loadFile(file)"
         />
-        <RouterLink
-          :to="{ name: 'runtimes' }"
-          data-testid="runtimes-link"
-          class="inline-flex min-h-11 items-center text-sm text-accent-text underline"
-          :class="classes.versionsLink"
-          >{{ $t('submit.versions') }}</RouterLink
-        >
       </div>
-      <span v-if="state.languageLimits" :class="REGION_ORDER.info" class="text-sm text-muted">{{
-        $t('submit.limits', {
-          time: formatTimeLimit(state.languageLimits.timeLimit),
-          memory: formatMemoryLimit(state.languageLimits.memoryLimit),
-        })
-      }}</span>
       <p
         v-if="problem.contest"
         class="text-sm"
@@ -189,10 +185,7 @@ const hasSourceUpload = computed(() => !state.fileMode);
         :class="REGION_ORDER.upload"
         @pick="(file) => state.loadFile(file)"
       />
-      <div
-        v-if="$slots.actions"
-        :class="isTopRow && !isFull ? REGION_ORDER.actionsTopRow : REGION_ORDER.actions"
-      >
+      <div v-if="$slots.actions" :class="REGION_ORDER.actions">
         <slot name="actions" />
       </div>
 
@@ -205,9 +198,10 @@ const hasSourceUpload = computed(() => !state.fileMode);
         :loading="state.submitting"
         :aria-describedby="submitDescribedBy"
         class="shrink-0"
-        :class="isFull ? REGION_ORDER.submitLast : REGION_ORDER.submitTopRow"
-        >{{ $t(submitLabelKey) }}</AppButton
-      >
+        :class="REGION_ORDER.submitTopRow"
+        aria-keyshortcuts="Control+Enter Meta+Enter"
+        >{{ $t(submitLabelKey) }}<KeyHint :keys="shortcutHint"
+      /></AppButton>
     </div>
 
     <div class="min-w-0" :class="[REGION_ORDER.body, classes.body]">
@@ -217,6 +211,8 @@ const hasSourceUpload = computed(() => !state.fileMode);
         :aria-label="$t('submit.source')"
         :aria-describedby="errorReference"
         :class="classes.editor"
+        @dragover="allowFileDrop"
+        @drop.capture="loadDroppedFile"
       >
         <CodeEditor
           v-model="state.source"
@@ -225,6 +221,7 @@ const hasSourceUpload = computed(() => !state.fileMode);
           :min-lines="classes.editorMinLines"
           class="min-h-full"
           :class="classes.editorFill"
+          @request-submit="state.submitNow()"
         />
       </div>
       <div v-else-if="state.language" class="flex flex-col gap-2">
@@ -269,8 +266,7 @@ const hasSourceUpload = computed(() => !state.fileMode);
     </p>
 
     <div
-      v-if="!isSheet || !state.fileMode"
-      class="flex min-w-0 items-center gap-3 text-sm"
+      class="flex min-w-0 flex-wrap items-center gap-x-3 text-sm"
       :class="[REGION_ORDER.counterRow, classes.counterRow]"
     >
       <template v-if="!state.fileMode">
@@ -287,6 +283,18 @@ const hasSourceUpload = computed(() => !state.fileMode);
           $t('submit.templateRestored')
         }}</span>
       </template>
+      <span v-if="state.languageLimits" class="text-muted">{{
+        $t('submit.limits', {
+          time: formatTimeLimit(state.languageLimits.timeLimit),
+          memory: formatMemoryLimit(state.languageLimits.memoryLimit),
+        })
+      }}</span>
+      <RouterLink
+        :to="{ name: 'runtimes' }"
+        data-testid="runtimes-link"
+        class="inline-flex min-h-11 items-center text-muted underline hover:text-content"
+        >{{ $t('submit.versions') }}</RouterLink
+      >
     </div>
     <AppButton
       v-if="!isTopRow"
