@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Dialog from 'primevue/dialog';
+import Modal from '@/components/ui/Modal.vue';
 import { computed, ref, useId } from 'vue';
 import type { OrganizationChip } from '@/api/types/admin-common';
 import type { CreatedUser, NewUserRow } from '@/api/types/users-admin';
@@ -61,18 +61,15 @@ function download() {
   // Revoked on the next tick: Safari aborts a download whose URL dies in the same tick.
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
-/** The custom header slot loses PrimeVue's own label, so the dialog is named by its heading here. */
+/** The custom header slot has no title of the Modal's own, so the dialog is named by its heading here. */
 const titleId = useId();
 </script>
 
 <template>
-  <Dialog
+  <Modal
     v-model:visible="visible"
-    modal
-    :draggable="false"
     :style="{ width: '760px', maxWidth: 'calc(100vw - 2rem)' }"
-    :close-button-props="{ 'aria-label': $t('common.close') }"
-    :pt="{ root: { 'aria-labelledby': titleId } }"
+    :aria-labelledby="titleId"
   >
     <template #header>
       <h2 :id="titleId" class="font-display text-subtitle leading-7 font-semibold">
@@ -150,5 +147,5 @@ const titleId = useId();
         {{ $t('admin.users.create.results.download') }}
       </button>
     </section>
-  </Dialog>
+  </Modal>
 </template>

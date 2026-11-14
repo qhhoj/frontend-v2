@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Dialog from 'primevue/dialog';
 import { TriangleAlert } from 'lucide-vue-next';
+import Modal from '@/components/ui/Modal.vue';
 import { computed, ref, useId, watch } from 'vue';
 import AdminChip from '../../ui/AdminChip.vue';
 import AdminField from '../../ui/AdminField.vue';
@@ -59,13 +59,10 @@ const CELL = 'border-b border-line px-2 py-1.5';
 </script>
 
 <template>
-  <Dialog
+  <Modal
     v-model:visible="visible"
-    modal
-    :draggable="false"
     :style="{ width: '720px', maxWidth: 'calc(100vw - 2rem)' }"
-    :close-button-props="{ 'aria-label': $t('common.close') }"
-    :pt="{ root: { 'aria-labelledby': titleId } }"
+    :aria-labelledby="titleId"
   >
     <template #header>
       <h2 :id="titleId" class="font-display text-subtitle leading-7 font-semibold">
@@ -208,5 +205,5 @@ const CELL = 'border-b border-line px-2 py-1.5';
         </button>
       </div>
     </form>
-  </Dialog>
+  </Modal>
 </template>

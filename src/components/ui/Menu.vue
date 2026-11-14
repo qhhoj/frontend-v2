@@ -18,6 +18,8 @@ export interface MenuEntry {
   disabled?: boolean;
   /** A short line under the label, e.g. why a disabled item is disabled. */
   hint?: string;
+  /** Starts a new group: a separator above it (sign-out under the account pages). */
+  separated?: boolean;
 }
 
 /**
@@ -82,9 +84,13 @@ const toMenuItem = (item: MenuEntry): MenuItem => ({
     if (!(item.to && isModified(originalEvent))) runItem(item);
   },
 });
+const withSeparators = (items: MenuEntry[]): MenuItem[] =>
+  items.flatMap((item, index) =>
+    item.separated && index > 0 ? [{ separator: true }, toMenuItem(item)] : [toMenuItem(item)],
+  );
 const model = computed<MenuItem[]>(() => {
-  const plain = props.items.filter((item) => !item.danger).map(toMenuItem);
-  const danger = props.items.filter((item) => item.danger).map(toMenuItem);
+  const plain = withSeparators(props.items.filter((item) => !item.danger));
+  const danger = withSeparators(props.items.filter((item) => item.danger));
   return plain.length && danger.length
     ? [...plain, { separator: true }, ...danger]
     : [...plain, ...danger];
