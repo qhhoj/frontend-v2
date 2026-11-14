@@ -59,6 +59,9 @@ describe('activate page', () => {
     expect(lead).toContain('chưa gửi được liên kết');
     expect(lead).not.toContain('đăng nhập ngay');
     expect(wrapper.get('#main a[href="/forgot-password"]').text()).toBe('Đặt mật khẩu mới');
+    expect(wrapper.get('#main a[href="/forgot-password"]').attributes('href')).toBe(
+      '/forgot-password',
+    );
   });
 
   it('explains a dead link and sends a new one to the address typed', async () => {
