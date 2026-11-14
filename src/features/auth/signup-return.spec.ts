@@ -3,7 +3,7 @@ import { reactive } from 'vue';
 import {
   SIGNUP_RETURN_TTL_MS,
   rememberSignupReturn,
-  signupReturnQuery,
+  takeSignupReturnQuery,
   useReturnQuery,
 } from './signup-return';
 
@@ -27,14 +27,22 @@ describe('return path through sign-up', () => {
       route.query = { redirect: value };
       expect(useReturnQuery().value).toEqual({});
       rememberSignupReturn(value, 1000);
-      expect(signupReturnQuery(2000)).toEqual({});
+      expect(takeSignupReturnQuery(2000)).toEqual({});
     },
   );
 
   it('keeps the registering path for the sign-in after activation, until it goes stale', () => {
     rememberSignupReturn('/contests/x', 1000);
-    expect(signupReturnQuery(2000)).toEqual({ redirect: '/contests/x' });
-    expect(signupReturnQuery(1000 + SIGNUP_RETURN_TTL_MS + 1)).toEqual({});
+    expect(takeSignupReturnQuery(2000)).toEqual({ redirect: '/contests/x' });
+    rememberSignupReturn('/contests/x', 1000);
+    expect(takeSignupReturnQuery(1000 + SIGNUP_RETURN_TTL_MS + 1)).toEqual({});
+  });
+
+  it('is cleared once taken, so a later sign-in does not reuse it', () => {
+    rememberSignupReturn('/contests/x', 1000);
+    takeSignupReturnQuery(2000);
+    expect(localStorage.getItem('qhhoj.signup-return')).toBeNull();
+    expect(takeSignupReturnQuery(2000)).toEqual({});
   });
 
   it('refuses a foreign URL planted in storage', () => {
@@ -42,6 +50,6 @@ describe('return path through sign-up', () => {
       'qhhoj.signup-return',
       JSON.stringify({ path: '//evil.example', at: 1000 }),
     );
-    expect(signupReturnQuery(2000)).toEqual({});
+    expect(takeSignupReturnQuery(2000)).toEqual({});
   });
 });

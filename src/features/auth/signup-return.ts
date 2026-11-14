@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { readStorage, writeStorage } from '@/lib/storage';
+import { readStorage, removeStorage, writeStorage } from '@/lib/storage';
 import { safeRedirect } from '@/router/safe-redirect';
 
 const KEY = 'qhhoj.signup-return';
@@ -22,9 +22,10 @@ export function rememberSignupReturn(redirect: unknown, now = Date.now()): void 
   if (path !== '/') writeStorage(KEY, JSON.stringify({ path, at: now }));
 }
 
-/** `{ redirect }` for the post-activation login, or `{}` when nothing fresh was kept. The path is re-checked on the way out. */
-export function signupReturnQuery(now = Date.now()): { redirect?: string } {
+/** `{ redirect }` for the post-activation login, or `{}` when nothing fresh was kept. Taken once: the note is gone after the read, and the path is re-checked on the way out. */
+export function takeSignupReturnQuery(now = Date.now()): { redirect?: string } {
   const raw = readStorage(KEY);
+  removeStorage(KEY);
   if (raw === null) return {};
   try {
     const note = JSON.parse(raw) as { path?: unknown; at?: unknown };
