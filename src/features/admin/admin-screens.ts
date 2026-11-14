@@ -121,6 +121,7 @@ export const ADMIN_SCREENS = {
   pages: { path: '/admin/pages', permission: 'flatpages.change_flatpage' },
   log: { path: '/admin/log', permission: 'judge.change_settings' },
   shortLinks: { path: '/admin/short-links', permission: 'judge.manage_short_link' },
+  shareReports: { path: '/admin/share-reports', permission: 'judge.manage_share' },
   integrations: { path: '/admin/integrations', permission: 'judge.manage_integration' },
   problemsDeleted: { path: '/admin/problems/deleted', permission: 'judge.delete_problem' },
   organizationQuotas: {

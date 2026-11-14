@@ -6245,6 +6245,234 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/internal/shares": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List shares
+         * @description Signed-in callers only. The caller's unexpired shares, newest first, taken-down ones with their takedown. `submissionId` narrows to copies of one submission (the share dialog's "already shared"). `scope=all` lists everyone's and needs `judge.manage_share` (403 `forbidden`).
+         */
+        get: operations["MySharesController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/shares/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read a shared link
+         * @description Public, `X-Robots-Tag: noindex, nofollow`. The page of `/c/<code>`: source, language, author, expiry, the frozen copy of a submission share, and the problem's code and name only when the viewer may see the problem. 404 `not_found` (never cached) for an unknown, expired or taken-down code and for a banned, deactivated or deleted author. A submission share is checked again on every read: 403 `contest_running` while a contest that lists its problem is running, not started, frozen or has a hidden board, 403 `hidden` when the setter now shows sources to owners and testers only. The owner passes these with `hiddenReason` set; staff with `judge.manage_share` pass every rule. 120 reads per minute per visitor address or user (429 `rate_limited`).
+         */
+        get: operations["ShareReadController_view"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a share
+         * @description The owner, or staff with `judge.manage_share` (403 `forbidden` otherwise; a staff delete is audit-logged). Removes the link and its stored code at once. 404 `not_found` for an unknown or expired code. Returns 204.
+         */
+        delete: operations["MySharesController_remove"];
+        options?: never;
+        head?: never;
+        /**
+         * Change a share's title or expiry
+         * @description The owner only (403 `forbidden`). A new `expiry` counts from now. 404 `not_found` for an unknown or expired code.
+         */
+        patch: operations["MySharesController_edit"];
+        trace?: never;
+    };
+    "/api/internal/shares/{code}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download a shared link's code
+         * @description Same as the raw form, with `Content-Disposition: attachment` and the filename `<code>.<language extension>` (`Main.java` for Java).
+         */
+        get: operations["ShareReadController_download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/shares/{code}/raw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Show a shared link's code as plain text
+         * @description Same rules, errors and limit as reading the link. Answers `text/plain; charset=utf-8` with `Content-Disposition: inline`, `X-Content-Type-Options: nosniff`, `Content-Security-Policy: sandbox`, `X-Robots-Tag: noindex, nofollow` and `Cache-Control: private, no-store`.
+         */
+        get: operations["ShareReadController_raw"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/shares/{code}/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report a share
+         * @description Signed-in callers who can read the link (its read errors apply). Flags it for staff with a `reason` (`spam`, `abuse`, `contest`: leaks a running contest's solution, `other`) and an optional `note` (up to 500 characters). Each user reports a share once (409 `conflict`); reporting one's own is 403 `forbidden`. 10 reports per hour per user (429 `rate_limited`). Returns 204.
+         */
+        post: operations["ShareReportsController_report"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/shares/{code}/reports/settle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Settle the reports of a share
+         * @description Requires `judge.manage_share`. Marks every open report of the share `resolved` or `dismissed`; taking it down is a separate call. 404 `not_found` for an unknown or expired code, or when it has no open reports. Returns 204.
+         */
+        post: operations["ShareReportsController_settle"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/shares/{code}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore a taken-down share
+         * @description Requires `judge.manage_share`. The link reads again as before (a banned author's links stay down until the ban is lifted). Audit-logged. 404 `not_found` for an unknown or expired code, 409 `conflict` when it is not down. Returns 204.
+         */
+        post: operations["ShareModerationController_restore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/shares/{code}/takedown": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Take a share down
+         * @description Requires `judge.manage_share`. Everyone else gets 404 for the link from now on; the owner sees the takedown and its `reason` in their list. Reversible with restore; both are audit-logged. 404 `not_found` for an unknown or expired code, 409 `conflict` when already down. Returns 204.
+         */
+        post: operations["ShareModerationController_takedown"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/shares/pastes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Paste code behind a link
+         * @description Signed-in users. At most 65536 bytes of UTF-8 text without NUL (400 `validation_failed`, issues `source_too_large`, `source_empty`, `source_invalid`) in a known text language (issues `language_unknown`, `language_takes_file`). Pastes cannot be tied to a contest, so they are not contest-guarded; report and takedown cover leaks. Both kinds share the budgets: 5 per minute and 30 per day per user (429 `rate_limited`), and at most 200 unexpired links per user (409 `conflict`, issue `share_limit`). Muted users get 403 `forbidden` (issue `muted`). The link is `/c/<code>`: anyone with it can read it, without signing in.
+         */
+        post: operations["ShareCreateController_createPaste"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/shares/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List share reports
+         * @description Requires `judge.manage_share`. 20 per page, newest first: `status=open` (the default) or `settled`. Each carries its share while it still exists (expired and deleted shares drop out).
+         */
+        get: operations["ShareReportsController_queue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/internal/shares/submissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Share a frozen copy of a submission
+         * @description The submission's owner only (403 `forbidden` for anyone else, 404 when it cannot be seen). Stores what a visitor may see: source, language, verdict, points, time, memory and the case results the problem shows; never checker feedback, program output or an internal error's text. A later rejudge changes nothing. Only `D` and `CE` submissions in a text language (409 `conflict`, issue `submission_not_shareable`). Refused with 403 `hidden` when the setter shows sources to owners and testers only, and 403 `contest_running` while any contest that lists the problem (or holds the submission) is running, not started, frozen or has a hidden board. Both kinds share the budgets: 5 per minute and 30 per day per user (429 `rate_limited`), and at most 200 unexpired links per user (409 `conflict`, issue `share_limit`). Muted users get 403 `forbidden` (issue `muted`). The link is `/c/<code>`: anyone with it can read it, without signing in.
+         */
+        post: operations["ShareCreateController_createCopy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/internal/short-links": {
         parameters: {
             query?: never;
@@ -9073,6 +9301,19 @@ export interface components {
              */
             reason: string;
         };
+        CreatePasteDto: {
+            /** @description How long the link lives; `30d` by default. */
+            expiry?: components["schemas"]["ShareExpiry"];
+            /**
+             * Format: uuid
+             * @description Language for highlighting and the download's extension; not a file-only one.
+             */
+            languageId: string;
+            /** @description The code, at most 65536 bytes of UTF-8 (checked by the service, which counts bytes). */
+            source: string;
+            /** @description Optional plain-text title; control characters are dropped. */
+            title?: string;
+        };
         CreatePostDto: {
             /** @description Markdown content, rendered when saved. */
             content: string;
@@ -9177,6 +9418,17 @@ export interface components {
             expiresAt?: string;
             /** @description Site path to shorten, for example `/problems/aplusb`; only problems, contests, posts, users and organizations are accepted (otherwise 400). */
             path: string;
+        };
+        CreateSubmissionShareDto: {
+            /** @description How long the link lives; `never` by default. */
+            expiry?: components["schemas"]["ShareExpiry"];
+            /**
+             * Format: uuid
+             * @description The caller's own finished submission.
+             */
+            submissionId: string;
+            /** @description Optional plain-text title; control characters are dropped. */
+            title?: string;
         };
         CreateTagProblemDto: {
             /**
@@ -9322,6 +9574,12 @@ export interface components {
             problem: components["schemas"]["ProblemRefResponse"];
             /** @description When it becomes readable by everyone (ISO 8601). */
             publishOn: string;
+        };
+        EditShareDto: {
+            /** @description New lifetime, counted from now. */
+            expiry?: components["schemas"]["ShareExpiry"];
+            /** @description New plain-text title; control characters are dropped. */
+            title?: string;
         };
         EffectivePermissionResponse: {
             codename: string;
@@ -9561,6 +9819,42 @@ export interface components {
             editor: components["schemas"]["UserSummaryResponse"] | null;
             /** @description Revision id. */
             id: string;
+        };
+        FrozenCopyResponse: {
+            /** @description Batch summaries, when the problem showed only those. */
+            batches: components["schemas"]["SubmissionBatchResponse"][] | null;
+            /** @description The problem's case count; null when only totals are shown. */
+            caseCount: number | null;
+            /** @description Points earned over all test cases. */
+            casePoints: number;
+            /** @description Every case, when the problem showed them to visitors. */
+            cases: components["schemas"]["ShareCaseResponse"][] | null;
+            /** @description Points available over all test cases. */
+            caseTotal: number;
+            /** @description The compiler's output of a `CE`. */
+            compileLog: string | null;
+            /**
+             * Format: date-time
+             * @description When it was judged.
+             */
+            judgedAt: string | null;
+            /** @description Largest memory use in KiB. */
+            memory: number | null;
+            /** @description Points awarded. */
+            points: number | null;
+            /** @description The problem's points at share time. */
+            problemPoints: number;
+            /** @description Verdict at share time. */
+            result: components["schemas"]["SubmissionResult"] | null;
+            /** @description `D` judged or `CE` compile error. */
+            status: components["schemas"]["ShareableStatus"];
+            /**
+             * Format: date-time
+             * @description When the submission was made.
+             */
+            submittedAt: string;
+            /** @description Largest running time in seconds. */
+            time: number | null;
         };
         GhostCellResponse: {
             /** @description Minute of the contest at which the ghost solved the problem. */
@@ -11688,6 +11982,12 @@ export interface components {
             /** @description Id of the comment. */
             id: string;
         };
+        ReportShareDto: {
+            /** @description Optional details for staff. */
+            note?: string;
+            /** @description Why: `spam`, `abuse`, `contest` (leaks a running contest's solution) or `other`. */
+            reason: components["schemas"]["ShareReportReason"];
+        };
         ResendActivationDto: {
             /** @description Email address for the activation link and password resets, up to 254 characters. */
             email: string;
@@ -11854,6 +12154,10 @@ export interface components {
             /** @description `resolved` when the reports led to action, `dismissed` when they did not. */
             outcome: components["schemas"]["CommentReportOutcome"];
         };
+        SettleShareReportsDto: {
+            /** @description `resolved` when the reports led to action, `dismissed` when they did not. */
+            outcome: components["schemas"]["CommentReportOutcome"];
+        };
         SetUserPasswordDto: {
             /** @description The account password, re-entered to confirm the change. */
             currentPassword: string;
@@ -11866,6 +12170,199 @@ export interface components {
              * @description The Discord webhook URL (https).
              */
             url: string;
+        };
+        /**
+         * @description `D` judged or `CE` compile error.
+         * @enum {string}
+         */
+        ShareableStatus: "CE" | "D";
+        ShareCaseResponse: {
+            /** @description Batch number, from 1; null for a case outside any batch. */
+            batch: number | null;
+            /** @description Memory used in KiB. */
+            memory: number;
+            /** @description Points earned by the case. */
+            points: number;
+            /** @description Position of the case in judging order. */
+            position: number;
+            /**
+             * @description Case verdict: `AC`, `WA`, `TLE`, `MLE`, `OLE`, `IR`, `RTE` or `SC`.
+             * @enum {string}
+             */
+            status: "AC" | "IR" | "MLE" | "OLE" | "RTE" | "SC" | "TLE" | "WA";
+            /** @description Running time in seconds. */
+            time: number;
+            /** @description Points available for the case. */
+            total: number;
+        };
+        /**
+         * @description How long the link lives; `never` by default.
+         * @enum {string}
+         */
+        ShareExpiry: "1d" | "30d" | "7d" | "never";
+        /**
+         * @description Why everyone else is refused it now; only the owner and staff read a share that has one.
+         * @enum {string}
+         */
+        ShareHiddenReason: "author_unavailable" | "contest_running" | "source_hidden" | "taken_down";
+        /**
+         * @description `submission`: a frozen copy of a submission; `paste`: pasted code.
+         * @enum {string}
+         */
+        ShareKind: "paste" | "submission";
+        ShareLanguageResponse: {
+            /** @description File extension at share time. */
+            extension: string;
+            /** @description Language key at share time. */
+            key: string;
+            /** @description Language name at share time. */
+            name: string;
+        };
+        ShareListItemResponse: {
+            /** @description The owner; null when the account is gone. */
+            author: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description The code in `/c/<code>`. */
+            code: string;
+            /**
+             * Format: date-time
+             * @description When the share was made.
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description When the link stops working; null if it never expires.
+             */
+            expiresAt: string | null;
+            /** @description `submission`: a frozen copy of a submission; `paste`: pasted code. */
+            kind: components["schemas"]["ShareKind"];
+            /** @description The language at share time. */
+            language: components["schemas"]["ShareLanguageResponse"];
+            /** @description The copied submission; null for a paste. */
+            submissionId: string | null;
+            /** @description Set while staff keep it taken down. */
+            takenDown: components["schemas"]["ShareTakedownResponse"] | null;
+            /** @description The owner's title; may be empty. */
+            title: string;
+        };
+        /** @enum {string} */
+        ShareListScope: "all" | "mine";
+        ShareProblemResponse: {
+            /** @description Problem code, for the link `/problems/<code>`. */
+            code: string;
+            /** @description Problem name. */
+            name: string;
+        };
+        /**
+         * @description Why: `spam`, `abuse`, `contest` (leaks a running contest's solution) or `other`.
+         * @enum {string}
+         */
+        ShareReportReason: "abuse" | "contest" | "other" | "spam";
+        ShareReportResponse: {
+            /**
+             * Format: date-time
+             * @description When it was reported.
+             */
+            createdAt: string;
+            /** @description Report id. */
+            id: string;
+            /** @description The reporter's note; may be empty. */
+            note: string;
+            reason: components["schemas"]["ShareReportReason"];
+            /** @description Who reported; null when the account is gone. */
+            reporter: components["schemas"]["UserSummaryResponse"] | null;
+            /**
+             * Format: date-time
+             * @description When it was settled.
+             */
+            settledAt: string | null;
+            /** @description The staff member who settled it; null while open or when the account is gone. */
+            settledBy: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description The reported share; null once it expired or was deleted. */
+            share: components["schemas"]["ShareSummaryResponse"] | null;
+            /** @description `open`, `resolved` or `dismissed`. */
+            status: components["schemas"]["CommentReportStatus"];
+        };
+        ShareSummaryResponse: {
+            /** @description The code in `/c/<code>`. */
+            code: string;
+            /**
+             * Format: date-time
+             * @description When the share was made.
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description When the link stops working; null if it never expires.
+             */
+            expiresAt: string | null;
+            /** @description `submission`: a frozen copy of a submission; `paste`: pasted code. */
+            kind: components["schemas"]["ShareKind"];
+            /** @description The language at share time. */
+            language: components["schemas"]["ShareLanguageResponse"];
+            /** @description The copied submission; null for a paste. */
+            submissionId: string | null;
+            /** @description Set while staff keep it taken down. */
+            takenDown: components["schemas"]["ShareTakedownResponse"] | null;
+            /** @description The owner's title; may be empty. */
+            title: string;
+        };
+        ShareTakedownResponse: {
+            /**
+             * Format: date-time
+             * @description When staff took it down.
+             */
+            at: string;
+            /** @description Why, as staff wrote it. */
+            reason: string;
+        };
+        ShareViewerResponse: {
+            /** @description The owner, or staff with `judge.manage_share`. */
+            canDelete: boolean;
+            /** @description The owner may change the title and expiry. */
+            canEdit: boolean;
+            /** @description Signed in and not the owner. */
+            canReport: boolean;
+            /** @description Staff with `judge.manage_share`: take down or restore. */
+            canTakeDown: boolean;
+            /** @description The viewer made it. */
+            isOwner: boolean;
+        };
+        ShareViewResponse: {
+            /** @description Who shared it; null only for staff reading a share whose author is gone. */
+            author: components["schemas"]["UserSummaryResponse"] | null;
+            /** @description The code in `/c/<code>`. */
+            code: string;
+            /** @description The submission's result; null for a paste. */
+            copy: components["schemas"]["FrozenCopyResponse"] | null;
+            /**
+             * Format: date-time
+             * @description When it was shared.
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description When the link stops working; null if never.
+             */
+            expiresAt: string | null;
+            /** @description What the raw and download links name the file. */
+            filename: string;
+            /** @description Why everyone else is refused it now; only the owner and staff read a share that has one. */
+            hiddenReason: components["schemas"]["ShareHiddenReason"] | null;
+            /** @description `submission`: a frozen copy; `paste`: pasted code. */
+            kind: components["schemas"]["ShareKind"];
+            /** @description The language at share time. */
+            language: components["schemas"]["ShareLanguageResponse"];
+            /** @description The copied submission's problem, only for viewers who may see the problem. */
+            problem: components["schemas"]["ShareProblemResponse"] | null;
+            /** @description The code. */
+            source: string;
+            /** @description The copied submission; shown to the owner and staff only. */
+            submissionId: string | null;
+            /** @description The takedown; staff only. */
+            takenDown: components["schemas"]["ShareTakedownResponse"] | null;
+            /** @description The owner's title; may be empty. */
+            title: string;
+            viewer: components["schemas"]["ShareViewerResponse"];
         };
         ShortLinkResponse: {
             /** @description The code in `/s/<code>`. */
@@ -12587,6 +13084,8 @@ export interface components {
             canReject: boolean;
             /** @description Whether `POST /submissions/{id}/rejudge` is allowed. */
             canRejudge: boolean;
+            /** @description Whether `POST /shares/submissions` may be tried: the owner's judged or compile-error submission in a text language. A running contest or the setter's source rule can still refuse it. */
+            canShare: boolean;
         };
         /**
          * @description Why a queued submission is not being judged: `waiting_for_problem_data`, `waiting_for_judge_runtime` or `waiting_for_judge_sandbox` while a Judge could not run it for that transient reason (it is retried with a backoff, and ends Internal Error after about 30 minutes); `waiting_for_capable_judge` once a Judge refused it as unsupported (it stays queued until a Judge that can grade it is connected; the missing feature is not reported yet); null otherwise.
@@ -12769,6 +13268,10 @@ export interface components {
             id: string;
             /** @description Tag name. */
             name: string;
+        };
+        TakedownShareDto: {
+            /** @description Why, shown to the owner in their list and kept in the audit log. */
+            reason: string;
         };
         TestCaseDto: {
             /**
@@ -13773,7 +14276,7 @@ export interface operations {
                 /** @description Changes before this time (ISO 8601 with offset). */
                 to?: string;
                 /** @description Only changes to this kind of object. */
-                type?: "blogPost" | "comment" | "contest" | "contestParticipation" | "flatpage" | "group" | "judge" | "license" | "organization" | "problem" | "problemGroup" | "problemType" | "setting" | "submission" | "submission_batch" | "tagProblem" | "user";
+                type?: "blogPost" | "comment" | "contest" | "contestParticipation" | "flatpage" | "group" | "judge" | "license" | "organization" | "problem" | "problemGroup" | "problemType" | "setting" | "share" | "submission" | "submission_batch" | "tagProblem" | "user";
             };
             header?: never;
             path?: never;
@@ -25374,6 +25877,467 @@ export interface operations {
                 };
                 content: {
                     "application/xml": string;
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    MySharesController_list: {
+        parameters: {
+            query?: {
+                /** @description Page number, starting at 1. */
+                page?: number;
+                /** @description Shares per page, 1-100. */
+                pageSize?: number;
+                /** @description `mine` lists the caller's shares; `all` lists everyone's and needs `judge.manage_share`. */
+                scope?: components["schemas"]["ShareListScope"];
+                /** @description Only the copies of this submission (the share dialog's "already shared"). */
+                submissionId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShareListItemResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShareReadController_view: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Share code from `/c/<code>`; matched case-insensitively. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShareViewResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    MySharesController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Share code from `/c/<code>`; matched case-insensitively. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    MySharesController_edit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Share code from `/c/<code>`; matched case-insensitively. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditShareDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShareSummaryResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShareReadController_download: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Share code from `/c/<code>`; matched case-insensitively. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The code, as an attachment. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShareReadController_raw: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Share code from `/c/<code>`; matched case-insensitively. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The code, shown inline. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShareReportsController_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Share code from `/c/<code>`; matched case-insensitively. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReportShareDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShareReportsController_settle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Share code from `/c/<code>`; matched case-insensitively. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SettleShareReportsDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShareModerationController_restore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Share code from `/c/<code>`; matched case-insensitively. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShareModerationController_takedown: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Share code from `/c/<code>`; matched case-insensitively. */
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TakedownShareDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShareCreateController_createPaste: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePasteDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShareSummaryResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShareReportsController_queue: {
+        parameters: {
+            query?: {
+                /** @description 1-based page number. */
+                page?: number;
+                /** @description `open` (the default) or `settled`. */
+                status?: components["schemas"]["CommentReportQueue"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShareReportResponse"][];
+                        meta: components["schemas"]["PageMetaResponse"];
+                    };
+                };
+            };
+            /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
+            default: {
+                headers: {
+                    /** @description Whole seconds to wait before retrying; sent with 429 and 503. */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ShareCreateController_createCopy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSubmissionShareDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ShareSummaryResponse"];
+                    };
                 };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */

@@ -62,7 +62,10 @@
     "runtimes": "Judges and languages",
     "postDrafts": "My drafts",
     "contestAll": "All statements",
-    "contestProblemBest": "Best submissions of a problem"
+    "contestProblemBest": "Best submissions of a problem",
+    "paste": "Paste code",
+    "share": "Shared link",
+    "settingsShares": "My links"
   },
   "contests": {
     "title": "Contests",
@@ -404,7 +407,8 @@
     "menu": "Account of {username}",
     "profile": "My profile",
     "settings": "Settings",
-    "admin": "Administration"
+    "admin": "Administration",
+    "paste": "Paste code"
   },
   "settings": {
     "sections": "Settings sections",
@@ -412,7 +416,8 @@
       "profile": "Profile",
       "appearance": "Appearance",
       "security": "Security",
-      "data": "Data"
+      "data": "Data",
+      "shares": "Links"
     },
     "defaults": {
       "languageHint": "Preselected on the submit page.",
@@ -2982,6 +2987,189 @@
       "discardTitle": "Discard {count} change? | Discard {count} changes?",
       "discardBody": "The unsaved changes will be lost.",
       "keepEditing": "Keep editing"
+    }
+  },
+  "share": {
+    "button": "Share",
+    "link": {
+      "label": "Public link",
+      "copy": "Copy link"
+    },
+    "kind": {
+      "submission": "Submission snapshot",
+      "paste": "Pasted code"
+    },
+    "expiry": {
+      "label": "Expires",
+      "never": "Never expires",
+      "expired": "Expired",
+      "days": "Expires in {count} day | Expires in {count} days",
+      "hours": "Expires in {count} hour | Expires in {count} hours",
+      "soon": "Expires in a few minutes",
+      "option": {
+        "never": "Never",
+        "1d": "1 day",
+        "7d": "7 days",
+        "30d": "30 days"
+      }
+    },
+    "dialog": {
+      "title": "Share submission",
+      "blockedTitle": "Cannot share yet",
+      "snapshot": "Snapshot taken at {time}. Rejudging or deleting the submission later does not change the shared page.",
+      "includes": "Included:",
+      "includesList": "source code, language, each test's result, judging time.",
+      "excludes": "Not included:",
+      "excludesList": "checker feedback, program output, internal error messages.",
+      "publicHint": "Anyone with the link can view it, no sign-in needed.",
+      "create": "Create link",
+      "created": "Link created.",
+      "existing": "You shared this submission at {time}. Reuse that link, or take a new snapshot.",
+      "takeNew": "Take a new snapshot",
+      "done": "Done",
+      "contestTitle": "A contest is running.",
+      "contestBody": "A submission to a problem used in a contest can be shared only after the contest ends and its board is no longer frozen.",
+      "hiddenTitle": "Source code is not public.",
+      "hiddenBody": "The setter shows this problem's source code only to the submission's owner and testers, so no link can be made."
+    },
+    "delete": {
+      "title": "Delete this link?",
+      "body": "Anyone holding the link will no longer be able to open it. This cannot be undone.",
+      "confirm": "Delete link",
+      "done": "Link deleted"
+    },
+    "error": {
+      "share_limit": "You have too many live links. Delete some in Settings and try again.",
+      "submission_not_shareable": "Only judged or compile-error submissions in a text language can be shared.",
+      "source_too_large": "The code is too large: 64 KB at most.",
+      "source_empty": "Paste some code before creating a link.",
+      "source_invalid": "The code contains characters that cannot be used.",
+      "language_unknown": "This language cannot be used. Pick another one.",
+      "language_takes_file": "This language takes files only, pick another one.",
+      "muted": "Your account is muted, so links cannot be created."
+    },
+    "paste": {
+      "title": "Paste code",
+      "lead": "Make a short link to a piece of code. 64 KB at most. Anyone with the link can view it.",
+      "signInTitle": "Sign in to create a link.",
+      "signInBody": "The code you paste is kept in this browser.",
+      "signInFirst": "Sign in to create a link",
+      "empty": "Paste code before creating a link",
+      "tooLarge": "The code is too large, 64 KB at most",
+      "noLanguage": "Pick a language",
+      "editor": "Code to share",
+      "size": "{size} / {max} · {lines} lines",
+      "fromClipboard": "Paste from clipboard",
+      "clipboardDenied": "The browser does not allow reading the clipboard. Paste straight into the editor.",
+      "language": "Language",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Example: Fibonacci sequence",
+      "create": "Create link"
+    },
+    "code": {
+      "title": "Source code"
+    },
+    "result": {
+      "passed": "{done} / {total} tests",
+      "judgedAt": "Judged at {time}",
+      "points": "points",
+      "snapshot": "Snapshot",
+      "snapshotAt": "taken at {time}. The result does not change when the submission is rejudged."
+    },
+    "details": {
+      "title": "Details",
+      "author": "Author",
+      "problem": "Problem",
+      "createdAt": "Created",
+      "language": "Language",
+      "size": "Size",
+      "expiry": "Expires",
+      "public": "Public, not indexed."
+    },
+    "hidden": {
+      "author_unavailable": "The author's account is no longer usable, so others cannot open this link.",
+      "contest_running": "A contest using this problem has not ended, so others cannot open this link.",
+      "source_hidden": "The setter now shows source code only to the owner and testers, so others cannot open this link.",
+      "taken_down": "Staff took this link down: {reason}"
+    },
+    "state": {
+      "goneTitle": "This link is gone",
+      "goneBody": "This link does not exist, has expired or was taken down.",
+      "newPaste": "Paste new code",
+      "home": "Back to home",
+      "contestTitle": "Cannot be viewed right now",
+      "contestBody": "This submission belongs to a problem used in a contest that has not ended. Come back after the contest ends.",
+      "hiddenTitle": "Source code is not public",
+      "hiddenBody": "The setter shows this problem's source code only to the submission's owner and testers."
+    },
+    "report": {
+      "open": "Report this content",
+      "title": "Report content",
+      "body": "Staff will review this link. Each person can report a link once.",
+      "reasonLabel": "Reason",
+      "noteLabel": "Note",
+      "confirm": "Send report",
+      "duplicate": "You already reported this link.",
+      "sent": "Report sent",
+      "reason": {
+        "contest": "Leaks a running contest's solution",
+        "abuse": "Abusive content",
+        "spam": "Spam",
+        "other": "Another reason"
+      }
+    },
+    "takedown": {
+      "open": "Take down",
+      "restore": "Restore",
+      "title": "Take this link down?",
+      "body": "The link stops opening for everyone. The owner reads the reason in their list. You can restore it later.",
+      "reasonLabel": "Reason",
+      "confirm": "Take down link"
+    },
+    "edit": {
+      "title": "Edit link",
+      "expiryHint": "Now: {current}. Pick a length to count it from now."
+    },
+    "list": {
+      "heading": "My links",
+      "lead": "Submission snapshots and pastes you shared.",
+      "title": "Title",
+      "kind": "Type",
+      "createdAt": "Created",
+      "expiresAt": "Expires",
+      "caption": "Shared links",
+      "pager": "Link pages",
+      "empty": "You have not shared any link yet.",
+      "newPaste": "Paste code",
+      "takenDown": "Taken down",
+      "copyFailed": "Could not copy"
+    },
+    "reports": {
+      "lead": "Reports about shared links, newest first.",
+      "tabs": {
+        "label": "Report status",
+        "open": "Open",
+        "settled": "Settled"
+      },
+      "table": {
+        "share": "Link",
+        "reason": "Reason",
+        "note": "Note",
+        "reporter": "Reporter",
+        "createdAt": "Reported",
+        "pager": "Report pages",
+        "caption": "Shared link reports"
+      },
+      "settled": {
+        "resolved": "Marked as acted on",
+        "dismissed": "Report dismissed"
+      },
+      "settleFailed": "Could not settle the report",
+      "open": "Open link",
+      "resolve": "Acted on",
+      "dismiss": "Dismiss",
+      "gone": "The link expired or was deleted",
+      "empty": "No reports."
     }
   }
 }
