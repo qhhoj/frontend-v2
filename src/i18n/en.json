@@ -833,6 +833,8 @@
     "activation": {
       "doneTitle": "Account activated",
       "doneLead": "Your email is confirmed. You can sign in now.",
+      "resetLead": "Your email is confirmed. The password you chose at signup no longer works: we sent a password-reset link to your email. Set a new password with it.",
+      "setPassword": "Set a new password",
       "deadTitle": "The link has expired",
       "deadLead": "An activation link works for 7 days. Enter your email to get a new one."
     },
@@ -896,6 +898,7 @@
     "contest_running": "Not available yet: the contest's submissions are not public.",
     "hidden": "This is hidden from you.",
     "editor_cannot_register": "Setters and testers do not register.",
+    "not_invited": "You are not invited to this contest.",
     "banned_from_contest": "You are banned from this contest.",
     "registration_not_required": "This contest needs no registration: enter when it starts.",
     "registration_closed": "Registration for this contest is closed.",

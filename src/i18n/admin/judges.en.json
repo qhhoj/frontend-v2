@@ -101,7 +101,8 @@
       "contest": "Contest",
       "normal": "Normal",
       "rejudge": "Rejudge",
-      "batch": "Batch rejudge"
+      "batch": "Batch rejudge",
+      "backlog": "Backlog"
     },
     "alerts": {
       "noJudge": "{count} {subject} submissions are waiting but no online judge runs that language.",

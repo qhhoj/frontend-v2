@@ -10,7 +10,7 @@ export interface paths {
         };
         /**
          * List recorded changes across the site
-         * @description Requires `judge.change_settings`. The global change log: every write that already leaves a record (the `revisions` rows of problems, contests, users, organizations, posts, comments, pages, catalogs, submission locks and batch rejudges, and setting changes), newest first, 50 per page (`limit` 1-50). Each entry names the actor, the action, the object (with a label and whether it still exists) and the changed field names; values are never returned, and the note (`comment`) of a `user`, `problem`, `contest`, `contestParticipation` or `submission` record is empty unless you also hold `auth.change_user`, `judge.edit_all_problem`, `judge.edit_all_contest` or `judge.change_submission` respectively, and so is the note of any kind not known to carry only fixed notes. Records of superuser-only settings (decision 416) are left out unless you are a superuser. Filters: `actor` (exact username; unknown gives an empty page), `type`, and a `from`/`to` time range. Page with `before` = the previous page's `nextBefore`. Reads are not logged.
+         * @description Requires `judge.change_settings`. The global change log: every write that already leaves a record (the `revisions` rows of problems, contests, users, organizations, posts, comments, pages, catalogs, submission locks and batch rejudges, and setting changes), newest first, 50 per page (`limit` 1-50). Each entry names the actor, the action, the object (with a label, null for a problem, contest, contest participation, organization, blog post or share unless you hold the matching edit-all or share permission, and whether it still exists) and the changed field names; values are never returned, and the note (`comment`) of a `user`, `problem`, `contest`, `contestParticipation` or `submission` record is empty unless you also hold `auth.change_user`, `judge.edit_all_problem`, `judge.edit_all_contest` or `judge.change_submission` respectively, and so is the note of any kind not known to carry only fixed notes. Records of superuser-only settings (decision 416) are left out unless you are a superuser. Filters: `actor` (exact username; unknown gives an empty page), `type`, and a `from`/`to` time range. Page with `before` = the previous page's `nextBefore`. Reads are not logged.
          */
         get: operations["AuditController_list"];
         put?: never;
@@ -624,6 +624,7 @@ export interface paths {
         /**
          * Create a site page
          * @description Requires `flatpages.add_flatpage`. Stores a page and renders its Markdown to sanitised HTML. The URL is canonicalised (`about/` becomes `/about`). Records a revision. Errors: 400 `invalid_url`, 409 `conflict` when the URL is taken.
+         *     Needs a browser session (API tokens get 403).
          */
         post: operations["FlatpagesAdminController_create"];
         delete?: never;
@@ -649,6 +650,7 @@ export interface paths {
         /**
          * Delete a site page
          * @description Requires `flatpages.delete_flatpage`. Removes the page; its history stays readable and the deletion is recorded. 404 `not_found`. Returns 204.
+         *     Needs a browser session (API tokens get 403).
          */
         delete: operations["FlatpagesAdminController_delete"];
         options?: never;
@@ -656,6 +658,7 @@ export interface paths {
         /**
          * Edit a site page
          * @description Requires `flatpages.change_flatpage`. Partial update; null values are refused. Last write wins. Records a revision when something changed. Errors: 404 `not_found`, 400 `invalid_url`, 409 `conflict` when the new URL is taken.
+         *     Needs a browser session (API tokens get 403).
          */
         patch: operations["FlatpagesAdminController_update"];
         trace?: never;
@@ -732,7 +735,7 @@ export interface paths {
         post?: never;
         /**
          * Delete anonymous activity data
-         * @description Requires `judge.can_see_user_activity`. Needs a browser session (API tokens get 403) and not impersonating. Deletes all activity log rows and sessions of signed-out visitors; the deletion is written to the server log and recorded as a `user` revision (`delete_anonymous_activity`) on your account. Returns 204.
+         * @description Requires `judge.can_see_user_activity` and a browser session (API tokens get 403), not while impersonating. Deletes all activity log rows and sessions of signed-out visitors; the deletion is written to the server log and recorded as a `user` revision (`delete_anonymous_activity`) on your account. Returns 204.
          */
         delete: operations["UserActivityStaffController_deleteAnonymous"];
         options?: never;
@@ -749,7 +752,7 @@ export interface paths {
         };
         /**
          * List who is on the site now
-         * @description Requires `judge.can_see_user_activity`. Returns counts of signed-in users, anonymous visitors and bots seen in the last 30 minutes, plus a page of 50 signed-in users, most recently seen first (`hasMore` tells whether a later page exists).
+         * @description Requires `judge.can_see_user_activity` and a browser session (API tokens get 403). Returns counts of signed-in users, anonymous visitors and bots seen in the last 30 minutes, plus a page of 50 signed-in users, most recently seen first (`hasMore` tells whether a later page exists).
          */
         get: operations["UserActivityStaffController_liveVisitors"];
         put?: never;
@@ -769,7 +772,7 @@ export interface paths {
         };
         /**
          * Search the user activity log
-         * @description Requires `judge.can_see_user_activity`. Returns request log rows of the last `days` (1-90, default 7), newest first, 50 per page with `hasMore` paging. `user` is a username fragment or `anonymous`, `ip` an address prefix and `path` a path fragment; a `user` fragment that matches nobody gives an empty page.
+         * @description Requires `judge.can_see_user_activity` and a browser session (API tokens get 403). Returns request log rows of the last `days` (1-90, default 7), newest first, 50 per page with `hasMore` paging. `user` is a username fragment or `anonymous`, `ip` an address prefix and `path` a path fragment; a `user` fragment that matches nobody gives an empty page.
          */
         get: operations["UserActivityStaffController_list"];
         put?: never;
@@ -789,7 +792,7 @@ export interface paths {
         };
         /**
          * Export the user activity log as CSV
-         * @description Requires `judge.can_see_user_activity`. Same filters as the log search, streamed as a `text/csv` attachment named `user-activity.csv` (newest first, at most 100000 rows, cells made spreadsheet-safe).
+         * @description Requires `judge.can_see_user_activity` and a browser session (API tokens get 403). Same filters as the log search, streamed as a `text/csv` attachment named `user-activity.csv` (newest first, at most 100000 rows, cells made spreadsheet-safe).
          */
         get: operations["UserActivityStaffController_export"];
         put?: never;
@@ -812,7 +815,7 @@ export interface paths {
         post?: never;
         /**
          * Delete a user's activity data
-         * @description Requires `judge.can_see_user_activity`. Needs a browser session (API tokens get 403) and not impersonating. Deletes the user's activity log rows and their stored sessions; the deletion is written to the server log and recorded as a `user` revision (`delete_activity`) with the counts. 403 `forbidden` when the target is yourself or a superuser and you are not a superuser; 404 `not_found` for an unknown user. Returns 204.
+         * @description Requires `judge.can_see_user_activity` and a browser session (API tokens get 403), not while impersonating. Deletes the user's activity log rows and their stored sessions; the deletion is written to the server log and recorded as a `user` revision (`delete_activity`) with the counts. 403 `forbidden` when the target is yourself or a superuser and you are not a superuser; 404 `not_found` for an unknown user. Returns 204.
          */
         delete: operations["UserActivityStaffController_deleteUser"];
         options?: never;
@@ -829,7 +832,7 @@ export interface paths {
         };
         /**
          * List the activity log of one user
-         * @description Requires `judge.can_see_user_activity`. Returns the user's request log rows of the last `days` (1-90, default 7), newest first, 50 per page with `hasMore` paging. 404 `not_found` for an unknown user.
+         * @description Requires `judge.can_see_user_activity` and a browser session (API tokens get 403). Returns the user's request log rows of the last `days` (1-90, default 7), newest first, 50 per page with `hasMore` paging. 404 `not_found` for an unknown user.
          */
         get: operations["UserActivityStaffController_userLogs"];
         put?: never;
@@ -849,7 +852,7 @@ export interface paths {
         };
         /**
          * Summarize one user's activity
-         * @description Requires `judge.can_see_user_activity`. Returns the number of requests over the last `days` (1-90, default 90), requests per UTC day, the 20 most used IP addresses, the 30 most requested paths and the 50 most recent sessions. 404 `not_found` for an unknown user.
+         * @description Requires `judge.can_see_user_activity` and a browser session (API tokens get 403). Returns the number of requests over the last `days` (1-90, default 90), requests per UTC day, the 20 most used IP addresses, the 30 most requested paths and the 50 most recent sessions. 404 `not_found` for an unknown user.
          */
         get: operations["UserActivityStaffController_summary"];
         put?: never;
@@ -922,7 +925,7 @@ export interface paths {
          * Set a user's password
          * @description Requires `auth.change_user`, a browser session, and your own current password (`currentPassword`; wrong attempts share the 10 in 15 minutes budget with other password confirmations: 400 `invalid_credentials`, then 429 `rate_limited`). At most 10 credential changes (password sets and e-mail changes) per admin per hour (429 `rate_limited`).
          *     The new password must pass the signup policy and not appear in a known breach (400 `validation_failed`, issues on `newPassword`). Signs the user out everywhere and revokes their API token; recorded as a `user` revision `staff_set_password` without the password.
-         *     Errors: 403 `forbidden` for yourself or a superuser unless you are one, 404 `not_found`, 409 `conflict` on a concurrent change. Returns 204.
+         *     Errors: 403 `forbidden` for yourself, a superuser unless you are one, or a user holding a permission you lack, 404 `not_found`, 409 `conflict` on a concurrent change. Returns 204.
          */
         post: operations["UserEditingController_setPassword"];
         delete?: never;
@@ -943,7 +946,7 @@ export interface paths {
         /**
          * Send a password reset link
          * @description Requires `auth.change_user` and a browser session. Mails the user the same link as the public reset form, sharing its per-address budget (3 per hour, then 429 `rate_limited`); recorded as a `user` revision `staff_send_reset_link`.
-         *     Errors: 403 `forbidden` for yourself or a superuser unless you are one, 404 `not_found`, 409 `conflict` with issue `account_inactive` or `email_missing`, 503 `mail_unavailable` when mail is not configured. Returns 204.
+         *     Errors: 403 `forbidden` for yourself, a superuser unless you are one, or a user holding a permission you lack, 404 `not_found`, 409 `conflict` with issue `account_inactive` or `email_missing`, 503 `mail_unavailable` when mail is not configured. Returns 204.
          */
         post: operations["UserEditingController_sendResetLink"];
         delete?: never;
@@ -972,7 +975,7 @@ export interface paths {
         /**
          * Edit a user's profile
          * @description Requires `judge.change_profile` and a browser session; changing `email` or `isActive` also needs `auth.change_user` (403 `forbidden`, issue `email_not_editable` or `activation_not_editable`), and an `email` change also your own `currentPassword` (400 `validation_failed` issue `password_required`, 400 `invalid_credentials`) and spends the credential budget shared with password sets (10 per admin per hour). An e-mail change removes the user's social sign-in links (they were granted for the old address), voids reset links and activation keys already sent, signs the user out everywhere and revokes the API token. Not on yourself. Absent fields stay unchanged, `null` is refused; every check runs before the first write (a write that loses a race keeps the earlier ones, all audited). `organizations` replaces the whole ordered list (staff bypass the open-organization cap); deactivating signs the user out everywhere and revokes the API token and the contest feed keys the user minted. Every change is recorded as a `user` revision `staff_edit`.
-         *     Errors: 400 `validation_failed` with issues `email_invalid`, `password_required`, `email_taken`, `organization_unknown`, `organization_admin_member` (the user administers a dropped organization); 403 `forbidden` for yourself or a superuser unless you are one; 404 `not_found`; 409 `conflict` with issue `user_banned` (a banned account keeps its rank and unlisting and is reactivated by unbanning), or when the memberships changed meanwhile or the e-mail is being registered.
+         *     Errors: 400 `validation_failed` with issues `email_invalid`, `password_required`, `email_taken`, `organization_unknown`, `organization_admin_member` (the user administers a dropped organization); 403 `forbidden` for yourself, a superuser unless you are one, or a user holding a permission you lack; 404 `not_found`; 409 `conflict` with issue `user_banned` (a banned account keeps its rank and unlisting and is reactivated by unbanning), or when the memberships changed meanwhile or the e-mail is being registered.
          */
         patch: operations["UserEditingController_update"];
         trace?: never;
@@ -989,7 +992,7 @@ export interface paths {
         /**
          * Rename a user
          * @description Requires `auth.change_user` and a browser session; not yourself. Changes the login name (a case-only change is allowed); the old name keeps opening the profile while no account holds it. Recorded as a `user` revision `staff_rename`.
-         *     Errors: 400 `validation_failed` with issue `username_invalid_characters` or `username_taken`; 403 `forbidden` for yourself or a superuser unless you are one; 404 `not_found`; 409 `conflict` when renamed meanwhile.
+         *     Errors: 400 `validation_failed` with issue `username_invalid_characters` or `username_taken`; 403 `forbidden` for yourself, a superuser unless you are one, or a user holding a permission you lack; 404 `not_found`; 409 `conflict` when renamed meanwhile.
          */
         post: operations["UserEditingController_rename"];
         delete?: never;
@@ -1011,7 +1014,7 @@ export interface paths {
         /**
          * Remove a user's social sign-in links
          * @description Requires `auth.change_user` and a browser session. No Google, GitHub or Facebook identity signs in to the account any more (a provider can link again only through a verified e-mail matching the account's current one). Sessions already open stay: set a password to end them. Recorded as a `user` revision `staff_remove_social_links`.
-         *     Errors: 403 `forbidden` for yourself or a superuser unless you are one, 404 `not_found`. Returns 204.
+         *     Errors: 403 `forbidden` for yourself, a superuser unless you are one, or a user holding a permission you lack, 404 `not_found`. Returns 204.
          */
         delete: operations["UserEditingController_removeSocialLinks"];
         options?: never;
@@ -1254,7 +1257,7 @@ export interface paths {
         put?: never;
         /**
          * Activate an account
-         * @description Public. Consumes the single-use key from the activation mail and turns the account on. Errors: 400 `invalid_token` for an unknown, used or expired key. Returns 204.
+         * @description Public. Consumes the single-use key from the activation mail and turns the account on. A password chosen at signup stops working in the same write (sessions and API token end with it), and a password-reset link is mailed to set one: `passwordResetSent` says whether it went out (when false for such an account, the reset form sends one). Errors: 400 `invalid_token` for an unknown, used or expired key. Returns 200.
          */
         post: operations["RegistrationController_activate"];
         delete?: never;
@@ -2138,6 +2141,7 @@ export interface paths {
          *     Its participations, announcements, ranking link, ghosts, balloons, feed
          *     keys, replay and official ranking are deleted; its submissions are kept
          *     outside any contest. Returns 204.
+         *     Needs a browser session (API tokens get 403).
          */
         delete: operations["ContestEditingController_remove"];
         options?: never;
@@ -2638,7 +2642,8 @@ export interface paths {
          *     latest virtual run is unfinished gets that run back. Joins are rate limited
          *     per user (429 `rate_limited`). Editors and
          *     testers join as spectators. Refusals include 409 `contest_not_started`,
-         *     `virtual_disallowed` and `not_registered`, 403 `banned_from_contest` and
+         *     `virtual_disallowed` and `not_registered`, 403 `not_invited`,
+         *     `banned_from_contest` and
          *     the access-code and rules errors listed for registering.
          */
         post: operations["ContestParticipationController_join"];
@@ -2982,8 +2987,9 @@ export interface paths {
          *     viewer sees the full board, only their own row, or nothing (403
          *     `forbidden`); non-editors see frozen standings during a freeze. A contest
          *     ranking access code sent as `code` shows the full board whatever those
-         *     rules say, and wrong codes (403) are rate limited per IP. Boards of non-
-         *     editors are cached.
+         *     rules say, and wrong codes (403) are rate limited per IP. Before the
+         *     start, `problems` is empty and rows carry no cells except for editors and
+         *     testers. Boards of non-editors are cached.
          */
         get: operations["ContestRankingController_ranking"];
         put?: never;
@@ -3091,6 +3097,7 @@ export interface paths {
          *     to the user when the contest has rules.
          *     Refusals are 409 `editor_cannot_register`, `registration_not_required`,
          *     `registration_closed`, `contest_ended` or `already_registered`; 403
+         *     `not_invited` (a private contest's staff listed only to watch it),
          *     `banned_from_contest`, `access_code_required` or `wrong_access_code`; 400
          *     `rules_not_accepted`; and 409 `rules_changed` when the revision is missing or the rules were saved
          *     after the user read them. Wrong access codes are rate limited per user and
@@ -3186,7 +3193,8 @@ export interface paths {
          * Get the statistics of a contest
          * @description Returns result counts per problem and per language. Subject to the same
          *     rule as the full submission list, so it fails with 403 `forbidden` while
-         *     the viewer may not see that list.
+         *     the viewer may not see that list. Before the start, `problems` is empty
+         *     except for the contest's editors and testers.
          */
         get: operations["ContestStatsController_get"];
         put?: never;
@@ -3962,7 +3970,7 @@ export interface paths {
          *     organization's problem tags are removed. Recorded in the revision log
          *     (its history page is gone with it). Returns 204, also when repeated on
          *     a deleted slug (which finishes an interrupted delete); 404 `not_found`
-         *     for an unknown slug.
+         *     for an unknown slug. Needs a browser session (API tokens get 403).
          */
         delete: operations["OrganizationEditingController_remove"];
         options?: never;
@@ -4316,7 +4324,8 @@ export interface paths {
         head?: never;
         /**
          * Change the quota of an organization
-         * @description Requires `judge.edit_all_organization`. Sets the monthly credits cap, the
+         * @description Requires `judge.edit_all_organization` and a browser session (API tokens
+         *     get 403). Sets the monthly credits cap, the
          *     monthly judging cap in milliseconds, the storage cap in bytes, or the
          *     unlimited flag; `null` clears a cap so the site default applies again,
          *     and omitted fields stay as they are. The change is logged. Returns the
@@ -4932,6 +4941,7 @@ export interface paths {
          *     user may delete 10 problems per hour (429 `rate_limited`). Queues a
          *     recomputation of the points of everyone who solved it. Failures carry the
          *     code in `error.issues[0].code`.
+         *     Needs a browser session (API tokens get 403).
          */
         delete: operations["ProblemLifecycleController_remove"];
         options?: never;
@@ -5623,7 +5633,8 @@ export interface paths {
         put?: never;
         /**
          * Purge a deleted problem immediately
-         * @description Superuser only (403 `forbidden` otherwise), and the body's `confirmCode`
+         * @description Superuser only (403 `forbidden` otherwise), from a browser session (API
+         *     tokens get 403), and the body's `confirmCode`
          *     must repeat the problem code. Queues the purge job without waiting for the
          *     grace period and answers 202 `{ queued: true }`; the job deletes the test
          *     data and statement files but leaves a tombstone with the code and name, and
@@ -5716,7 +5727,9 @@ export interface paths {
          *     ends (403 `spectator_cannot_submit`). Other errors: 403 `banned_from_problem`, 429
          *     `rate_limited` (20 per minute per user) and 429
          *     `unfinished_submission_limit` (2 unfinished submissions, waived by
-         *     `judge.spam_submission`). Queues the submission for judging and returns its
+         *     `judge.spam_submission`; not applied in a running final-submission contest,
+         *     where 429 `final_pending_limit` caps pending submissions at 50 per problem).
+         *     Queues the submission for judging and returns its
          *     `id`.
          */
         post: operations["SubmissionCreateController_submit"];
@@ -6095,7 +6108,7 @@ export interface paths {
         put?: never;
         /**
          * Request an export of my data
-         * @description Signed-in callers only, not while impersonating. Queues a background job that builds a zip of the caller's data and answers 202 `{queued: true}`. Allowed once a day while a fresh zip exists, and at most 3 times a day in total.
+         * @description Signed-in callers only, from a browser session (API tokens get 403), not while impersonating. Queues a background job that builds a zip of the caller's data and answers 202 `{queued: true}`. Allowed once a day while a fresh zip exists, and at most 3 times a day in total.
          *     Errors: 409 `conflict` while an export is already being prepared, 429 `rate_limited` when asking again within a day or past the daily cap, 404 `not_found` when exports are unavailable.
          */
         post: operations["UserDataController_prepare"];
@@ -6114,7 +6127,7 @@ export interface paths {
         };
         /**
          * Download my data export
-         * @description Signed-in callers only, not while impersonating. Streams the prepared zip as an attachment (`application/zip`, `nosniff`). 404 `not_found` when no unexpired export exists.
+         * @description Signed-in callers only, from a browser session (API tokens get 403), not while impersonating. Streams the prepared zip as an attachment (`application/zip`, `nosniff`). 404 `not_found` when no unexpired export exists.
          */
         get: operations["UserDataController_download"];
         put?: never;
@@ -6831,6 +6844,7 @@ export interface paths {
          *     submission; 409 `problem_deleted` when the problem is deleted. A rejudge
          *     discards the override unless `lock` locks the submission too. Logged as a
          *     submission revision with `comment`. Answers 204.
+         *     Needs a browser session (API tokens get 403).
          */
         put: operations["SubmissionActionsController_overrideScore"];
         post?: never;
@@ -7414,7 +7428,7 @@ export interface paths {
         put?: never;
         /**
          * Ban a user
-         * @description Requires `judge.ban_user`. Deactivates the account, hides it from the leaderboards, sets its rank to `banned`, records the reason, signs the user out everywhere and revokes their API token. Errors: 400 `validation_failed` for the reason reserved to automatic contest-cheating bans, 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`, 409 `conflict` when already banned. Returns 204.
+         * @description Requires `judge.ban_user` and a browser session (API tokens get 403), not while impersonating. Deactivates the account, hides it from the leaderboards, sets its rank to `banned`, records the reason, signs the user out everywhere and revokes their API token. Errors: 400 `validation_failed` for the reason reserved to automatic contest-cheating bans, 403 `forbidden` when targeting yourself, a superuser or a user holding a permission you lack, 404 `not_found`, 409 `conflict` when already banned. Returns 204.
          */
         post: operations["UserModerationController_ban"];
         delete?: never;
@@ -7534,7 +7548,7 @@ export interface paths {
         put?: never;
         /**
          * Reset a user's two-factor sign-in
-         * @description Requires `judge.ban_user` and a browser session (API tokens get 403), not while impersonating, like the other staff credential routes. Removes the user's authenticator app and all security keys so a locked-out user can sign in again, signs them out everywhere, revokes their API token and records a `user` revision for audit. Errors: 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`. Returns 204.
+         * @description Requires `judge.ban_user` and a browser session (API tokens get 403), not while impersonating, like the other staff credential routes. Removes the user's authenticator app and all security keys so a locked-out user can sign in again, signs them out everywhere, revokes their API token and records a `user` revision for audit. Errors: 403 `forbidden` when targeting yourself, a superuser or a user holding a permission you lack, 404 `not_found`. Returns 204.
          */
         post: operations["UserModerationController_resetTwoFactor"];
         delete?: never;
@@ -7574,7 +7588,7 @@ export interface paths {
         put?: never;
         /**
          * Unban a user
-         * @description Requires `judge.ban_user`. Restores the account as an active, listed `user`, whatever rank it had before. Errors: 403 `forbidden` when targeting yourself or a superuser, 404 `not_found`, 409 `conflict` when the user is not banned. Returns 204.
+         * @description Requires `judge.ban_user` and a browser session (API tokens get 403), not while impersonating. Restores the account as an active, listed `user`, whatever rank it had before. Errors: 403 `forbidden` when targeting yourself, a superuser or a user holding a permission you lack, 404 `not_found`, 409 `conflict` when the user is not banned. Returns 204.
          */
         post: operations["UserModerationController_unban"];
         delete?: never;
@@ -7693,6 +7707,10 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        ActivationResponse: {
+            /** @description A password-reset link was mailed: the password chosen at signup no longer works, and the account sets one through that link. False when the account had no such password, or the mail could not be sent (the reset form sends another). */
+            passwordResetSent: boolean;
+        };
         ActivityCountResponse: {
             /** @description Number of requests. */
             count: number;
@@ -7902,7 +7920,7 @@ export interface components {
             deleted: boolean;
             /** @description Object id, or the key for a setting. */
             id: string;
-            /** @description What to call the object: problem code, contest key, username, organization slug, page url, post title, setting key, catalog name. Null when the kind has no name (comment, submission) or the object is gone. */
+            /** @description What to call the object: problem code, contest key, username, organization slug, page url, post title, setting key, catalog name. Null when the kind has no name (comment, submission) or the object is gone, and for a problem, contest, contest participation, organization, blog post or share unless you also hold `judge.edit_all_problem`, `judge.edit_all_contest`, `judge.edit_all_organization`, `judge.edit_all_post` or `judge.manage_share` respectively. */
             label: string | null;
         };
         BalloonPageMetaResponse: {
@@ -9957,7 +9975,7 @@ export interface components {
             counts: components["schemas"]["HomeCountsResponse"];
             /** @description The 7 newest problems. */
             newProblems: components["schemas"]["HomeProblemResponse"][];
-            /** @description Newest comments the viewer may read. */
+            /** @description Newest comments the viewer may read; a `bodyHtml` over 32 KiB comes as a paragraph of its first words. */
             recentComments: components["schemas"]["RecentCommentResponse"][];
             /** @description Top 5 users by contribution points. */
             topContributors: components["schemas"]["HomeUserResponse"][];
@@ -13422,7 +13440,7 @@ export interface components {
             messages: components["schemas"]["TicketMessageResponse"][];
             /** @description Staff-only internal notes: set for those who may edit them (`can.editNotes`: staff and assignees), null for every other reader. */
             notes: string | null;
-            /** @description Messages and state changes by time (equal instants: message first). */
+            /** @description Messages and state changes by time (equal instants: message first); `marked-good` and `unmarked-good` only for those who may mark the ticket good (`can.markGood`). */
             timeline: components["schemas"]["TicketTimelineEntryResponse"][];
             /** @description Ticket title. */
             title: string;
@@ -16820,11 +16838,15 @@ export interface operations {
             };
         };
         responses: {
-            204: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ActivationResponse"];
+                    };
+                };
             };
             /** @description Any failure. `error.code` is a snake_case machine code; `fields` and `issues` appear on validation failures; some codes add members of their own (`banReason`). */
             default: {

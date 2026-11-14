@@ -833,6 +833,8 @@
     "activation": {
       "doneTitle": "Tài khoản đã kích hoạt",
       "doneLead": "Email của bạn đã được xác nhận. Bạn có thể đăng nhập ngay.",
+      "resetLead": "Email của bạn đã được xác nhận. Mật khẩu đặt lúc đăng ký không còn dùng được: chúng tôi đã gửi liên kết đặt lại mật khẩu tới email của bạn. Hãy đặt mật khẩu mới qua liên kết đó.",
+      "setPassword": "Đặt mật khẩu mới",
       "deadTitle": "Liên kết đã hết hạn",
       "deadLead": "Liên kết kích hoạt chỉ dùng được trong 7 ngày. Nhập email để nhận liên kết mới."
     },
@@ -896,6 +898,7 @@
     "contest_running": "Chưa xem được: bài nộp của kỳ thi chưa được công khai.",
     "hidden": "Nội dung này bị ẩn với bạn.",
     "editor_cannot_register": "Người ra đề và người thử đề không cần đăng ký.",
+    "not_invited": "Bạn chưa được mời tham gia kỳ thi này.",
     "banned_from_contest": "Bạn bị cấm tham gia kỳ thi này.",
     "registration_not_required": "Kỳ thi này không cần đăng ký: vào thi khi kỳ thi bắt đầu.",
     "registration_closed": "Kỳ thi này đã đóng đăng ký. Bạn không thể đăng ký thêm.",

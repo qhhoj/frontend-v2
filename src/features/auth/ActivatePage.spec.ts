@@ -2,7 +2,7 @@ import { flushPromises } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { createMemoryHistory } from 'vue-router';
 import { signedOut } from '@/test/fixtures';
-import { fail, mockApi, noContent, sequence } from '@/test/mock-api';
+import { fail, mockApi, noContent, ok, sequence } from '@/test/mock-api';
 import { brandRoutes } from '@/test/auth-routes';
 import { mountApp } from '@/test/mount';
 
@@ -25,7 +25,7 @@ describe('activate page', () => {
     const calls = mockApi({
       'GET /auth/me': signedOut,
       ...brandRoutes,
-      'POST /auth/activate': noContent(),
+      'POST /auth/activate': ok({ passwordResetSent: false }),
     });
     await mountApp('/activate/k123', history);
     expect(calls.filter((call) => call.path === '/auth/activate').map((call) => call.body)).toEqual(
@@ -33,6 +33,18 @@ describe('activate page', () => {
     );
     expect(pushed).not.toHaveBeenCalled();
     expect(replaced.mock.calls.at(-1)?.[0]).toBe('/activate/done');
+  });
+
+  it('sends an account whose password was voided to the reset form', async () => {
+    mockApi({
+      'GET /auth/me': signedOut,
+      ...brandRoutes,
+      'POST /auth/activate': ok({ passwordResetSent: true }),
+    });
+    const { wrapper } = await mountApp('/activate/k123');
+    await flushPromises();
+    expect(wrapper.get('#main [role="status"]').text()).toContain('liên kết đặt lại mật khẩu');
+    expect(wrapper.get('#main a[href="/forgot-password"]').text()).toBe('Đặt mật khẩu mới');
   });
 
   it('explains a dead link and sends a new one to the address typed', async () => {
@@ -62,7 +74,7 @@ describe('activate page', () => {
     const calls = mockApi({
       'GET /auth/me': signedOut,
       ...brandRoutes,
-      'POST /auth/activate': sequence(fail(429, 'rate_limited'), noContent()),
+      'POST /auth/activate': sequence(fail(429, 'rate_limited'), ok({ passwordResetSent: false })),
     });
     const { wrapper } = await mountApp('/activate/k123');
     await wrapper

@@ -48,7 +48,13 @@ useNoReferrer();
 const route = useRoute();
 const router = useRouter();
 const state = ref<ActivationState>(route.params.key === DONE_KEY ? 'activated' : 'pending');
-const card = computed(() => CARDS[state.value]);
+/** The signup password was voided: the account sets a new one through a reset link, not by signing in. */
+const passwordVoided = ref(false);
+const card = computed(() =>
+  state.value === 'activated' && passwordVoided.value
+    ? { ...CARDS.activated, leadKey: 'auth.activation.resetLead' }
+    : CARDS[state.value],
+);
 const errorText = ref<string | null>(null);
 const asksForEmail = computed(() => state.value === 'linkDead' || state.value === 'linkResent');
 // The page shows nothing until the key is checked, so it is waiting on first data: the shell announces it and walks the Bits.
@@ -69,7 +75,7 @@ function showFailure(caught: unknown) {
 
 async function activateKey() {
   try {
-    await activate(String(route.params.key));
+    passwordVoided.value = (await activate(String(route.params.key))).passwordResetSent;
   } catch (caught) {
     showFailure(caught);
     return;
@@ -100,9 +106,13 @@ onMounted(() => {
     <template v-if="card.bit" #badge>
       <InlineBit :kind="card.bit" class="self-center" />
     </template>
-    <AppButton v-if="state === 'activated'" tone="primary" block :to="{ name: 'login' }">{{
-      $t('auth.submitLogin')
-    }}</AppButton>
+    <AppButton
+      v-if="state === 'activated'"
+      tone="primary"
+      block
+      :to="{ name: passwordVoided ? 'forgot-password' : 'login' }"
+      >{{ $t(passwordVoided ? 'auth.activation.setPassword' : 'auth.submitLogin') }}</AppButton
+    >
     <EmailLinkRequest
       v-else-if="asksForEmail"
       :send="resendActivation"

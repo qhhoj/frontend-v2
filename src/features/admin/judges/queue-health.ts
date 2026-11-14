@@ -10,6 +10,9 @@ export interface QueueAlert {
   count: number;
 }
 
+/** Superseded final-contest rows wait here behind all other work; their age says nothing about a stuck queue. */
+const BACKLOG_PRIORITY = 4;
+
 /** What needs a human: a queued language no usable judge runs, rows pinned to a judge that is away, and a long oldest wait. */
 export function queueAlerts(queue: JudgeQueue, now: number): QueueAlert[] {
   const alerts: QueueAlert[] = [
@@ -24,12 +27,19 @@ export function queueAlerts(queue: JudgeQueue, now: number): QueueAlert[] {
       .filter((pin) => !pin.online)
       .map((pin) => ({ kind: 'pinnedOffline' as const, subject: pin.judge, count: pin.count })),
   ];
-  const oldest = queue.oldestQueuedSince ? new Date(queue.oldestQueuedSince).getTime() : null;
+  const urgent = queue.byPriority.filter((row) => row.priority !== BACKLOG_PRIORITY);
+  const oldest = urgent.length
+    ? Math.min(...urgent.map((row) => new Date(row.oldestSince).getTime()))
+    : null;
   if (oldest !== null && now - oldest > STALE_WAIT_MS)
-    alerts.push({ kind: 'stale', subject: '', count: queue.queued });
+    alerts.push({
+      kind: 'stale',
+      subject: '',
+      count: urgent.reduce((sum, row) => sum + row.count, 0),
+    });
   return alerts;
 }
 
-/** Priority 0 contest … 3 batch rejudge, as the i18n key part. */
-export const PRIORITY_KEYS = ['contest', 'normal', 'rejudge', 'batch'] as const;
+/** Priority 0 contest … 3 batch rejudge, 4 backlog, as the i18n key part. */
+export const PRIORITY_KEYS = ['contest', 'normal', 'rejudge', 'batch', 'backlog'] as const;
 export const priorityKey = (priority: number) => PRIORITY_KEYS[priority] ?? 'normal';
