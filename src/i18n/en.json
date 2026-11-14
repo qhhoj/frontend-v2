@@ -2329,20 +2329,19 @@
       "on": {
         "title": "Always on",
         "body": "Fewer effects; text and colours stay.",
-        "preview": "Still Bit · no blur"
+        "preview": "Still Bit · flat background"
       },
       "off": {
         "title": "Always off",
         "body": "Every effect, even on a weak device.",
-        "preview": "Moving Bit · frosted glass"
+        "preview": "Moving Bit · patterned background"
       }
     },
     "machineOn": "This device: on",
     "machineOff": "This device: off",
     "effectsTitle": "When on",
     "effects": {
-      "blur": "No background blur (frosted glass)",
-      "blobs": "Background colour blobs hidden",
+      "background": "Page background shown as one flat colour",
       "motion": "No motion effects",
       "bit": "Bit is a still picture",
       "replay": "Ranking replay without moving rows",

@@ -2329,20 +2329,19 @@
       "on": {
         "title": "Luôn bật",
         "body": "Ít hiệu ứng, chữ và màu giữ nguyên.",
-        "preview": "Bit tĩnh · không làm mờ"
+        "preview": "Bit tĩnh · nền phẳng"
       },
       "off": {
         "title": "Luôn tắt",
         "body": "Đủ hiệu ứng, kể cả khi máy yếu.",
-        "preview": "Bit chuyển động · kính mờ"
+        "preview": "Bit chuyển động · nền họa tiết"
       }
     },
     "machineOn": "Máy này: đang bật",
     "machineOff": "Máy này: đang tắt",
     "effectsTitle": "Khi bật",
     "effects": {
-      "blur": "Tắt làm mờ nền (kính mờ)",
-      "blobs": "Ẩn các vệt màu nền",
+      "background": "Nền trang hiện một màu phẳng, không họa tiết",
       "motion": "Bỏ hiệu ứng chuyển động",
       "bit": "Bit hiển thị hình tĩnh",
       "replay": "Phát lại bảng điểm không chuyển hàng",

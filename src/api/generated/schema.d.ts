@@ -7877,11 +7877,6 @@ export interface components {
              * @description Deprecated (Glass, retired 2026-11-15): accepted from older clients and ignored.
              */
             glow?: number;
-            /**
-             * @description Colour mode; omit to leave it to `siteTheme`.
-             * @enum {string}
-             */
-            mode?: "auto" | "dark" | "light";
         };
         AppearanceResponse: {
             /**
@@ -7899,11 +7894,6 @@ export interface components {
              * @enum {string}
              */
             contrast?: "high" | "standard";
-            /**
-             * @description Colour mode; absent means `siteTheme` decides.
-             * @enum {string}
-             */
-            mode?: "auto" | "dark" | "light";
         };
         ArchivedInOrganizationResponse: {
             /** @description Name of the organization. */

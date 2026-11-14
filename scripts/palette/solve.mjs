@@ -9,9 +9,13 @@ import {
   solveLightness,
   worstContrast,
 } from './color.mjs';
-import { LANES, PARTIAL_ALPHAS } from './paper.mjs';
+import { FAILING_LANES, LANES, PARTIAL_ALPHAS } from './paper.mjs';
 
 export const WHITE = '#FFFFFF';
+/** Closest a verdict text may come to AC text, OKLab x100 under normal, deuteranopic and protanopic vision. */
+export const MIN_VERDICT_SEPARATION = 5;
+/** Smallest luminance ratio between adjacent text levels (text, secondary, muted), so the three stay distinct. */
+export const MIN_TEXT_STEP = 1.1;
 
 /** Contrast floors (WCAG ratios), standard and high contrast; a pair is [light mode, dark mode]. */
 const FLOORS = {
@@ -75,11 +79,21 @@ function neutrals(palette, mode, floors, accents) {
   const solve = (start, floor) => solveLightness(start, chroma, hue, readable(floor), stepOf(mode));
   const { ground, surface } = palette[mode];
   const bordered = (hex) => worstContrast(hex, [ground, surface]) >= floors.control;
+  const text = solve(pick(0.4, 0.8), pick(...floors.text));
+  const textMuted = solve(pick(0.65, 0.62), floors.muted);
+  // Secondary sits between text and muted: where its own floor lands on muted's (the tint floor rules both), it moves
+  // toward text until it is a step from each.
+  const between = (hex) =>
+    contrast(hex, textMuted) >= MIN_TEXT_STEP && contrast(hex, text) >= MIN_TEXT_STEP;
+  const ownSecondary = solve(pick(0.55, 0.72), pick(...floors.secondary));
+  const textSecondary = between(ownSecondary)
+    ? ownSecondary
+    : solveLightness(lightnessOf(textMuted), chroma, hue, between, stepOf(mode) / 4);
   return {
     ...palette[mode],
-    text: solve(pick(0.4, 0.8), pick(...floors.text)),
-    textSecondary: solve(pick(0.55, 0.72), pick(...floors.secondary)),
-    textMuted: solve(pick(0.65, 0.62), floors.muted),
+    text,
+    textSecondary,
+    textMuted,
     lineControl: solveLightness(pick(0.8, 0.35), chroma, hue, bordered, stepOf(mode)),
   };
 }
@@ -198,10 +212,18 @@ function tintedText(palette, mode, [hue, chroma], alpha, floor, extraAlphas = []
   return { text, tint };
 }
 
+/** AC text a step further from its ground (more contrast) until every failing verdict's text is far enough from it. */
+function separateAccepted(palette, mode, texts) {
+  const [hue, chroma] = palette.lanes.ac;
+  const apart = (hex) =>
+    FAILING_LANES.every((lane) => separation(hex, texts[lane]) >= MIN_VERDICT_SEPARATION);
+  return solveLightness(lightnessOf(texts.ac), chroma, hue, apart, stepOf(mode));
+}
+
 function lanes(palette, mode, floors, highContrast, accentFills) {
   const solids = laneSolids(palette, mode, floors, highContrast, accentFills);
   const alpha = isLight(mode) ? 0.12 : 0.16;
-  return Object.fromEntries(
+  const solved = Object.fromEntries(
     LANES.map((lane) => {
       const partials = lane === 'ac' ? PARTIAL_ALPHAS : [];
       const { text, tint } = tintedText(
@@ -215,6 +237,8 @@ function lanes(palette, mode, floors, highContrast, accentFills) {
       return [lane, { text, tint, solid: solids[lane], on: labelOn(palette, solids[lane]) }];
     }),
   );
+  const texts = Object.fromEntries(LANES.map((lane) => [lane, solved[lane].text]));
+  return { ...solved, ac: { ...solved.ac, text: separateAccepted(palette, mode, texts) } };
 }
 
 /** The first-solve cell: a stronger green than the AC tint (3:1 against it) that carries its label. */

@@ -1,7 +1,8 @@
 // The contrast proof of a solved palette: every pair a screen draws, at the WCAG minimum of its level.
 // Returns the failures as readable lines; an empty list is a pass.
-import { contrast, over } from './color.mjs';
-import { LANES, PARTIAL_ALPHAS } from './paper.mjs';
+import { contrast, over, separation } from './color.mjs';
+import { FAILING_LANES, LANES, PARTIAL_ALPHAS } from './paper.mjs';
+import { MIN_TEXT_STEP, MIN_VERDICT_SEPARATION } from './solve.mjs';
 
 /** Minimum ratios: body text, non-text (borders, fills, rings), a label on a solid fill. */
 const MINIMUMS = {
@@ -64,6 +65,13 @@ function checkLanes({ expect, expectOn }, set, minimums) {
     expect(`${lane} label`, contrast(on, solid), minimums.label);
     expectOn(`${lane} solid`, solid, [neutrals.ground, neutrals.surface], minimums.graphic);
   }
+  FAILING_LANES.forEach((lane) =>
+    expect(
+      `ac/${lane} text separation (colour-blind)`,
+      separation(set.lanes.ac.text, set.lanes[lane].text),
+      MIN_VERDICT_SEPARATION,
+    ),
+  );
   const acTint = set.lanes.ac.tint;
   PARTIAL_ALPHAS.forEach((alpha, index) =>
     expectOn(
@@ -110,6 +118,9 @@ export function proveSet(set, mode, level) {
     [neutrals.ground, neutrals.surface],
     minimums.graphic,
   );
+  const { text, textSecondary, textMuted } = neutrals;
+  check.expect('text/secondary step', contrast(text, textSecondary), MIN_TEXT_STEP);
+  check.expect('secondary/muted step', contrast(textSecondary, textMuted), MIN_TEXT_STEP);
   for (const [id, accent] of Object.entries(set.accents))
     checkAccent(check, id, accent, neutrals, minimums);
   checkLanes(check, set, minimums);

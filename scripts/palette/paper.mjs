@@ -1,6 +1,8 @@
 // Palette A, "Paper & Ultramarine": the inputs the generator turns into tokens. Hues and chromas are OKLCH
 // ([hue, chroma]); grounds are fixed hex. Change a value here, run `npm run palette`, commit the regenerated CSS.
 export const LANES = ['ac', 'wa', 'tle', 'mle', 'rte', 'ce', 'ie', 'pending'];
+/** The failing verdicts whose text sits beside AC text (ranking cells, test strips): each must stay apart from AC under colour blindness. */
+export const FAILING_LANES = ['wa', 'tle', 'mle', 'rte'];
 /** The three partial-score steps (IOI ranking cells, partial tests): the AC tint at these strengths, under AC text. */
 export const PARTIAL_ALPHAS = [0.08, 0.14, 0.2];
 
