@@ -19,7 +19,7 @@ const press = (key: string, init: KeyboardEventInit = {}, target: EventTarget = 
   );
 
 describe('site search keys', () => {
-  it('sends / to the page search and Ctrl K to the palette', async () => {
+  it('sends / to the page search and Ctrl K to the palette, never from a field or an editor', async () => {
     mockApi({ ...problemListRoutes, ...anonymousViewer });
     const { wrapper } = await mountApp('/problems');
     const field = wrapper.get<HTMLInputElement>('#main input[type="search"]').element;
@@ -30,7 +30,18 @@ describe('site search keys', () => {
     expect(press('/', {}, field)).toBe(true);
     expect(palette()).toBeNull();
 
-    press('k', { ctrlKey: true }, field);
+    // In a text field or a code editor Ctrl K edits text (a Mac's "delete to end of line"): no palette.
+    const editor = document.createElement('div');
+    editor.setAttribute('contenteditable', 'true');
+    editor.innerHTML = '<div class="cm-line">x</div>';
+    wrapper.get('#main').element.append(editor);
+    for (const target of [field, editor.firstElementChild!]) {
+      expect(press('k', { ctrlKey: true }, target)).toBe(true);
+      await flushPromises();
+      expect(palette()).toBeNull();
+    }
+
+    press('k', { ctrlKey: true });
     await vi.waitFor(() => expect(palette()).not.toBeNull());
   });
 

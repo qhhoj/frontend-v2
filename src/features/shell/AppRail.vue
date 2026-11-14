@@ -15,7 +15,7 @@ import UserMenu from './UserMenu.vue';
 /**
  * The desktop rail, from `md` up: the brand, the search button (Ctrl K), the seven sections (Kỳ thi with its count of
  * running contests), the contest the viewer is taking part in, and the account at the foot. 224 px from 1100 px
- * (`rail-wide`); below that a 56 px column of icons whose labels stay their accessible names. Opaque: the page
+ * (`rail-wide`); below that a 56 px column of icons (44 px targets) whose labels stay their accessible names. Opaque: the page
  * background is drawn behind `main` only.
  */
 defineProps<{ current: CurrentParticipation | null }>();
@@ -33,11 +33,12 @@ const CURRENT_ROW =
 </script>
 
 <template>
-  <div
+  <aside
     data-testid="app-rail"
-    class="sticky top-0 hidden h-dvh w-14 shrink-0 flex-col gap-3 overflow-y-auto border-r border-line bg-surface-strong px-1.5 py-2 md:flex rail-wide:w-(--qh-rail) rail-wide:px-3 print:hidden"
+    :aria-label="$t('nav.rail')"
+    class="sticky top-0 hidden h-dvh w-14 shrink-0 flex-col gap-3 overflow-y-auto border-r border-line bg-surface-strong px-1 py-2 md:flex rail-wide:w-(--qh-rail) rail-wide:px-3 print:hidden"
   >
-    <div class="flex min-h-11 items-center px-1 max-rail-wide:justify-center">
+    <div class="flex min-h-11 items-center px-1 max-rail-wide:justify-center max-rail-wide:px-0">
       <BrandWordmark size="sm" class="max-rail-wide:hidden" />
       <RouterLink
         to="/"
@@ -95,5 +96,5 @@ const CURRENT_ROW =
     <div :class="['border-t border-line pt-2', !current && 'mt-auto']">
       <UserMenu variant="row" />
     </div>
-  </div>
+  </aside>
 </template>

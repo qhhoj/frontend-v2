@@ -1,4 +1,12 @@
-import { BookOpen, Building2, House, ListChecks, Medal, Newspaper, Trophy } from 'lucide-vue-next';
+import {
+  Building2,
+  ChartColumn,
+  House,
+  ListChecks,
+  Newspaper,
+  Send,
+  Trophy,
+} from 'lucide-vue-next';
 import type { Component } from 'vue';
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -16,10 +24,10 @@ export interface NavItem {
 /** The seven public sections, in the order of the rail and of the phone sheet (the tab bar keeps the first four). */
 export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/', labelKey: 'nav.home', icon: House },
-  { path: '/problems', labelKey: 'nav.problems', icon: BookOpen },
+  { path: '/problems', labelKey: 'nav.problems', icon: ListChecks },
   { path: '/contests', labelKey: 'nav.contests', icon: Trophy },
-  { path: '/submissions', labelKey: 'nav.submissions', icon: ListChecks },
-  { path: '/users', labelKey: 'nav.users', icon: Medal },
+  { path: '/submissions', labelKey: 'nav.submissions', icon: Send },
+  { path: '/users', labelKey: 'nav.users', icon: ChartColumn },
   { path: '/blog', labelKey: 'nav.blog', icon: Newspaper },
   { path: '/organizations', labelKey: 'nav.organizations', icon: Building2 },
 ];

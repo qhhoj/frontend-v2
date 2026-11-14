@@ -17,7 +17,8 @@
     "runningCount": "{count} running",
     "me": "Me",
     "back": "Back",
-    "breadcrumb": "Breadcrumb"
+    "breadcrumb": "Breadcrumb",
+    "rail": "Sidebar"
   },
   "pages": {
     "problem": "Problem",

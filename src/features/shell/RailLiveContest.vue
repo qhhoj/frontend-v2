@@ -13,13 +13,15 @@ import { useLocaleStore } from '@/stores/locale.store';
 
 /**
  * The rail's card for the contest the viewer is in: its status, name, the clock, and for a contestant the rank and the
- * solved count. The rank is the viewer's row of the board the ranking tab reads: the same query, polled at the same rate
- * while the rail is shown (from md), so with the tab open there is still one poll; it is left out when the board is closed to
- * the viewer, shows no rank or is frozen. The solved count comes from the contest's problem list (the contest page's query). A spectator sees
- * the clock only.
+ * solved count. The rank is the viewer's row of the board the ranking tab reads (the same query, so with the tab open
+ * there is still one poll), re-read every 2 minutes; it is left out when the board is closed to the viewer, failed,
+ * shows no rank or is frozen. The solved count comes from the contest's problem list (the contest page's query), re-read
+ * after each of the viewer's verdicts. A spectator sees the clock only.
  */
-/** The rail is shown from md; a phone asks for neither the board nor the problem list. */
-const RAIL_QUERY = '(min-width: 768px)';
+/** The rank and the solved count are drawn on the wide rail only; narrower, neither the board nor the list is asked. */
+const WIDE_RAIL_QUERY = '(min-width: 68.75rem)';
+/** A rank hint, not the ranking tab: a slow re-read keeps a full-board poll per contestant cheap. */
+const RAIL_BOARD_POLL_MS = 120_000;
 const props = defineProps<{ current: CurrentParticipation }>();
 const { t } = useI18n();
 const locale = useLocaleStore();
@@ -32,8 +34,8 @@ const statusText = computed(() => {
 });
 
 const isContestant = computed(() => kind.value !== 'spectate');
-const isRailShown = useMediaQuery(RAIL_QUERY);
-const isAsked = computed(() => isContestant.value && isRailShown.value);
+const isWideRail = useMediaQuery(WIDE_RAIL_QUERY);
+const isAsked = computed(() => isContestant.value && isWideRail.value);
 const contest = useContestQuery(contestKey, isAsked);
 /** A board closed to this viewer (hidden, or open only after the contest) is not polled for a rank it cannot show. */
 const isBoardAsked = computed(
@@ -43,11 +45,12 @@ const board = useRankingQuery(
   contestKey,
   computed(() => kind.value === 'virtual'),
   isAsked,
-  isBoardAsked,
+  { isEnabled: isBoardAsked, pollMs: RAIL_BOARD_POLL_MS },
 );
+/** Never a stale rank: none once the board is closed (403, or the contest says so) or its last read failed. */
 const rank = computed(() => {
   const ranking = board.data.value;
-  if (!isContestant.value || !ranking || ranking.frozen) return null;
+  if (!isBoardAsked.value || board.isError.value || !ranking || ranking.frozen) return null;
   const own = ranking.rows.find((row) => row.participationId === props.current.participation.id);
   return own?.rank ?? null;
 });
@@ -77,7 +80,7 @@ const standing = computed(() =>
       <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-positive" />
       <span class="max-rail-wide:sr-only">{{ statusText }}</span>
     </span>
-    <span class="text-sm font-semibold text-content max-rail-wide:sr-only">{{
+    <span class="truncate text-sm font-semibold text-content max-rail-wide:sr-only">{{
       current.contest.name
     }}</span>
     <span class="flex items-baseline gap-2 max-rail-wide:flex-col max-rail-wide:items-center">

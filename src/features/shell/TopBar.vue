@@ -83,9 +83,12 @@ const isHome = computed(() => route.path === '/');
               class="inline-flex min-h-11 items-center text-muted hover:text-content"
               >{{ sectionLabel }}</RouterLink
             >
-            <span v-else aria-current="page" class="font-semibold text-content">{{
-              sectionLabel
-            }}</span>
+            <span
+              v-else
+              :aria-current="pageName ? undefined : 'page'"
+              class="font-semibold text-content"
+              >{{ sectionLabel }}</span
+            >
           </li>
           <li v-if="pageName" class="flex min-w-0 items-center gap-1.5">
             <ChevronRight v-if="section" aria-hidden="true" class="size-4 shrink-0 text-muted" />
