@@ -7853,29 +7853,47 @@ export interface components {
         };
         AppearanceDto: {
             /**
-             * @description Accent colour preset.
+             * @description Accent preset; a retired Clay or Glass id is stored as its successor.
              * @enum {string}
              */
-            accent: "clay" | "gold" | "mint" | "mono" | "ocean" | "orchid" | "red" | "sunset";
+            accent: "clay" | "gold" | "graphite" | "mint" | "mono" | "ocean" | "orchid" | "plum" | "red" | "sunset" | "teal" | "terracotta" | "ultramarine";
             /**
              * @description Page background style; omit for the default (`blueprint`).
              * @enum {string}
              */
             background?: "blueprint" | "contour" | "dither" | "grainy" | "halftone" | "landscape" | "none" | "paper" | "stipple";
-            /** @description Glass effect strength, 0-100. */
-            glass: number;
-            /** @description Glow effect strength, 0-100. */
-            glow: number;
+            /**
+             * @description Contrast level; omit for `standard`.
+             * @enum {string}
+             */
+            contrast?: "high" | "standard";
+            /**
+             * @deprecated
+             * @description Deprecated (Glass, retired 2026-11-15): accepted from older clients and ignored.
+             */
+            glass?: number;
+            /**
+             * @deprecated
+             * @description Deprecated (Glass, retired 2026-11-15): accepted from older clients and ignored.
+             */
+            glow?: number;
         };
         AppearanceResponse: {
-            /** @description Accent colour preset. */
-            accent: string;
-            /** @description Page background style; absent means the default (`blueprint`). */
-            background?: string;
-            /** @description Glass effect strength, 0-100. */
-            glass: number;
-            /** @description Glow effect strength, 0-100. */
-            glow: number;
+            /**
+             * @description Accent preset.
+             * @enum {string}
+             */
+            accent: "graphite" | "plum" | "teal" | "terracotta" | "ultramarine";
+            /**
+             * @description Page background style; absent means the default (`blueprint`).
+             * @enum {string}
+             */
+            background?: "blueprint" | "contour" | "dither" | "grainy" | "halftone" | "landscape" | "none" | "paper" | "stipple";
+            /**
+             * @description Contrast level; absent means `standard`.
+             * @enum {string}
+             */
+            contrast?: "high" | "standard";
         };
         ArchivedInOrganizationResponse: {
             /** @description Name of the organization. */
@@ -11536,7 +11554,7 @@ export interface components {
             about: string;
             /** @description Rendered, sanitised HTML of `about`. */
             aboutHtml: string;
-            /** @description Custom accent and glass settings; null for the site look. */
+            /** @description The personal look (accent, contrast, page background); null for the site look. */
             appearance: components["schemas"]["AppearanceResponse"] | null;
             /** @description Roaming Bits: off with one Bit until the user turns them on. */
             bitRoam: components["schemas"]["BitRoamResponse"];
@@ -14217,7 +14235,7 @@ export interface components {
         UserResponse: {
             /** @description Object rights behind the admin screens, beside the permission codenames. */
             adminCapabilities: components["schemas"]["AdminCapabilitiesResponse"];
-            /** @description Custom accent and glass settings; null for the site default. */
+            /** @description The personal look (accent, contrast, page background); null for the site default. */
             appearance: components["schemas"]["AppearanceResponse"] | null;
             /** @description Account email address. */
             email: string;

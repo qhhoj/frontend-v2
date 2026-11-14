@@ -1,43 +1,35 @@
 import { describe, expect, it } from 'vitest';
-import {
-  AUTO_THEME,
-  canonicalPreference,
-  GLASS_AUTO_THEME,
-  resolveTheme,
-  THEMES,
-} from './registry';
+import { AUTO_THEME, canonicalPreference, resolveTheme, THEMES } from './registry';
 
 describe('resolveTheme', () => {
-  it('follows the system scheme for auto and lands on Clay', () => {
-    expect(resolveTheme(AUTO_THEME, 'dark').id).toBe('clay-dark');
-    expect(resolveTheme(AUTO_THEME, 'light').id).toBe('clay-light');
+  it('follows the system scheme for auto and for an unknown preference', () => {
+    expect(resolveTheme(AUTO_THEME, 'dark').id).toBe('dark');
+    expect(resolveTheme(AUTO_THEME, 'light').id).toBe('light');
+    expect(resolveTheme('neon-retired', 'light').id).toBe('light');
+    expect(resolveTheme('', 'dark').id).toBe('dark');
   });
 
-  it('maps the legacy siteTheme values light and dark onto Clay whatever the system says', () => {
-    expect(resolveTheme('light', 'dark').id).toBe('clay-light');
-    expect(resolveTheme('dark', 'light').id).toBe('clay-dark');
-  });
-
-  it('accepts a theme id, Glass included, whatever the system says', () => {
-    expect(resolveTheme('glass-light', 'dark').id).toBe('glass-light');
-    expect(resolveTheme('glass-dark', 'light').id).toBe('glass-dark');
-    expect(resolveTheme('clay-dark', 'light').id).toBe('clay-dark');
-    expect(resolveTheme('clay-light', 'dark').id).toBe('clay-light');
-  });
-
-  it('falls back to the Clay theme of the system scheme for an unknown preference', () => {
-    expect(resolveTheme('neon-retired', 'light').id).toBe('clay-light');
-    expect(resolveTheme('', 'dark').id).toBe('clay-dark');
+  it('keeps a chosen mode whatever the system says, a Clay or Glass id included', () => {
+    expect(resolveTheme('light', 'dark').id).toBe('light');
+    expect(resolveTheme('dark', 'light').id).toBe('dark');
+    expect(resolveTheme('glass-dark', 'light').id).toBe('dark');
+    expect(resolveTheme('clay-light', 'dark').id).toBe('light');
+    expect(resolveTheme('glass-auto', 'dark').id).toBe('dark');
   });
 });
 
 describe('canonicalPreference', () => {
-  it('turns a legacy value into the Clay id and leaves current and inherited-looking values alone', () => {
-    expect(canonicalPreference('light')).toBe('clay-light');
-    expect(canonicalPreference('dark')).toBe('clay-dark');
-    for (const inherited of ['constructor', '__proto__', 'toString'])
-      expect(canonicalPreference(inherited)).toBe(inherited);
-    for (const value of [AUTO_THEME, GLASS_AUTO_THEME, ...THEMES.map((theme) => theme.id)])
+  it('turns a Clay or Glass id into its successor and leaves current and inherited-looking values alone', () => {
+    expect(canonicalPreference('clay-dark')).toBe('dark');
+    expect(canonicalPreference('glass-light')).toBe('light');
+    expect(canonicalPreference('glass-auto')).toBe(AUTO_THEME);
+    for (const value of [
+      'constructor',
+      '__proto__',
+      'toString',
+      AUTO_THEME,
+      ...THEMES.map((theme) => theme.id),
+    ])
       expect(canonicalPreference(value)).toBe(value);
   });
 });

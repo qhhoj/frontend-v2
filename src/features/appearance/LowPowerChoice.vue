@@ -12,7 +12,7 @@ import { useLowPowerStore } from '@/theme/low-power.store';
 
 /** Board M10C: three cards (each with a small preview), what "on" changes, and where the choice is kept. */
 const lowPower = useLowPowerStore();
-const EFFECT_KEYS = ['blur', 'blobs', 'motion', 'bit', 'replay', 'ranking', 'editor'] as const;
+const EFFECT_KEYS = ['background', 'motion', 'bit', 'replay', 'ranking', 'editor'] as const;
 const machineKey = computed(() => (lowPower.isWeak ? 'lowPower.machineOn' : 'lowPower.machineOff'));
 const isSaved = ref(false);
 const preference = computed<LowPowerPreference>({

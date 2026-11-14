@@ -46,46 +46,36 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 ## Styling
 
 - Components use the semantic utilities from `src/theme/styles.css` only (`bg-surface`, `text-content`, `text-muted`, `border-line`, `rounded-card`, `font-display`, ...). Tailwind's own palette, fonts and radii are removed
-- No colour literals outside `src/theme/themes/*.css` (specs excepted): `npm run lint:tokens` fails on them. Bit's sprite palettes in `src/mascot/bit-sprite.ts` are the only exception (sprite colours, like an image asset); `lint:tokens` skips that one file
+- No colour literals outside `src/theme/palette/*.css` (generated; specs excepted): `npm run lint:tokens` fails on them. Bit's sprite palettes in `src/mascot/bit-sprite.ts` are the only exception (sprite colours, like an image asset); `lint:tokens` skips that one file
 - Classes picked at runtime come from a static `Record<..., string>` map (Tailwind must see the full class names)
-- Card: `Card` (frosted in the Glass themes, a flat hairline card in Clay: the theme decides); user-written HTML (posts, comments, about pages) goes in `UserContent`, which contains it (see decisions)
+- Card: `Card` (an opaque hairline card); user-written HTML (posts, comments, about pages) goes in `UserContent`, which contains it (see decisions)
 - Overlays (menus, popovers) are opaque `bg-surface-solid`
 - PrimeVue is unstyled; its look lives in `src/theme/primevue-preset.ts` with the same utilities
 - Screens are built only from an approved mock-up; others get logic and plain placeholder markup
 
-## Add a theme
+## Change the palette
 
-Two families exist: **Clay** (flat, the default: `clay-light`, `clay-dark`) and **Glass** (`glass-light`, `glass-dark`). Copy the file of the family you want.
+Colours are generated. `scripts/palette/paper.mjs` holds the inputs (grounds, neutral hue, the five accents, verdict lanes, tags, tiers, medals, syntax as OKLCH hue and chroma); `scripts/palette/solve.mjs` solves each lightness against its contrast floor; `npm run palette` writes `src/theme/palette/` (`paper-light.css`, `paper-dark.css`, `contrast-high.css`, `accents.css`). Never edit those files: `npm run lint:palette` (part of `npm run lint`) fails on a failing pair or a file that differs from a fresh build. Roles that reuse a palette colour (status, limits, retired Clay names) are aliases in `src/theme/tokens.css`; `themes.node.spec.ts` checks the composed cascade and those aliases.
 
-1. Copy `src/theme/themes/clay-light.css` (or a Glass file) to `src/theme/themes/<id>.css`. Keep only `:root[data-theme='<id>']` as the selector (the bare `:root,` fallback belongs to `clay-light` alone) and change the values (6-digit hex or `rgb()`/`rgba()` only; the `coin-*` and `gradient-accent` gradient stops must be 6-digit hex, `themes.node.spec.ts` reads them as such). Keep `--qh-blur` and `--qh-blob-display`: a flat theme has `0px`, `none`, `surface` equal to `surface-solid`, transparent blobs, a transparent `glow`, a one-colour `gradient-accent` and `chart-line-start: var(--qh-accent)`; a frosted theme has a blur in px, `block` and `chart-line-start: var(--qh-accent-2)`
-2. In the same file add the seven accent presets, one rule per id in `ACCENTS` (`src/theme/appearance.ts`): `:root[data-theme='<id>'][data-accent='<accent>'], :root[data-theme='<id>'] [data-accent='<accent>'] { ... }`, each defining exactly the 14 accent tokens (`ACCENT_TOKENS` in `themes.node.spec.ts`: `surface-hover`, `line-accent`, `accent`, `accent-2`, `accent-text`, `accent-soft`, `accent-soft-text`, `on-accent`, `focus-ring`, `gradient-accent`, `glow`, `blob-1..3`; `first-solve-*` stays in the base rule, it never follows the accent). The rule for the theme's own preset (its registry `accent`, step 5) repeats the base values. A flat theme keeps every preset flat (transparent blobs, opaque `surface-hover`, a `gradient-accent` whose two stops equal its `accent`, an invisible `glow`). The second selector lets a swatch inside the page show a preset's own colours. Start from the file of the same family (`clay-*.css` or `glass-*.css`) and keep the hue of each preset
-3. Set the six `--qh-syntax-*` colours (keyword, type, number, string, comment, function); they are drawn on the inner tile (`--qh-surface-strong` over the card)
-4. Import it in `src/theme/styles.css` next to the others
-5. Add `{ id: '<id>', labelKey: 'theme.<key>', scheme: 'dark' | 'light', glass: true | false, accent: '<preset id>' }` to `THEMES` in `src/theme/registry.ts`, and the label to both locale files. `accent` is the theme's own preset: the one whose rule repeats the base values, and where a personal look starts when it is turned on. `auto` (Clay) and `glass-auto` (Glass) resolve to the first theme of their style and the system scheme, so list the default first
-6. Add `'<id>': '<its --qh-ground>'` to `grounds` in the pre-paint script in `index.html`; `src/theme/prepaint.spec.ts` fails on a missing id or a ground that differs from the theme file. If the theme becomes the default of its style and scheme, also change the fallback in the `var theme =` expression of that script (it builds `clay-` or `glass-` plus the scheme) and the static `theme-color` meta
-7. `npm test`: `src/theme/themes.node.spec.ts` fails on a missing token, a CSS file that is not registered (or the reverse), a missing import in `styles.css`, the wrong `color-scheme`, a flat theme that is not flat (or a frosted one that is), duplicate syntax colours, or any text pair under 4.5:1 on the worst ground (every blob centre, glass, hover row, inner tile and the opaque fallback), now for every accent preset at five Glass levels (0, 25, 50, 75, 100) with blobs at full Glow, an accent fill or border under 3:1 on the ground, a preset with a missing or extra token, or a base that does not equal exactly the registry `accent` preset. A preset that fails gets new values (darker accent text in a light theme, weaker blobs in a dark one); the check is never loosened
-8. Backend: nothing to do for the theme id. `siteTheme` accepts any id matching `^[a-z][a-z0-9-]{0,31}$`; the SPA resolves an id it does not know to the Clay theme of the OS scheme. The personal look has its own field (`appearance`, backend ask B25), independent of `siteTheme`
-
-Stored values (`siteTheme` for signed-in accounts, the browser's preference otherwise): `auto` (Clay, follows the OS; the legacy default), `clay-light`, `clay-dark`, `glass-auto` (Glass, follows the OS), `glass-light`, `glass-dark`. The legacy `light` and `dark` resolve to `clay-light` and `clay-dark`, so existing accounts need no migration. The pre-paint script paints the last applied theme id (`qhhoj.resolvedTheme`) only when the account chose it (`qhhoj.resolvedBy` is `account`); otherwise it resolves the browser preference by today's OS scheme.
-
-Change a palette: edit the values in the theme file and run `npm test`.
+- Modes are `light` and `dark` (`THEMES` in `src/theme/registry.ts`); a preference may also be `auto` (follows the device). The retired `clay-*` and `glass-*` ids map through `LEGACY_PREFERENCES`; the backend maps stored ones on read
+- The pre-paint script in `index.html` keeps each mode's ground in `grounds`, the legacy maps and the accent and background lists; `src/theme/prepaint.spec.ts` fails when they drift
 
 ## Appearance (personal look)
 
-- A visitor's own look is `{accent, glass, glow}` (`src/theme/appearance.ts`). It is opt-in: no look means the site's own theme, and turning it on starts from `siteLook(<the theme's registry accent>)`, which changes nothing visible
-- `appearance.store.ts` paints it (`data-accent`, `--qh-glass-level`, `--qh-blob-strength` on `<html>`). `useAppearanceChoice` is the only way the UI changes the look: paint at once, then save `{ appearance }`. `useAccountAppearanceSync` (called in the shell) applies the account's value, which outranks the browser's; `null` there means the site look. Anonymous visitors keep it in localStorage (`qhhoj.appearance`); `qhhoj.paintedAppearance` is what the pre-paint script in `index.html` paints
-- Style and Mode (Clay or Glass; light, dark or automatic) are not part of the look: they are the theme preference (`siteTheme`), changed through `useThemeChoice` by `ModeChoice`, and never turn the look on. Both savers go through `useProfileSave` (`src/features/account/use-profile-save.ts`), which drops an answer that a newer save overtook
-- Glass and glow are derived in `tokens.css` (`--qh-surface-live`, `--qh-blur-live`) and consumed by `bg-surface`, `glass` and `blob-field`; unset, they equal the site look. Components never read `--qh-surface` or `--qh-blur` for glass
-- Add an accent: its id in `ACCENTS`, a rule in every theme file, the label under `appearance.accent.<id>` in both locale files, the id in the pre-paint script's `accents` list (`prepaint.spec.ts` checks it) and in the backend's `APPEARANCE_ACCENTS`
-- Swatches: `<span :data-accent="id" class="bg-gradient-accent ...">` shows that preset's colours without any colour in the component
+- A visitor's own look is `{accent, contrast, background}` (`src/theme/appearance.ts`). No look means the site's own (ultramarine, the device's contrast, Blueprint)
+- `appearance.store.ts` paints it (`data-accent`, `data-contrast`, `data-background` on `<html>`). `useAppearanceChoice` is the only way the UI changes the look: paint at once, then save `{ appearance }`. `useAccountAppearanceSync` (called in the shell) applies the account's value, which outranks the browser's; `null` there means the site look. Anonymous visitors keep it in localStorage (`qhhoj.appearance`); `qhhoj.paintedAppearance` is what the pre-paint script paints
+- Mode is not part of the look: it is the theme preference (`siteTheme`), changed through `useThemeChoice` by `ModeChoice`. Both savers go through `useProfileSave` (`src/features/account/use-profile-save.ts`), which drops an answer that a newer save overtook
+- `src/theme/legacy-look.ts` moves this browser's Clay or Glass values before the stores start; `main.ts` shows one toast when it moved a choice
+- Add an accent: its hue and chroma in `PAPER.accents`, its id in `ACCENTS`, the label under `appearance.accent.<id>` in both locale files, the id in the pre-paint script's `accents` list (`prepaint.spec.ts` checks it) and in the backend's `APPEARANCE_ACCENTS`; then `npm run palette`
+- Swatches: `<span :data-accent="id" class="bg-accent ...">` shows that accent's colours without any colour in the component
 
 ## Accessibility
 
-- Text 4.5:1 on every ground, checked per theme by `themes.node.spec.ts`
+- Text 4.5:1 (7:1 at high contrast) on every ground, proven by `npm run lint:palette`
 - Never remove the focus ring; real `<button>`/`<a>`; `aria-label` on icon-only buttons; icons `aria-hidden="true"`
 - Meaning never by colour alone: verdicts carry their code and a spoken label; ranking cells `+n`/`−n`/`?n` plus a label
 - Touch targets at least 44 px (`min-h-11`, `size-11`); wide tables scroll inside their card
-- `prefers-reduced-motion` and `prefers-reduced-transparency` are handled in the token layer; do not add motion that bypasses `--qh-duration`. The loading indicators are the exception: the Bit swarm runs on `requestAnimationFrame`, and the skeleton pulse and Bit's sob and tear animations keep their own durations; all of them stop under reduced motion
+- `prefers-reduced-motion` and `prefers-contrast: more` are handled in the token layer and the pre-paint script; do not add motion that bypasses `--qh-duration`. The loading indicators are the exception: the Bit swarm runs on `requestAnimationFrame`, and the skeleton pulse and Bit's sob and tear animations keep their own durations; all of them stop under reduced motion
 
 ## i18n
 

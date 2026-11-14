@@ -45,8 +45,8 @@ afterEach(() => {
   delete document.documentElement.dataset.theme;
   delete document.documentElement.dataset.accent;
   delete document.documentElement.dataset.lowPower;
-  document.documentElement.style.removeProperty('--qh-glass-level');
-  document.documentElement.style.removeProperty('--qh-blob-strength');
+  delete document.documentElement.dataset.contrast;
+  delete document.documentElement.dataset.background;
   document.documentElement.style.colorScheme = '';
   document.documentElement.lang = '';
   i18n.global.locale.value = DEFAULT_LOCALE;

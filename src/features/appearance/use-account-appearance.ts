@@ -3,7 +3,6 @@ import { useProfileQuery } from '@/features/account/profile.queries';
 import { useSessionStore } from '@/stores/session.store';
 import { parseAppearance } from '@/theme/appearance';
 import { useAppearanceStore } from '@/theme/appearance.store';
-import { forgetSentLook, isSupersededAnswer } from './use-appearance-choice';
 
 /**
  * A signed-in viewer's saved look outranks this browser's (and `null` there means the site look); signing out, or a
@@ -15,7 +14,7 @@ export function useAccountAppearanceSync() {
   const session = useSessionStore();
   const { data } = useProfileQuery();
   watch(
-    // A string, so a background refetch with the same value does not undo a slider being dragged.
+    // A string, so a background refetch with the same value does not adopt it again.
     () =>
       [
         session.status,
@@ -24,14 +23,9 @@ export function useAccountAppearanceSync() {
       ] as const,
     ([status, passwordChangeRequired, saved]) => {
       if (status === 'unknown') return;
-      if (status !== 'authenticated' || passwordChangeRequired) {
-        forgetSentLook();
-        return appearance.adopt(undefined);
-      }
+      if (status !== 'authenticated' || passwordChangeRequired) return appearance.adopt(undefined);
       if (saved === undefined) return; // loading or failed: keep what is painted
-      const answer = parseAppearance(JSON.parse(saved));
-      if (isSupersededAnswer(answer, appearance.look)) return;
-      appearance.adopt(answer);
+      appearance.adopt(parseAppearance(JSON.parse(saved)));
     },
     { immediate: true },
   );

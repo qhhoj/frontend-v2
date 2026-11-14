@@ -1,17 +1,17 @@
 import { defineStore } from 'pinia';
 import { computed, onScopeDispose, ref, watch } from 'vue';
 import { readStorage, writeStorage } from '@/lib/storage';
-import { AUTO_THEME, resolveTheme, THEMES } from './registry';
+import { AUTO_THEME, canonicalPreference, resolveTheme, THEMES } from './registry';
 import type { ColorScheme } from './registry';
 
-const PREFERENCE_KEY = 'qhhoj.theme';
+export const PREFERENCE_KEY = 'qhhoj.theme';
 /** The theme last painted, whatever chose it. Read by the pre-paint script in index.html to avoid a flash. */
-const RESOLVED_KEY = 'qhhoj.resolvedTheme';
+export const RESOLVED_KEY = 'qhhoj.resolvedTheme';
 /** Who painted it: `account` (an adopted `siteTheme`) or `local` (the browser preference and the OS). Only account paints are held at start-up. */
-const RESOLVED_BY_KEY = 'qhhoj.resolvedBy';
+export const RESOLVED_BY_KEY = 'qhhoj.resolvedBy';
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
-/** No preference counts as light: Clay & ivory is light-first. */
+/** No preference counts as light: Paper is light-first. */
 const schemeOf = (prefersDark: boolean): ColorScheme => (prefersDark ? 'dark' : 'light');
 
 export const useThemeStore = defineStore('theme', () => {
@@ -21,8 +21,10 @@ export const useThemeStore = defineStore('theme', () => {
   const accountTheme = ref<string | null>(null);
 
   // A theme painted from the account stays until the account, a choice or the OS says otherwise: the local
-  // preference cannot know the account's theme, while `auto` and `glass-auto` resolve afresh by today's OS scheme.
-  const cachedTheme = THEMES.find((theme) => theme.id === readStorage(RESOLVED_KEY));
+  // preference cannot know the account's theme, while `auto` resolves afresh by today's OS scheme.
+  const cachedTheme = THEMES.find(
+    (theme) => theme.id === canonicalPreference(readStorage(RESOLVED_KEY) ?? ''),
+  );
   const holdingCache = ref(cachedTheme !== undefined && readStorage(RESOLVED_BY_KEY) === 'account');
 
   const media = typeof matchMedia === 'function' ? matchMedia(DARK_QUERY) : undefined;
@@ -34,7 +36,7 @@ export const useThemeStore = defineStore('theme', () => {
   media?.addEventListener('change', onSystemChange);
   onScopeDispose(() => media?.removeEventListener('change', onSystemChange));
 
-  /** What the Style and Mode controls show as selected: the account's theme while signed in, else the browser's choice. */
+  /** What the Mode control shows as selected: the account's theme while signed in, else the browser's choice. */
   const preference = computed(() => accountTheme.value ?? localPreference.value);
   const theme = computed(
     () =>

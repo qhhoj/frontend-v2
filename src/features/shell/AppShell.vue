@@ -13,7 +13,6 @@ import HighPriorityBanner from '@/features/notifications/HighPriorityBanner.vue'
 import LiveAnnouncementAlert from '@/features/contests/live/LiveAnnouncementAlert.vue';
 import OfficialModeBanner from '@/features/official-mode/OfficialModeBanner.vue';
 import SiteNoticeBanner from '@/features/site-notice/SiteNoticeBanner.vue';
-import BackgroundBlobs from './BackgroundBlobs.vue';
 import LoadingLayer from './LoadingLayer.vue';
 import { useAccountCacheSync } from './use-account-cache';
 import { useAccountThemeSync } from './use-account-theme';
@@ -33,12 +32,11 @@ const { current: currentContest } = useCurrentContest(
 </script>
 
 <template>
-  <!-- The ground is on <html> (with the page background, theme/backgrounds.css); `isolate` keeps the fixed blobs (-z-10) above it and below the content. -->
+  <!-- The ground is on <html> (with the page background, theme/backgrounds.css); `isolate` keeps the background's fixed layers below the content. -->
   <!-- `viewport-fit=cover` lets the page reach under the notch and home bar; the root keeps its content out of the insets. -->
   <div
     class="relative isolate flex min-h-dvh flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] font-body text-content print:bg-white print:text-black"
   >
-    <BackgroundBlobs class="print:hidden" />
     <a
       href="#main"
       class="sr-only print:hidden focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-overlay focus:rounded-pill focus:bg-surface-solid focus:px-4 focus:py-2"

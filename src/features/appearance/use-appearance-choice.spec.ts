@@ -31,30 +31,19 @@ describe('appearance choice', () => {
   it('saves the whole look for a signed-in viewer, keeping the parts it did not change', async () => {
     const calls = mockApi(echoProfile);
     const choice = mountChoice({ signedIn: true });
-    await choice.update({ accent: 'mint' });
-    await choice.update({ glass: 40 });
+    await choice.update({ accent: 'teal' });
+    await choice.update({ contrast: 'high' });
     expect(patches(calls)).toEqual([
-      { appearance: { accent: 'mint', glass: 0, glow: 100 } },
-      { appearance: { accent: 'mint', glass: 40, glow: 100 } },
+      { appearance: { accent: 'teal' } },
+      { appearance: { accent: 'teal', contrast: 'high' } },
     ]);
   });
 
-  it('paints on apply and sends only when told to save (slider drags do not flood the API)', async () => {
-    const calls = mockApi(echoProfile);
-    const choice = mountChoice({ signedIn: true });
-    choice.apply({ glass: 30 });
-    choice.apply({ glass: 31 });
-    expect(root.style.getPropertyValue('--qh-glass-level')).toBe('31');
-    expect(calls).toEqual([]);
-    await choice.save();
-    expect(patches(calls)).toEqual([{ appearance: { accent: 'clay', glass: 31, glow: 100 } }]);
-  });
-
   it('resets the look and the mode together, in one request', async () => {
-    localStorage.setItem('qhhoj.theme', 'glass-light');
+    localStorage.setItem('qhhoj.theme', 'light');
     const calls = mockApi(echoProfile);
     const choice = mountChoice({ signedIn: true });
-    await choice.update({ accent: 'gold' });
+    await choice.update({ accent: 'plum' });
     await choice.reset();
     expect(patches(calls).at(-1)).toEqual({ appearance: null, siteTheme: 'auto' });
     expect(root.dataset.accent).toBeUndefined();
@@ -64,9 +53,9 @@ describe('appearance choice', () => {
   it('keeps the look in this browser when saving to the account fails', async () => {
     mockApi(failedSave);
     const choice = mountChoice({ signedIn: true });
-    await choice.update({ accent: 'mint' });
+    await choice.update({ accent: 'teal' });
     await flushPromises();
-    expect(useAppearanceStore().look?.accent).toBe('mint');
-    expect(root.dataset.accent).toBe('mint');
+    expect(useAppearanceStore().look?.accent).toBe('teal');
+    expect(root.dataset.accent).toBe('teal');
   });
 });

@@ -652,15 +652,17 @@
   },
   "appearance": {
     "title": "Appearance",
-    "customLook": "Use my own look",
-    "customLookHelp": "Off: you see the site's own look. On: your choices below.",
-    "styleAndMode": "Style and mode",
-    "style": "Style",
     "mode": "Mode",
     "modeOption": {
       "light": "Light",
       "dark": "Dark",
       "auto": "Device"
+    },
+    "contrast": "Contrast",
+    "contrastHelp": "High: darker text, borders and verdict colours. Until you choose, the page follows your device.",
+    "contrastOption": {
+      "standard": "Standard",
+      "high": "High"
     },
     "backgroundTitle": "Page background",
     "backgroundHelp": "A faint pattern behind the page; cards, tables and text stay on solid surfaces. Low-power mode shows a flat tint.",
@@ -676,26 +678,14 @@
       "landscape": "Landscape"
     },
     "accentTitle": "Accent",
-    "accentHelp": "Every preset is checked for readable text in light and dark.",
+    "accentHelp": "Every accent is checked for readable text in light, dark and high contrast.",
     "accent": {
-      "clay": "Clay",
-      "orchid": "Orchid",
-      "ocean": "Ocean",
-      "mint": "Mint",
-      "sunset": "Sunset",
-      "gold": "Gold",
-      "mono": "Mono",
-      "red": "Red"
+      "ultramarine": "Ultramarine",
+      "teal": "Teal",
+      "plum": "Plum",
+      "terracotta": "Terracotta",
+      "graphite": "Graphite"
     },
-    "glass": "Glass",
-    "glassOnly": "Glass and glow only apply to the Glass themes.",
-    "glassHelp": "How see-through cards are. Solid is easiest to read and lightest on older devices.",
-    "glassStop": {
-      "clear": "Clear",
-      "frosted": "Frosted",
-      "solid": "Solid"
-    },
-    "glow": "Background glow",
     "reset": "Reset to site default",
     "useSite": "Use site default",
     "moreSettings": "More in Settings",
@@ -708,7 +698,7 @@
     "showingSite": "Showing the site's own look",
     "savedAccount": "Saved to your account · applies on every device",
     "savedBrowser": "Saved in this browser · sign in to keep it on every device",
-    "solidByDevice": "Your device asks for less transparency, so cards stay solid."
+    "migrated": "QHHOJ has a new look. Your earlier choices moved to the nearest colours; change them in Settings › Appearance."
   },
   "bitRoam": {
     "title": "Bits around the page",
@@ -719,14 +709,6 @@
     "stillNote": "The Bits stand still in low-power mode or with reduced motion.",
     "resting": "The Bits are resting until this session ends",
     "callBack": "Call back"
-  },
-  "theme": {
-    "styleClay": "Clay",
-    "styleGlass": "Glass",
-    "clayLight": "Clay light",
-    "clayDark": "Clay dark",
-    "glassDark": "Glass dark",
-    "glassLight": "Glass light"
   },
   "locale": {
     "switchTo": "Chuyển sang tiếng Việt",
@@ -2347,20 +2329,19 @@
       "on": {
         "title": "Always on",
         "body": "Fewer effects; text and colours stay.",
-        "preview": "Still Bit · no blur"
+        "preview": "Still Bit · flat background"
       },
       "off": {
         "title": "Always off",
         "body": "Every effect, even on a weak device.",
-        "preview": "Moving Bit · frosted glass"
+        "preview": "Moving Bit · patterned background"
       }
     },
     "machineOn": "This device: on",
     "machineOff": "This device: off",
     "effectsTitle": "When on",
     "effects": {
-      "blur": "No background blur (frosted glass)",
-      "blobs": "Background colour blobs hidden",
+      "background": "Page background shown as one flat colour",
       "motion": "No motion effects",
       "bit": "Bit is a still picture",
       "replay": "Ranking replay without moving rows",

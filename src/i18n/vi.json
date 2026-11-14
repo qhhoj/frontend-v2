@@ -652,15 +652,17 @@
   },
   "appearance": {
     "title": "Giao diện",
-    "customLook": "Dùng giao diện riêng",
-    "customLookHelp": "Tắt: bạn thấy giao diện của trang. Bật: dùng các lựa chọn bên dưới.",
-    "styleAndMode": "Kiểu và chế độ",
-    "style": "Kiểu",
     "mode": "Chế độ",
     "modeOption": {
       "light": "Sáng",
       "dark": "Tối",
       "auto": "Theo máy"
+    },
+    "contrast": "Độ tương phản",
+    "contrastHelp": "Cao: chữ, viền và màu kết quả đậm hơn. Khi chưa chọn, trang theo cài đặt của thiết bị.",
+    "contrastOption": {
+      "standard": "Chuẩn",
+      "high": "Cao"
     },
     "backgroundTitle": "Nền trang",
     "backgroundHelp": "Họa tiết mờ sau trang; thẻ, bảng và chữ vẫn nằm trên nền đặc. Chế độ tiết kiệm pin hiện một màu phẳng.",
@@ -676,26 +678,14 @@
       "landscape": "Đồi núi"
     },
     "accentTitle": "Màu nhấn",
-    "accentHelp": "Mỗi màu đều được kiểm tra để chữ đủ rõ ở cả nền sáng lẫn tối.",
+    "accentHelp": "Mỗi màu đều được kiểm tra để chữ đủ rõ ở cả chế độ sáng, tối và tương phản cao.",
     "accent": {
-      "clay": "Clay",
-      "orchid": "Orchid",
-      "ocean": "Ocean",
-      "mint": "Mint",
-      "sunset": "Sunset",
-      "gold": "Gold",
-      "mono": "Mono",
-      "red": "Đỏ"
+      "ultramarine": "Lam",
+      "teal": "Xanh két",
+      "plum": "Mận",
+      "terracotta": "Đất nung",
+      "graphite": "Than chì"
     },
-    "glass": "Kính",
-    "glassOnly": "Glass và quầng sáng chỉ áp dụng cho giao diện Glass.",
-    "glassHelp": "Độ trong của các thẻ. Đặc là dễ đọc nhất và nhẹ nhất cho máy cũ.",
-    "glassStop": {
-      "clear": "Trong",
-      "frosted": "Mờ",
-      "solid": "Đặc"
-    },
-    "glow": "Quầng sáng nền",
     "reset": "Về mặc định của trang",
     "useSite": "Dùng mặc định của trang",
     "moreSettings": "Thêm trong Cài đặt",
@@ -708,7 +698,7 @@
     "showingSite": "Đang dùng giao diện của trang",
     "savedAccount": "Đã lưu vào tài khoản · áp dụng trên mọi thiết bị",
     "savedBrowser": "Đã lưu trong trình duyệt này · đăng nhập để dùng trên mọi thiết bị",
-    "solidByDevice": "Thiết bị của bạn yêu cầu giảm độ trong suốt, nên các thẻ luôn đặc."
+    "migrated": "QHHOJ có giao diện mới. Lựa chọn cũ của bạn đã được chuyển sang màu gần nhất; đổi lại trong Cài đặt › Giao diện."
   },
   "bitRoam": {
     "title": "Bit chạy quanh trang",
@@ -719,14 +709,6 @@
     "stillNote": "Bit đứng yên khi bật Chế độ tiết kiệm hoặc giảm chuyển động.",
     "resting": "Bit đi nghỉ đến hết phiên này",
     "callBack": "Gọi lại"
-  },
-  "theme": {
-    "styleClay": "Clay",
-    "styleGlass": "Glass",
-    "clayLight": "Clay sáng",
-    "clayDark": "Clay tối",
-    "glassDark": "Glass tối",
-    "glassLight": "Glass sáng"
   },
   "locale": {
     "switchTo": "Switch to English",
@@ -2347,20 +2329,19 @@
       "on": {
         "title": "Luôn bật",
         "body": "Ít hiệu ứng, chữ và màu giữ nguyên.",
-        "preview": "Bit tĩnh · không làm mờ"
+        "preview": "Bit tĩnh · nền phẳng"
       },
       "off": {
         "title": "Luôn tắt",
         "body": "Đủ hiệu ứng, kể cả khi máy yếu.",
-        "preview": "Bit chuyển động · kính mờ"
+        "preview": "Bit chuyển động · nền họa tiết"
       }
     },
     "machineOn": "Máy này: đang bật",
     "machineOff": "Máy này: đang tắt",
     "effectsTitle": "Khi bật",
     "effects": {
-      "blur": "Tắt làm mờ nền (kính mờ)",
-      "blobs": "Ẩn các vệt màu nền",
+      "background": "Nền trang hiện một màu phẳng, không họa tiết",
       "motion": "Bỏ hiệu ứng chuyển động",
       "bit": "Bit hiển thị hình tĩnh",
       "replay": "Phát lại bảng điểm không chuyển hàng",
