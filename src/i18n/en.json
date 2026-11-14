@@ -413,7 +413,8 @@
     "profile": "My profile",
     "settings": "Settings",
     "admin": "Administration",
-    "paste": "Paste code"
+    "paste": "Paste code",
+    "tickets": "Support tickets"
   },
   "settings": {
     "sections": "Settings sections",
@@ -1211,7 +1212,8 @@
         "submissions": "All submissions",
         "best": "Best submissions",
         "pdfStatement": "PDF statement",
-        "material": "Attached material"
+        "material": "Attached material",
+        "report": "Report a problem with this task"
       }
     },
     "pdfRender": "Download statement as PDF",
@@ -1472,7 +1474,6 @@
     "submitting": "Submitting…",
     "submitFile": "Submit file",
     "collapse": "Collapse",
-    "expand": "Expand",
     "fullscreen": "Full screen",
     "exitFullscreen": "Exit full screen",
     "language": "Language",
@@ -2800,7 +2801,8 @@
     "version": "Frontend version",
     "versionTitle": "Frontend build being served (commit and date)",
     "source": "Source code (AGPL)",
-    "runtimes": "Judges"
+    "runtimes": "Judges",
+    "support": "Support"
   },
   "runtimes": {
     "title": "Judges and languages",

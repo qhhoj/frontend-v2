@@ -78,6 +78,8 @@ const items = computed<MenuItem[]>(() => [
     <AppButton :to="{ name: 'login', query: { redirect: route.fullPath } }">
       {{ $t('account.login') }}
     </AppButton>
-    <AppButton tone="primary" :to="{ name: 'register' }">{{ $t('account.register') }}</AppButton>
+    <AppButton tone="primary" :to="{ name: 'register', query: { redirect: route.fullPath } }">{{
+      $t('account.register')
+    }}</AppButton>
   </div>
 </template>

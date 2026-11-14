@@ -14,9 +14,11 @@ import SocialButtons from './SocialButtons.vue';
 import { useAfterSignIn, usePreloadAfterSignIn } from './use-after-sign-in';
 import { useAuthAction } from './use-auth-action';
 import { AUTH_LINK } from './auth-link';
+import { useReturnQuery } from './signup-return';
 
 const session = useSessionStore();
 const route = useRoute();
+const returnQuery = useReturnQuery();
 const afterSignIn = useAfterSignIn();
 const preloadAfterSignIn = usePreloadAfterSignIn();
 const form = reactive({ username: '', password: '' });
@@ -114,7 +116,7 @@ const attempt = () =>
         @input="clearMissing('password')"
       />
       <p class="flex justify-end text-sm">
-        <RouterLink :to="{ name: 'forgot-password' }" :class="AUTH_LINK">{{
+        <RouterLink :to="{ name: 'forgot-password', query: returnQuery }" :class="AUTH_LINK">{{
           $t('auth.forgot')
         }}</RouterLink>
       </p>
@@ -122,7 +124,7 @@ const attempt = () =>
       <SocialButtons />
       <p class="text-center text-sm text-muted">
         {{ $t('auth.noAccountPrompt') }}
-        <RouterLink :to="{ name: 'register' }" :class="AUTH_LINK">{{
+        <RouterLink :to="{ name: 'register', query: returnQuery }" :class="AUTH_LINK">{{
           $t('account.register')
         }}</RouterLink>
       </p>

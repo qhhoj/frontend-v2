@@ -13,6 +13,7 @@ import AuthError from './AuthError.vue';
 import AuthLayout from './AuthLayout.vue';
 import EmailLinkRequest from './EmailLinkRequest.vue';
 import { AUTH_LINK } from './auth-link';
+import { takeSignupReturnQuery } from './signup-return';
 import { useNoReferrer } from './use-no-referrer';
 
 type ActivationState = 'pending' | 'activated' | 'linkDead' | 'linkResent' | 'failed';
@@ -48,6 +49,8 @@ useNoReferrer();
 const route = useRoute();
 const router = useRouter();
 const state = ref<ActivationState>(route.params.key === DONE_KEY ? 'activated' : 'pending');
+/** The path the user registered from, so the sign-in after activation lands there (taken once, see `signup-return.ts`). */
+const returnQuery = ref(state.value === 'activated' ? takeSignupReturnQuery() : {});
 /**
  * How activation left the signup password: `sent` (voided, reset link mailed), `required` (voided, no mail) or none.
  * It rides in the done address's `reset` query, so a reload shows the same card.
@@ -93,6 +96,7 @@ async function activateKey() {
     return;
   }
   state.value = 'activated';
+  returnQuery.value = takeSignupReturnQuery();
   // The used key does not stay in the address bar or the history (same page instance, no reload).
   await router.replace({
     name: 'activate',
@@ -126,7 +130,7 @@ onMounted(() => {
       v-if="state === 'activated'"
       tone="primary"
       block
-      :to="{ name: passwordVoided ? 'forgot-password' : 'login' }"
+      :to="{ name: passwordVoided ? 'forgot-password' : 'login', query: returnQuery }"
       >{{ $t(passwordVoided ? 'auth.activation.setPassword' : 'auth.submitLogin') }}</AppButton
     >
     <EmailLinkRequest
@@ -146,7 +150,7 @@ onMounted(() => {
       </AppButton>
     </template>
     <p v-if="state !== 'activated'" class="text-center text-sm">
-      <RouterLink :to="{ name: 'login' }" :class="AUTH_LINK">{{
+      <RouterLink :to="{ name: 'login', query: returnQuery }" :class="AUTH_LINK">{{
         $t('auth.backToLogin')
       }}</RouterLink>
     </p>

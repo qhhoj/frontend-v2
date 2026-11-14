@@ -413,7 +413,8 @@
     "profile": "Hồ sơ của tôi",
     "settings": "Cài đặt",
     "admin": "Quản trị",
-    "paste": "Dán mã"
+    "paste": "Dán mã",
+    "tickets": "Phiếu hỗ trợ"
   },
   "settings": {
     "sections": "Các mục cài đặt",
@@ -1211,7 +1212,8 @@
         "submissions": "Tất cả bài nộp",
         "best": "Bài nộp tốt nhất",
         "pdfStatement": "Đề bài PDF",
-        "material": "Tài liệu đính kèm"
+        "material": "Tài liệu đính kèm",
+        "report": "Báo lỗi bài này"
       }
     },
     "pdfRender": "Tải đề dạng PDF",
@@ -1472,7 +1474,6 @@
     "submitting": "Đang nộp…",
     "submitFile": "Nộp tệp",
     "collapse": "Thu gọn",
-    "expand": "Mở rộng",
     "fullscreen": "Toàn màn hình",
     "exitFullscreen": "Thu nhỏ",
     "language": "Ngôn ngữ",
@@ -2800,7 +2801,8 @@
     "version": "Phiên bản giao diện",
     "versionTitle": "Bản dựng giao diện đang chạy (commit và ngày)",
     "source": "Mã nguồn (AGPL)",
-    "runtimes": "Máy chấm"
+    "runtimes": "Máy chấm",
+    "support": "Hỗ trợ"
   },
   "runtimes": {
     "title": "Máy chấm và ngôn ngữ",

@@ -5,7 +5,9 @@ import InlineBit from '@/components/InlineBit.vue';
 import AuthLayout from './AuthLayout.vue';
 import EmailLinkRequest from './EmailLinkRequest.vue';
 import { AUTH_LINK } from './auth-link';
+import { useReturnQuery } from './signup-return';
 
+const returnQuery = useReturnQuery();
 const sent = ref(false);
 </script>
 
@@ -29,7 +31,7 @@ const sent = ref(false);
       </template>
     </EmailLinkRequest>
     <p class="text-center text-sm">
-      <RouterLink :to="{ name: 'login' }" :class="AUTH_LINK">{{
+      <RouterLink :to="{ name: 'login', query: returnQuery }" :class="AUTH_LINK">{{
         $t('auth.backToLogin')
       }}</RouterLink>
     </p>

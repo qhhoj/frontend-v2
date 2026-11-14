@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useSessionStore } from '@/stores/session.store';
+
 /** AGPL-3.0 §13: every visitor is offered the source of the running site (frontend commit; backend and judge in the same org). */
 const SOURCE_URL = 'https://github.com/qhhoj';
+const session = useSessionStore();
 </script>
 
 <template>
@@ -21,6 +24,13 @@ const SOURCE_URL = 'https://github.com/qhhoj';
       data-testid="runtimes-footer"
       class="inline-flex min-h-11 items-center text-accent-text underline"
       >{{ $t('footer.runtimes') }}</RouterLink
+    >
+    <RouterLink
+      v-if="session.status === 'authenticated'"
+      :to="{ name: 'tickets' }"
+      data-testid="support-footer"
+      class="inline-flex min-h-11 items-center text-accent-text underline"
+      >{{ $t('footer.support') }}</RouterLink
     >
   </footer>
 </template>
