@@ -19,7 +19,7 @@ const { data: home, isPending, isError } = useHomeQuery();
 const COUNT_KEYS = ['users', 'problems', 'submissions', 'contests'] as const;
 const counts = computed(() =>
   home.value
-    ? COUNT_KEYS.map((key) => [key, formatNumber(home.value!.counts[key], locale.locale)] as const)
+    ? COUNT_KEYS.map((key) => [key, formatNumber(home.value.counts[key], locale.locale)] as const)
     : [],
 );
 </script>
