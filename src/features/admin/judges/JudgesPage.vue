@@ -75,7 +75,7 @@ onBeforeRouteLeave(() => {
       :lead="$t('admin.judges.index.lead')"
     >
       <template #actions>
-        <RouterLink :to="{ name: 'admin-judgeNew' }" :class="buttonClass('primary')">
+        <RouterLink :to="{ name: 'admin-judgeNew' }" :class="buttonClass('secondary')">
           {{ $t('admin.judges.index.addButton') }}
         </RouterLink>
       </template>
