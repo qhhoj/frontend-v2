@@ -94,6 +94,7 @@ const status = computed(() => {
     v-model:visible="visible"
     :title="$t('admin.shell.search.title')"
     size="md"
+    dismissable
     data-testid="admin-palette"
   >
     <div class="flex flex-col gap-3">

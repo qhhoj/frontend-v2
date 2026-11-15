@@ -1,4 +1,5 @@
 import { flushPromises } from '@vue/test-utils';
+import { defineComponent, h, ref } from 'vue';
 import { describe, expect, it } from 'vitest';
 import { mountComponent } from '@/test/mount';
 import Modal from './Modal.vue';
@@ -55,5 +56,51 @@ describe('Modal', () => {
     await flushPromises();
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(document.activeElement?.id).toBe('cancel');
+  });
+
+  it('gives focus back to its opener when Escape closes it', async () => {
+    const opener = document.createElement('button');
+    document.body.append(opener);
+    opener.focus();
+    const visible = ref(true);
+    mountComponent(
+      defineComponent({
+        setup: () => () =>
+          h(
+            Modal,
+            {
+              visible: visible.value,
+              'onUpdate:visible': (next: boolean) => (visible.value = next),
+              title: 'A',
+            },
+            () => h('input', { id: 'first' }),
+          ),
+      }),
+    );
+    await flushPromises();
+    expect(document.activeElement?.id).toBe('first');
+    pressEscape();
+    await flushPromises();
+    expect(dialog()).toBeNull();
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('closes on a click outside only when dismissable', async () => {
+    const clickBackdrop = () =>
+      dialog().dispatchEvent(
+        new MouseEvent('click', { bubbles: true, clientX: 900, clientY: 900 }),
+      );
+    const plain = mountComponent(Modal, { props: { visible: true, title: 'A' } });
+    await flushPromises();
+    clickBackdrop();
+    expect(plain.emitted('update:visible')).toBeUndefined();
+    plain.unmount();
+
+    const dismissable = mountComponent(Modal, {
+      props: { visible: true, title: 'B', dismissable: true },
+    });
+    await flushPromises();
+    clickBackdrop();
+    expect(dismissable.emitted('update:visible')).toEqual([[false]]);
   });
 });
