@@ -41,8 +41,8 @@ const spanText = useSpanText();
 const timeLeftOf = (contest: ContestListItem) =>
   spanText(spanMessage((Date.parse(contest.endTime) - now.value) / 1000));
 const retry = () => {
-  running.refetch();
-  upcoming.refetch();
+  void running.refetch();
+  void upcoming.refetch();
 };
 const ROW = 'flex min-h-9 items-center gap-3 py-1.5 text-content hover:bg-surface-hover touch:py-3';
 </script>
