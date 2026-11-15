@@ -33,7 +33,7 @@ const host = (afterHide: () => void = () => {}) =>
 
 async function open(afterHide?: () => void) {
   mountComponent(host(afterHide));
-  await flushPromises(); // PrimeVue's overlay only reacts to its first open once it has mounted its portal
+  await flushPromises();
   byId('opener').focus();
   byId('opener').click();
   await flushPromises();

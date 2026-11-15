@@ -39,11 +39,11 @@ UI journeys are checked by agent-run Markdown click-by-click test scripts, kept 
 
 ```
 src/
-  main.ts, app-plugins.ts   bootstrap (Pinia, router, i18n, vue-query, PrimeVue unstyled)
+  main.ts, app-plugins.ts   bootstrap (Pinia, router, i18n, vue-query)
   router/                   route table, guards (session, 2FA, password change, admin area), safe redirects
   api/                      fetch client, SSE, DTO types, one <area>.api.ts per backend area
   stores/                   Pinia: session, locale (the theme store lives in theme/)
-  theme/                    tokens, generated palette/, registry, theme and look stores, PrimeVue preset
+  theme/                    tokens, generated palette/, registry, theme and look stores
   i18n/                     vi.json (default), en.json
   lib/                      pure helpers (verdicts, rating tiers, formats, dates, ranking cells)
   components/               shared UI parts
@@ -68,7 +68,6 @@ Data flow: page -> `features/<area>/<area>.queries.ts` (vue-query) -> `api/<area
 | A colour, radius or font                                     | `scripts/palette/paper.mjs` then `npm run palette`, `src/theme/tokens.css`                                                                                                               |
 | Change the palette                                           | [CONTRIBUTING.md](CONTRIBUTING.md#change-the-palette)                                                                                                                                    |
 | A utility name used by components                            | `src/theme/styles.css` (`@theme inline`)                                                                                                                                                 |
-| PrimeVue component styling                                   | `src/theme/primevue-preset.ts`                                                                                                                                                           |
 | A route or who may open it                                   | `src/router/routes.ts`, `src/router/guards.ts`                                                                                                                                           |
 | A backend call or DTO type                                   | `src/api/<area>.api.ts` (typed by route through `src/api/typed.ts`); `src/api/types/<area>.ts` are aliases of `src/api/generated/schema.d.ts`; after a backend change: `npm run api:gen` |
 | A live stream (SSE): connection, give-up, reconnect, refresh | `useLiveStream` in `src/api/events.ts`; what a frame means stays in the feature; burst windows in `src/lib/settle-window.ts`                                                             |

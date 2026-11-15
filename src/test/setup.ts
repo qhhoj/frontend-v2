@@ -34,7 +34,7 @@ beforeEach(() => {
       unobserve() {}
       disconnect() {}
     },
-  ); // PrimeVue overlays watch their content size
+  ); // popup.ts watches the size of a panel and its opener
 });
 
 afterEach(() => {

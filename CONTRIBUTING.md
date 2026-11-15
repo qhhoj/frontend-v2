@@ -5,7 +5,7 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 ## Stack
 
 - API types: `openapi-typescript` 7.13.0 (exact) generates `src/api/generated/schema.d.ts` from the committed backend snapshot
-- Vue 3.5, Vite 8, TypeScript 5.9 (strict, `noUncheckedIndexedAccess`), Vue Router 5, Pinia 4, @tanstack/vue-query 5, vue-i18n 11, Tailwind 4, PrimeVue 4.5.5 (MIT, unstyled), lucide-vue-next, @fontsource fonts
+- Vue 3.5, Vite 8, TypeScript 5.9 (strict, `noUncheckedIndexedAccess`), Vue Router 5, Pinia 4, @tanstack/vue-query 5, vue-i18n 11, Tailwind 4, lucide-vue-next, @fontsource fonts
 - Versions are exact in `package.json`. TypeScript stays on 5.9: typescript-eslint 8 supports `<6.1`
 - Tests: Vitest 5 + jsdom + @vue/test-utils
 
@@ -50,7 +50,7 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 - Classes picked at runtime come from a static `Record<..., string>` map (Tailwind must see the full class names)
 - Card: `Card` (an opaque hairline card); user-written HTML (posts, comments, about pages) goes in `UserContent`, which contains it (see decisions)
 - Overlays (menus, popovers) are opaque `bg-surface-solid`
-- PrimeVue is unstyled; its look lives in `src/theme/primevue-preset.ts` with the same utilities
+- Dialogs, popovers, menus and pick-lists are the kit's own (`src/components/ui`: native `<dialog>`, the Popover API); no UI library
 - Screens are built only from an approved mock-up; others get logic and plain placeholder markup
 
 ## Change the palette

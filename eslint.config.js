@@ -17,7 +17,7 @@ export default defineConfigWithVueTs(
       'vue/multi-word-component-names': ['error', { ignores: ['App'] }],
     },
   },
-  // Old wrappers and direct PrimeVue parts: a file may keep the imports its raw-element baseline counts (docs/wrapper-migration.md).
+  // Old wrappers: a file may keep the imports its raw-element baseline counts (docs/wrapper-migration.md).
   ...eslintImportBlocks(readBaselines().merged),
   skipFormatting,
 );

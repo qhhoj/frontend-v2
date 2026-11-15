@@ -16,7 +16,7 @@ describe('Modal', () => {
     expect(dialog().className).toContain('sm:w-[min(47.5rem,calc(100vw-2rem))]');
   });
 
-  it('keeps the preset width when no size is given', async () => {
+  it('keeps the default width when no size is given', async () => {
     mountComponent(Modal, { props: { visible: true, title: 'A' } });
     await flushPromises();
     expect(dialog().className).not.toContain('max-sm:w-screen');

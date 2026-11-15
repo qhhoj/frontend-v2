@@ -5,7 +5,7 @@ import Modal from '@/components/ui/Modal.vue';
 import type { ModalSize } from '@/components/ui/Modal.vue';
 
 /**
- * One confirm step for the destructive or irreversible choices, in a `Modal` (the shared Dialog preset).
+ * One confirm step for the destructive or irreversible choices, in a `Modal`.
  * `confirm` only says the user chose it: the consumer closes the dialog (set `visible` false) once its request is done.
  * The cancel button says "Hủy" (`common.cancel`) and a `neutral` confirm "Xác nhận" (`common.confirm`). A `danger` confirm names
  * verb + object ("Xóa thẻ", "Gỡ liên kết Polygon", "Cấm bitcoder"): pass `confirmLabel`, never a bare "Xóa" or "OK" (the bare
@@ -14,11 +14,11 @@ import type { ModalSize } from '@/components/ui/Modal.vue';
  * `canConfirm` is false while a required input in the body (a code, a password) is still empty: the confirm button turns
  * `aria-disabled` (focus is kept) and neither it nor Enter confirms.
  * The body is a `<form>` and the confirm button (in the footer, outside it) submits it by id, so Enter in an input and a click
- * each emit once. Focus returns to the element that opened it (PrimeVue restores it when the dialog hides).
+ * each emit once. Focus returns to the element that opened it (`Modal` restores it when the dialog closes).
  * `returnFocusTo` names where focus lands when the dialog closes after a confirm (not after Cancel, Escape or the close button):
- * pass it when the opener row disappears with the confirmed action, so PrimeVue has nothing to return focus to.
+ * pass it when the opener row disappears with the confirmed action, so `Modal` has nothing to return focus to.
  * The body is `body` or the default slot; the `error` slot shows a failed confirm inside the dialog.
- * `size` (sm 480, md 640, lg 760 px; lg is full screen on a phone) widens the dialog past the preset's 448 px, for a body with a form.
+ * `size` (sm 480, md 640, lg 760 px; lg is full screen on a phone) widens the dialog past the default 448 px, for a body with a form.
  * `blockedReason` says under the body why the confirm is blocked while `canConfirm` is false ("Nhập đúng mã để xác nhận").
  * A `<button>` in the body needs `type="button"`, or it submits the form and confirms.
  */
