@@ -21,6 +21,8 @@ import { useStreamedContest } from './use-streamed-contest';
  * region: a toast at the bottom right on a computer, a one-row banner under the contest bar on a phone. It goes once read
  * (the Announcements tab marks it) or closed; a close is kept in storage like the read mark.
  */
+// The root is a Teleport, so the shell's classes (print:hidden) go on the region itself.
+defineOptions({ inheritAttrs: false });
 const streamed = useStreamedContest();
 const route = useRoute();
 const viewerId = useViewerId();
@@ -72,6 +74,7 @@ const announcementsTab = computed(() => ({
   <Teleport :to="topDialog ?? 'body'" :disabled="!topDialog">
     <div
       v-if="streamed.contest.value"
+      v-bind="$attrs"
       data-testid="contest-announcement-live"
       role="status"
       aria-live="polite"
