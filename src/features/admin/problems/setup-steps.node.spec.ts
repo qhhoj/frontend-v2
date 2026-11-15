@@ -36,6 +36,23 @@ describe('setupSteps', () => {
     expect(nextStep(setupSteps(blankTranslation, []))?.id).toBe('statement');
   });
 
+  it('counts a PDF statement as a written statement', () => {
+    const pdfOnly = editableProblem({
+      editor: { ...problemEditor(), description: '', translations: [] },
+      pdfStatementUrl: '/files/statement.pdf',
+    });
+    expect(doneIds(setupSteps(pdfOnly, []))).toContain('statement');
+  });
+
+  it('counts tests and points done for an external-judge problem', () => {
+    const external = editableProblem({
+      externalJudge: { oj: 'CodeForces' },
+    });
+    expect(doneIds(setupSteps(external, null))).toEqual(
+      expect.arrayContaining(['tests', 'scoring']),
+    );
+  });
+
   it('leads to the tests once the statement is written', () => {
     const written = editableProblem();
     expect(nextStep(setupSteps(written, null))).toMatchObject({
