@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { FileText } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import PdfLink from './PdfLink.vue';
 import StatementNote from './StatementNote.vue';
 
 /**
- * An uploaded PDF statement, shown inline like the old site did: a slim toolbar (PDF badge, the translation note, "open in a new tab")
+ * An uploaded PDF statement, shown inline like the old site did: a slim toolbar (the translation note, the one PDF button that opens it in a new tab)
  * above the viewer. Only a path on this site is framed (CSP `frame-src 'self'`); any other URL is just linked.
  */
 const props = defineProps<{ problem: ProblemDetail; url: string; untranslated?: boolean }>();
@@ -16,16 +15,8 @@ const isSitePath = computed(() => /^\/(?![/\\])/.test(props.url));
 <template>
   <section data-testid="pdf-statement" class="flex flex-col gap-3">
     <div class="flex flex-wrap items-center gap-x-3.5 gap-y-2.5">
-      <span
-        class="inline-flex items-center gap-1.5 rounded-row bg-accent-soft px-2 py-0.5 font-mono text-tiny font-bold tracking-wide text-accent-soft-text"
-        ><FileText aria-hidden="true" class="size-3.5" />PDF</span
-      >
       <StatementNote v-if="untranslated" class="min-w-0 flex-1 basis-60" />
-      <PdfLink
-        :problem="problem"
-        class="max-sm:w-full"
-        :class="untranslated ? 'sm:ml-auto' : 'ml-auto max-sm:ml-0'"
-      />
+      <PdfLink :problem="problem" class="max-sm:w-full" :class="untranslated ? 'sm:ml-auto' : ''" />
     </div>
     <iframe
       v-if="isSitePath"

@@ -7,14 +7,12 @@ import ContestProblemSwitcher from '@/features/contests/ContestProblemSwitcher.v
 import { useProblemRail } from '@/features/contests/use-problem-rail';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { useNavSection } from '@/features/shell/nav-section';
-import { useMediaQuery } from '@/lib/use-media-query';
 import { translate } from '@/i18n';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import ProblemContent from './ProblemContent.vue';
 import StatementSkeleton from './StatementSkeleton.vue';
-import SubmitPaneSkeleton from './SubmitPaneSkeleton.vue';
 import { PROBLEM_LAYOUT } from './problem-layout';
 import { useProblemQuery } from './problems.queries';
 
@@ -53,11 +51,11 @@ usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : problem.val
 
 const session = useSessionStore();
 const hasEditor = computed(() => session.status === 'authenticated');
+/** The submit panel is open beside the statement: the page column widens to fit both. */
+const panelOpen = ref(false);
 const layout = computed(
   () => PROBLEM_LAYOUT[contest.value && railEntries.value ? 'contest' : 'plain'],
 );
-/** Where the statement takes the whole column, the loading page shows no pane: the sheet's bar is fixed below. */
-const isStacked = useMediaQuery(() => layout.value.stacked);
 
 /** Set when the editorial answers 404 for this problem; the tab then disappears until another problem is opened. */
 const editorialGone = ref(false);
@@ -100,7 +98,7 @@ watch(
       'page-column',
       contest && railEntries
         ? 'lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start'
-        : hasEditor
+        : panelOpen
           ? '[--page-width:120rem]'
           : '[--page-width:80rem]',
     ]"
@@ -115,9 +113,8 @@ watch(
     <div class="flex min-w-0 flex-col gap-5">
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
-          <div :class="[layout.grid, hasEditor ? layout.columns.editor : layout.columns.signIn]">
+          <div :class="[layout.grid, hasEditor ? '' : layout.columns.signIn]">
             <StatementSkeleton header :class="layout.left" />
-            <SubmitPaneSkeleton v-if="hasEditor && !isStacked" :class="layout.pane" />
           </div>
         </template>
         <ProblemContent
@@ -130,6 +127,7 @@ watch(
           :contest="contest && railEntries ? contest : null"
           :contest-is-live="!isReadOnlyContest"
           @gone="editorialGone = true"
+          @panel="panelOpen = $event"
         />
       </QueryState>
     </div>

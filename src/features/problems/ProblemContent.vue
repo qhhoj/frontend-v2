@@ -21,6 +21,7 @@ import ProblemMySubmissions from './ProblemMySubmissions.vue';
 import StatementBody from './StatementBody.vue';
 import ProblemTypesCard from './ProblemTypesCard.vue';
 import StatementNote from './StatementNote.vue';
+import SubmitOpenButton from './SubmitOpenButton.vue';
 import SubmitPane from './SubmitPane.vue';
 import { hasNoStatement } from './statement-presence';
 import type { ProblemLayout } from './problem-layout';
@@ -30,7 +31,7 @@ import { useSubmitForm } from './use-submit-form';
 const DEFAULT_TAB = 'statement';
 /**
  * A loaded problem (Workbench split): left the statement card (header, facts strip, tabs), then the viewer's submissions,
- * links, types and comments; right the submit pane. The page keys it by code, so another problem never inherits the typed
+ * links, types and comments; right the submit pane once the viewer opens it from the header. The page keys it by code, so another problem never inherits the typed
  * code, pick or file.
  */
 const props = defineProps<{
@@ -43,15 +44,18 @@ const props = defineProps<{
   contestIsLive?: boolean;
 }>();
 const tab = defineModel<string>('tab', { required: true });
-defineEmits<{ gone: [] }>();
+const emit = defineEmits<{ gone: []; panel: [open: boolean] }>();
 const route = useRoute();
 // The submit form is this component's: beside the statement the pane shows it; where the statement takes the whole column
 // (phones, tablets) the sheet does.
 const session = useSessionStore();
 const isSignedIn = computed(() => session.status === 'authenticated');
 const usesSheet = useMediaQuery(() => props.layout.stacked);
-/** The sheet starts closed, so the statement is what the viewer sees first. */
+/** The pane and the sheet start closed, so the statement is what the viewer sees first; the header button opens them. */
 const submitOpen = ref(false);
+/** The pane takes a column beside the statement; the page widens its column for it. */
+const paneIsOpen = computed(() => isSignedIn.value && !usesSheet.value && submitOpen.value);
+watch(paneIsOpen, (isOpen) => emit('panel', isOpen), { immediate: true });
 /** The pane and the facts strip stick under whatever bar stays at the top: the impersonation banner, else the contest bar. */
 const IMPERSONATION_BANNER_HEIGHT = '3.5rem';
 const stickyTop = computed(() => ({
@@ -63,7 +67,7 @@ const stickyTop = computed(() => ({
 const resubmitId = computed(() =>
   isSignedIn.value && typeof route.query.resubmit === 'string' ? route.query.resubmit : null,
 );
-// `?resubmit=`: the prefilled code is the point of the visit, so the sheet opens for it (the pane is always open). Every time the id
+// `?resubmit=`: the prefilled code is the point of the visit, so the pane or the sheet opens for it. Every time the id
 // appears, not only on load: an anonymous viewer arrives with it after signing in.
 watch(
   resubmitId,
@@ -88,12 +92,23 @@ function panelIdOf(tabId: string) {
 <template>
   <ProblemArchivedNotice :code="problem.code" :organization-ids="problem.organizations" />
   <div
-    :class="[layout.grid, isSignedIn ? layout.columns.editor : layout.columns.signIn]"
+    :class="[
+      layout.grid,
+      isSignedIn ? (paneIsOpen ? layout.columns.editor : '') : layout.columns.signIn,
+    ]"
     :style="stickyTop"
   >
     <!-- The statement tab's card carries the problem header; on the editorial tab the card is header and tabs only. -->
     <Card as="div" data-testid="statement-card" :class="['min-w-0 p-6 sm:p-8', layout.left]">
       <ProblemHeader :problem="problem" :section="tab === 'editorial' ? 'editorial' : 'statement'">
+        <template v-if="isSignedIn" #actions>
+          <SubmitOpenButton
+            :form="submitForm"
+            :open="submitOpen && !usesSheet"
+            :show-result="!usesSheet"
+            @open="submitOpen = true"
+          />
+        </template>
         <template #strip>
           <ProblemLimitStrip
             :problem="problem"
