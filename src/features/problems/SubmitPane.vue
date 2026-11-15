@@ -67,7 +67,7 @@ watch(open, async (isOpen) => {
 });
 
 /** `s` from anywhere on the page but a field or the editor opens the pane if needed and puts the caret in its editor. */
-async function onKeydown(event: KeyboardEvent) {
+function onKeydown(event: KeyboardEvent) {
   if (props.usesSheet || !props.isSignedIn || !isFocusEditorShortcut(event)) return;
   event.preventDefault();
   if (!open.value)
