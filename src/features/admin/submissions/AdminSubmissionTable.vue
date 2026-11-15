@@ -123,7 +123,7 @@ const menuItems = (row: SubmissionListItem): RowMenuItem[] => [
         :to="{ name: 'submission', params: { id: row.id } }"
         class="inline-flex rounded-full transition-opacity hover:opacity-90"
       >
-        <VerdictChip :verdict="submissionVerdictOf(row)" class="min-w-12" />
+        <VerdictChip :verdict="submissionVerdictOf(row)" />
       </RouterLink>
     </template>
     <template #cell-user="{ row }">
