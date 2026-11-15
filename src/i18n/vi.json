@@ -2603,6 +2603,8 @@
     "accepted": "Đã đồng ý bản {revision} lúc {time}"
   },
   "problemSwitcher": {
+    "collapse": "Thu gọn danh sách bài",
+    "expand": "Mở rộng danh sách bài",
     "limitsColumn": "Giới hạn",
     "status": {
       "solved": "Đã giải",

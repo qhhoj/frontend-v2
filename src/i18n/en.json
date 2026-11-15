@@ -2603,6 +2603,8 @@
     "accepted": "Accepted revision {revision} at {time}"
   },
   "problemSwitcher": {
+    "collapse": "Collapse the problem list",
+    "expand": "Expand the problem list",
     "limitsColumn": "Limits",
     "status": {
       "solved": "Solved",

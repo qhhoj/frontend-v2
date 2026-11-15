@@ -5,6 +5,7 @@ import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import ContestProblemSwitcher from '@/features/contests/ContestProblemSwitcher.vue';
 import { useProblemRail } from '@/features/contests/use-problem-rail';
+import { useProblemRailCollapse } from '@/features/contests/use-problem-rail-collapse';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { useNavSection } from '@/features/shell/nav-section';
 import { translate } from '@/i18n';
@@ -53,6 +54,7 @@ const session = useSessionStore();
 const hasEditor = computed(() => session.status === 'authenticated');
 /** The submit panel is open beside the statement: the page column widens to fit both. */
 const panelOpen = ref(false);
+const { isCollapsed: railCollapsed, toggle: toggleRail } = useProblemRailCollapse(panelOpen);
 const layout = computed(
   () => PROBLEM_LAYOUT[contest.value && railEntries.value ? 'contest' : 'plain'],
 );
@@ -97,7 +99,12 @@ watch(
     :class="[
       'page-column',
       contest && railEntries
-        ? 'lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start'
+        ? [
+            'lg:grid lg:items-start',
+            railCollapsed
+              ? 'lg:grid-cols-[3rem_minmax(0,1fr)]'
+              : 'lg:grid-cols-[240px_minmax(0,1fr)]',
+          ]
         : panelOpen
           ? '[--page-width:120rem]'
           : '[--page-width:80rem]',
@@ -109,6 +116,8 @@ watch(
       :contest-name="contest.name"
       :entries="railEntries"
       :carries-contest="isReadOnlyContest"
+      :collapsed="railCollapsed"
+      @toggle="toggleRail"
     />
     <div class="flex min-w-0 flex-col gap-5">
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
