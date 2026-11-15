@@ -7,7 +7,8 @@ import { VERDICT_TONE_CLASSES } from '@/lib/verdicts';
 /**
  * The one verdict chip (Workbench, directions.md §2): a Lucide glyph, the mono code and, with `named`, the verdict's name, on
  * its lane tint. Glyph and code carry the meaning, so colour is never the only signal. Without `named` the name is the tooltip
- * and what a screen reader reads.
+ * and what a screen reader reads. Without `named` the chip has one fixed minimum width (fits the longest code, 3 characters),
+ * so the titles beside a column of chips line up.
  */
 defineProps<{ verdict: Verdict; named?: boolean }>();
 
@@ -25,7 +26,7 @@ const GLYPHS: Record<VerdictTone, Component> = {
 <template>
   <span
     class="inline-flex h-5 shrink-0 items-center gap-1 rounded-cell px-1.5 text-tiny leading-4 font-semibold whitespace-nowrap"
-    :class="VERDICT_TONE_CLASSES[verdict.tone]"
+    :class="[VERDICT_TONE_CLASSES[verdict.tone], named ? '' : 'min-w-13 justify-center']"
     :title="named ? undefined : $t(verdict.labelKey)"
   >
     <component
