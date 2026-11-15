@@ -1,78 +1,106 @@
 <!-- eslint-disable vue/multi-word-component-names -- the kit names primitives by role (docs/design-language.md). -->
 <script setup lang="ts">
-import Dialog from 'primevue/dialog';
-import { computed } from 'vue';
+import { X } from 'lucide-vue-next';
+import { computed, useAttrs, useId, useTemplateRef } from 'vue';
+import IconButton from './IconButton.vue';
+import { useModalDialog } from './modal-dialog';
 
 export type ModalSize = 'sm' | 'md' | 'lg';
 
 /**
- * The one dialog: PrimeVue's Dialog on the shared preset (modal, not draggable, a labelled close button, Escape closes).
- * PrimeVue traps focus while it is open and gives it back to the opener when it hides. On open, focus goes to the first
- * meaningful control (the first field in the body, else the first enabled footer button), never to the close button, and a
- * mouse- or touch-opened dialog shows no focus ring there (`:focus-visible` decides).
+ * The one dialog: a native modal `<dialog>` (`modal-dialog.ts`: top layer, the page inert behind it, Escape closes, the page
+ * does not scroll). Focus returns to the opener when it closes. On open, focus goes to the first meaningful control (an
+ * `[autofocus]` element, else the first field in the body, else the first enabled footer button), never to the close button,
+ * and a mouse- or touch-opened dialog shows no focus ring there (`:focus-visible` decides).
  * `size` picks a width (sm 480, md 640, lg 760 px, never wider than the viewport minus 2 rem); `lg` fills
- * the screen below 640 px, sm and md stay a centred card; without it the preset's 448 px applies at every width.
- * `closable` false hides the close button and ignores Escape (a busy step).
- * Slots: default (body), `header` (in place of `title`), `footer`. Other attributes (`style`, `aria-describedby`) go to the Dialog.
+ * the screen below 640 px, sm and md stay a centred card; without it the dialog is 448 px at every width.
+ * `closable` false hides the close button and ignores Escape (a busy step). `dismissable`: a click outside closes it too.
+ * Slots: default (body), `header` (in place of `title`; name the dialog with `aria-labelledby`), `footer`.
+ * Other attributes (`style`, `aria-describedby`, `data-testid`) go to the `<dialog>`.
  */
+defineOptions({ inheritAttrs: false });
 const props = withDefaults(
   defineProps<{
     title?: string;
     size?: ModalSize;
     closable?: boolean;
+    dismissable?: boolean;
   }>(),
-  { title: undefined, size: undefined, closable: true },
+  { title: undefined, size: undefined, closable: true, dismissable: false },
 );
 const visible = defineModel<boolean>('visible', { required: true });
+const attrs = useAttrs();
+const titleId = useId();
 
 const WIDTHS: Record<ModalSize, string> = {
   sm: 'sm:w-[min(30rem,calc(100vw-2rem))]',
   md: 'sm:w-[min(40rem,calc(100vw-2rem))]',
   lg: 'sm:w-[min(47.5rem,calc(100vw-2rem))]',
 };
-/** Only the widest size is full screen on a phone; sm and md stay a centred card with the mask's 1 rem margins. */
+/** Only the widest size is full screen on a phone; sm and md stay a centred card with 1 rem margins. */
 const FULL_ON_PHONE =
-  'max-sm:h-dvh max-sm:max-h-dvh max-sm:w-screen max-sm:rounded-none max-sm:border-0';
+  'max-sm:h-dvh max-sm:max-h-dvh max-sm:w-screen max-sm:max-w-none max-sm:rounded-none max-sm:border-0';
 const sizeClass = computed(
   () => props.size && [WIDTHS[props.size], props.size === 'lg' && FULL_ON_PHONE],
 );
-/** Fields first (or an `[autofocus]` element), then the footer's first enabled button (Cancel on a confirm). */
-const FIRST_FIELD = '[autofocus], input:not([type=hidden]):not(:disabled), select, textarea';
-const HEADER_BUTTON = '[data-pc-group-section="headericon"]';
+const labelledBy = computed(
+  () => (attrs['aria-labelledby'] as string | undefined) ?? (props.title ? titleId : undefined),
+);
+
+const body = useTemplateRef<HTMLElement>('body');
+const footer = useTemplateRef<HTMLElement>('footer');
+const FIRST_FIELD = 'input:not([type=hidden]):not(:disabled), select, textarea';
 const FIRST_FOOTER_BUTTON = 'button:not(:disabled):not([aria-disabled=true])';
-/**
- * PrimeVue's own focus (after the enter transition) lands on the close button when nothing is marked `autofocus`, and forces
- * a visible ring. Right after it, move focus on with a plain `focus()`, so the ring follows the browser's `:focus-visible`.
- */
-function focusFirstControl(dialog: Element) {
-  if (!document.activeElement?.matches(HEADER_BUTTON)) return;
-  const target =
-    dialog.querySelector<HTMLElement>(`[data-pc-section="content"] :is(${FIRST_FIELD})`) ??
-    dialog.querySelector<HTMLElement>(`[data-pc-section="footer"] ${FIRST_FOOTER_BUTTON}`);
-  target?.focus();
-}
-/** Merged into the preset's mask (not replacing it): no inset on a phone, so a sized dialog reaches the edges. */
-const pt = computed(() => ({
-  ...(props.size === 'lg' && { mask: { class: 'max-sm:p-0' } }),
-  transition: { onAfterEnter: focusFirstControl },
-}));
+/** `[autofocus]` first, then a field, then the footer's first enabled button (Cancel on a confirm), then the close button. */
+const initialFocus = (dialog: HTMLDialogElement) =>
+  body.value?.querySelector<HTMLElement>('[autofocus]') ??
+  body.value?.querySelector<HTMLElement>(FIRST_FIELD) ??
+  footer.value?.querySelector<HTMLElement>(FIRST_FOOTER_BUTTON) ??
+  dialog.querySelector<HTMLElement>('[data-modal-close]');
+
+const handlers = useModalDialog(useTemplateRef<HTMLDialogElement>('dialog'), visible, {
+  isClosable: () => props.closable,
+  isDismissable: () => props.dismissable,
+  initialFocus,
+});
 </script>
 
 <template>
-  <Dialog
-    v-model:visible="visible"
-    modal
-    :header="title"
-    :draggable="false"
-    :class="sizeClass"
-    :pt="pt"
-    :pt-options="{ mergeProps: true }"
-    :closable="closable"
-    :close-on-escape="closable"
-    :close-button-props="{ 'aria-label': $t('common.close') }"
-  >
-    <template v-if="$slots.header" #header><slot name="header" /></template>
-    <slot />
-    <template v-if="$slots.footer" #footer><slot name="footer" /></template>
-  </Dialog>
+  <!-- Created on open, so the dialog comes last in <body>: the newest overlay is last in DOM order too. -->
+  <Teleport v-if="visible" to="body">
+    <dialog
+      ref="dialog"
+      v-bind="attrs"
+      role="dialog"
+      aria-modal="true"
+      :aria-labelledby="labelledBy"
+      class="m-auto max-h-[calc(100dvh-2rem)] w-[min(28rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] flex-col rounded-card border border-line-strong bg-surface-solid p-0 text-content shadow-float outline-none backdrop:bg-ground/70 open:flex"
+      :class="sizeClass"
+      @cancel="handlers.onCancel"
+      @close="handlers.onClose"
+      @pointerdown="handlers.onPointerdown"
+      @click="handlers.onClick"
+    >
+      <header class="flex shrink-0 items-start justify-between gap-3 px-6 pt-5">
+        <slot name="header">
+          <h2 :id="titleId" class="m-0 font-display text-section leading-7 font-semibold">
+            {{ title }}
+          </h2>
+        </slot>
+        <IconButton
+          v-if="closable"
+          data-modal-close
+          :label="$t('common.close')"
+          @click="visible = false"
+        >
+          <X aria-hidden="true" />
+        </IconButton>
+      </header>
+      <!-- A dialog taller than the screen scrolls here, so the header (close button) and footer stay on screen. -->
+      <div ref="body" class="min-h-0 overflow-y-auto px-6 py-4"><slot /></div>
+      <footer v-if="$slots.footer" ref="footer" class="flex shrink-0 justify-end gap-2.5 px-6 pb-5">
+        <slot name="footer" />
+      </footer>
+    </dialog>
+  </Teleport>
 </template>

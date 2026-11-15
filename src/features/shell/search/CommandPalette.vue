@@ -115,7 +115,13 @@ const status = computed(() => {
 </script>
 
 <template>
-  <Modal v-model:visible="visible" :title="$t('search.title')" size="md" data-testid="site-palette">
+  <Modal
+    v-model:visible="visible"
+    :title="$t('search.title')"
+    size="md"
+    dismissable
+    data-testid="site-palette"
+  >
     <div class="flex flex-col gap-3">
       <TextInput
         v-model="text"

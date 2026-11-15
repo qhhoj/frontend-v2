@@ -1,15 +1,28 @@
-import { getCurrentInstance, h, render } from 'vue';
+import { getCurrentInstance, h, render, watch } from 'vue';
 import type { AppContext } from 'vue';
+import { topDialog } from './modal-dialog';
 import ToastHost from './ToastHost.vue';
 import { clearToasts, dismissToast, showToast } from './toasts';
 
 let host: HTMLElement | null = null;
 
-/** Renders the one toast host into `<body>` with the app's context (i18n), the first time a component asks for toasts. */
+/**
+ * The host lives in `<body>`, or inside the open modal dialog while there is one: the rest of the page is inert and under the
+ * top layer then, and a toast must stay readable and its undo clickable.
+ */
+const placeHost = () => host && (topDialog.value ?? document.body).append(host);
+watch(topDialog, placeHost, { flush: 'sync' });
+
+/** Renders the one toast host with the app's context (i18n), the first time a component asks for toasts. */
 function ensureHost(appContext: AppContext | undefined) {
-  if (host?.isConnected || !appContext || typeof document === 'undefined') return;
+  if (host) {
+    // The dialog that held it has just been removed, before `topDialog` moved it out.
+    if (!host.isConnected) placeHost();
+    return;
+  }
+  if (!appContext || typeof document === 'undefined') return;
   host = document.createElement('div');
-  document.body.append(host);
+  placeHost();
   const vnode = h(ToastHost);
   vnode.appContext = appContext;
   render(vnode, host);
