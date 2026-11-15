@@ -18,7 +18,7 @@ describe('active filter chips', () => {
       groupId: 'g1',
       pointsMin: 800,
       pointsMax: 2400,
-      hideSolved: true,
+      hasEditorial: true,
     };
     const chips = filterChips(filters, catalog);
     expect(chips.map((chip) => chip.label)).toEqual([
@@ -26,7 +26,7 @@ describe('active filter chips', () => {
       'Quy hoạch động',
       'Tham lam',
       '800–2400 điểm',
-      'Ẩn bài đã giải',
+      'Có lời giải',
     ]);
     expect(chips[1]!.clear).toEqual({ typeIds: ['t2'] });
     expect(chips[3]!.clear).toEqual({ pointsMin: null, pointsMax: null });

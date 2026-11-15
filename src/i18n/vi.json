@@ -1225,24 +1225,19 @@
   "problems": {
     "title": "Bài tập",
     "results": "{n} kết quả",
-    "solvedCount": "Đã giải {solved} bài",
     "search": "Mã hoặc tên bài",
-    "types": "Lọc theo dạng bài",
-    "pointsAny": "Điểm",
-    "pointsFilter": "Lọc theo điểm",
     "listName": "Danh sách bài",
-    "pointsRange": "Điểm {min}–{max}",
     "pointsAnyBound": "Bất kỳ",
-    "pointsDone": "Xong",
     "pointsMin": "Điểm từ",
     "pointsMax": "Điểm đến",
     "columns": {
-      "problem": "Bài",
+      "problem": "Tên bài",
       "types": "Dạng bài",
       "points": "Điểm",
       "acRate": "AC",
       "users": "Đã giải",
-      "status": "Trạng thái"
+      "status": "Trạng thái",
+      "code": "Mã"
     },
     "solved": "Đã giải",
     "attempted": "Đã thử",
@@ -1260,15 +1255,12 @@
     "random": "Bài ngẫu nhiên",
     "randomNone": "Không có bài phù hợp.",
     "randomFailed": "Chưa chọn được bài, thử lại.",
-    "hideSolved": "Ẩn bài đã giải",
     "hasEditorial": "Có lời giải",
     "filtering": "Đang lọc:",
     "clearAll": "Xóa tất cả",
     "removeFilter": "Bỏ lọc: {name}",
     "pointsChip": "{min}–{max} điểm",
     "count": "{n} bài",
-    "legendPartial": "= chấm từng phần",
-    "legend": "Chú giải",
     "uncategorized": "Chưa phân loại",
     "attemptedLong": "Đã thử, chưa đúng",
     "notTried": "Chưa thử",
@@ -1282,11 +1274,27 @@
     },
     "solverCount": "{count} giải",
     "filterPanel": "Bộ lọc",
+    "filterPanelShort": "Lọc",
     "tier": {
       "1": "Dễ",
       "2": "Trung bình",
       "3": "Khó",
       "4": "Rất khó"
+    },
+    "solvedShort": "{solved} đã giải",
+    "partialHint": "chấm từng phần",
+    "hasEditorialHint": "Chỉ bài đã có lời giải được công bố",
+    "solvedFilter": {
+      "label": "Lọc theo bài đã giải",
+      "any": "Tất cả",
+      "unsolved": "Chưa giải",
+      "solved": "Đã giải"
+    },
+    "peek": {
+      "label": "Xem nhanh bài",
+      "lastSubmission": "Lần nộp gần nhất",
+      "open": "Mở bài",
+      "crowd": "AC {rate}% · {count} người đã giải"
     }
   },
   "submissions": {

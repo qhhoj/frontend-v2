@@ -1,28 +1,33 @@
 <script setup lang="ts">
 import { SlidersHorizontal } from 'lucide-vue-next';
-import { computed, ref, useId, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { isProblemSort } from '@/api/types/problems';
 import type { CatalogItem } from '@/api/types/problems';
 import AppButton from '@/components/ui/AppButton.vue';
 import Chip from '@/components/ui/Chip.vue';
+import Popover from '@/components/ui/Popover.vue';
+import SearchInput from '@/components/ui/SearchInput.vue';
+import SegmentedControl from '@/components/ui/SegmentedControl.vue';
+import { translate } from '@/i18n';
 import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useDebouncedText } from '@/lib/use-debounced-text';
-import ProblemFilterControls from './ProblemFilterControls.vue';
+import ProblemFilterPanel from './ProblemFilterPanel.vue';
+import ProblemSortSelect from './ProblemSortSelect.vue';
 import RandomProblemButton from './RandomProblemButton.vue';
-import SearchInput from '@/components/ui/SearchInput.vue';
-import ToolbarSelect from '@/components/ToolbarSelect.vue';
-import { DEFAULT_SORT, sortOptions } from './problem-sort-options';
 import { listedCode, problemSearchIntent } from './problem-search-input';
 import { panelFilterCount } from './use-problem-filters';
-import type { ProblemFilters } from './use-problem-filters';
+import type { ProblemFilters, SolvedFilter } from './use-problem-filters';
 
+/**
+ * The list's one toolbar row: search (Enter opens a typed code), the solved choice (signed in), "Bộ lọc" with the rarer
+ * filters, the order when no column header shows it, and the random pick. On a phone the search takes its own line.
+ */
 const props = withDefaults(
   defineProps<{
     filters: ProblemFilters;
     types: CatalogItem[];
     groups: CatalogItem[];
-    /** "Ẩn bài đã giải" means nothing without a signed-in viewer. */
+    /** The solved choice means nothing without a signed-in viewer. */
     signedIn: boolean;
     /** Codes of the problems the list shows now: Enter opens the one that equals the typed code. */
     listedCodes?: readonly string[];
@@ -73,21 +78,26 @@ function openExact(event: KeyboardEvent) {
   searchText.commitNow(code);
   awaitedCode = code;
 }
-/** Orders the column headers can show: the name and the three number columns. */
-const HEADER_SORT_FIELDS: readonly string[] = ['name', 'points', 'acRate', 'userCount'];
-const hasNonHeaderSort = computed(
+/** Orders the column headers show: every one but the dates. */
+const HEADER_SORT_FIELDS: readonly string[] = ['code', 'name', 'points', 'acRate', 'userCount'];
+const isHeaderSort = computed(
   () =>
     props.filters.sort !== null &&
-    !HEADER_SORT_FIELDS.includes(props.filters.sort.replace(/^-/, '')),
+    HEADER_SORT_FIELDS.includes(props.filters.sort.replace(/^-/, '')),
 );
-const setSort = (value: string) =>
-  emit('update', { sort: value !== DEFAULT_SORT && isProblemSort(value) ? value : null });
 
-/** A phone keeps search and sort in sight; the other filters and the random pick wait behind "Bộ lọc". */
+/** A phone's rows have no column headers: its sort, and the random pick, wait behind "Bộ lọc" with the other filters. */
 const isCompact = useMediaQuery(COMPACT_LIST_QUERY);
+const panel = ref<InstanceType<typeof Popover>>();
 const isPanelOpen = ref(false);
-const panelId = useId();
 const panelCount = computed(() => panelFilterCount(props.filters));
+const SOLVED_CHOICES = computed(() =>
+  (['any', 'unsolved', 'solved'] as const).map((value) => ({
+    value,
+    label: translate(`problems.solvedFilter.${value}`),
+  })),
+);
+const setSolved = (solved: SolvedFilter) => emit('update', { solved });
 </script>
 
 <template>
@@ -96,49 +106,50 @@ const panelCount = computed(() => panelFilterCount(props.filters));
       v-model="searchText"
       :label="$t('problems.searchLabel')"
       :placeholder="$t('problems.search')"
-      :class="isCompact ? 'basis-full' : 'max-w-[320px] min-w-[180px] flex-1'"
+      :class="isCompact ? 'basis-full' : 'max-w-80 min-w-44 flex-1'"
       @keydown.enter="openExact"
     />
-    <ProblemFilterControls
-      v-if="!isCompact"
-      :filters="filters"
-      :types="types"
-      :groups="groups"
-      :signed-in="signedIn"
-      @update="emit('update', $event)"
+    <!-- The page-level (md) segments share their frame equally, so the frame gets the width of three labels on a
+         computer (the search yields first) and the room beside "Lọc" on a phone. -->
+    <SegmentedControl
+      v-if="signedIn"
+      :class="isCompact ? 'min-w-0 flex-1' : 'min-w-72 shrink-0'"
+      :label="$t('problems.solvedFilter.label')"
+      :options="SOLVED_CHOICES"
+      :model-value="filters.solved"
+      @update:model-value="setSolved"
     />
-    <!-- Desktop sorts by the column headers. The select stays on phones (compact rows have no headers) and on
-         desktop while the list is in an order no header shows (newest is the default; oldest, code). -->
-    <ToolbarSelect
-      :class="{ 'sm:hidden': !hasNonHeaderSort }"
-      :label="$t('problems.sort')"
-      :model-value="filters.sort ?? DEFAULT_SORT"
-      :options="sortOptions()"
-      :active="filters.sort !== null"
-      @update:model-value="setSort"
+    <AppButton
+      data-testid="problem-filter-panel-toggle"
+      aria-haspopup="dialog"
+      :aria-expanded="isPanelOpen"
+      @click="panel?.toggle($event)"
+    >
+      <template #icon><SlidersHorizontal class="size-4" aria-hidden="true" /></template>
+      {{ isCompact ? $t('problems.filterPanelShort') : $t('problems.filterPanel') }}
+      <Chip v-if="panelCount" size="sm" class="font-mono tabular-nums">{{ panelCount }}</Chip>
+    </AppButton>
+    <Popover
+      ref="panel"
+      :label="$t('problems.filterPanel')"
+      @show="isPanelOpen = true"
+      @hide="isPanelOpen = false"
+    >
+      <ProblemFilterPanel
+        :filters="filters"
+        :types="types"
+        :groups="groups"
+        :with-sort="isCompact"
+        @update="emit('update', $event)"
+      />
+      <RandomProblemButton v-if="isCompact" :filters="filters" labelled class="mt-3" />
+    </Popover>
+    <!-- The default order (newest first) and the other date orders have no column: the select says which one is on. -->
+    <ProblemSortSelect
+      v-if="!isCompact && !isHeaderSort"
+      :sort="filters.sort"
+      @update="emit('update', { sort: $event })"
     />
     <RandomProblemButton v-if="!isCompact" :filters="filters" class="ml-auto" />
-    <template v-if="isCompact">
-      <AppButton
-        data-testid="problem-filter-panel-toggle"
-        :aria-expanded="isPanelOpen"
-        :aria-controls="panelId"
-        @click="isPanelOpen = !isPanelOpen"
-      >
-        <template #icon><SlidersHorizontal class="size-4" aria-hidden="true" /></template>
-        {{ $t('problems.filterPanel') }}
-        <Chip v-if="panelCount" class="font-mono tabular-nums">{{ panelCount }}</Chip>
-      </AppButton>
-      <div v-show="isPanelOpen" :id="panelId" class="flex basis-full flex-wrap items-center gap-2">
-        <ProblemFilterControls
-          :filters="filters"
-          :types="types"
-          :groups="groups"
-          :signed-in="signedIn"
-          @update="emit('update', $event)"
-        />
-        <RandomProblemButton :filters="filters" />
-      </div>
-    </template>
   </div>
 </template>

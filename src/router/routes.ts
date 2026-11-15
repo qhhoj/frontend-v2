@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router';
 import { adminRoutes } from '@/features/admin/admin-routes';
+import { restoreListSetup } from '@/features/problems/problem-list-setup';
 import { USER_COMMENTS_PERMISSION } from '@/features/profile/user-comments-access';
 
 export const routes: RouteRecordRaw[] = [
@@ -14,6 +15,7 @@ export const routes: RouteRecordRaw[] = [
     name: 'problems',
     component: () => import('@/features/problems/ProblemsPage.vue'),
     meta: { titleKey: 'nav.problems' },
+    beforeEnter: restoreListSetup,
   },
   {
     path: '/problems/:code',

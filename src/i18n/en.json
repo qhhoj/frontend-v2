@@ -1225,24 +1225,19 @@
   "problems": {
     "title": "Problems",
     "results": "{n} result | {n} results",
-    "solvedCount": "{solved} solved",
     "search": "Code or name",
-    "types": "Filter by problem type",
-    "pointsAny": "Points",
-    "pointsFilter": "Filter by points",
     "listName": "Problem list",
-    "pointsRange": "Points {min}–{max}",
     "pointsAnyBound": "Any",
-    "pointsDone": "Done",
     "pointsMin": "Points from",
     "pointsMax": "Points to",
     "columns": {
-      "problem": "Problem",
+      "problem": "Name",
       "types": "Type",
       "points": "Points",
       "acRate": "AC",
       "users": "Solved",
-      "status": "Status"
+      "status": "Status",
+      "code": "Code"
     },
     "solved": "Solved",
     "attempted": "Attempted",
@@ -1260,15 +1255,12 @@
     "random": "Random problem",
     "randomNone": "No matching problem.",
     "randomFailed": "Could not pick a problem, try again.",
-    "hideSolved": "Hide solved",
     "hasEditorial": "Has editorial",
     "filtering": "Filtering:",
     "clearAll": "Clear all",
     "removeFilter": "Remove filter: {name}",
     "pointsChip": "{min}–{max} points",
     "count": "{n} problem | {n} problems",
-    "legendPartial": "= partial scoring",
-    "legend": "Legend",
     "uncategorized": "Uncategorized",
     "attemptedLong": "Attempted, not solved",
     "notTried": "Not tried",
@@ -1282,11 +1274,27 @@
     },
     "solverCount": "{count} solved",
     "filterPanel": "Filters",
+    "filterPanelShort": "Filter",
     "tier": {
       "1": "Easy",
       "2": "Medium",
       "3": "Hard",
       "4": "Very hard"
+    },
+    "solvedShort": "{solved} solved",
+    "partialHint": "partial scoring",
+    "hasEditorialHint": "Only problems with a published editorial",
+    "solvedFilter": {
+      "label": "Filter by solved",
+      "any": "All",
+      "unsolved": "Unsolved",
+      "solved": "Solved"
+    },
+    "peek": {
+      "label": "Problem preview",
+      "lastSubmission": "Last submission",
+      "open": "Open problem",
+      "crowd": "AC {rate}% · {count} solved"
     }
   },
   "submissions": {
