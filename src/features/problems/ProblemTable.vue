@@ -16,32 +16,24 @@ import { formatNumber, formatProblemPoints } from '@/lib/format';
 import { COMPACT_LIST_BELOW_PX } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
 import ProblemStatusMark from './ProblemStatusMark.vue';
-import ProblemTierMark from './ProblemTierMark.vue';
 
 /**
  * The problem list: the kit `DataTable` on a computer, one 32 px line per problem (48 px on a touch screen), and on a phone
  * compact rows instead of a table that scrolls sideways. Sorting is by the column headers; a third click on one returns to
- * the default order. An empty list under filters offers to clear them. Each table row carries `data-code`, and the row in
- * the peek pane (`peekCode`) is marked.
+ * the default order. An empty list under filters offers to clear them. Each table row carries `data-code` (the page loads
+ * that problem ahead on hover and focus). The name takes the width the other columns leave.
  */
-const props = withDefaults(
-  defineProps<{
-    problems: ProblemListItem[];
-    sort: ProblemSort | null;
-    /** Without a viewer there is no status to show, not even "not tried". */
-    signedIn: boolean;
-    loading: boolean;
-    error: unknown;
-    meta: NumberedPageMeta | undefined;
-    /** The list is empty because of filters: the empty state offers to clear them. */
-    filtered: boolean;
-    /** The problem the peek pane shows. */
-    peekCode?: string | null;
-    /** The types column, when a problem on the page has types (the peek pane beside a narrow table names them instead). */
-    typesColumn?: boolean;
-  }>(),
-  { peekCode: null, typesColumn: true },
-);
+const props = defineProps<{
+  problems: ProblemListItem[];
+  sort: ProblemSort | null;
+  /** Without a viewer there is no status to show, not even "not tried". */
+  signedIn: boolean;
+  loading: boolean;
+  error: unknown;
+  meta: NumberedPageMeta | undefined;
+  /** The list is empty because of filters: the empty state offers to clear them. */
+  filtered: boolean;
+}>();
 const emit = defineEmits<{ sort: [sort: ProblemSort | null]; retry: []; clearFilters: [] }>();
 const { t } = useI18n();
 const locale = useLocaleStore();
@@ -54,10 +46,8 @@ const sortOf = (field: string, first: 'asc' | 'desc') => ({
   first,
   clears: true,
 });
-/** The types column only when wanted and a problem on this page has a type worth naming. */
-const hasTypes = computed(
-  () => props.typesColumn && props.problems.some((problem) => namedTypes(problem).length > 0),
-);
+/** The types column only when a problem on this page has a type worth naming. */
+const hasTypes = computed(() => props.problems.some((problem) => namedTypes(problem).length > 0));
 const columns = computed<DataTableColumn[]>(() => [
   ...(props.signedIn
     ? [{ key: 'status', label: t('problems.columns.status'), hideLabel: true }]
@@ -81,7 +71,7 @@ const columns = computed<DataTableColumn[]>(() => [
           key: 'types',
           label: t('problems.columns.types'),
           hideBelow: 'lg' as const,
-          cellClass: 'w-40 max-w-40',
+          cellClass: 'max-w-56 whitespace-nowrap',
         },
       ]
     : []),
@@ -113,12 +103,9 @@ function namedTypes(problem: ProblemListItem) {
     .filter((type) => type.name !== UNCATEGORIZED_TYPE_NAME)
     .map((type) => problemTypeLabel(type));
 }
-/** One type chip fits the column; the rest are counted, and all are named in the tooltip. The name keeps the width. */
+/** One type chip, the rest counted in a "+N" that is never cut; all are named in the tooltip. The name keeps the width. */
 const SHOWN_TYPES = 1;
-const rowAttrs = (problem: ProblemListItem) => ({
-  'data-code': problem.code,
-  class: problem.code === props.peekCode ? 'bg-accent-soft' : undefined,
-});
+const rowAttrs = (problem: ProblemListItem) => ({ 'data-code': problem.code });
 const pointsText = (problem: ProblemListItem) =>
   formatProblemPoints(problem.points, problem.partial, locale.locale);
 </script>
@@ -164,25 +151,25 @@ const pointsText = (problem: ProblemListItem) =>
       >
     </template>
     <template #cell-types="{ row }">
-      <span class="flex items-center gap-1 overflow-hidden" :title="namedTypes(row).join(', ')">
-        <Chip v-for="name in namedTypes(row).slice(0, SHOWN_TYPES)" :key="name" size="sm">{{
-          name
-        }}</Chip>
+      <span class="flex items-center gap-1" :title="namedTypes(row).join(', ')">
+        <Chip
+          v-for="name in namedTypes(row).slice(0, SHOWN_TYPES)"
+          :key="name"
+          size="sm"
+          class="min-w-0"
+          ><span class="block max-w-40 truncate">{{ name }}</span></Chip
+        >
         <span
           v-if="namedTypes(row).length > SHOWN_TYPES"
-          class="text-caption whitespace-nowrap text-muted"
+          class="shrink-0 text-caption whitespace-nowrap text-muted"
           >+{{ namedTypes(row).length - SHOWN_TYPES }}</span
         >
       </span>
     </template>
     <template #cell-points="{ row }">
-      <span
-        class="inline-flex items-center gap-2 font-medium"
-        :title="row.partial ? $t('problems.partialHint') : undefined"
-      >
-        <ProblemTierMark :points="row.points" />
-        {{ pointsText(row) }}
-      </span>
+      <span class="font-medium" :title="row.partial ? $t('problems.partialHint') : undefined">{{
+        pointsText(row)
+      }}</span>
     </template>
     <template #cell-acRate="{ row }">{{ formatNumber(row.acRate, locale.locale, 1) }}%</template>
     <template #cell-userCount="{ row }">{{ formatNumber(row.userCount, locale.locale) }}</template>
@@ -198,10 +185,7 @@ const pointsText = (problem: ProblemListItem) =>
           />
         </template>
         <template #trail>
-          <span class="inline-flex items-center gap-2 font-mono text-sm font-medium tabular-nums">
-            <ProblemTierMark :points="row.points" />
-            {{ pointsText(row) }}
-          </span>
+          <span class="font-mono text-sm font-medium tabular-nums">{{ pointsText(row) }}</span>
           <span class="text-caption text-muted tabular-nums">{{
             $t('problems.solverCount', { count: formatNumber(row.userCount, locale.locale) })
           }}</span>

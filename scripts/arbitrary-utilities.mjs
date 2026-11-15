@@ -17,7 +17,6 @@ export const ALLOWED = {
   'components/CryingBit.vue': ['rounded-[50%]'],
   'features/runtimes/JudgeCard.vue': ['rounded-[2px]'],
   'features/submissions/list/TestStrip.vue': ['rounded-[2px]', 'rounded-[3px]'],
-  'features/problems/ProblemTierMark.vue': ['rounded-[3px]'],
   'features/submissions/VerdictDistributionBar.vue': ['rounded-[3px]'],
 };
 

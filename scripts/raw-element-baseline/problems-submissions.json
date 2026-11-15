@@ -6,9 +6,6 @@
     "button": 1,
     "disabled-opacity": 1
   },
-  "features/problems/ProblemTierMark.vue": {
-    "fixed-size": 1
-  },
   "features/problems/SourceUploadButton.vue": {
     "file": 1
   },

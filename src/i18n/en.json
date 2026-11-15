@@ -1276,12 +1276,6 @@
     "solverCount": "{count} solved",
     "filterPanel": "Filters",
     "filterPanelShort": "Filter",
-    "tier": {
-      "1": "Easy",
-      "2": "Medium",
-      "3": "Hard",
-      "4": "Very hard"
-    },
     "solvedShort": "{solved} solved",
     "partialHint": "partial scoring",
     "hasEditorialHint": "Only problems with a published editorial",
@@ -1290,12 +1284,6 @@
       "any": "All",
       "unsolved": "Unsolved",
       "solved": "Solved"
-    },
-    "peek": {
-      "label": "Problem preview",
-      "lastSubmission": "Last submission",
-      "open": "Open problem",
-      "crowd": "AC {rate}% · {count} solved"
     }
   },
   "submissions": {

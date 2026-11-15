@@ -28,7 +28,8 @@ const groupOptions = computed(() => [
 </script>
 
 <template>
-  <div class="flex w-80 max-w-full flex-col gap-4">
+  <!-- Its own scroll below the toolbar: a short window never pushes the panel over the trigger. -->
+  <div class="flex max-h-[calc(100dvh-9rem)] w-80 max-w-full flex-col gap-4 overflow-y-auto">
     <ProblemSortSelect
       v-if="withSort"
       :sort="filters.sort"
