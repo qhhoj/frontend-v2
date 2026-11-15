@@ -76,7 +76,10 @@ onMounted(() => {
   bodyObserver.observe(body.value);
 });
 onBeforeUnmount(() => bodyObserver?.disconnect());
-watch(() => comment.value.bodyHtml, () => void nextTick(measureBody));
+watch(
+  () => comment.value.bodyHtml,
+  () => void nextTick(measureBody),
+);
 const hiderName = computed(() => comment.value.hiddenBy?.username ?? null);
 const authorName = computed(() => comment.value.author?.username ?? t('comments.deletedAccount'));
 const send = (score: VoteScore) => voteComment(comment.value.id, score);
@@ -239,7 +242,7 @@ const hasActionRow = computed(
         {{ $t('comments.deleted.placeholder') }}
       </p>
       <template v-else>
-        <div ref="body" class="mt-1.5 mb-2 overflow-hidden" :class="isBodyOpen || 'max-h-24'">
+        <div ref="body" class="mt-1.5 mb-2 overflow-hidden" :class="{ 'max-h-24': !isBodyOpen }">
           <UserContent :html="comment.bodyHtml" :class="comment.hidden && 'text-muted'" />
         </div>
         <AppButton
