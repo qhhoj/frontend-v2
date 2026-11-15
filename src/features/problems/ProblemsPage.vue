@@ -5,19 +5,27 @@ import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
 import { translate } from '@/i18n';
-import { formatNumber, formatProblemPoints } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
 import { lastPageOf } from '@/lib/paging';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import ProblemFilterChips from './ProblemFilterChips.vue';
 import ProblemFilters from './ProblemFilters.vue';
-import ProblemStatusMark from './ProblemStatusMark.vue';
+import ProblemPeek from './ProblemPeek.vue';
 import ProblemTable from './ProblemTable.vue';
 import { filterChips } from './problem-filter-chips';
+import { saveListSetup } from './problem-list-setup';
 import { useProblemListQuery, useProblemMetaQuery } from './problems.queries';
 import { useProblemFilters } from './use-problem-filters';
+import type { ProblemFilters as Filters } from './use-problem-filters';
+import { useProblemPeek } from './use-problem-peek';
 
+/**
+ * The problem list (Workbench): the h1 is for screen readers (the top bar names the page), the count and the staff's
+ * "Tạo bài tập" sit in the top bar, then one toolbar row, the active filter chips, and the table with the peek pane
+ * beside it on a wide screen with a mouse.
+ */
 const router = useRouter();
 const { filters, page, update, clearAll } = useProblemFilters();
 const locale = useLocaleStore();
@@ -33,9 +41,24 @@ const { data: viewer } = useUserPageQuery(() => session.user?.username ?? '');
 const chips = computed(() =>
   filterChips(filters.value, { types: meta.value?.types ?? [], groups: meta.value?.groups ?? [] }),
 );
+/** The solved choice has no chip, but an empty list under it still offers to clear the filters. */
+const isFiltered = computed(() => chips.value.length > 0 || filters.value.solved !== 'any');
 
 const problems = computed(() => data.value?.items ?? []);
 const listedCodes = computed(() => problems.value.map((problem) => problem.code));
+
+/** The solved choice and the sort are the learner's setup: kept for the next bare visit (`problem-list-setup.ts`). */
+function change(patch: Partial<Filters>) {
+  update(patch);
+  const username = session.user?.username;
+  if (!username || !('solved' in patch || 'sort' in patch)) return;
+  saveListSetup(username, { ...filters.value, ...patch });
+}
+const clearFilters = () => {
+  clearAll();
+  const username = session.user?.username;
+  if (username) saveListSetup(username, { solved: 'any', sort: filters.value.sort });
+};
 
 /** A page past the end (a stale link, a shrunk list) or an unusable `?page=` is replaced by the nearest valid one. */
 watch([data, isPlaceholderData, () => router.currentRoute.value.query.page], () => {
@@ -51,91 +74,86 @@ watch([data, isPlaceholderData, () => router.currentRoute.value.query.page], () 
 const listTop = ref<HTMLElement | null>(null);
 watch(page, () => listTop.value?.scrollIntoView({ block: 'start' }), { flush: 'post' });
 
-/** The signed-in viewer's progress; anonymous visitors get nothing. */
-const solvedSummary = computed(() =>
-  viewer.value
-    ? translate('problems.solvedCount', {
-        solved: formatNumber(viewer.value.problemCount, locale.locale),
-      })
-    : '',
-);
-/** Above the list: how many problems, or how many match the filters. */
+/** "214 đã giải · 1.483 bài", or "3 kết quả" under filters; the solved part for a signed-in viewer only. */
 const countText = computed(() => {
   const total = data.value?.meta.total;
   if (total === undefined) return '';
   const count = formatNumber(total, locale.locale);
-  return chips.value.length
+  const listed = isFiltered.value
     ? translate('problems.results', { n: count }, total)
     : translate('problems.count', { n: count }, total);
+  if (!viewer.value) return listed;
+  const solved = formatNumber(viewer.value.problemCount, locale.locale);
+  return `${translate('problems.solvedShort', { solved })} · ${listed}`;
 });
-/** The legend: desktop only, so a phone keeps the list on its first screen; status marks only mean something to a signed-in viewer. */
-const partialSample = computed(() => formatProblemPoints(800, true, locale.locale));
+
+/** The phone's top bar has no actions slot: there the count and the create button stay in the page. */
 const isPhone = useMediaQuery(PHONE_QUERY);
-const LEGEND_MARKS = [
-  { status: 'solved', labelKey: 'problems.solved' },
-  { status: 'attempted', labelKey: 'problems.attempted' },
-  { status: null, labelKey: 'problems.notTried' },
-] as const;
+/** The peek pane needs the width and a pointer that can rest on a row. */
+const isPeekable = useMediaQuery('(min-width: 1280px) and (pointer: fine)');
+/** Beside the pane, the types column fits only from 1440 px; the pane names the types of the row it shows. */
+const isWide = useMediaQuery('(min-width: 1440px)');
+const peek = useProblemPeek(problems);
 </script>
 
 <template>
   <div class="page-column">
-    <PageHeader :title="$t('problems.title')" :meta="solvedSummary ? [solvedSummary] : []">
-      <template v-if="solvedSummary || !isPhone" #meta>
-        <p
-          data-testid="problems-legend"
-          class="hidden flex-wrap items-center gap-x-2 gap-y-1 md:flex"
-        >
-          <template v-if="session.user !== null">
-            <span v-if="solvedSummary" aria-hidden="true">·</span>
-            <template v-for="(mark, index) in LEGEND_MARKS" :key="mark.labelKey">
-              <span v-if="index > 0" aria-hidden="true">·</span>
-              <span class="inline-flex items-center gap-1 lowercase">
-                <span aria-hidden="true" class="inline-flex"
-                  ><ProblemStatusMark :status="mark.status" class="size-3.5"
-                /></span>
-                {{ $t(mark.labelKey) }}
-              </span>
-            </template>
-            <span aria-hidden="true">·</span>
-          </template>
-          <span
-            ><b class="font-mono font-semibold text-content">{{ partialSample }}</b>
-            {{ $t('problems.legendPartial') }}</span
-          >
+    <PageHeader class="sr-only" :title="$t('problems.title')" />
+    <Teleport defer to="#top-bar-actions" :disabled="isPhone">
+      <div class="flex items-center justify-between gap-3">
+        <p data-testid="problems-count" class="font-mono text-meta text-muted tabular-nums">
+          {{ countText }}
         </p>
-      </template>
-      <template #actions><CreateShortcut kind="problem" /></template>
-    </PageHeader>
-    <ProblemFilters
-      :filters="filters"
-      :types="meta?.types ?? []"
-      :groups="meta?.groups ?? []"
-      :signed-in="session.user !== null"
-      :listed-codes="listedCodes"
-      @update="update"
-    />
-    <ProblemFilterChips :chips="chips" @remove="update" @clear-all="clearAll" />
-    <div ref="listTop" class="flex scroll-mt-20 flex-col gap-3" :aria-busy="isPlaceholderData">
-      <p
-        v-if="data"
-        data-testid="problems-count"
-        class="min-h-11 content-center text-sm text-muted"
-      >
-        {{ countText }}
-      </p>
-      <ProblemTable
-        :problems="problems"
-        :sort="filters.sort"
+        <CreateShortcut kind="problem" />
+      </div>
+    </Teleport>
+    <div class="flex flex-col gap-3">
+      <ProblemFilters
+        :filters="filters"
+        :types="meta?.types ?? []"
+        :groups="meta?.groups ?? []"
         :signed-in="session.user !== null"
-        :loading="isPending"
-        :error="error"
-        :meta="data?.meta"
-        :filtered="chips.length > 0"
-        @sort="update({ sort: $event })"
-        @retry="refetch()"
-        @clear-filters="clearAll"
+        :listed-codes="listedCodes"
+        @update="change"
       />
+      <ProblemFilterChips :chips="chips" @remove="update" @clear-all="clearFilters" />
+    </div>
+    <div
+      ref="listTop"
+      class="grid scroll-mt-20 items-start gap-3"
+      :class="isPeekable ? 'xl:grid-cols-[minmax(0,1fr)_20rem]' : 'grid-cols-1'"
+      :aria-busy="isPlaceholderData"
+    >
+      <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -- the rows' links take focus and keys; this only listens to them bubble. -->
+      <div
+        class="min-w-0"
+        @pointerover="peek.onPointerOver"
+        @pointerleave="peek.onPointerLeave"
+        @focusin="peek.onFocusIn"
+        @keydown="peek.onKeydown"
+      >
+        <ProblemTable
+          :problems="problems"
+          :sort="filters.sort"
+          :signed-in="session.user !== null"
+          :loading="isPending"
+          :error="error"
+          :meta="data?.meta"
+          :filtered="isFiltered"
+          :types-column="!isPeekable || isWide"
+          :peek-code="isPeekable ? peek.peeked.value?.code : null"
+          @sort="change({ sort: $event })"
+          @retry="refetch()"
+          @clear-filters="clearFilters"
+        />
+      </div>
+      <aside
+        v-if="isPeekable && peek.peeked.value"
+        :aria-label="$t('problems.peek.label')"
+        class="glass sticky top-4 max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-card p-4"
+      >
+        <ProblemPeek :problem="peek.peeked.value" />
+      </aside>
     </div>
   </div>
 </template>

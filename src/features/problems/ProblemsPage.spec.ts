@@ -51,7 +51,7 @@ describe('problem list', () => {
   });
   afterEach(() => vi.useRealTimers());
 
-  it('toggles solved and editorial filters, clears all, and the back button undoes a change', async () => {
+  it('sets the solved choice and the editorial filter, clears all, and the back button undoes a change', async () => {
     const calls = mockApi({
       ...anonymous(),
       'GET /auth/me': signedIn(),
@@ -59,20 +59,23 @@ describe('problem list', () => {
       'GET /users/user_01': ok(userPage()),
     });
     const { wrapper, router } = await mountApp('/problems');
-    const toggle = (name: string) =>
+    const segment = (name: string) =>
       wrapper.findAll('#main button[aria-pressed]').find((button) => button.text() === name)!;
-    await toggle('Ẩn bài đã giải').trigger('click');
+    const editorial = () => document.body.querySelector<HTMLElement>('[role="switch"]')!;
+    await segment('Chưa giải').trigger('click');
     await flushPromises();
-    await toggle('Có lời giải').trigger('click');
+    expect(router.currentRoute.value.query.unsolved).toBe('1');
+    await wrapper.get('[data-testid="problem-filter-panel-toggle"]').trigger('click');
+    await flushPromises();
+    editorial().click();
     await flushPromises();
     const query = lastListQuery(calls);
     expect([query.get('solved'), query.get('hasEditorial')]).toEqual(['false', 'true']);
-    expect(toggle('Ẩn bài đã giải').attributes('aria-pressed')).toBe('true');
     router.back();
     await flushPromises();
-    expect(toggle('Có lời giải').attributes('aria-pressed')).toBe('false');
-    expect(toggle('Ẩn bài đã giải').attributes('aria-pressed')).toBe('true');
-    await toggle('Có lời giải').trigger('click');
+    expect(editorial().getAttribute('aria-checked')).toBe('false');
+    expect(segment('Chưa giải').attributes('aria-pressed')).toBe('true');
+    editorial().click();
     await flushPromises();
     const clearAll = wrapper.findAll('button').find((button) => button.text() === 'Xóa tất cả')!;
     await clearAll.trigger('click');
@@ -101,10 +104,7 @@ describe('problem list', () => {
       ...commentPageRoute('problem', 'lucky'),
     });
     const { wrapper, router } = await mountApp('/problems?min=800&editorial=1');
-    await wrapper
-      .findAll('#main button')
-      .find((button) => button.text() === 'Bài ngẫu nhiên')!
-      .trigger('click');
+    await wrapper.get('#main button[aria-label="Bài ngẫu nhiên"]').trigger('click');
     await flushPromises();
     const asked = calls.find((call) => call.path === '/problems/random')!;
     expect([asked.query.get('pointsMin'), asked.query.get('hasEditorial')]).toEqual([
@@ -118,10 +118,7 @@ describe('problem list', () => {
   it('says so when no problem matches the random pick', async () => {
     mockApi({ ...anonymous(), 'GET /problems/random': fail(404, 'no_problem') });
     const { wrapper, router } = await mountApp('/problems');
-    await wrapper
-      .findAll('#main button')
-      .find((button) => button.text() === 'Bài ngẫu nhiên')!
-      .trigger('click');
+    await wrapper.get('#main button[aria-label="Bài ngẫu nhiên"]').trigger('click');
     await flushPromises();
     expect(wrapper.get('[data-testid="random-status"]').text()).toBe('Không có bài phù hợp.');
     expect(router.currentRoute.value.name).toBe('problems');
@@ -233,21 +230,13 @@ describe('problem list', () => {
     expect(wrapper.findAll('tbody svg[role="img"]')).toHaveLength(0);
   });
 
-  it("repeats a problem's types under its name for the table that hides the types column, leaving out the catch-all type", async () => {
+  it('drops the types column on a page where no problem has a type worth naming', async () => {
     const uncategorized = { id: 'type-uncat', name: 'uncategorized', fullName: 'Chưa phân loại' };
-    const [lis, , dpbitree] = threeProblems;
     mockApi(
-      anonymous(
-        page([
-          { ...lis!, types: [...lis!.types, uncategorized] },
-          { ...dpbitree!, types: [uncategorized] },
-        ]),
-      ),
+      anonymous(page(threeProblems.map((problem) => ({ ...problem, types: [uncategorized] })))),
     );
     const { wrapper } = await mountApp('/problems');
-    const [typed, untyped] = wrapper.findAll('tbody tr').map((row) => row.get('td').text());
-    expect(typed).toMatch(/lis · Quy hoạch động$/);
-    expect(untyped).toMatch(/dpbitree$/);
+    expect(wrapper.findAll('th').map((cell) => cell.text())).not.toContain('Dạng bài');
   });
 
   it('opens a problem from a click anywhere in its row, but not at the end of a text selection', async () => {
@@ -273,13 +262,10 @@ describe('problem list', () => {
   it('swaps a minimum above the maximum and forgets the random message on the next filter', async () => {
     mockApi({ ...anonymous(), 'GET /problems/random': fail(404, 'no_problem') });
     const { wrapper, router } = await mountApp('/problems?max=1000');
-    await wrapper
-      .findAll('#main button')
-      .find((button) => button.text() === 'Bài ngẫu nhiên')!
-      .trigger('click');
+    await wrapper.get('#main button[aria-label="Bài ngẫu nhiên"]').trigger('click');
     await flushPromises();
     expect(wrapper.get('[data-testid="random-status"]').text()).not.toBe('');
-    await wrapper.get('#main button[aria-label^="Lọc theo điểm"]').trigger('click');
+    await wrapper.get('[data-testid="problem-filter-panel-toggle"]').trigger('click');
     await flushPromises();
     const minimum = document.body.querySelector<HTMLInputElement>('input[name="pointsMin"]')!;
     minimum.value = '2000';

@@ -1,15 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { VueWrapper } from '@vue/test-utils';
 import { mountComponent } from '@/test/mount';
-import ProblemPointsPicker from './ProblemPointsPicker.vue';
+import ProblemPointsRange from './ProblemPointsRange.vue';
 
-/** The popover rendered inline, so the sliders can be driven. */
-const InlinePopover = { template: '<div><slot /></div>', methods: { toggle() {} } };
 const open = (min: number | null = null, max: number | null = null) =>
-  mountComponent(ProblemPointsPicker, {
-    props: { min, max },
-    stubs: { Popover: InlinePopover },
-  });
+  mountComponent(ProblemPointsRange, { props: { min, max } });
 const slider = (picker: VueWrapper, name: string) =>
   picker.get(`input[name="${name}"]`).element as HTMLInputElement;
 async function drag(picker: VueWrapper, name: string, value: number) {
@@ -18,12 +13,12 @@ async function drag(picker: VueWrapper, name: string, value: number) {
   await picker.get(`input[name="${name}"]`).trigger('input');
 }
 
-describe('ProblemPointsPicker', () => {
+describe('ProblemPointsRange', () => {
   it('shows the range while dragging and changes the filter once, on release', async () => {
     const picker = open();
     await drag(picker, 'pointsMinSlider', 1200);
     await drag(picker, 'pointsMinSlider', 1500);
-    expect(picker.get('button').text()).toContain('1500');
+    expect(picker.get('[data-testid="points-readout"]').text()).toContain('1500');
     expect(picker.emitted('change')).toBeUndefined();
     await picker.get('input[name="pointsMinSlider"]').trigger('change');
     expect(picker.emitted('change')).toEqual([[{ pointsMin: 1500, pointsMax: null }]]);

@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { ChevronDown } from 'lucide-vue-next';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, useId, watch } from 'vue';
 import { PROBLEM_LIMITS } from '@/features/admin/problems/general/problem-form';
 import { translate } from '@/i18n';
-import { toolbarControlClass } from '@/components/toolbar-classes';
-import AppButton from '@/components/ui/AppButton.vue';
-import Popover from '@/components/ui/Popover.vue';
 import TextInput from '@/components/ui/TextInput.vue';
 
+/** The points filter of the "Bộ lọc" panel: two fields and a two-handle slider. The range applies as it is set. */
 const props = defineProps<{ min: number | null; max: number | null }>();
 const emit = defineEmits<{
   change: [range: { pointsMin: number | null; pointsMax: number | null }];
@@ -15,8 +12,7 @@ const emit = defineEmits<{
 
 /** The slider spans the points a problem can have; a handle at its end of the track means "no bound". */
 const SLIDER = { ...PROBLEM_LIMITS.points, step: 100 } as const;
-const popover = ref<InstanceType<typeof Popover>>();
-const open = ref(false);
+const titleId = useId();
 /** The bounds follow the pointer while dragging; the filter changes once, on release. null: no bound. */
 const draftMin = ref<number | null>(null);
 const draftMax = ref<number | null>(null);
@@ -33,11 +29,11 @@ const high = computed(() => draftMax.value ?? SLIDER.max);
 const active = computed(() => draftMin.value !== null || draftMax.value !== null);
 const label = computed(() =>
   active.value
-    ? translate('problems.pointsRange', {
+    ? translate('problems.pointsChip', {
         min: draftMin.value ?? '…',
         max: draftMax.value ?? '…',
       })
-    : translate('problems.pointsAny'),
+    : translate('problems.pointsAnyBound'),
 );
 const percent = (value: number) => ((value - SLIDER.min) / (SLIDER.max - SLIDER.min)) * 100;
 const fill = computed(() => ({
@@ -74,92 +70,76 @@ const commit = () => setRange(draftMin.value, draftMax.value);
 </script>
 
 <template>
-  <button
-    type="button"
-    aria-haspopup="dialog"
-    :aria-expanded="open"
-    :aria-label="`${$t('problems.pointsFilter')}: ${label}`"
-    :class="toolbarControlClass(active)"
-    @click="popover?.toggle($event)"
-  >
-    {{ label }}
-    <ChevronDown class="size-4" aria-hidden="true" />
-  </button>
-  <Popover
-    ref="popover"
-    :label="$t('problems.pointsFilter')"
-    @show="open = true"
-    @hide="open = false"
-  >
-    <div class="flex w-72 flex-col gap-3">
-      <div class="flex gap-3">
-        <label class="flex flex-1 flex-col gap-1 text-sm">
-          {{ $t('problems.pointsMin') }}
-          <TextInput
-            :model-value="min ?? ''"
-            name="pointsMin"
-            type="number"
-            inputmode="numeric"
-            :min="SLIDER.min"
-            :max="SLIDER.max"
-            :step="SLIDER.step"
-            :placeholder="$t('problems.pointsAnyBound')"
-            @change="setMin(numberOf($event))"
-          />
-        </label>
-        <label class="flex flex-1 flex-col gap-1 text-sm">
-          {{ $t('problems.pointsMax') }}
-          <TextInput
-            :model-value="max ?? ''"
-            name="pointsMax"
-            type="number"
-            inputmode="numeric"
-            :min="SLIDER.min"
-            :max="SLIDER.max"
-            :step="SLIDER.step"
-            :placeholder="$t('problems.pointsAnyBound')"
-            @change="setMax(numberOf($event))"
-          />
-        </label>
-      </div>
-      <div class="points-slider" data-testid="points-slider" :style="fill">
-        <input
-          type="range"
-          name="pointsMinSlider"
-          :class="{ 'is-top': minOnTop }"
+  <fieldset class="m-0 flex flex-col gap-3 border-0 p-0" :aria-labelledby="titleId">
+    <p class="flex items-baseline justify-between gap-2">
+      <span :id="titleId" class="text-sm font-semibold">{{ $t('problems.columns.points') }}</span>
+      <span data-testid="points-readout" class="text-meta text-muted tabular-nums">{{
+        label
+      }}</span>
+    </p>
+    <div class="flex gap-3">
+      <label class="flex flex-1 flex-col gap-1 text-sm">
+        {{ $t('problems.pointsMin') }}
+        <TextInput
+          :model-value="min ?? ''"
+          name="pointsMin"
+          type="number"
+          inputmode="numeric"
           :min="SLIDER.min"
           :max="SLIDER.max"
           :step="SLIDER.step"
-          :value="low"
-          :aria-label="$t('problems.pointsMin')"
-          @input="slide($event, 'low')"
-          @change="commit"
+          :placeholder="$t('problems.pointsAnyBound')"
+          @change="setMin(numberOf($event))"
         />
-        <input
-          type="range"
-          name="pointsMaxSlider"
+      </label>
+      <label class="flex flex-1 flex-col gap-1 text-sm">
+        {{ $t('problems.pointsMax') }}
+        <TextInput
+          :model-value="max ?? ''"
+          name="pointsMax"
+          type="number"
+          inputmode="numeric"
           :min="SLIDER.min"
           :max="SLIDER.max"
           :step="SLIDER.step"
-          :value="high"
-          :aria-label="$t('problems.pointsMax')"
-          @input="slide($event, 'high')"
-          @change="commit"
+          :placeholder="$t('problems.pointsAnyBound')"
+          @change="setMax(numberOf($event))"
         />
-      </div>
-      <p
-        class="flex justify-between text-caption leading-4 text-muted tabular-nums"
-        aria-hidden="true"
-      >
-        <span>{{ SLIDER.min }}</span
-        ><span>{{ SLIDER.max }}</span>
-      </p>
-      <!-- The range applies as it is set; "Xong" only closes the popover. -->
-      <AppButton tone="primary" block @click="popover?.hide()">{{
-        $t('problems.pointsDone')
-      }}</AppButton>
+      </label>
     </div>
-  </Popover>
+    <div class="points-slider" data-testid="points-slider" :style="fill">
+      <input
+        type="range"
+        name="pointsMinSlider"
+        :class="{ 'is-top': minOnTop }"
+        :min="SLIDER.min"
+        :max="SLIDER.max"
+        :step="SLIDER.step"
+        :value="low"
+        :aria-label="$t('problems.pointsMin')"
+        @input="slide($event, 'low')"
+        @change="commit"
+      />
+      <input
+        type="range"
+        name="pointsMaxSlider"
+        :min="SLIDER.min"
+        :max="SLIDER.max"
+        :step="SLIDER.step"
+        :value="high"
+        :aria-label="$t('problems.pointsMax')"
+        @input="slide($event, 'high')"
+        @change="commit"
+      />
+    </div>
+    <p
+      class="flex justify-between text-caption leading-4 text-muted tabular-nums"
+      aria-hidden="true"
+    >
+      <span>{{ SLIDER.min }}</span
+      ><span>{{ SLIDER.max }}</span>
+    </p>
+  </fieldset>
 </template>
 
 <style scoped>

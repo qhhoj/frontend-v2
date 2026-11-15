@@ -32,7 +32,7 @@ describe('problem filters in the URL', () => {
       typeIds: [TYPE_ID],
       pointsMin: 800,
       pointsMax: 2400,
-      hideSolved: true,
+      solved: 'unsolved' as const,
       hasEditorial: true,
       sort: 'acRate' as const,
     };
@@ -45,16 +45,26 @@ describe('problem filters in the URL', () => {
     expect(parseProblemFilters(query)).toEqual(filters);
   });
 
-  it('asks the API for unsolved problems only when hiding solved ones', () => {
+  it('keeps the old unsolved=1 links, and lets it win over solved=1', () => {
+    expect(parseProblemFilters({ unsolved: '1' }).solved).toBe('unsolved');
+    expect(parseProblemFilters({ solved: '1' }).solved).toBe('solved');
+    expect(parseProblemFilters({ unsolved: '1', solved: '1' }).solved).toBe('unsolved');
+    expect(toProblemQuery({ ...NO_FILTERS, solved: 'solved' })).toMatchObject({ solved: '1' });
+  });
+
+  it('asks the API for unsolved or solved problems only when one is chosen', () => {
     expect(toApiFilters(NO_FILTERS).solved).toBeUndefined();
-    expect(toApiFilters({ ...NO_FILTERS, hideSolved: true }).solved).toBe(false);
+    expect(toApiFilters({ ...NO_FILTERS, solved: 'unsolved' }).solved).toBe(false);
+    expect(toApiFilters({ ...NO_FILTERS, solved: 'solved' }).solved).toBe(true);
     expect(toApiFilters({ ...NO_FILTERS, hasEditorial: true }).hasEditorial).toBe(true);
   });
 });
 
 describe('panelFilterCount', () => {
-  it('ignores search and sort, which stay outside the phone filter panel', () => {
-    expect(panelFilterCount({ ...NO_FILTERS, search: 'sum', sort: 'points' })).toBe(0);
+  it('ignores search, the solved choice and sort, which stay outside the filter panel', () => {
+    expect(
+      panelFilterCount({ ...NO_FILTERS, search: 'sum', solved: 'unsolved', sort: 'points' }),
+    ).toBe(0);
   });
 
   it('counts each narrowing filter once, a points range as one', () => {
@@ -65,10 +75,9 @@ describe('panelFilterCount', () => {
         typeIds: [TYPE_ID, V4_ID],
         pointsMin: 100,
         pointsMax: 800,
-        hideSolved: true,
         hasEditorial: true,
       }),
-    ).toBe(5);
+    ).toBe(4);
     expect(panelFilterCount({ ...NO_FILTERS, pointsMax: 800 })).toBe(1);
   });
 });

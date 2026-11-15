@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ViewerStatus } from '@/api/types/problems';
 
-/** Filled check = solved, half-filled circle = attempted, empty ring = not tried. The label names it for screen readers. */
+/** Filled check = solved, half-filled circle = attempted, empty ring = not tried. The label names it for screen readers and as the tooltip. */
 defineProps<{ status: ViewerStatus }>();
 </script>
 
@@ -15,6 +15,7 @@ defineProps<{ status: ViewerStatus }>();
     :aria-label="$t('problems.solved')"
     class="text-positive"
   >
+    <title>{{ $t('problems.solved') }}</title>
     <circle cx="9" cy="9" r="8" fill="currentColor" />
     <path
       d="M5.2 9.3l2.4 2.4 5-5"
@@ -34,6 +35,7 @@ defineProps<{ status: ViewerStatus }>();
     :aria-label="$t('problems.attemptedLong')"
     class="text-verdict-tle"
   >
+    <title>{{ $t('problems.attemptedLong') }}</title>
     <circle cx="9" cy="9" r="7.2" stroke="currentColor" stroke-width="1.6" fill="none" />
     <path d="M9 1.8a7.2 7.2 0 0 1 0 14.4z" fill="currentColor" />
   </svg>
@@ -46,6 +48,7 @@ defineProps<{ status: ViewerStatus }>();
     :aria-label="$t('problems.notTried')"
     class="text-muted"
   >
+    <title>{{ $t('problems.notTried') }}</title>
     <circle cx="9" cy="9" r="7.2" stroke="currentColor" stroke-width="1.6" fill="none" />
   </svg>
 </template>

@@ -9,6 +9,7 @@ import CompactListRow from '@/components/CompactListRow.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import FactLine from '@/components/FactLine.vue';
 import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
 import DataTable from '@/components/ui/DataTable.vue';
 import type { DataTableColumn } from '@/components/ui/DataTableColumns';
 import { formatNumber, formatProblemPoints } from '@/lib/format';
@@ -18,21 +19,29 @@ import ProblemStatusMark from './ProblemStatusMark.vue';
 import ProblemTierMark from './ProblemTierMark.vue';
 
 /**
- * The problem list: the kit `DataTable` (48 px rows) on a computer, and on a phone compact rows instead of a table
- * that scrolls sideways. Sorting is by the column headers; a third click on one returns to the default order. An empty list
- * under filters offers to clear them.
+ * The problem list: the kit `DataTable` on a computer, one 32 px line per problem (48 px on a touch screen), and on a phone
+ * compact rows instead of a table that scrolls sideways. Sorting is by the column headers; a third click on one returns to
+ * the default order. An empty list under filters offers to clear them. Each table row carries `data-code`, and the row in
+ * the peek pane (`peekCode`) is marked.
  */
-const props = defineProps<{
-  problems: ProblemListItem[];
-  sort: ProblemSort | null;
-  /** Without a viewer there is no status to show, not even "not tried". */
-  signedIn: boolean;
-  loading: boolean;
-  error: unknown;
-  meta: NumberedPageMeta | undefined;
-  /** The list is empty because of filters: the empty state offers to clear them. */
-  filtered: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    problems: ProblemListItem[];
+    sort: ProblemSort | null;
+    /** Without a viewer there is no status to show, not even "not tried". */
+    signedIn: boolean;
+    loading: boolean;
+    error: unknown;
+    meta: NumberedPageMeta | undefined;
+    /** The list is empty because of filters: the empty state offers to clear them. */
+    filtered: boolean;
+    /** The problem the peek pane shows. */
+    peekCode?: string | null;
+    /** The types column, when a problem on the page has types (the peek pane beside a narrow table names them instead). */
+    typesColumn?: boolean;
+  }>(),
+  { peekCode: null, typesColumn: true },
+);
 const emit = defineEmits<{ sort: [sort: ProblemSort | null]; retry: []; clearFilters: [] }>();
 const { t } = useI18n();
 const locale = useLocaleStore();
@@ -45,22 +54,37 @@ const sortOf = (field: string, first: 'asc' | 'desc') => ({
   first,
   clears: true,
 });
+/** The types column only when wanted and a problem on this page has a type worth naming. */
+const hasTypes = computed(
+  () => props.typesColumn && props.problems.some((problem) => namedTypes(problem).length > 0),
+);
 const columns = computed<DataTableColumn[]>(() => [
   ...(props.signedIn
     ? [{ key: 'status', label: t('problems.columns.status'), hideLabel: true }]
     : []),
+  {
+    key: 'code',
+    label: t('problems.columns.code'),
+    mono: true,
+    sort: sortOf('code', 'asc'),
+    cellClass: 'text-meta text-secondary',
+  },
   {
     key: 'name',
     label: t('problems.columns.problem'),
     priority: 'primary',
     sort: sortOf('name', 'asc'),
   },
-  {
-    key: 'types',
-    label: t('problems.columns.types'),
-    hideBelow: 'lg',
-    cellClass: 'w-64 max-w-64 truncate text-caption text-muted',
-  },
+  ...(hasTypes.value
+    ? [
+        {
+          key: 'types',
+          label: t('problems.columns.types'),
+          hideBelow: 'lg' as const,
+          cellClass: 'w-56 max-w-56',
+        },
+      ]
+    : []),
   {
     key: 'points',
     label: t('problems.columns.points'),
@@ -84,24 +108,31 @@ const changeSort = (value: string | undefined) =>
   emit('sort', value !== undefined && isProblemSort(value) ? value : null);
 
 /** The catch-all type says nothing in a list, so it is left out. */
-const namedTypes = (problem: ProblemListItem) =>
-  problem.types
+function namedTypes(problem: ProblemListItem) {
+  return problem.types
     .filter((type) => type.name !== UNCATEGORIZED_TYPE_NAME)
-    .map((type) => problemTypeLabel(type))
-    .join(', ');
-/** The types column: a problem with no other type shows a dash. */
-const typesText = (problem: ProblemListItem) => namedTypes(problem) || '—';
+    .map((type) => problemTypeLabel(type));
+}
+/** Two type chips fit the column; the rest are counted, and all are named in the tooltip. */
+const SHOWN_TYPES = 2;
+const rowAttrs = (problem: ProblemListItem) => ({
+  'data-code': problem.code,
+  class: problem.code === props.peekCode ? 'bg-accent-soft hover:bg-accent-soft' : undefined,
+});
 const pointsText = (problem: ProblemListItem) =>
   formatProblemPoints(problem.points, problem.partial, locale.locale);
 </script>
 
 <template>
+  <!-- 32 px lines where the pointer is fine; a touch screen keeps the kit's 48 px rows, a finger's height. -->
   <DataTable
+    class="[&_tbody_td]:h-(--qh-row) touch:[&_tbody_td]:h-12"
     :columns="columns"
     :rows="problems"
     :row-key="(problem) => problem.id"
     :label="$t('problems.listName')"
     :row-to="(problem) => target(problem.code)"
+    :row-attrs="rowAttrs"
     :sort="sort ?? undefined"
     :loading="loading"
     :error="error"
@@ -123,18 +154,28 @@ const pointsText = (problem: ProblemListItem) =>
     <template #cell-name="{ row }">
       <RouterLink
         :to="target(row.code)"
+        :title="row.name"
         class="block truncate font-medium text-content hover:text-accent-text"
         >{{ row.name }}</RouterLink
       >
-      <span class="block truncate text-caption text-muted">
-        <span class="font-mono">{{ row.code }}</span>
-        <!-- Below `lg` the types column is hidden, so the name does not truncate: its types go on this line. -->
-        <span v-if="namedTypes(row)" class="lg:hidden"> · {{ namedTypes(row) }}</span>
+    </template>
+    <template #cell-types="{ row }">
+      <span class="flex items-center gap-1 overflow-hidden" :title="namedTypes(row).join(', ')">
+        <Chip v-for="name in namedTypes(row).slice(0, SHOWN_TYPES)" :key="name" size="sm">{{
+          name
+        }}</Chip>
+        <span
+          v-if="namedTypes(row).length > SHOWN_TYPES"
+          class="text-caption whitespace-nowrap text-muted"
+          >+{{ namedTypes(row).length - SHOWN_TYPES }}</span
+        >
       </span>
     </template>
-    <template #cell-types="{ row }">{{ typesText(row) }}</template>
     <template #cell-points="{ row }">
-      <span class="inline-flex items-center gap-2 font-medium">
+      <span
+        class="inline-flex items-center gap-2 font-medium"
+        :title="row.partial ? $t('problems.partialHint') : undefined"
+      >
         <ProblemTierMark :points="row.points" />
         {{ pointsText(row) }}
       </span>
