@@ -5,7 +5,7 @@ import { updateSetting } from '@/api/settings-admin.api';
 import type { Setting, SettingKey } from '@/api/types/settings-admin';
 import { CircleCheck } from 'lucide-vue-next';
 import { useLocaleStore } from '@/stores/locale.store';
-import AdminChip from '../ui/AdminChip.vue';
+import Chip from '@/components/ui/Chip.vue';
 import AdminNotice from '../ui/feedback/AdminNotice.vue';
 import { CARD } from '../ui/controls';
 import { isSameValue } from '../ui/form/dirty-form';
@@ -175,9 +175,9 @@ defineExpose({ save, discard: discardEdits });
           @cleared="onCleared"
         />
         <div class="flex shrink-0 items-center gap-1">
-          <AdminChip v-if="!setting.isDefault" data-testid="changed-chip" tone="accent">
+          <Chip v-if="!setting.isDefault" data-testid="changed-chip" tone="accent">
             {{ t('admin.settings.reset.notDefault') }}
-          </AdminChip>
+          </Chip>
           <SettingInfo
             :setting-key="setting.key"
             :default-text="defaultTextOf(setting)"

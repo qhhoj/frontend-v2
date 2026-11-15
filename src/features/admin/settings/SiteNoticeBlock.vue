@@ -5,7 +5,7 @@ import { deleteConfig, putConfig } from '@/api/site-admin.api';
 import Notice from '@/components/ui/Notice.vue';
 import { SITE_NOTICE_KEY } from '@/features/site-notice/site-notice';
 import AdminField from '../ui/AdminField.vue';
-import AdminChip from '../ui/AdminChip.vue';
+import Chip from '@/components/ui/Chip.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import { CARD, INPUT, buttonClass } from '../ui/controls';
 import AdminNotice from '../ui/feedback/AdminNotice.vue';
@@ -93,7 +93,7 @@ defineExpose({ save, discard });
         />
       </AdminField>
       <div class="flex shrink-0 items-center gap-1">
-        <AdminChip v-if="stored" tone="accent">{{ $t('admin.site.notice.live') }}</AdminChip>
+        <Chip v-if="stored" tone="accent">{{ $t('admin.site.notice.live') }}</Chip>
         <SettingInfo
           :setting-key="SITE_NOTICE_KEY"
           :default-text="null"

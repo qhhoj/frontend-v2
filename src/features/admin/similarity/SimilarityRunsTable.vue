@@ -5,8 +5,8 @@ import type { RunStatus, SimilarityRun, SimilarityScope } from '@/api/types/simi
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
-import AdminChip from '../ui/AdminChip.vue';
-import type { ChipTone } from '../ui/AdminChip.vue';
+import Chip from '@/components/ui/Chip.vue';
+import type { ChipTone } from '@/components/ui/Chip.vue';
 import { buttonClass } from '../ui/controls';
 import { shortId } from '../ui/short-id';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
@@ -30,8 +30,8 @@ const columns = computed<AdminColumn[]>(() => [
 const TONES: Record<RunStatus, ChipTone> = {
   queued: 'neutral',
   running: 'info',
-  done: 'positive',
-  failed: 'negative',
+  done: 'success',
+  failed: 'danger',
 };
 const pairsText = (run: SimilarityRun) => {
   const pairs = totalPairs(run);
@@ -65,7 +65,7 @@ const detailTo = (run: SimilarityRun) => ({
         <span class="font-mono font-semibold">{{ shortId(row.id) }}</span>
       </template>
       <template #cell-status="{ row }">
-        <AdminChip :tone="TONES[row.status]">{{ runStatusText(row) }}</AdminChip>
+        <Chip :tone="TONES[row.status]">{{ runStatusText(row) }}</Chip>
       </template>
       <template #cell-createdAt="{ row }">
         <span class="whitespace-nowrap">{{

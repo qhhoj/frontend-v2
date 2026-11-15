@@ -7,7 +7,7 @@ import type { ShortLink } from '@/api/types/short-links';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
-import AdminChip from '../ui/AdminChip.vue';
+import Chip from '@/components/ui/Chip.vue';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
 import type { AdminColumn } from '../ui/table/table-columns';
@@ -73,9 +73,9 @@ const menuItems = (link: ShortLink) => [
       }}</RouterLink>
     </template>
     <template #cell-expires="{ row }">
-      <AdminChip v-if="isExpired(row)" tone="negative" data-testid="expired-chip">
+      <Chip v-if="isExpired(row)" tone="danger" data-testid="expired-chip">
         {{ $t('admin.shortlinks.table.expired') }}
-      </AdminChip>
+      </Chip>
       <span v-else-if="row.expiresAt" class="whitespace-nowrap">{{
         dateOrDash(row.expiresAt)
       }}</span>

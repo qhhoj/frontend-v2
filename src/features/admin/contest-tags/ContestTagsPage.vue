@@ -91,7 +91,7 @@ const menuOf = (tag: ContestTag): RowMenuItem[] => [
         <button
           type="button"
           data-testid="tag-create"
-          :class="buttonClass('primary')"
+          :class="buttonClass('secondary')"
           :aria-disabled="isFull || undefined"
           :title="isFull ? $t('admin.contestTags.full') : undefined"
           @click="openEditor(null)"

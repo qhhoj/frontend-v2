@@ -82,12 +82,10 @@
     "AdminPageHeader": 1
   },
   "features/admin/similarity/SimilarityRunsTable.vue": {
-    "AdminChip": 2,
     "AdminDataTable": 1,
     "controls": 1
   },
   "features/admin/similarity/SimilarityScopeForm.vue": {
-    "AdminChip": 1,
     "SettingsCard": 1,
     "button": 2,
     "controls": 6,

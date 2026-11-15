@@ -112,7 +112,6 @@
     "AdminPageHeader": 1
   },
   "features/admin/languages/LanguageIdentitySection.vue": {
-    "AdminChip": 1,
     "AdminField": 4,
     "controls": 8,
     "input": 4
@@ -122,7 +121,6 @@
     "controls": 2
   },
   "features/admin/languages/LanguagesTable.vue": {
-    "AdminChip": 3,
     "AdminDataTable": 1,
     "details": 1
   },
@@ -268,7 +266,6 @@
     "controls": 2
   },
   "features/admin/settings/RevisionItem.vue": {
-    "AdminChip": 1,
     "button": 1,
     "controls": 2
   },
@@ -283,14 +280,12 @@
     "select": 1
   },
   "features/admin/settings/SecretField.vue": {
-    "AdminChip": 1,
     "AdminField": 1,
     "button": 2,
     "controls": 6,
     "password": 1
   },
   "features/admin/settings/SettingBlock.vue": {
-    "AdminChip": 1,
     "AdminNotice": 1,
     "controls": 1,
     "use-admin-toast": 1
@@ -305,7 +300,6 @@
     "select": 1
   },
   "features/admin/settings/SiteNoticeBlock.vue": {
-    "AdminChip": 1,
     "AdminField": 1,
     "AdminNotice": 1,
     "button": 1,
