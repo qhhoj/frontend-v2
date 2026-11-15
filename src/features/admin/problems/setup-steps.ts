@@ -13,8 +13,12 @@ export interface SetupStep {
 
 const isWritten = (text: string | undefined) => (text ?? '').trim() !== '';
 
-/** A statement in any slot counts: the base description or a translation's (a new problem is often written in Vietnamese only). */
+/**
+ * A statement in any slot counts: the base description, a translation's (a new problem is often written in Vietnamese
+ * only) or a PDF statement.
+ */
 const hasStatement = (problem: EditableProblem) =>
+  problem.pdfStatementUrl !== null ||
   isWritten(problem.editor?.description) ||
   (problem.editor?.translations ?? []).some((translation) => isWritten(translation.description));
 
@@ -26,14 +30,16 @@ export function setupSteps(
   problem: EditableProblem,
   cases: readonly TestCase[] | null,
 ): SetupStep[] {
+  // An external-judge problem keeps its tests and points on the remote judge.
+  const isExternal = problem.externalJudge !== null;
   const hasCases = (cases ?? []).some((testCase) => testCase.type === 'C');
   return [
     { id: 'info', isDone: true, routeName: 'admin-problemGeneral' },
     { id: 'statement', isDone: hasStatement(problem), routeName: 'admin-problemStatements' },
-    { id: 'tests', isDone: hasCases, routeName: 'admin-problemData' },
+    { id: 'tests', isDone: isExternal || hasCases, routeName: 'admin-problemData' },
     {
       id: 'scoring',
-      isDone: hasCases && scoredCasePoints(cases ?? []) > 0,
+      isDone: isExternal || (hasCases && scoredCasePoints(cases ?? []) > 0),
       routeName: 'admin-problemData',
     },
     { id: 'trial', isDone: problem.viewerStatus !== null, routeName: 'problem' },
