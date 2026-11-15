@@ -12,7 +12,7 @@ import AppButton from '@/components/ui/AppButton.vue';
 import Chip from '@/components/ui/Chip.vue';
 import DataTable from '@/components/ui/DataTable.vue';
 import type { DataTableColumn } from '@/components/ui/DataTableColumns';
-import { formatNumber, formatProblemPoints } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
 import { COMPACT_LIST_BELOW_PX } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
 import ProblemStatusMark from './ProblemStatusMark.vue';
@@ -46,8 +46,6 @@ const sortOf = (field: string, first: 'asc' | 'desc') => ({
   first,
   clears: true,
 });
-/** The types column only when a problem on this page has a type worth naming. */
-const hasTypes = computed(() => props.problems.some((problem) => namedTypes(problem).length > 0));
 const columns = computed<DataTableColumn[]>(() => [
   ...(props.signedIn
     ? [{ key: 'status', label: t('problems.columns.status'), hideLabel: true }]
@@ -57,7 +55,7 @@ const columns = computed<DataTableColumn[]>(() => [
     label: t('problems.columns.code'),
     mono: true,
     sort: sortOf('code', 'asc'),
-    cellClass: 'max-w-32 truncate text-meta text-secondary',
+    cellClass: 'whitespace-nowrap text-meta text-secondary',
   },
   {
     key: 'name',
@@ -65,16 +63,6 @@ const columns = computed<DataTableColumn[]>(() => [
     priority: 'primary',
     sort: sortOf('name', 'asc'),
   },
-  ...(hasTypes.value
-    ? [
-        {
-          key: 'types',
-          label: t('problems.columns.types'),
-          hideBelow: 'lg' as const,
-          cellClass: 'max-w-56 whitespace-nowrap',
-        },
-      ]
-    : []),
   {
     key: 'points',
     label: t('problems.columns.points'),
@@ -107,7 +95,7 @@ function namedTypes(problem: ProblemListItem) {
 const SHOWN_TYPES = 1;
 const rowAttrs = (problem: ProblemListItem) => ({ 'data-code': problem.code });
 const pointsText = (problem: ProblemListItem) =>
-  formatProblemPoints(problem.points, problem.partial, locale.locale);
+  t('problems.pointsValue', { points: formatNumber(problem.points, locale.locale, 2, false) });
 </script>
 
 <template>
@@ -138,32 +126,31 @@ const pointsText = (problem: ProblemListItem) =>
     </template>
 
     <template #cell-status="{ row }"><ProblemStatusMark :status="row.viewerStatus" /></template>
-    <!-- A long code is cut (its full text is the tooltip), so the name keeps its room. -->
-    <template #cell-code="{ row }"
-      ><span :title="row.code">{{ row.code }}</span></template
-    >
+    <!-- The code is never cut: it is what tells `_r1_a` from `_r2_a`. The name keeps the rest of the width. -->
+    <template #cell-code="{ row }">{{ row.code }}</template>
+    <!-- The type is a small chip after the name, only when the problem has one; the name is cut before it. -->
     <template #cell-name="{ row }">
-      <RouterLink
-        :to="target(row.code)"
-        :title="row.name"
-        class="block truncate font-medium text-content hover:text-accent-text"
-        >{{ row.name }}</RouterLink
-      >
-    </template>
-    <template #cell-types="{ row }">
-      <span class="flex items-center gap-1" :title="namedTypes(row).join(', ')">
-        <Chip
-          v-for="name in namedTypes(row).slice(0, SHOWN_TYPES)"
-          :key="name"
-          size="sm"
-          class="min-w-0"
-          ><span class="block max-w-40 truncate">{{ name }}</span></Chip
+      <span class="flex items-center gap-2">
+        <RouterLink
+          :to="target(row.code)"
+          :title="row.name"
+          class="min-w-0 truncate font-medium text-content hover:text-accent-text"
+          >{{ row.name }}</RouterLink
         >
         <span
-          v-if="namedTypes(row).length > SHOWN_TYPES"
-          class="shrink-0 text-caption whitespace-nowrap text-muted"
-          >+{{ namedTypes(row).length - SHOWN_TYPES }}</span
+          v-if="namedTypes(row).length > 0"
+          class="flex shrink-0 items-center gap-1"
+          :title="namedTypes(row).join(', ')"
         >
+          <Chip size="sm"
+            ><span class="block max-w-40 truncate">{{ namedTypes(row)[0] }}</span></Chip
+          >
+          <span
+            v-if="namedTypes(row).length > SHOWN_TYPES"
+            class="text-caption whitespace-nowrap text-muted"
+            >+{{ namedTypes(row).length - SHOWN_TYPES }}</span
+          >
+        </span>
       </span>
     </template>
     <template #cell-points="{ row }">

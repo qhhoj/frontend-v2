@@ -1272,6 +1272,7 @@
     "filterPanel": "Filters",
     "filterPanelShort": "Filter",
     "solvedShort": "{solved} solved",
+    "pointsValue": "{points} points",
     "partialHint": "partial scoring",
     "hasEditorialHint": "Only problems with a published editorial",
     "solvedFilter": {
