@@ -20,7 +20,7 @@ const contributors = computed(() => (home.value?.topContributors ?? []).slice(0,
 <template>
   <Card
     :variant="embedded ? 'plain' : 'glass'"
-    :padding="embedded ? undefined : 'lg'"
+    :padding="embedded ? undefined : 'sm'"
     :title="$t('blog.topContributors')"
   >
     <template v-if="!embedded" #actions
@@ -35,11 +35,11 @@ const contributors = computed(() => (home.value?.topContributors ?? []).slice(0,
           </div>
         </div>
       </template>
-      <ol class="flex flex-col gap-3">
+      <ol class="flex flex-col divide-y divide-line">
         <li
           v-for="(user, index) in contributors"
           :key="user.username"
-          class="flex items-center gap-2.5"
+          class="flex items-center gap-2.5 py-1.5 first:pt-0 last:pb-0"
         >
           <span class="w-5 shrink-0 text-right font-mono text-sm tabular-nums text-muted">
             {{ index + 1 }}

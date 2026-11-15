@@ -7,7 +7,7 @@ const PAGE_SKELETON_ROWS = 6;
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-3">
     <section data-skeleton-region="notification-day">
       <h2 class="text-caption leading-4 font-semibold text-muted">
         <SkeletonBlock text class="w-16" />

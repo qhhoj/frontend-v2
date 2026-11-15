@@ -21,7 +21,7 @@ const problems = computed(() => (home.value?.newProblems ?? []).slice(0, props.l
 <template>
   <Card
     :variant="embedded ? 'plain' : 'glass'"
-    :padding="embedded ? undefined : 'lg'"
+    :padding="embedded ? undefined : 'sm'"
     :title="$t('blog.newProblems')"
   >
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
@@ -33,11 +33,11 @@ const problems = computed(() => (home.value?.newProblems ?? []).slice(0, props.l
           </div>
         </div>
       </template>
-      <ul class="flex flex-col gap-3">
+      <ul class="flex flex-col divide-y divide-line">
         <li
           v-for="problem in problems"
           :key="problem.code"
-          class="flex items-start justify-between gap-3"
+          class="flex items-start justify-between gap-3 py-1.5 first:pt-0 last:pb-0"
         >
           <div class="flex min-w-0 flex-col">
             <RouterLink
