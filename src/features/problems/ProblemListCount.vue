@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
 
-/** The list's count ("214 đã giải · 1.483 bài") and the staff's "Tạo bài tập": in the top bar on a computer, in the page on a phone. */
+/** The list's count ("214 đã giải · 1.483 bài") and the staff's "Tạo bài tập": one row at the top of the page. */
 defineProps<{ text: string }>();
 </script>
 

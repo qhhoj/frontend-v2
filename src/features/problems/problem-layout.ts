@@ -15,8 +15,8 @@ export const PROBLEM_LAYOUT = {
     stacked: '(max-width: 1023.98px)',
     left: 'lg:col-start-1',
     /**
-     * Pinned under the sticky bars (`--pane-top`), so Submit and the result never scroll away; short enough (less the 48 px top
-     * bar and the page's 24 px paddings) to fit whole on load too.
+     * Pinned under the sticky bars (`--pane-top`), so Submit and the result never scroll away; short enough (less the page's
+     * 24 px paddings and the footer's room) to fit whole on load too.
      */
     pane: 'lg:sticky lg:top-(--pane-top) lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:h-[calc(100dvh-var(--pane-top)-6rem)]',
     /** The facts strip under the title stays in sight while the statement scrolls, where the split is. */

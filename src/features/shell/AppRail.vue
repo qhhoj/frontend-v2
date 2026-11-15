@@ -3,9 +3,13 @@ import { PanelLeftClose, PanelLeftOpen, Search } from 'lucide-vue-next';
 import BitSprite from '@/components/BitSprite.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import BrandWordmark from '@/components/ui/BrandWordmark.vue';
+import IconButton from '@/components/ui/IconButton.vue';
+import AppearancePanel from '@/features/appearance/AppearancePanel.vue';
+import NotificationBell from '@/features/notifications/NotificationBell.vue';
 import type { CurrentParticipation } from '@/api/types/contests';
 import OfficialModePill from '@/features/official-mode/OfficialModePill.vue';
 import type { BitLook } from '@/mascot/bit-sprite';
+import LocaleToggle from './LocaleToggle.vue';
 import { NAV_ITEMS, useIsNavCurrent, useNavLinkEvents } from './nav-items';
 import RailLiveContest from './RailLiveContest.vue';
 import { useRunningContestCount } from './use-running-contest-count';
@@ -15,7 +19,8 @@ import UserMenu from './UserMenu.vue';
 
 /**
  * The desktop rail, from `md` up: the brand, the search button (Ctrl K), the seven sections (Kỳ thi with its count of
- * running contests), the contest the viewer is taking part in, and the account at the foot. 224 px from 1100 px
+ * running contests), the contest the viewer is taking part in, and at the foot one row of icons (bell, language, look,
+ * collapse; stacked in the narrow column) over the account. 224 px from 1100 px
  * (`rail-open`); below that, or when the viewer collapses it (button at the foot, `[`; AppShell sets `data-rail`), a 56 px
  * column of icons (44 px targets) whose labels stay their accessible names and tooltips. Opaque: the page background is
  * drawn behind `main` only.
@@ -102,28 +107,23 @@ const CURRENT_ROW =
     </nav>
     <RailLiveContest v-if="current" :current="current" class="mt-auto" />
     <div :class="['flex flex-col gap-1 border-t border-line pt-2', !current && 'mt-auto']">
-      <!-- Only where the full rail can show (from 1100 px); narrower, the column is always icons. -->
-      <AppButton
-        tone="plain"
-        data-testid="rail-collapse"
-        aria-keyshortcuts="["
-        :aria-expanded="!isCollapsed"
-        :aria-label="$t(isCollapsed ? 'nav.railExpand' : 'nav.railCollapse')"
-        :title="`${$t(isCollapsed ? 'nav.railExpand' : 'nav.railCollapse')} ([)`"
-        :class="[ROW, 'w-full text-left max-rail-wide:hidden']"
-        @click="toggle"
-      >
-        <component
-          :is="isCollapsed ? PanelLeftOpen : PanelLeftClose"
-          aria-hidden="true"
-          class="size-4 shrink-0"
-        />
-        <span class="min-w-0 flex-1 truncate rail-slim:sr-only">{{ $t('nav.railCollapse') }}</span>
-        <kbd
-          class="rounded-cell border border-line px-1.5 font-mono text-caption leading-5 rail-slim:hidden"
-          >[</kbd
+      <div class="flex items-center gap-1 rail-slim:flex-col">
+        <NotificationBell compact />
+        <LocaleToggle compact />
+        <AppearancePanel compact />
+        <!-- Only where the full rail can show (from 1100 px); narrower, the column is always icons. -->
+        <IconButton
+          compact
+          data-testid="rail-collapse"
+          aria-keyshortcuts="["
+          :aria-expanded="!isCollapsed"
+          :label="`${$t(isCollapsed ? 'nav.railExpand' : 'nav.railCollapse')} ([)`"
+          class="ml-auto max-rail-wide:hidden rail-slim:ml-0"
+          @click="toggle"
         >
-      </AppButton>
+          <component :is="isCollapsed ? PanelLeftOpen : PanelLeftClose" aria-hidden="true" />
+        </IconButton>
+      </div>
       <UserMenu variant="row" />
     </div>
   </aside>

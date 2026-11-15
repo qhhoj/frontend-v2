@@ -6,7 +6,6 @@ import { useUserPageQuery } from '@/features/users/users.queries';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { lastPageOf } from '@/lib/paging';
-import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import ProblemFilterChips from './ProblemFilterChips.vue';
@@ -20,8 +19,8 @@ import { NO_FILTERS, useProblemFilters } from './use-problem-filters';
 import type { ProblemFilters as Filters } from './use-problem-filters';
 
 /**
- * The problem list (Workbench): the h1 is for screen readers (the top bar names the page), the count and the staff's
- * "Tạo bài tập" sit in the top bar, then one toolbar row, the active filter chips, and the table with the peek pane
+ * The problem list (Workbench): the h1 is for screen readers, the count and the staff's "Tạo bài tập" sit first in the
+ * page, then one toolbar row, the active filter chips, and the table with the peek pane
  * beside it on a wide screen with a mouse.
  */
 const router = useRouter();
@@ -93,8 +92,6 @@ const countText = computed(() => {
   return `${translate('problems.solvedShort', { solved })} · ${listed}`;
 });
 
-/** The phone's top bar has no actions slot: there the count and the create button stay in the page. */
-const isPhone = useMediaQuery(PHONE_QUERY);
 const prefetch = usePrefetchProblem(lang);
 /** The row an event came from has its problem loaded ahead. */
 function prefetchRow(event: Event) {
@@ -107,9 +104,7 @@ function prefetchRow(event: Event) {
 <template>
   <div class="page-column">
     <PageHeader class="sr-only" :title="$t('problems.title')" />
-    <!-- Two branches, not a disabled Teleport: the top bar swaps its phone and desktop layouts, so the target comes and goes. -->
-    <ProblemListCount v-if="isPhone" :text="countText" />
-    <Teleport v-else defer to="#top-bar-actions"><ProblemListCount :text="countText" /></Teleport>
+    <ProblemListCount :text="countText" />
     <div class="flex flex-col gap-3">
       <ProblemFilters
         :filters="filters"

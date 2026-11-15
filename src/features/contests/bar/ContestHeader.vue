@@ -81,6 +81,11 @@ const freeze = computed(() =>
 
 <template>
   <div class="flex flex-col gap-2" data-testid="contest-page-header">
+    <nav :aria-label="$t('common.breadcrumb')" class="hidden text-caption text-muted md:block">
+      <RouterLink :to="{ name: 'contests' }" class="hover:text-content hover:underline">{{
+        $t('nav.contests')
+      }}</RouterLink>
+    </nav>
     <header v-if="contest" class="flex flex-wrap items-center gap-x-3 gap-y-1">
       <img
         v-if="contest.logoOverrideImage"
