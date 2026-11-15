@@ -100,7 +100,9 @@ watch(
       'page-column',
       contest && railEntries
         ? 'lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start'
-        : '[--page-width:120rem]',
+        : hasEditor
+          ? '[--page-width:120rem]'
+          : '[--page-width:80rem]',
     ]"
   >
     <ContestProblemSwitcher

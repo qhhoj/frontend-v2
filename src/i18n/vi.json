@@ -1161,8 +1161,7 @@
     "limits": {
       "time": "Thời gian",
       "memory": "Bộ nhớ",
-      "points": "Điểm",
-      "acRate": "Tỉ lệ AC"
+      "points": "Điểm"
     },
     "noStatement": {
       "title": "Chưa có đề bài",
@@ -1186,7 +1185,6 @@
     "rail": {
       "railLabel": "Thông tin bài",
       "facts": {
-        "solvers": "Người giải",
         "io": "Nhập/xuất",
         "input": "Nhập",
         "output": "Xuất",
@@ -1525,7 +1523,6 @@
       "sourceLength": "Mã nguồn vượt quá {max} ký tự."
     },
     "versions": "Phiên bản trình dịch",
-    "close": "Đóng khung nộp bài",
     "result": {
       "atTest": "{verdict} test {test}",
       "details": "Xem chi tiết",

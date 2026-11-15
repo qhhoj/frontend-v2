@@ -80,7 +80,7 @@ const FILLED_EDITOR = {
     'h-full !max-h-none [&_.code-editor-host]:h-full [&_.cm-editor]:h-full [&_.code-editor-fallback]:min-h-full',
   counterRow: '',
   submit: { size: 'md', block: false },
-  header: 'flex flex-wrap items-center gap-x-3 gap-y-2',
+  header: '@container/bar flex flex-wrap items-center gap-x-3 gap-y-2',
   strip: 'order-1',
   /** The contest line gets its own row under the bar, so the bar keeps to one row in a narrow pane. */
   info: 'order-6 basis-full',
@@ -175,7 +175,7 @@ function loadDroppedFile(event: DragEvent) {
       </p>
       <SourceUploadButton
         v-if="!isSheet && hasSourceUpload"
-        :icon-only="false"
+        :icon-only="layout === 'pane'"
         :class="REGION_ORDER.upload"
         @pick="(file) => state.loadFile(file)"
       />
