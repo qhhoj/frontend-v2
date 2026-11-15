@@ -9,7 +9,7 @@ import BitMascot from '@/components/BitMascot.vue';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import VerdictLabel from '@/components/VerdictLabel.vue';
+import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { translate } from '@/i18n';
 import { NO_VALUE, formatNumber, scoreBelowFull } from '@/lib/format';
 import { provisionalPoints, ringProgress } from '@/lib/grading';
@@ -137,7 +137,7 @@ const problem = computed(() => {
           />
           {{ $t(verdict.labelKey) }}
         </p>
-        <p v-else class="text-sm"><VerdictLabel :verdict="verdict" /></p>
+        <p v-else class="text-sm"><VerdictChip :verdict="verdict" named /></p>
         <p
           data-testid="score"
           class="mt-1 font-mono text-section leading-none font-semibold tabular-nums"

@@ -4,7 +4,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { OrganizationProblem } from '@/api/types/organization-problems';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
@@ -112,7 +112,7 @@ function saveTags(tagIds: string[]) {
       {{ $t('orgProblems.memberReadOnly') }}
     </SettingsNotice>
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)] lg:items-start">
-      <GlassCard
+      <Card
         ref="listCard"
         as="div"
         tabindex="-1"
@@ -195,7 +195,7 @@ function saveTags(tagIds: string[]) {
         <p v-if="actions.failureText.value" role="alert" class="text-sm text-negative">
           {{ actions.failureText.value }}
         </p>
-      </GlassCard>
+      </Card>
       <OrgTagCatalogue
         v-if="isAdmin"
         :slug="slug"

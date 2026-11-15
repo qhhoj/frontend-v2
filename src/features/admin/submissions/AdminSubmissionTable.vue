@@ -6,7 +6,7 @@ import type { NumberedPageMeta } from '@/api/client';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import UserLink from '@/components/UserLink.vue';
-import VerdictBadge from '@/components/VerdictBadge.vue';
+import VerdictChip from '@/components/ui/VerdictChip.vue';
 import SubmissionProblemName from '@/features/submissions/SubmissionProblemName.vue';
 import { formatCaseMemory, formatCaseTime } from '@/lib/format';
 import { copyText } from '@/lib/clipboard';
@@ -123,7 +123,7 @@ const menuItems = (row: SubmissionListItem): RowMenuItem[] => [
         :to="{ name: 'submission', params: { id: row.id } }"
         class="inline-flex rounded-full transition-opacity hover:opacity-90"
       >
-        <VerdictBadge :verdict="submissionVerdictOf(row)" size="sm" class="min-w-12" />
+        <VerdictChip :verdict="submissionVerdictOf(row)" class="min-w-12" />
       </RouterLink>
     </template>
     <template #cell-user="{ row }">

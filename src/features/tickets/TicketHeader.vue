@@ -2,7 +2,7 @@
 import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed } from 'vue';
 import type { TicketDetail } from '@/api/types/tickets';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import { translate } from '@/i18n';
 import StateBit from '@/components/StateBit.vue';
 import { formatNumber } from '@/lib/format';
@@ -41,7 +41,7 @@ const LINK_CLASS = 'inline-flex flex-wrap items-center gap-2 text-sm hover:under
 </script>
 
 <template>
-  <GlassCard data-testid="ticket-header" class="flex flex-col gap-3 p-5 sm:p-6">
+  <Card data-testid="ticket-header" class="flex flex-col gap-3 p-5 sm:p-6">
     <PageHeader
       :title="ticket.title"
       :crumbs="[
@@ -90,5 +90,5 @@ const LINK_CLASS = 'inline-flex flex-wrap items-center gap-2 text-sm hover:under
         <p class="text-meta text-muted">{{ $t('ticket.meta', meta) }}</p>
       </template>
     </PageHeader>
-  </GlassCard>
+  </Card>
 </template>

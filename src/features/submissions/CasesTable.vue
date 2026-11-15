@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
-import VerdictLabel from '@/components/VerdictLabel.vue';
+import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { translate } from '@/i18n';
 import CaseDetails from './CaseDetails.vue';
 import { caseDetails, type CaseDetail } from './case-details';
@@ -153,7 +153,9 @@ const isHidden = computed(
               >
                 {{ row.label }}
               </th>
-              <td :class="[CELL, CELL_PLACES.result]"><VerdictLabel :verdict="row.verdict" /></td>
+              <td :class="[CELL, CELL_PLACES.result]">
+                <VerdictChip :verdict="row.verdict" named />
+              </td>
               <td :class="[NUMBER_CELL, CELL_PLACES.time]">{{ row.time }}</td>
               <td :class="[NUMBER_CELL, CELL_PLACES.memory]">{{ row.memory }}</td>
               <td :class="[NUMBER_CELL, CELL_PLACES.points, pointsClass(row.verdict)]">

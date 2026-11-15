@@ -18,7 +18,7 @@ function focusInput(event: MouseEvent) {
     frameEl.querySelector('input')?.focus();
 }
 const FRAMED =
-  'flex h-(--qh-control) items-center gap-2 rounded-cell border border-line-control bg-surface-solid px-3 text-base text-content has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus has-aria-invalid:border-negative has-aria-invalid:inset-ring has-aria-invalid:inset-ring-negative has-disabled:cursor-not-allowed has-disabled:border-line has-disabled:bg-surface-strong has-disabled:text-muted';
+  'flex h-(--qh-control) items-center gap-2 rounded-cell border border-line-control bg-surface-solid px-2.5 text-meta text-content has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus has-aria-invalid:border-negative has-aria-invalid:inset-ring has-aria-invalid:inset-ring-negative has-disabled:cursor-not-allowed has-disabled:border-line has-disabled:bg-surface-strong has-disabled:text-muted';
 </script>
 
 <template>
@@ -51,7 +51,7 @@ const FRAMED =
       :aria-invalid="
         field?.invalid ?? ($attrs['aria-invalid' as keyof typeof $attrs] as 'true' | undefined)
       "
-      class="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-muted"
+      class="h-full min-w-0 flex-1 bg-transparent text-meta outline-none placeholder:text-muted"
     />
     <span v-if="$slots.suffix" class="flex shrink-0 items-center text-muted"
       ><slot name="suffix"

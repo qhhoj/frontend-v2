@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import type { TicketDetail } from '@/api/types/tickets';
 import { translate } from '@/i18n';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import UserName from '@/components/UserName.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { formatAgo } from '@/lib/format-date';
@@ -30,7 +30,7 @@ const DD = 'text-sm';
 </script>
 
 <template>
-  <GlassCard as="aside" class="flex flex-col gap-4 p-5">
+  <Card as="aside" class="flex flex-col gap-4 p-5">
     <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-3">
       <dt :class="DT">{{ $t('ticket.link') }}</dt>
       <dd :class="DD">{{ linkLabel }}</dd>
@@ -67,5 +67,5 @@ const DD = 'text-sm';
         {{ $t(failureKey) }}
       </p>
     </section>
-  </GlassCard>
+  </Card>
 </template>

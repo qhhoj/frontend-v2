@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 
 /** The ticket page's shape while it loads: the header card, three message cards, the side card. Each block mirrors the loaded markup's size. */
@@ -9,11 +9,7 @@ const MESSAGE_ROWS = [0, 1, 2];
 <template>
   <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
     <div class="flex min-w-0 flex-col gap-5">
-      <GlassCard
-        as="div"
-        data-skeleton-region="ticket-header"
-        class="flex flex-col gap-3 p-5 sm:p-6"
-      >
+      <Card as="div" data-skeleton-region="ticket-header" class="flex flex-col gap-3 p-5 sm:p-6">
         <p class="text-meta"><SkeletonBlock text class="w-32" /></p>
         <div class="flex flex-wrap items-center gap-2">
           <SkeletonBlock pill class="h-6 w-24" />
@@ -27,7 +23,7 @@ const MESSAGE_ROWS = [0, 1, 2];
           <SkeletonBlock text class="w-full" />
           <span class="sm:hidden"> <SkeletonBlock text class="w-1/2" /></span>
         </div>
-      </GlassCard>
+      </Card>
       <section class="flex flex-col gap-4">
         <p data-skeleton-region="thread-counts" class="text-meta">
           <SkeletonBlock text class="w-40" />
@@ -50,8 +46,8 @@ const MESSAGE_ROWS = [0, 1, 2];
         </div>
       </section>
     </div>
-    <GlassCard as="aside" data-skeleton-region="ticket-side" class="p-5">
+    <Card as="aside" data-skeleton-region="ticket-side" class="p-5">
       <SkeletonBlock class="h-40 w-full" />
-    </GlassCard>
+    </Card>
   </div>
 </template>

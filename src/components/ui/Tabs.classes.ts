@@ -1,10 +1,13 @@
-/** The class recipes of `Tabs`, per look. `rail` is the pill row on a phone and a vertical side nav from `lg`. */
+/**
+ * The class recipes of `Tabs`, per look. `underline` is the Workbench tab row (directions.md §2: a 2 px accent underline under
+ * the current tab, no fill); `pill` is a row of quiet 28 px boxes; `rail` is the pill row on a phone and a side nav from `lg`.
+ */
 export type TabsVariant = 'pill' | 'underline' | 'rail';
 
 export const TABS_FRAME: Record<TabsVariant, string> = {
   pill: 'flex',
   underline: 'relative flex items-end border-b border-line',
-  rail: 'flex lg:glass lg:w-60 lg:shrink-0 lg:rounded-card lg:p-2.5',
+  rail: 'flex lg:w-56 lg:shrink-0 lg:rounded-card lg:border lg:border-line lg:bg-surface lg:p-1.5',
 };
 
 /**
@@ -38,19 +41,19 @@ const MENU_ROOM: Record<TabsVariant, string> = {
 export const tabsList = (variant: TabsVariant, hasMenu: boolean) =>
   hasMenu ? `${LIST[variant]} ${MENU_ROOM[variant]}` : LIST[variant];
 
+/** A boxed tab: the accent-soft pair while current. */
 const PILL_TAB =
-  'min-h-11 rounded-pill border border-transparent px-4 font-medium hover:bg-surface-hover aria-[current=page]:font-semibold aria-selected:font-semibold';
+  'min-h-(--qh-control) rounded-control border border-transparent px-2.5 hover:bg-surface-hover aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text aria-selected:border-accent aria-selected:bg-accent-soft aria-selected:text-accent-soft-text';
 
-/** One active look for every tab set: accent-soft fill, accent border. */
 export const TAB_CLASS: Record<TabsVariant, string> = {
   pill: PILL_TAB,
   underline:
-    '-mb-px min-h-(--qh-control-sm) rounded-t-cell border-b-2 border-transparent px-3 font-semibold focus-visible:-outline-offset-2',
+    '-mb-px min-h-(--qh-control) border-b-2 border-transparent px-2.5 focus-visible:-outline-offset-2 aria-[current=page]:border-accent aria-[current=page]:text-content aria-selected:border-accent aria-selected:text-content',
   rail: `${PILL_TAB} lg:flex-1`,
 };
 
 export const TAB_BASE =
-  'inline-flex items-center gap-2 text-sm whitespace-nowrap text-muted hover:text-content aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text aria-selected:border-accent aria-selected:bg-accent-soft aria-selected:text-accent-soft-text';
+  'inline-flex items-center gap-2 text-meta font-medium whitespace-nowrap text-muted hover:text-content aria-[current=page]:font-semibold aria-selected:font-semibold';
 
 /** The "⋯" button sits over the strip's right end: on the underline's baseline, or centred on the pill row. */
 export const MORE_CLASS: Record<TabsVariant, string> = {

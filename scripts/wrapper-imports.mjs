@@ -19,7 +19,6 @@ export const WRAPPERS = [
   wrapper('AdminDataTable', 'features/admin/ui/table/AdminDataTable.vue', 'DataTable'),
   wrapper('AdminPageHeader', 'features/admin/ui/AdminPageHeader.vue', 'PageHeader'),
   wrapper('AdminNotice', 'features/admin/ui/feedback/AdminNotice.vue', 'Notice'),
-  wrapper('GlassCard', 'components/GlassCard.vue', 'Card'),
   wrapper('AdminDrawer', 'features/admin/ui/AdminDrawer.vue', 'Drawer'),
   wrapper('AdminRowMenu', 'features/admin/ui/table/AdminRowMenu.vue', 'RowMenu'),
   wrapper(

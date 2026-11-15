@@ -48,13 +48,7 @@ describe('Chip', () => {
     expect(chip.emitted('click')).toBeUndefined();
   });
 
-  it('colours a verdict code with that verdict and a tag with its tag pair', () => {
-    expect(mountComponent(Chip, { props: { tone: 'TLE' } }).classes()).toContain(
-      'text-verdict-tle',
-    );
-    expect(mountComponent(Chip, { props: { tone: 'MLE' } }).classes()).toContain(
-      'text-verdict-tle',
-    );
+  it('colours a tag with its tag pair', () => {
     expect(mountComponent(Chip, { props: { tone: 'tag-3' } }).classes()).toContain('bg-tag-3-bg');
   });
 });

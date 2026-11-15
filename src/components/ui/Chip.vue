@@ -4,14 +4,12 @@ import { X } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
-import { VERDICT_TONE_CLASSES, VERDICT_TONES } from '@/lib/verdicts';
-import type { VerdictCode } from '@/lib/verdicts';
 
 type TagTone = `tag-${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8}`;
 /** `solid` is the attention count ("something waits for you"): the one filled chip. */
 type StatusTone = 'neutral' | 'accent' | 'solid' | 'success' | 'danger' | 'warning' | 'info';
-/** A status, a tag colour, or a verdict code (AC, WA, ...) for the verdict's own pair. */
-export type ChipTone = StatusTone | TagTone | VerdictCode;
+/** A status or a tag colour. A verdict is a `VerdictChip`, which adds its glyph. */
+export type ChipTone = StatusTone | TagTone;
 export type ChipSize = 'sm' | 'md';
 
 /**
@@ -52,7 +50,7 @@ const emit = defineEmits<{ remove: [] }>();
 
 defineOptions({ name: 'UiChip' });
 
-const STATUS_TONES: Record<StatusTone | TagTone, string> = {
+const TONES: Record<ChipTone, string> = {
   neutral: 'border-line bg-surface-strong text-muted',
   accent: 'border-transparent bg-accent-soft text-accent-soft-text',
   solid: 'border-transparent bg-accent text-on-accent',
@@ -109,12 +107,7 @@ const innerClass = computed(() => {
   const base = 'inline-flex min-w-0 items-center gap-1 rounded-pill';
   return isInteractive.value ? `${base} ${INTERACTIVE_INNER}` : base;
 });
-const toneClass = computed(() => {
-  if (props.pressed) return PRESSED;
-  return props.tone in VERDICT_TONES
-    ? `border-transparent ${VERDICT_TONE_CLASSES[VERDICT_TONES[props.tone as VerdictCode]]}`
-    : STATUS_TONES[props.tone as StatusTone | TagTone];
-});
+const toneClass = computed(() => (props.pressed ? PRESSED : TONES[props.tone]));
 </script>
 
 <template>

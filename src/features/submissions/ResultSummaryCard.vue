@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
-import VerdictLabel from '@/components/VerdictLabel.vue';
+import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { translate } from '@/i18n';
 import { formatCaseMemory, formatCaseTime } from '@/lib/format';
 import { PARTIAL_CODE, caseVerdictOf } from '@/lib/verdicts';
@@ -173,7 +173,7 @@ const tableLink = computed(() =>
           <span class="font-mono font-semibold"
             >{{ $t('submission.cases.test') }} {{ testCase.position }}</span
           >
-          <VerdictLabel :verdict="caseVerdictOf(testCase)" />
+          <VerdictChip :verdict="caseVerdictOf(testCase)" named />
           <span class="ml-auto font-mono text-meta whitespace-nowrap text-muted tabular-nums">{{
             caseFacts(testCase)
           }}</span>

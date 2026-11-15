@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import VerdictLabel from '@/components/VerdictLabel.vue';
+import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { GLOBAL_SCOPE } from '@/features/submissions/list/submission-scope';
 import { useScopedSubmissionListQuery } from '@/features/submissions/submissions.queries';
 import type { SubmissionFilters } from '@/features/submissions/use-submission-filters';
@@ -35,7 +35,7 @@ const latest = computed(() => data.value?.items[0]);
     <h3 class="text-meta font-semibold text-secondary">{{ $t('problems.peek.lastSubmission') }}</h3>
     <p v-if="latest" class="flex items-center gap-2 text-sm">
       <RouterLink :to="{ name: 'submission', params: { id: latest.id } }">
-        <VerdictLabel :verdict="submissionVerdictOf(latest)" />
+        <VerdictChip :verdict="submissionVerdictOf(latest)" named />
       </RouterLink>
       <time :datetime="latest.date" class="ml-auto text-meta text-muted">{{
         formatAgoCompact(latest.date, now, locale.locale)

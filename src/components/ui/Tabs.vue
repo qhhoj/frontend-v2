@@ -47,7 +47,7 @@ export interface TabItem {
 }
 
 /**
- * A row of tabs. `pill` is the public look; `underline` switches an admin page's sections; `rail` is a vertical side nav
+ * A row of tabs. `underline` (the default) is the Workbench look; `pill` a row of boxed tabs; `rail` is a vertical side nav
  * from `lg` and the pill row below it. Link tabs mark the open one `aria-current="page"` (the `v-model` key, else the
  * router's exact match); without links the row is a tablist with a roving tabindex and arrow keys. `overflow="menu"`
  * hides a tab that does not fit whole (never the current one) and lists it behind a "⋯ Thêm" button; `scroll` lets the row
@@ -64,7 +64,7 @@ const props = withDefaults(
     moreLabel?: string;
     moreTestid?: string;
   }>(),
-  { variant: 'pill', overflow: 'menu', moreLabel: undefined, moreTestid: 'tabs-more' },
+  { variant: 'underline', overflow: 'menu', moreLabel: undefined, moreTestid: 'tabs-more' },
 );
 defineOptions({ name: 'UiTabs' });
 const current = defineModel<string>();

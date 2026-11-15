@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import type { TicketDetail } from '@/api/types/tickets';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { useTicketPatch } from './use-ticket-patch';
 
@@ -31,7 +31,7 @@ const markGood = () => patch({ isContributive: !props.ticket.isContributive });
 </script>
 
 <template>
-  <GlassCard as="section" class="flex flex-col gap-4 p-5">
+  <Card as="section" class="flex flex-col gap-4 p-5">
     <h2 class="text-sm font-semibold">{{ $t('ticket.handle') }}</h2>
     <AppButton
       v-if="ticket.can.markGood"
@@ -73,5 +73,5 @@ const markGood = () => patch({ isContributive: !props.ticket.isContributive });
     <p v-if="failureKey" role="alert" class="text-meta text-negative">
       {{ $t(failureKey) }}
     </p>
-  </GlassCard>
+  </Card>
 </template>

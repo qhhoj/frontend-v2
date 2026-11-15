@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { ShareView } from '@/api/types/shares';
 import FactLine from '@/components/FactLine.vue';
 import Card from '@/components/ui/Card.vue';
-import VerdictLabel from '@/components/VerdictLabel.vue';
+import VerdictChip from '@/components/ui/VerdictChip.vue';
 import VerdictRing from '@/features/submissions/VerdictRing.vue';
 import { translate } from '@/i18n';
 import { NO_VALUE, formatCaseMemory, formatCaseTime, formatNumber } from '@/lib/format';
@@ -59,7 +59,7 @@ const facts = computed(() =>
     <div class="flex items-center gap-5">
       <VerdictRing size="md" :progress="null" :verdict="verdict" :share="partialShare" />
       <div class="min-w-0">
-        <p class="text-sm"><VerdictLabel :verdict="verdict" /></p>
+        <p class="text-sm"><VerdictChip :verdict="verdict" named /></p>
         <p class="mt-1 font-mono text-section leading-none font-semibold tabular-nums">
           {{ score }}
           <span class="text-base text-muted"

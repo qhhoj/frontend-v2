@@ -1,6 +1,5 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
-import GlassCard from '../GlassCard.vue';
 import Card from './Card.vue';
 
 describe('Card', () => {
@@ -33,10 +32,5 @@ describe('Card', () => {
         .classes()
         .some((name) => name.startsWith('-mx')),
     ).toBe(false);
-  });
-
-  it('GlassCard renders the same markup as the default Card', () => {
-    const options = { props: { as: 'div' }, attrs: { class: 'p-5' }, slots: { default: 'Body' } };
-    expect(mount(GlassCard, options).html()).toBe(mount(Card, options).html());
   });
 });

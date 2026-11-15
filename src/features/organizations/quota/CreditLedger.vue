@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CreditEntry } from '@/api/types/organization-usage';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import { actorName } from '@/lib/actor';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -15,7 +15,7 @@ const CELL = 'py-2 pr-3 align-middle';
 </script>
 
 <template>
-  <GlassCard
+  <Card
     as="section"
     data-testid="credit-ledger"
     aria-labelledby="credit-ledger-title"
@@ -58,5 +58,5 @@ const CELL = 'py-2 pr-3 align-middle';
         </tbody>
       </table>
     </div>
-  </GlassCard>
+  </Card>
 </template>

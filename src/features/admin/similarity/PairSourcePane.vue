@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { shortId } from '../ui/short-id';
-import VerdictBadge from '@/components/VerdictBadge.vue';
+import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -51,7 +51,7 @@ const lineClass = (line: number): string => {
   <section class="flex min-w-0 flex-col gap-3 rounded-card border border-line p-3">
     <header class="flex flex-wrap items-center gap-2">
       <AdminUserLabel :username="source.username" :size="28" />
-      <VerdictBadge v-if="verdict" :verdict="verdict" size="sm" />
+      <VerdictChip v-if="verdict" :verdict="verdict" />
       <span class="text-sm text-muted">{{ factsText }}</span>
       <RouterLink
         :to="`/submissions/${source.submissionId}`"

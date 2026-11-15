@@ -9,13 +9,9 @@
     "fixed-size": 1
   },
   "components/SourceDiff.vue": {
-    "GlassCard": 1,
     "button": 2,
     "table": 2,
     "verdict-tone": 12
-  },
-  "components/SourceDiffSkeleton.vue": {
-    "GlassCard": 1
   },
   "components/ToolbarSelect.vue": {
     "select": 1
@@ -1558,18 +1554,6 @@
   "features/bit-roam/BitRoamLayer.vue": {
     "use-admin-toast": 1
   },
-  "features/blog/AuthorCard.vue": {
-    "GlassCard": 1
-  },
-  "features/blog/BlogDraftsPage.vue": {
-    "GlassCard": 1
-  },
-  "features/blog/BlogListPage.vue": {
-    "GlassCard": 2
-  },
-  "features/blog/MorePostsCard.vue": {
-    "GlassCard": 1
-  },
   "features/blog/PostActions.vue": {
     "primevue": 2
   },
@@ -1699,9 +1683,6 @@
   "features/contests/replay/ReplayTable.vue": {
     "table": 1
   },
-  "features/external-judge/ExternalJudgeStatusCard.vue": {
-    "GlassCard": 1
-  },
   "features/home/NewPostsCard.vue": {
     "CommunityCard": 1
   },
@@ -1758,9 +1739,6 @@
   "features/organizations/OrganizationCardSkeleton.vue": {
     "fixed-size": 3
   },
-  "features/organizations/OrganizationContestsPage.vue": {
-    "GlassCard": 1
-  },
   "features/organizations/OrganizationLogo.vue": {
     "fixed-size": 1
   },
@@ -1797,15 +1775,11 @@
     "checkbox": 1
   },
   "features/organizations/problems/OrgProblemsPage.vue": {
-    "GlassCard": 1,
     "SettingsNotice": 1,
     "button": 1
   },
   "features/organizations/problems/OrgSelectBox.vue": {
     "checkbox": 1
-  },
-  "features/organizations/problems/OrgTagCatalogue.vue": {
-    "GlassCard": 1
   },
   "features/organizations/problems/OrgTagDialog.vue": {
     "radio": 1
@@ -1814,14 +1788,10 @@
     "SettingsNotice": 1
   },
   "features/organizations/quota/CreditLedger.vue": {
-    "GlassCard": 1,
     "table": 1
   },
   "features/organizations/quota/OrgQuotaPage.vue": {
     "fixed-size": 5
-  },
-  "features/organizations/quota/QuotaMeterCard.vue": {
-    "GlassCard": 1
   },
   "features/organizations/quota/QuotaNotice.vue": {
     "SettingsNotice": 1
@@ -1972,35 +1942,22 @@
     "input": 2
   },
   "features/tickets/NewTicketPage.vue": {
-    "GlassCard": 2,
     "radio": 1
   },
   "features/tickets/TicketAlertsStrip.vue": {
     "fixed-size": 1
-  },
-  "features/tickets/TicketHeader.vue": {
-    "GlassCard": 1
   },
   "features/tickets/TicketMessages.vue": {
     "SettingsNotice": 1,
     "details": 1
   },
   "features/tickets/TicketNotes.vue": {
-    "GlassCard": 1,
     "textarea": 1
-  },
-  "features/tickets/TicketPageSkeleton.vue": {
-    "GlassCard": 2
   },
   "features/tickets/TicketReply.vue": {
-    "GlassCard": 1,
     "textarea": 1
   },
-  "features/tickets/TicketSidePanel.vue": {
-    "GlassCard": 1
-  },
   "features/tickets/TicketStaffActions.vue": {
-    "GlassCard": 1,
     "input": 1
   },
   "features/tickets/TicketTable.vue": {
@@ -2010,9 +1967,6 @@
   "features/tickets/TicketTableSkeleton.vue": {
     "fixed-size": 3,
     "table": 1
-  },
-  "features/tickets/TicketsPage.vue": {
-    "GlassCard": 1
   },
   "features/tickets/canned/CannedReplyPicker.vue": {
     "button": 1,
