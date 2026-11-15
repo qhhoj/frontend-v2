@@ -186,8 +186,6 @@
       }
     },
     "rules": {
-      "show": "Details",
-      "hide": "Collapse",
       "intro": "About",
       "title": "Format and rules",
       "format": "Format",

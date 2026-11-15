@@ -186,8 +186,6 @@
       }
     },
     "rules": {
-      "show": "Chi tiết",
-      "hide": "Thu gọn",
       "intro": "Giới thiệu",
       "title": "Thể thức & quy định",
       "format": "Thể thức",

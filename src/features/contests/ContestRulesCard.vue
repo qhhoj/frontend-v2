@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, useId } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ContestDetail } from '@/api/types/contests';
 import Card from '@/components/ui/Card.vue';
-import FoldPanel from '@/components/ui/FoldPanel.vue';
+import Disclosure from '@/components/ui/Disclosure.vue';
 import { useLocaleStore } from '@/stores/locale.store';
 import { contestRules } from './contest-rules';
 import type { RuleRow } from './contest-rules';
@@ -11,9 +11,8 @@ import type { RuleRow } from './contest-rules';
 const props = defineProps<{ contest: ContestDetail }>();
 const { t } = useI18n();
 const locale = useLocaleStore();
-/** Closed until the header is clicked; the rows slide open in a `FoldPanel`. */
+/** Closed until the header is clicked; the rows slide open (Disclosure). */
 const isOpen = ref(false);
-const panelId = useId();
 const rules = computed(() => contestRules(props.contest, locale.locale));
 
 /** Params that are message keys (the scoreboard visibility) are translated before they fill the sentence. */
@@ -37,24 +36,16 @@ const summary = computed(() =>
 </script>
 
 <template>
-  <Card as="div" class="px-5 py-3">
-    <button
-      type="button"
-      class="flex min-h-8 w-full items-center gap-2 text-left text-sm"
-      :aria-expanded="isOpen"
-      :aria-controls="panelId"
-      @click="isOpen = !isOpen"
-    >
-      <span class="shrink-0 font-semibold">{{ $t('contests.rules.title') }}</span>
-      <span class="min-w-0 flex-1 truncate text-muted" :class="isOpen && 'invisible'">{{
-        summary
-      }}</span>
-      <span class="shrink-0 text-accent-text">
-        {{ isOpen ? `${$t('contests.rules.hide')} ▾` : `${$t('contests.rules.show')} ▸` }}
-      </span>
-    </button>
-    <FoldPanel :id="panelId" :open="isOpen">
-      <dl class="mt-3 flex flex-col gap-2.5 text-sm">
+  <Card as="div" class="px-5 py-1">
+    <Disclosure v-model:open="isOpen" :label="$t('contests.rules.title')">
+      <template #summary>
+        <span
+          class="min-w-0 flex-1 truncate font-normal text-muted"
+          :class="isOpen && 'invisible'"
+          >{{ summary }}</span
+        >
+      </template>
+      <dl class="flex flex-col gap-2.5 pb-2 text-sm">
         <div
           v-for="rule in rules"
           :key="rule.termKey"
@@ -64,6 +55,6 @@ const summary = computed(() =>
           <dd>{{ valueText(rule) }}</dd>
         </div>
       </dl>
-    </FoldPanel>
+    </Disclosure>
   </Card>
 </template>
