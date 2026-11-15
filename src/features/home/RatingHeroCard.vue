@@ -15,8 +15,6 @@ import { ratingTier } from '@/lib/rating-tiers';
 import { sparklineAreaPath, sparklinePath } from '@/lib/sparkline';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
 import { useLocaleStore } from '@/stores/locale.store';
-import ContinueButton from './ContinueButton.vue';
-import RecentSubmissionsList from './RecentSubmissionsList.vue';
 
 const props = defineProps<{ username: string }>();
 const { data: user, isPending, error, refetch } = useUserPageQuery(() => props.username);
@@ -75,11 +73,7 @@ const tiles = computed(() =>
 </script>
 
 <template>
-  <Card
-    data-testid="rating-hero"
-    padding="lg"
-    class="grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]"
-  >
+  <Card data-testid="rating-hero" padding="lg">
     <div class="min-w-0">
       <QueryState
         :loading="isPending"
@@ -107,7 +101,7 @@ const tiles = computed(() =>
               </p>
             </div>
             <!-- The hero Bit's box (16 pixels of 5 px, 7 px from sm up), so the card keeps its height. -->
-            <SkeletonBlock data-skeleton-region="bit" class="size-20 shrink-0 sm:size-28" />
+            <SkeletonBlock data-skeleton-region="bit" class="size-16 shrink-0" />
           </div>
           <div data-skeleton-region="chart" class="mt-4 flex h-12 justify-end">
             <SkeletonBlock class="h-full w-full max-w-60" />
@@ -167,7 +161,7 @@ const tiles = computed(() =>
               data-testid="home-bit"
               :look="PLACEMENT_LOOKS.hero"
               blinks
-              class="[--bit-px:5px] sm:[--bit-px:7px]"
+              class="[--bit-px:4px]"
             />
           </div>
           <div v-if="showsChart" class="mt-4 flex justify-end">
@@ -217,10 +211,8 @@ const tiles = computed(() =>
             </svg>
           </div>
           <StatGrid mode="stat" :items="tiles" class="mt-3" />
-          <ContinueButton :username="username" class="mt-4" />
         </template>
       </QueryState>
     </div>
-    <RecentSubmissionsList :username="username" />
   </Card>
 </template>

@@ -1146,7 +1146,12 @@
       "pp": "{pp} PP",
       "leaderboard": "Leaderboard",
       "noPerformers": "No one has performance points yet."
-    }
+    },
+    "continueHint": "Back to the problem you left unfinished",
+    "liveEnter": "Enter contest",
+    "liveScore": "{score} points",
+    "upcoming": "Upcoming contests",
+    "noUpcoming": "No contest is scheduled."
   },
   "problem": {
     "copySample": "Copy sample",
@@ -2621,7 +2626,6 @@
   },
   "contestBar": {
     "label": "Your current contest",
-    "live": "In contest",
     "virtual": "Virtual #{run}",
     "spectate": "Spectating",
     "rankingShort": "Ranking"
@@ -3203,7 +3207,6 @@
     }
   },
   "rail": {
-    "live": "In contest",
     "rank": "rank {rank}"
   },
   "search": {

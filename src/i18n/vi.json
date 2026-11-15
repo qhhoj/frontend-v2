@@ -1146,7 +1146,12 @@
       "pp": "{pp} PP",
       "leaderboard": "Bảng xếp hạng",
       "noPerformers": "Chưa có ai có điểm PP."
-    }
+    },
+    "continueHint": "Quay lại bài bạn đang làm dở",
+    "liveEnter": "Vào thi",
+    "liveScore": "{score} điểm",
+    "upcoming": "Kỳ thi sắp tới",
+    "noUpcoming": "Chưa có kỳ thi nào được lên lịch."
   },
   "problem": {
     "copySample": "Sao chép ví dụ",
@@ -3203,7 +3208,6 @@
     }
   },
   "rail": {
-    "live": "Đang thi",
     "rank": "hạng {rank}"
   },
   "search": {
