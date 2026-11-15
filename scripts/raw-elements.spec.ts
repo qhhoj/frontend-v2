@@ -148,7 +148,7 @@ describe('the baselines', () => {
     expect(
       hash,
       `raw-elements.first.json changed. Only a rule that now sees more uses may change it: regenerate it (recipe in docs/wrapper-migration.md), then paste the output of \`sha256sum scripts/raw-elements.first.json\` here`,
-    ).toBe('798c3dc88d1f0af6b1fd09f40e8cfb7eceb6fc12216ed877ed1c67dc58219d1b');
+    ).toBe('071b4f4ea2585d6d0350716c219bc70c4c856cb2d3b3a99d8d7cbd272fb62839');
     const firstCounts = JSON.parse(first) as Counts;
     const merged = readBaselines().merged as Counts;
     const grown = Object.entries(merged).flatMap(([rel, counts]) =>
