@@ -26,8 +26,13 @@ const routes = (overrides: Record<string, MockHandler> = {}): Record<string, Moc
 });
 const rowOf = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], username: string) =>
   wrapper.findAll('tbody tr').find((row) => row.text().includes(username))!;
+/** Each attempted cell's visible line ("+1 0:09"). */
 const cellTexts = (row: ReturnType<typeof rowOf>) =>
-  row.findAll('td span[aria-hidden="true"]').map((cell) => cell.text());
+  row
+    .findAll('td')
+    .map((cell) => cell.findAll('span[aria-hidden="true"]').map((part) => part.text()))
+    .filter((parts) => parts.length > 0)
+    .map((parts) => parts.join(' '));
 
 describe('contest ranking', () => {
   afterEach(() => vi.useRealTimers());
@@ -118,7 +123,7 @@ describe('contest ranking', () => {
     );
     const { wrapper } = await mountApp('/contests/r42/ranking');
     const row = rowOf(wrapper, 'user_07');
-    expect(cellTexts(row)).toEqual(['+10:09', '?2']);
+    expect(cellTexts(row)).toEqual(['+1 0:09', '?2']);
     expect(
       row
         .findAll('td')
@@ -330,6 +335,14 @@ describe('contest ranking', () => {
       await flushPromises();
       expect(router.currentRoute.value.query).toMatchObject({ virtual: '1', compare: '1' });
       expect(wrapper.find('[data-testid="virtual-overlay"]').exists()).toBe(true);
+      // The switch stays, so the viewer can leave the comparison.
+      const back = wrapper
+        .findAll('[role="group"] button')
+        .find((button) => button.text() === 'Chính thức');
+      await back!.trigger('click');
+      await flushPromises();
+      expect(router.currentRoute.value.query.compare).toBeUndefined();
+      expect(wrapper.find('[data-testid="virtual-overlay"]').exists()).toBe(false);
     });
 
     it('opens on the official board once no virtual run is live', async () => {
@@ -352,12 +365,13 @@ describe('contest ranking', () => {
         (button) => button.textContent?.trim() === name,
       );
 
-    it('tells contestants who they wait for and what "?n" means, without the publish button', async () => {
+    it('tells contestants in a chip that results are pending and what "?n" means, without the publish button', async () => {
       mockApi(endedRoutes(false, true));
       const { wrapper } = await mountApp('/contests/r41/ranking');
-      const notice = wrapper.get('[data-testid="freeze-notice"]');
-      expect(notice.text()).toContain('Kết quả cuối đang chờ ban tổ chức công bố');
-      expect(notice.text()).toContain('30 phút cuối');
+      const chip = wrapper.get('[data-testid="freeze-chip"]');
+      expect(chip.text()).toContain('Chờ công bố');
+      expect(chip.text()).toContain('30 phút cuối');
+      expect(wrapper.find('[data-testid="freeze-notice"]').exists()).toBe(false);
       expect(wrapper.find('[data-testid="publish-results"]').exists()).toBe(false);
     });
 
@@ -377,12 +391,17 @@ describe('contest ranking', () => {
       ]);
     });
 
-    it('keeps the running copy while the contest still runs', async () => {
+    it('says "Đóng băng" beside the clock while the contest still runs, and keeps the board in place', async () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
       vi.setSystemTime(new Date('2026-10-08T10:00:00Z'));
       mockApi(routes());
       const { wrapper } = await mountApp('/contests/r42/ranking');
-      expect(wrapper.get('[data-testid="freeze-notice"]').text()).toContain('Bảng đang đóng băng');
+      const actions = wrapper.get(
+        '[data-testid="contest-page-header"] [data-testid="page-header-actions"]',
+      );
+      expect(actions.get('[data-testid="freeze-chip"]').text()).toContain('Đóng băng');
+      expect(actions.find('[data-testid="contest-clock"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="freeze-notice"]').exists()).toBe(false);
     });
   });
 });

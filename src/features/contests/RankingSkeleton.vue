@@ -2,25 +2,38 @@
 import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { RANK_COLUMN_REM, statsWidthRem, tableMinWidthRem } from './ranking-columns';
+import {
+  DEFAULT_STATS_COLUMNS,
+  RANK_COLUMN_REM,
+  TIME_COLUMN_REM,
+  statsWidthRem,
+  tableMinWidthRem,
+} from './ranking-columns';
 
 const props = defineProps<{ problemCount: number; hasTimeColumn: boolean }>();
 const ROWS = 10;
-/** Same columns and minimum width as RankingTable (which scrolls sideways below it): rank, name (the rest), then the score and problem columns together. */
-const columns = computed(
-  () =>
-    `grid-template-columns: ${RANK_COLUMN_REM}rem minmax(0, 1fr) ${statsWidthRem(props.problemCount, props.hasTimeColumn)}rem; min-width: ${tableMinWidthRem(props.problemCount, props.hasTimeColumn)}rem`,
-);
+/** Same columns and minimum width as RankingTable's desktop table (which scrolls sideways below it): rank, name (the rest), then the score and problem columns together. */
+const columns = computed(() => {
+  const stats = {
+    ...DEFAULT_STATS_COLUMNS,
+    timeRem: props.hasTimeColumn ? TIME_COLUMN_REM : null,
+  };
+  return `grid-template-columns: ${RANK_COLUMN_REM}rem minmax(0, 1fr) ${statsWidthRem(props.problemCount, stats)}rem; min-width: ${tableMinWidthRem(props.problemCount, stats)}rem`;
+});
 </script>
 
 <template>
   <Card as="div" class="overflow-hidden">
-    <p aria-hidden="true" class="px-5 pt-3 text-meta md:hidden">
-      <SkeletonBlock text class="w-48" />
-    </p>
+    <div
+      data-skeleton-region="toolbar"
+      class="flex items-center gap-2 border-b border-line px-3 py-2"
+    >
+      <SkeletonBlock class="h-(--qh-control) w-48" />
+      <SkeletonBlock class="ml-auto h-(--qh-control-sm) w-24" />
+    </div>
     <div
       data-skeleton-region="table-header"
-      class="grid items-center py-4 text-meta"
+      class="grid items-center py-2.5 text-meta"
       :style="columns"
     >
       <span class="block px-5"><SkeletonBlock text class="w-8" /></span>
@@ -31,7 +44,7 @@ const columns = computed(
       v-for="row in ROWS"
       :key="row"
       data-skeleton-region="row"
-      class="grid items-center border-t border-line py-2.5 font-mono text-sm"
+      class="grid h-(--qh-row-dense) items-center border-t border-line font-mono text-sm"
       :style="columns"
     >
       <span class="block px-5"><SkeletonBlock text class="w-8" /></span>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import PageHeader from '@/components/ui/PageHeader.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { LocateFixed } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
@@ -10,10 +9,9 @@ import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
-import { rankingSummary } from '../ranking-summary';
 import { useSessionStore } from '@/stores/session.store';
 import ContestNotFound from '../ContestNotFound.vue';
-import ContestTabs from '../ContestTabs.vue';
+import ContestHeader from '../bar/ContestHeader.vue';
 import { useContestQuery } from '../contests.queries';
 import ReplayEventFeed from './ReplayEventFeed.vue';
 import ReplayPlayerBar from './ReplayPlayerBar.vue';
@@ -58,15 +56,6 @@ const myRowId = computed(
     board.value?.rows.find((row) => row.kind === 'real' && row.userId === viewerId.value)?.id ??
     null,
 );
-const summary = computed(() =>
-  contest.value
-    ? rankingSummary(
-        contest.value.formatName,
-        index.value?.problems.length ?? contest.value.problems?.length ?? 0,
-        contest.value.userCount,
-      )
-    : '',
-);
 /** Phase changes only: the replay became ready after building, or playback reached the end. */
 const announcement = computed(() => {
   if (state.value !== 'ready') return '';
@@ -85,22 +74,12 @@ const goToMyRow = () => myRowId.value && table.value?.focusRow(myRowId.value);
     <ContestNotFound v-if="isMissing" />
     <QueryState v-else :loading="contestPending" :error="contestError" @retry="refetchContest()">
       <template #skeleton>
-        <SkeletonBlock data-skeleton-region="nav" pill class="h-[52px] w-72 max-w-full" />
-        <div data-skeleton-region="title">
-          <p class="text-muted"><SkeletonBlock text class="w-56" /></p>
-          <div class="mt-1 page-title">
-            <SkeletonBlock text class="w-80 max-w-full" />
-          </div>
+        <div data-skeleton-region="title" class="page-title">
+          <SkeletonBlock text class="w-80 max-w-full" />
         </div>
+        <SkeletonBlock data-skeleton-region="nav" class="h-(--qh-control-sm) w-96 max-w-full" />
       </template>
-      <template v-if="contest">
-        <ContestTabs :contest-key="key" :phase="contest.phase" />
-        <PageHeader :title="contest.name">
-          <template #above>
-            <p class="text-muted">{{ summary }}</p>
-          </template>
-        </PageHeader>
-      </template>
+      <ContestHeader v-if="contest" :contest-key="key" :contest="contest" />
     </QueryState>
     <p role="status" data-testid="replay-announcement" class="sr-only">{{ announcement }}</p>
     <template v-if="contest">

@@ -19,9 +19,8 @@ import {
   seenAnnouncementId,
 } from './announcement-seen';
 import ContestAnnouncementComposer from './ContestAnnouncementComposer.vue';
-import ContestCompactHeader from './ContestCompactHeader.vue';
 import ContestNotFound from './ContestNotFound.vue';
-import ContestTabs from './ContestTabs.vue';
+import ContestHeader from './bar/ContestHeader.vue';
 import { useContestAnnouncementsQuery, useContestQuery } from './contests.queries';
 import { isAnnouncementStreamPaused } from './use-announcement-feed';
 
@@ -75,8 +74,7 @@ const goTo = (next: number) =>
   <div class="page-column">
     <ContestNotFound v-if="isMissing" />
     <template v-else>
-      <ContestTabs :contest-key="key" :phase="contest?.phase" />
-      <ContestCompactHeader v-if="contest" :contest="contest" />
+      <ContestHeader :contest-key="key" :contest="contest" />
       <ContestAnnouncementComposer v-if="contest?.viewer.canEdit" :contest="contest" />
       <div v-if="isLive" class="flex justify-end">
         <Chip tone="success">{{ $t('contests.announcements.live') }}</Chip>

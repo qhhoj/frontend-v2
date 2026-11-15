@@ -14,6 +14,8 @@ const props = defineProps<{
   withCodeNeeded?: boolean;
   /** Leave the restricting-organization links out: the caller shows them elsewhere. */
   hideOrganizations?: boolean;
+  /** Only the organizations and tags: the contest header already shows the format and access chips. */
+  onlyTags?: boolean;
 }>();
 /** Read from the cache only: the list and the contest header fetch the catalogue; elsewhere tags stay neutral. */
 const { data: catalogue } = useContestTagsCache();
@@ -22,20 +24,24 @@ const tagChips = computed(() => {
   return props.contest.tags.map((slug) => tagChipOf(slug, bySlug));
 });
 /** The restricting organizations lead the tags; the plain "organization only" chip stands in where they are not shown. */
-const showOrganizations = computed(() => props.withTags && props.contest.organizations.length > 0);
+const showOrganizations = computed(
+  () => (props.withTags || props.onlyTags) && props.contest.organizations.length > 0,
+);
 </script>
 
 <template>
-  <Chip>{{ formatLabel(contest.formatName) }}</Chip>
-  <Chip v-if="contest.isRated" tone="accent" :icon="TrendingUp">{{ $t('contests.rated') }}</Chip>
-  <Chip v-if="withCodeNeeded && contest.requiresAccessCode" :icon="Lock">{{
-    $t('contests.list.codeNeeded')
-  }}</Chip>
-  <Chip v-if="contest.isPrivate">{{ $t('contests.private') }}</Chip>
-  <Chip v-else-if="contest.isOrganizationPrivate && !showOrganizations">{{
-    $t('contests.organizationPrivate')
-  }}</Chip>
-  <template v-if="withTags">
+  <template v-if="!onlyTags">
+    <Chip>{{ formatLabel(contest.formatName) }}</Chip>
+    <Chip v-if="contest.isRated" tone="accent" :icon="TrendingUp">{{ $t('contests.rated') }}</Chip>
+    <Chip v-if="withCodeNeeded && contest.requiresAccessCode" :icon="Lock">{{
+      $t('contests.list.codeNeeded')
+    }}</Chip>
+    <Chip v-if="contest.isPrivate">{{ $t('contests.private') }}</Chip>
+    <Chip v-else-if="contest.isOrganizationPrivate && !showOrganizations">{{
+      $t('contests.organizationPrivate')
+    }}</Chip>
+  </template>
+  <template v-if="withTags || onlyTags">
     <ContestOrganizationChips v-if="showOrganizations && !hideOrganizations" :contest="contest" />
     <Chip
       v-for="chip in tagChips"

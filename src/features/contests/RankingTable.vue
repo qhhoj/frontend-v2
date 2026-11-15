@@ -2,33 +2,33 @@
 import Chip from '@/components/ui/Chip.vue';
 import UserLink from '@/components/UserLink.vue';
 import RankColumnHeader from '@/components/RankColumnHeader.vue';
-import { Star } from 'lucide-vue-next';
+import EmptyState from '@/components/EmptyState.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { computed, ref } from 'vue';
 import { focusTableRow } from '@/lib/focus-table-row';
 import { medalClass } from '@/lib/medal';
+import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useMotionAllowed } from '@/lib/use-motion-allowed';
 import type { Ranking, RankingProblem, RankingRow } from '@/api/types/contests';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { deltaToneClass, formatDelta } from '@/lib/rating-delta';
-import {
-  formatCumtime,
-  isPenaltyFormat,
-  rankingCell,
-  showsCumtime,
-  totalScoreText,
-} from '@/lib/ranking-cells';
+import { isPenaltyFormat, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import RankingCell from './RankingCell.vue';
+import RankingLegend from './RankingLegend.vue';
+import RankingList from './RankingList.vue';
 import RankingProblemHeader from './RankingProblemHeader.vue';
 import {
-  PROBLEM_COLUMN_REM,
-  phoneMinWidthRem,
   RANK_COLUMN_REM,
   RATING_COLUMN_REM,
-  SCORE_COLUMN_REM,
-  TIME_COLUMN_REM,
+  problemColumnRem,
+  scoreColumnRem,
   tableMinWidthRem,
+  timeColumnRem,
 } from './ranking-columns';
+import type { StatsColumns } from './ranking-columns';
+import { rowViewOf } from './ranking-row-view';
+import type { RowView } from './ranking-row-view';
 
 const props = defineProps<{
   ranking: Ranking;
@@ -39,10 +39,13 @@ const props = defineProps<{
   contestKey?: string;
   /** The viewer may only see own submissions (backend narrows the list), so only their own row links. */
   ownSubmissionsOnly?: boolean;
+  /** Why cells show "?" while the board is frozen: a line in "Chú giải". */
+  freezeNote?: string;
 }>();
+defineSlots<{ tools?: () => unknown }>();
 /** Rank and name stay while the problem columns scroll (the rank column is `RANK_COLUMN_REM` = 5 rem = `left-20`). */
 const RANK_STICKY = 'sticky left-0 z-10 bg-surface-solid';
-/** Name sticks next to the rank at every width; below `sm` the score is printed under it and the score column is hidden. */
+/** Name sticks next to the rank while the problem columns scroll. */
 const NAME_STICKY = 'sticky left-20 z-10 bg-surface-solid';
 /** The viewer's row keeps its tint over the opaque sticky cells. */
 const stickyBackground = (row: RankingRow) =>
@@ -55,12 +58,6 @@ const focusRow = (participationId: string) =>
   focusTableRow(root.value, participationId, isMotionAllowed.value);
 defineExpose({ focusRow });
 const hasVirtualRows = computed(() => props.rows.some((row) => row.virtual > 0));
-const cellsOf = (row: RankingRow) =>
-  props.ranking.problems.map((problem) => ({
-    problemId: problem.problemId,
-    to: submissionsLink(row, problem),
-    view: rankingCell(row.cells[problem.problemId], problem, row.participationId, props.context),
-  }));
 /** Contest submissions of one user (and problem); undefined where the viewer may not see them. */
 const submissionsLink = (row: RankingRow, problem?: RankingProblem) => {
   if (!props.contestKey) return undefined;
@@ -71,37 +68,46 @@ const submissionsLink = (row: RankingRow, problem?: RankingProblem) => {
     query: { user: row.user.username, problem: problem?.code },
   };
 };
-const LEGEND = [
-  'ranking.legend.solved',
-  'ranking.legend.failed',
-  'ranking.legend.pending',
-] as const;
-const POINTS_LEGEND = [
-  'ranking.legend.fullPoints',
-  'ranking.legend.partialPoints',
-  'ranking.legend.zeroPoints',
-  'ranking.legend.notAttempted',
-] as const;
-/** Points boards put the cumulative time under the score; penalty boards keep Score and Penalty. */
+/** Below `sm` the board is a list in the screen's width; only one of the two is rendered, so 600 rows are not drawn twice. */
+const isCompact = useMediaQuery(COMPACT_LIST_QUERY);
+/** Points boards print the cumulative time beside the score; penalty boards keep Score and Penalty. */
 const hasCombinedScore = computed(
   () => !penalty.value && props.context.showsTime && showsCumtime(props.context.formatName),
 );
 const hasTimeColumn = computed(() => penalty.value && showsCumtime(props.context.formatName));
 /** Rated contests carry each row's rating change once the ratings are applied. */
 const hasRatingColumn = computed(() => props.ranking.rows.some((row) => row.ratingChange));
-const ratingRem = computed(() => (hasRatingColumn.value ? RATING_COLUMN_REM : 0));
-/** Table min-widths as CSS variables: the phone one has no score column and a capped name column. */
-const widthVars = computed(() => ({
-  '--board-min': `${tableMinWidthRem(props.ranking.problems.length, hasTimeColumn.value) + ratingRem.value}rem`,
-  '--board-min-phone': `${phoneMinWidthRem(props.ranking.problems.length) + ratingRem.value}rem`,
-}));
-/** The phone's line under the name: the score, and the penalty where the board has its own penalty column. */
-const phoneScoreText = (row: RankingRow) => {
-  if (row.isDisqualified) return '—';
-  const score = totalScoreText(row.score, props.ranking.problems, props.context);
-  if (!hasTimeColumn.value) return score;
-  return `${score} · ${formatCumtime(props.context.formatName, row.cumtime, props.context.locale)}`;
-};
+/** Every row's printed texts, built once per board read for all rows, so a search does not change the columns. */
+const rowViews = computed(
+  () =>
+    new Map(
+      props.ranking.rows.map((row) => [
+        row.participationId,
+        rowViewOf(row, props.ranking.problems, props.context, submissionsLink),
+      ]),
+    ),
+);
+const viewOf = (row: RankingRow): RowView =>
+  rowViews.value.get(row.participationId) ??
+  rowViewOf(row, props.ranking.problems, props.context, submissionsLink);
+/** Each column as wide as the widest text the board prints in it, so nothing is cut or drawn over the next one. */
+const columns = computed<StatsColumns>(() => {
+  const views = [...rowViews.value.values()];
+  return {
+    scoreRem: scoreColumnRem(
+      views.map((view) => ({
+        total: view.total,
+        time: hasCombinedScore.value ? view.time : undefined,
+      })),
+    ),
+    timeRem: hasTimeColumn.value ? timeColumnRem(views.map((view) => view.time)) : null,
+    ratingRem: hasRatingColumn.value ? RATING_COLUMN_REM : null,
+    problemRem: problemColumnRem(views.flatMap((view) => view.cells.map((cell) => cell.view))),
+  };
+});
+const minWidth = computed(
+  () => `${tableMinWidthRem(props.ranking.problems.length, columns.value)}rem`,
+);
 const scoreHeaderKey = computed(() =>
   hasCombinedScore.value ? 'ranking.columns.scoreTime' : 'ranking.columns.score',
 );
@@ -109,25 +115,51 @@ const scoreHeaderKey = computed(() =>
 
 <template>
   <div ref="root" class="contents">
-    <ScrollRegion :label="$t('ranking.scrollRegion')" :hint="$t('ranking.scrollHint')">
-      <table
-        class="w-full min-w-(--board-min-phone) table-fixed border-collapse sm:min-w-(--board-min)"
-        :style="widthVars"
-      >
+    <div
+      data-testid="ranking-toolbar"
+      class="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2"
+    >
+      <slot name="tools" />
+      <div class="ml-auto">
+        <RankingLegend
+          :is-penalty="penalty"
+          :shows-time="context.showsTime"
+          :has-virtual-rows="hasVirtualRows"
+          :freeze-note="freezeNote"
+        />
+      </div>
+    </div>
+    <EmptyState v-if="!ranking.rows.length">
+      {{ $t('ranking.empty') }}
+      <template v-if="contestKey" #action>
+        <AppButton tone="secondary" :to="{ name: 'contest', params: { key: contestKey } }">
+          {{ $t('ranking.emptyAction') }}
+        </AppButton>
+      </template>
+    </EmptyState>
+    <RankingList
+      v-else-if="isCompact"
+      :ranking="ranking"
+      :rows="rows"
+      :view-of="viewOf"
+      :viewer-id="viewerId"
+      :has-time-column="hasTimeColumn"
+      :has-combined-score="hasCombinedScore"
+      :has-rating-column="hasRatingColumn"
+      :link-of="submissionsLink"
+    />
+    <ScrollRegion v-else :label="$t('ranking.scrollRegion')" :hint="$t('ranking.scrollHint')">
+      <table class="w-full table-fixed border-collapse" :style="{ minWidth }">
         <colgroup>
           <col :style="{ width: `${RANK_COLUMN_REM}rem` }" />
           <col />
-          <col class="max-sm:hidden" :style="{ width: `${SCORE_COLUMN_REM}rem` }" />
-          <col
-            v-if="hasTimeColumn"
-            class="max-sm:hidden"
-            :style="{ width: `${TIME_COLUMN_REM}rem` }"
-          />
-          <col v-if="hasRatingColumn" :style="{ width: `${RATING_COLUMN_REM}rem` }" />
+          <col :style="{ width: `${columns.scoreRem}rem` }" />
+          <col v-if="columns.timeRem" :style="{ width: `${columns.timeRem}rem` }" />
+          <col v-if="columns.ratingRem" :style="{ width: `${columns.ratingRem}rem` }" />
           <col
             v-for="problem in ranking.problems"
             :key="problem.problemId"
-            :style="{ width: `${PROBLEM_COLUMN_REM}rem` }"
+            :style="{ width: `${columns.problemRem}rem` }"
           />
         </colgroup>
         <caption class="sr-only">
@@ -137,26 +169,26 @@ const scoreHeaderKey = computed(() =>
         </caption>
         <thead>
           <tr class="text-center text-meta text-muted">
-            <th scope="col" :class="[RANK_STICKY, 'w-14 px-3 py-4 text-right font-medium']">
+            <th scope="col" :class="[RANK_STICKY, 'w-14 px-3 py-2.5 text-right font-medium']">
               <RankColumnHeader :label="$t('ranking.columns.rank')" />
             </th>
-            <th scope="col" :class="[NAME_STICKY, 'px-2.5 py-4 text-left font-medium']">
+            <th scope="col" :class="[NAME_STICKY, 'px-2.5 py-2.5 text-left font-medium']">
               {{ $t('ranking.columns.user') }}
             </th>
-            <th scope="col" class="px-2.5 py-4 font-medium max-sm:hidden">
+            <th scope="col" class="px-2.5 py-2.5 font-medium">
               {{ $t(scoreHeaderKey) }}
             </th>
-            <th v-if="hasTimeColumn" scope="col" class="px-2.5 py-4 font-medium max-sm:hidden">
+            <th v-if="hasTimeColumn" scope="col" class="px-2.5 py-2.5 font-medium">
               {{ $t('ranking.columns.penalty') }}
             </th>
-            <th v-if="hasRatingColumn" scope="col" class="px-2.5 py-4 font-medium">
+            <th v-if="hasRatingColumn" scope="col" class="px-2.5 py-2.5 font-medium">
               {{ $t('ranking.columns.ratingChange') }}
             </th>
             <th
               v-for="problem in ranking.problems"
               :key="problem.problemId"
               scope="col"
-              class="px-1.5 py-4 font-bold text-content"
+              class="px-1.5 py-2.5 font-bold text-content"
             >
               <RankingProblemHeader :problem="problem" :contest-key="contestKey" />
             </th>
@@ -171,7 +203,7 @@ const scoreHeaderKey = computed(() =>
             :class="{ 'bg-surface-hover': row.user.id === viewerId }"
           >
             <td
-              class="w-14 px-3 py-2.5 text-right"
+              class="h-(--qh-row-dense) w-14 px-3 py-0 text-right"
               :class="[
                 RANK_STICKY,
                 stickyBackground(row),
@@ -183,14 +215,15 @@ const scoreHeaderKey = computed(() =>
             <th
               scope="row"
               tabindex="-1"
-              class="overflow-hidden px-2.5 py-2.5 text-left font-body"
+              class="overflow-hidden px-2.5 py-0 text-left font-body"
               :class="[NAME_STICKY, stickyBackground(row)]"
             >
-              <span class="flex items-center gap-2">
+              <span class="flex items-center gap-2 whitespace-nowrap">
                 <UserLink
                   :username="row.user.username"
                   :rating="row.user.rating"
                   :to="submissionsLink(row)"
+                  class="min-w-0 truncate"
                 />
                 <Chip v-if="row.virtual > 0">{{ $t('ranking.virtual') }}</Chip>
                 <Chip v-if="row.user.id === viewerId" tone="accent">{{ $t('common.you') }}</Chip>
@@ -198,25 +231,20 @@ const scoreHeaderKey = computed(() =>
                   $t('ranking.disqualified')
                 }}</Chip>
               </span>
-              <span class="mt-0.5 block font-mono text-sm font-bold tabular-nums sm:hidden">{{
-                phoneScoreText(row)
-              }}</span>
             </th>
-            <td class="font-bold max-sm:hidden">
-              <template v-if="row.isDisqualified">—</template>
-              <template v-else>{{ totalScoreText(row.score, ranking.problems, context) }}</template>
+            <td class="overflow-hidden px-1.5 whitespace-nowrap">
+              <span class="font-bold">
+                <template v-if="row.isDisqualified">—</template>
+                <template v-else>{{ viewOf(row).total }}</template>
+              </span>
               <small
                 v-if="hasCombinedScore && !row.isDisqualified"
-                class="block text-tiny font-medium text-muted"
-                >{{ formatCumtime(context.formatName, row.cumtime, context.locale) }}</small
+                class="ml-1 text-tiny font-medium text-muted"
+                >{{ viewOf(row).time }}</small
               >
             </td>
-            <td v-if="hasTimeColumn" class="max-sm:hidden">
-              {{
-                row.isDisqualified
-                  ? '—'
-                  : formatCumtime(context.formatName, row.cumtime, context.locale)
-              }}
+            <td v-if="hasTimeColumn" class="overflow-hidden whitespace-nowrap">
+              {{ row.isDisqualified ? '—' : viewOf(row).time }}
             </td>
             <td
               v-if="hasRatingColumn"
@@ -233,7 +261,7 @@ const scoreHeaderKey = computed(() =>
               >
             </td>
             <RankingCell
-              v-for="cell in cellsOf(row)"
+              v-for="cell in viewOf(row).cells"
               :key="cell.problemId"
               :view="cell.view"
               :to="cell.to"
@@ -250,34 +278,5 @@ const scoreHeaderKey = computed(() =>
     >
       {{ $t('ranking.noMatch') }}
     </p>
-    <ul
-      v-if="penalty"
-      class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-meta text-muted"
-    >
-      <li class="flex items-center gap-1.5">
-        <span
-          data-testid="first-solve-swatch"
-          class="inline-flex size-5 items-center justify-center rounded-cell bg-first-solve text-first-solve-text"
-          ><Star class="size-3"
-        /></span>
-        {{ $t('ranking.legend.firstSolve') }}
-      </li>
-      <li v-for="key in LEGEND" :key="key">{{ $t(key) }}</li>
-      <li v-if="hasVirtualRows">{{ $t('ranking.virtualLegend') }}</li>
-    </ul>
-    <ul
-      v-else
-      class="flex flex-wrap gap-x-4.5 gap-y-2 border-t border-line px-5 py-3.5 text-meta text-muted"
-    >
-      <li v-if="context.showsTime" class="flex items-center gap-1.5">
-        <span
-          class="inline-flex size-5 items-center justify-center rounded-cell bg-first-solve text-first-solve-text"
-          ><Star class="size-3" aria-hidden="true"
-        /></span>
-        {{ $t('ranking.legend.firstPoints') }}
-      </li>
-      <li v-for="key in POINTS_LEGEND" :key="key">{{ $t(key) }}</li>
-      <li v-if="hasVirtualRows">{{ $t('ranking.virtualLegend') }}</li>
-    </ul>
   </div>
 </template>

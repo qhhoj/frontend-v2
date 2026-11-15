@@ -10,9 +10,8 @@ import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
-import ContestCompactHeader from './ContestCompactHeader.vue';
 import ContestNotFound from './ContestNotFound.vue';
-import ContestTabs from './ContestTabs.vue';
+import ContestHeader from './bar/ContestHeader.vue';
 import { useContestQuery, useContestStatsQuery } from './contests.queries';
 import LanguageStatsTable from './LanguageStatsTable.vue';
 import ProblemResultsTable from './ProblemResultsTable.vue';
@@ -49,8 +48,7 @@ const tiles = computed(() =>
   <div class="page-column">
     <ContestNotFound v-if="isMissing" />
     <template v-else>
-      <ContestTabs :contest-key="key" :phase="contest?.phase" />
-      <ContestCompactHeader v-if="contest" :contest="contest" />
+      <ContestHeader :contest-key="key" :contest="contest" />
       <Card v-if="isClosed" as="div" class="flex flex-col items-center gap-2 px-6 py-8 text-center">
         <BitLoop kind="security" :label="$t('contests.stats.closedTitle')" class="[--bit-px:4px]" />
         <strong class="block text-content">{{ $t('contests.stats.closedTitle') }}</strong>

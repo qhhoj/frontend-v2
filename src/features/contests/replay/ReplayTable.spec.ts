@@ -60,18 +60,20 @@ describe('ReplayTable', () => {
       wrapper.findAll('tbody tr').find((row) => row.text().includes(username))!;
     const cellsOf = (username: string) =>
       rowOf(username)
-        .findAll('td span[aria-hidden="true"]')
-        .map((cell) => cell.text());
+        .findAll('td')
+        .map((cell) => cell.findAll('span[aria-hidden="true"]').map((part) => part.text()))
+        .filter((parts) => parts.length > 0)
+        .map((parts) => parts.join(' '));
     const starsOf = (username: string) => rowOf(username).findAll('td svg').length;
     const rankOf = (username: string) => rowOf(username).get('td').text();
-    expect([cellsOf('user_07'), starsOf('user_07')]).toEqual([['+0:09'], 1]);
+    expect([cellsOf('user_07'), starsOf('user_07')]).toEqual([['+ 0:09'], 1]);
     expect(rankOf('user_03')).toBe('3');
     await wrapper.setProps({ board: boardAt(index, REPLAY_END, ICPC) } as never);
-    expect([cellsOf('user_07'), starsOf('user_07')]).toEqual([['+0:09', '+0:31'], 2]);
-    expect(cellsOf('user_12')).toEqual(['+10:12']);
+    expect([cellsOf('user_07'), starsOf('user_07')]).toEqual([['+ 0:09', '+ 0:31'], 2]);
+    expect(cellsOf('user_12')).toEqual(['+1 0:12']);
     expect(rankOf('user_03')).toBe('5');
     await wrapper.setProps({ board: boardAt(index, 600, ICPC) } as never);
-    expect([cellsOf('user_07'), starsOf('user_07')]).toEqual([['+0:09'], 1]);
+    expect([cellsOf('user_07'), starsOf('user_07')]).toEqual([['+ 0:09'], 1]);
     expect(cellsOf('user_12')).toEqual(['−1']);
   });
 

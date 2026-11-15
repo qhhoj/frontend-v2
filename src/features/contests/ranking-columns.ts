@@ -1,25 +1,106 @@
+import type { RankingCellView } from '@/lib/ranking-cells';
+
 /**
  * Column widths of the ranking board, in rem. The table uses a fixed layout, so a column keeps its width whatever
  * rows, names or cells arrive; the name column takes the rest. The loading skeleton uses the same numbers.
+ * The score, penalty and problem columns grow to the widest text the board prints (a 30-day contest's "+12 12 ng 17 g"),
+ * so no text is cut and none is drawn over the next column.
  */
 export const RANK_COLUMN_REM = 5;
-export const SCORE_COLUMN_REM = 7;
+/** The narrowest score column: a points total and its time ("1.106,3 62:55"). */
+export const SCORE_COLUMN_REM = 8;
 export const TIME_COLUMN_REM = 7;
+/** The narrowest problem column: a penalty cell ("+1 1:32", "−3", "?2") with room for the header. */
 export const PROBLEM_COLUMN_REM = 6;
 /** "+42 → 1843": shown once the contest's ratings are applied. */
 export const RATING_COLUMN_REM = 8;
 /** Narrowest the name column gets before the board scrolls sideways. */
 export const NAME_COLUMN_MIN_REM = 14;
 
+/** The board's numbers are IBM Plex Mono: every character is 0.6 em wide, so a text's width follows from its length. */
+const MONO_EM = 0.6;
+const ROOT_PX = 16;
+/** `text-sm` (cells, scores) and `text-tiny` (times, phone mini cells). */
+const TEXT_PX = 14;
+const TINY_PX = 11;
+const textRem = (text: string, fontPx: number) => (text.length * MONO_EM * fontPx) / ROOT_PX;
+/** A 4 px gap between parts, and 4 px spare so a hover ring or a rounding never clips. */
+const GAP_REM = 0.25;
+const SPARE_REM = 0.25;
+/** Widths move in half-rem steps, so a poll that adds one character rarely moves the board. */
+const roundUp = (rem: number) => Math.ceil(rem * 2) / 2;
+
+/** The cell's padding (td 2 px and box 4 px each side), its star, its text and its time on one line. */
+const CELL_PADDING_REM = 0.75;
+const STAR_REM = 0.75 + GAP_REM;
+const cellRem = (view: RankingCellView) =>
+  CELL_PADDING_REM +
+  (view.kind === 'first-solve' ? STAR_REM : 0) +
+  textRem(view.text, TEXT_PX) +
+  (view.time ? GAP_REM + textRem(view.time, TINY_PX) : 0) +
+  SPARE_REM;
+
+/** One width for every problem column: the widest cell of the board. */
+export const problemColumnRem = (views: Iterable<RankingCellView>) => {
+  let widest = PROBLEM_COLUMN_REM;
+  for (const view of views) widest = Math.max(widest, cellRem(view));
+  return roundUp(widest);
+};
+
+/** The score cell's padding (6 px each side), the total and the time beside it on points boards. */
+const SCORE_PADDING_REM = 0.75;
+export const scoreColumnRem = (scores: Iterable<{ total: string; time?: string }>) => {
+  let widest = SCORE_COLUMN_REM;
+  for (const { total, time } of scores)
+    widest = Math.max(
+      widest,
+      SCORE_PADDING_REM +
+        textRem(total, TEXT_PX) +
+        (time ? GAP_REM + textRem(time, TINY_PX) : 0) +
+        SPARE_REM,
+    );
+  return roundUp(widest);
+};
+
+/** The penalty column: icpc minutes, or a vnoj total that turns into days and hours from 100 hours. */
+export const timeColumnRem = (times: Iterable<string>) => {
+  let widest = TIME_COLUMN_REM;
+  for (const time of times) widest = Math.max(widest, textRem(time, TEXT_PX) + 2 * SPARE_REM);
+  return roundUp(widest);
+};
+
+/** The phone list's mini cell: the problem's label and the cell's text ("A 100"), 2 px padding each side. */
+const MINI_PADDING_REM = 0.25;
+export const miniCellRem = (cells: Iterable<{ label: string; text: string }>) => {
+  let widest = 0;
+  for (const { label, text } of cells)
+    widest = Math.max(
+      widest,
+      MINI_PADDING_REM + textRem(text ? `${label} ${text}` : label, TINY_PX) + SPARE_REM,
+    );
+  return roundUp(widest);
+};
+
+/** The widths right of the name column; null where the board has no such column. */
+export interface StatsColumns {
+  scoreRem: number;
+  timeRem: number | null;
+  ratingRem: number | null;
+  problemRem: number;
+}
+export const DEFAULT_STATS_COLUMNS: StatsColumns = {
+  scoreRem: SCORE_COLUMN_REM,
+  timeRem: null,
+  ratingRem: null,
+  problemRem: PROBLEM_COLUMN_REM,
+};
+
 /** Width of everything right of the name column. */
-export const statsWidthRem = (problemCount: number, hasTimeColumn: boolean) =>
-  SCORE_COLUMN_REM + (hasTimeColumn ? TIME_COLUMN_REM : 0) + problemCount * PROBLEM_COLUMN_REM;
+export const statsWidthRem = (problemCount: number, columns: StatsColumns) =>
+  columns.scoreRem +
+  (columns.timeRem ?? 0) +
+  (columns.ratingRem ?? 0) +
+  problemCount * columns.problemRem;
 
-export const tableMinWidthRem = (problemCount: number, hasTimeColumn: boolean) =>
-  RANK_COLUMN_REM + NAME_COLUMN_MIN_REM + statsWidthRem(problemCount, hasTimeColumn);
-
-/** Below `sm` the score moves under the name and the name column is capped, so rank, name and score never scroll away. */
-export const NAME_COLUMN_PHONE_REM = 9;
-
-export const phoneMinWidthRem = (problemCount: number) =>
-  RANK_COLUMN_REM + NAME_COLUMN_PHONE_REM + problemCount * PROBLEM_COLUMN_REM;
+export const tableMinWidthRem = (problemCount: number, columns: StatsColumns) =>
+  RANK_COLUMN_REM + NAME_COLUMN_MIN_REM + statsWidthRem(problemCount, columns);

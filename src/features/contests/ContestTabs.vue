@@ -4,7 +4,8 @@ import { computed, toRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import type { ContestPhase } from '@/api/types/contests';
-import PillTabs, { type PillTab } from '@/components/PillTabs.vue';
+import Tabs from '@/components/ui/Tabs.vue';
+import type { TabItem } from '@/components/ui/Tabs.vue';
 import {
   contestEditTarget,
   type ContestEditScreen,
@@ -66,21 +67,22 @@ const isStreaming = computed(
     !streamed.isPending.value &&
     streamed.contest.value?.key !== props.contestKey,
 );
-const tabs = computed<PillTab[]>(() => {
-  const own = visibleTabs.value.map((tab) => ({
-    key: tab.name,
-    label: t(tab.labelKey),
-    to: { name: tab.name, params: { key: props.contestKey } },
-    isCurrent: tab.name === props.current,
-    badge:
-      tab.name === 'contest-announcements' && unread.value > 0
-        ? {
-            text: String(unread.value),
-            tone: 'accent' as const,
-            srLabel: t('contests.announcements.unread', { count: unread.value }, unread.value),
-          }
+const tabs = computed<TabItem[]>(() => {
+  const own = visibleTabs.value.map((tab) => {
+    const hasUnread = tab.name === 'contest-announcements' && unread.value > 0;
+    return {
+      key: tab.name,
+      label: t(tab.labelKey),
+      to: { name: tab.name, params: { key: props.contestKey } },
+      isCurrent: tab.name === props.current,
+      count: hasUnread ? String(unread.value) : undefined,
+      countLabel: hasUnread
+        ? t('contests.announcements.unread', { count: unread.value }, unread.value)
         : undefined,
-  }));
+      countTone: 'accent' as const,
+      countTestid: 'tab-badge',
+    };
+  });
   const balloons = {
     key: 'contest-balloons',
     label: t('balloons.tab'),
@@ -98,6 +100,6 @@ const tabs = computed<PillTab[]>(() => {
 </script>
 
 <template>
-  <PillTabs :tabs="tabs" :label="t('contests.tabs.label')" />
+  <Tabs :items="tabs" :label="t('contests.tabs.label')" variant="underline" overflow="scroll" />
   <AnnouncementLiveRegion :contest-key="contestKey" :is-streaming="isStreaming" />
 </template>
