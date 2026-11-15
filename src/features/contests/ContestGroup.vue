@@ -16,7 +16,13 @@ import ContestListSkeletons from './ContestListSkeletons.vue';
 import EndedContestTable from './EndedContestTable.vue';
 import RunningContestCard from './RunningContestCard.vue';
 import UpcomingContestRow from './UpcomingContestRow.vue';
-import { PHASE_PAGE_SIZE, groupQuery, toContestListLocation } from './use-contest-list-filters';
+import {
+  OVERVIEW_PAGE_SIZE,
+  PHASE_PAGE_SIZE,
+  groupQuery,
+  isPagedGroup,
+  toContestListLocation,
+} from './use-contest-list-filters';
 import type { ContestListFilters, ContestListRoute } from './use-contest-list-filters';
 
 const props = defineProps<{
@@ -38,6 +44,7 @@ const { data: list, isPending, error, refetch } = useContestListQuery(query);
 const contests = computed(() => list.value?.items ?? []);
 const total = computed(() => list.value?.meta.total ?? 0);
 const isSingleGroup = computed(() => props.filters.phase === props.phase);
+const isPaged = computed(() => isPagedGroup(props.filters, props.phase));
 const isFiltered = computed(() =>
   Boolean(props.filters.search.trim() || props.filters.isRatedOnly || props.filters.tag),
 );
@@ -54,21 +61,33 @@ const hasRunEnded = computed(() => shownContests.value.length < contests.value.l
 watch(hasRunEnded, (isNowEnded) => {
   if (isNowEnded) void refetch();
 });
-/** The overview shows "5 of 31" when the group lists fewer than it holds. */
+/** The overview shows "3 of 31" when the group lists fewer than it holds; a paged group shows its total. */
 const countText = computed(() =>
-  !isSingleGroup.value && total.value > contests.value.length
+  !isPaged.value && total.value > contests.value.length
     ? t('contests.list.shownOf', {
         shown: contests.value.length,
         total: formatNumber(total.value, locale.locale),
       })
     : formatNumber(total.value, locale.locale),
 );
-/** Each overview group says "Xem tất cả" (its own page of the list); the single group offers the way back. */
+/** Each overview group says "Xem tất cả" (its own page of the list); the single group offers the way back.
+ * The ended group pages in the overview, so there it has no such link. */
 const linkText = computed(() =>
   isSingleGroup.value ? t('contests.list.allGroups') : t('common.viewAll'),
 );
 /** An empty overview group shows no count and no link: there is nothing to see. */
+const hasLink = computed(() => hasItems.value && (isSingleGroup.value || props.phase !== 'ended'));
 const hasItems = computed(() => isSingleGroup.value || total.value > 0);
+/** An empty running or upcoming group in the overview takes no room: only the groups with contests show. */
+const isHidden = computed(
+  () =>
+    !isSingleGroup.value &&
+    props.phase !== 'ended' &&
+    !isFiltered.value &&
+    !isPending.value &&
+    !error.value &&
+    shownContests.value.length === 0,
+);
 /** "Only this group" from the overview, "all groups" back from it; the search and rated filter stay. */
 const toggleTarget = computed(() => ({
   ...listPage.value,
@@ -82,7 +101,7 @@ const headingId = computed(() => `contest-group-${props.phase}`);
 const countId = computed(() => `contest-group-${props.phase}-count`);
 /** A page past the last one comes back empty: say so, rather than that the phase has no contests. */
 const isPastLastPage = computed(
-  () => isSingleGroup.value && props.filters.page > 1 && contests.value.length === 0,
+  () => isPaged.value && props.filters.page > 1 && contests.value.length === 0,
 );
 const firstPageTarget = computed(() => ({
   ...listPage.value,
@@ -96,6 +115,7 @@ const clearTagTarget = computed(() => ({
 
 <template>
   <section
+    v-if="!isHidden"
     :aria-labelledby="headingId"
     :aria-describedby="hasItems ? countId : undefined"
     class="flex flex-col gap-4"
@@ -107,7 +127,7 @@ const clearTagTarget = computed(() => ({
         </h2>
         <Chip v-if="hasItems" :id="countId" size="md">{{ countText }}</Chip>
       </div>
-      <SeeAllLink v-if="hasItems" :to="toggleTarget"
+      <SeeAllLink v-if="hasLink" :to="toggleTarget"
         >{{ linkText
         }}<span class="sr-only">: {{ $t(`contests.phase.${phase}`) }}</span></SeeAllLink
       >
@@ -141,9 +161,9 @@ const clearTagTarget = computed(() => ({
         :is-organization-scoped="Boolean(organizationId)"
       />
       <SubmissionPager
-        v-if="isSingleGroup"
+        v-if="isPaged"
         :page="filters.page"
-        :page-size="PHASE_PAGE_SIZE"
+        :page-size="filters.phase === phase ? PHASE_PAGE_SIZE : OVERVIEW_PAGE_SIZE[phase]"
         :total="list?.meta.total"
         :item-count="contests.length"
         @update:page="(page) => emit('page', page)"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { serverNow } from '@/lib/server-clock';
 import { CARD_VARIANTS } from '@/components/ui/Card.variants';
 import type { ContestListItem } from '@/api/types/contests';
@@ -27,7 +28,7 @@ import {
 import { useSpanText } from './use-span-text';
 import ViewerBadge from './ViewerBadge.vue';
 
-defineProps<{
+const props = defineProps<{
   contests: ContestListItem[];
   /** The list is one organization's: its name is not repeated on every row, and editors get a pencil. */
   isOrganizationScoped?: boolean;
@@ -40,6 +41,8 @@ const contestTarget = (contest: ContestListItem) => ({
 });
 /** "Xem" only repeats the row's own link: the button stays for a call that says something else ("Quay lại kỳ thi"). */
 const hasOwnCall = (contest: ContestListItem) => callOf(contest).labelKey !== 'contests.list.view';
+/** The actions column is there only when a row has a button: otherwise it is an empty strip. */
+const hasActions = computed(() => props.contests.some((contest) => hasOwnCall(contest)));
 const spanText = useSpanText();
 /** Ended rows do not change with the clock, so each render reads it once. */
 const callOf = (contest: ContestListItem) => listCallToAction(contest, serverNow());
@@ -116,7 +119,7 @@ const compactFacts = (contest: ContestListItem) => {
           <th scope="col" class="font-semibold" :class="ENDED_CELL.participants">
             {{ $t('contests.list.columns.participants') }}
           </th>
-          <th scope="col" :class="ENDED_CELL.action">
+          <th v-if="hasActions" scope="col" :class="ENDED_CELL.action">
             <span class="sr-only">{{ $t('contests.list.columns.action') }}</span>
           </th>
         </tr>
@@ -161,7 +164,7 @@ const compactFacts = (contest: ContestListItem) => {
               })
             }}</span>
           </td>
-          <td :class="ENDED_CELL.action">
+          <td v-if="hasActions" :class="ENDED_CELL.action">
             <ContestCallLink
               v-if="hasOwnCall(contest)"
               :contest-key="contest.key"
