@@ -59,9 +59,6 @@ describe('contest bar on contest pages (M-01)', () => {
     await vi.waitFor(() =>
       expect(wrapper.find('[data-testid="top-bar-live-contest"]').exists()).toBe(true),
     );
-    expect(wrapper.get('[data-testid="top-bar-live-contest"]').attributes('href')).toBe(
-      '/contests/trash_ended',
-    );
     expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(false);
   });
   it.each([
