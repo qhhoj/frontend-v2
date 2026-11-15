@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref, watch } from 'vue';
+import type { DeepReadonly } from 'vue';
 import { translate } from '@/i18n';
 import ToastItem from './ToastItem.vue';
 import { dismissToast, holdToasts, releaseToasts, toasts } from './toasts';
@@ -60,7 +61,7 @@ function pileStyle(index: number) {
   };
 }
 
-function undo(toast: Toast) {
+function undo(toast: DeepReadonly<Toast>) {
   dismissToast(toast.id);
   toast.undo?.();
 }

@@ -24,7 +24,7 @@ import StatementNote from './StatementNote.vue';
 import SubmitOpenButton from './SubmitOpenButton.vue';
 import SubmitPane from './SubmitPane.vue';
 import SubmitSignInButton from './SubmitSignInButton.vue';
-import { useVerdictToastTracking } from '@/features/submissions/verdict-toast/use-verdict-toast-tracking';
+import { useVerdictToastTracking } from '@/features/submissions/verdict-toast/use-toast-tracking';
 import { hasNoStatement } from './statement-presence';
 import type { ProblemLayout } from './problem-layout';
 import { useScoreScale } from './use-contest-problem';

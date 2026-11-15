@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { CircleAlert, CircleCheck, Info, X } from 'lucide-vue-next';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import type { DeepReadonly } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 import { translate } from '@/i18n';
 import BitMascot from '@/components/BitMascot.vue';
 import { BIT_MOODS } from '@/mascot/bit-moods';
@@ -15,7 +17,9 @@ import type { Toast } from './toasts';
  * the link. On touch a horizontal swipe past SWIPE_DISMISS_PX closes it; a shorter one snaps back. It reports its height so the
  * stack can lay the cards out when it expands.
  */
-const props = defineProps<{ toast: Toast }>();
+const props = defineProps<{ toast: DeepReadonly<Toast> }>();
+/** The router takes a mutable location; the toast list is read-only. */
+const link = computed(() => props.toast.to as RouteLocationRaw | undefined);
 const emit = defineEmits<{ dismiss: []; undo: []; measure: [height: number] }>();
 
 const ICONS = { success: CircleCheck, danger: CircleAlert, info: Info } as const;
@@ -107,7 +111,7 @@ onBeforeUnmount(() => observer?.disconnect());
       class="bit-pop [--bit-px:2px]"
     />
     <p class="m-0 min-w-0 flex-1 py-1">
-      <StretchedLink v-if="props.toast.to" :to="props.toast.to" @click="emit('dismiss')">{{
+      <StretchedLink v-if="link" :to="link" @click="emit('dismiss')">{{
         props.toast.text
       }}</StretchedLink>
       <template v-else>{{ props.toast.text }}</template>
