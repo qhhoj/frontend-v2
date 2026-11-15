@@ -33,7 +33,7 @@ const props = defineProps<{
   /** A poll just changed the board and motion is allowed: numbers tick and rows move. */
   isTicking: boolean;
 }>();
-const MOVE_CLASS = 'transition-[translate] duration-(--qh-duration) ease-move';
+const MOVE_CLASS = 'transition-transform duration-(--qh-duration) ease-move';
 /** Above this many rows the rows jump instead of sliding (FLIP reads every row's box on every change). */
 const FLIP_MAX_ROWS = 100;
 const isMotionAllowed = useMotionAllowed();

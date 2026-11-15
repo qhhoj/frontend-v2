@@ -67,7 +67,7 @@ const isLive = useLiveBoard(
 );
 /** Numbers tick and rows move only when a poll changed the board and motion is allowed. */
 const isTicking = computed(() => isLive.value && isMotionAllowed.value);
-const MOVE_CLASS = 'transition-[translate] duration-(--qh-duration) ease-move';
+const MOVE_CLASS = 'transition-transform duration-(--qh-duration) ease-move';
 /** Above this many rows the rows jump instead of sliding (FLIP reads every row's box on every change). */
 const FLIP_MAX_ROWS = 100;
 /** The rows sit in a `TransitionGroup` whenever they may move: swapping it per poll would redraw every row and lose the change. */
