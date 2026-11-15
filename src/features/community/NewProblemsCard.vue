@@ -2,28 +2,25 @@
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import Card from '@/components/ui/Card.vue';
+import PageSection from '@/components/ui/PageSection.vue';
 import StretchedLink from '@/components/ui/StretchedLink.vue';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useHomeQuery } from './community.queries';
 
-/** The newest problems; `home` adds the code and date after each name (wide screens) and writes the points out; always one line per problem. */
-const props = withDefaults(
-  defineProps<{ limit: number; variant?: 'rail' | 'home'; embedded?: boolean }>(),
-  { variant: 'rail', embedded: false },
-);
+/** The home's newest problems: the code and date after each name (wide screens) and the points; always one line per problem. */
+const props = defineProps<{ limit: number }>();
 const locale = useLocaleStore();
 const { data: home, isPending, error, refetch } = useHomeQuery();
 const problems = computed(() => (home.value?.newProblems ?? []).slice(0, props.limit));
 </script>
 
 <template>
-  <Card
-    :variant="embedded ? 'plain' : 'glass'"
-    :padding="embedded ? undefined : 'sm'"
+  <PageSection
+    data-testid="new-problems"
     :title="$t('blog.newProblems')"
+    :see-all="{ to: { name: 'problems' }, label: $t('common.viewAll') }"
   >
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
@@ -45,10 +42,7 @@ const problems = computed(() => (home.value?.newProblems ?? []).slice(0, props.l
             class="min-w-0 truncate font-semibold"
             >{{ problem.name }}</StretchedLink
           >
-          <span
-            v-if="variant === 'home'"
-            class="ml-auto hidden shrink-0 text-caption text-muted sm:inline"
-          >
+          <span class="ml-auto hidden shrink-0 text-caption text-muted sm:inline">
             {{
               $t('blog.problemLine', {
                 code: problem.code,
@@ -57,14 +51,10 @@ const problems = computed(() => (home.value?.newProblems ?? []).slice(0, props.l
             }}
           </span>
           <span class="shrink-0 font-mono text-sm tabular-nums text-muted">
-            {{
-              variant === 'home'
-                ? $t('blog.problemPoints', { points: formatNumber(problem.points, locale.locale) })
-                : formatNumber(problem.points, locale.locale)
-            }}
+            {{ $t('blog.problemPoints', { points: formatNumber(problem.points, locale.locale) }) }}
           </span>
         </li>
       </ul>
     </QueryState>
-  </Card>
+  </PageSection>
 </template>

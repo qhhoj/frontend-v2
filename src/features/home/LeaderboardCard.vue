@@ -3,15 +3,14 @@ import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import UserName from '@/components/UserName.vue';
-import Card from '@/components/ui/Card.vue';
-import SeeAllLink from '@/components/ui/SeeAllLink.vue';
+import PageSection from '@/components/ui/PageSection.vue';
 import { useHomeQuery } from '@/features/community/community.queries';
 import { formatNumber } from '@/lib/format';
 import { medalClass } from '@/lib/medal';
 import { useLocaleStore } from '@/stores/locale.store';
 
 /**
- * The anonymous home's one leaderboard card: two short lists, the top performance points and the top contribution
+ * The anonymous home's last section: two short lists side by side (stacked on a phone), the top performance points and the top contribution
  * points, each with the first few users. The full lists are on the users page.
  */
 const ROWS = 3;
@@ -44,15 +43,16 @@ const lists = computed(() => [
 </script>
 
 <template>
-  <Card data-testid="leaderboard" padding="lg" :title="$t('home.anon.leaderboard')">
-    <template #actions>
-      <SeeAllLink :to="{ name: 'users' }">{{ $t('home.anon.allUsers') }}</SeeAllLink>
-    </template>
+  <PageSection
+    data-testid="leaderboard"
+    :title="$t('home.anon.leaderboard')"
+    :see-all="{ to: { name: 'users' }, label: $t('home.anon.allUsers') }"
+  >
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <SkeletonBlock v-for="row in 6" :key="row" pill class="mb-2 h-5 w-full" />
       </template>
-      <div class="flex flex-col gap-4">
+      <div class="grid gap-x-8 gap-y-(--space-stack) sm:grid-cols-2">
         <section v-for="list in lists" :key="list.key" :data-testid="`leaders-${list.key}`">
           <h3 class="mb-1.5 text-meta font-semibold text-muted">
             <RouterLink :to="list.to" class="hover:underline">{{ $t(list.title) }}</RouterLink>
@@ -80,5 +80,5 @@ const lists = computed(() => [
         </section>
       </div>
     </QueryState>
-  </Card>
+  </PageSection>
 </template>

@@ -40,28 +40,28 @@ const format = (value: number) => formatNumber(value, locale.locale);
     v-if="current"
     data-testid="live-contest"
     padding="sm"
-    class="flex flex-col gap-2 border-l-4 border-l-positive"
+    class="flex flex-wrap items-center gap-x-5 gap-y-2 border-l-4 border-l-positive"
   >
-    <p class="flex items-center gap-1.5 text-meta font-semibold text-positive">
-      <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-positive" />
-      {{ $t(statusKey, { run: current.participation.virtual }) }}
-    </p>
-    <h2 class="truncate text-title leading-5.5 font-semibold">{{ current.contest.name }}</h2>
-    <div class="flex flex-wrap items-baseline gap-x-5 gap-y-1">
-      <p>
-        <span class="text-meta text-muted">{{ $t('ranking.timeLeft') }}</span>
-        <CountdownTimer
-          :key="current.participation.endTime"
-          :until="current.participation.endTime"
-          class="ml-2 text-subtitle font-semibold"
-        />
+    <div class="min-w-0 flex-1 basis-56">
+      <p class="flex items-center gap-1.5 text-meta font-semibold text-positive">
+        <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-positive" />
+        {{ $t(statusKey, { run: current.participation.virtual }) }}
       </p>
-      <p v-if="standing" data-testid="live-standing" class="font-mono text-sm tabular-nums">
-        <template v-if="standing.rank !== null"
-          >{{ $t('rail.rank', { rank: format(standing.rank) }) }} · </template
-        >{{ $t('home.liveScore', { score: format(standing.score) }) }}
-      </p>
+      <h2 class="truncate text-title leading-5.5 font-semibold">{{ current.contest.name }}</h2>
     </div>
+    <p>
+      <span class="text-meta text-muted">{{ $t('ranking.timeLeft') }}</span>
+      <CountdownTimer
+        :key="current.participation.endTime"
+        :until="current.participation.endTime"
+        class="ml-2 text-subtitle font-semibold"
+      />
+    </p>
+    <p v-if="standing" data-testid="live-standing" class="font-mono text-sm tabular-nums">
+      <template v-if="standing.rank !== null"
+        >{{ $t('rail.rank', { rank: format(standing.rank) }) }} · </template
+      >{{ $t('home.liveScore', { score: format(standing.score) }) }}
+    </p>
     <div class="flex flex-wrap gap-2">
       <AppButton tone="primary" :to="{ name: 'contest', params: { key: current.contest.key } }">{{
         $t('home.liveEnter')
