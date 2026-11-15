@@ -28,7 +28,9 @@ const MAX_SHOWN = 2;
 const props = defineProps<{ narrow?: boolean; excludeKey?: string }>();
 const { data, isPending, error, refetch } = useRunningContestsQuery(MAX_SHOWN + 1);
 const contests = computed(() =>
-  (data.value?.items ?? []).filter((contest) => contest.key !== props.excludeKey).slice(0, MAX_SHOWN),
+  (data.value?.items ?? [])
+    .filter((contest) => contest.key !== props.excludeKey)
+    .slice(0, MAX_SHOWN),
 );
 const now = useNow(30_000);
 const locale = useLocaleStore();

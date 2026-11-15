@@ -42,7 +42,11 @@ const { current } = useCurrentContest();
         </div>
         <div class="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-4">
           <RatingHeroCard :username="session.user.username" class="order-3 lg:order-none" />
-          <RunningContestsCard narrow :exclude-key="current?.contest.key" class="order-4 lg:order-none" />
+          <RunningContestsCard
+            narrow
+            :exclude-key="current?.contest.key"
+            class="order-4 lg:order-none"
+          />
           <UpcomingContestsCard class="order-5 lg:order-none" />
           <TopPerformersCard class="order-7 lg:order-none" />
           <TopContributorsCard :limit="3" class="order-8 lg:order-none" />
