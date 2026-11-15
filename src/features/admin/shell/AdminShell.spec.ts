@@ -5,6 +5,8 @@ import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
 import { staffViewer } from '@/test/admin-routes';
 import { loginRoutes } from '@/test/auth-routes';
+import { editableProblem, problemEditorRoutes } from '@/test/admin-fixtures/problems';
+import { STAFF_ID } from '@/test/admin-routes';
 
 /** AdminShell loads lazily from AppShell: wait until its top bar is in the DOM. */
 const waitForAdminShell = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
@@ -16,6 +18,38 @@ const navLinks = (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper']) =>
   wrapper.findAll('[data-testid="admin-nav"] a').map((link) => link.text());
 
 describe('AdminShell', () => {
+  it('opens the dashboard with the problems the staff member had open, with their state and last tab', async () => {
+    localStorage.setItem(
+      `qhhoj.admin.recent.${STAFF_ID}`,
+      JSON.stringify([
+        {
+          path: '/admin/problems/aplusb/data',
+          titleKey: 'admin.shell.screens.problemData',
+          detail: 'aplusb',
+        },
+        {
+          path: '/admin/problems/aplusb/general',
+          titleKey: 'admin.shell.screens.problemGeneral',
+          detail: 'aplusb',
+        },
+      ]),
+    );
+    mockApi({
+      ...staffViewer(['judge.edit_own_problem']),
+      'GET /problems': page([]),
+      ...problemEditorRoutes(
+        editableProblem({ code: 'aplusb', name: 'A cộng B', isPublic: false }),
+      ),
+    });
+    const { wrapper } = await mountApp('/admin');
+    const rows = () => wrapper.findAll('[data-testid="admin-continue"] li');
+    await vi.waitFor(() => expect(rows()).toHaveLength(1));
+    expect(rows()[0]!.text()).toContain('A cộng B');
+    expect(rows()[0]!.text()).toContain('Bản nháp');
+    expect(rows()[0]!.find('a').attributes('href')).toBe('/admin/problems/aplusb/data');
+    localStorage.clear();
+  });
+
   it('greets the staff member and lists only the screens their permissions open', async () => {
     mockApi(staffViewer(['judge.add_problem']));
     const { wrapper } = await mountApp('/admin');

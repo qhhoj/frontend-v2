@@ -1,29 +1,20 @@
 <script setup lang="ts">
 import { History } from 'lucide-vue-next';
 import { computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { useSessionStore } from '@/stores/session.store';
-import { canUseAdmin } from '../../admin-access';
+import { recordOf } from './continue-records';
 import { shortcutsOf, useRecentScreens } from './recent-screens';
+import { useIsOpenable } from './use-openable';
 
-const router = useRouter();
-const session = useSessionStore();
 const { recent } = useRecentScreens();
+const isOpenable = useIsOpenable();
 /**
- * "Lối tắt": the pages this account opens most, from this browser's visits. A shortcut whose screen the viewer can no
- * longer open (permissions change) is left out, not offered as a dead end.
+ * "Lối tắt": the pages this account opens most, from this browser's visits, without the problems and contests (those are
+ * the rows of "Tiếp tục"). A shortcut whose screen the viewer can no longer open is left out.
  */
 const openable = computed(() =>
-  shortcutsOf(recent.value).filter((entry) => {
-    const target = router.resolve(entry.path);
-    return (
-      target.name !== 'admin-unknown' &&
-      canUseAdmin(session.user, {
-        permission: target.meta.permission ?? null,
-        capability: target.meta.capability,
-      })
-    );
-  }),
+  shortcutsOf(recent.value.filter((entry) => !recordOf(entry.path))).filter((entry) =>
+    isOpenable(entry.path),
+  ),
 );
 </script>
 
