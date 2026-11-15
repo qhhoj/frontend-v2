@@ -8,8 +8,8 @@ import type { ActivityLog } from '@/api/types/activity-admin';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
-import AdminChip from '../ui/AdminChip.vue';
-import type { ChipTone } from '../ui/AdminChip.vue';
+import Chip from '@/components/ui/Chip.vue';
+import type { ChipTone } from '@/components/ui/Chip.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
@@ -66,7 +66,7 @@ function openSummary(username: string) {
 
 /** Server errors and refusals stand out; the text (the code) carries the meaning. */
 const toneOf = (statusCode: number): ChipTone =>
-  statusCode >= 500 ? 'negative' : statusCode >= 400 ? 'caution' : 'neutral';
+  statusCode >= 500 ? 'danger' : statusCode >= 400 ? 'warning' : 'neutral';
 const goTo = (next: number) => (page.value = next);
 </script>
 
@@ -114,7 +114,7 @@ const goTo = (next: number) => (page.value = next);
       </div>
     </template>
     <template #cell-status="{ row }">
-      <AdminChip :tone="toneOf(row.statusCode)" class="font-mono">{{ row.statusCode }}</AdminChip>
+      <Chip :tone="toneOf(row.statusCode)" class="font-mono">{{ row.statusCode }}</Chip>
     </template>
     <template #footer>
       <span>{{ $t('admin.activity.table.page', { page }) }}</span>

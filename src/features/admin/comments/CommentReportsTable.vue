@@ -10,7 +10,7 @@ import AppButton from '@/components/ui/AppButton.vue';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { adminRouteName } from '../admin-screens';
-import AdminChip from '../ui/AdminChip.vue';
+import Chip from '@/components/ui/Chip.vue';
 import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
@@ -116,13 +116,13 @@ const rowName = (item: CommentReportQueueItem) =>
     <template #bulk><slot name="bulk" /></template>
     <template #cell-comment="{ row }"><CommentExcerpt :comment="row.comment" /></template>
     <template #cell-state="{ row }">
-      <AdminChip v-if="row.comment.deleted">{{ $t('admin.comments.chips.deleted') }}</AdminChip>
-      <AdminChip v-else-if="row.comment.hidden" tone="caution" :icon="EyeOff">
+      <Chip v-if="row.comment.deleted">{{ $t('admin.comments.chips.deleted') }}</Chip>
+      <Chip v-else-if="row.comment.hidden" tone="warning" :icon="EyeOff">
         {{ $t('admin.comments.chips.hidden') }}
-      </AdminChip>
-      <AdminChip v-else tone="positive" :icon="Eye">
+      </Chip>
+      <Chip v-else tone="success" :icon="Eye">
         {{ $t('admin.comments.chips.visible') }}
-      </AdminChip>
+      </Chip>
     </template>
     <template #cell-reports="{ row }">
       <ul class="m-0 flex max-w-48 min-w-0 list-none flex-col gap-1 p-0 py-2">
@@ -131,9 +131,9 @@ const rowName = (item: CommentReportQueueItem) =>
           :key="index"
           class="flex flex-wrap items-center gap-x-2 gap-y-1"
         >
-          <AdminChip :tone="report.status === 'open' ? 'negative' : 'neutral'">
+          <Chip :tone="report.status === 'open' ? 'danger' : 'neutral'">
             {{ $t(`comments.report.reason.${report.reason}`) }}
-          </AdminChip>
+          </Chip>
           <UserName
             v-if="report.reporter"
             :username="report.reporter.username"

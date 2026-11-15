@@ -6,7 +6,7 @@ import type { NumberedPageMeta } from '@/api/client';
 import type { AdminCommentItem } from '@/api/types/comments';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
-import AdminChip from '../ui/AdminChip.vue';
+import Chip from '@/components/ui/Chip.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
@@ -81,15 +81,15 @@ const menuItems = (item: AdminCommentItem) => [
       </CommentExcerpt>
     </template>
     <template #cell-state="{ row }">
-      <AdminChip v-if="row.comment.deleted" tone="neutral">
+      <Chip v-if="row.comment.deleted" tone="neutral">
         {{ $t('admin.comments.chips.deleted') }}
-      </AdminChip>
-      <AdminChip v-else-if="row.comment.hidden" tone="caution" :icon="EyeOff">
+      </Chip>
+      <Chip v-else-if="row.comment.hidden" tone="warning" :icon="EyeOff">
         {{ $t('admin.comments.chips.hidden') }}
-      </AdminChip>
-      <AdminChip v-else tone="positive" :icon="Eye">
+      </Chip>
+      <Chip v-else tone="success" :icon="Eye">
         {{ $t('admin.comments.chips.visible') }}
-      </AdminChip>
+      </Chip>
     </template>
     <template #cell-page="{ row }"><CommentPlace :item="row" /></template>
     <template #cell-createdAt="{ row }">

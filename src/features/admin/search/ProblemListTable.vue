@@ -8,7 +8,7 @@ import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
-import AdminChip from '../ui/AdminChip.vue';
+import Chip from '@/components/ui/Chip.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
@@ -125,19 +125,19 @@ const menuItems = (code: string) =>
     </template>
     <template #cell-status="{ row }">
       <span class="inline-flex gap-1">
-        <AdminChip v-if="row.isPublic" tone="positive" :icon="Globe">
+        <Chip v-if="row.isPublic" tone="success" :icon="Globe">
           {{ $t('admin.problemList.status.public') }}
-        </AdminChip>
-        <AdminChip v-else-if="isSuggestedQueue" tone="caution" :icon="Lightbulb">{{
+        </Chip>
+        <Chip v-else-if="isSuggestedQueue" tone="warning" :icon="Lightbulb">{{
           $t('admin.problemList.status.suggested')
-        }}</AdminChip>
-        <AdminChip v-else :icon="Lock">{{ $t('admin.problemList.status.private') }}</AdminChip>
-        <AdminChip v-if="row.isOrganizationPrivate" tone="info" :icon="Building2">
+        }}</Chip>
+        <Chip v-else :icon="Lock">{{ $t('admin.problemList.status.private') }}</Chip>
+        <Chip v-if="row.isOrganizationPrivate" tone="info" :icon="Building2">
           {{ $t('admin.problemList.orgPrivate') }}
-        </AdminChip>
-        <AdminChip v-if="row.partial" :title="$t('admin.problemList.partialHint')">
+        </Chip>
+        <Chip v-if="row.partial" :title="$t('admin.problemList.partialHint')">
           {{ $t('admin.problemList.partial') }}
-        </AdminChip>
+        </Chip>
       </span>
     </template>
     <template #cell-group="{ row }">{{ row.group?.fullName ?? '—' }}</template>
