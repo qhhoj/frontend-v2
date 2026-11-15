@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import StateBit from '@/components/StateBit.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import SubmissionList from './list/SubmissionList.vue';
 import { GLOBAL_SCOPE } from './list/submission-scope';
@@ -10,11 +9,7 @@ const { isDeciding } = useMineByDefault();
 
 <template>
   <div class="page-column">
-    <PageHeader :title="$t('submissions.title')">
-      <template #start
-        ><StateBit variant="judging" size="inline" class="shrink-0 max-sm:hidden"
-      /></template>
-    </PageHeader>
+    <PageHeader :title="$t('submissions.title')" />
     <SubmissionList :scope="GLOBAL_SCOPE" :enabled="!isDeciding" />
   </div>
 </template>

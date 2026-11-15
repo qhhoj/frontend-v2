@@ -4,7 +4,6 @@ import { computed } from 'vue';
 import UserLink from '@/components/UserLink.vue';
 import { voteDisabledKey } from '@/features/vote/vote-rules';
 import VoteControl from '@/components/VoteControl.vue';
-import { Pin } from 'lucide-vue-next';
 import Chip from '@/components/ui/Chip.vue';
 import type { PostListItem } from '@/api/types/blog';
 import type { VoteScore } from '@/api/types/votes';
@@ -46,11 +45,9 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
   >
     <div class="flex min-w-0 flex-1 flex-col gap-0.5">
       <h2 class="flex min-w-0 items-center gap-2 text-title leading-snug font-semibold">
-        <span v-if="post.sticky" class="shrink-0 text-accent-text" data-testid="post-pin">
-          <Pin aria-hidden="true" class="size-4" /><span class="sr-only">{{
-            $t('blog.pinned')
-          }}</span>
-        </span>
+        <Chip v-if="post.sticky" tone="accent" class="shrink-0" data-testid="post-pin">{{
+          $t('blog.pinned')
+        }}</Chip>
         <Chip v-if="unpublished" class="shrink-0">{{
           $t(`blog.drafts.state.${unpublished}`)
         }}</Chip>

@@ -116,7 +116,6 @@ const go = (patch: Record<string, string | undefined>) =>
     />
     <template v-else>
       <PageHeader :title="$t('balloons.title')">
-        <template #start><InlineBit :kind="EXTRAS_BITS.balloonsHeading" /></template>
         <template #lead>
           <RouterLink
             :to="{ name: 'contest', params: { key } }"

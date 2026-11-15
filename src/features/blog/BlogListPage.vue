@@ -5,7 +5,6 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
-import StateBit from '@/components/StateBit.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import type { PostFeed } from '@/api/types/blog';
 import AppButton from '@/components/ui/AppButton.vue';
@@ -50,9 +49,7 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
 
 <template>
   <div class="page-column">
-    <PageHeader :title="$t('blog.title')" :lead="$t('blog.lead')">
-      <template #start><StateBit variant="writing" size="inline" /></template>
-    </PageHeader>
+    <PageHeader :title="$t('blog.title')" :lead="$t('blog.lead')" />
     <div class="flex flex-wrap items-center justify-between gap-3">
       <Tabs
         :model-value="feed"

@@ -2,7 +2,6 @@
 import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed, ref } from 'vue';
 import Card from '@/components/ui/Card.vue';
-import StateBit from '@/components/StateBit.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import FormField from '@/components/ui/FormField.vue';
@@ -39,9 +38,7 @@ const trimmedCode = computed(() => draft.problemCode.trim());
     </p>
     <div class="grid gap-6 lg:grid-cols-[1fr_300px]">
       <Card as="section" class="p-5 sm:p-6">
-        <PageHeader :title="$t('tickets.newTicket')">
-          <template #start><StateBit variant="writing" size="inline" /></template>
-        </PageHeader>
+        <PageHeader :title="$t('tickets.newTicket')" />
         <form ref="form" novalidate class="mt-6 flex flex-col gap-5" @submit.prevent="submit">
           <fieldset class="flex flex-col gap-3">
             <legend class="mb-2 text-sm font-semibold">{{ $t('tickets.new.about') }}</legend>

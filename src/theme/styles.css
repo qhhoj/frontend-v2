@@ -264,12 +264,12 @@
   font-weight: 700;
   line-height: 1.25;
 }
-/* Section title: the h2 of a page section, one step under the page title (--text-section, 20 px). */
+/* Section title: the h2 of a page section, one size on every page, the same step as a Card title (--text-title, 17 px). */
 @utility section-title {
   font-family: var(--qh-font-display);
-  font-size: var(--text-section);
+  font-size: var(--text-title);
   font-weight: 700;
-  line-height: 1.75rem;
+  line-height: 1.375rem;
 }
 /* A card: the opaque surface and its hairline (the Glass blur and the background blobs were retired with palette A). */
 /* Whole-box link (kit: StretchedLink, Card `to`/`href`). The box is `box-link`; its one real link is `stretched-link`, whose

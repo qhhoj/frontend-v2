@@ -3,7 +3,6 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { NOTIFICATION_STATES } from '@/api/types/notifications';
 import EmptyState from '@/components/EmptyState.vue';
-import InlineBit from '@/components/InlineBit.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import AppButton from '@/components/ui/AppButton.vue';
@@ -62,7 +61,6 @@ const FILTER_CLASS =
 <template>
   <div class="page-column">
     <PageHeader :title="$t('notifications.title')" :lead="$t('notifications.lead')">
-      <template #start><InlineBit :kind="NOTIFICATION_BITS.header" /></template>
       <template v-if="canReadAll" #actions>
         <MarkAllReadButton @failed="readAllFailureKey = $event" />
       </template>

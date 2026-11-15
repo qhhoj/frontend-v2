@@ -145,7 +145,9 @@ const phoneFacts = (problem: ContestProblem) =>
             <td class="px-3 py-2 font-mono text-meta whitespace-nowrap tabular-nums">
               {{ limitsText(problem) }}
             </td>
-            <td class="px-3 py-2 text-right font-mono tabular-nums">{{ pointsOf(problem) }}</td>
+            <td class="px-3 py-2 text-right font-mono tabular-nums">
+              {{ $t('contests.problems.pointsShort', { points: pointsOf(problem) }) }}
+            </td>
             <td v-if="hasOwnResults" class="max-w-40 px-3 py-2 xl:max-w-none">
               <OwnResultChip :problem="problem" :context="context" />
             </td>
