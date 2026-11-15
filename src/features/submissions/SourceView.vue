@@ -70,16 +70,13 @@ const lineCount = computed(() => sourceLineCount(source.value));
 const lineNumbers = computed(() =>
   Array.from({ length: lineCount.value }, (_unused, index) => index + 1).join('\n'),
 );
-/** A source up to this many lines opens unfolded, since the code is what most readers come for; a longer one opens folded. */
-const UNFOLDED_MAX_LINES = 200;
-/** The reader's own choice, null to follow the length; "View source" links (#source) open the source unfolded whatever its length. */
-const choiceFromHash = () => (route.hash === '#source' ? true : null);
-const expandChoice = ref<boolean | null>(choiceFromHash());
+/** The code starts folded so the page reads at a glance, whatever its length; "View source" links (#source) open it. */
+const isHashOpen = () => route.hash === '#source';
+const isExpanded = ref(isHashOpen());
 watch(
   () => props.id,
-  () => (expandChoice.value = choiceFromHash()),
+  () => (isExpanded.value = isHashOpen()),
 );
-const isExpanded = computed(() => expandChoice.value ?? lineCount.value <= UNFOLDED_MAX_LINES);
 </script>
 
 <template>
@@ -88,12 +85,13 @@ const isExpanded = computed(() => expandChoice.value ?? lineCount.value <= UNFOL
       <h2 class="section-title">{{ $t('submission.source.title') }}</h2>
       <div class="flex flex-wrap items-center gap-2">
         <AppButton
-          v-if="data && isExpanded"
+          v-if="data"
+          data-testid="source-toggle"
           aria-controls="source-code"
-          :aria-expanded="true"
-          @click="expandChoice = false"
+          :aria-expanded="isExpanded"
+          @click="isExpanded = !isExpanded"
         >
-          {{ $t('submission.source.collapse') }}
+          {{ isExpanded ? $t('submission.source.collapse') : $t('submission.source.expand') }}
         </AppButton>
       </div>
     </div>
@@ -110,6 +108,14 @@ const isExpanded = computed(() => expandChoice.value ?? lineCount.value <= UNFOL
     </div>
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><SourceViewSkeleton /></template>
+      <SourceFileBar
+        v-if="data"
+        :id="id"
+        :filename="data.filename"
+        :language-key="languageKey"
+        :language-name="languageName"
+        :text="source"
+      />
       <div
         v-if="isExpanded"
         id="source-code"
@@ -123,25 +129,6 @@ const isExpanded = computed(() => expandChoice.value ?? lineCount.value <= UNFOL
         }}</pre>
         <pre ref="sourceBlock" class="pr-6"></pre>
       </div>
-      <div v-else class="px-6 pb-5">
-        <AppButton
-          block
-          data-testid="source-expand"
-          aria-controls="source-code"
-          :aria-expanded="false"
-          @click="expandChoice = true"
-        >
-          {{ $t('submission.source.expand', { count: lineCount }) }}
-        </AppButton>
-      </div>
-      <SourceFileBar
-        v-if="data"
-        :id="id"
-        :filename="data.filename"
-        :language-key="languageKey"
-        :language-name="languageName"
-        :text="source"
-      />
       <slot v-if="data" />
     </QueryState>
   </Card>

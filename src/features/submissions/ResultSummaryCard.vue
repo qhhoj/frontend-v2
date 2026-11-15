@@ -23,7 +23,7 @@ import {
 
 /**
  * The result summary above the source, below `xl` only (from `xl` the full table stands beside the source instead): one
- * numbered tile per test, grouped by subtask, and the tests that lost points opened with their judge text. A tile opens or
+ * numbered tile per test, grouped by subtask, every test closed until its tile is tapped. A tile opens or
  * closes its test inside this card, so the reader never jumps past the code; the full table (`#cases`) keeps times and memory.
  */
 const props = defineProps<{
@@ -35,8 +35,6 @@ const props = defineProps<{
   running: boolean;
 }>();
 
-/** At most this many point-losing tests open by themselves; the others are a tap or the table away. */
-const OPEN_LOSSES_MAX = 3;
 const TILE =
   'flex size-8 items-center justify-center rounded-skeleton font-mono text-caption font-bold touch:size-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';
 const OPEN_TILE = 'ring-2 ring-content ring-offset-2 ring-offset-surface-solid';
@@ -45,14 +43,12 @@ const locale = useLocaleStore();
 const isLoss = (testCase: SubmissionCase) =>
   !isFullCase(testCase) && testCase.status !== SKIPPED_STATUS;
 const losses = computed(() => props.cases.filter(isLoss));
-const openByDefault = computed(
-  () => new Set(losses.value.slice(0, OPEN_LOSSES_MAX).map((testCase) => testCase.position)),
-);
-/** The tiles the reader tapped, open or closed, over the default. */
-const toggled = ref(new Map<number, boolean>());
-const isOpen = (position: number) =>
-  toggled.value.get(position) ?? openByDefault.value.has(position);
-const toggle = (position: number) => toggled.value.set(position, !isOpen(position));
+/** Every test starts closed so the result reads at a glance; a tap on a tile opens its judge text. */
+const opened = ref(new Set<number>());
+const isOpen = (position: number) => opened.value.has(position);
+const toggle = (position: number) => {
+  if (!opened.value.delete(position)) opened.value.add(position);
+};
 const openCases = computed(() => props.cases.filter((testCase) => isOpen(testCase.position)));
 const closedLossCount = computed(
   () => losses.value.filter((testCase) => !isOpen(testCase.position)).length,
