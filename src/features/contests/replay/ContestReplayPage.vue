@@ -11,7 +11,6 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
 import { useSessionStore } from '@/stores/session.store';
 import ContestNotFound from '../ContestNotFound.vue';
-import ContestHeader from '../bar/ContestHeader.vue';
 import { useContestQuery } from '../contests.queries';
 import ReplayEventFeed from './ReplayEventFeed.vue';
 import ReplayPlayerBar from './ReplayPlayerBar.vue';
@@ -70,119 +69,107 @@ const goToMyRow = () => myRowId.value && table.value?.focusRow(myRowId.value);
 </script>
 
 <template>
-  <div class="page-column">
-    <ContestNotFound v-if="isMissing" />
-    <QueryState v-else :loading="contestPending" :error="contestError" @retry="refetchContest()">
+  <ContestNotFound v-if="isMissing" />
+  <QueryState v-else :loading="contestPending" :error="contestError" @retry="refetchContest()">
+    <template #skeleton>
+      <!-- The layout's header already stands in for the title and the tabs. -->
+      <span hidden />
+    </template>
+  </QueryState>
+  <p role="status" data-testid="replay-announcement" class="sr-only">{{ announcement }}</p>
+  <template v-if="contest">
+    <ReplayStatePanel v-if="panelState" :state="panelState" :contest-key="key" @retry="refetch()" />
+    <QueryState v-else :loading="state === 'loading'" :error="null">
       <template #skeleton>
-        <div data-skeleton-region="title" class="page-title">
-          <SkeletonBlock text class="w-80 max-w-full" />
-        </div>
-        <SkeletonBlock data-skeleton-region="nav" class="h-(--qh-control-sm) w-96 max-w-full" />
-      </template>
-      <ContestHeader v-if="contest" :contest-key="key" :contest="contest" />
-    </QueryState>
-    <p role="status" data-testid="replay-announcement" class="sr-only">{{ announcement }}</p>
-    <template v-if="contest">
-      <ReplayStatePanel
-        v-if="panelState"
-        :state="panelState"
-        :contest-key="key"
-        @retry="refetch()"
-      />
-      <QueryState v-else :loading="state === 'loading'" :error="null">
-        <template #skeleton>
-          <div class="flex flex-col gap-5">
-            <Card
-              data-skeleton-region="player"
-              data-replay-part="player"
-              class="flex flex-col gap-3 p-4 sm:p-5"
-            >
-              <div class="flex flex-wrap items-center gap-3">
-                <SkeletonBlock pill class="h-11 w-28" />
-                <p class="font-mono"><SkeletonBlock text class="w-40" /></p>
-                <span class="hidden flex-1 sm:block" />
-                <SkeletonBlock pill class="h-[52px] w-[184px]" />
-              </div>
-              <div class="relative">
-                <span class="mt-2 inline-block h-11 w-full"
-                  ><SkeletonBlock class="size-full"
-                /></span>
-              </div>
-              <p class="font-mono text-caption leading-4"><SkeletonBlock text class="w-full" /></p>
-              <p class="text-caption leading-4"><SkeletonBlock text class="w-56" /></p>
-            </Card>
-            <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
-              <Card as="div" data-replay-part="board" class="overflow-hidden">
-                <div
-                  v-for="row in BOARD_SKELETON_ROWS"
-                  :key="row"
-                  data-skeleton-region="board-row"
-                  class="flex items-center gap-4 border-t border-line px-5 py-2.5 font-mono text-sm first:border-t-0"
-                >
-                  <SkeletonBlock text class="w-8" />
-                  <span class="flex min-w-0 flex-1 items-center gap-2">
-                    <SkeletonBlock class="size-6 shrink-0" />
-                    <SkeletonBlock text class="w-40 max-w-full" />
-                  </span>
-                  <SkeletonBlock text class="hidden w-48 sm:inline-block" />
-                </div>
-              </Card>
-              <Card
-                as="div"
-                data-skeleton-region="feed"
-                data-replay-part="feed"
-                class="flex flex-col gap-3 p-5"
-              >
-                <div class="font-display text-subtitle leading-7">
-                  <SkeletonBlock text class="w-28" />
-                </div>
-                <SkeletonBlock text class="w-full" />
-                <SkeletonBlock text class="w-3/4" />
-              </Card>
+        <div class="flex flex-col gap-5">
+          <Card
+            data-skeleton-region="player"
+            data-replay-part="player"
+            class="flex flex-col gap-3 p-4 sm:p-5"
+          >
+            <div class="flex flex-wrap items-center gap-3">
+              <SkeletonBlock pill class="h-11 w-28" />
+              <p class="font-mono"><SkeletonBlock text class="w-40" /></p>
+              <span class="hidden flex-1 sm:block" />
+              <SkeletonBlock pill class="h-[52px] w-[184px]" />
             </div>
-          </div>
-        </template>
-        <div v-if="board && index" class="flex flex-col gap-5">
-          <ReplayPlayerBar
-            :seconds="seconds"
-            :duration-seconds="durationSeconds"
-            :is-playing="isPlaying"
-            :speed="speed"
-            :marks="marks"
-            @play="player.play()"
-            @pause="player.pause()"
-            @seek="seek"
-            @speed="player.setSpeed($event)"
-          />
-          <p v-if="isFinished" class="flex items-center gap-3 text-sm text-muted">
-            <InlineBit kind="crown" />
-            {{ $t('replay.player.finished') }}
-          </p>
+            <div class="relative">
+              <span class="mt-2 inline-block h-11 w-full"><SkeletonBlock class="size-full" /></span>
+            </div>
+            <p class="font-mono text-caption leading-4"><SkeletonBlock text class="w-full" /></p>
+            <p class="text-caption leading-4"><SkeletonBlock text class="w-56" /></p>
+          </Card>
           <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
             <Card as="div" data-replay-part="board" class="overflow-hidden">
-              <div v-if="myRowId" class="flex justify-end px-5 pt-4">
-                <AppButton @click="goToMyRow">
-                  <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
-                  {{ $t('replay.player.myRow') }}
-                </AppButton>
+              <div
+                v-for="row in BOARD_SKELETON_ROWS"
+                :key="row"
+                data-skeleton-region="board-row"
+                class="flex items-center gap-4 border-t border-line px-5 py-2.5 font-mono text-sm first:border-t-0"
+              >
+                <SkeletonBlock text class="w-8" />
+                <span class="flex min-w-0 flex-1 items-center gap-2">
+                  <SkeletonBlock class="size-6 shrink-0" />
+                  <SkeletonBlock text class="w-40 max-w-full" />
+                </span>
+                <SkeletonBlock text class="hidden w-48 sm:inline-block" />
               </div>
-              <ReplayTable
-                ref="table"
-                :board="board"
-                :context="context"
-                :viewer-id="viewerId"
-                :label="$t('replay.table.caption')"
-              />
             </Card>
-            <ReplayEventFeed
+            <Card
+              as="div"
+              data-skeleton-region="feed"
               data-replay-part="feed"
-              :entries="feed"
-              :problems="index.problems"
-              :context="context"
-            />
+              class="flex flex-col gap-3 p-5"
+            >
+              <div class="font-display text-subtitle leading-7">
+                <SkeletonBlock text class="w-28" />
+              </div>
+              <SkeletonBlock text class="w-full" />
+              <SkeletonBlock text class="w-3/4" />
+            </Card>
           </div>
         </div>
-      </QueryState>
-    </template>
-  </div>
+      </template>
+      <div v-if="board && index" class="flex flex-col gap-5">
+        <ReplayPlayerBar
+          :seconds="seconds"
+          :duration-seconds="durationSeconds"
+          :is-playing="isPlaying"
+          :speed="speed"
+          :marks="marks"
+          @play="player.play()"
+          @pause="player.pause()"
+          @seek="seek"
+          @speed="player.setSpeed($event)"
+        />
+        <p v-if="isFinished" class="flex items-center gap-3 text-sm text-muted">
+          <InlineBit kind="crown" />
+          {{ $t('replay.player.finished') }}
+        </p>
+        <div class="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
+          <Card as="div" data-replay-part="board" class="overflow-hidden">
+            <div v-if="myRowId" class="flex justify-end px-5 pt-4">
+              <AppButton @click="goToMyRow">
+                <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
+                {{ $t('replay.player.myRow') }}
+              </AppButton>
+            </div>
+            <ReplayTable
+              ref="table"
+              :board="board"
+              :context="context"
+              :viewer-id="viewerId"
+              :label="$t('replay.table.caption')"
+            />
+          </Card>
+          <ReplayEventFeed
+            data-replay-part="feed"
+            :entries="feed"
+            :problems="index.problems"
+            :context="context"
+          />
+        </div>
+      </div>
+    </QueryState>
+  </template>
 </template>

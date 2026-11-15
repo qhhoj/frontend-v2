@@ -16,7 +16,7 @@ import { useCurrentContest } from './use-current-contest';
 
 /**
  * The contest bar on the contest's own pages: the one H1 (the name), the phase and format chips, the clock while time runs, the
- * freeze chip beside the clock, and the contest's tabs. Every tab renders it, so the state sits in one place and
+ * freeze chip beside the clock, and the contest's tabs. `ContestLayout` renders it once for every tab, so the state sits in one place and
  * the layout does not jump between tabs. The shell's `ContestBar` steps aside while this header shows the clock
  * (`header-clock.ts`), so the clock shows once and never zero times. The clock counts what the viewer's own time is: a virtual run's end, else the end of their live
  * window, else the contest's end; it shows only while that time runs.

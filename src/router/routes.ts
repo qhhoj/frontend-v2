@@ -72,10 +72,47 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'nav.contests' },
   },
   {
+    // One layout for the contest's tab pages: its header and tab strip stay mounted while the tab changes, so the tab indicator slides.
     path: '/contests/:key',
-    name: 'contest',
-    component: () => import('@/features/contests/ContestPage.vue'),
-    meta: { titleKey: 'pages.contest' },
+    component: () => import('@/features/contests/ContestLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'contest',
+        component: () => import('@/features/contests/ContestPage.vue'),
+        meta: { titleKey: 'pages.contest' },
+      },
+      {
+        path: 'announcements',
+        name: 'contest-announcements',
+        component: () => import('@/features/contests/ContestAnnouncementsPage.vue'),
+        meta: { titleKey: 'pages.contestAnnouncements' },
+      },
+      {
+        path: 'submissions',
+        name: 'contest-submissions',
+        component: () => import('@/features/contests/ContestSubmissionsPage.vue'),
+        meta: { titleKey: 'pages.contestSubmissions' },
+      },
+      {
+        path: 'stats',
+        name: 'contest-stats',
+        component: () => import('@/features/contests/ContestStatsPage.vue'),
+        meta: { titleKey: 'pages.contestStats' },
+      },
+      {
+        path: 'ranking',
+        name: 'contest-ranking',
+        component: () => import('@/features/contests/ContestRankingPage.vue'),
+        meta: { titleKey: 'pages.ranking' },
+      },
+      {
+        path: 'replay',
+        name: 'contest-replay',
+        component: () => import('@/features/contests/replay/ContestReplayPage.vue'),
+        meta: { titleKey: 'pages.contestReplay' },
+      },
+    ],
   },
   {
     // Balloon volunteers in `balloonStaff` may be non-staff: no `adminArea`, the server answers 403/404.
@@ -102,36 +139,6 @@ export const routes: RouteRecordRaw[] = [
     name: 'contest-problem-best',
     component: () => import('@/features/contests/best/ContestBestPage.vue'),
     meta: { titleKey: 'pages.contestProblemBest' },
-  },
-  {
-    path: '/contests/:key/announcements',
-    name: 'contest-announcements',
-    component: () => import('@/features/contests/ContestAnnouncementsPage.vue'),
-    meta: { titleKey: 'pages.contestAnnouncements' },
-  },
-  {
-    path: '/contests/:key/submissions',
-    name: 'contest-submissions',
-    component: () => import('@/features/contests/ContestSubmissionsPage.vue'),
-    meta: { titleKey: 'pages.contestSubmissions' },
-  },
-  {
-    path: '/contests/:key/stats',
-    name: 'contest-stats',
-    component: () => import('@/features/contests/ContestStatsPage.vue'),
-    meta: { titleKey: 'pages.contestStats' },
-  },
-  {
-    path: '/contests/:key/ranking',
-    name: 'contest-ranking',
-    component: () => import('@/features/contests/ContestRankingPage.vue'),
-    meta: { titleKey: 'pages.ranking' },
-  },
-  {
-    path: '/contests/:key/replay',
-    name: 'contest-replay',
-    component: () => import('@/features/contests/replay/ContestReplayPage.vue'),
-    meta: { titleKey: 'pages.contestReplay' },
   },
   {
     path: '/public-rankings/:token',

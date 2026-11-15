@@ -19,7 +19,6 @@ import ContestJoinRulesCard from './ContestJoinRulesCard.vue';
 import ContestNotFound from './ContestNotFound.vue';
 import ContestProblemsTable from './ContestProblemsTable.vue';
 import ContestRulesCard from './ContestRulesCard.vue';
-import ContestHeader from './bar/ContestHeader.vue';
 import { acceptanceOf } from './join-rules';
 import { useContestQuery } from './contests.queries';
 
@@ -61,31 +60,28 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
 </script>
 
 <template>
-  <div class="page-column">
-    <ContestNotFound v-if="isMissing" />
-    <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
-      <template #skeleton><ContestDetailSkeleton /></template>
-      <template v-if="contest">
-        <!-- The card's hidden countdown tells the page when a phase flips, so the header's clock needs no handler here. -->
-        <ContestHeader :contest-key="key" :contest="contest" />
-        <ContestHeaderCard :contest="contest" :run="run" @elapsed="onCountdownElapsed">
-          <template #actions>
-            <ContestActions :contest="contest" :current="current" />
-            <ShortLinkButton compact :path="shortLinkPath({ kind: 'contest', key: contest.key })" />
-          </template>
-        </ContestHeaderCard>
-        <div class="flex min-w-0 flex-col gap-6">
-          <ContestAnnouncementsRail v-if="isUnderway" :contest="contest" />
-          <ContestJoinRulesCard
-            :contest="contest"
-            :acceptance="acceptanceOf(contest.viewer.liveParticipation)"
-          />
-          <ContestRulesCard :contest="contest" />
-          <ContestProblemsTable :contest="contest" />
-          <ContestIntroCard :contest="contest" />
-          <CommentsSection v-if="!isUnderway" type="contest" :page-key="contest.key" class="mt-2" />
-        </div>
-      </template>
-    </QueryState>
-  </div>
+  <ContestNotFound v-if="isMissing" />
+  <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
+    <template #skeleton><ContestDetailSkeleton /></template>
+    <template v-if="contest">
+      <!-- The card's hidden countdown tells the page when a phase flips. -->
+      <ContestHeaderCard :contest="contest" :run="run" @elapsed="onCountdownElapsed">
+        <template #actions>
+          <ContestActions :contest="contest" :current="current" />
+          <ShortLinkButton compact :path="shortLinkPath({ kind: 'contest', key: contest.key })" />
+        </template>
+      </ContestHeaderCard>
+      <div class="flex min-w-0 flex-col gap-6">
+        <ContestAnnouncementsRail v-if="isUnderway" :contest="contest" />
+        <ContestJoinRulesCard
+          :contest="contest"
+          :acceptance="acceptanceOf(contest.viewer.liveParticipation)"
+        />
+        <ContestRulesCard :contest="contest" />
+        <ContestProblemsTable :contest="contest" />
+        <ContestIntroCard :contest="contest" />
+        <CommentsSection v-if="!isUnderway" type="contest" :page-key="contest.key" class="mt-2" />
+      </div>
+    </template>
+  </QueryState>
 </template>

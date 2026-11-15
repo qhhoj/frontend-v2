@@ -10,7 +10,6 @@ const hasActionRow = computed(() => session.status === 'authenticated');
 </script>
 
 <template>
-  <SkeletonBlock data-skeleton-region="tabs" pill class="h-[52px] w-96 max-w-full" />
   <Card
     as="div"
     data-skeleton-region="contest-header"
