@@ -16,9 +16,9 @@ export const PROBLEM_LAYOUT = {
     left: 'lg:col-start-1',
     /**
      * Pinned under the sticky bars (`--pane-top`), so Submit and the result never scroll away; short enough (less the page's
-     * 24 px paddings and the footer's room) to fit whole on load too.
+     * 24 px bottom padding and a 24 px gap) to fit whole on load too: 100dvh - top - 3rem.
      */
-    pane: 'lg:sticky lg:top-(--pane-top) lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:h-[calc(100dvh-var(--pane-top)-6rem)]',
+    pane: 'lg:sticky lg:top-(--pane-top) lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:h-[calc(100dvh-var(--pane-top)-3rem)]',
     /** The facts strip under the title stays in sight while the statement scrolls, where the split is. */
     facts: 'lg:sticky lg:top-(--pane-top)',
   },
@@ -29,7 +29,7 @@ export const PROBLEM_LAYOUT = {
     },
     stacked: '(max-width: 1279.98px)',
     left: 'xl:col-start-1',
-    pane: 'xl:sticky xl:top-(--pane-top) xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:h-[calc(100dvh-var(--pane-top)-6rem)]',
+    pane: 'xl:sticky xl:top-(--pane-top) xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:h-[calc(100dvh-var(--pane-top)-3rem)]',
     facts: 'xl:sticky xl:top-(--pane-top)',
   },
 } as const;

@@ -9,7 +9,7 @@ import Tabs from '@/components/ui/Tabs.vue';
 import UserName from '@/components/UserName.vue';
 import CommentsSection from '@/features/comments/CommentsSection.vue';
 import ProblemArchivedNotice from '@/features/organizations/problems/ProblemArchivedNotice.vue';
-import { useMediaQuery } from '@/lib/use-media-query';
+import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useSessionStore } from '@/stores/session.store';
 import EditorialTab from './EditorialTab.vue';
 import NoStatement from './NoStatement.vue';
@@ -32,7 +32,7 @@ import { useSubmitForm } from './use-submit-form';
 
 const DEFAULT_TAB = 'statement';
 /**
- * A loaded problem (Workbench split): left the statement card (header, facts strip, tabs), then links, types and comments; right the submit pane once the viewer opens it from the header. The page keys it by code, so another problem never inherits the typed
+ * A loaded problem (Workbench split): left the header on the page background (facts strip, tabs) and the statement card, then links, types and comments; right the submit pane once the viewer opens it from the header. The page keys it by code, so another problem never inherits the typed
  * code, pick or file.
  */
 const props = defineProps<{
@@ -52,6 +52,8 @@ const route = useRoute();
 const session = useSessionStore();
 const isSignedIn = computed(() => session.status === 'authenticated');
 const usesSheet = useMediaQuery(() => props.layout.stacked);
+/** A phone: the statement drops its card frame and padding, the page gutter is the margin. */
+const isPhone = useMediaQuery(PHONE_QUERY);
 /** The pane and the sheet start closed, so the statement is what the viewer sees first; the header button opens them. */
 const submitOpen = ref(false);
 /** The pane takes a column beside the statement; the page widens its column for it. */
@@ -101,18 +103,23 @@ function panelIdOf(tabId: string) {
 <template>
   <ProblemArchivedNotice :code="problem.code" :organization-ids="problem.organizations" />
   <div :class="[layout.grid, paneIsOpen ? layout.columns.editor : '']" :style="stickyTop">
-    <!-- The statement tab's card carries the problem header; on the editorial tab the card is header and tabs only. -->
-    <Card as="div" data-testid="statement-card" :class="['min-w-0 p-6 sm:p-8', layout.left]">
+    <!-- The left column: the header on the page background (sticky facts strip, tabs), then the statement card (statement tab only;
+         v-show keeps the tab panel the tabs point to). -->
+    <div :class="['min-w-0', layout.left]">
       <ProblemHeader :problem="problem" :section="tab === 'editorial' ? 'editorial' : 'statement'">
         <template #actions>
-          <SubmitOpenButton
-            v-if="isSignedIn"
-            :form="submitForm"
-            :open="submitOpen && !usesSheet"
-            :show-result="!usesSheet"
-            @open="submitOpen = true"
-          />
-          <div v-else data-testid="submit-sign-in"><SubmitSignInButton /></div>
+          <!-- On a phone the bottom sheet's bar is the one submit entry (it shows for anonymous viewers too). -->
+          <div v-if="isSignedIn" class="max-md:hidden">
+            <SubmitOpenButton
+              :form="submitForm"
+              :open="submitOpen && !usesSheet"
+              :show-result="!usesSheet"
+              @open="submitOpen = true"
+            />
+          </div>
+          <div v-else data-testid="submit-sign-in" class="max-md:hidden">
+            <SubmitSignInButton />
+          </div>
         </template>
         <template #strip>
           <ProblemLimitStrip
@@ -131,39 +138,47 @@ function panelIdOf(tabId: string) {
           overflow="scroll"
         />
       </ProblemHeader>
-      <div
-        :id="panelIdOf(DEFAULT_TAB)"
-        :role="tabs.length > 1 ? 'tabpanel' : undefined"
-        :aria-labelledby="tabs.length > 1 ? `${panelIdOf(DEFAULT_TAB)}-tab` : undefined"
-        :hidden="tab !== DEFAULT_TAB"
-        :tabindex="tab === DEFAULT_TAB ? 0 : undefined"
+      <Card
+        v-show="tab === DEFAULT_TAB"
+        as="div"
+        data-testid="statement-card"
+        :variant="isPhone ? 'plain' : 'glass'"
+        :class="['mt-4', isPhone ? '' : 'p-6 sm:p-8']"
       >
-        <template v-if="tab === DEFAULT_TAB">
-          <StatementNote v-if="!problem.translated && !problem.pdfStatementUrl" class="mt-4" />
-          <PdfStatement
-            v-if="problem.pdfStatementUrl"
-            :problem="problem"
-            :url="problem.pdfStatementUrl"
-            :untranslated="!problem.translated"
-            class="mt-4 mb-6 last:mb-0"
-          />
-          <NoStatement
-            v-if="hasNoStatement(problem)"
-            :code="problem.code"
-            :can-edit="problem.canEdit"
-            class="mt-4"
-          />
-          <StatementBody v-else :html="problem.descriptionHtml" class="mt-4" />
-          <p v-if="problem.authors.length" class="mt-6 text-sm text-muted">
-            {{ $t('problem.authors') }}
-            <template v-for="(author, index) in problem.authors" :key="author.id"
-              ><template v-if="index">, </template
-              ><UserName :username="author.username" :rating="author.rating"
-            /></template>
-          </p>
-        </template>
-      </div>
-    </Card>
+        <div
+          :id="panelIdOf(DEFAULT_TAB)"
+          :role="tabs.length > 1 ? 'tabpanel' : undefined"
+          :aria-labelledby="tabs.length > 1 ? `${panelIdOf(DEFAULT_TAB)}-tab` : undefined"
+          :hidden="tab !== DEFAULT_TAB"
+          :tabindex="tab === DEFAULT_TAB ? 0 : undefined"
+        >
+          <template v-if="tab === DEFAULT_TAB">
+            <StatementNote v-if="!problem.translated && !problem.pdfStatementUrl" class="mt-4" />
+            <PdfStatement
+              v-if="problem.pdfStatementUrl"
+              :problem="problem"
+              :url="problem.pdfStatementUrl"
+              :untranslated="!problem.translated"
+              class="mt-4 mb-6 last:mb-0"
+            />
+            <NoStatement
+              v-if="hasNoStatement(problem)"
+              :code="problem.code"
+              :can-edit="problem.canEdit"
+              class="mt-4"
+            />
+            <StatementBody v-else :html="problem.descriptionHtml" class="mt-4" />
+            <p v-if="problem.authors.length" class="mt-6 text-sm text-muted">
+              {{ $t('problem.authors') }}
+              <template v-for="(author, index) in problem.authors" :key="author.id"
+                ><template v-if="index">, </template
+                ><UserName :username="author.username" :rating="author.rating"
+              /></template>
+            </p>
+          </template>
+        </div>
+      </Card>
+    </div>
     <!-- Keyed by code: another problem never inherits the typed code, pick or file. -->
     <SubmitPane
       :key="problem.code"
