@@ -15,6 +15,7 @@ import ModeChoice from './ModeChoice.vue';
 import SegmentedChoice from './SegmentedChoice.vue';
 import { useAppearanceChoice } from './use-appearance-choice';
 
+defineProps<{ compact?: boolean }>();
 const TITLE_ID = 'appearance-panel-title';
 const { reset } = useAppearanceChoice();
 const popover = ref<InstanceType<typeof Popover>>();
@@ -27,7 +28,7 @@ const lowPowerOptions = computed(() =>
 
 <template>
   <IconButton
-    tone="secondary"
+    :compact="compact"
     aria-haspopup="dialog"
     :aria-expanded="isOpen"
     :label="$t('appearance.title')"

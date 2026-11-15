@@ -100,9 +100,9 @@ const isHome = computed(() => route.path === '/');
       </nav>
       <div id="top-bar-actions" class="flex shrink-0 items-center gap-2" />
       <div class="flex shrink-0 items-center gap-1">
-        <NotificationBell />
-        <LocaleToggle />
-        <AppearancePanel />
+        <NotificationBell compact />
+        <LocaleToggle compact />
+        <AppearancePanel compact />
       </div>
     </div>
     <p class="sr-only" aria-live="polite" data-testid="notification-arrived">

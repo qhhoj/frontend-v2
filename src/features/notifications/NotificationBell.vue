@@ -37,6 +37,7 @@ const listQuery = useNotificationsQuery(DRAWER_QUERY, isOpen);
 const opener = useOpenNotification();
 
 const unread = computed(() => countQuery.data.value?.count ?? 0);
+defineProps<{ compact?: boolean }>();
 const badge = computed(() => unreadBadge(unread.value, locale.locale));
 const latest = computed(() => (listQuery.data.value?.items ?? []).slice(0, LATEST_ROWS));
 const bellLabel = computed(() =>
@@ -54,7 +55,7 @@ const readAllFailureKey = ref<string | null>(null);
 <template>
   <template v-if="session.user">
     <IconButton
-      tone="secondary"
+      :compact="compact"
       data-testid="notification-bell"
       class="relative"
       aria-haspopup="dialog"
