@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ContestDetail } from '@/api/types/contests';
 import Card from '@/components/ui/Card.vue';
+import Disclosure from '@/components/ui/Disclosure.vue';
 import { useLocaleStore } from '@/stores/locale.store';
 import { contestRules } from './contest-rules';
 import type { RuleRow } from './contest-rules';
@@ -10,6 +11,8 @@ import type { RuleRow } from './contest-rules';
 const props = defineProps<{ contest: ContestDetail }>();
 const { t } = useI18n();
 const locale = useLocaleStore();
+/** Closed until the header is clicked; the rows slide open (Disclosure). */
+const isOpen = ref(false);
 const rules = computed(() => contestRules(props.contest, locale.locale));
 
 /** Params that are message keys (the scoreboard visibility) are translated before they fill the sentence. */
@@ -33,26 +36,25 @@ const summary = computed(() =>
 </script>
 
 <template>
-  <Card as="details" class="group px-5 py-3">
-    <summary
-      class="flex min-h-8 cursor-pointer list-none items-center gap-2 text-sm marker:hidden [&::-webkit-details-marker]:hidden"
-    >
-      <span class="shrink-0 font-semibold">{{ $t('contests.rules.title') }}</span>
-      <span class="min-w-0 flex-1 truncate text-muted group-open:invisible">{{ summary }}</span>
-      <span class="shrink-0 text-accent-text">
-        <span class="group-open:hidden">{{ $t('contests.rules.show') }} ▸</span>
-        <span class="hidden group-open:inline">{{ $t('contests.rules.hide') }} ▾</span>
-      </span>
-    </summary>
-    <dl class="mt-3 flex flex-col gap-2.5 text-sm">
-      <div
-        v-for="rule in rules"
-        :key="rule.termKey"
-        class="grid grid-cols-[8rem_minmax(0,1fr)] gap-3"
-      >
-        <dt class="text-muted">{{ $t(rule.termKey) }}</dt>
-        <dd>{{ valueText(rule) }}</dd>
-      </div>
-    </dl>
+  <Card as="div" class="px-5 py-1">
+    <Disclosure v-model:open="isOpen" :label="$t('contests.rules.title')">
+      <template #summary>
+        <span
+          class="min-w-0 flex-1 truncate font-normal text-muted"
+          :class="isOpen && 'invisible'"
+          >{{ summary }}</span
+        >
+      </template>
+      <dl class="flex flex-col gap-2.5 pb-2 text-sm">
+        <div
+          v-for="rule in rules"
+          :key="rule.termKey"
+          class="grid grid-cols-[8rem_minmax(0,1fr)] gap-3"
+        >
+          <dt class="text-muted">{{ $t(rule.termKey) }}</dt>
+          <dd>{{ valueText(rule) }}</dd>
+        </div>
+      </dl>
+    </Disclosure>
   </Card>
 </template>

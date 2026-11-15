@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router';
 import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
+import FoldPanel from '@/components/ui/FoldPanel.vue';
 import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { translate } from '@/i18n';
 import CaseDetails from './CaseDetails.vue';
@@ -196,7 +197,7 @@ const isHidden = computed(
                 >
                   <ChevronRight
                     aria-hidden="true"
-                    class="size-3.5 text-muted"
+                    class="size-3.5 text-muted transition-transform duration-(--qh-duration) ease-move"
                     :class="isOpen(row.key) && 'rotate-90'"
                   />
                   {{ row.label }}
@@ -212,9 +213,13 @@ const isHidden = computed(
                 {{ row.points }}
               </td>
             </tr>
-            <tr v-if="isOpen(row.key)" :id="`${row.key}-details`" class="max-sm:block">
-              <td colspan="5" class="px-6 pb-3 max-sm:block max-sm:px-4 xl:px-3">
-                <CaseDetails :details="row.details" />
+            <tr v-if="row.details.length > 0" :id="`${row.key}-details`" class="max-sm:block">
+              <td colspan="5" class="p-0 max-sm:block">
+                <FoldPanel :open="isOpen(row.key)">
+                  <div class="px-6 pb-3 max-sm:px-4 xl:px-3">
+                    <CaseDetails :details="row.details" />
+                  </div>
+                </FoldPanel>
               </td>
             </tr>
           </template>
