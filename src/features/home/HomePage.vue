@@ -28,8 +28,9 @@ const session = useSessionStore();
     <template v-if="session.user">
       <PageHeader :title="$t('nav.home')" class="sr-only" />
       <div class="grid gap-4 lg:grid-cols-[repeat(auto-fit,minmax(20rem,1fr))]">
-        <ContinueCard :username="session.user.username" />
-        <LiveContestCard />
+        <ContinueCard :username="session.user.username" class="order-2 lg:order-none" />
+        <!-- Phone: a running contest is the most urgent, so "Đang thi" comes before "Tiếp tục". -->
+        <LiveContestCard class="order-1 lg:order-none" />
       </div>
       <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
         <div class="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-4">
