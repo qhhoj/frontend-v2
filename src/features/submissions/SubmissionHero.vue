@@ -9,6 +9,10 @@ import BitLoop from '@/components/BitLoop.vue';
 import BitMascot from '@/components/BitMascot.vue';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import Card from '@/components/ui/Card.vue';
+import UserLink from '@/components/UserLink.vue';
+import type { SubmissionInContest } from '@/features/contests/submission/submission-contest';
+import { formatClock, formatDate, formatRelative } from '@/lib/format-date';
+import { useNow } from '@/lib/use-now';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
 import { NO_VALUE, formatNumber, scoreBelowFull } from '@/lib/format';
@@ -19,21 +23,29 @@ import { verdictBitMood } from '@/mascot/verdict-bit';
 import { useLocaleStore } from '@/stores/locale.store';
 import ShareButton from '@/features/shares/ShareButton.vue';
 import TestStrip from './list/TestStrip.vue';
+import DeletedProblemChip from './DeletedProblemChip.vue';
 import { heroParts } from './hero-line';
 import VerdictRing from './VerdictRing.vue';
 
 /** Two decimals like the problem header; no digit grouping, scores are read as plain numbers. */
 const SCORE_FRACTION_DIGITS = 2;
 
+/** "3 minutes ago" only needs a fresh clock once a minute. */
+const CLOCK_REFRESH_MS = 60_000;
+
 /**
- * The score card: the 128 px ring, the verdict, the score and the Bit mascot, then the failing test, passed count, time,
- * memory and language, and what to do now: "Nộp lại" for the author, "Về đề bài" for everyone (the primary action when
- * there is nothing to resubmit). The default slot is the footer of the same card (staff actions). Keep
- * `SubmissionHeroSkeleton.vue` in step.
+ * The verdict strip: the ring, the verdict, the score and the Bit mascot, then one meta line with the problem, author,
+ * date, passed count, time, memory, language and judge (the old facts card), and what to do now: "Nộp lại" for the
+ * author, "Về đề bài" for everyone (the primary action when there is nothing to resubmit). The default slot is the
+ * footer of the same card (staff actions). Keep `SubmissionHeroSkeleton.vue` in step.
  */
 const props = defineProps<{
   submission: SubmissionDetail;
   verdict: Verdict;
+  /** The problem's name when it is readable; the row's own name is the fallback. */
+  problemName: string | null;
+  /** In the viewer's contest: the contest link, the contest letter, and the minute of the run. */
+  inContest?: SubmissionInContest | null;
   /** The problem's points when it is readable. */
   problemPoints: number | null;
   /** The problem is still loading: only the score waits for it. */
@@ -50,6 +62,7 @@ const props = defineProps<{
   nextTo?: RouteLocationRaw | null;
 }>();
 const locale = useLocaleStore();
+const now = useNow(CLOCK_REFRESH_MS);
 const format = (points: number) =>
   formatNumber(points, locale.locale, SCORE_FRACTION_DIGITS, false);
 
@@ -151,21 +164,21 @@ const problem = computed(() => {
     data-testid="submission-hero"
     class="@container min-w-0 overflow-hidden rounded-card"
   >
-    <div class="flex flex-wrap items-center gap-x-6 gap-y-4 p-6 sm:p-8">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
       <div :class="motion" class="shrink-0">
         <VerdictRing
-          size="lg"
+          size="sm"
           :progress="isFinished ? null : ringProgress(submission)"
           :verdict="verdict"
           :share="partialShare"
           :is-empty="submission.status === 'PD'"
         />
       </div>
-      <div class="order-1 min-w-0 flex-1 basis-full @xl:order-none @xl:basis-40">
+      <div class="min-w-0 flex-1 @xl:flex-none">
         <p
           v-if="isLive"
           data-testid="grading-line"
-          class="flex items-center gap-2 text-display leading-9 font-semibold"
+          class="flex items-center gap-2 text-title leading-6 font-semibold"
           :style="{ color: nameColour }"
         >
           <span
@@ -178,64 +191,99 @@ const problem = computed(() => {
           v-else
           data-testid="verdict-name"
           :class="motion"
-          class="text-display leading-9 font-semibold"
+          class="text-title leading-6 font-semibold"
           :style="{ color: nameColour }"
         >
           {{ $t(verdict.labelKey) }}
         </p>
-        <p
-          data-testid="score"
-          class="mt-1 font-mono text-score leading-none font-semibold tabular-nums"
-        >
-          <span class="text-score">
-            <SkeletonBlock v-if="isProblemLoading" text class="w-40" />
+        <p data-testid="score" class="font-mono text-stat leading-none font-semibold tabular-nums">
+          <span class="text-stat">
+            <SkeletonBlock v-if="isProblemLoading" text class="w-24" />
             <template v-else>{{ scoreText.value }}</template>
           </span>
           <template v-if="!isProblemLoading && scoreText.outOf"
             >{{ ' '
-            }}<span class="text-section-legacy whitespace-nowrap text-muted">{{
+            }}<span class="text-section whitespace-nowrap text-muted">{{
               scoreText.outOf
             }}</span></template
           >
         </p>
-        <p v-if="isProvisional" data-testid="provisional" class="text-meta text-muted">
-          {{ $t('submission.provisional') }}
-        </p>
-        <p v-if="failingTest" data-testid="failing-test" class="mt-2 text-title font-semibold">
+      </div>
+      <div class="order-1 min-w-0 basis-full @xl:order-none @xl:flex-1 @xl:basis-60">
+        <p v-if="failingTest" data-testid="failing-test" class="text-meta font-semibold">
           {{ failingTest }}
         </p>
         <p
-          v-if="line || submission.language"
           data-testid="hero-line"
-          class="mt-1 text-meta text-muted"
+          class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-meta text-muted"
         >
-          {{ line }}
-          <!-- The "·" wraps with the language, never alone at a line end. -->
-          <span v-if="submission.language" class="whitespace-nowrap"
-            ><template v-if="line">· </template><LanguageLabel :language="submission.language"
+          <RouterLink
+            v-if="inContest"
+            :to="{ name: 'contest', params: { key: inContest.contest.key } }"
+            class="font-semibold text-accent-text hover:underline"
+            >{{ inContest.contest.name }}</RouterLink
+          >
+          <span v-if="submission.problem?.isDeleted" class="font-semibold text-content"
+            >{{ submission.problem.name }} <DeletedProblemChip
           /></span>
-        </p>
-        <p v-if="submission.isPretested" class="mt-1 text-meta text-muted">
-          {{ $t('submission.pretest') }}
+          <RouterLink
+            v-else-if="submission.problem"
+            :to="{
+              name: 'problem',
+              params: { code: submission.problem.code },
+              query: contestQuery,
+            }"
+            class="font-semibold text-content hover:underline"
+            ><template v-if="inContest">{{ inContest.problem.label }}. </template
+            >{{ problemName ?? submission.problem.name }}</RouterLink
+          >
+          <UserLink
+            v-if="submission.user"
+            :username="submission.user.username"
+            :rating="submission.user.rating"
+            size="sm"
+          />
+          <time
+            :datetime="submission.date"
+            :title="formatDate(submission.date, 'datetime', locale.locale)"
+            >{{
+              inContest?.minute != null
+                ? $t('submission.contest.minute', {
+                    time: formatClock(submission.date),
+                    minute: inContest.minute,
+                  })
+                : formatRelative(submission.date, now, locale.locale)
+            }}</time
+          >
+          <span v-if="line">{{ line }}</span>
+          <LanguageLabel v-if="submission.language" :language="submission.language" />
+          <span v-if="submission.judgedOn" class="font-mono">{{ submission.judgedOn }}</span>
+          <span v-if="isProvisional" data-testid="provisional">{{
+            $t('submission.provisional')
+          }}</span>
+          <span v-if="submission.isPretested">{{ $t('submission.pretest') }}</span>
         </p>
       </div>
       <BitLoop
         v-if="!isFinished"
         data-testid="judging-bit"
         kind="judging"
-        class="ml-auto [--bit-px:4px] @2xl:[--bit-px:6px]"
+        class="ml-auto [--bit-px:3px]"
       />
       <BitMascot
         v-else-if="bit"
         :look="bit.look"
         :label="$t(bit.labelKey)"
         :closed-eyes="bit.eyesShut"
-        class="ml-auto [--bit-px:4px] @2xl:[--bit-px:6px]"
+        class="ml-auto [--bit-px:3px]"
       />
       <div v-if="submission.testSummary" class="order-2 w-full @xl:order-none">
         <TestStrip :summary="submission.testSummary" :is-grading="!isFinished" />
       </div>
-      <div v-if="problem || shareId" class="order-3 flex w-full flex-wrap gap-2 @xl:order-none">
+      <div
+        v-if="problem || shareId"
+        class="order-3 flex w-full flex-wrap gap-2 @xl:order-none @xl:w-auto"
+      >
         <AppButton v-if="nextTo" tone="primary" :to="nextTo">
           {{ $t('submission.actions.next') }}
         </AppButton>

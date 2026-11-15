@@ -1536,14 +1536,6 @@
     "liveUpdates": "Cập nhật trực tiếp",
     "staleReload": "Kết nối đã dừng; tải lại để xem trạng thái mới nhất",
     "reload": "Tải lại",
-    "facts": {
-      "problem": "Bài",
-      "user": "Người nộp",
-      "language": "Ngôn ngữ",
-      "judge": "Máy chấm",
-      "submitted": "Nộp lúc",
-      "contest": "Kỳ thi"
-    },
     "pretest": "Bài nộp này chỉ chấm với bộ test mẫu (pretest).",
     "overview": {
       "title": "Theo subtask",
@@ -1593,8 +1585,7 @@
       "output": "Đầu ra",
       "compileLogHidden": "Lỗi biên dịch. Thông báo biên dịch chỉ hiện cho người xem được mã nguồn.",
       "expandAll": "Mở tất cả",
-      "collapseAll": "Thu gọn tất cả",
-      "detailsTitle": "Chi tiết từng test"
+      "collapseAll": "Thu gọn tất cả"
     },
     "source": {
       "title": "Mã nguồn",
