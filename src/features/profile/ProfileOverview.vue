@@ -2,7 +2,7 @@
 import AppButton from '@/components/ui/AppButton.vue';
 import OrganizationLogo from '@/features/organizations/OrganizationLogo.vue';
 import { computed } from 'vue';
-import Card from '@/components/ui/Card.vue';
+import PageSection from '@/components/ui/PageSection.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import UserContent from '@/components/UserContent.vue';
@@ -10,12 +10,11 @@ import { useActivityQuery, useRatingHistoryQuery } from '@/features/users/users.
 import { ratedHistory } from '@/lib/rating-chart';
 import ActivityHeatmap from './ActivityHeatmap.vue';
 import ProfileOverviewSkeleton from './ProfileOverviewSkeleton.vue';
-import ProfileStats from './ProfileStats.vue';
 import RatingChart from './RatingChart.vue';
 import RecentContests from './RecentContests.vue';
 import { useProfileUser } from './use-profile-user';
 
-/** Stats come first on a phone (`order-first`) and sit beside the main column from `lg` up. */
+/** One column: recent contests, the rating chart, then activity, about and organizations (the stats row lives in the layout). */
 const { username, query } = useProfileUser();
 const { data: user } = query;
 const {
@@ -36,14 +35,14 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
 </script>
 
 <template>
-  <div
-    v-if="user"
-    class="flex flex-col gap-4 lg:grid lg:items-start lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]"
-  >
-    <ProfileStats :user="user" class="order-first lg:order-none lg:col-start-2 lg:row-start-1" />
+  <div v-if="user" class="flex flex-col gap-(--space-section) pt-(--space-header)">
+    <QueryState :loading="ratingsPending" :error="ratingsError" @retry="refetchRatings()">
+      <template #skeleton><ProfileOverviewSkeleton part="contests" /></template>
+      <RecentContests :history="history" />
+    </QueryState>
 
-    <div class="flex min-w-0 flex-col gap-4 lg:col-start-1 lg:row-span-2 lg:row-start-1">
-      <Card data-testid="rating-card" :title="$t('ratingChart.title')" padding="md">
+    <PageSection :title="$t('ratingChart.title')">
+      <div data-testid="rating-card">
         <QueryState :loading="ratingsPending" :error="ratingsError" @retry="refetchRatings()">
           <template #skeleton><ProfileOverviewSkeleton part="chart" /></template>
           <template v-if="ratedCount > 0">
@@ -63,41 +62,34 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
             </AppButton>
           </StatePanel>
         </QueryState>
-      </Card>
+      </div>
+    </PageSection>
 
-      <Card :title="$t('profile.activityTitle')" padding="md">
-        <QueryState :loading="activityPending" :error="activityError" @retry="refetchActivity()">
-          <template #skeleton><ProfileOverviewSkeleton part="heatmap" /></template>
-          <ActivityHeatmap v-if="activity" :activity="activity" />
-        </QueryState>
-      </Card>
-
-      <QueryState :loading="ratingsPending" :error="ratingsError" @retry="refetchRatings()">
-        <template #skeleton><ProfileOverviewSkeleton part="contests" /></template>
-        <RecentContests :history="history" />
+    <PageSection :title="$t('profile.activityTitle')">
+      <QueryState :loading="activityPending" :error="activityError" @retry="refetchActivity()">
+        <template #skeleton><ProfileOverviewSkeleton part="heatmap" /></template>
+        <ActivityHeatmap v-if="activity" :activity="activity" />
       </QueryState>
-    </div>
+    </PageSection>
 
-    <div class="flex min-w-0 flex-col gap-4 lg:col-start-2 lg:row-start-2">
-      <Card v-if="user.aboutHtml" :title="$t('profile.about')" padding="md">
-        <UserContent :html="user.aboutHtml" />
-      </Card>
-      <Card v-if="user.organizations.length" :title="$t('profile.organizations')" padding="md">
-        <ul class="flex flex-col gap-1">
-          <li v-for="organization in user.organizations" :key="organization.id">
-            <RouterLink
-              :to="{ name: 'organization', params: { slug: organization.slug } }"
-              class="flex min-w-0 items-center gap-3 rounded-row p-1.5 hover:bg-surface-hover"
-            >
-              <OrganizationLogo :organization="organization" />
-              <span class="flex min-w-0 flex-col">
-                <span class="break-words font-semibold">{{ organization.name }}</span>
-                <span class="truncate text-sm text-muted">{{ organization.shortName }}</span>
-              </span>
-            </RouterLink>
-          </li>
-        </ul>
-      </Card>
-    </div>
+    <PageSection v-if="user.aboutHtml" :title="$t('profile.about')">
+      <UserContent :html="user.aboutHtml" />
+    </PageSection>
+    <PageSection v-if="user.organizations.length" :title="$t('profile.organizations')">
+      <ul class="flex flex-col gap-1">
+        <li v-for="organization in user.organizations" :key="organization.id">
+          <RouterLink
+            :to="{ name: 'organization', params: { slug: organization.slug } }"
+            class="flex min-w-0 items-center gap-3 rounded-row p-1.5 hover:bg-surface-hover"
+          >
+            <OrganizationLogo :organization="organization" />
+            <span class="flex min-w-0 flex-col">
+              <span class="break-words font-semibold">{{ organization.name }}</span>
+              <span class="truncate text-sm text-muted">{{ organization.shortName }}</span>
+            </span>
+          </RouterLink>
+        </li>
+      </ul>
+    </PageSection>
   </div>
 </template>

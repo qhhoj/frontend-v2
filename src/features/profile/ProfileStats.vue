@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { UserPage } from '@/api/types/users';
-import Card from '@/components/ui/Card.vue';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -13,7 +12,7 @@ interface StatRow {
   hint?: string;
 }
 
-/** The profile's numbers as a compact list (label muted on the left, value on the right) instead of tinted tiles; a value wraps rather than being cut. */
+/** The profile's numbers as one row under the header: each label over its value, 3 by 2 on a phone. A value wraps rather than being cut. */
 const props = defineProps<{ user: UserPage }>();
 const locale = useLocaleStore();
 
@@ -46,19 +45,13 @@ const rows = computed<StatRow[]>(() => [
 </script>
 
 <template>
-  <Card data-testid="profile-stats" :title="$t('profile.stats')" padding="md">
-    <dl class="m-0 flex flex-col divide-y divide-line">
-      <div
-        v-for="row in rows"
-        :key="row.label"
-        :title="row.hint"
-        class="flex min-h-8 items-baseline justify-between gap-3 py-1.5 text-meta"
-      >
-        <dt class="text-muted">{{ row.label }}</dt>
-        <dd class="m-0 min-w-0 text-right font-mono font-semibold tabular-nums break-words">
-          {{ row.value }}
-        </dd>
-      </div>
-    </dl>
-  </Card>
+  <dl
+    data-testid="profile-stats"
+    class="m-0 grid grid-cols-3 gap-x-4 gap-y-3 border-y border-line py-3 md:grid-cols-6"
+  >
+    <div v-for="row in rows" :key="row.label" :title="row.hint" class="min-w-0">
+      <dt class="text-caption text-muted">{{ row.label }}</dt>
+      <dd class="m-0 font-mono text-sm font-semibold tabular-nums break-words">{{ row.value }}</dd>
+    </div>
+  </dl>
 </template>
