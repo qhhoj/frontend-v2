@@ -1149,6 +1149,7 @@
       "leaderboard": "Bảng xếp hạng",
       "noPerformers": "Chưa có ai có điểm PP."
     },
+    "contestants": "{count} thí sinh",
     "continueHint": "Quay lại bài bạn đang làm dở",
     "liveEnter": "Vào thi",
     "liveScore": "{score} điểm",

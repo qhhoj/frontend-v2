@@ -6,6 +6,7 @@ import TopContributorsCard from '@/features/community/TopContributorsCard.vue';
 import { useCurrentContest } from '@/features/contests/bar/use-current-contest';
 import { useSessionStore } from '@/stores/session.store';
 import AnonymousHero from './AnonymousHero.vue';
+import ContestsCard from './ContestsCard.vue';
 import ContinueCard from './ContinueCard.vue';
 import LiveContestCard from './LiveContestCard.vue';
 import NewPostsCard from './NewPostsCard.vue';
@@ -16,9 +17,9 @@ import TopPerformersCard from './TopPerformersCard.vue';
 import UpcomingContestsCard from './UpcomingContestsCard.vue';
 
 /**
- * Signed in, top to bottom: "Tiếp tục" and "Đang thi" (when the viewer is in a contest), then my submissions, new
- * problems, rating, running and upcoming contests, posts. Below `lg` the two columns collapse into one list in that
- * order (`contents` + `order-*`); from `lg` the left column is the work, the right one the context.
+ * Signed in: the main column is the work, top to bottom "Đang thi" (when the viewer is in a contest) and "Tiếp tục",
+ * the contests, my submissions, then new problems and posts side by side. The side column is only the greeting, rating
+ * and stats card. Below `lg` the two columns collapse into one list in priority order (`contents` + `order-*`).
  * A visitor gets the sign-up card, then the public cards (contests, posts, leaderboards).
  */
 const session = useSessionStore();
@@ -29,28 +30,23 @@ const { current } = useCurrentContest();
   <div class="page-column">
     <template v-if="session.user">
       <PageHeader :title="$t('nav.home')" class="sr-only" />
-      <div class="grid gap-4 lg:grid-cols-[repeat(auto-fit,minmax(20rem,1fr))]">
-        <ContinueCard :username="session.user.username" class="order-2 lg:order-none" />
-        <!-- Phone: a running contest is the most urgent, so "Đang thi" comes before "Tiếp tục". -->
-        <LiveContestCard class="order-1 lg:order-none" />
-      </div>
       <div class="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
         <div class="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-4">
-          <RecentSubmissionsList :username="session.user.username" class="order-1 lg:order-none" />
-          <NewProblemsCard :limit="5" variant="home" class="order-2 lg:order-none" />
-          <NewPostsCard class="order-6 lg:order-none" />
+          <div
+            class="order-1 grid gap-4 lg:order-none lg:grid-cols-[repeat(auto-fit,minmax(18rem,1fr))]"
+          >
+            <LiveContestCard />
+            <ContinueCard :username="session.user.username" />
+          </div>
+          <ContestsCard :exclude-key="current?.contest.key" class="order-3 lg:order-none" />
+          <RecentSubmissionsList :username="session.user.username" class="order-4 lg:order-none" />
+          <div class="order-5 grid gap-4 lg:order-none lg:grid-cols-2">
+            <NewProblemsCard :limit="5" variant="home" />
+            <NewPostsCard />
+          </div>
         </div>
         <div class="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-4">
-          <RatingHeroCard :username="session.user.username" class="order-3 lg:order-none" />
-          <RunningContestsCard
-            narrow
-            :exclude-key="current?.contest.key"
-            class="order-4 lg:order-none"
-          />
-          <UpcomingContestsCard class="order-5 lg:order-none" />
-          <TopPerformersCard class="order-7 lg:order-none" />
-          <TopContributorsCard :limit="3" class="order-8 lg:order-none" />
-          <RecentCommentsCard :limit="4" class="order-9 lg:order-none" />
+          <RatingHeroCard :username="session.user.username" class="order-2 lg:order-none" />
         </div>
       </div>
     </template>

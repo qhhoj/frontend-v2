@@ -8,7 +8,7 @@ import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useHomeQuery } from './community.queries';
 
-/** The newest problems; `home` adds the code and date under each name and writes the points out. */
+/** The newest problems; `home` adds the code and date after each name (wide screens) and writes the points out; always one line per problem. */
 const props = withDefaults(
   defineProps<{ limit: number; variant?: 'rail' | 'home'; embedded?: boolean }>(),
   { variant: 'rail', embedded: false },
@@ -37,24 +37,25 @@ const problems = computed(() => (home.value?.newProblems ?? []).slice(0, props.l
         <li
           v-for="problem in problems"
           :key="problem.code"
-          class="flex items-start justify-between gap-3 py-1.5 first:pt-0 last:pb-0"
+          class="flex items-baseline justify-between gap-3 py-1.5 first:pt-0 last:pb-0"
         >
-          <div class="flex min-w-0 flex-col">
-            <RouterLink
-              :to="{ name: 'problem', params: { code: problem.code } }"
-              class="font-semibold hover:underline"
-            >
-              {{ problem.name }}
-            </RouterLink>
-            <span v-if="variant === 'home'" class="text-caption leading-4 text-muted">
-              {{
-                $t('blog.problemLine', {
-                  code: problem.code,
-                  date: formatDate(problem.date, 'short', locale.locale),
-                })
-              }}
-            </span>
-          </div>
+          <RouterLink
+            :to="{ name: 'problem', params: { code: problem.code } }"
+            class="min-w-0 truncate font-semibold hover:underline"
+          >
+            {{ problem.name }}
+          </RouterLink>
+          <span
+            v-if="variant === 'home'"
+            class="ml-auto hidden shrink-0 text-caption text-muted sm:inline"
+          >
+            {{
+              $t('blog.problemLine', {
+                code: problem.code,
+                date: formatDate(problem.date, 'short', locale.locale),
+              })
+            }}
+          </span>
           <span class="shrink-0 font-mono text-sm tabular-nums text-muted">
             {{
               variant === 'home'

@@ -39,8 +39,8 @@ const format = (value: number) => formatNumber(value, locale.locale);
   <Card
     v-if="current"
     data-testid="live-contest"
-    padding="lg"
-    class="flex flex-col gap-3 border-l-4 border-l-positive"
+    padding="sm"
+    class="flex flex-col gap-2 border-l-4 border-l-positive"
   >
     <p class="flex items-center gap-1.5 text-meta font-semibold text-positive">
       <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-positive" />
