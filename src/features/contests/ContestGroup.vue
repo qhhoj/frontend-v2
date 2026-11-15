@@ -50,8 +50,6 @@ const shownContests = computed(() =>
     (contest) => props.phase !== 'running' || phaseAt(contest, now.value) === 'running',
   ),
 );
-/** One running contest spans the column; two columns only from two on. */
-const isSoleRunning = computed(() => shownContests.value.length === 1);
 const hasRunEnded = computed(() => shownContests.value.length < contests.value.length);
 /** Then the server is asked once for the list without it. */
 watch(hasRunEnded, (isNowEnded) => {
@@ -128,18 +126,16 @@ const clearTagTarget = computed(() => ({
         :tag-name="filters.tag ? (tagName ?? filters.tag) : null"
         :clear-tag-target="clearTagTarget"
       />
-      <div
-        v-else-if="phase === 'running'"
-        :class="['grid gap-4', !isSoleRunning && 'lg:grid-cols-2']"
-      >
-        <RunningContestCard
-          v-for="contest in shownContests"
-          :key="contest.key"
-          :contest="contest"
-          :wide="isSoleRunning"
-          :with-edit="Boolean(organizationId)"
-        />
-      </div>
+      <Card v-else-if="phase === 'running'" as="div" class="overflow-hidden">
+        <ul class="m-0 list-none p-0">
+          <RunningContestCard
+            v-for="contest in shownContests"
+            :key="contest.key"
+            :contest="contest"
+            :with-edit="Boolean(organizationId)"
+          />
+        </ul>
+      </Card>
       <Card v-else-if="phase === 'upcoming'" as="div">
         <ul class="m-0 list-none p-0">
           <UpcomingContestRow

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppButton from '@/components/ui/AppButton.vue';
-import { ExternalLink, Printer } from 'lucide-vue-next';
+import { Printer } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ContestDetail, ContestPhase, ContestProblem } from '@/api/types/contests';
@@ -102,20 +102,17 @@ const phoneFacts = (problem: ContestProblem) =>
             <th scope="col" class="px-5 py-3 font-semibold">
               {{ $t('contests.problems.columns.label') }}
             </th>
-            <th scope="col" class="px-3 py-3 font-semibold">
+            <th scope="col" class="px-3 py-2 font-semibold">
               {{ $t('contests.problems.columns.name') }}
             </th>
-            <th scope="col" class="px-3 py-3 font-semibold whitespace-nowrap">
+            <th scope="col" class="px-3 py-2 font-semibold whitespace-nowrap">
               {{ $t('problemSwitcher.limitsColumn') }}
             </th>
-            <th scope="col" class="px-3 py-3 text-right font-semibold">
+            <th scope="col" class="px-3 py-2 text-right font-semibold">
               {{ $t('contests.problems.columns.points') }}
             </th>
-            <th v-if="hasOwnResults" scope="col" class="px-3 py-3 font-semibold whitespace-nowrap">
+            <th v-if="hasOwnResults" scope="col" class="px-3 py-2 font-semibold whitespace-nowrap">
               {{ $t('contests.problems.columns.own') }}
-            </th>
-            <th scope="col" class="px-3 py-3">
-              <span class="sr-only">{{ $t('contests.problems.columns.open') }}</span>
             </th>
           </tr>
         </thead>
@@ -123,19 +120,19 @@ const phoneFacts = (problem: ContestProblem) =>
           <tr
             v-for="problem in contest.problems"
             :key="problem.problemId"
-            class="border-t border-line"
+            class="relative border-t border-line hover:bg-surface-hover"
           >
             <th
               scope="row"
-              class="px-5 py-3 text-left font-display text-section leading-7 font-bold"
+              class="px-5 py-2 text-left font-display text-section leading-7 font-bold"
             >
               {{ problem.label }}
             </th>
-            <td class="w-full max-w-0 min-w-28 px-3 py-3">
+            <td class="w-full max-w-0 min-w-28 px-3 py-2">
               <RouterLink
                 :to="problemLink(problem)"
                 :title="problem.name"
-                class="block truncate font-semibold hover:text-accent-text"
+                class="block truncate font-semibold after:absolute after:inset-0 hover:text-accent-text"
                 >{{ problem.name }}</RouterLink
               >
               <span :title="problem.code" class="block truncate font-mono text-caption text-muted">
@@ -145,19 +142,12 @@ const phoneFacts = (problem: ContestProblem) =>
                 {{ capLines.get(problem.problemId) }}
               </span>
             </td>
-            <td class="px-3 py-3 font-mono text-meta whitespace-nowrap tabular-nums">
+            <td class="px-3 py-2 font-mono text-meta whitespace-nowrap tabular-nums">
               {{ limitsText(problem) }}
             </td>
-            <td class="px-3 py-3 text-right font-mono tabular-nums">{{ pointsOf(problem) }}</td>
-            <td v-if="hasOwnResults" class="max-w-40 px-3 py-3 xl:max-w-none">
+            <td class="px-3 py-2 text-right font-mono tabular-nums">{{ pointsOf(problem) }}</td>
+            <td v-if="hasOwnResults" class="max-w-40 px-3 py-2 xl:max-w-none">
               <OwnResultChip :problem="problem" :context="context" />
-            </td>
-            <td class="px-3 py-3 text-right">
-              <AppButton :to="problemLink(problem)" icon-only :title="$t('contests.problems.open')">
-                <span class="sr-only"
-                  >{{ $t('contests.problems.open') }} {{ problem.label }}. {{ problem.name }}</span
-                ><ExternalLink class="size-4" aria-hidden="true" />
-              </AppButton>
             </td>
           </tr>
         </tbody>
@@ -166,7 +156,7 @@ const phoneFacts = (problem: ContestProblem) =>
         <li
           v-for="problem in contest.problems"
           :key="problem.problemId"
-          class="flex min-h-16 items-center gap-3 border-t border-line px-3.5 py-3 first:border-t-0"
+          class="relative flex min-h-14 items-center gap-3 border-t border-line px-3.5 py-3 first:border-t-0"
         >
           <span class="w-7 font-display text-[22px] font-bold" aria-hidden="true">
             {{ problem.label }}
@@ -174,7 +164,7 @@ const phoneFacts = (problem: ContestProblem) =>
           <div class="min-w-0 flex-1">
             <RouterLink
               :to="problemLink(problem)"
-              class="flex min-h-11 min-w-0 items-center font-semibold"
+              class="flex min-h-9 min-w-0 items-center font-semibold after:absolute after:inset-0"
               ><span class="sr-only">{{ problem.label }}. </span
               ><span class="line-clamp-2">{{ problem.name }}</span></RouterLink
             >
