@@ -12,7 +12,6 @@ const ARBITRARY =
  */
 export const ALLOWED = {
   'features/contests/ContestProblemsTable.vue': ['text-[22px]'],
-  'features/auth/LoginBrandPanel.vue': ['text-[34px]'],
   'features/appearance/AppearancePreview.vue': ['text-[22px]'],
   'components/CryingBit.vue': ['rounded-[50%]'],
   'features/runtimes/JudgeCard.vue': ['rounded-[2px]'],
