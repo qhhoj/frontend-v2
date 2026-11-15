@@ -61,7 +61,7 @@ const LINK =
         <span class="text-caption leading-4 text-muted">{{
           $t(`admin.contests.general.rail.${stat.key}`)
         }}</span>
-        <span class="font-display text-section leading-7 font-semibold tabular-nums">{{
+        <span class="font-display text-section-legacy leading-7 font-semibold tabular-nums">{{
           stat.value
         }}</span>
         <span v-if="stat.note" class="text-caption leading-4 text-muted">

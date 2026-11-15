@@ -124,7 +124,7 @@ const phoneFacts = (problem: ContestProblem) =>
           >
             <th
               scope="row"
-              class="px-5 py-2 text-left font-display text-section leading-7 font-bold"
+              class="px-5 py-2 text-left font-display text-section-legacy leading-7 font-bold"
             >
               {{ problem.label }}
             </th>

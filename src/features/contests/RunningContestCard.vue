@@ -48,7 +48,7 @@ const perParticipation = computed(() =>
       <PhasePill phase="running" />
       <h3
         :title="contest.name"
-        class="min-w-0 truncate font-display text-section leading-7 font-semibold"
+        class="min-w-0 truncate font-display text-section-legacy leading-7 font-semibold"
       >
         {{ contest.name }}
       </h3>
