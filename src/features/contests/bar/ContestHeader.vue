@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { Printer, Snowflake, Timer } from 'lucide-vue-next';
+import { Ellipsis, Printer, Snowflake, Timer } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import type { ContestDetail, ContestPhase } from '@/api/types/contests';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import Chip from '@/components/ui/Chip.vue';
+import IconButton from '@/components/ui/IconButton.vue';
+import Menu from '@/components/ui/Menu.vue';
 import type { MenuEntry } from '@/components/ui/Menu.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
@@ -49,6 +52,12 @@ const { current: participation } = useCurrentContest();
 const run = computed(() =>
   participation.value?.contest.key === props.contestKey ? participation.value.participation : null,
 );
+const route = useRoute();
+/**
+ * The join, virtual and register buttons sit on the contest's main tab only. A viewer who is in the contest keeps the
+ * status line ("Rời kỳ thi") on every tab: the leave button has no other home while the header shows the clock.
+ */
+const showsActions = computed(() => route.name === 'contest' || run.value !== null);
 const phase = computed(() => (props.contest ? phaseAt(props.contest, now.value) : undefined));
 const clockUntil = computed(() => {
   const contest = props.contest;
@@ -111,7 +120,7 @@ const freeze = computed(() =>
 
 <template>
   <div data-testid="contest-page-header">
-    <PageHeader v-if="contest" :title="contest.name" :overflow="overflow">
+    <PageHeader v-if="contest" :title="contest.name" beside-from="xl">
       <template v-if="contest.logoOverrideImage" #start>
         <img
           :src="contest.logoOverrideImage"
@@ -147,7 +156,25 @@ const freeze = computed(() =>
           </span>
         </template>
       </template>
-      <template #actions>
+      <template #titleTools>
+        <Menu v-if="overflow.length > 0" :items="overflow" :label="$t('common.moreActions')">
+          <template #trigger="{ toggle, open, setOpener }">
+            <IconButton
+              :ref="(el) => setOpener((el as { $el?: HTMLElement } | null)?.$el ?? null)"
+              tone="secondary"
+              :label="$t('nav.more')"
+              aria-haspopup="menu"
+              :aria-expanded="open"
+              data-testid="page-header-overflow"
+              @click="toggle"
+            >
+              <Ellipsis aria-hidden="true" />
+            </IconButton>
+          </template>
+        </Menu>
+        <ShortLinkButton compact :path="shortLinkPath({ kind: 'contest', key: contest.key })" />
+      </template>
+      <template v-if="freeze || clockUntil || showsActions" #actions>
         <span
           v-if="freeze"
           data-testid="freeze-chip"
@@ -169,13 +196,13 @@ const freeze = computed(() =>
           <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
           <CountdownTimer :key="clockUntil" :until="clockUntil" @elapsed="emit('elapsed')" />
         </p>
-        <!-- Capped from `md`: a note under the button (virtual run, spectating) wraps instead of widening the column over the title. -->
+        <!-- Under `xl` the actions are one row under the title; from `xl` a column beside it, capped so a note wraps instead of widening it over the title. -->
         <ContestActions
+          v-if="showsActions"
           :contest="contest"
           :current="participation"
-          class="md:max-w-80 md:items-end md:text-right"
+          class="max-xl:flex-row max-xl:flex-wrap max-xl:items-center xl:max-w-80 xl:items-end xl:text-right"
         />
-        <ShortLinkButton compact :path="shortLinkPath({ kind: 'contest', key: contest.key })" />
       </template>
       <template #tabs>
         <ContestTabs :contest-key="contestKey" :phase="contest.phase" :current="current" />
