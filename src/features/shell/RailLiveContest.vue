@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n';
 import type { CurrentParticipation } from '@/api/types/contests';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import { participationKind } from '@/features/contests/bar/current-contest';
-import { useContestQuery, useRankingQuery } from '@/features/contests/contests.queries';
+import { useContestQuery } from '@/features/contests/contests.queries';
 import { solvedSummary } from '@/features/contests/own-result';
 import { formatNumber } from '@/lib/format';
 import { useMediaQuery } from '@/lib/use-media-query';
@@ -13,15 +13,12 @@ import { useLocaleStore } from '@/stores/locale.store';
 
 /**
  * The rail's card for the contest the viewer is in: its status, name, the clock, and for a contestant the rank and the
- * solved count. The rank is the viewer's row of the board the ranking tab reads (the same query, so with the tab open
- * there is still one poll), re-read every 2 minutes; it is left out when the board is closed to the viewer, failed,
- * shows no rank or is frozen. The solved count comes from the contest's problem list (the contest page's query), re-read
+ * solved count. The rank is `standing.rank` of the participation (re-read every 2 minutes); it is left out when there is none
+ * or the board is frozen. The solved count comes from the contest's problem list (the contest page's query), re-read
  * after each of the viewer's verdicts. A spectator sees the clock only.
  */
-/** The rank and the solved count are drawn on the wide rail only; narrower, neither the board nor the list is asked. */
+/** The rank and the solved count are drawn on the wide rail only; narrower, the list is not asked. */
 const WIDE_RAIL_QUERY = '(min-width: 68.75rem)';
-/** A rank hint, not the ranking tab: a slow re-read keeps a full-board poll per contestant cheap. */
-const RAIL_BOARD_POLL_MS = 120_000;
 const props = defineProps<{ current: CurrentParticipation }>();
 const { t } = useI18n();
 const locale = useLocaleStore();
@@ -37,23 +34,10 @@ const isContestant = computed(() => kind.value !== 'spectate');
 const isWideRail = useMediaQuery(WIDE_RAIL_QUERY);
 const isAsked = computed(() => isContestant.value && isWideRail.value);
 const contest = useContestQuery(contestKey, isAsked);
-/** A board closed to this viewer (hidden, or open only after the contest) is not polled for a rank it cannot show. */
-const isBoardAsked = computed(
-  () => isAsked.value && contest.data.value?.viewer.canSeeFullScoreboard === true,
+/** The rank, from `standing`: null for a spectator, before the start, when the board is hidden and while it is frozen. */
+const rank = computed(() =>
+  props.current.standing?.frozen ? null : (props.current.standing?.rank ?? null),
 );
-const board = useRankingQuery(
-  contestKey,
-  computed(() => kind.value === 'virtual'),
-  isAsked,
-  { isEnabled: isBoardAsked, pollMs: RAIL_BOARD_POLL_MS },
-);
-/** Never a stale rank: none once the board is closed (403, or the contest says so) or its last read failed. */
-const rank = computed(() => {
-  const ranking = board.data.value;
-  if (!isBoardAsked.value || board.isError.value || !ranking || ranking.frozen) return null;
-  const own = ranking.rows.find((row) => row.participationId === props.current.participation.id);
-  return own?.rank ?? null;
-});
 /** Null while the problems are not shown yet (before the start). */
 const solved = computed(() => {
   const problems = contest.data.value?.problems;

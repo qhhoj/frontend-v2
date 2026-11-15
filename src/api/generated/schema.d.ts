@@ -9552,6 +9552,8 @@ export interface components {
         CurrentParticipationResponse: {
             contest: components["schemas"]["CurrentContestResponse"];
             participation: components["schemas"]["ParticipationSummaryResponse"];
+            /** @description The viewer's place on the board a non-editor sees (frozen while frozen); null for a spectator, before the start and when the board is hidden from them (a contestant whose board is hidden still gets their own score, with a null rank). */
+            standing: components["schemas"]["OwnStandingResponse"] | null;
         };
         CurrentPasswordDto: {
             /** @description The account password, re-entered to confirm the change. */
@@ -10798,6 +10800,16 @@ export interface components {
          * @enum {string}
          */
         OverrideResult: "AC" | "IR" | "MLE" | "OLE" | "RTE" | "TLE" | "WA";
+        OwnStandingResponse: {
+            /** @description Cumulative time (penalty) in seconds. */
+            cumtime: number;
+            /** @description Whether the values are the frozen ones. */
+            frozen: boolean;
+            /** @description Null when the board shows only the viewer's row. */
+            rank: number | null;
+            /** @description Total score. */
+            score: number;
+        };
         PackageBuildingResponse: {
             /**
              * @description Always `building`.

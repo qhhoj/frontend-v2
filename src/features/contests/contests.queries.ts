@@ -50,13 +50,17 @@ export const useContestQuery = (
   });
 };
 
-/** The viewer's current participation (virtual run number and end); asked only while in a contest. */
+/** Re-read while the viewer is in a contest, so the standing in the shell (rank, score) stays current; a viewer in none is not polled. */
+const CURRENT_POLL_MS = 120_000;
+
+/** The viewer's current participation (virtual run number, end and standing); asked only while in a contest. */
 export const useCurrentParticipationQuery = (isEnabled: Ref<boolean>) => {
   const viewerId = useViewerId();
   return useQuery({
     enabled: isEnabled,
     queryKey: computed(() => ['contests', 'current', viewerId.value]),
     queryFn: fetchCurrentParticipation,
+    refetchInterval: (query) => (query.state.data ? CURRENT_POLL_MS : false),
   });
 };
 
@@ -103,29 +107,19 @@ const keepBoardOfContest = (viewerId: string, contestKey: string) => {
       : undefined;
 };
 
-/** A reader that is not the ranking tab: it may stay off, and may re-read a running board less often. */
-interface RankingReader {
-  isEnabled?: MaybeRefOrGetter<boolean>;
-  pollMs?: number;
-}
-
 export const useRankingQuery = (
   key: MaybeRefOrGetter<string>,
   withVirtual: Ref<boolean>,
   running: Ref<boolean>,
-  { isEnabled = true, pollMs }: RankingReader = {},
 ) => {
   const viewerId = useViewerId();
   const isLowPower = useLowPowerPainted();
   return useQuery({
-    enabled: () => toValue(isEnabled),
     queryKey: computed(() => rankingKey(viewerId.value, toValue(key), withVirtual.value)),
     queryFn: () => fetchRanking(toValue(key), withVirtual.value),
     /** Switching the virtual toggle keeps the old board on screen (never another contest's or viewer's). */
     placeholderData: computed(() => keepBoardOfContest(viewerId.value, toValue(key))),
-    refetchInterval: computed(() =>
-      running.value ? (pollMs ?? rankingPollMs(isLowPower.value)) : false,
-    ),
+    refetchInterval: computed(() => (running.value ? rankingPollMs(isLowPower.value) : false)),
     /** A hidden tab does not poll; it refetches when it becomes visible again. */
     refetchIntervalInBackground: false,
   });

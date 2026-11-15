@@ -47,7 +47,7 @@ describe('contest bar on contest pages (M-01)', () => {
     expect(wrapper.find('[data-testid="contest-clock"]').exists()).toBe(false);
   });
 
-  it("links back to the viewer's contest from another contest's page", async () => {
+  it("shows a chip in the top bar, not the bar, on another contest's page", async () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
     mockApi({
       ...signedInViewer(),
@@ -56,8 +56,31 @@ describe('contest bar on contest pages (M-01)', () => {
       'GET /contests/trash_ended/announcements': page([]),
     });
     const { wrapper } = await mountApp('/contests/r42');
-    await vi.waitFor(() => expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(true));
-    const links = wrapper.get('[data-testid="contest-bar"] nav').findAll('a');
-    expect(links.map((link) => link.attributes('href'))).toContain('/contests/trash_ended/ranking');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="top-bar-live-contest"]').exists()).toBe(true),
+    );
+    expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(false);
+  });
+  it.each([
+    [false, '#7'],
+    [true, null],
+  ])('chip shows the rank only on a live board (frozen: %s)', async (frozen, shown) => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(),
+      'GET /contests/current': ok({
+        ...run('trash_ended', 'Trash Cup 2026'),
+        standing: { rank: 7, score: 100, cumtime: 0, frozen },
+      }),
+      'GET /contests/trash_ended/announcements': page([]),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="top-bar-live-contest"]').exists()).toBe(true),
+    );
+    expect(wrapper.get('[data-testid="top-bar-live-contest"]').text().includes('#7')).toBe(
+      shown !== null,
+    );
   });
 });

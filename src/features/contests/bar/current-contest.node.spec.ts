@@ -23,6 +23,7 @@ const current = (
     virtual: 0,
     ...participation,
   },
+  standing: null,
 });
 
 describe('activeParticipation', () => {
