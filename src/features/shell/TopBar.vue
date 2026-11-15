@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Search } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import type { CurrentParticipation } from '@/api/types/contests';
 import AppButton from '@/components/ui/AppButton.vue';
 import BrandWordmark from '@/components/ui/BrandWordmark.vue';
 import IconButton from '@/components/ui/IconButton.vue';
@@ -14,6 +15,7 @@ import { useIsFirstNavigationPending } from '@/router/first-navigation';
 import { pageTitle } from '@/router/page-title';
 import { useSessionStore } from '@/stores/session.store';
 import LocaleToggle from './LocaleToggle.vue';
+import TopBarLiveContest from './TopBarLiveContest.vue';
 import { useCurrentSection } from './nav-items';
 
 /**
@@ -22,6 +24,8 @@ import { useCurrentSection } from './nav-items';
  * On a phone (56 px): back to the section, the page's name (the brand on the home page), search, and the bell or sign-in.
  * It owns the notification stream's announcements in both layouts.
  */
+/** `liveContest`: the contest the viewer is in, to show as a chip; null on that contest's own pages (its bar shows it). */
+defineProps<{ liveContest: CurrentParticipation | null }>();
 const emit = defineEmits<{ search: [] }>();
 const { t } = useI18n();
 const route = useRoute();
@@ -57,6 +61,7 @@ const isHome = computed(() => route.path === '/');
         pageName ?? sectionLabel ?? $t('app.name')
       }}</span>
       <div class="ml-auto flex shrink-0 items-center gap-1">
+        <TopBarLiveContest v-if="liveContest" :current="liveContest" />
         <IconButton
           data-testid="top-bar-search"
           :label="$t('search.title')"
@@ -100,6 +105,7 @@ const isHome = computed(() => route.path === '/');
       </nav>
       <div id="top-bar-actions" class="flex shrink-0 items-center gap-2" />
       <div class="flex shrink-0 items-center gap-1">
+        <TopBarLiveContest v-if="liveContest" :current="liveContest" />
         <NotificationBell compact />
         <LocaleToggle compact />
         <AppearancePanel compact />

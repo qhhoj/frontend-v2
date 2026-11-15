@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineAsyncComponent, ref } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAccountAppearanceSync } from '@/features/appearance/use-account-appearance';
 import BitRoamLayer from '@/features/bit-roam/BitRoamLayer.vue';
@@ -15,6 +15,7 @@ import OfficialModeBanner from '@/features/official-mode/OfficialModeBanner.vue'
 import SiteNoticeBanner from '@/features/site-notice/SiteNoticeBanner.vue';
 import LoadingLayer from './LoadingLayer.vue';
 import CommandPalette from './search/CommandPalette.vue';
+import { navSectionOverride } from './nav-section';
 import TabBar from './TabBar.vue';
 import TopBar from './TopBar.vue';
 import { useAccountCacheSync } from './use-account-cache';
@@ -33,6 +34,14 @@ const { current: currentContest } = useCurrentContest(
   () => route.meta.layout !== 'admin' && route.meta.layout !== 'auth',
 );
 const isSearchOpen = ref(false);
+/** On the contest's own pages its bar is the status; on every other page the top bar carries a chip instead. */
+const isOnCurrentContest = computed(
+  () =>
+    currentContest.value !== null &&
+    (route.params.key === currentContest.value.contest.key ||
+      navSectionOverride.value === '/contests'),
+);
+const chipContest = computed(() => (isOnCurrentContest.value ? null : currentContest.value));
 </script>
 
 <template>
@@ -63,8 +72,8 @@ const isSearchOpen = ref(false);
     <div v-else class="flex flex-1">
       <AppRail :current="currentContest" @search="isSearchOpen = true" />
       <div class="flex min-w-0 flex-1 flex-col">
-        <TopBar @search="isSearchOpen = true" />
-        <ContestBar v-if="currentContest" :current="currentContest" />
+        <TopBar :live-contest="chipContest" @search="isSearchOpen = true" />
+        <ContestBar v-if="currentContest && isOnCurrentContest" :current="currentContest" />
         <LiveAnnouncementAlert class="print:hidden" />
         <SiteNoticeBanner class="print:hidden" />
         <OfficialModeBanner class="print:hidden" />

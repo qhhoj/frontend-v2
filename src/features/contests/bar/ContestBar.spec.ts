@@ -47,7 +47,7 @@ describe('contest bar on contest pages (M-01)', () => {
     expect(wrapper.find('[data-testid="contest-clock"]').exists()).toBe(false);
   });
 
-  it("links back to the viewer's contest from another contest's page", async () => {
+  it("shows a chip in the top bar, not the bar, on another contest's page", async () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
     mockApi({
       ...signedInViewer(),
@@ -56,8 +56,12 @@ describe('contest bar on contest pages (M-01)', () => {
       'GET /contests/trash_ended/announcements': page([]),
     });
     const { wrapper } = await mountApp('/contests/r42');
-    await vi.waitFor(() => expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(true));
-    const links = wrapper.get('[data-testid="contest-bar"] nav').findAll('a');
-    expect(links.map((link) => link.attributes('href'))).toContain('/contests/trash_ended/ranking');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="top-bar-live-contest"]').exists()).toBe(true),
+    );
+    expect(wrapper.get('[data-testid="top-bar-live-contest"]').attributes('href')).toBe(
+      '/contests/trash_ended',
+    );
+    expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(false);
   });
 });

@@ -408,7 +408,9 @@ describe('contest actions: a virtual run of another contest', () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
     const calls = mockApi(routes());
     const { wrapper } = await mountApp('/contests/r42');
-    await vi.waitFor(() => expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(true));
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="top-bar-live-contest"]').exists()).toBe(true),
+    );
     await buttonNamed(wrapper, 'Vào thi').trigger('click');
     await flushPromises();
     expect(dialog()!.textContent).toContain('Trash Cup 2026');
@@ -421,7 +423,9 @@ describe('contest actions: a virtual run of another contest', () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
     const calls = mockApi(routes());
     const { wrapper } = await mountApp('/contests/r42');
-    await vi.waitFor(() => expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(true));
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="top-bar-live-contest"]').exists()).toBe(true),
+    );
     await buttonNamed(wrapper, 'Vào thi').trigger('click');
     await flushPromises();
     dialogButton('Vào thi').click();
