@@ -2,7 +2,6 @@
 import Chip from '@/components/ui/Chip.vue';
 import { computed, watch } from 'vue';
 import type { ContestPhase } from '@/api/types/contests';
-import Card from '@/components/ui/Card.vue';
 import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import QueryState from '@/components/QueryState.vue';
 import SubmissionPager from '@/features/submissions/SubmissionPager.vue';
@@ -126,26 +125,16 @@ const clearTagTarget = computed(() => ({
         :tag-name="filters.tag ? (tagName ?? filters.tag) : null"
         :clear-tag-target="clearTagTarget"
       />
-      <Card v-else-if="phase === 'running'" as="div" class="overflow-hidden">
-        <ul class="m-0 list-none p-0">
-          <RunningContestCard
-            v-for="contest in shownContests"
-            :key="contest.key"
-            :contest="contest"
-            :with-edit="Boolean(organizationId)"
-          />
-        </ul>
-      </Card>
-      <Card v-else-if="phase === 'upcoming'" as="div">
-        <ul class="m-0 list-none p-0">
-          <UpcomingContestRow
-            v-for="contest in shownContests"
-            :key="contest.key"
-            :contest="contest"
-            :with-edit="Boolean(organizationId)"
-          />
-        </ul>
-      </Card>
+      <!-- Blocks wrap and grow, so the last row is filled: 1 block is the full width, 2 halves, 4 on a 3-wide row 3 and 1 wide. -->
+      <ul v-else-if="phase !== 'ended'" class="m-0 flex list-none flex-wrap gap-3 p-0">
+        <component
+          :is="phase === 'running' ? RunningContestCard : UpcomingContestRow"
+          v-for="contest in shownContests"
+          :key="contest.key"
+          :contest="contest"
+          :with-edit="Boolean(organizationId)"
+        />
+      </ul>
       <EndedContestTable
         v-else
         :contests="shownContests"

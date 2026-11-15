@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import Card from '@/components/ui/Card.vue';
 import type { ContestListItem } from '@/api/types/contests';
 import { spanMessage } from '@/lib/contest-time';
 import { formatNumber } from '@/lib/format';
@@ -36,58 +37,61 @@ const startsInText = computed(() =>
 </script>
 
 <template>
-  <li
+  <Card
+    as="li"
+    :to="{ name: 'contest', params: { key: contest.key } }"
+    :link-label="contest.name"
     data-testid="upcoming-contest"
-    class="relative flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line px-4 py-3 first:border-t-0 hover:bg-surface-hover md:px-5"
+    class="flex min-w-0 grow basis-80 flex-col gap-2 p-4"
   >
-    <span
-      data-testid="day-chip"
-      class="flex size-14 shrink-0 flex-col items-center justify-center rounded-row bg-accent-soft text-accent-soft-text"
-    >
-      <span class="font-display text-display leading-none font-bold">{{ dayTile.day }}</span>
-      <span class="text-caption font-semibold">{{ dayTile.month }}</span>
-      <span v-if="dayTile.year" class="text-tiny leading-none">{{ dayTile.year }}</span>
-    </span>
-    <!-- On a phone the name takes the rest of the day chip's line (basis 0 let the times share it, one word a line). -->
-    <div class="min-w-0 flex-1 basis-[calc(100%-5rem)] sm:basis-0">
-      <h3 class="font-display text-subtitle leading-6 font-semibold">
-        <RouterLink
-          :to="{ name: 'contest', params: { key: contest.key } }"
-          class="after:absolute after:inset-0 hover:text-accent-text"
-          >{{ contest.name }}</RouterLink
+    <div class="flex min-w-0 items-center gap-3">
+      <span
+        data-testid="day-chip"
+        class="flex size-12 shrink-0 flex-col items-center justify-center rounded-row bg-accent-soft text-accent-soft-text"
+      >
+        <span class="font-display text-subtitle leading-none font-bold">{{ dayTile.day }}</span>
+        <span class="text-tiny font-semibold">{{ dayTile.month }}</span>
+      </span>
+      <div class="min-w-0">
+        <h3
+          :title="contest.name"
+          class="truncate font-display text-subtitle leading-6 font-semibold"
         >
-      </h3>
-      <p v-if="contest.summary" class="text-sm text-muted">{{ contest.summary }}</p>
-      <div class="mt-1 flex flex-wrap items-center gap-1.5 [&_a]:relative">
-        <ContestChips :contest="contest" with-tags with-code-needed />
-        <ViewerBadge :badge-key="call.badgeKey" />
-        <template v-if="withEdit">
-          <span class="font-mono text-caption text-muted">{{ contest.key }}</span>
-          <ContestEditLink :contest="contest" />
-        </template>
+          {{ contest.name }}
+        </h3>
+        <p class="truncate text-sm text-muted">
+          <span class="font-mono font-semibold tabular-nums">{{ timeRange }}</span>
+          · {{ durationText }}
+        </p>
       </div>
     </div>
-    <div class="text-sm">
-      <p class="font-mono font-semibold tabular-nums">{{ timeRange }}</p>
-      <p class="text-muted">
-        {{ durationText }} · {{ $t('contests.list.startsIn', { relative: startsInText }) }}
-      </p>
+    <div class="flex flex-wrap items-center gap-1.5 [&_a]:relative">
+      <ContestChips :contest="contest" with-tags with-code-needed />
+      <ViewerBadge :badge-key="call.badgeKey" />
+      <template v-if="withEdit">
+        <span class="font-mono text-caption text-muted">{{ contest.key }}</span>
+        <ContestEditLink :contest="contest" />
+      </template>
     </div>
-    <p class="text-sm text-muted">
-      {{
-        $t(
-          'contests.participants',
-          { count: formatNumber(contest.userCount, locale.locale) },
-          contest.userCount,
-        )
-      }}
-    </p>
-    <ContestCallLink
-      compact
-      :contest-key="contest.key"
-      :contest-name="contest.name"
-      :label-key="call.labelKey"
-      :is-primary="call.isPrimary"
-    />
-  </li>
+    <div class="mt-auto flex items-center justify-between gap-3 pt-1">
+      <p class="min-w-0 text-sm text-muted">
+        {{ $t('contests.list.startsIn', { relative: startsInText }) }}
+        ·
+        {{
+          $t(
+            'contests.participants',
+            { count: formatNumber(contest.userCount, locale.locale) },
+            contest.userCount,
+          )
+        }}
+      </p>
+      <ContestCallLink
+        compact
+        :contest-key="contest.key"
+        :contest-name="contest.name"
+        :label-key="call.labelKey"
+        :is-primary="call.isPrimary"
+      />
+    </div>
+  </Card>
 </template>
