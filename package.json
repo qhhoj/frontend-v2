@@ -18,9 +18,7 @@
     "raw-elements:shrink": "node scripts/raw-elements.mjs --shrink",
     "lint:copy": "node scripts/check-vi-copy.mjs",
     "format": "prettier --write .",
-    "test": "vitest run --project node --project dom",
-    "test:scripts": "vitest run --project scripts",
-    "test:scanners": "bash scripts/run-scanner-specs.sh",
+    "test": "vitest run",
     "api:gen": "node scripts/api-gen.mjs",
     "api:check": "node scripts/api-gen.mjs --check",
     "check": "npm run api:check && npm run lint && npm run typecheck && npm test"
