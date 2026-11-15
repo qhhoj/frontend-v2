@@ -36,10 +36,10 @@
     "empty": "Chưa có kỳ thi nào.",
     "columns": {
       "contest": "Kỳ thi",
-      "phase": "Giai đoạn",
+      "state": "Trạng thái",
       "time": "Thời gian",
       "users": "Thí sinh",
-      "flags": "Trạng thái"
+      "flags": "Ghi chú"
     },
     "window": "{start} → {end}",
     "scopeLabel": "Phạm vi",
@@ -72,6 +72,10 @@
       "rated": "{value}",
       "from": "Từ {value}",
       "before": "Trước {value}"
+    },
+    "state": {
+      "draft": "Bản nháp",
+      "frozen": "Đóng băng bảng"
     },
     "badges": {
       "hidden": "Đang ẩn",

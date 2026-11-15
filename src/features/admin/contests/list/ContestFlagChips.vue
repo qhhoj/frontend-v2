@@ -14,11 +14,15 @@ interface Flag {
   tone: ChipTone;
   icon: Component;
 }
+/** A hidden contest that has not started is a draft: the state chip says so. */
+const isHiddenAfterStart = computed(
+  () => props.contest.editor?.isVisible === false && props.contest.phase !== 'upcoming',
+);
 const flags = computed<Flag[]>(() => {
   const contest = props.contest;
   const lockedAfter = contest.editor?.lockedAfter;
   const shown: [boolean, Flag][] = [
-    [contest.editor?.isVisible === false, { key: 'hidden', tone: 'caution', icon: EyeOff }],
+    [isHiddenAfterStart.value, { key: 'hidden', tone: 'caution', icon: EyeOff }],
     [contest.isPrivate, { key: 'private', tone: 'neutral', icon: Lock }],
     [contest.isOrganizationPrivate, { key: 'organization', tone: 'neutral', icon: Building2 }],
     [
