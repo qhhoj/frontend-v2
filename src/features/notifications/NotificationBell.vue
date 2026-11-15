@@ -27,7 +27,7 @@ import { useOpenNotification } from './use-open-notification';
 
 /**
  * The bell beside the user menu (from `md`; a phone reaches notifications from the menu sheet); its drawer shows the
- * latest five rows. The live stream and the arrival announcements are the header's (`useNotificationAlerts`).
+ * latest five rows. The live stream and the arrival announcements are `NotificationAnnouncer`'s (`useNotificationAlerts`).
  */
 const session = useSessionStore();
 const locale = useLocaleStore();

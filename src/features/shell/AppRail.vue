@@ -14,6 +14,7 @@ import { NAV_ITEMS, useIsNavCurrent, useNavLinkEvents } from './nav-items';
 import RailLiveContest from './RailLiveContest.vue';
 import { useRunningContestCount } from './use-running-contest-count';
 import { shortcutHint } from '@/lib/shortcut-hint';
+import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useRailCollapse } from './use-rail-collapse';
 import UserMenu from './UserMenu.vue';
 
@@ -31,6 +32,8 @@ const isCurrent = useIsNavCurrent();
 const linkEvents = useNavLinkEvents();
 const runningCount = useRunningContestCount();
 const { isCollapsed, toggle } = useRailCollapse();
+/** Below `md` the rail is hidden by CSS: its bell, language and look controls are not mounted then, so the phone's top bar owns the only bell. */
+const isPhone = useMediaQuery(PHONE_QUERY);
 const BIT: BitLook = { headgear: 'none', palette: 'terracotta' };
 
 /** One row: 36 px for a mouse, 44 on touch; the current section is a panel with an accent edge. */
@@ -107,7 +110,11 @@ const CURRENT_ROW =
     </nav>
     <RailLiveContest v-if="current" :current="current" class="mt-auto" />
     <div :class="['flex flex-col gap-1 border-t border-line pt-2', !current && 'mt-auto']">
-      <div class="flex items-center gap-1 rail-slim:flex-col">
+      <!-- Icons stay 24 px; each button is a 44 px target (the rail's 48 px inner width fits it). -->
+      <div
+        v-if="!isPhone"
+        class="flex items-center gap-1 rail-slim:flex-col [&>button]:min-h-11! [&>button]:min-w-11!"
+      >
         <NotificationBell compact />
         <LocaleToggle compact />
         <AppearancePanel compact />
