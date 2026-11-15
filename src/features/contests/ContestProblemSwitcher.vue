@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-vue-next';
+import IconButton from '@/components/ui/IconButton.vue';
 import type { SwitcherEntry, SwitcherStatus } from './problem-switcher';
 
 /**
@@ -43,18 +44,16 @@ const LINK =
     :aria-label="$t('problemSwitcher.title')"
     class="glass min-w-0 rounded-card p-2 lg:sticky lg:top-20"
   >
-    <button
-      type="button"
-      data-testid="problem-switcher-toggle"
-      :aria-expanded="!collapsed"
-      :aria-label="$t(collapsed ? 'problemSwitcher.expand' : 'problemSwitcher.collapse')"
-      :title="$t(collapsed ? 'problemSwitcher.expand' : 'problemSwitcher.collapse')"
-      class="hidden min-h-11 w-full items-center rounded-row px-3 hover:bg-surface-hover lg:flex"
-      :class="collapsed ? 'justify-center' : 'justify-end'"
-      @click="$emit('toggle')"
-    >
-      <component :is="collapsed ? PanelLeftOpen : PanelLeftClose" aria-hidden="true" class="size-4" />
-    </button>
+    <div class="hidden lg:flex" :class="collapsed ? 'justify-center' : 'justify-end'">
+      <IconButton
+        :label="$t(collapsed ? 'problemSwitcher.expand' : 'problemSwitcher.collapse')"
+        data-testid="problem-switcher-toggle"
+        :aria-expanded="!collapsed"
+        @click="$emit('toggle')"
+      >
+        <component :is="collapsed ? PanelLeftOpen : PanelLeftClose" aria-hidden="true" />
+      </IconButton>
+    </div>
     <RouterLink
       :to="{ name: 'contest', params: { key: contestKey } }"
       class="hidden min-h-11 items-center px-3 font-display text-sm font-semibold hover:text-accent-text lg:flex"
@@ -72,7 +71,11 @@ const LINK =
           <span class="font-display text-subtitle leading-7 font-bold">{{ entry.label }}</span>
           <span
             aria-hidden="true"
-            :class="['hidden size-2 rounded-full', DOT_CLASSES[entry.status], collapsed && 'lg:block']"
+            :class="[
+              'hidden size-2 rounded-full',
+              DOT_CLASSES[entry.status],
+              collapsed && 'lg:block',
+            ]"
           ></span>
           <span :class="['flex min-w-0 flex-col', collapsed && 'lg:sr-only']">
             <span class="max-w-40 truncate font-semibold lg:max-w-none lg:whitespace-normal">{{

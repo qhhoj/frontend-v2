@@ -101,7 +101,9 @@ watch(
       contest && railEntries
         ? [
             'lg:grid lg:items-start',
-            railCollapsed ? 'lg:grid-cols-[3rem_minmax(0,1fr)]' : 'lg:grid-cols-[240px_minmax(0,1fr)]',
+            railCollapsed
+              ? 'lg:grid-cols-[3rem_minmax(0,1fr)]'
+              : 'lg:grid-cols-[240px_minmax(0,1fr)]',
           ]
         : panelOpen
           ? '[--page-width:120rem]'
