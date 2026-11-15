@@ -20,6 +20,14 @@ export const ALLOWED = {
     'transition-transform':
       'rows that change rank slide to their place (FLIP); off under reduced motion',
   },
+  'features/contests/RankingTable.vue': {
+    'transition-transform':
+      'rows that change rank in the live board slide to their place (FLIP); off under reduced motion',
+  },
+  'features/contests/RankingList.vue': {
+    'transition-transform':
+      'rows that change rank in the live board slide to their place (FLIP); off under reduced motion',
+  },
   'components/ui/DataTable.vue': { 'transition-transform': CHEVRON },
   'components/ui/Disclosure.vue': { 'transition-transform': CHEVRON },
   'components/ui/Notice.vue': { 'transition-transform': CHEVRON },
