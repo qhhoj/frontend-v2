@@ -78,6 +78,7 @@ const handlers = useModalDialog(useTemplateRef<HTMLDialogElement>('dialog'), vis
       :class="sizeClass"
       @cancel="handlers.onCancel"
       @close="handlers.onClose"
+      @pointerdown="handlers.onPointerdown"
       @click="handlers.onClick"
     >
       <header class="flex shrink-0 items-start justify-between gap-3 px-6 pt-5">

@@ -86,10 +86,11 @@ describe('Modal', () => {
   });
 
   it('closes on a click outside only when dismissable', async () => {
-    const clickBackdrop = () =>
-      dialog().dispatchEvent(
-        new MouseEvent('click', { bubbles: true, clientX: 900, clientY: 900 }),
-      );
+    const clickBackdrop = () => {
+      const outside = { bubbles: true, clientX: 900, clientY: 900 };
+      dialog().dispatchEvent(new MouseEvent('pointerdown', outside));
+      dialog().dispatchEvent(new MouseEvent('click', outside));
+    };
     const plain = mountComponent(Modal, { props: { visible: true, title: 'A' } });
     await flushPromises();
     clickBackdrop();
@@ -102,5 +103,49 @@ describe('Modal', () => {
     await flushPromises();
     clickBackdrop();
     expect(dismissable.emitted('update:visible')).toEqual([[false]]);
+  });
+
+  it('leaves Escape to the page while it is closed', async () => {
+    mountComponent(Modal, { props: { visible: false, title: 'A' } });
+    await flushPromises();
+    const escape = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+    document.dispatchEvent(escape);
+    expect(escape.defaultPrevented).toBe(false);
+  });
+
+  it('stays open when a field inside sends a cancel (a file picker dismissed)', async () => {
+    const open = mountComponent(Modal, {
+      props: { visible: true, title: 'A' },
+      slots: { default: '<input id="file" type="file" />' },
+    });
+    await flushPromises();
+    document
+      .getElementById('file')!
+      .dispatchEvent(new Event('cancel', { bubbles: true, cancelable: true }));
+    expect(open.emitted('update:visible')).toBeUndefined();
+  });
+
+  it('ignores the close event of the dialog it replaced on a quick reopen', async () => {
+    const visible = ref(true);
+    mountComponent(
+      defineComponent({
+        setup: () => () =>
+          h(Modal, {
+            visible: visible.value,
+            'onUpdate:visible': (next: boolean) => (visible.value = next),
+            title: 'A',
+          }),
+      }),
+    );
+    await flushPromises();
+    const first = dialog();
+    visible.value = false;
+    await flushPromises();
+    visible.value = true;
+    await flushPromises();
+    first.dispatchEvent(new Event('close'));
+    await flushPromises();
+    expect(visible.value).toBe(true);
+    expect(dialog()).not.toBe(first);
   });
 });

@@ -47,6 +47,7 @@ export function useModalDialog(
   options: ModalDialogOptions,
 ) {
   let opener: HTMLElement | null = null;
+  let pressedOnBackdrop = false;
 
   function open(element: HTMLDialogElement) {
     opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -64,7 +65,8 @@ export function useModalDialog(
     unlockScroll();
     const active = document.activeElement;
     const isFocusLost = !active || active === document.body || element.contains(active);
-    if (element.open) element.close?.();
+    if (element.open && typeof element.close === 'function') element.close();
+    else element.removeAttribute('open'); // jsdom
     if (isFocusLost && opener?.isConnected) opener.focus();
     opener = null;
   }
@@ -78,8 +80,11 @@ export function useModalDialog(
     { flush: 'post' },
   );
 
+  /** Only the top open dialog takes Escape; a closed one leaves it to the page (a search box, a native sheet). */
   function onKeydown(event: KeyboardEvent) {
-    if (event.defaultPrevented || !isEscape(event) || topDialog.value !== dialog.value) return;
+    const element = dialog.value;
+    if (!element || topDialog.value !== element) return;
+    if (event.defaultPrevented || !isEscape(event)) return;
     event.preventDefault();
     if (options.isClosable()) visible.value = false;
   }
@@ -88,22 +93,35 @@ export function useModalDialog(
   onBeforeUnmount(() => dialog.value && release(dialog.value));
 
   return {
-    /** The back gesture (Escape is handled above, so the browser never closes it on its own). */
+    /**
+     * The back gesture (Escape is handled above, so the browser never closes it on its own). A `cancel` that bubbles from a
+     * field inside (a file picker dismissed) is not the dialog's.
+     */
     onCancel(event: Event) {
+      if (event.target !== event.currentTarget) return;
       event.preventDefault();
       if (options.isClosable()) visible.value = false;
     },
-    /** Shut by the browser despite `cancel` being refused: a busy dialog opens again. */
+    /**
+     * Shut by the browser despite `cancel` being refused: a busy dialog opens again. The event is queued, so it may come from
+     * a dialog already closed by `release` (removed, or replaced by a reopen): those are ignored.
+     */
     onClose(event: Event) {
       const element = event.currentTarget as HTMLDialogElement;
+      if (element !== dialog.value || !element.isConnected) return;
       if (!visible.value || element.open) return;
       if (options.isClosable()) visible.value = false;
       else element.showModal();
     },
+    /** Where the press began: a text selection dragged out onto the backdrop is not a backdrop click. */
+    onPointerdown(event: PointerEvent) {
+      pressedOnBackdrop = isBackdropClick(event, event.currentTarget as HTMLDialogElement);
+    },
     onClick(event: MouseEvent) {
       const element = event.currentTarget as HTMLDialogElement;
-      if (options.isDismissable() && options.isClosable() && isBackdropClick(event, element))
-        visible.value = false;
+      const isDismissed = pressedOnBackdrop && isBackdropClick(event, element);
+      pressedOnBackdrop = false;
+      if (isDismissed && options.isDismissable() && options.isClosable()) visible.value = false;
     },
   };
 }
