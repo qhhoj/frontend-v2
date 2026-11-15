@@ -64,11 +64,16 @@ jobs:
   # lint, typecheck and test run in parallel; each skips (a pass) on docs-only pushes.
   # ESLint and Prettier: only the changed files on pull requests and in the merge queue (both judge one file at a time;
   # a tooling or scripts/ change lints everything, see scripts/lint-changed.sh), everything on main and nightly.
+  # Four parallel shards: each lints every fourth file (type-aware ESLint is the slow part); shard 1 also runs Prettier.
   lint:
     needs: changes
     if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -78,8 +83,9 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --ignore-scripts
-      - run: |
-          if [ "$DIFF_ONLY" = true ]; then bash scripts/lint-changed.sh "$BASE"; else npx eslint . && npx prettier --check .; fi
+      - env:
+          LINT_SHARD: ${{ matrix.shard }}/4
+        run: bash scripts/lint-changed.sh "$([ "$DIFF_ONLY" = true ] && echo "$BASE")"
 
   # The repo's own lint rules (lint:tokens, palette, copy, dates, plan-codes), in parallel with ESLint.
   lint-rules:
@@ -117,8 +123,9 @@ jobs:
           restore-keys: tsbuild-${{ hashFiles('package-lock.json', 'tsconfig*.json') }}-
       - run: npm run typecheck
 
-  # Pull requests and the merge queue: one runner, only specs whose import graph touches a file changed since the base.
-  # Pushes to main, the nightly run and manual runs: the full suite in three shards.
+  # Always five shards. Pull requests and the merge queue run only the specs whose import graph touches a file changed
+  # since the base (a config change selects everything, so the shards keep that case fast); pushes to main, the nightly
+  # run and manual runs run the full suite.
   test:
     needs: changes
     if: needs.changes.outputs.code == 'true'
@@ -127,7 +134,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: ${{ fromJSON((github.event_name == 'pull_request' || github.event_name == 'merge_group') && '[1]' || '[1, 2, 3]') }}
+        shard: [1, 2, 3, 4, 5]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -141,7 +148,7 @@ jobs:
         env:
           SHARD: ${{ matrix.shard }}/${{ strategy.job-total }}
         run: |
-          if [ "$DIFF_ONLY" = true ]; then npm test -- --changed "$BASE" --passWithNoTests; else npm test -- --shard="$SHARD"; fi
+          if [ "$DIFF_ONLY" = true ]; then npm test -- --changed "$BASE" --shard="$SHARD" --passWithNoTests; else npm test -- --shard="$SHARD"; fi
 
   # Scanner specs read the whole source tree, so `--changed` never selects them: pull requests and the merge queue run
   # them here, in parallel with the unit tests (the full suite on main and nightly already includes them).
