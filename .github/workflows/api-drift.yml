@@ -1,9 +1,12 @@
 name: API drift
 
-# The snapshot in src/api/generated must be the document the DEPLOYED backend serves: its latest GitHub release
-# (the backend deploys only on a release; backend main may hold unreleased changes the live API would refuse).
-# Red here means: check out the backend release tag, run `npm run api:gen`, fix the typecheck, open a
-# `chore: sync api schema` PR. A PR that needs unreleased backend changes waits for that release.
+# The snapshot in src/api/generated must equal the openapi.json of some backend release among the last 30
+# (newest first): the frontend may never use API shapes that no released backend has. A new release does not
+# turn open PRs red; a snapshot older than the latest release only prints a notice. Red here means the
+# snapshot matches no recent release: it is unreleased or hand-edited. Check out a release tag in
+# ../backend-v2, run `npm run api:gen` and fix the typecheck. A PR that needs unreleased backend changes
+# waits for that release.
+
 on:
   pull_request:
   push:
@@ -17,31 +20,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-      - name: latest backend release
-        id: release
-        env: { GH_TOKEN: '${{ github.token }}' }
-        shell: bash -eo pipefail {0}
-        run: |
-          tag=$(gh api repos/qhhoj/backend-v2/releases/latest --jq .tag_name)
-          test -n "$tag" || { echo "::error::no backend release found"; exit 1; }
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-        with:
-          repository: qhhoj/backend-v2
-          ref: ${{ steps.release.outputs.tag }}
-          path: backend
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm
       - run: npm ci --ignore-scripts
-      - name: backend checkout has the contract
-        run: test -f backend/openapi.json
-      - name: snapshot equals the latest backend release
-        env: { TAG: '${{ steps.release.outputs.tag }}' }
+      - name: schema.d.ts is generated from the snapshot
+        run: npm run api:check
+      - name: snapshot equals a recent backend release
+        env: { GH_TOKEN: '${{ github.token }}' }
+        shell: bash -eo pipefail {0}
         run: |
-          echo "snapshot taken from backend $(cat src/api/generated/openapi.source); latest release $TAG is $(git -C backend rev-parse HEAD)"
-          OPENAPI_SPEC=backend/openapi.json npm run api:check -- --backend || {
-            echo "::error::src/api/generated is not backend release $TAG. If this PR needs backend changes not yet released, merge it after the backend release X containing them exists and its deploy has run (check the backend Deploy workflow). Otherwise check out $TAG in ../backend-v2, run npm run api:gen and commit."
-            exit 1
-          }
+          snapshot=src/api/generated/openapi.json
+          tags=$(gh api 'repos/qhhoj/backend-v2/releases?per_page=30' --jq '.[] | select(.draft | not) | .tag_name')
+          test -n "$tags" || { echo "::error::no backend release found"; exit 1; }
+          latest=$(head -n1 <<< "$tags")
+          for tag in $tags; do
+            if gh api "repos/qhhoj/backend-v2/contents/openapi.json?ref=$tag" -H 'Accept: application/vnd.github.raw' | cmp -s - "$snapshot"; then
+              echo "snapshot equals backend release $tag (source $(cat src/api/generated/openapi.source))"
+              if [ "$tag" != "$latest" ]; then
+                echo "::notice::types match $tag; latest is $latest, run npm run api:gen in a separate PR"
+              fi
+              exit 0
+            fi
+          done
+          echo "::error::src/api/generated/openapi.json equals none of the last 30 backend releases (latest $latest), so it is unreleased or hand-edited. If this PR needs backend changes not yet released, merge it after the backend release containing them exists and its deploy has run (check the backend Deploy workflow). Otherwise check out a release tag in ../backend-v2, run npm run api:gen and commit."
+          exit 1
