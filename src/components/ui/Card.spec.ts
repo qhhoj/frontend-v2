@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
+import { mountComponent } from '@/test/mount';
 import Card from './Card.vue';
 
 describe('Card', () => {
@@ -32,5 +33,32 @@ describe('Card', () => {
         .classes()
         .some((name) => name.startsWith('-mx')),
     ).toBe(false);
+  });
+
+  it('makes the whole card one link when it has `to` or `href`, titled by its title', () => {
+    const card = mountComponent(Card, {
+      props: { title: 'Kỳ thi A', to: '/contests/a', padding: 'md' },
+      slots: { default: '<button>Đăng ký</button>' },
+    });
+    const link = card.get('h2 a');
+    expect(link.attributes('href')).toBe('/contests/a');
+    expect(link.classes()).toContain('stretched-link');
+    expect(card.classes()).toContain('box-link');
+    expect(card.findAll('a')).toHaveLength(1);
+  });
+
+  it('names the link of an untitled link card for screen readers, and a plain URL becomes a plain link', () => {
+    const card = mountComponent(Card, {
+      props: { href: 'https://example.com/x', linkLabel: 'Mở bài viết' },
+    });
+    const link = card.get('a.stretched-link');
+    expect(link.attributes('href')).toBe('https://example.com/x');
+    expect(link.text()).toBe('Mở bài viết');
+  });
+
+  it('is no link and no box-link without `to` or `href`', () => {
+    const card = mount(Card, { props: { title: 'Thống kê' } });
+    expect(card.find('a').exists()).toBe(false);
+    expect(card.classes()).not.toContain('box-link');
   });
 });

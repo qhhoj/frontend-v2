@@ -44,6 +44,14 @@ describe('DataTable', () => {
     expect(push).toHaveBeenCalledWith('/problem/b');
   });
 
+  it('marks the primary link of a rowTo row so the row, not the text, shows the focus ring', () => {
+    const wrapper = mountComponent(DataTable, {
+      props: { ...BASE, rowTo: (row: Item) => `/problem/${row.code}` },
+    });
+    expect(wrapper.get('tbody tr a').classes()).toContain('row-link');
+    expect(wrapper.get('tbody tr').classes()).toContain('cursor-pointer');
+  });
+
   it('opens a rowTo row in a new tab on Ctrl-click or middle click, never at the end of a text selection', async () => {
     const wrapper = mountComponent(DataTable, {
       props: { ...BASE, rowTo: (row: Item) => `/problem/${row.code}` },

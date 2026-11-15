@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, useSlots } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
+import StretchedLink from './StretchedLink.vue';
 import {
   CARD_HEADER_BLEED,
   CARD_PADDING,
@@ -17,6 +19,13 @@ const props = withDefaults(
     lead?: string;
     /** A rule between the header and the body, edge to edge when `padding` is set. */
     divided?: boolean;
+    /**
+     * The card stands for one destination: the WHOLE card is its link (`to` a route, `href` a plain URL). The `title` is the
+     * link text; a card without a title needs `linkLabel`, read by screen readers. Buttons and links inside still work.
+     */
+    to?: RouteLocationRaw;
+    href?: string;
+    linkLabel?: string;
   }>(),
   {
     as: 'section',
@@ -25,12 +34,16 @@ const props = withDefaults(
     title: undefined,
     lead: undefined,
     divided: false,
+    to: undefined,
+    href: undefined,
+    linkLabel: undefined,
   },
 );
 
 defineOptions({ name: 'UiCard' });
 
 const slots = useSlots();
+const isLink = computed(() => props.to !== undefined || props.href !== undefined);
 const hasHeader = computed(() => Boolean(props.title || props.lead || slots.actions));
 const headerClass = computed(() =>
   props.divided
@@ -42,6 +55,7 @@ const headerClass = computed(() =>
 const cardClass = computed(() => [
   CARD_VARIANTS[props.variant],
   props.padding && CARD_PADDING[props.padding],
+  isLink.value && 'box-link',
 ]);
 </script>
 
@@ -53,13 +67,19 @@ const cardClass = computed(() => [
       :class="headerClass"
     >
       <div class="min-w-0">
-        <h2 v-if="title" class="text-title leading-5.5 font-semibold">{{ title }}</h2>
+        <h2 v-if="title" class="text-title leading-5.5 font-semibold">
+          <StretchedLink v-if="isLink" :to="to" :href="href">{{ title }}</StretchedLink>
+          <template v-else>{{ title }}</template>
+        </h2>
         <p v-if="lead" class="mt-1 text-meta leading-4.5 text-muted">{{ lead }}</p>
       </div>
       <div v-if="$slots.actions" class="flex flex-wrap items-center gap-2">
         <slot name="actions" />
       </div>
     </header>
+    <StretchedLink v-if="isLink && !title" :to="to" :href="href">
+      <span class="sr-only">{{ linkLabel }}</span>
+    </StretchedLink>
     <slot />
   </component>
 </template>
