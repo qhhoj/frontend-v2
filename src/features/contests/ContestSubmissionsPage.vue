@@ -14,7 +14,6 @@ import { useNow } from '@/lib/use-now';
 import { usePageTitle } from '@/router/page-title';
 import { useSessionStore } from '@/stores/session.store';
 import ContestNotFound from './ContestNotFound.vue';
-import ContestHeader from './bar/ContestHeader.vue';
 import { useContestQuery } from './contests.queries';
 import { ownSubmissionsOnly } from './own-submissions';
 
@@ -50,55 +49,52 @@ const emptyNextOf = (code: string): ContestProblem => {
 </script>
 
 <template>
-  <div class="page-column">
-    <ContestNotFound v-if="isMissing" />
-    <template v-else>
-      <ContestHeader :contest-key="key" :contest="contest" />
-      <div
-        v-if="isOwnOnly && !isVisitorOnOwnList"
-        data-testid="own-only"
-        class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"
+  <ContestNotFound v-if="isMissing" />
+  <template v-else>
+    <div
+      v-if="isOwnOnly && !isVisitorOnOwnList"
+      data-testid="own-only"
+      class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"
+    >
+      <h2 class="section-title">
+        {{ $t('contests.submissions.ownHeading') }}
+      </h2>
+      <p
+        class="flex items-center gap-1.5 text-meta text-muted"
+        :title="$t('contests.submissions.ownOnlyBody')"
       >
-        <h2 class="section-title">
-          {{ $t('contests.submissions.ownHeading') }}
-        </h2>
-        <p
-          class="flex items-center gap-1.5 text-meta text-muted"
-          :title="$t('contests.submissions.ownOnlyBody')"
+        <Lock class="size-3.5" aria-hidden="true" />{{ $t('contests.submissions.onlyYou') }}
+        <span class="sr-only">{{ $t('contests.submissions.ownOnlyBody') }}</span>
+      </p>
+    </div>
+    <Notice
+      v-else-if="isVisitorOnOwnList"
+      data-testid="own-only"
+      :title="$t('contests.submissions.ownOnlyTitle')"
+    >
+      {{ $t('contests.submissions.ownOnlyBody') }}
+      <template #action>
+        <SubmitSignInLink label-key="contests.submissions.signIn" />
+      </template>
+    </Notice>
+    <SubmissionList
+      v-if="canAsk"
+      :scope="scope"
+      :problem-source="problemSource"
+      :show-stats="false"
+      show-status-groups
+      empty-key="contests.submissions.empty"
+    >
+      <template v-if="contest?.problems?.length" #emptyAction="{ filters }">
+        <AppButton
+          tone="secondary"
+          :to="{ name: 'problem', params: { code: emptyNextOf(filters.problem).code } }"
         >
-          <Lock class="size-3.5" aria-hidden="true" />{{ $t('contests.submissions.onlyYou') }}
-          <span class="sr-only">{{ $t('contests.submissions.ownOnlyBody') }}</span>
-        </p>
-      </div>
-      <Notice
-        v-else-if="isVisitorOnOwnList"
-        data-testid="own-only"
-        :title="$t('contests.submissions.ownOnlyTitle')"
-      >
-        {{ $t('contests.submissions.ownOnlyBody') }}
-        <template #action>
-          <SubmitSignInLink label-key="contests.submissions.signIn" />
-        </template>
-      </Notice>
-      <SubmissionList
-        v-if="canAsk"
-        :scope="scope"
-        :problem-source="problemSource"
-        :show-stats="false"
-        show-status-groups
-        empty-key="contests.submissions.empty"
-      >
-        <template v-if="contest?.problems?.length" #emptyAction="{ filters }">
-          <AppButton
-            tone="secondary"
-            :to="{ name: 'problem', params: { code: emptyNextOf(filters.problem).code } }"
-          >
-            {{
-              $t('contests.submissions.openProblem', { label: emptyNextOf(filters.problem).label })
-            }}
-          </AppButton>
-        </template>
-      </SubmissionList>
-    </template>
-  </div>
+          {{
+            $t('contests.submissions.openProblem', { label: emptyNextOf(filters.problem).label })
+          }}
+        </AppButton>
+      </template>
+    </SubmissionList>
+  </template>
 </template>

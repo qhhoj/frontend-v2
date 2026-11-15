@@ -9,14 +9,13 @@ import Notice from '@/components/ui/Notice.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
 import QueryState from '@/components/QueryState.vue';
-import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { isPenaltyFormat, showsCellTime, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { boardFreezeOf } from './bar/board-freeze';
-import ContestHeader from './bar/ContestHeader.vue';
+import { reportBoardFrozen } from './bar/board-frozen-report';
 import { ownSubmissionsOnly } from './own-submissions';
 import RankingSkeleton from './RankingSkeleton.vue';
 import RankingFreezeNotice from './RankingFreezeNotice.vue';
@@ -73,6 +72,9 @@ const {
   // The virtual row moves while the run lasts, so its board is re-read like a running one.
   computed(() => running.value || (withVirtual.value && virtualRun.value !== null)),
 );
+
+/** The layout's header shows the freeze chip from the board's own answer. */
+reportBoardFrozen(() => ranking.value?.frozen);
 
 /** The backend says the full board is closed to this viewer: it answers 403 or shows only their row. */
 const isBoardHidden = computed(
@@ -173,107 +175,97 @@ async function goToMyRow() {
 </script>
 
 <template>
-  <div class="page-column">
-    <QueryState :loading="contestPending" :error="contestError" @retry="refetchContest()">
-      <template #skeleton>
-        <div data-skeleton-region="title" class="page-title">
-          <SkeletonBlock text class="w-80 max-w-full" />
-        </div>
-        <SkeletonBlock data-skeleton-region="nav" class="h-(--qh-control-sm) w-96 max-w-full" />
-      </template>
-      <template v-if="contest">
-        <ContestHeader
-          :contest-key="key"
-          :contest="contest"
-          :is-board-frozen="ranking?.frozen"
-          @elapsed="refetchContest()"
-        />
-        <RankingFreezeNotice :contest="contest" />
-        <Notice
-          v-if="isBoardHidden"
-          role="status"
-          :title="$t('ranking.hiddenTitle')"
-          data-testid="ranking-hidden"
-        >
-          {{ $t(hiddenBodyKey) }}
-        </Notice>
-        <!-- Picks the board, so it stays outside it: compare mode draws no board and still needs a way back. -->
-        <SegmentedControl
-          :label="$t('ranking.viewMode')"
-          :options="viewModes"
-          :model-value="viewMode"
-          data-testid="ranking-view-mode"
-          class="self-start whitespace-nowrap"
-          @update:model-value="setViewMode"
-        />
-      </template>
-    </QueryState>
-    <QueryState
-      v-if="contest && !isComparing"
-      :loading="rankingPending"
-      :error="ranking || isBoardHidden ? null : rankingError"
-      @retry="refetchRanking()"
-    >
-      <template #skeleton>
-        <div class="flex flex-col gap-5">
-          <RankingSkeleton :problem-count="problemCount" :has-time-column="skeletonHasTimeColumn" />
-        </div>
-      </template>
-      <div
-        v-if="ranking && (ranking.rows.length || !isBoardHidden)"
-        :aria-busy="rankingStale"
-        class="flex flex-col gap-5"
+  <QueryState :loading="contestPending" :error="contestError" @retry="refetchContest()">
+    <template #skeleton>
+      <!-- The layout's header already stands in for the title and the tabs. -->
+      <span hidden />
+    </template>
+    <template v-if="contest">
+      <RankingFreezeNotice :contest="contest" />
+      <Notice
+        v-if="isBoardHidden"
+        role="status"
+        :title="$t('ranking.hiddenTitle')"
+        data-testid="ranking-hidden"
       >
-        <Notice v-if="rankingRefreshFailed" tone="warning" bit="sweat" role="status">
-          {{ $t('ranking.refreshFailed') }}
-        </Notice>
-        <Card
-          id="ranking-board"
-          as="div"
-          tabindex="-1"
-          class="scroll-mt-4 overflow-hidden"
-          :class="{ 'opacity-60': rankingStale }"
-        >
-          <RankingTable
-            ref="table"
-            :ranking="ranking"
-            :rows="rows"
-            :context="rankingContext"
-            :viewer-id="session.user?.id ?? null"
-            :contest-key="key"
-            :problem-names="problemNames"
-            :own-submissions-only="contest ? ownSubmissionsOnly(contest, now) : true"
-            :freeze-note="freezeNote"
-            :is-stale="rankingStale"
-          >
-            <template #tools>
-              <SearchInput
-                v-model="search"
-                :label="$t('ranking.searchLabel')"
-                class="w-full sm:w-48"
-              />
-              <AppButton
-                v-if="myRow && !isComparing"
-                tone="primary"
-                data-testid="my-row"
-                @click="goToMyRow"
-              >
-                <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
-                {{
-                  myRow.rank === null || myRow.isDisqualified
-                    ? $t('replay.player.myRow')
-                    : $t('ranking.myRow', { rank: myRow.rank })
-                }}
-              </AppButton>
-            </template>
-          </RankingTable>
-        </Card>
+        {{ $t(hiddenBodyKey) }}
+      </Notice>
+      <!-- Picks the board, so it stays outside it: compare mode draws no board and still needs a way back. -->
+      <SegmentedControl
+        :label="$t('ranking.viewMode')"
+        :options="viewModes"
+        :model-value="viewMode"
+        data-testid="ranking-view-mode"
+        class="self-start whitespace-nowrap"
+        @update:model-value="setViewMode"
+      />
+    </template>
+  </QueryState>
+  <QueryState
+    v-if="contest && !isComparing"
+    :loading="rankingPending"
+    :error="ranking || isBoardHidden ? null : rankingError"
+    @retry="refetchRanking()"
+  >
+    <template #skeleton>
+      <div class="flex flex-col gap-5">
+        <RankingSkeleton :problem-count="problemCount" :has-time-column="skeletonHasTimeColumn" />
       </div>
-    </QueryState>
-    <VirtualOverlay
-      v-else-if="contest && virtualRun"
-      :contest="contest"
-      :participation="virtualRun"
-    />
-  </div>
+    </template>
+    <div
+      v-if="ranking && (ranking.rows.length || !isBoardHidden)"
+      :aria-busy="rankingStale"
+      class="flex flex-col gap-5"
+    >
+      <Notice v-if="rankingRefreshFailed" tone="warning" bit="sweat" role="status">
+        {{ $t('ranking.refreshFailed') }}
+      </Notice>
+      <Card
+        id="ranking-board"
+        as="div"
+        tabindex="-1"
+        class="scroll-mt-4 overflow-hidden"
+        :class="{ 'opacity-60': rankingStale }"
+      >
+        <RankingTable
+          ref="table"
+          :ranking="ranking"
+          :rows="rows"
+          :context="rankingContext"
+          :viewer-id="session.user?.id ?? null"
+          :contest-key="key"
+          :problem-names="problemNames"
+          :own-submissions-only="contest ? ownSubmissionsOnly(contest, now) : true"
+          :freeze-note="freezeNote"
+          :is-stale="rankingStale"
+        >
+          <template #tools>
+            <SearchInput
+              v-model="search"
+              :label="$t('ranking.searchLabel')"
+              class="w-full sm:w-48"
+            />
+            <AppButton
+              v-if="myRow && !isComparing"
+              tone="primary"
+              data-testid="my-row"
+              @click="goToMyRow"
+            >
+              <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
+              {{
+                myRow.rank === null || myRow.isDisqualified
+                  ? $t('replay.player.myRow')
+                  : $t('ranking.myRow', { rank: myRow.rank })
+              }}
+            </AppButton>
+          </template>
+        </RankingTable>
+      </Card>
+    </div>
+  </QueryState>
+  <VirtualOverlay
+    v-else-if="contest && virtualRun"
+    :contest="contest"
+    :participation="virtualRun"
+  />
 </template>
