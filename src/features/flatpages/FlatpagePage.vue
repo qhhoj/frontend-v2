@@ -47,7 +47,7 @@ usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : page.value?
     <template #skeleton>
       <div data-skeleton-region="flatpage" class="page-column">
         <SkeletonBlock text class="h-8 w-2/3" />
-        <div class="flex max-w-3xl flex-col gap-3">
+        <div class="flex max-w-prose flex-col gap-3">
           <SkeletonBlock v-for="line in 10" :key="line" text class="h-4 w-full" />
         </div>
       </div>
@@ -60,7 +60,7 @@ usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : page.value?
       >
         <template #actions><AdminEditLink :to="flatpageEditTarget(session.user)" /></template>
       </PageHeader>
-      <UserContent :html="page.contentHtml" class="max-w-3xl overflow-x-auto" />
+      <UserContent :html="page.contentHtml" class="max-w-prose overflow-x-auto text-base leading-7" />
     </article>
   </QueryState>
 </template>

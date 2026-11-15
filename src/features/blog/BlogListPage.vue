@@ -89,7 +89,7 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
       v-if="draftCount > 0"
       :to="{ name: 'post-drafts' }"
       data-testid="my-drafts"
-      class="glass flex min-h-14 items-center gap-3 rounded-card px-4 font-semibold hover:bg-surface-hover sm:px-5"
+      class="glass flex min-h-12 items-center gap-3 rounded-card px-4 font-semibold hover:bg-surface-hover sm:px-5"
     >
       <FilePen aria-hidden="true" class="size-5 text-accent-text" />
       <span class="flex-1">{{ $t('blog.myDrafts') }}</span>

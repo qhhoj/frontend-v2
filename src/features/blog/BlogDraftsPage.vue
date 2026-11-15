@@ -49,7 +49,7 @@ const posts = computed(() => data.value?.items ?? []);
             v-for="post in posts"
             :key="post.id"
             data-testid="draft-row"
-            class="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-4 sm:px-5"
+            class="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3 sm:px-5"
           >
             <Chip :tone="postStateOf(post) === 'draft' ? 'neutral' : 'accent'">
               {{ $t(`blog.drafts.state.${postStateOf(post)}`) }}
@@ -60,7 +60,7 @@ const posts = computed(() => data.value?.items ?? []);
             >
               {{ post.title }}
             </RouterLink>
-            <time :datetime="post.publishOn" class="text-sm text-muted">
+            <time :datetime="post.publishOn" class="text-meta text-muted">
               {{
                 postStateOf(post) === 'scheduled'
                   ? $t('blog.drafts.publishesAt', {

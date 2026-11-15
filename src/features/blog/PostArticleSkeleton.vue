@@ -20,7 +20,7 @@ const BODY_WIDTHS = ['w-full', 'w-11/12', 'w-full', 'w-4/5', 'w-full', 'w-10/12'
         </div>
       </div>
     </div>
-    <div data-skeleton-region="body" class="flex flex-col gap-3">
+    <div data-skeleton-region="body" class="flex max-w-prose flex-col gap-3">
       <SkeletonBlock
         v-for="(width, index) in BODY_WIDTHS"
         :key="index"

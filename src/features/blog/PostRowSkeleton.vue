@@ -4,12 +4,12 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 </script>
 
 <template>
-  <article data-skeleton-region="post-row" class="px-4 py-4 sm:px-5 sm:py-5">
-    <div data-part="body" class="flex min-w-0 flex-col gap-2">
-      <div data-part="title" class="flex h-7 items-center">
+  <article data-skeleton-region="post-row" class="px-4 py-3 sm:px-5 sm:py-4">
+    <div data-part="body" class="flex min-w-0 flex-col gap-1.5">
+      <div data-part="title" class="flex h-6 items-center">
         <SkeletonBlock pill class="h-4 w-3/4" />
       </div>
-      <div data-part="excerpt" class="flex flex-col gap-2 py-1">
+      <div data-part="excerpt" class="flex flex-col gap-2 py-0.5">
         <SkeletonBlock pill class="h-3.5 w-full" />
         <SkeletonBlock pill class="h-3.5 w-2/3" />
       </div>

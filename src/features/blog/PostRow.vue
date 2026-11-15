@@ -34,9 +34,9 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
 </script>
 
 <template>
-  <article data-testid="post-row" class="px-4 py-4 sm:px-5 sm:py-5">
-    <div class="flex min-w-0 flex-col gap-2">
-      <h2 class="line-clamp-2 text-subtitle leading-snug font-semibold [overflow-wrap:anywhere]">
+  <article data-testid="post-row" class="px-4 py-3 sm:px-5 sm:py-4">
+    <div class="flex min-w-0 flex-col gap-1.5">
+      <h2 class="line-clamp-2 text-title leading-snug font-semibold [overflow-wrap:anywhere]">
         <Chip v-if="post.sticky" tone="accent" class="mr-2 align-middle">{{
           $t('blog.pinned')
         }}</Chip>
@@ -50,10 +50,10 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
           {{ post.title }}
         </RouterLink>
       </h2>
-      <p v-if="excerpt" class="line-clamp-2 leading-6 text-muted [overflow-wrap:anywhere]">
+      <p v-if="excerpt" class="line-clamp-2 text-sm leading-5 text-muted [overflow-wrap:anywhere]">
         {{ excerpt }}
       </p>
-      <footer class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm text-muted">
+      <footer class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-meta text-muted">
         <UserLink
           v-for="author in post.authors"
           :key="author.id"
