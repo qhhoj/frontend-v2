@@ -4,7 +4,8 @@ import type { EditableContest } from '@/api/types/contest-editing';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { CARD } from '../../ui/controls';
-import ContestPhaseChip from '../list/ContestPhaseChip.vue';
+import ContestStateChip from '../list/ContestStateChip.vue';
+import { editorStateInputOf } from '../list/contest-state';
 import ContestVisibilitySwitch from './ContestVisibilitySwitch.vue';
 import { CONTEST_SECTION_KEYS, contestSectionLabel, jumpToSection } from './contest-sections';
 
@@ -50,7 +51,7 @@ const LINK =
         <span class="text-caption leading-4 text-muted">{{
           $t('admin.contests.general.rail.phase')
         }}</span>
-        <ContestPhaseChip :phase="contest.phase" />
+        <ContestStateChip v-bind="editorStateInputOf(contest)" />
       </div>
       <ContestVisibilitySwitch
         :contest="contest"
