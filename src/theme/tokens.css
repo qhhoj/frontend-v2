@@ -58,23 +58,34 @@
   --qh-radius-skeleton: 4px;
   /* Radius by role: controls (buttons, tabs, segmented). The admin scope (.qh-admin) sets the cell radius. */
   --qh-radius-control: 4px;
-  /* Control heights: md is the default, sm for toolbars and row actions (44 px on touch), lg for the submit card only. Workbench's 28 px desktop control arrives with the kit restyle (step 3). */
-  --qh-control: 2.75rem;
-  --qh-control-sm: 2.25rem;
-  --qh-control-lg: 3.5rem;
-  /* Admin density, global so no size depends on whether the admin chunk has loaded: 40 px rows, 36 px controls, 24 px chips (48, 44, 32 on touch). */
+  /* Control heights (Workbench): md 28 is the default, sm 24 for toolbars and row actions, lg 36 for the submit card only.
+     Every one is 44 px or more under the touch media below. */
+  --qh-control: 1.75rem;
+  --qh-control-sm: 1.5rem;
+  --qh-control-lg: 2.25rem;
+  /* Admin density, global so no size depends on whether the admin chunk has loaded: 40 px rows, 28 px controls, 24 px chips (48, 44, 32 on touch). */
   --qa-row: 2.5rem;
-  --qa-control: var(--qh-control-sm);
+  --qa-control: var(--qh-control);
   --qa-chip: 1.5rem;
   --qa-gap: 0.75rem;
+  /* Motion (.batch/motion-ux/motion-notes.md): five durations and four curves. Reduced motion (below) and low power
+     (styles.css) zero the durations, so every element shows its end state at once. */
+  --qh-duration-instant: 80ms;
   --qh-duration-fast: 150ms;
   --qh-duration: 200ms;
+  --qh-duration-emphasis: 320ms;
+  --qh-highlight-decay: 1200ms;
   --qh-ease: cubic-bezier(0.2, 0, 0, 1);
+  --qh-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --qh-ease-move: cubic-bezier(0.4, 0, 0.2, 1);
+  --qh-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @media (pointer: coarse), (max-width: 40rem) {
   :root {
+    --qh-control: 2.75rem;
     --qh-control-sm: 2.75rem;
+    --qh-control-lg: 3.5rem;
     --qh-radius-card: 8px;
     --qa-row: 3rem;
     --qa-chip: 2rem;
@@ -83,7 +94,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   :root {
+    --qh-duration-instant: 0ms;
     --qh-duration-fast: 0ms;
     --qh-duration: 0ms;
+    --qh-duration-emphasis: 0ms;
+    --qh-highlight-decay: 0ms;
   }
 }

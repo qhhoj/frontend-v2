@@ -1,7 +1,8 @@
 /**
  * The one button recipe (docs/design-language.md): `AppButton`/`IconButton`, and `buttonClass()` in `admin/ui/controls.ts` which
- * delegates here. Corner and height come from the control tokens, so `.qh-admin` gives 12 px corners and the small height; the
- * `in-[.qh-admin]:` classes swap the public look (gradient primary, wide padding) for the admin one.
+ * delegates here. Workbench (directions.md §2): one look for public and admin pages. Height and corner come from the control
+ * tokens (28 px, 44 px on touch; 4 px corners). Primary is the accent fill, secondary a hairline box, ghost text only.
+ * Boxed buttons press with the `pressable` scale (motion notes 1).
  * Disabled is `aria-disabled` plus a muted token pair, never opacity. A button with `aria-pressed` is a toggle and wears the
  * accent-soft pair while pressed. `link` is an inline text action: no box, a 44 px hit area.
  */
@@ -14,7 +15,7 @@ const CURSOR = 'aria-disabled:cursor-not-allowed disabled:cursor-not-allowed';
 /** Boxed tones: a pending or not-yet-allowed primary wears the accent-soft pair; danger is outlined. */
 const BOXED_TONES: Record<BoxedTone, string> = {
   primary:
-    'bg-gradient-accent font-bold text-on-accent aria-disabled:bg-none aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text',
+    'border border-accent bg-accent font-semibold text-on-accent hover:border-accent-2 hover:bg-accent-2 aria-disabled:border-accent-soft aria-disabled:bg-accent-soft aria-disabled:text-accent-soft-text',
   secondary:
     'border border-line-control bg-surface-solid font-semibold text-content hover:bg-surface-hover aria-disabled:text-muted disabled:text-muted',
   ghost:
@@ -29,16 +30,6 @@ const BOXED_TONES: Record<BoxedTone, string> = {
  */
 const ROW_CLASSES =
   'inline-flex min-h-(--qh-control) w-full items-center justify-start gap-2 rounded-card border border-line bg-surface-solid px-4 py-2 text-left text-sm font-normal text-muted hover:bg-surface-hover aria-disabled:bg-surface-strong aria-disabled:text-muted aria-disabled:hover:bg-surface-strong';
-
-/** Inside `.qh-admin`, a boxed tone takes the admin look on top of the public one. */
-const ADMIN_SCOPE_TONES: Record<BoxedTone, string> = {
-  primary:
-    'in-[.qh-admin]:border in-[.qh-admin]:border-accent in-[.qh-admin]:bg-none in-[.qh-admin]:bg-accent in-[.qh-admin]:font-semibold in-[.qh-admin]:hover:border-accent-2 in-[.qh-admin]:hover:bg-accent-2 in-[.qh-admin]:aria-disabled:border-line in-[.qh-admin]:aria-disabled:bg-surface-strong in-[.qh-admin]:aria-disabled:text-muted',
-  secondary:
-    'in-[.qh-admin]:aria-disabled:border-line in-[.qh-admin]:aria-disabled:bg-surface-strong',
-  ghost: '',
-  danger: 'in-[.qh-admin]:aria-disabled:border-line in-[.qh-admin]:aria-disabled:bg-surface-strong',
-};
 
 /** A toggle that is on (`aria-pressed`): the accent-soft pair, whatever the hover. */
 const PRESSED =
@@ -55,9 +46,9 @@ const TOKEN_HEIGHTS: Record<ButtonSize, string> = {
 };
 
 const TOKEN_PADDING: Record<ButtonSize, string> = {
-  sm: 'px-4 in-[.qh-admin]:px-2.5',
-  md: 'px-5 in-[.qh-admin]:px-3.5',
-  lg: 'px-6 in-[.qh-admin]:px-3.5',
+  sm: 'px-2.5',
+  md: 'px-3',
+  lg: 'px-4',
 };
 
 /** Square icon-only buttons: as wide as they are tall, no side padding. */
@@ -78,7 +69,7 @@ export interface ButtonClassOptions {
 
 function boxedClasses(tone: BoxedTone, size: ButtonSize, iconOnly: boolean) {
   const width = iconOnly ? TOKEN_ICON_WIDTHS[size] : TOKEN_PADDING[size];
-  return `inline-flex ${TOKEN_HEIGHTS[size]} ${width} items-center justify-center whitespace-nowrap rounded-control text-sm in-[.qh-admin]:transition-colors ${CURSOR} ${BOXED_TONES[tone]} ${ADMIN_SCOPE_TONES[tone]} ${PRESSED}`;
+  return `inline-flex ${TOKEN_HEIGHTS[size]} ${width} items-center justify-center whitespace-nowrap rounded-control text-sm pressable ${CURSOR} ${BOXED_TONES[tone]} ${PRESSED}`;
 }
 
 /** The class list of a button or button-styled link. */

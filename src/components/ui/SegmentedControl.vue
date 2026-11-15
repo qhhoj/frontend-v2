@@ -32,7 +32,8 @@ export interface SegmentDot {
 }
 
 /**
- * One choice out of a few, as pills inside one pill frame. `md` fills its width with equal segments (settings);
+ * One choice out of two to four views (Workbench): boxed segments inside one 28 px frame, the current one raised on the solid
+ * surface. `md` fills its width with equal segments (settings);
  * `sm` is the admin chip density (a 44 px segment on a coarse pointer) and wraps on a narrow phone instead of being clipped, the
  * current segment scrolled into view when the row still overflows. Links make it a `nav`; buttons a `group` of `aria-pressed` toggles.
  */
@@ -68,17 +69,24 @@ function stateOf(option: SegmentOption<Value>) {
   return { type: 'button', disabled: props.disabled, 'aria-pressed': isCurrent };
 }
 
+/**
+ * The frame is exactly one control tall (`--qh-control`: 28 px, 44 on touch), like every other toolbar control. Its outline
+ * is an inset ring, which takes no height; the segments stretch to fill it. On touch the frame has no padding, so a segment
+ * is the full 44 px.
+ */
+const FRAME_BASE =
+  'flex min-h-(--qh-control) gap-0.5 rounded-control bg-surface-strong p-0.5 inset-ring inset-ring-line touch:gap-0 touch:p-0';
 const FRAME = {
-  md: 'flex gap-1 rounded-pill bg-surface-strong p-1',
-  sm: 'flex max-w-full flex-wrap gap-0.5 self-start overflow-x-auto rounded-row border border-line-strong bg-surface-solid p-0.5',
+  md: FRAME_BASE,
+  sm: `${FRAME_BASE} max-w-full flex-wrap self-start overflow-x-auto`,
 };
 const SEGMENT = {
-  md: 'min-h-11 flex-1 px-2 leading-tight',
-  sm: 'inline-flex min-h-7 shrink-0 items-center gap-1.5 px-3 font-semibold whitespace-nowrap touch:min-h-11',
+  md: 'inline-flex flex-1 items-center justify-center gap-1.5 px-2.5 py-0.5 leading-tight touch:min-h-11',
+  sm: 'inline-flex shrink-0 items-center gap-1.5 px-2.5 py-0.5 whitespace-nowrap touch:min-h-11',
 };
-/** One active look for every tab set: accent-soft fill, accent border. Disabled keeps full-contrast text, no opacity. */
+/** The current segment: raised on the solid surface. Disabled keeps full-contrast text, no opacity. */
 const ACTIVE =
-  'border-accent bg-accent-soft font-semibold text-accent-soft-text disabled:border-line-strong disabled:bg-surface-hover disabled:text-content';
+  'border-line-strong bg-surface-solid font-semibold text-content disabled:bg-surface-hover';
 const IDLE =
   'border-transparent text-muted hover:text-content disabled:border-line disabled:bg-surface-strong';
 
@@ -104,7 +112,7 @@ const segments = computed(() => props.options.map((option) => ({ option, dot: do
       :key="option.value"
       v-bind="stateOf(option)"
       :data-testid="option.testid"
-      class="rounded-pill border text-sm disabled:cursor-not-allowed"
+      class="rounded-cell border text-meta font-medium disabled:cursor-not-allowed"
       :class="[SEGMENT[size], option.value === modelValue ? ACTIVE : IDLE]"
       @click="option.to ? undefined : emit('update:modelValue', option.value)"
     >

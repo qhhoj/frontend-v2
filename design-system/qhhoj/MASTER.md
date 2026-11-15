@@ -61,7 +61,7 @@ The generator solves every value against its floor (body text 4.5:1 standard, 7:
 
 ## Components
 
-- **Card**: `ui/Card.vue` (variant `glass` = `glass rounded-card`; `padding` or caller padding): an opaque hairline card. `GlassCard` is its old-name wrapper.
+- **Card**: `ui/Card.vue` (variant `glass` = `glass rounded-card`; `padding` or caller padding): an opaque hairline card.
 - **Pill nav / tabs**: `glass` pill container; active item `bg-accent-soft` + `text-accent-soft-text` + accent border (one active style for every tab set), others `text-muted` with a `bg-surface-hover` hover.
 - **Primary button**: `bg-accent` (or the flat `bg-gradient-accent`) + `text-on-accent`, 56 px tall (`h-14`) in the swap card, 44 px elsewhere.
 - **Token pill**: pill with a coin (`coin-1` ... `coin-6`) and label; selected = accent border + accent tint.

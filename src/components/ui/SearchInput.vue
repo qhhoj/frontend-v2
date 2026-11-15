@@ -40,7 +40,7 @@ const clear = () => (typed.value = '');
   <div v-bind="frame" class="relative min-w-0">
     <Search
       aria-hidden="true"
-      class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted"
+      class="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted"
     />
     <input
       v-bind="input"
@@ -48,7 +48,7 @@ const clear = () => (typed.value = '');
       type="search"
       :aria-label="label"
       :placeholder="placeholder ?? label"
-      class="h-(--qh-control) w-full min-w-0 appearance-none rounded-cell border border-line-control bg-surface-solid pr-11 pl-9 text-base text-content placeholder:text-muted [&::-webkit-search-cancel-button]:hidden"
+      class="h-(--qh-control) w-full min-w-0 appearance-none rounded-cell border border-line-control bg-surface-solid pr-8 pl-8 text-meta text-content placeholder:text-muted [&::-webkit-search-cancel-button]:hidden"
     />
     <button
       v-if="clearable && typed"
@@ -57,7 +57,7 @@ const clear = () => (typed.value = '');
       :aria-label="$t('common.clearSearch')"
       @click="clear"
     >
-      <X aria-hidden="true" class="size-4" />
+      <X aria-hidden="true" class="size-3.5" />
     </button>
   </div>
 </template>

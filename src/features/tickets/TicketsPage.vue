@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import EmptyState from '@/components/EmptyState.vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
@@ -53,7 +53,7 @@ const isDefaultList = computed(
     <!-- Keyed by the whole URL: a Back or Forward to other filters remounts the inputs, so they never keep text from another query. -->
     <StaffTicketFilters :key="route.fullPath" :filters="filters" />
     <p class="sr-only" aria-live="polite">{{ announcement }}</p>
-    <GlassCard as="div" class="overflow-hidden">
+    <Card as="div" class="overflow-hidden">
       <QueryState :loading="isPending" :error="null">
         <template #skeleton><TicketTableSkeleton /></template>
         <StatePanel
@@ -101,6 +101,6 @@ const isDefaultList = computed(
           </template>
         </template>
       </QueryState>
-    </GlassCard>
+    </Card>
   </div>
 </template>

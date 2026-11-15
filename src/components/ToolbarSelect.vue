@@ -47,6 +47,6 @@ const chosen = computed(
         {{ option.label }}
       </option>
     </select>
-    <ChevronDown class="pointer-events-none absolute right-3 size-4" aria-hidden="true" />
+    <ChevronDown class="pointer-events-none absolute right-2.5 size-3.5" aria-hidden="true" />
   </label>
 </template>

@@ -7,7 +7,8 @@ import { dismissToast, pauseToast, resumeToast, toasts } from './toasts';
 import type { Toast } from './toasts';
 
 /**
- * The toast stack: one polite region (a failure is an alert), bottom right, bottom centre on phones.
+ * The toast stack: one polite region (a failure is an alert), bottom right, bottom centre on phones. Motion notes 4: a toast
+ * rises 12 px on a spring, the others move up by ease-move, and one leaves with a 4 px fade.
  * Texts come from the global `translate`: the host outlives the component that mounted it.
  */
 const ICONS = { success: CircleCheck, danger: CircleAlert, info: Info } as const;
@@ -34,16 +35,17 @@ function undo(toast: Toast) {
     <TransitionGroup
       tag="ol"
       class="m-0 flex w-full max-w-sm list-none flex-col gap-2 p-0"
-      enter-from-class="translate-y-2 opacity-0"
-      enter-active-class="transition-[transform,opacity] duration-(--qh-duration) ease-standard"
-      leave-active-class="transition-opacity duration-(--qh-duration-fast) ease-standard"
-      leave-to-class="opacity-0"
+      enter-from-class="translate-y-3 opacity-0"
+      enter-active-class="transition-[translate,opacity] duration-(--qh-duration) ease-spring"
+      leave-active-class="transition-[translate,opacity] duration-(--qh-duration-fast) ease-exit"
+      leave-to-class="translate-y-1 opacity-0"
+      move-class="transition-[translate] duration-(--qh-duration) ease-move"
     >
       <li
         v-for="toast in toasts"
         :key="toast.id"
         :role="toast.tone === 'danger' ? 'alert' : undefined"
-        class="pointer-events-auto flex items-start gap-2.5 rounded-row border border-line-strong bg-surface-solid py-2 pr-2 pl-3 text-sm text-content shadow-float"
+        class="pointer-events-auto flex items-center gap-2.5 rounded-row border border-line-strong bg-surface-solid py-1.5 pr-1.5 pl-3 text-meta text-content shadow-float"
         @mouseenter="pauseToast(toast.id)"
         @mouseleave="resumeToast(toast.id)"
         @focusin="pauseToast(toast.id)"
@@ -52,10 +54,10 @@ function undo(toast: Toast) {
         <component
           :is="ICONS[toast.tone]"
           aria-hidden="true"
-          class="mt-2 size-4 shrink-0"
+          class="size-4 shrink-0"
           :class="ICON_TONES[toast.tone]"
         />
-        <p class="m-0 min-w-0 flex-1 py-1.5">{{ toast.text }}</p>
+        <p class="m-0 min-w-0 flex-1 py-1">{{ toast.text }}</p>
         <AppButton v-if="toast.undo" tone="ghost" size="sm" @click="undo(toast)">
           {{ toast.undoLabel ?? translate('common.undo') }}
         </AppButton>

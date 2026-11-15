@@ -9,13 +9,9 @@
     "fixed-size": 1
   },
   "components/SourceDiff.vue": {
-    "GlassCard": 1,
     "button": 2,
     "table": 2,
     "verdict-tone": 12
-  },
-  "components/SourceDiffSkeleton.vue": {
-    "GlassCard": 1
   },
   "components/ToolbarSelect.vue": {
     "select": 1

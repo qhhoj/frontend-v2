@@ -33,7 +33,7 @@ export const VERDICT_TONES: Record<VerdictCode, VerdictTone> = {
   D: 'pending',
   PD: 'pending',
 };
-/** Tone classes shared by VerdictBadge and VerdictLabel: tokens only (lint:tokens). */
+/** Tone classes of `VerdictChip`: tokens only (lint:tokens). */
 export const VERDICT_TONE_CLASSES: Record<VerdictTone, string> = {
   ac: 'bg-verdict-ac-bg text-verdict-ac',
   pc: 'bg-partial-bg-2 text-verdict-partial',

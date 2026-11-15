@@ -173,12 +173,12 @@ function onBoxKeydown(event: KeyboardEvent) {
     :aria-describedby="describedBy ?? field?.describedBy"
     :aria-invalid="isInvalid || undefined"
     :aria-busy="loading || undefined"
-    class="relative flex h-(--qh-control) w-full min-w-0 cursor-pointer items-center rounded-cell border bg-surface-solid pl-3 text-base text-content outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+    class="relative flex h-(--qh-control) w-full min-w-0 cursor-pointer items-center rounded-cell border bg-surface-solid pl-2.5 text-meta text-content outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
     :class="isInvalid ? 'border-negative' : 'border-line-control'"
     @click="popup.isOpen.value ? close() : open()"
     @keydown="onBoxKeydown"
   >
-    <span class="min-h-11 flex-1 truncate py-2" :class="!selected && 'text-muted'">
+    <span class="flex-1 truncate" :class="!selected && 'text-muted'">
       <slot name="value" :value="model" :placeholder="placeholder">
         {{ selected ? labelOf(selected) : placeholder }}
       </slot>
@@ -206,9 +206,9 @@ function onBoxKeydown(event: KeyboardEvent) {
       class="rounded-row border border-line-strong bg-surface-solid p-1 text-content shadow-float"
       :style="{ minWidth: `${box?.offsetWidth ?? 0}px` }"
     >
-      <div v-if="filter" class="relative p-1 pb-2">
+      <div v-if="filter" class="relative p-1">
         <Search
-          class="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted"
+          class="pointer-events-none absolute top-1/2 left-3.5 size-3.5 -translate-y-1/2 text-muted"
           aria-hidden="true"
         />
         <input
@@ -221,7 +221,7 @@ function onBoxKeydown(event: KeyboardEvent) {
           :aria-controls="listId"
           :aria-activedescendant="activeId"
           :placeholder="filterPlaceholder"
-          class="h-11 w-full rounded-row border border-line-control bg-surface-solid pr-3 pl-10 text-base text-content placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          class="h-(--qh-control) w-full rounded-cell border border-line-control bg-surface-solid pr-2.5 pl-8 text-meta text-content placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           @keydown="onListKeydown"
         />
       </div>
@@ -239,7 +239,7 @@ function onBoxKeydown(event: KeyboardEvent) {
           :key="String(valueOf(option))"
           role="option"
           :aria-selected="valueOf(option) === model"
-          class="flex min-h-11 cursor-pointer items-center rounded-cell px-3 text-sm hover:bg-surface-hover"
+          class="flex min-h-(--qh-row) cursor-pointer items-center rounded-cell px-2.5 text-meta hover:bg-surface-hover touch:min-h-11"
           :class="[
             index === active && 'bg-surface-hover outline-2 -outline-offset-2 outline-focus',
             valueOf(option) === model && 'font-semibold text-accent-text',

@@ -189,6 +189,9 @@
   --radius-control: var(--qh-radius-control);
   --shadow-float: var(--qh-shadow-float);
   --ease-standard: var(--qh-ease);
+  --ease-exit: var(--qh-ease-exit);
+  --ease-move: var(--qh-ease-move);
+  --ease-spring: var(--qh-ease-spring);
   --default-transition-duration: var(--qh-duration-fast);
   --default-transition-timing-function: var(--qh-ease);
 }
@@ -248,10 +251,6 @@
 @utility glass {
   background-color: var(--qh-surface);
   border: 1px solid var(--qh-line);
-}
-/* The primary fill: one flat accent (the name stays until the kit restyle, build plan step 3). */
-@utility bg-gradient-accent {
-  background-color: var(--qh-accent);
 }
 /* Loading indicators keep their own durations (--qh-duration is 0 under reduced motion) and switch themselves off there. */
 @keyframes qh-skeleton-pulse {
@@ -434,11 +433,37 @@
   }
 }
 
+/*
+ * Press (motion notes 1): buttons, icon buttons and interactive chips scale to .97 on a spring and come back. Under reduced
+ * motion or low power the scale stays 1, so a press is a colour step only. `will-change` keeps the label from hopping a
+ * fraction of a pixel when it lands.
+ */
+@utility pressable {
+  will-change: scale;
+  transition:
+    scale var(--qh-duration) var(--qh-ease-spring),
+    color var(--qh-duration-fast) var(--qh-ease),
+    background-color var(--qh-duration-fast) var(--qh-ease),
+    border-color var(--qh-duration-fast) var(--qh-ease);
+  &:active:not([aria-disabled='true'], :disabled) {
+    transition-duration: var(--qh-duration-instant), var(--qh-duration-fast);
+    transition-timing-function: var(--qh-ease);
+    @media (prefers-reduced-motion: no-preference) {
+      :root:not([data-low-power]) & {
+        scale: 0.97;
+      }
+    }
+  }
+}
+
 /* Low-power mode (src/theme/low-power.store.ts and the pre-paint script write `data-low-power` on <html>; F2's replay reads it too):
    no motion. */
 :root[data-low-power] {
+  --qh-duration-instant: 0ms;
   --qh-duration-fast: 0ms;
   --qh-duration: 0ms;
+  --qh-duration-emphasis: 0ms;
+  --qh-highlight-decay: 0ms;
 }
 :root[data-low-power] *,
 :root[data-low-power] *::before,
@@ -803,6 +828,15 @@
     position: fixed;
     inset: auto;
     margin: 0;
+    /* Motion notes 3: the list grows from its opener's edge (scaleY .96) and fades in. */
+    transform-origin: top;
+    transition:
+      opacity var(--qh-duration-fast) var(--qh-ease),
+      scale var(--qh-duration-fast) var(--qh-ease);
+    @starting-style {
+      opacity: 0;
+      scale: 1 0.96;
+    }
     max-width: calc(100% - 1rem);
     max-height: calc(100% - 1rem);
     overflow: auto;

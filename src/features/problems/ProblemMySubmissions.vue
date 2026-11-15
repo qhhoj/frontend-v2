@@ -9,7 +9,7 @@ import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StateBit from '@/components/StateBit.vue';
-import VerdictBadge from '@/components/VerdictBadge.vue';
+import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { GLOBAL_SCOPE } from '@/features/submissions/list/submission-scope';
 import { useScopedSubmissionListQuery } from '@/features/submissions/submissions.queries';
 import type { SubmissionFilters } from '@/features/submissions/use-submission-filters';
@@ -97,7 +97,7 @@ const rows = computed(() =>
           class="flex min-h-11 items-center gap-2.5 border-t border-line"
         >
           <RouterLink :to="{ name: 'submission', params: { id: submission.id } }">
-            <VerdictBadge :verdict="submissionVerdictOf(submission)" size="sm" />
+            <VerdictChip :verdict="submissionVerdictOf(submission)" />
           </RouterLink>
           <p :data-scale="score.scale" :title="submission.contest?.name" class="min-w-0">
             <span class="font-mono font-bold tabular-nums">{{ score.value }}</span

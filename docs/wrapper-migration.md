@@ -69,7 +69,6 @@ Uses, then files. The last M lane updates this table; the M lanes before it only
 | `AdminPageHeader`    | `features/admin/ui/AdminPageHeader.vue`           | 33 | 33 | `PageHeader`                                             |
 | `AdminRowMenu`       | `features/admin/ui/table/AdminRowMenu.vue`        | 29 | 18 | `RowMenu`                                                |
 | `AdminNotice`        | `features/admin/ui/feedback/AdminNotice.vue`      | 24 | 21 | `Notice`                                                 |
-| `GlassCard`          | `components/GlassCard.vue`                        | 23 | 20 | `Card`                                                   |
 | `SettingsNotice`     | `features/account/settings/SettingsNotice.vue`    | 27 | 20 | `Notice`                                                 |
 | `use-admin-toast`    | `features/admin/ui/feedback/use-admin-toast.ts`   | 18 | 18 | `useToast` (`components/ui/use-toast`)                   |
 | `AdminUserLabel`     | `features/admin/ui/AdminUserLabel.vue`            | 18 | 17 | `UserLink`                                               |

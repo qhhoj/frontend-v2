@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed, ref } from 'vue';
-import GlassCard from '@/components/GlassCard.vue';
+import Card from '@/components/ui/Card.vue';
 import StateBit from '@/components/StateBit.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import AppButton from '@/components/ui/AppButton.vue';
@@ -38,7 +38,7 @@ const trimmedCode = computed(() => draft.problemCode.trim());
       <span>{{ $t('tickets.new.breadcrumb') }}</span>
     </p>
     <div class="grid gap-6 lg:grid-cols-[1fr_300px]">
-      <GlassCard as="section" class="p-6 sm:p-8">
+      <Card as="section" class="p-6 sm:p-8">
         <PageHeader :title="$t('tickets.newTicket')">
           <template #start><StateBit variant="writing" size="inline" /></template>
         </PageHeader>
@@ -115,9 +115,9 @@ const trimmedCode = computed(() => draft.problemCode.trim());
             </AppButton>
           </div>
         </form>
-      </GlassCard>
+      </Card>
 
-      <GlassCard as="aside" class="h-fit p-6">
+      <Card as="aside" class="h-fit p-6">
         <h2 class="font-display text-base font-bold">{{ $t('tickets.new.before') }}</h2>
         <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-muted">
           <li>
@@ -130,7 +130,7 @@ const trimmedCode = computed(() => draft.problemCode.trim());
           </li>
           <li>{{ $t('tickets.new.describe') }}</li>
         </ul>
-      </GlassCard>
+      </Card>
     </div>
   </div>
 </template>

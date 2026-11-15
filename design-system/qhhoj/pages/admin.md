@@ -203,7 +203,7 @@ Colour and opacity transitions use `--qh-duration-fast` (150 ms). Drawers and sh
   - Remove the 3 Bits, the lookup card and the footnote.
 - **Submissions**:
   - Filter bar: search for problem/user. A "Trạng thái" popover holds two check-chip groups (QU…PD, AC…RJ) with presets (Mọi IE, Mọi CE, Chưa AC). Language goes in the popover.
-  - Table: ID mono, Người nộp, Bài, Kết quả (VerdictBadge), Điểm, Thời gian, Bộ nhớ, Ngôn ngữ, Lúc nộp.
+  - Table: ID mono, Người nộp, Bài, Kết quả (VerdictChip), Điểm, Thời gian, Bộ nhớ, Ngôn ngữ, Lúc nộp.
   - Bulk: Chấm lại, Tính lại điểm, Từ chối.
   - The "Chấm lại theo bộ lọc nâng cao" link becomes a header secondary action.
 - **Rejudge**: a single form card with the filter summary on the right as a sticky "Sẽ áp dụng cho ~N bài nộp" panel. "Chấm lại các bài nộp này" is primary with a confirm, not a red outline. Recent runs become a table under it.

@@ -145,7 +145,7 @@ function onKeydown(event: KeyboardEvent) {
           <a
             :href="hrefOf(item)"
             tabindex="-1"
-            class="flex min-h-10 items-center gap-3 px-3 text-sm no-underline touch:min-h-11"
+            class="flex min-h-(--qh-row) items-center gap-2.5 px-2.5 text-meta no-underline touch:min-h-11"
             :class="
               item.disabled
                 ? 'cursor-not-allowed text-muted'

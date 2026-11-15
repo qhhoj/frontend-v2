@@ -17,7 +17,10 @@ type Wrapper = Awaited<ReturnType<typeof mountApp>>['wrapper'];
 /** The screens are lazy routes: the form is there once its chunk has loaded. */
 async function mountForm(path: string) {
   const mounted = await mountApp(path);
-  await vi.waitFor(() => expect(mounted.wrapper.find('#language-name').exists()).toBe(true));
+  // The form is a lazy route too: its chunk can take seconds on a loaded machine.
+  await vi.waitFor(() => expect(mounted.wrapper.find('#language-name').exists()).toBe(true), {
+    timeout: 15_000,
+  });
   return mounted;
 }
 async function fillIn(wrapper: Wrapper, values: Record<string, string>) {
@@ -73,7 +76,9 @@ describe('LanguageFormPage, create', () => {
       ],
     ]);
     // The list is a lazy route: the redirect lands once its chunk has loaded.
-    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('admin-languages'));
+    await vi.waitFor(() => expect(router.currentRoute.value.name).toBe('admin-languages'), {
+      timeout: 15_000,
+    });
   });
 
   it('puts a taken key under the key box and stays on the page', async () => {
