@@ -2626,6 +2626,7 @@
   },
   "contestBar": {
     "label": "Your current contest",
+    "live": "In contest",
     "virtual": "Virtual #{run}",
     "spectate": "Spectating",
     "rankingShort": "Ranking"
@@ -3207,6 +3208,7 @@
     }
   },
   "rail": {
+    "live": "In contest",
     "rank": "rank {rank}"
   },
   "search": {

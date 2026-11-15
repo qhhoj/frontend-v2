@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   contestItem,
   leaderboardEntry,
+  participationSummary,
   profile,
   ratingHistory,
   signedIn,
@@ -61,7 +62,7 @@ describe('home', () => {
     expect(wrapper.get('[data-testid="rating-hero"] [role="alert"] button').text()).toBe('Thử lại');
   });
 
-  it('puts the newest posts, pinned first, between the running contests and the leaderboard', async () => {
+  it('lists the newest posts, pinned first', async () => {
     const posts = [
       postItem({ id: communityId(1), title: 'Nội quy thi', sticky: true }),
       postItem({ id: communityId(2), title: 'Lịch luyện tập', sticky: false }),
@@ -80,24 +81,18 @@ describe('home', () => {
       ['Tổng kết', `/blog/${communityId(3)}`],
     ]);
     expect(card.get('li').text()).toContain('Ghim');
-    const order = wrapper
-      .findAll(
-        '[data-testid="new-posts"], [data-testid="top-performers"], [data-testid="running-contests"]',
-      )
-      .map((node) => node.attributes('data-testid'));
-    expect(order).toEqual(['running-contests', 'new-posts', 'top-performers']);
   });
 
   it('continues with the newest problem that is not accepted, inside the personal card', async () => {
     mockApi(signedInRoutes());
     const { wrapper } = await mountApp('/');
     await flushPromises();
-    const button = wrapper.get('[data-testid="rating-hero"] [data-testid="continue-problem"]');
+    const button = wrapper.get('[data-testid="continue-card"] [data-testid="continue-problem"]');
     expect(button.attributes('href')).toBe('/problems/sp');
     expect(button.text()).toBe('Tiếp tục: Đường đi ngắn nhất');
-    expect(
-      wrapper.get('[data-testid="rating-hero"] [data-testid="recent-submissions"]').text(),
-    ).toContain('Đường đi ngắn nhất');
+    expect(wrapper.get('[data-testid="recent-submissions"]').text()).toContain(
+      'Đường đi ngắn nhất',
+    );
   });
 
   it('leads with the rating, or with the problems solved before the first rating', async () => {
@@ -140,6 +135,39 @@ describe('home', () => {
     await flushPromises();
     expect(wrapper.get('[data-testid="hero-figure"]').text()).toBe('2104');
     expect(wrapper.find('[data-testid="rating-chart"]').exists()).toBe(false);
+  });
+
+  it('shows the contest the viewer is in, with the own rank when the answer has one', async () => {
+    const live = {
+      contest: {
+        key: 'r42',
+        name: 'QHH Round #42',
+        startTime: '2026-10-08T08:00:00Z',
+        endTime: '2026-10-08T11:24:37Z',
+      },
+      participation: participationSummary(),
+      standing: { rank: 7, score: 220, cumtime: 3180, frozen: false },
+    };
+    mockApi(
+      signedInRoutes({
+        'GET /contests/current': ok(live),
+        'GET /contests/r42/announcements': page([]),
+      }),
+    );
+    const { wrapper } = await mountApp('/');
+    await flushPromises();
+    const card = wrapper.get('[data-testid="live-contest"]');
+    expect(card.text()).toContain('QHH Round #42');
+    expect(card.get('[data-testid="live-standing"]').text()).toContain('hạng 7');
+    expect(card.get('[data-testid="live-standing"]').text()).toContain('220 điểm');
+    expect(card.get('a[href="/contests/r42"]').text()).toBe('Vào thi');
+  });
+
+  it('shows no contest card when the viewer is in none', async () => {
+    mockApi(signedInRoutes());
+    const { wrapper } = await mountApp('/');
+    await flushPromises();
+    expect(wrapper.find('[data-testid="live-contest"]').exists()).toBe(false);
   });
 
   it('shows anonymous viewers the sign-up card above the same cards', async () => {

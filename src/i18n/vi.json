@@ -3208,6 +3208,7 @@
     }
   },
   "rail": {
+    "live": "Đang thi",
     "rank": "hạng {rank}"
   },
   "search": {
