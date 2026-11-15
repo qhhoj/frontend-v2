@@ -335,6 +335,14 @@ describe('contest ranking', () => {
       await flushPromises();
       expect(router.currentRoute.value.query).toMatchObject({ virtual: '1', compare: '1' });
       expect(wrapper.find('[data-testid="virtual-overlay"]').exists()).toBe(true);
+      // The switch stays, so the viewer can leave the comparison.
+      const back = wrapper
+        .findAll('[role="group"] button')
+        .find((button) => button.text() === 'Chính thức');
+      await back!.trigger('click');
+      await flushPromises();
+      expect(router.currentRoute.value.query.compare).toBeUndefined();
+      expect(wrapper.find('[data-testid="virtual-overlay"]').exists()).toBe(false);
     });
 
     it('opens on the official board once no virtual run is live', async () => {

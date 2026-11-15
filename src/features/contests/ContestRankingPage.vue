@@ -198,6 +198,15 @@ async function goToMyRow() {
         >
           {{ $t(hiddenBodyKey) }}
         </Notice>
+        <!-- Picks the board, so it stays outside it: compare mode draws no board and still needs a way back. -->
+        <SegmentedControl
+          :label="$t('ranking.viewMode')"
+          :options="viewModes"
+          :model-value="viewMode"
+          data-testid="ranking-view-mode"
+          class="self-start whitespace-nowrap"
+          @update:model-value="setViewMode"
+        />
       </template>
     </QueryState>
     <QueryState
@@ -267,13 +276,6 @@ async function goToMyRow() {
                 v-model="search"
                 :label="$t('ranking.searchLabel')"
                 class="w-full sm:w-48"
-              />
-              <SegmentedControl
-                :label="$t('ranking.viewMode')"
-                :options="viewModes"
-                :model-value="viewMode"
-                class="whitespace-nowrap"
-                @update:model-value="setViewMode"
               />
               <AppButton
                 v-if="myRow && !isComparing"

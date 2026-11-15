@@ -24,7 +24,9 @@ const tagChips = computed(() => {
   return props.contest.tags.map((slug) => tagChipOf(slug, bySlug));
 });
 /** The restricting organizations lead the tags; the plain "organization only" chip stands in where they are not shown. */
-const showOrganizations = computed(() => props.withTags && props.contest.organizations.length > 0);
+const showOrganizations = computed(
+  () => (props.withTags || props.onlyTags) && props.contest.organizations.length > 0,
+);
 </script>
 
 <template>

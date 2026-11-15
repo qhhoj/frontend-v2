@@ -2,15 +2,24 @@
 import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { RANK_COLUMN_REM, statsWidthRem, tableMinWidthRem } from './ranking-columns';
+import {
+  DEFAULT_STATS_COLUMNS,
+  RANK_COLUMN_REM,
+  TIME_COLUMN_REM,
+  statsWidthRem,
+  tableMinWidthRem,
+} from './ranking-columns';
 
 const props = defineProps<{ problemCount: number; hasTimeColumn: boolean }>();
 const ROWS = 10;
 /** Same columns and minimum width as RankingTable's desktop table (which scrolls sideways below it): rank, name (the rest), then the score and problem columns together. */
-const columns = computed(
-  () =>
-    `grid-template-columns: ${RANK_COLUMN_REM}rem minmax(0, 1fr) ${statsWidthRem(props.problemCount, props.hasTimeColumn)}rem; min-width: ${tableMinWidthRem(props.problemCount, props.hasTimeColumn)}rem`,
-);
+const columns = computed(() => {
+  const stats = {
+    ...DEFAULT_STATS_COLUMNS,
+    timeRem: props.hasTimeColumn ? TIME_COLUMN_REM : null,
+  };
+  return `grid-template-columns: ${RANK_COLUMN_REM}rem minmax(0, 1fr) ${statsWidthRem(props.problemCount, stats)}rem; min-width: ${tableMinWidthRem(props.problemCount, stats)}rem`;
+});
 </script>
 
 <template>

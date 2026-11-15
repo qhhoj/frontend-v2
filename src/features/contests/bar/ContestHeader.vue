@@ -12,13 +12,14 @@ import ContestChips from '../ContestChips.vue';
 import ContestTabs from '../ContestTabs.vue';
 import PhasePill from '../PhasePill.vue';
 import { boardFreezeOf } from './board-freeze';
+import { useShownClock } from './header-clock';
 import { useCurrentContest } from './use-current-contest';
 
 /**
  * The contest bar on the contest's own pages: the one H1 (the name), the phase and format chips, the clock while time runs, the
  * freeze chip beside the clock, and the contest's tabs. Every tab renders it, so the state sits in one place and
- * the layout does not jump between tabs. The shell's `ContestBar` steps aside on these pages (`contest-pages.ts`), so the
- * clock shows once. The clock counts what the viewer's own time is: a virtual run's end, else the end of their live
+ * the layout does not jump between tabs. The shell's `ContestBar` steps aside while this header shows the clock
+ * (`header-clock.ts`), so the clock shows once and never zero times. The clock counts what the viewer's own time is: a virtual run's end, else the end of their live
  * window, else the contest's end; it shows only while that time runs.
  * `isBoardFrozen` is the board's own answer where the page has it (the ranking); elsewhere `viewer.boardFrozenAt` decides.
  */
@@ -48,6 +49,10 @@ const clockUntil = computed(() => {
   if (phase.value !== 'running') return null;
   return ownEndTime(contest.endTime, run.value?.virtual === 0 ? run.value : null);
 });
+useShownClock(
+  () => props.contestKey,
+  () => clockUntil.value !== null,
+);
 const freeze = computed(() =>
   props.contest ? boardFreezeOf(props.contest, now.value, props.isBoardFrozen) : null,
 );

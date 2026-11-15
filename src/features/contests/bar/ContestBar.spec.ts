@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { contestDetail, contestViewer, participationSummary } from '@/test/fixtures';
 import { contestPageRoutes } from '@/test/contest-routes';
-import { mockApi, ok, page } from '@/test/mock-api';
+import { fail, mockApi, ok, page } from '@/test/mock-api';
 import { mountApp } from '@/test/mount';
 import { signedInViewer } from '@/test/problem-routes';
 
@@ -14,7 +14,7 @@ const run = (key: string, name: string) => ({
 describe('contest bar on contest pages (M-01)', () => {
   afterEach(() => vi.useRealTimers());
 
-  it("steps aside on the running contest's own tabs, whose header carries the clock", async () => {
+  it("steps aside on the running contest's own tabs once their header shows the clock", async () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
     const contest = contestDetail({
       viewer: contestViewer({ isCurrent: true, inContest: true, liveStatus: 'participating' }),
@@ -29,6 +29,22 @@ describe('contest bar on contest pages (M-01)', () => {
       expect(wrapper.find('[data-testid="contest-clock"] [role="timer"]').exists()).toBe(true),
     );
     expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(false);
+  });
+
+  it('keeps its clock on a tab whose contest failed to load', async () => {
+    vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
+    const contest = contestDetail();
+    mockApi({
+      ...signedInViewer(),
+      ...contestPageRoutes(contest),
+      [`GET /contests/${contest.key}`]: fail(500, 'internal'),
+      'GET /contests/current': ok(run(contest.key, contest.name)),
+    });
+    const { wrapper } = await mountApp(`/contests/${contest.key}/announcements`);
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="contest-bar"] [role="timer"]').exists()).toBe(true),
+    );
+    expect(wrapper.find('[data-testid="contest-clock"]').exists()).toBe(false);
   });
 
   it("links back to the viewer's contest from another contest's page", async () => {

@@ -8,7 +8,7 @@ import { navSectionOverride } from '@/features/shell/nav-section';
 import { usePublishedHeight } from '@/features/problems/use-dock-height';
 import { useSessionStore } from '@/stores/session.store';
 import { useUnreadAnnouncementCount } from '../announcement-seen';
-import { CONTEST_HEADER_ROUTES } from './contest-pages';
+import { isClockShownFor } from './header-clock';
 import { participationKind } from './current-contest';
 
 /**
@@ -17,8 +17,8 @@ import { participationKind } from './current-contest';
  * where the status is its dot and only the ranking and the announcements stay as links (M-02, M-06); on a coarse pointer the bar
  * is 44 px and its links fill it, so each is a 44 px target (D-17). On the contest's
  * own pages its tab row is the navigation, so the bar keeps only the status and the clock: one active link and one
- * unread badge per screen (M-01, Q-B). On the pages that draw `ContestHeader` (the tabs) it steps aside: that header carries
- * the clock, so it shows once. Shown by `AppShell` through `useCurrentContest`.
+ * unread badge per screen (M-01, Q-B). While a `ContestHeader` (the tabs) shows this contest's clock it steps aside, so
+ * the clock shows once; if that header has no clock yet (its contest still loading or failed) the bar stays. Shown by `AppShell` through `useCurrentContest`.
  */
 const props = defineProps<{ current: CurrentParticipation }>();
 const { t } = useI18n();
@@ -32,10 +32,8 @@ const statusText = computed(() => {
 });
 const unread = useUnreadAnnouncementCount(contestKey);
 const isOnContestPage = computed(() => route.params.key === contestKey.value);
-/** The contest's own tab pages: their `ContestHeader` has the name, the clock and the tabs. */
-const isSteppedAside = computed(
-  () => isOnContestPage.value && CONTEST_HEADER_ROUTES.has(String(route.name ?? '')),
-);
+/** The contest's own tab pages: once their `ContestHeader` shows this contest's clock, the bar is not needed. */
+const isSteppedAside = computed(() => isClockShownFor(contestKey.value));
 const root = ref<HTMLElement | null>(null);
 /** Sticky things below it (the print toolbar) clear it through `--contest-bar-height`; gone, it publishes nothing. */
 usePublishedHeight(root, '--contest-bar-height', () => true);

@@ -5,21 +5,22 @@ import type { Ranking, RankingRow } from '@/api/types/contests';
 import UserLink from '@/components/UserLink.vue';
 import Chip from '@/components/ui/Chip.vue';
 import { medalClass } from '@/lib/medal';
-import { formatCumtime, rankingCell, totalScoreText } from '@/lib/ranking-cells';
-import type { RankingContext } from '@/lib/ranking-cells';
 import { deltaToneClass, formatDelta } from '@/lib/rating-delta';
 import { KIND_CLASSES, PARTIAL_CLASSES } from './ranking-cell-classes';
+import { miniCellRem } from './ranking-columns';
+import type { RowView } from './ranking-row-view';
 
 /**
  * The board on a phone (below `sm`): one row per contestant with rank, name, score and a mini cell per problem, all in
- * the screen's width. The mini cells wrap instead of scrolling; each shows its cell's short text (`+1`, `−3`, `?2`,
- * points) on the cell's colours and is read out with its problem label. It is an ordered list, not a table: rows are
+ * the screen's width. The mini cells wrap instead of scrolling; each shows its problem label and its cell's short text (`A +1`, `B ?2`,
+ * `C 100`) on the cell's colours, all as wide as the widest one so they line up in columns, and is read out with its problem label. It is an ordered list, not a table: rows are
  * `li[data-row-id]` with a focusable `[data-row-focus]` name block, so "Về hàng của tôi" (`focusTableRow`) works on both.
  */
 const props = defineProps<{
   ranking: Ranking;
   rows: RankingRow[];
-  context: RankingContext;
+  /** What each row prints (cells, total, time), built once per board read by `RankingTable`. */
+  viewOf: (row: RankingRow) => RowView;
   viewerId: string | null;
   /** The board has a penalty column on desktop: here the penalty goes under the score. */
   hasTimeColumn: boolean;
@@ -37,14 +38,16 @@ const problemRange = computed(() => {
 const scoreHeaderKey = computed(() =>
   props.hasTimeColumn ? 'ranking.columns.scorePenalty' : 'ranking.columns.score',
 );
-const miniCellsOf = (row: RankingRow) =>
-  props.ranking.problems.map((problem) => ({
-    problemId: problem.problemId,
-    label: problem.label,
-    view: rankingCell(row.cells[problem.problemId], problem, row.participationId, props.context),
-  }));
-const timeText = (row: RankingRow) =>
-  formatCumtime(props.context.formatName, row.cumtime, props.context.locale);
+/** One width for every mini cell of the board, so the cells line up in columns across rows. */
+const miniWidth = computed(() => {
+  const cells = props.rows.flatMap((row) =>
+    props.viewOf(row).cells.map((cell) => ({
+      label: cell.label,
+      text: cell.view.kind === 'empty' ? '' : cell.view.text,
+    })),
+  );
+  return `${miniCellRem(cells.length ? cells : props.ranking.problems.map(({ label }) => ({ label, text: '' })))}rem`;
+});
 const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
 </script>
 
@@ -83,14 +86,16 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
           </span>
           <span class="mt-1.5 flex flex-wrap gap-0.5">
             <span
-              v-for="cell in miniCellsOf(row)"
+              v-for="cell in viewOf(row).cells"
               :key="cell.problemId"
-              class="inline-flex h-4.5 min-w-5.5 items-center justify-center rounded-cell px-0.5 font-mono text-tiny leading-none font-semibold tabular-nums"
+              :style="{ width: miniWidth }"
+              class="inline-flex h-4.5 items-center justify-center gap-0.5 rounded-cell px-0.5 font-mono text-tiny leading-none font-semibold tabular-nums"
               :class="[
                 cell.view.kind === 'empty' ? 'bg-surface-strong' : KIND_CLASSES[cell.view.kind],
                 cell.view.partialStep && PARTIAL_CLASSES[cell.view.partialStep],
               ]"
-              ><span aria-hidden="true">{{ cell.view.text }}</span
+              ><span aria-hidden="true" class="opacity-70">{{ cell.label }}</span
+              ><span aria-hidden="true">{{ cell.view.kind === 'empty' ? '' : cell.view.text }}</span
               ><span class="sr-only"
                 >{{ cell.label }}:
                 {{
@@ -107,12 +112,12 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
         <span class="px-2 py-2 text-right font-mono tabular-nums">
           <span class="sr-only">{{ $t(scoreHeaderKey) }}</span>
           <span class="block text-sm font-bold">{{
-            row.isDisqualified ? '—' : totalScoreText(row.score, ranking.problems, context)
+            row.isDisqualified ? '—' : viewOf(row).total
           }}</span>
           <span
             v-if="(hasTimeColumn || hasCombinedScore) && !row.isDisqualified"
             class="block text-caption text-muted"
-            >{{ timeText(row) }}</span
+            >{{ viewOf(row).time }}</span
           >
           <span
             v-if="hasRatingColumn && row.ratingChange"

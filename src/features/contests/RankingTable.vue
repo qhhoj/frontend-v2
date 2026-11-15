@@ -12,27 +12,23 @@ import { useMotionAllowed } from '@/lib/use-motion-allowed';
 import type { Ranking, RankingProblem, RankingRow } from '@/api/types/contests';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { deltaToneClass, formatDelta } from '@/lib/rating-delta';
-import {
-  formatCumtime,
-  isPenaltyFormat,
-  rankingCell,
-  showsCumtime,
-  totalScoreText,
-} from '@/lib/ranking-cells';
+import { isPenaltyFormat, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import RankingCell from './RankingCell.vue';
 import RankingLegend from './RankingLegend.vue';
 import RankingList from './RankingList.vue';
 import RankingProblemHeader from './RankingProblemHeader.vue';
 import {
-  PROBLEM_COLUMN_REM,
   RANK_COLUMN_REM,
   RATING_COLUMN_REM,
-  SCORE_COLUMN_REM,
-  TIME_COLUMN_REM,
-  TIMED_POINTS_COLUMN_REM,
+  problemColumnRem,
+  scoreColumnRem,
   tableMinWidthRem,
+  timeColumnRem,
 } from './ranking-columns';
+import type { StatsColumns } from './ranking-columns';
+import { rowViewOf } from './ranking-row-view';
+import type { RowView } from './ranking-row-view';
 
 const props = defineProps<{
   ranking: Ranking;
@@ -62,12 +58,6 @@ const focusRow = (participationId: string) =>
   focusTableRow(root.value, participationId, isMotionAllowed.value);
 defineExpose({ focusRow });
 const hasVirtualRows = computed(() => props.rows.some((row) => row.virtual > 0));
-const cellsOf = (row: RankingRow) =>
-  props.ranking.problems.map((problem) => ({
-    problemId: problem.problemId,
-    to: submissionsLink(row, problem),
-    view: rankingCell(row.cells[problem.problemId], problem, row.participationId, props.context),
-  }));
 /** Contest submissions of one user (and problem); undefined where the viewer may not see them. */
 const submissionsLink = (row: RankingRow, problem?: RankingProblem) => {
   if (!props.contestKey) return undefined;
@@ -87,14 +77,36 @@ const hasCombinedScore = computed(
 const hasTimeColumn = computed(() => penalty.value && showsCumtime(props.context.formatName));
 /** Rated contests carry each row's rating change once the ratings are applied. */
 const hasRatingColumn = computed(() => props.ranking.rows.some((row) => row.ratingChange));
-const ratingRem = computed(() => (hasRatingColumn.value ? RATING_COLUMN_REM : 0));
-/** A points cell with a time needs the wider column to stay on one line. */
-const problemRem = computed(() =>
-  !penalty.value && props.context.showsTime ? TIMED_POINTS_COLUMN_REM : PROBLEM_COLUMN_REM,
-);
-const minWidth = computed(
+/** Every row's printed texts, built once per board read for all rows, so a search does not change the columns. */
+const rowViews = computed(
   () =>
-    `${tableMinWidthRem(props.ranking.problems.length, hasTimeColumn.value, problemRem.value) + ratingRem.value}rem`,
+    new Map(
+      props.ranking.rows.map((row) => [
+        row.participationId,
+        rowViewOf(row, props.ranking.problems, props.context, submissionsLink),
+      ]),
+    ),
+);
+const viewOf = (row: RankingRow): RowView =>
+  rowViews.value.get(row.participationId) ??
+  rowViewOf(row, props.ranking.problems, props.context, submissionsLink);
+/** Each column as wide as the widest text the board prints in it, so nothing is cut or drawn over the next one. */
+const columns = computed<StatsColumns>(() => {
+  const views = [...rowViews.value.values()];
+  return {
+    scoreRem: scoreColumnRem(
+      views.map((view) => ({
+        total: view.total,
+        time: hasCombinedScore.value ? view.time : undefined,
+      })),
+    ),
+    timeRem: hasTimeColumn.value ? timeColumnRem(views.map((view) => view.time)) : null,
+    ratingRem: hasRatingColumn.value ? RATING_COLUMN_REM : null,
+    problemRem: problemColumnRem(views.flatMap((view) => view.cells.map((cell) => cell.view))),
+  };
+});
+const minWidth = computed(
+  () => `${tableMinWidthRem(props.ranking.problems.length, columns.value)}rem`,
 );
 const scoreHeaderKey = computed(() =>
   hasCombinedScore.value ? 'ranking.columns.scoreTime' : 'ranking.columns.score',
@@ -129,7 +141,7 @@ const scoreHeaderKey = computed(() =>
       v-else-if="isCompact"
       :ranking="ranking"
       :rows="rows"
-      :context="context"
+      :view-of="viewOf"
       :viewer-id="viewerId"
       :has-time-column="hasTimeColumn"
       :has-combined-score="hasCombinedScore"
@@ -141,13 +153,13 @@ const scoreHeaderKey = computed(() =>
         <colgroup>
           <col :style="{ width: `${RANK_COLUMN_REM}rem` }" />
           <col />
-          <col :style="{ width: `${SCORE_COLUMN_REM}rem` }" />
-          <col v-if="hasTimeColumn" :style="{ width: `${TIME_COLUMN_REM}rem` }" />
-          <col v-if="hasRatingColumn" :style="{ width: `${RATING_COLUMN_REM}rem` }" />
+          <col :style="{ width: `${columns.scoreRem}rem` }" />
+          <col v-if="columns.timeRem" :style="{ width: `${columns.timeRem}rem` }" />
+          <col v-if="columns.ratingRem" :style="{ width: `${columns.ratingRem}rem` }" />
           <col
             v-for="problem in ranking.problems"
             :key="problem.problemId"
-            :style="{ width: `${problemRem}rem` }"
+            :style="{ width: `${columns.problemRem}rem` }"
           />
         </colgroup>
         <caption class="sr-only">
@@ -220,25 +232,19 @@ const scoreHeaderKey = computed(() =>
                 }}</Chip>
               </span>
             </th>
-            <td class="px-1.5 whitespace-nowrap">
+            <td class="overflow-hidden px-1.5 whitespace-nowrap">
               <span class="font-bold">
                 <template v-if="row.isDisqualified">—</template>
-                <template v-else>{{
-                  totalScoreText(row.score, ranking.problems, context)
-                }}</template>
+                <template v-else>{{ viewOf(row).total }}</template>
               </span>
               <small
                 v-if="hasCombinedScore && !row.isDisqualified"
                 class="ml-1 text-tiny font-medium text-muted"
-                >{{ formatCumtime(context.formatName, row.cumtime, context.locale) }}</small
+                >{{ viewOf(row).time }}</small
               >
             </td>
-            <td v-if="hasTimeColumn">
-              {{
-                row.isDisqualified
-                  ? '—'
-                  : formatCumtime(context.formatName, row.cumtime, context.locale)
-              }}
+            <td v-if="hasTimeColumn" class="overflow-hidden whitespace-nowrap">
+              {{ row.isDisqualified ? '—' : viewOf(row).time }}
             </td>
             <td
               v-if="hasRatingColumn"
@@ -255,7 +261,7 @@ const scoreHeaderKey = computed(() =>
               >
             </td>
             <RankingCell
-              v-for="cell in cellsOf(row)"
+              v-for="cell in viewOf(row).cells"
               :key="cell.problemId"
               :view="cell.view"
               :to="cell.to"
