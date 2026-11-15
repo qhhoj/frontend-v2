@@ -47,7 +47,7 @@ export function switchNamed(wrapper: Pick<VueWrapper, 'findAll' | 'get'>, label:
   return found;
 }
 
-/** PrimeVue renders a dialog into `document.body`, not into the wrapper. The last one is on top (a confirm over a drawer). */
+/** A dialog is teleported to `document.body`, not into the wrapper. The last one is on top (a confirm over a drawer). */
 export function openDialog(): HTMLElement {
   const dialog = [...document.body.querySelectorAll<HTMLElement>('[role="dialog"]')].at(-1);
   if (!dialog) throw new Error('No dialog is open');

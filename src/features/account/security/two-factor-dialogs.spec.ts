@@ -34,7 +34,7 @@ async function openSecurity(routes: Record<string, MockHandler>) {
   const { wrapper } = await mountApp('/settings/security');
   return { wrapper, calls };
 }
-/** PrimeVue moves focus into a dialog only when its enter transition ends, so a click sent before that races the move. */
+/** `Modal` moves focus into the dialog after it renders, so a click sent before that races the move. */
 async function settleDialog() {
   await vi.waitFor(() => expect(document.activeElement?.closest('[role="dialog"]')).toBeTruthy());
 }

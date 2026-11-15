@@ -10,7 +10,7 @@ import { useJudgeWrites } from './judges.mutations';
 import { JUDGE_SEARCH_ID, useJudgesCache } from './judges.queries';
 
 /**
- * The confirm dialogs of the judges board, one open at a time (`open`). They stay mounted, so PrimeVue can return focus to
+ * The confirm dialogs of the judges board, one open at a time (`open`). They stay mounted, so `Modal` can return focus to
  * the ⋯ button that opened them; `judge` is kept after a close so the title does not blank while the dialog fades.
  */
 const props = defineProps<{ judge: Judge | null }>();

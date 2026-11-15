@@ -43,8 +43,8 @@
   --text-stat: 28px;
   --text-hero: 40px;
   --text-score: 40px;
-  /* Z scale: z-sticky, z-savebar, z-header, z-bit, z-overlay, z-toast. PrimeVue stacks its own overlays at
-     1000 and modals at 1100, so a toast sits above them. */
+  /* Z scale: z-sticky, z-savebar, z-header, z-bit, z-overlay, z-toast. Dialogs and popups sit in the top layer, above
+     every z-index; the toast host moves into the open dialog (use-toast.ts). */
   --z-index-sticky: 10;
   --z-index-savebar: 20;
   --z-index-header: 30;

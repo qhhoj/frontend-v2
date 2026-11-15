@@ -18,7 +18,7 @@ describe('import rules', () => {
     }
   });
 
-  it('count a wrapper re-exported by a kit barrel, but let the kit import PrimeVue', () => {
+  it('count a wrapper re-exported by a kit barrel', () => {
     const barrel = `export { default as AdminChip } from '@/features/admin/ui/AdminChip.vue'; export * from '@/features/admin/ui/controls';`;
     expect(rules(barrel, 'components/ui/zz-barrel.ts')).toEqual(['AdminChip', 'controls']);
   });
@@ -27,12 +27,6 @@ describe('import rules', () => {
     for (const path of ['ui/./AdminChip.vue', 'ui/x/../AdminChip.vue', 'ui/AdminChip.vue?x']) {
       expect(rules(`import Chip from '@/features/admin/${path}';`), path).toEqual(['AdminChip']);
     }
-  });
-
-  it('count a direct PrimeVue part, but not its types or the kit wrapping it', () => {
-    expect(rules(`import Dialog from 'primevue/dialog';`)).toEqual(['primevue']);
-    expect(rules(`import type { MenuItem } from 'primevue/menuitem';`)).toEqual([]);
-    expect(rules(`import Dialog from 'primevue/dialog';`, 'components/ui/Modal.vue')).toEqual([]);
   });
 
   it('match the resolved file, whatever the path is written as or the binding is named', () => {

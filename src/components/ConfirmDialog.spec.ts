@@ -95,7 +95,7 @@ describe('ConfirmDialog with an input in its body', () => {
     expect(wrapper.emitted('confirm')).toHaveLength(1);
   });
 
-  // Regression guard for PrimeVue's own focus restore (ConfirmDialog no longer implements it).
+  // Regression guard for `Modal`'s focus restore (ConfirmDialog does not implement it).
   it('gives focus back to the element that opened it', async () => {
     const opener = document.createElement('button');
     document.body.append(opener);

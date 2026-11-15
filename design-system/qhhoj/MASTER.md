@@ -41,7 +41,7 @@ The generator solves every value against its floor (body text 4.5:1 standard, 7:
 
 - Radius by role: controls `rounded-control` 4, inputs, code and cells `rounded-cell` 4, inset tiles, rows and notices `rounded-row` 6, cards and dialogs `rounded-card` 6 (8 on phones), skeletons 4. `rounded-pill` stays for switches, dots and avatars; chips and tabs leave it in the kit restyle (step 3). A menu or popover is `rounded-row`. No `rounded-[…]` outside the lint allowlist.
 - Control heights: `--qh-control` 44 px (md), `--qh-control-sm` 36 px (44 px on coarse pointers; the admin scope's default), `--qh-control-lg` 56 px (swap card submit). Workbench's 28 px desktop control arrives with the kit restyle.
-- Z scale: `z-sticky` 10, `z-savebar` 20, `z-header` 30, `z-bit` 40, `z-overlay` 50, `z-toast` 1200 (above PrimeVue's 1000/1100 layers). No `z-[…]`.
+- Z scale: `z-sticky` 10, `z-savebar` 20, `z-header` 30, `z-bit` 40, `z-overlay` 50, `z-toast` 1200 (dialogs and popups are in the top layer, above all of these). No `z-[…]`.
 - One soft shadow, `shadow-float` (`--qh-shadow-float`), on floating surfaces only: modals, menus, popovers, toasts. Control borders use `--qh-line-control` (3:1 on the ground); `--qh-line` stays the hairline of cards and dividers.
 - Motion: `--qh-duration-fast` 150 ms and `--qh-duration` 200 ms, ease `--qh-ease`, on colour, border and opacity only; no layout-shifting hover. `prefers-reduced-motion`: durations 0, no transitions or animations.
 

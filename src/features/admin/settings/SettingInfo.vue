@@ -7,8 +7,7 @@ import { buttonClass } from '../ui/controls';
 
 /**
  * The ⓘ beside a setting: its key, its default, its history and the reset, kept out of the way until asked for.
- * The popover renders in the body like every Popover (inside the row PrimeVue's page coordinates land off by the admin
- * main area). Closing it from one of its own buttons sends focus back to the ⓘ; a target the action focuses afterwards
+ * The popover renders in the top layer like every Popover. Closing it from one of its own buttons sends focus back to the ⓘ; a target the action focuses afterwards
  * (the history panel's heading) still takes it from there.
  */
 const props = defineProps<{
