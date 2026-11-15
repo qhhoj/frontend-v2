@@ -67,7 +67,7 @@ const pickMemberAction = async (wrapper: Mounted['wrapper'], text: string) => {
   const item = [...document.querySelectorAll<HTMLElement>('[role="menuitem"]')].find(
     (element) => element.textContent?.trim() === text,
   );
-  item!.querySelector<HTMLElement>('[data-pc-section="itemcontent"]')!.click();
+  item!.querySelector('a')!.click();
   await flushPromises();
 };
 const click = async (wrapper: Awaited<ReturnType<typeof mountApp>>['wrapper'], text: string) => {

@@ -141,8 +141,7 @@ describe('membership header: member and join', () => {
     const leaveItem = [...document.body.querySelectorAll('[role="menuitem"]')].find((item) =>
       item.textContent?.includes('Rời tổ chức'),
     ) as HTMLElement;
-    // PrimeVue's menu item listens on its content element, the menuitem's first child.
-    (leaveItem.firstElementChild as HTMLElement).click();
+    leaveItem.querySelector('a')!.click();
     await flushPromises();
     expect(calls.some((call) => call.method === 'POST')).toBe(false);
     const dialog = document.body.querySelector('[role="dialog"]')!;
@@ -162,7 +161,7 @@ describe('membership header: member and join', () => {
     const leaveItem = [...document.body.querySelectorAll('[role="menuitem"]')].find((item) =>
       item.textContent?.includes('Rời tổ chức'),
     ) as HTMLElement;
-    (leaveItem.firstElementChild as HTMLElement).click();
+    leaveItem.querySelector('a')!.click();
     await flushPromises();
     return document.body.querySelector('[role="dialog"]')!;
   };
