@@ -40,6 +40,8 @@ export function usePopup(panel: Readonly<Ref<HTMLElement | null>>, onOutsideClic
   const opener = shallowRef<HTMLElement | null>(null);
   const anchorName = `--qh-popup-${++popupCount}`;
   const host = computed(() => topDialog.value ?? 'body');
+  /** A dialog opening or closing would move the open panel to a new host, which hides it: close it instead. */
+  watch(host, () => (isOpen.value = false));
 
   let isAnchored = false;
   /** Both paths: a removed opener closes the panel; without anchors, the panel follows it. */

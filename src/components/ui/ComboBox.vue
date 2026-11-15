@@ -109,10 +109,14 @@ watch(
   },
   { flush: 'post' },
 );
-watch(query, (value) => {
-  active.value = shown.value.length ? 0 : -1;
-  emit('filter', { value });
-});
+watch(
+  query,
+  (value) => {
+    active.value = shown.value.length ? 0 : -1;
+    emit('filter', { value });
+  },
+  { flush: 'sync' },
+);
 
 function move(to: number) {
   active.value = Math.min(Math.max(to, 0), shown.value.length - 1);
@@ -133,10 +137,11 @@ const listKeys = computed<Record<string, () => void>>(() => ({
     : { Home: () => move(0), End: () => move(shown.value.length - 1), ' ': pickActive }),
 }));
 function onListKeydown(event: KeyboardEvent) {
-  if (event.key === 'Tab') return close(false);
+  if (event.key === 'Tab') return close();
   const action = listKeys.value[event.key];
   if (!action) return;
   event.preventDefault();
+  if (event.key === 'Escape') event.stopPropagation(); // the submit sheet closes on any Escape that reaches it
   action();
 }
 const OPEN_KEYS = new Set(['Enter', ' ', 'ArrowDown', 'ArrowUp']);
