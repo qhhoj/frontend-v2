@@ -17,7 +17,7 @@ const comments = computed(() => (home.value?.recentComments ?? []).slice(0, prop
 <template>
   <Card
     :variant="embedded ? 'plain' : 'glass'"
-    :padding="embedded ? undefined : 'lg'"
+    :padding="embedded ? undefined : 'sm'"
     :title="$t('blog.recentComments')"
   >
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
@@ -30,7 +30,7 @@ const comments = computed(() => (home.value?.recentComments ?? []).slice(0, prop
         </div>
       </template>
       <EmptyState v-if="!comments.length" compact>{{ $t('blog.noComments') }}</EmptyState>
-      <div v-else class="flex flex-col gap-4">
+      <div v-else class="flex flex-col divide-y divide-line">
         <RecentCommentRow
           v-for="comment in comments"
           :key="comment.id"

@@ -20,7 +20,7 @@ import { boardColumns, rowAnchor, sortLocation } from './leaderboard-columns';
 import { revealRow } from './reveal-row';
 
 /**
- * The board: the kit `DataTable` (48 px rows). From `lg` up all five number columns show and any heading sorts; below it
+ * The board: the kit `DataTable` (40 px rows). From `lg` up all five number columns show and any heading sorts; below it
  * only the sorted number shows, and a select above the table sorts. A heading sorts one way, highest first.
  */
 const props = defineProps<{
@@ -94,6 +94,7 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
     :row-attrs="rowAttrs"
     :row-to="(entry) => ({ name: 'user', params: { username: entry.username } })"
     :label="$t('leaderboard.title')"
+    density="compact"
     stack="scroll"
     :sticky-columns="0"
     :skeleton-rows="12"

@@ -19,7 +19,7 @@ const target = computed(() => commentRoute(props.comment.page, props.comment.id)
 </script>
 
 <template>
-  <article class="flex flex-col gap-1">
+  <article class="flex flex-col gap-0.5 py-2 first:pt-0 last:pb-0">
     <p class="flex flex-wrap items-center gap-x-1 text-sm">
       <UserLink
         v-if="comment.author"
