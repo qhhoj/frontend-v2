@@ -4,7 +4,8 @@
     "all": "All",
     "public": "Public",
     "private": "Private",
-    "suggested": "Suggested"
+    "suggested": "Suggested",
+    "unfinished": "Unfinished"
   },
   "group": "Group",
   "anyGroup": "Any group",
@@ -15,10 +16,21 @@
   "columns": {
     "problem": "Problem",
     "status": "Status",
+    "setup": "Ready",
     "group": "Group",
     "authors": "Authors",
     "points": "Points",
     "date": "Published"
+  },
+  "setup": {
+    "ready": "Ready",
+    "unfinished": "Unfinished",
+    "missing": "Missing: {gaps}",
+    "gaps": {
+      "statement": "statement",
+      "tests": "tests",
+      "points": "points"
+    }
   },
   "orgPrivate": "Organization",
   "bulk": {

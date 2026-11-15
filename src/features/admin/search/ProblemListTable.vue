@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Building2, Database, Globe, Lightbulb, Lock } from 'lucide-vue-next';
+import { Building2, Check, CircleAlert, Database, Globe, Lightbulb, Lock } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { NumberedPageMeta } from '@/api/client';
@@ -15,6 +15,7 @@ import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
 import { standardRowMenu } from '../ui/table/standard-row-menu';
 import ProblemCloneDialog from '../problems/general/ProblemCloneDialog.vue';
 import type { AdminColumn } from '../ui/table/table-columns';
+import { GAP_ROUTE, setupGapsOf } from './problem-setup-marks';
 import HighlightedText from './HighlightedText.vue';
 
 /**
@@ -53,6 +54,7 @@ const columns = computed<AdminColumn[]>(() => [
     priority: 'badge',
     cellClass: 'max-w-80',
   },
+  { key: 'setup', label: t('admin.problemList.columns.setup'), priority: 'badge' },
   { key: 'group', label: t('admin.problemList.columns.group'), cellClass: 'max-w-48 truncate' },
   { key: 'authors', label: t('admin.problemList.columns.authors') },
   {
@@ -69,6 +71,18 @@ const columns = computed<AdminColumn[]>(() => [
   },
 ]);
 const editorOf = (code: string) => ({ name: 'admin-problemGeneral', params: { code } });
+/** Names the gaps for the hover text, and sends the click to the tab that fixes the first one. */
+const gapsOf = (problem: ProblemListItem) => setupGapsOf(problem.setup) ?? [];
+const gapText = (problem: ProblemListItem) =>
+  t('admin.problemList.setup.missing', {
+    gaps: gapsOf(problem)
+      .map((gap) => t(`admin.problemList.setup.gaps.${gap}`))
+      .join(', '),
+  });
+const gapLink = (problem: ProblemListItem) => ({
+  name: GAP_ROUTE[gapsOf(problem)[0]!],
+  params: { code: problem.code },
+});
 const cloning = ref('');
 const isCloneOpen = ref(false);
 function askClone(code: string) {
@@ -139,6 +153,24 @@ const menuItems = (code: string) =>
           {{ $t('admin.problemList.partial') }}
         </Chip>
       </span>
+    </template>
+    <template #cell-setup="{ row }">
+      <template v-if="row.setup">
+        <Chip v-if="gapsOf(row).length === 0" tone="success" size="sm" :icon="Check">
+          {{ $t('admin.problemList.setup.ready') }}
+        </Chip>
+        <RouterLink
+          v-else
+          :to="gapLink(row)"
+          :title="gapText(row)"
+          :aria-label="`${$t('admin.problemList.setup.unfinished')}. ${gapText(row)}`"
+          class="inline-flex rounded-pill"
+        >
+          <Chip tone="warning" size="sm" :icon="CircleAlert">
+            {{ $t('admin.problemList.setup.unfinished') }}
+          </Chip>
+        </RouterLink>
+      </template>
     </template>
     <template #cell-group="{ row }">{{ row.group?.fullName ?? '—' }}</template>
     <template #cell-authors="{ row }">

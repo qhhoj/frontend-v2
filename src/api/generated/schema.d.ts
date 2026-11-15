@@ -6294,7 +6294,7 @@ export interface paths {
         };
         /**
          * Read a shared link
-         * @description Public, `X-Robots-Tag: noindex, nofollow`. The page of `/c/<code>`: source, language, author, expiry, the frozen copy of a submission share, and the problem's code and name only when the viewer may see the problem. 404 `not_found` (never cached) for an unknown, expired or taken-down code and for a banned, deactivated or deleted author. A submission share is checked again on every read: 403 `contest_running` while a contest that lists its problem is running, not started, frozen or has a hidden board, 403 `hidden` when a signed-out visitor can no longer see the problem (hidden, organization-private or deleted) or the setter now shows sources to owners and testers only. The owner passes these with `hiddenReason` set; staff with `judge.manage_share` pass every rule. 120 reads per minute per address, and per user as well when signed in (429 `rate_limited`).
+         * @description Public, `X-Robots-Tag: noindex, nofollow`. The page of `/c/<code>`: source, language, author, expiry, the frozen copy of a submission share, and the problem's code and name only when the viewer may see the problem. 404 `not_found` (never cached) for an unknown, expired or taken-down code and for a banned, deactivated or deleted author. A submission share is checked again on every read: 403 `contest_running` while a contest that lists its problem is running, not started, frozen or has a hidden board, 403 `hidden` (issue `problem_hidden` when a signed-out visitor can no longer see the problem: hidden, organization-private or deleted; issue `source_hidden` when the setter now shows sources to owners and testers only). The owner passes these with `hiddenReason` set; staff with `judge.manage_share` pass every rule. 120 reads per minute per address, and per user as well when signed in (429 `rate_limited`).
          */
         get: operations["ShareReadController_view"];
         put?: never;
@@ -6484,7 +6484,7 @@ export interface paths {
         put?: never;
         /**
          * Share a frozen copy of a submission
-         * @description The submission's owner only (403 `forbidden` for anyone else, 404 when it cannot be seen). Stores what a visitor may see: source, language, verdict, points, time, memory and the case results the problem shows; never checker feedback, program output or an internal error's text. A later rejudge changes nothing. Only `D` and `CE` submissions in a text language with stored source text (409 `conflict`, issue `submission_not_shareable`). Only submissions to public problems: 403 `hidden` when a signed-out visitor cannot see the problem (hidden, organization-private or deleted) or the setter shows sources to owners and testers only, and 403 `contest_running` while any contest that lists the problem (or holds the submission) is running, not started, frozen or has a hidden board. Both kinds share the budgets: 5 per minute and 30 per day per user (429 `rate_limited`), and at most 200 unexpired links per user (409 `conflict`, issue `share_limit`; issue `busy` when another create of the same user holds its lock too long). Muted users get 403 `forbidden` (issue `muted`), and so does a superuser impersonating someone. The link is `/c/<code>`: anyone with it can read it, without signing in.
+         * @description The submission's owner only (403 `forbidden` for anyone else, 404 when it cannot be seen). Stores what a visitor may see: source, language, verdict, points, time, memory and the case results the problem shows; never checker feedback, program output or an internal error's text. A later rejudge changes nothing. Only `D` and `CE` submissions in a text language with stored source text (409 `conflict`, issue `submission_not_shareable`). Only submissions to public problems: 403 `hidden` (issue `problem_hidden` when a signed-out visitor cannot see the problem: hidden, organization-private or deleted; issue `source_hidden` when the setter shows sources to owners and testers only), and 403 `contest_running` while any contest that lists the problem (or holds the submission) is running, not started, frozen or has a hidden board. Both kinds share the budgets: 5 per minute and 30 per day per user (429 `rate_limited`), and at most 200 unexpired links per user (409 `conflict`, issue `share_limit`; issue `busy` when another create of the same user holds its lock too long). Muted users get 403 `forbidden` (issue `muted`), and so does a superuser impersonating someone. The link is `/c/<code>`: anyone with it can read it, without signing in.
          */
         post: operations["ShareCreateController_createCopy"];
         delete?: never;
@@ -11497,6 +11497,8 @@ export interface components {
             partial: boolean;
             /** @description Points the problem is worth. */
             points: number;
+            /** @description Setup readiness. Only on problems the viewer may edit; absent for other viewers, and for a problem the backfill has not reached yet. */
+            setup?: components["schemas"]["ProblemSetupResponse"];
             /** @description Problem types. */
             types: components["schemas"]["CatalogItemResponse"][];
             /** @description Number of users who solved the problem. */
@@ -11525,8 +11527,18 @@ export interface components {
             /** @description Problem title. */
             name: string;
         };
+        ProblemSetupResponse: {
+            /** @description Test cases are scored: the scored points add up to more than 0. */
+            hasPoints: boolean;
+            /** @description A written statement in the base language or any translation or a PDF statement. */
+            hasStatement: boolean;
+            /** @description At least one test case. */
+            hasTests: boolean;
+        };
         /** @enum {string} */
         ProblemSort: "-acRate" | "-code" | "-date" | "-name" | "-points" | "-userCount" | "acRate" | "code" | "date" | "name" | "points" | "userCount";
+        /** @enum {string} */
+        ProblemStatus: "unfinished";
         ProblemTagResponse: {
             /** @description A colour token key (`tag-1`..`tag-8`), never a hex. */
             color: components["schemas"]["TagColor"];
@@ -23425,6 +23437,8 @@ export interface operations {
                 solved?: boolean;
                 /** @description Sort field (`date`, `code`, `name`, `points`, `acRate`, `userCount`); a leading `-` sorts descending. */
                 sort?: components["schemas"]["ProblemSort"];
+                /** @description `unfinished`: only problems the viewer may edit that lack a statement or scored test cases (the admin list's readiness filter). */
+                status?: components["schemas"]["ProblemStatus"];
                 /** @description true: only suggested problems still awaiting review (a suggester set, not public, so pair it with `visibility=private` or `all`); false: only the rest. */
                 suggested?: boolean;
                 /** @description Only problems having any of these problem types (ids from `GET /problems/meta`); repeat the parameter. */
@@ -25465,6 +25479,8 @@ export interface operations {
                 search?: string;
                 /** @description `false`: only problems the viewer has not solved; `true`: only solved ones (an AC with every case point). Anonymous viewers have solved nothing. */
                 solved?: boolean;
+                /** @description `unfinished`: only problems the viewer may edit that lack a statement or scored test cases (the admin list's readiness filter). */
+                status?: components["schemas"]["ProblemStatus"];
                 /** @description true: only suggested problems still awaiting review (a suggester set, not public, so pair it with `visibility=private` or `all`); false: only the rest. */
                 suggested?: boolean;
                 /** @description Only problems having any of these problem types (ids from `GET /problems/meta`); repeat the parameter. */

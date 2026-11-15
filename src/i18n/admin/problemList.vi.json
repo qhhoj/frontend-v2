@@ -4,7 +4,8 @@
     "all": "Tất cả",
     "public": "Công khai",
     "private": "Riêng tư",
-    "suggested": "Đề xuất"
+    "suggested": "Đề xuất",
+    "unfinished": "Chưa xong"
   },
   "group": "Nhóm",
   "anyGroup": "Mọi nhóm",
@@ -15,10 +16,21 @@
   "columns": {
     "problem": "Bài",
     "status": "Trạng thái",
+    "setup": "Sẵn sàng",
     "group": "Nhóm",
     "authors": "Tác giả",
     "points": "Điểm",
     "date": "Ngày đăng"
+  },
+  "setup": {
+    "ready": "Sẵn sàng",
+    "unfinished": "Chưa xong",
+    "missing": "Còn thiếu: {gaps}",
+    "gaps": {
+      "statement": "đề bài",
+      "tests": "test",
+      "points": "điểm"
+    }
   },
   "orgPrivate": "Tổ chức",
   "bulk": {

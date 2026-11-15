@@ -4,8 +4,14 @@ import { valuesOf } from '@/features/problems/use-problem-filters';
 import { pageFromQuery } from '@/lib/paging';
 import { SEARCH_MAX_LENGTH } from './index-search';
 
-/** The segmented status filter of the staff problem list; `suggested` is the review queue (legacy `is_suggesting`). */
-export const PROBLEM_STATUS_FILTERS = ['all', 'public', 'private', 'suggested'] as const;
+/** The segmented status filter of the staff problem list; `suggested` is the review queue (legacy `is_suggesting`); `unfinished` lists editable problems missing a statement or scored tests. */
+export const PROBLEM_STATUS_FILTERS = [
+  'all',
+  'public',
+  'private',
+  'suggested',
+  'unfinished',
+] as const;
 export type ProblemStatusFilter = (typeof PROBLEM_STATUS_FILTERS)[number];
 
 /** Sorts the staff list's column headers offer (Bài: name, Điểm, Ngày đăng), newest first by default; `code` stays valid in old links. */
@@ -83,12 +89,13 @@ export function filterQueryOf(current: LocationQuery, patch: FilterPatch): Locat
 
 const STATUS_QUERY: Record<
   ProblemStatusFilter,
-  Pick<ProblemListQuery, 'visibility' | 'suggested'>
+  Pick<ProblemListQuery, 'visibility' | 'suggested' | 'status'>
 > = {
   all: { visibility: 'all' },
   public: { visibility: 'public' },
   private: { visibility: 'private' },
   suggested: { visibility: 'all', suggested: true },
+  unfinished: { visibility: 'all', status: 'unfinished' },
 };
 
 /** The `GET /problems` query; `authorId` is resolved from the username by the caller (undefined = no author filter). */
