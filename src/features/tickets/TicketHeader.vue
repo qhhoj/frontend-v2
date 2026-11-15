@@ -41,7 +41,7 @@ const LINK_CLASS = 'inline-flex flex-wrap items-center gap-2 text-sm hover:under
 </script>
 
 <template>
-  <Card data-testid="ticket-header" class="flex flex-col gap-3 p-5 sm:p-6">
+  <Card data-testid="ticket-header" class="flex flex-col gap-3 p-4 sm:p-5">
     <PageHeader
       :title="ticket.title"
       :crumbs="[

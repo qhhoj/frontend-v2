@@ -30,7 +30,7 @@ const DD = 'text-sm';
 </script>
 
 <template>
-  <Card as="aside" class="flex flex-col gap-4 p-5">
+  <Card as="aside" class="flex flex-col gap-4 p-4">
     <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-3">
       <dt :class="DT">{{ $t('ticket.link') }}</dt>
       <dd :class="DD">{{ linkLabel }}</dd>

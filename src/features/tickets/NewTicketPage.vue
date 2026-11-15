@@ -38,7 +38,7 @@ const trimmedCode = computed(() => draft.problemCode.trim());
       <span>{{ $t('tickets.new.breadcrumb') }}</span>
     </p>
     <div class="grid gap-6 lg:grid-cols-[1fr_300px]">
-      <Card as="section" class="p-6 sm:p-8">
+      <Card as="section" class="p-5 sm:p-6">
         <PageHeader :title="$t('tickets.newTicket')">
           <template #start><StateBit variant="writing" size="inline" /></template>
         </PageHeader>
@@ -49,7 +49,7 @@ const trimmedCode = computed(() => draft.problemCode.trim());
               <label
                 v-for="option in KIND_OPTIONS"
                 :key="option.value"
-                class="flex cursor-pointer flex-col gap-1 rounded-row border p-4"
+                class="flex cursor-pointer flex-col gap-1 rounded-row border p-3"
                 :class="
                   draft.kind === option.value
                     ? 'border-accent bg-accent-soft'

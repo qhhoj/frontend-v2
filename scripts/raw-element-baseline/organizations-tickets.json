@@ -70,14 +70,6 @@
   "features/tickets/TicketStaffActions.vue": {
     "input": 1
   },
-  "features/tickets/TicketTable.vue": {
-    "fixed-size": 2,
-    "table": 1
-  },
-  "features/tickets/TicketTableSkeleton.vue": {
-    "fixed-size": 3,
-    "table": 1
-  },
   "features/tickets/canned/CannedReplyPicker.vue": {
     "button": 1,
     "fixed-size": 1

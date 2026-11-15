@@ -2214,7 +2214,8 @@
       "failedTitle": "The ticket was not sent",
       "rateLimitedWait": "Too many attempts. Try again in {seconds} seconds."
     },
-    "title": "Support tickets"
+    "title": "Support tickets",
+    "pickOne": "Pick a ticket on the left to read it."
   },
   "ticket": {
     "title": "Ticket",
