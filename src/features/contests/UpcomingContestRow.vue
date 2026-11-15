@@ -61,8 +61,10 @@ const startsInText = computed(() =>
       <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
         <ContestChips :contest="contest" with-tags with-code-needed />
         <ViewerBadge :badge-key="call.badgeKey" />
-        <span class="font-mono text-caption text-muted">{{ contest.key }}</span>
-        <ContestEditLink v-if="withEdit" :contest="contest" />
+        <template v-if="withEdit">
+          <span class="font-mono text-caption text-muted">{{ contest.key }}</span>
+          <ContestEditLink :contest="contest" />
+        </template>
       </div>
     </div>
     <div class="text-sm">

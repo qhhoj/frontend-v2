@@ -122,6 +122,7 @@ const clearTagTarget = computed(() => ({
         :phase="phase"
         :is-filtered="isFiltered"
         :is-past-last-page="isPastLastPage"
+        :quiet="!isSingleGroup && !isFiltered"
         :first-page-target="firstPageTarget"
         :list-route="listPage"
         :tag-name="filters.tag ? (tagName ?? filters.tag) : null"

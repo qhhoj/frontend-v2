@@ -31,6 +31,19 @@ describe('contest list', () => {
     ]);
   });
 
+  it('shows empty overview groups as one line and opens an ended contest from its whole row', async () => {
+    mockApi({
+      ...anonymousViewer,
+      ...contestListRoutes({ ended: [contestItem({ key: 'old1', phase: 'ended' })] }),
+    });
+    const { wrapper, router } = await mountApp('/contests');
+    const push = vi.spyOn(router, 'push').mockResolvedValue(undefined);
+    expect(wrapper.findAll('[data-testid="quiet-empty"]')).toHaveLength(2);
+    expect(wrapper.text()).not.toContain('r42');
+    await wrapper.get('[data-testid="ended-contests"] tbody tr').trigger('click');
+    expect(push).toHaveBeenCalledWith({ name: 'contest', params: { key: 'old1' } });
+  });
+
   it("counts the time left down with the hero's clock", async () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date', 'setInterval', 'clearInterval'] });
     mockApi({ ...anonymousViewer, ...contestListRoutes({ running: [running] }) });
