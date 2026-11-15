@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { ChevronLeft, Ellipsis } from 'lucide-vue-next';
-import { useSlots } from 'vue';
+import { computed, useSlots } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
+import { useCurrentSection } from '@/features/shell/nav-items';
 import AppButton from './AppButton.vue';
 import Menu from './Menu.vue';
 import type { MenuEntry } from './Menu.vue';
+import { usePublishBack } from './page-back';
 
 export interface PageCrumb {
   label: string;
@@ -22,6 +26,9 @@ export interface PageCrumb {
  * `crumbs` is the trail; below `md` it gives way to `back` (the phone's way up). A `back` without crumbs shows at every
  * width. `meta` strings are joined by "·"; the `#meta` slot adds chips or a status to the same line. `#start` is the
  * page's Bit, logo or avatar: always left of the title, on the phone too (a page Bit never goes in `#actions`).
+ * A page with neither `crumbs` nor `back` shows its section as the one crumb ("Kỳ thi" over a contest's title), unless it is
+ * the section's own root page, where the H1 says the same. The page's `back` is published (`page-back.ts`) so the phone top
+ * bar can hide its own arrow.
  * `#above` is a kicker line over the title (a code, chips, a summary) and `#lead` a lead that holds more than a string.
  */
 const props = withDefaults(
@@ -53,6 +60,15 @@ defineSlots<{
   tabs?: () => unknown;
 }>();
 const slots = useSlots();
+const { t } = useI18n();
+const route = useRoute();
+const section = useCurrentSection();
+usePublishBack(() => props.back);
+const shownCrumbs = computed<PageCrumb[]>(() => {
+  if (props.crumbs.length > 0 || props.back || !section.value) return props.crumbs;
+  if (section.value.path === route.path) return [];
+  return [{ label: t(section.value.labelKey), to: section.value.path }];
+});
 const hasActions = () => Boolean(slots.actions) || props.overflow.length > 0;
 
 /**
@@ -72,11 +88,11 @@ const CELL = {
     class="grid grid-cols-[auto_minmax(0,1fr)] md:grid-cols-[auto_minmax(min(100%,16rem),1fr)_minmax(0,auto)]"
   >
     <nav
-      v-if="crumbs.length > 0"
+      v-if="shownCrumbs.length > 0"
       :aria-label="$t('common.breadcrumb')"
       class="col-span-full row-start-1 hidden flex-wrap items-center gap-1.5 text-caption text-muted md:flex"
     >
-      <template v-for="(crumb, index) in crumbs" :key="index">
+      <template v-for="(crumb, index) in shownCrumbs" :key="index">
         <span v-if="index > 0" aria-hidden="true">/</span>
         <RouterLink
           v-if="crumb.to"
@@ -93,7 +109,7 @@ const CELL = {
       :to="back.to"
       :aria-label="back.ariaLabel"
       class="col-span-full row-start-1 -ml-1 inline-flex min-h-11 items-center gap-1 justify-self-start text-sm font-semibold text-accent-text"
-      :class="crumbs.length > 0 && 'md:hidden'"
+      :class="shownCrumbs.length > 0 && 'md:hidden'"
     >
       <ChevronLeft aria-hidden="true" class="size-4" />{{ back.label }}
     </RouterLink>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import PageHeader from '@/components/ui/PageHeader.vue';
+import PageLayout from '@/components/ui/PageLayout.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
+import Toolbar from '@/components/ui/Toolbar.vue';
 import ToolbarSelect from '@/components/ToolbarSelect.vue';
 import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
 import { computed } from 'vue';
@@ -41,34 +43,42 @@ const tagName = computed(() => {
 </script>
 
 <template>
-  <div class="page-column">
-    <PageHeader :title="$t('contests.title')">
-      <template #actions><CreateShortcut kind="contest" /></template>
-    </PageHeader>
-    <div class="flex flex-wrap items-center gap-2">
-      <SearchInput
-        v-model="search"
-        :label="$t('contests.list.search')"
-        :placeholder="$t('contests.list.searchPlaceholder')"
-        :maxlength="100"
-        class="w-full sm:w-64"
-      />
-      <ToolbarSelect
-        v-model="ratedChoice"
-        :label="$t('contests.list.ratedLabel')"
-        :options="ratedOptions"
-        :active="ratedChoice !== 'any'"
-        class="w-full sm:w-auto"
-      />
-    </div>
-    <ContestTagFilter
-      :tags="tags ?? []"
-      :selected="filters.tag"
-      :state="tagState"
-      :is-loading="isTagsPending"
-      :has-failed="hasTagsFailed"
-      @select="(tag) => update({ tag })"
-    />
+  <PageLayout>
+    <template #header>
+      <PageHeader :title="$t('contests.title')">
+        <template #actions><CreateShortcut kind="contest" /></template>
+      </PageHeader>
+    </template>
+    <template #toolbar>
+      <Toolbar>
+        <template #left>
+          <SearchInput
+            v-model="search"
+            :label="$t('contests.list.search')"
+            :placeholder="$t('contests.list.searchPlaceholder')"
+            :maxlength="100"
+            class="w-full sm:w-64"
+          />
+          <ToolbarSelect
+            v-model="ratedChoice"
+            :label="$t('contests.list.ratedLabel')"
+            :options="ratedOptions"
+            :active="ratedChoice !== 'any'"
+            class="w-full sm:w-auto"
+          />
+        </template>
+        <template #chips>
+          <ContestTagFilter
+            :tags="tags ?? []"
+            :selected="filters.tag"
+            :state="tagState"
+            :is-loading="isTagsPending"
+            :has-failed="hasTagsFailed"
+            @select="(tag) => update({ tag })"
+          />
+        </template>
+      </Toolbar>
+    </template>
     <ContestGroup
       v-for="phase in shownPhases"
       :key="phase"
@@ -77,5 +87,5 @@ const tagName = computed(() => {
       :tag-name="tagName"
       @page="(page) => update({ page })"
     />
-  </div>
+  </PageLayout>
 </template>
