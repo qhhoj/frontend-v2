@@ -24,6 +24,7 @@ import StatementNote from './StatementNote.vue';
 import SubmitOpenButton from './SubmitOpenButton.vue';
 import SubmitPane from './SubmitPane.vue';
 import SubmitSignInButton from './SubmitSignInButton.vue';
+import { useVerdictToastTracking } from '@/features/submissions/verdict-toast/use-verdict-toast-tracking';
 import { hasNoStatement } from './statement-presence';
 import type { ProblemLayout } from './problem-layout';
 import { useScoreScale } from './use-contest-problem';
@@ -78,6 +79,12 @@ watch(
 );
 const scaleContest = () => (props.contestIsLive === false ? null : props.contest);
 const submitForm = useSubmitForm(toRef(props, 'problem'), resubmitId, scaleContest);
+// A submission sent here is followed to its verdict by the shell, which toasts it unless the result strip is on screen.
+useVerdictToastTracking({
+  submissionId: submitForm.lastSubmissionId,
+  wasSolvedBefore: () => props.problem.viewerStatus === 'solved',
+  isResultVisible: () => isSignedIn.value && (usesSheet.value || submitOpen.value),
+});
 const scoreScale = useScoreScale(() => props.problem, scaleContest);
 const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id === 'editorial'));
 const { t } = useI18n();

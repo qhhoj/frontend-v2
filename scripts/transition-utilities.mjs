@@ -16,6 +16,10 @@ export const ALLOWED = {
   'components/ui/Switch.vue': {
     'transition-transform': 'the thumb slides between the ends of the track',
   },
+  'components/ui/ToastHost.vue': {
+    'transition-transform':
+      'the toasts of a stack move between the pile and the expanded list, and the rest slide to their place when one leaves; off under reduced motion',
+  },
   'features/contests/replay/ReplayTable.vue': {
     'transition-transform':
       'rows that change rank slide to their place (FLIP); off under reduced motion',

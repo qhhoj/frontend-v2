@@ -350,6 +350,20 @@
     animation: qh-row-added 2s ease-out;
   }
 }
+/* Bit pops once beside a first-solve verdict: one spring from small to full size. --qh-duration-emphasis is 0 under reduced motion and low power, so Bit is simply there. */
+@keyframes qh-bit-pop {
+  from {
+    scale: 0.4;
+    opacity: 0;
+  }
+  to {
+    scale: 1;
+    opacity: 1;
+  }
+}
+@utility bit-pop {
+  animation: qh-bit-pop var(--qh-duration-emphasis) var(--qh-ease-spring) both;
+}
 @utility skeleton-pulse {
   animation: qh-skeleton-pulse 1.4s ease-in-out infinite;
   @media (prefers-reduced-motion: reduce) {
