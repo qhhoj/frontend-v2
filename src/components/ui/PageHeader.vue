@@ -4,11 +4,11 @@ import { computed, useSlots } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
-import { useCurrentSection } from '@/features/shell/nav-items';
 import AppButton from './AppButton.vue';
 import Menu from './Menu.vue';
 import type { MenuEntry } from './Menu.vue';
 import { usePublishBack } from './page-back';
+import { useInjectedSection } from './page-section';
 
 export interface PageCrumb {
   label: string;
@@ -62,7 +62,7 @@ defineSlots<{
 const slots = useSlots();
 const { t } = useI18n();
 const route = useRoute();
-const section = useCurrentSection();
+const section = useInjectedSection();
 usePublishBack(() => props.back);
 const shownCrumbs = computed<PageCrumb[]>(() => {
   if (props.crumbs.length > 0 || props.back || !section.value) return props.crumbs;

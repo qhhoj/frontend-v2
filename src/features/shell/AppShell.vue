@@ -16,6 +16,7 @@ import SiteNoticeBanner from '@/features/site-notice/SiteNoticeBanner.vue';
 import VerdictToastWatcher from '@/features/submissions/verdict-toast/VerdictToastWatcher.vue';
 import LoadingLayer from './LoadingLayer.vue';
 import CommandPalette from './search/CommandPalette.vue';
+import { providePageSection } from './nav-items';
 import { navSectionOverride } from './nav-section';
 import TabBar from './TabBar.vue';
 import TopBar from './TopBar.vue';
@@ -26,6 +27,7 @@ import { useRailCollapse } from './use-rail-collapse';
 /** Lazy: the admin nav and icons stay out of the bundle every visitor loads. */
 const AdminShell = defineAsyncComponent(() => import('@/features/admin/shell/AdminShell.vue'));
 
+providePageSection();
 useAccountCacheSync();
 useAccountThemeSync();
 useAccountAppearanceSync();
