@@ -108,8 +108,8 @@ function panelIdOf(tabId: string) {
     <div :class="['min-w-0', layout.left]">
       <ProblemHeader :problem="problem" :section="tab === 'editorial' ? 'editorial' : 'statement'">
         <template #actions>
-          <!-- On a phone the bottom sheet's bar is the one submit entry (it shows for anonymous viewers too). -->
-          <div v-if="isSignedIn" class="max-md:hidden">
+          <!-- Wherever the bottom sheet is used its bar is the one submit entry (it shows for anonymous viewers too). -->
+          <div v-if="isSignedIn" :class="layout.hideWhenSheet">
             <SubmitOpenButton
               :form="submitForm"
               :open="submitOpen && !usesSheet"
@@ -117,7 +117,7 @@ function panelIdOf(tabId: string) {
               @open="submitOpen = true"
             />
           </div>
-          <div v-else data-testid="submit-sign-in" class="max-md:hidden">
+          <div v-else data-testid="submit-sign-in" :class="layout.hideWhenSheet">
             <SubmitSignInButton />
           </div>
         </template>

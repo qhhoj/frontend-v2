@@ -13,6 +13,8 @@ export const PROBLEM_LAYOUT = {
     },
     /** Where the statement takes the whole column and the sheet replaces the pane (below `lg`). */
     stacked: '(max-width: 1023.98px)',
+    /** Hides the header's submit entry wherever the sheet's bar is the entry (same range as `stacked`). */
+    hideWhenSheet: 'max-lg:hidden',
     left: 'lg:col-start-1',
     /**
      * Pinned under the sticky bars (`--pane-top`), so Submit and the result never scroll away; short enough (less the page's
@@ -28,6 +30,7 @@ export const PROBLEM_LAYOUT = {
       editor: 'xl:grid-cols-[minmax(0,5fr)_minmax(0,4fr)]',
     },
     stacked: '(max-width: 1279.98px)',
+    hideWhenSheet: 'max-xl:hidden',
     left: 'xl:col-start-1',
     pane: 'xl:sticky xl:top-(--pane-top) xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:h-[calc(100dvh-var(--pane-top)-3rem)]',
     facts: 'xl:sticky xl:top-(--pane-top)',
