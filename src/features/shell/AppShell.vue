@@ -15,6 +15,7 @@ import OfficialModeBanner from '@/features/official-mode/OfficialModeBanner.vue'
 import SiteNoticeBanner from '@/features/site-notice/SiteNoticeBanner.vue';
 import VerdictToastWatcher from '@/features/submissions/verdict-toast/VerdictToastWatcher.vue';
 import LoadingLayer from './LoadingLayer.vue';
+import NotificationAnnouncer from './NotificationAnnouncer.vue';
 import CommandPalette from './search/CommandPalette.vue';
 import { providePageSection } from './nav-items';
 import { navSectionOverride } from './nav-section';
@@ -39,7 +40,7 @@ const { current: currentContest } = useCurrentContest(
 );
 const isSearchOpen = ref(false);
 const { isCollapsed: isRailCollapsed } = useRailCollapse();
-/** On the contest's own pages its bar is the status; on every other page the top bar carries a chip instead. */
+/** On the contest's own pages its bar is the status; on every other page the phone's top bar carries a chip instead (the desktop rail's card shows it always). */
 const isOnCurrentContest = computed(
   () =>
     currentContest.value !== null &&
@@ -73,10 +74,11 @@ const chipContest = computed(() => (isOnCurrentContest.value ? null : currentCon
     >
       <slot />
     </main>
-    <!-- Workbench: the rail (from md) beside the page column; on a phone the top bar and the tab bar. The rail and the bars are opaque, so the page background shows behind the page column only. -->
+    <!-- Workbench: the rail (from md) beside the page column; on a phone the top bar and the tab bar; a desktop has no top bar. The rail and the bars are opaque, so the page background shows behind the page column only. -->
     <div v-else class="flex flex-1" :data-rail="isRailCollapsed ? 'collapsed' : 'open'">
       <AppRail :current="currentContest" @search="isSearchOpen = true" />
       <div class="flex min-w-0 flex-1 flex-col">
+        <NotificationAnnouncer />
         <TopBar :live-contest="chipContest" @search="isSearchOpen = true" />
         <ContestBar v-if="currentContest && isOnCurrentContest" :current="currentContest" />
         <LiveAnnouncementAlert class="print:hidden" />

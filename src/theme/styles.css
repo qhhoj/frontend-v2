@@ -237,7 +237,7 @@
     --shell-rail: 3.5rem;
   }
 }
-/* Page width: the top bar, every page's column and the footer share one left and right edge. */
+/* Page width: every page's column and the footer share one left and right edge. */
 @utility page-gutter {
   margin-inline: auto;
   width: 100%;
