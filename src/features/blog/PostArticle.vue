@@ -70,7 +70,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
       /></template>
     </PageHeader>
     <UserContent
-      class="post-body max-w-prose text-base leading-7 [&_pre]:text-sm [&_pre]:leading-6"
+      class="post-body text-base leading-7 [&_pre]:text-sm [&_pre]:leading-6"
       :html="post.contentHtml"
     />
     <footer

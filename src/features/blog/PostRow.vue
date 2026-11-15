@@ -4,17 +4,21 @@ import { computed } from 'vue';
 import UserLink from '@/components/UserLink.vue';
 import { voteDisabledKey } from '@/features/vote/vote-rules';
 import VoteControl from '@/components/VoteControl.vue';
+import { Pin } from 'lucide-vue-next';
 import Chip from '@/components/ui/Chip.vue';
 import type { PostListItem } from '@/api/types/blog';
 import type { VoteScore } from '@/api/types/votes';
 import { votePost } from '@/api/blog.api';
-import { formatDate } from '@/lib/format-date';
+import { formatAgo, formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { summaryExcerpt } from './post-summary';
 import { postStateOf } from './post-state';
 
-/** One post as a row: a two-line title, a muted two-line excerpt, then author, date and comments with the vote at the end of that line, as on a pinned card. */
+/**
+ * One post as a compact row, the whole row a link to the post: a title line (pin mark or state chip first), a muted one-line excerpt from `sm`,
+ * then author, relative date (the full date on hover) and comments. The vote sits at the row's end. Author, comments and vote stay their own targets.
+ */
 const props = defineProps<{ post: PostListItem }>();
 const session = useSessionStore();
 const locale = useLocaleStore();
@@ -28,58 +32,66 @@ const unpublished = computed(() => {
   const state = postStateOf(props.post);
   return state === 'live' ? null : state;
 });
+const postedAgo = computed(() => formatAgo(props.post.publishOn, Date.now(), locale.locale));
+const postedOn = computed(() => formatDate(props.post.publishOn, 'datetime', locale.locale));
 const excerpt = computed(() => summaryExcerpt(props.post.summaryHtml));
 const send = (score: VoteScore) => votePost(props.post.id, score);
 const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] });
 </script>
 
 <template>
-  <article data-testid="post-row" class="px-4 py-3 sm:px-5 sm:py-4">
-    <div class="flex min-w-0 flex-col gap-1.5">
-      <h2 class="line-clamp-2 text-title leading-snug font-semibold [overflow-wrap:anywhere]">
-        <Chip v-if="post.sticky" tone="accent" class="mr-2 align-middle">{{
-          $t('blog.pinned')
-        }}</Chip>
-        <Chip v-if="unpublished" class="mr-2 align-middle">{{
+  <article
+    data-testid="post-row"
+    class="relative flex items-center gap-3 px-4 py-2.5 hover:bg-surface-hover sm:px-5"
+  >
+    <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+      <h2 class="flex min-w-0 items-center gap-2 text-title leading-snug font-semibold">
+        <span v-if="post.sticky" class="shrink-0 text-accent-text" data-testid="post-pin">
+          <Pin aria-hidden="true" class="size-4" /><span class="sr-only">{{
+            $t('blog.pinned')
+          }}</span>
+        </span>
+        <Chip v-if="unpublished" class="shrink-0">{{
           $t(`blog.drafts.state.${unpublished}`)
         }}</Chip>
         <RouterLink
           :to="{ name: 'post', params: { id: post.id } }"
-          class="hover:underline touch:-my-3.5 touch:py-3.5"
+          class="truncate after:absolute after:inset-0 hover:underline"
         >
           {{ post.title }}
         </RouterLink>
       </h2>
-      <p v-if="excerpt" class="line-clamp-2 text-sm leading-5 text-muted [overflow-wrap:anywhere]">
+      <p v-if="excerpt" class="hidden truncate text-sm leading-5 text-muted sm:block">
         {{ excerpt }}
       </p>
-      <footer class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-meta text-muted">
-        <UserLink
+      <div
+        class="flex min-w-0 items-center gap-x-3 overflow-hidden whitespace-nowrap text-meta text-muted"
+      >
+        <span
           v-for="author in post.authors"
           :key="author.id"
-          :username="author.username"
-          :rating="author.rating"
-        />
-        <time :datetime="post.publishOn">
-          {{ formatDate(post.publishOn, 'date', locale.locale) }}
-        </time>
+          class="relative z-10 min-w-24 truncate touch:-my-3 touch:py-3"
+        >
+          <UserLink :username="author.username" :rating="author.rating" />
+        </span>
+        <time :datetime="post.publishOn" :title="postedOn" class="shrink-0">{{ postedAgo }}</time>
         <RouterLink
           :to="{ name: 'post', params: { id: post.id }, hash: '#comments' }"
-          class="hover:underline touch:-my-3.5 touch:py-3.5"
+          class="relative z-10 shrink-0 hover:underline touch:-my-3 touch:py-3"
         >
           {{ $t('blog.comments', { count: post.commentCount }) }}
         </RouterLink>
-        <VoteControl
-          class="ml-auto"
-          orientation="row"
-          :score="post.score"
-          :viewer-vote="post.viewerVote"
-          :can-vote="canVote"
-          :disabled-reason="$t(voteDisabledKey(session.user !== null))"
-          :send="send"
-          @voted="refreshPosts"
-        />
-      </footer>
+      </div>
     </div>
+    <VoteControl
+      class="relative z-10 shrink-0 [&_button]:size-9 sm:[&_button]:size-8"
+      orientation="row"
+      :score="post.score"
+      :viewer-vote="post.viewerVote"
+      :can-vote="canVote"
+      :disabled-reason="$t(voteDisabledKey(session.user !== null))"
+      :send="send"
+      @voted="refreshPosts"
+    />
   </article>
 </template>

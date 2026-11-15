@@ -8,9 +8,6 @@ import QueryState from '@/components/QueryState.vue';
 import StateBit from '@/components/StateBit.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import type { PostFeed } from '@/api/types/blog';
-import NewProblemsCard from '@/features/community/NewProblemsCard.vue';
-import RecentCommentsCard from '@/features/community/RecentCommentsCard.vue';
-import TopContributorsCard from '@/features/community/TopContributorsCard.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
@@ -18,8 +15,6 @@ import IconButton from '@/components/ui/IconButton.vue';
 import Tabs from '@/components/ui/Tabs.vue';
 import type { TabItem } from '@/components/ui/Tabs.vue';
 import { useSessionStore } from '@/stores/session.store';
-import PostCard from './PostCard.vue';
-import PostCardSkeleton from './PostCardSkeleton.vue';
 import PostRow from './PostRow.vue';
 import PostRowSkeleton from './PostRowSkeleton.vue';
 import { useMyDraftsQuery, usePostsQuery } from './blog.queries';
@@ -30,11 +25,11 @@ const session = useSessionStore();
 const { t } = useI18n();
 const { data, isPending, error, refetch } = usePostsQuery(feed, page);
 const items = computed(() => data.value?.items ?? []);
-/** Pinned posts lead as cards; the rest of the page is the compact list. */
-const pinned = computed(() => items.value.filter((post) => post.sticky));
-const posts = computed(() => items.value.filter((post) => !post.sticky));
-/** Only the first page of the newsfeed can open with pinned cards. */
-const expectsPinned = computed(() => feed.value === 'global' && page.value === 1);
+/** Pinned posts lead the page as the same rows, marked with a pin; the API's order is kept inside each group. */
+const posts = computed(() => [
+  ...items.value.filter((post) => post.sticky),
+  ...items.value.filter((post) => !post.sticky),
+]);
 const meta = computed(() => data.value?.meta);
 /** The signed-in viewer's unpublished posts: a link to them while there are any. */
 const drafts = useMyDraftsQuery(1);
@@ -48,7 +43,7 @@ const feedTabs = computed<TabItem[]>(() =>
   })),
 );
 
-/** Another page or feed is a new list: bring its top (not the rail's) into view, below the shell's header. */
+/** Another page or feed is a new list: bring its top into view, below the shell's header. */
 const listTop = ref<HTMLElement | null>(null);
 watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
 </script>
@@ -75,16 +70,6 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
         </IconButton>
       </div>
     </div>
-    <section
-      v-if="pinned.length || (isPending && expectsPinned)"
-      :aria-label="$t('blog.pinnedLabel')"
-      class="grid gap-4 sm:grid-cols-2"
-    >
-      <template v-if="isPending">
-        <PostCardSkeleton v-for="card in 2" :key="card" />
-      </template>
-      <PostCard v-for="post in pinned" v-else :key="post.id" :post="post" />
-    </section>
     <RouterLink
       v-if="draftCount > 0"
       :to="{ name: 'post-drafts' }"
@@ -96,32 +81,20 @@ watch([feed, page], () => listTop.value?.scrollIntoView({ block: 'start' }));
       <Chip size="md">{{ draftCount }}</Chip>
       <ChevronRight aria-hidden="true" class="size-4 text-muted" />
     </RouterLink>
-    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
-      <div ref="listTop" class="scroll-mt-20">
-        <Card as="div" data-testid="post-list" class="overflow-hidden">
-          <QueryState :loading="isPending" :error="error" @retry="refetch()">
-            <template #skeleton>
-              <div class="divide-y divide-line">
-                <PostRowSkeleton v-for="row in 6" :key="row" />
-              </div>
-            </template>
-            <StatePanel v-if="!items.length" kind="communityEmpty" :title="$t('blog.empty')" />
-            <div v-else-if="posts.length" class="divide-y divide-line">
-              <PostRow v-for="post in posts" :key="post.id" :post="post" />
+    <div ref="listTop" class="scroll-mt-20">
+      <Card as="div" data-testid="post-list" class="overflow-hidden">
+        <QueryState :loading="isPending" :error="error" @retry="refetch()">
+          <template #skeleton>
+            <div class="divide-y divide-line">
+              <PostRowSkeleton v-for="row in 8" :key="row" />
             </div>
-            <NumberedPager v-if="meta" class="p-4" :meta="meta" :label="$t('blog.pager')" />
-          </QueryState>
-        </Card>
-      </div>
-      <Card as="aside" class="relative divide-y divide-line [&>section]:p-4 sm:[&>section]:p-5">
-        <StateBit
-          variant="community"
-          size="tiny"
-          class="absolute top-4 right-4 sm:top-5 sm:right-5"
-        />
-        <RecentCommentsCard embedded :limit="3" />
-        <NewProblemsCard embedded :limit="4" />
-        <TopContributorsCard embedded :limit="3" />
+          </template>
+          <StatePanel v-if="!items.length" kind="communityEmpty" :title="$t('blog.empty')" />
+          <div v-else class="divide-y divide-line">
+            <PostRow v-for="post in posts" :key="post.id" :post="post" />
+          </div>
+          <NumberedPager v-if="meta" class="p-4" :meta="meta" :label="$t('blog.pager')" />
+        </QueryState>
       </Card>
     </div>
   </div>
