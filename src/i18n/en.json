@@ -14,6 +14,8 @@
     "organizations": "Organizations",
     "more": "More",
     "menu": "Menu",
+    "railCollapse": "Collapse the sidebar",
+    "railExpand": "Expand the sidebar",
     "runningCount": "{count} running",
     "me": "Me",
     "back": "Back",

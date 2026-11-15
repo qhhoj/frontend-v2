@@ -25,6 +25,24 @@
    syntax), so exactly one applies at every width, 1100 px included. */
 @custom-variant rail-wide (@media (min-width: 68.75rem));
 @custom-variant max-rail-wide (@media (width < 68.75rem));
+/* The public rail's own pair: `rail-slim` is the icon column (a narrow window, or the viewer collapsed it: AppShell's
+   `data-rail="collapsed"` on the shell row); `rail-open` is the full rail. Exact complements, like the pair above. The
+   admin rail keeps `rail-wide`, so the collapse never reaches it. */
+@custom-variant rail-slim {
+  @media (width < 68.75rem) {
+    @slot;
+  }
+  &:where([data-rail='collapsed'] *) {
+    @slot;
+  }
+}
+@custom-variant rail-open {
+  @media (min-width: 68.75rem) {
+    &:where(:not([data-rail='collapsed'] *)) {
+      @slot;
+    }
+  }
+}
 
 /* Only semantic names exist: Tailwind's palette, fonts, radii and shadows are dropped. */
 @theme {
@@ -207,6 +225,12 @@
   }
   @media (min-width: 68.75rem) {
     --shell-rail: var(--qh-rail);
+  }
+}
+/* A collapsed public rail is the 56 px column at every width. */
+@media (min-width: 68.75rem) {
+  [data-rail='collapsed'] {
+    --shell-rail: 3.5rem;
   }
 }
 /* Page width: the top bar, every page's column and the footer share one left and right edge. */
