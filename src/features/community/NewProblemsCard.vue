@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import Card from '@/components/ui/Card.vue';
+import StretchedLink from '@/components/ui/StretchedLink.vue';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -37,14 +38,13 @@ const problems = computed(() => (home.value?.newProblems ?? []).slice(0, props.l
         <li
           v-for="problem in problems"
           :key="problem.code"
-          class="flex items-baseline justify-between gap-3 py-1.5 first:pt-0 last:pb-0"
+          class="box-link flex items-baseline justify-between gap-3 py-1.5 first:pt-0 last:pb-0"
         >
-          <RouterLink
+          <StretchedLink
             :to="{ name: 'problem', params: { code: problem.code } }"
-            class="min-w-0 truncate font-semibold hover:underline"
+            class="min-w-0 truncate font-semibold"
+            >{{ problem.name }}</StretchedLink
           >
-            {{ problem.name }}
-          </RouterLink>
           <span
             v-if="variant === 'home'"
             class="ml-auto hidden shrink-0 text-caption text-muted sm:inline"

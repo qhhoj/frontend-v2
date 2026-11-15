@@ -1600,12 +1600,6 @@
   "features/community/NewProblemsCard.vue": {
     "CommunityCard": 1
   },
-  "features/community/RecentCommentsCard.vue": {
-    "CommunityCard": 1
-  },
-  "features/community/TopContributorsCard.vue": {
-    "CommunityCard": 1
-  },
   "features/contests/AccessCodeDialog.vue": {
     "password": 1,
     "uppercase": 1,
@@ -1691,9 +1685,6 @@
   },
   "features/home/RunningContestsCard.vue": {
     "fixed-size": 2
-  },
-  "features/home/TopPerformersCard.vue": {
-    "CommunityCard": 1
   },
   "features/leaderboard/MyRankLine.vue": {
     "button": 1

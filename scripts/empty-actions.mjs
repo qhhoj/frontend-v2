@@ -22,7 +22,6 @@ export const BASELINE = {
   'features/admin/shell/search/AdminCommandPalette.vue': 1,
   'features/admin/users/UsersPage.vue': 1,
   'features/comments/CommentsSection.vue': 1,
-  'features/community/RecentCommentsCard.vue': 1,
   'features/contests/balloons/BalloonsPage.vue': 1,
   'features/contests/balloons/BalloonsPrintPage.vue': 1,
   'features/contests/best/ContestBestPage.vue': 1,

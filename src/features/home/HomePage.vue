@@ -1,26 +1,25 @@
 <script setup lang="ts">
 import PageHeader from '@/components/ui/PageHeader.vue';
 import NewProblemsCard from '@/features/community/NewProblemsCard.vue';
-import RecentCommentsCard from '@/features/community/RecentCommentsCard.vue';
-import TopContributorsCard from '@/features/community/TopContributorsCard.vue';
 import { useCurrentContest } from '@/features/contests/bar/use-current-contest';
 import { useSessionStore } from '@/stores/session.store';
 import AnonymousHero from './AnonymousHero.vue';
 import ContestsCard from './ContestsCard.vue';
 import ContinueCard from './ContinueCard.vue';
+import LeaderboardCard from './LeaderboardCard.vue';
 import LiveContestCard from './LiveContestCard.vue';
 import NewPostsCard from './NewPostsCard.vue';
 import RatingHeroCard from './RatingHeroCard.vue';
 import RecentSubmissionsList from './RecentSubmissionsList.vue';
 import RunningContestsCard from './RunningContestsCard.vue';
-import TopPerformersCard from './TopPerformersCard.vue';
 import UpcomingContestsCard from './UpcomingContestsCard.vue';
 
 /**
  * Signed in: the main column is the work, top to bottom "Đang thi" (when the viewer is in a contest) and "Tiếp tục",
  * the contests, my submissions, then new problems and posts side by side. The side column is only the greeting, rating
  * and stats card. Below `lg` the two columns collapse into one list in priority order (`contents` + `order-*`).
- * A visitor gets the sign-up card, then the public cards (contests, posts, leaderboards).
+ * A visitor gets the sign-up card, then the main column (contests as one line each when empty, new problems, posts) and
+ * one leaderboard card on the side.
  */
 const session = useSessionStore();
 const { current } = useCurrentContest();
@@ -55,15 +54,12 @@ const { current } = useCurrentContest();
       <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
         <div class="flex min-w-0 flex-col gap-6">
           <RunningContestsCard />
+          <UpcomingContestsCard />
+          <NewProblemsCard :limit="8" variant="home" />
           <NewPostsCard />
         </div>
         <div class="flex min-w-0 flex-col gap-6">
-          <UpcomingContestsCard />
-          <TopPerformersCard />
-          <TopContributorsCard :limit="3" />
-          <!-- At most 5 rows per side list, so the side column does not outgrow the main one. -->
-          <NewProblemsCard :limit="5" variant="home" />
-          <RecentCommentsCard :limit="4" />
+          <LeaderboardCard />
         </div>
       </div>
     </template>
