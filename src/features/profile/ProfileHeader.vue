@@ -40,7 +40,6 @@ const canBan = computed(
 /** The inverse of the ban, for the same permission: unbanning an account that is not banned is a 409. */
 const canUnban = computed(() => canModerate.value && isBanned.value);
 const isUnbanOpen = ref(false);
-const isSignedIn = computed(() => session.status === 'authenticated');
 const joinedDate = computed(() => formatDate(props.user.dateJoined, 'date', locale.locale));
 /** The display name only when it adds something: it is often the username again. */
 const joinedLine = computed(() =>
@@ -59,7 +58,7 @@ const joinedLine = computed(() =>
     :back="{ to: '/users', label: $t('nav.users') }"
   >
     <template #start>
-      <UserAvatar class="max-sm:hidden" :username="user.username" :size="64" />
+      <UserAvatar class="max-sm:hidden" :username="user.username" :size="96" />
       <UserAvatar class="sm:hidden" :username="user.username" :size="32" />
     </template>
     <template #meta>
