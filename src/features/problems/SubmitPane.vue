@@ -4,11 +4,12 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import Card from '@/components/ui/Card.vue';
 import IconButton from '@/components/ui/IconButton.vue';
 import type { ProblemDetail } from '@/api/types/problems';
+import ProblemMySubmissions from './ProblemMySubmissions.vue';
 import SubmitForm from './SubmitForm.vue';
 import SubmitSheet from './SubmitSheet.vue';
-import SubmitSignInLink from './SubmitSignInLink.vue';
 import { isFocusEditorShortcut } from './submit-shortcuts';
 import { OPEN_BUTTON_ID } from './submit-open';
+import type { ScoreScale } from './submit-result';
 import type { useSubmitForm } from './use-submit-form';
 import {
   FULLSCREEN_TOGGLE_ID,
@@ -29,6 +30,8 @@ const props = defineProps<{
   form: ReturnType<typeof useSubmitForm>;
   usesSheet: boolean;
   isSignedIn: boolean;
+  /** What the viewer's earlier submissions in the pane are scored out of. */
+  scale: ScoreScale;
   /** The layout's place for the pane in the page grid; the sheet and full screen are fixed and take none. */
   placeClass: string;
 }>();
@@ -112,22 +115,16 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
     @fullscreen="setFullscreen(true)"
   />
   <Card
-    v-else-if="!isSignedIn"
-    padding="sm"
-    :title="$t('submit.title')"
-    data-testid="submit-sign-in"
-    :class="placeClass"
-  >
-    <SubmitSignInLink />
-  </Card>
-  <Card
-    v-else-if="open"
+    v-else-if="open && isSignedIn"
     as="section"
     :aria-label="$t('submit.title')"
     data-testid="submit-pane"
     :class="['flex min-h-80 min-w-0 flex-col p-3', placeClass]"
   >
     <SubmitForm :id="BODY_ID" :problem="problem" :form="form" layout="pane">
+      <template #history>
+        <ProblemMySubmissions :code="problem.code" :scale="scale" />
+      </template>
       <template #tools>
         <div class="flex items-center gap-1">
           <IconButton

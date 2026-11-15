@@ -23,6 +23,7 @@ import ProblemTypesCard from './ProblemTypesCard.vue';
 import StatementNote from './StatementNote.vue';
 import SubmitOpenButton from './SubmitOpenButton.vue';
 import SubmitPane from './SubmitPane.vue';
+import SubmitSignInButton from './SubmitSignInButton.vue';
 import { hasNoStatement } from './statement-presence';
 import type { ProblemLayout } from './problem-layout';
 import { useScoreScale } from './use-contest-problem';
@@ -30,8 +31,7 @@ import { useSubmitForm } from './use-submit-form';
 
 const DEFAULT_TAB = 'statement';
 /**
- * A loaded problem (Workbench split): left the statement card (header, facts strip, tabs), then the viewer's submissions,
- * links, types and comments; right the submit pane once the viewer opens it from the header. The page keys it by code, so another problem never inherits the typed
+ * A loaded problem (Workbench split): left the statement card (header, facts strip, tabs), then links, types and comments; right the submit pane once the viewer opens it from the header. The page keys it by code, so another problem never inherits the typed
  * code, pick or file.
  */
 const props = defineProps<{
@@ -91,23 +91,19 @@ function panelIdOf(tabId: string) {
 
 <template>
   <ProblemArchivedNotice :code="problem.code" :organization-ids="problem.organizations" />
-  <div
-    :class="[
-      layout.grid,
-      isSignedIn ? (paneIsOpen ? layout.columns.editor : '') : layout.columns.signIn,
-    ]"
-    :style="stickyTop"
-  >
+  <div :class="[layout.grid, paneIsOpen ? layout.columns.editor : '']" :style="stickyTop">
     <!-- The statement tab's card carries the problem header; on the editorial tab the card is header and tabs only. -->
     <Card as="div" data-testid="statement-card" :class="['min-w-0 p-6 sm:p-8', layout.left]">
       <ProblemHeader :problem="problem" :section="tab === 'editorial' ? 'editorial' : 'statement'">
-        <template v-if="isSignedIn" #actions>
+        <template #actions>
           <SubmitOpenButton
+            v-if="isSignedIn"
             :form="submitForm"
             :open="submitOpen && !usesSheet"
             :show-result="!usesSheet"
             @open="submitOpen = true"
           />
+          <div v-else data-testid="submit-sign-in"><SubmitSignInButton /></div>
         </template>
         <template #strip>
           <ProblemLimitStrip
@@ -167,7 +163,8 @@ function panelIdOf(tabId: string) {
       :form="submitForm"
       :uses-sheet="usesSheet"
       :is-signed-in="isSignedIn"
-      :place-class="isSignedIn ? layout.pane : layout.signIn"
+      :place-class="layout.pane"
+      :scale="scoreScale"
     />
     <div :class="['@container flex min-w-0 flex-col gap-5', layout.left]">
       <div
@@ -188,7 +185,7 @@ function panelIdOf(tabId: string) {
       >
         <!-- Two columns of cards where the column is wide enough (512 px), each card whole in one column. -->
         <ProblemMySubmissions
-          v-if="isSignedIn"
+          v-if="isSignedIn && usesSheet"
           :code="problem.code"
           :scale="scoreScale"
           class="mb-3.5 break-inside-avoid"
