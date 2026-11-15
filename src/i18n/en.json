@@ -295,6 +295,7 @@
       "viewAndRegister": "View & register",
       "endedRegion": "Ended contests, scrolls sideways",
       "shownOf": "{shown} of {total}",
+      "count": "{n} contest | {n} contests",
       "view": "View",
       "codeNeeded": "Code needed",
       "badges": {
@@ -1326,13 +1327,8 @@
       "positionOpen": "Page {page}"
     },
     "stats": {
-      "judgedToday": "judged today",
-      "acceptedToday": "accepted",
-      "queue": "waiting",
       "judges": "judges",
-      "noJudge": "no judge online",
-      "unavailable": "Statistics unavailable",
-      "distribution": "Today's verdicts by result"
+      "noJudge": "no judge online"
     },
     "queued": "In queue",
     "queuedShort": "Wait",

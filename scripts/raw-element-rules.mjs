@@ -41,12 +41,10 @@ const INPUT_TYPES = {
 /** Files that draw a verdict (a submission's result or the viewer's solved state): `verdict-*` is theirs. */
 export const VERDICT_PARTS = [
   'lib/verdicts.ts',
-  'features/submissions/VerdictDistributionBar.vue',
   'features/submissions/TestOverview.vue',
   'features/submissions/test-overview.ts',
   'features/submissions/list/test-strip.ts',
   'features/submissions/list/TestStrip.vue',
-  'features/submissions/ResultSummaryCard.vue',
   'features/submissions/CasesTable.vue',
   'features/contests/ProblemResultsTable.vue',
   'features/contests/OwnResultChip.vue',

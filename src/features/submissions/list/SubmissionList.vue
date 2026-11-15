@@ -3,6 +3,8 @@ import { computed, ref, watch } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
 import PageOutOfRange from '@/components/PageOutOfRange.vue';
 import Card from '@/components/ui/Card.vue';
+import Notice from '@/components/ui/Notice.vue';
+import Toolbar from '@/components/ui/Toolbar.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import { formatNumber } from '@/lib/format';
@@ -13,7 +15,6 @@ import LiveToggle from '../LiveToggle.vue';
 import SubmissionQuickFilters from '../SubmissionQuickFilters.vue';
 import SubmissionTable from '../SubmissionTable.vue';
 import SubmissionTableSkeleton from '../SubmissionTableSkeleton.vue';
-import SubmissionStatsStrip from '../SubmissionStatsStrip.vue';
 import { advancedFilterCount } from '../quick-filters';
 import { ALL_COLUMN_KEYS } from '../submission-table-cells';
 import type { ColumnKey } from '../submission-table-cells';
@@ -27,10 +28,11 @@ import type { SubmissionScope } from './submission-scope';
 import { useSubmissionList } from './use-submission-list';
 
 /**
- * The one submission list: stats strip, quick filters, "Bộ lọc nâng cao", live notices, the list, its one pager at the foot, and its loading,
+ * The one submission list: a warning when no judge is online, one `Toolbar` (quick filters left, "Trực tiếp" right),
+ * "Bộ lọc nâng cao", live notices, the list, its one pager at the foot, and its loading,
  * empty and error states. A page passes only its scope and what differs there: the problem box's choices, the
  * judging-state boxes, the columns and the unfiltered empty text. A contest's problem box also gives the rows their
- * letters and contest scores. The contest tab drops the site-wide stats (`showStats`); the live pill sits at the end of the one toolbar row.
+ * letters and contest scores. The contest tab drops the site-wide stats (`showStats`: the queue count on "Đang chấm" and the no-judge warning).
  */
 const props = withDefaults(
   defineProps<{
@@ -62,7 +64,11 @@ const { filters, update, reset, listQuery, rows, live, languages, emptyText } = 
   emptyKey: () => props.emptyKey,
 });
 const { data: list, isPending, error, refetch, isPlaceholderData } = listQuery;
-const { data: stats, isPending: isStatsPending } = useSubmissionStatsQuery(() => props.showStats);
+const { data: stats } = useSubmissionStatsQuery(() => props.showStats);
+/** Said in words and as a warning above the filters: nothing will be judged. */
+const hasNoJudge = computed(
+  () => stats.value !== undefined && stats.value.judgesTotal > 0 && stats.value.judgesOnline === 0,
+);
 /** The diff page needs a signed-in viewer, so only they pick rows. */
 const isSignedIn = computed(() => session.status === 'authenticated');
 const hasFixedUser = computed(() => fixedUserOf(props.scope) !== null);
@@ -126,24 +132,28 @@ watch(
 <template>
   <div class="flex min-w-0 flex-col gap-5">
     <p role="status" aria-live="polite" class="sr-only">{{ live.announcement.value }}</p>
-    <SubmissionStatsStrip v-if="showStats" :stats="stats" :pending="isStatsPending" />
+    <Notice v-if="hasNoJudge" tone="warning">{{ $t('submissions.stats.noJudge') }}</Notice>
     <div class="flex flex-col gap-3">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <SubmissionQuickFilters
-          :filters="filters"
-          :languages="languages"
-          :username="chipUsername"
-          :grading-count="stats?.queueLength"
-          :advanced-open="isAdvancedOpen"
-          :advanced-count="advancedCount"
-          :panel-id="ADVANCED_PANEL_ID"
-          :comparing="isSignedIn ? isComparing : null"
-          @update="update"
-          @toggle-advanced="toggleAdvanced"
-          @toggle-compare="toggleCompare"
-        />
-        <LiveToggle :live="filters.live" @update:live="update({ live: $event })" />
-      </div>
+      <Toolbar>
+        <template #left>
+          <SubmissionQuickFilters
+            :filters="filters"
+            :languages="languages"
+            :username="chipUsername"
+            :grading-count="stats?.queueLength"
+            :advanced-open="isAdvancedOpen"
+            :advanced-count="advancedCount"
+            :panel-id="ADVANCED_PANEL_ID"
+            :comparing="isSignedIn ? isComparing : null"
+            @update="update"
+            @toggle-advanced="toggleAdvanced"
+            @toggle-compare="toggleCompare"
+          />
+        </template>
+        <template #right>
+          <LiveToggle :live="filters.live" @update:live="update({ live: $event })" />
+        </template>
+      </Toolbar>
       <SubmissionFilterPanel
         v-if="isAdvancedOpen"
         :id="ADVANCED_PANEL_ID"

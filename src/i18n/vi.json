@@ -295,6 +295,7 @@
       "viewAndRegister": "Xem & đăng ký",
       "endedRegion": "Bảng kỳ thi đã kết thúc, cuộn ngang",
       "shownOf": "{shown} trong {total}",
+      "count": "{n} kỳ thi",
       "view": "Xem",
       "codeNeeded": "Cần mã",
       "badges": {
@@ -1326,13 +1327,8 @@
       "positionOpen": "Trang {page}"
     },
     "stats": {
-      "judgedToday": "đã chấm hôm nay",
-      "acceptedToday": "chấp nhận",
-      "queue": "chờ",
       "judges": "máy chấm",
-      "noJudge": "không có máy chấm",
-      "unavailable": "Không có số liệu thống kê",
-      "distribution": "Kết quả chấm hôm nay theo loại"
+      "noJudge": "không có máy chấm"
     },
     "queued": "Trong hàng đợi",
     "queuedShort": "Chờ",

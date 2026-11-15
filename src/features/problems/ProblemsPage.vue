@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
+import PageLayout from '@/components/ui/PageLayout.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
@@ -10,7 +12,6 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import ProblemFilterChips from './ProblemFilterChips.vue';
 import ProblemFilters from './ProblemFilters.vue';
-import ProblemListCount from './ProblemListCount.vue';
 import ProblemTable from './ProblemTable.vue';
 import { filterChips } from './problem-filter-chips';
 import { saveListSetup } from './problem-list-setup';
@@ -19,9 +20,8 @@ import { NO_FILTERS, useProblemFilters } from './use-problem-filters';
 import type { ProblemFilters as Filters } from './use-problem-filters';
 
 /**
- * The problem list (Workbench): the h1 is for screen readers, the count and the staff's "Tạo bài tập" sit first in the
- * page, then one toolbar row, the active filter chips, and the table with the peek pane
- * beside it on a wide screen with a mouse.
+ * The problem list on `PageLayout`: the header (with the staff's "Tạo bài tập"), one `Toolbar` (search and filters left;
+ * count, phone sort and random pick right) with the active filter chips under it, then the table.
  */
 const router = useRouter();
 const { filters: urlFilters, page, update, clearAll } = useProblemFilters();
@@ -102,20 +102,27 @@ function prefetchRow(event: Event) {
 </script>
 
 <template>
-  <div class="page-column">
-    <PageHeader class="sr-only" :title="$t('problems.title')" />
-    <ProblemListCount :text="countText" />
-    <div class="flex flex-col gap-3">
+  <PageLayout>
+    <template #header>
+      <PageHeader :title="$t('problems.title')">
+        <template #actions><CreateShortcut kind="problem" /></template>
+      </PageHeader>
+    </template>
+    <template #toolbar>
       <ProblemFilters
         :filters="filters"
         :types="meta?.types ?? []"
         :groups="meta?.groups ?? []"
         :signed-in="session.user !== null"
         :listed-codes="listedCodes"
+        :count-text="countText"
         @update="change"
-      />
-      <ProblemFilterChips :chips="chips" @remove="update" @clear-all="clearChips" />
-    </div>
+      >
+        <template v-if="chips.length" #default>
+          <ProblemFilterChips :chips="chips" @remove="update" @clear-all="clearChips" />
+        </template>
+      </ProblemFilters>
+    </template>
     <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -- the rows' links take focus and clicks; this only listens to them bubble. -->
     <div
       ref="listTop"
@@ -137,5 +144,5 @@ function prefetchRow(event: Event) {
         @clear-filters="clearFilters"
       />
     </div>
-  </div>
+  </PageLayout>
 </template>
