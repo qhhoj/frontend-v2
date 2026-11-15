@@ -1536,14 +1536,6 @@
     "liveUpdates": "Live updates",
     "staleReload": "The connection stopped; reload to see the latest status",
     "reload": "Reload",
-    "facts": {
-      "problem": "Problem",
-      "user": "Author",
-      "language": "Language",
-      "judge": "Judge",
-      "submitted": "Submitted",
-      "contest": "Contest"
-    },
     "pretest": "This submission was graded on the pretests only.",
     "overview": {
       "title": "By subtask",
@@ -1593,8 +1585,7 @@
       "output": "Output",
       "compileLogHidden": "Compilation error. The compile log shows only to viewers who may see the source.",
       "expandAll": "Expand all",
-      "collapseAll": "Collapse all",
-      "detailsTitle": "Test details"
+      "collapseAll": "Collapse all"
     },
     "source": {
       "title": "Source code",

@@ -18,8 +18,7 @@ import { formatCasePoints, pendingPositions } from './test-overview';
 /**
  * The result card ("Kết quả chấm"): the compile log, one row per test, then the `footer` slot (the subtasks and the total,
  * `TestOverview.vue`). Keep `CasesTableSkeleton.vue` in step: same card, header cells and row classes. Below `sm` the same rows lay out as cards
- * (test, verdict and points, then time and memory), so each test keeps one `#case-<n>` anchor. From `xl` the card sits in the
- * page's narrow rail beside the source, so its cells tighten there (`xl:px-3`) and the table drops its minimum width.
+ * (test, verdict and points, then time and memory), so each test keeps one `#case-<n>` anchor. From `xl` the cells tighten (`xl:px-3`) and the table drops its minimum width.
  */
 const props = defineProps<{
   cases: SubmissionCase[] | null;
@@ -32,8 +31,6 @@ const props = defineProps<{
   compileError?: string | null;
   /** A compile error whose log this viewer may not read (it quotes the code): said instead of "no test results". */
   compileLogHidden?: boolean;
-  /** Below `xl` a summary card (`ResultSummaryCard.vue`) stands above the source, so this card is titled as the per-test details there. */
-  summarized?: boolean;
 }>();
 
 const locale = useLocaleStore();
@@ -121,11 +118,7 @@ const isHidden = computed(
     class="scroll-mt-20 overflow-hidden rounded-card"
   >
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 pt-5 pb-3 sm:px-6">
-      <h2 v-if="summarized" class="section-title">
-        <span class="xl:hidden">{{ $t('submission.cases.detailsTitle') }}</span>
-        <span class="max-xl:hidden">{{ $t('submission.cases.title') }}</span>
-      </h2>
-      <h2 v-else class="section-title">{{ $t('submission.cases.title') }}</h2>
+      <h2 class="section-title">{{ $t('submission.cases.title') }}</h2>
       <span v-if="running" class="text-meta text-muted">{{ $t('submission.liveUpdates') }}</span>
       <AppButton
         v-if="expandable.length > 0"
