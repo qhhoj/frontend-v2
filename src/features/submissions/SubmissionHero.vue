@@ -193,7 +193,7 @@ const problem = computed(() => {
           </span>
           <template v-if="!isProblemLoading && scoreText.outOf"
             >{{ ' '
-            }}<span class="text-section whitespace-nowrap text-muted">{{
+            }}<span class="text-section-legacy whitespace-nowrap text-muted">{{
               scoreText.outOf
             }}</span></template
           >

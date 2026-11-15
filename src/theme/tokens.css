@@ -43,7 +43,18 @@
   --qh-tag-7-bg: var(--qh-tag-5-bg);
   --qh-tag-8: var(--qh-tag-5);
   --qh-tag-8-bg: var(--qh-tag-5-bg);
-  --qh-page-max: 80rem;
+  /* Page widths (layout plan §2): PageLayout sets --page-width to one of these. --qh-page-max is the old name of --page-wide. */
+  --page-wide: 80rem;
+  --page-split: 120rem;
+  --page-read: 46rem;
+  --qh-page-max: var(--page-wide);
+  /* Vertical rhythm, 4 px base (layout plan §3); the phone values are in the media query below. */
+  --space-page-top: 1.5rem;
+  --space-header: 1rem;
+  --space-toolbar: 0.75rem;
+  --space-section: 2.5rem;
+  --space-section-title: 0.5rem;
+  --space-stack: 0.75rem;
   --qh-sidebar-width: 20rem;
   /* Workbench sizes (build plan §1.2), for the shell and table steps: rows 32, board rows 36, the rail 224. */
   --qh-row: 2rem;
@@ -86,6 +97,10 @@
     --qh-control-sm: 2.75rem;
     --qh-control-lg: 3.5rem;
     --qh-radius-card: 8px;
+    --space-page-top: 1rem;
+    --space-header: 0.75rem;
+    --space-toolbar: 0.5rem;
+    --space-section: 2rem;
     --qa-row: 3rem;
     --qa-chip: 2rem;
   }

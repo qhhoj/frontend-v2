@@ -60,7 +60,7 @@ const facts = computed(() =>
       <VerdictRing size="md" :progress="null" :verdict="verdict" :share="partialShare" />
       <div class="min-w-0">
         <p class="text-sm"><VerdictChip :verdict="verdict" named /></p>
-        <p class="mt-1 font-mono text-section leading-none font-semibold tabular-nums">
+        <p class="mt-1 font-mono text-section-legacy leading-none font-semibold tabular-nums">
           {{ score }}
           <span class="text-base text-muted"
             >/ {{ format(copy.problemPoints) }} {{ $t('share.result.points') }}</span

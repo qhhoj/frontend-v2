@@ -15,7 +15,7 @@ export interface PageCrumb {
 
 /**
  * A page's header and the only place an H1 is written: breadcrumb (from `md`), the one H1 at the page step (`page-title`,
- * 26 px, for every page, admin included), a 13 px meta line, an optional one-line lead, the actions and the page's tabs
+ * 24 px, for every page, admin included), a 12 px meta line, an optional one-line lead, the actions and the page's tabs
  * under it all. The actions sit on the title's row from `md` (whatever the lead or meta under it) and below the title on
  * a phone; `overflow` adds a "⋯ Thêm" menu left of them for a third action or more (destructive items last), so the
  * primary stays the right-most button.
@@ -74,7 +74,7 @@ const CELL = {
     <nav
       v-if="crumbs.length > 0"
       :aria-label="$t('common.breadcrumb')"
-      class="col-span-full row-start-1 hidden flex-wrap items-center gap-1.5 text-meta text-muted md:flex"
+      class="col-span-full row-start-1 hidden flex-wrap items-center gap-1.5 text-caption text-muted md:flex"
     >
       <template v-for="(crumb, index) in crumbs" :key="index">
         <span v-if="index > 0" aria-hidden="true">/</span>
@@ -113,7 +113,7 @@ const CELL = {
     >
       <div
         v-if="meta.length > 0 || slots.meta"
-        class="mt-1 flex flex-wrap items-center gap-2 text-meta text-muted"
+        class="mt-1 flex flex-wrap items-center gap-2 text-caption text-muted"
       >
         <template v-for="(item, index) in meta" :key="index">
           <span v-if="index > 0" aria-hidden="true">·</span>

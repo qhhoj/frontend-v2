@@ -46,7 +46,7 @@ const hasCount = computed(() => typeof props.value === 'number' && props.value >
       <span class="flex items-baseline gap-2">
         <span
           class="font-display leading-9 font-semibold tabular-nums"
-          :class="needsAttention ? 'text-stat text-accent-text' : 'text-section'"
+          :class="needsAttention ? 'text-stat text-accent-text' : 'text-section-legacy'"
         >
           {{ value ?? '…' }}
         </span>

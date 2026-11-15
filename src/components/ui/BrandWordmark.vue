@@ -8,7 +8,11 @@ withDefaults(defineProps<{ to?: RouteLocationRaw; size?: 'sm' | 'md' | 'lg' }>()
   to: '/',
   size: 'md',
 });
-const SIZES = { sm: 'text-subtitle', md: 'text-section', lg: 'text-display lg:text-page' } as const;
+const SIZES = {
+  sm: 'text-subtitle',
+  md: 'text-section-legacy',
+  lg: 'text-display lg:text-page',
+} as const;
 const LOOK: BitLook = { headgear: 'none', palette: 'terracotta' };
 /** A 1 px halo in the theme's `--qh-bit-halo` (none on light grounds): on a dark header the sprite's brown outline would otherwise vanish and the mark read "QHHJ". */
 const HALO = ['1px 0', '-1px 0', '0 1px', '0 -1px']

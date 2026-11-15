@@ -83,7 +83,7 @@ const handlers = useModalDialog(useTemplateRef<HTMLDialogElement>('dialog'), vis
     >
       <header class="flex shrink-0 items-start justify-between gap-3 px-6 pt-5">
         <slot name="header">
-          <h2 :id="titleId" class="m-0 font-display text-section leading-7 font-semibold">
+          <h2 :id="titleId" class="m-0 font-display text-section-legacy leading-7 font-semibold">
             {{ title }}
           </h2>
         </slot>
