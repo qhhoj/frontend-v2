@@ -17,7 +17,7 @@ export function shellShortcutOf(event: KeyboardEvent): ShellShortcut | null {
 }
 
 /** A dialog, sheet, popup menu or popover is open: the keys belong to it. */
-const OVERLAY = '[role="dialog"][aria-modal="true"], .p-menu-overlay, [data-popup]';
+const OVERLAY = '[role="dialog"][aria-modal="true"], [data-popup]';
 const isOverlayOpen = () => document.querySelector(OVERLAY) !== null;
 
 /** The page's own search box: the first search field in `main` (a list's `FilterBar`). */
