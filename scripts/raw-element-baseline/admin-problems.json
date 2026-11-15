@@ -314,7 +314,6 @@
     "select": 2
   },
   "features/admin/search/ProblemListTable.vue": {
-    "AdminChip": 5,
     "AdminDataTable": 1,
     "AdminRowMenu": 1,
     "AdminUserLabel": 1
