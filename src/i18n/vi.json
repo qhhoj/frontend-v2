@@ -1144,6 +1144,7 @@
       "score": "{score} điểm",
       "topPp": "Top điểm PP",
       "pp": "{pp} PP",
+      "allUsers": "Tất cả người dùng",
       "leaderboard": "Bảng xếp hạng",
       "noPerformers": "Chưa có ai có điểm PP."
     },
@@ -1943,7 +1944,6 @@
     "readMore": "Đọc tiếp",
     "pager": "Trang bài viết",
     "empty": "Chưa có bài viết nào",
-    "recentComments": "Bình luận gần đây",
     "noComments": "Chưa có bình luận nào.",
     "newProblems": "Bài tập mới",
     "problemLine": "{code} · {date}",

@@ -9,7 +9,6 @@ import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import Card from '@/components/ui/Card.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import StateBit from '@/components/StateBit.vue';
 import ContestChips from '@/features/contests/ContestChips.vue';
 import PhasePill from '@/features/contests/PhasePill.vue';
 import { useSpanText } from '@/features/contests/use-span-text';
@@ -36,7 +35,16 @@ const timeLeftOf = (contest: ContestListItem) =>
 </script>
 
 <template>
-  <Card data-testid="running-contests" padding="lg" :title="$t('home.anon.running')">
+  <!-- Nothing running: one line instead of a card. -->
+  <p
+    v-if="!isPending && !error && !contests.length"
+    data-testid="running-contests"
+    class="flex flex-wrap items-center gap-x-2 text-muted"
+  >
+    {{ $t('home.noLiveContest') }}
+    <SeeAllLink :to="{ name: 'contests' }">{{ $t('home.browseContests') }}</SeeAllLink>
+  </p>
+  <Card v-else data-testid="running-contests" padding="lg" :title="$t('home.anon.running')">
     <template #actions>
       <!-- The 32 px Bit of a running contest; the negative margin keeps the header's height when it arrives. -->
       <BitLoop
@@ -104,11 +112,6 @@ const timeLeftOf = (contest: ContestListItem) =>
             $t('home.anon.viewContest')
           }}</AppButton>
         </article>
-      </div>
-      <div v-else class="flex flex-wrap items-center gap-3 py-2">
-        <StateBit variant="contest" size="inline" />
-        <p class="text-muted">{{ $t('home.noLiveContest') }}</p>
-        <SeeAllLink :to="{ name: 'contests' }">{{ $t('home.browseContests') }}</SeeAllLink>
       </div>
     </QueryState>
   </Card>

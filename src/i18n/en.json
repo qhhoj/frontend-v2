@@ -1144,6 +1144,7 @@
       "score": "{score} points",
       "topPp": "Top performance points",
       "pp": "{pp} PP",
+      "allUsers": "All users",
       "leaderboard": "Leaderboard",
       "noPerformers": "No one has performance points yet."
     },
@@ -1943,7 +1944,6 @@
     "readMore": "Read more",
     "pager": "Post pages",
     "empty": "No posts yet",
-    "recentComments": "Recent comments",
     "noComments": "No comments yet.",
     "newProblems": "New problems",
     "problemLine": "{code} · {date}",

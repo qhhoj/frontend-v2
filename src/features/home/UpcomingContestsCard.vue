@@ -19,7 +19,15 @@ const contests = computed(() => (data.value?.items ?? []).slice(0, UPCOMING_COUN
 </script>
 
 <template>
-  <Card data-testid="upcoming-contests" padding="lg" :title="$t('home.upcoming')">
+  <!-- Nothing scheduled: one line instead of a card. -->
+  <p
+    v-if="!isPending && !error && !contests.length"
+    data-testid="upcoming-contests"
+    class="text-muted"
+  >
+    {{ $t('home.noUpcoming') }}
+  </p>
+  <Card v-else data-testid="upcoming-contests" padding="lg" :title="$t('home.upcoming')">
     <template #actions>
       <SeeAllLink :to="{ name: 'contests' }">{{ $t('home.anon.allContests') }}</SeeAllLink>
     </template>
@@ -32,8 +40,7 @@ const contests = computed(() => (data.value?.items ?? []).slice(0, UPCOMING_COUN
           </div>
         </div>
       </template>
-      <p v-if="!contests.length" class="text-muted">{{ $t('home.noUpcoming') }}</p>
-      <ul v-else class="flex flex-col gap-3">
+      <ul class="flex flex-col gap-3">
         <li v-for="contest in contests" :key="contest.key" class="flex flex-col">
           <RouterLink
             :to="{ name: 'contest', params: { key: contest.key } }"
