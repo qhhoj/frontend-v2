@@ -11,6 +11,7 @@ import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
+import { useRowOpen } from '@/components/ui/use-row-open';
 import FactLine from '@/components/FactLine.vue';
 import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
@@ -32,6 +33,13 @@ defineProps<{
   isOrganizationScoped?: boolean;
 }>();
 const locale = useLocaleStore();
+const { open: openRow, openInTab } = useRowOpen();
+const contestTarget = (contest: ContestListItem) => ({
+  name: 'contest',
+  params: { key: contest.key },
+});
+/** "Xem" only repeats the row's own link: the button stays for a call that says something else ("Quay lại kỳ thi"). */
+const hasOwnCall = (contest: ContestListItem) => callOf(contest).labelKey !== 'contests.list.view';
 const spanText = useSpanText();
 /** Ended rows do not change with the clock, so each render reads it once. */
 const callOf = (contest: ContestListItem) => listCallToAction(contest, serverNow());
@@ -114,15 +122,23 @@ const compactFacts = (contest: ContestListItem) => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="contest in contests" :key="contest.key" :class="ENDED_ROW_CLASS">
+        <tr
+          v-for="contest in contests"
+          :key="contest.key"
+          :class="[ENDED_ROW_CLASS, 'cursor-pointer hover:bg-surface-hover']"
+          @click="openRow($event, contestTarget(contest))"
+          @auxclick="openInTab($event, contestTarget(contest))"
+        >
           <th scope="row" class="text-left font-normal" :class="ENDED_CELL.name">
             <RouterLink
               :to="{ name: 'contest', params: { key: contest.key } }"
               class="font-semibold hover:text-accent-text"
               >{{ contest.name }}</RouterLink
             >
-            <span class="flex items-center gap-1 font-mono text-caption text-muted"
-              >{{ contest.key }}<ContestEditLink v-if="isOrganizationScoped" :contest="contest"
+            <span
+              v-if="isOrganizationScoped"
+              class="flex items-center gap-1 font-mono text-caption text-muted"
+              >{{ contest.key }}<ContestEditLink :contest="contest"
             /></span>
             <span
               v-if="!isOrganizationScoped && contest.organizations.length"
@@ -147,6 +163,7 @@ const compactFacts = (contest: ContestListItem) => {
           </td>
           <td :class="ENDED_CELL.action">
             <ContestCallLink
+              v-if="hasOwnCall(contest)"
               :contest-key="contest.key"
               :contest-name="contest.name"
               :label-key="callOf(contest).labelKey"

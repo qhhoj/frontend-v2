@@ -56,8 +56,8 @@ const perParticipation = computed(() =>
             >{{ contest.name }}</RouterLink
           >
         </h3>
-        <p class="flex items-center gap-1 font-mono text-meta text-muted">
-          {{ contest.key }}<ContestEditLink v-if="withEdit" :contest="contest" />
+        <p v-if="withEdit" class="flex items-center gap-1 font-mono text-meta text-muted">
+          {{ contest.key }}<ContestEditLink :contest="contest" />
         </p>
         <p v-if="contest.summary" class="mt-1 text-muted">{{ contest.summary }}</p>
       </div>

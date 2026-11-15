@@ -20,6 +20,8 @@ const props = defineProps<{
   clearTagTarget?: RouteLocationRaw;
   /** The page the list lives on; the ended-contests hint stays inside it. */
   listRoute?: ContestListRoute;
+  /** An empty overview group with no filter: one muted line, so the groups with contests stay near the top. */
+  quiet?: boolean;
 }>();
 const isTagEmpty = computed(() => Boolean(props.tagName) && !props.isPastLastPage);
 /** With a filter set, the empty text says the filter is the reason, not that the phase is empty. */
@@ -50,7 +52,8 @@ const action = computed(() => {
 </script>
 
 <template>
-  <Card as="div">
+  <p v-if="quiet" data-testid="quiet-empty" class="text-sm text-muted">{{ messageText }}</p>
+  <Card v-else as="div">
     <EmptyState>
       <span class="block font-semibold text-content">{{ messageText }}</span>
       <span v-if="showsUpcomingHint" class="block">{{
