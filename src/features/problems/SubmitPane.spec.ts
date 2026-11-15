@@ -297,7 +297,7 @@ describe('full screen', () => {
     localStorage.setItem(FULLSCREEN_STORAGE_KEY, '1');
     mockApi(signedInRoutes());
     const desktop = await openProblem();
-    expect(paneOf(desktop.wrapper).exists()).toBe(true);
+    expect(desktop.wrapper.find('[data-testid="submit-pane"]').exists()).toBe(true);
     expect(desktop.wrapper.find('[aria-modal="true"]').exists()).toBe(false);
     desktop.wrapper.unmount();
     const phone = await openStacked();
