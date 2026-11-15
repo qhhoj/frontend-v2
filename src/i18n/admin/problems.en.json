@@ -1,6 +1,7 @@
 {
   "view": "View problem",
   "tabsLabel": "Problem sections",
+  "stepTodo": "Not done",
   "tabs": {
     "general": "General",
     "statements": "Statements",
