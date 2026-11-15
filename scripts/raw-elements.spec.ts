@@ -5,7 +5,9 @@ import { describe, expect, it } from 'vitest';
 import { classUses, elementUses } from './raw-element-rules.mjs';
 import {
   baselineErrors,
+  goneEntries,
   rawElementOffences,
+  staleCounts,
   readBaselines,
   shrunk,
   // @ts-expect-error plain .mjs module without types
@@ -117,9 +119,10 @@ describe('rawElementOffences', () => {
     expect(offence.text).toContain('use AppButton or IconButton');
   });
 
-  it('fail a file that has fewer than its count, so a fix lowers it', () => {
-    const [offence] = rawElementOffences(two, 'features/x/X.vue', { button: 3 }) as Use[];
-    expect(offence.text).toContain('raw-elements:shrink');
+  it('pass a file that has fewer than its count, and report the count as stale', () => {
+    expect(rawElementOffences(two, 'features/x/X.vue', { button: 3 })).toEqual([]);
+    expect(staleCounts(two, 'features/x/X.vue', { button: 3 })).toHaveLength(1);
+    expect(staleCounts(two, 'features/x/X.vue', { button: 2 })).toEqual([]);
   });
 });
 
@@ -130,7 +133,7 @@ describe('the baselines', () => {
     expect(shrunk(baseline, actual)).toEqual({ 'a.vue': { button: 2 } });
   });
 
-  it('flag an entry for a missing file or in the wrong area file', () => {
+  it('flag an entry in the wrong area file, and list entries of gone files without failing', () => {
     const merged = {
       'features/blog/Gone.vue': { button: 1 },
       'features/tickets/T.vue': { table: 1 },
@@ -139,7 +142,10 @@ describe('the baselines', () => {
       'features/blog/Gone.vue': 'blog-comments',
       'features/tickets/T.vue': 'shared',
     };
-    expect(baselineErrors({ merged, sourceOf }, ['features/tickets/T.vue'])).toHaveLength(2);
+    expect(baselineErrors({ merged, sourceOf })).toHaveLength(1);
+    expect(goneEntries({ merged, sourceOf }, ['features/tickets/T.vue'])).toEqual([
+      'features/blog/Gone.vue',
+    ]);
   });
 
   it('never gain a file or a count over the first baselines, which stay as written', () => {

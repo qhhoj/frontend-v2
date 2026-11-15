@@ -2,8 +2,9 @@
 // old wrapper and retired class the rules in scripts/raw-element-rules.mjs count. Each area of the app (one M lane of
 // the UX plan) has a baseline, scripts/raw-element-baseline/<area>.json: `{ "<path under src>": { "<rule>": count } }`,
 // the uses each file had on 2026-11-10. `npm run lint:tokens` fails when a file has more uses of a rule than its count
-// (an unlisted file has none), and when it has fewer, so a fix lowers the count in the same change:
-// `npm run raw-elements:shrink` rewrites the baselines down to the real counts and never raises or adds one.
+// (an unlisted file has none). A file with fewer uses (or a deleted file) is good news, not a failure: lint:tokens
+// prints a notice, and `npm run raw-elements:shrink` (run by `npm run prepush`) rewrites the baselines down to the real
+// counts; it never raises or adds one.
 // scripts/raw-elements.first.json keeps the first baselines; scripts/raw-elements.spec.ts fails when a baseline holds
 // a file or a count the first one does not, so the lists only shrink.
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -132,30 +133,38 @@ const where = (rel) => `scripts/raw-element-baseline/${areaOf(rel)}.json`;
 
 /**
  * The lint finding of one file against its baseline counts (`allowed`, `{ rule: count }`): every use of a rule the file
- * has more of than allowed, and one line per rule it has fewer of (the count must come down).
+ * has more of than allowed. Fewer uses than allowed is not a finding (see `staleCounts`).
  */
 export function rawElementOffences(source, rel, allowed = {}) {
   const uses = ruleUses(source, rel);
   const counts = countUses(uses);
   const over = uses.filter(({ rule }) => counts[rule] > (allowed[rule] ?? 0));
-  const under = Object.entries(allowed).filter(([rule, count]) => (counts[rule] ?? 0) < count);
-  return [
-    ...over.map(({ rule, line, text }) => ({
-      line,
-      text: `${text} (${rule}: ${counts[rule]} > ${allowed[rule] ?? 0} allowed; use ${KIT_PART[rule]})`,
-    })),
-    ...under.map(([rule, count]) => ({
-      line: 1,
-      text: `${rule}: ${counts[rule] ?? 0} left, ${count} in ${where(rel)}: run npm run raw-elements:shrink`,
-    })),
-  ];
+  return over.map(({ rule, line, text }) => ({
+    line,
+    text: `${text} (${rule}: ${counts[rule]} > ${allowed[rule] ?? 0} allowed; use ${KIT_PART[rule]})`,
+  }));
 }
 
-/** Baseline entries that point nowhere: a file that is gone, a file in another area's baseline, an unknown rule. */
-export function baselineErrors({ merged, sourceOf }, rels) {
+/** One line per rule a file has fewer uses of than its baseline count: the baseline can come down. */
+export function staleCounts(source, rel, allowed = {}) {
+  const counts = countUses(ruleUses(source, rel));
+  return Object.entries(allowed)
+    .filter(([rule, count]) => (counts[rule] ?? 0) < count)
+    .map(
+      ([rule, count]) =>
+        `src/${rel}: ${rule}: ${counts[rule] ?? 0} left, ${count} in ${where(rel)}`,
+    );
+}
+
+/** Baseline entries for a file that is gone (harmless; `raw-elements:shrink` drops them). */
+export const goneEntries = ({ merged }, rels) => {
   const present = new Set(rels);
+  return Object.keys(merged).filter((rel) => !present.has(rel));
+};
+
+/** Baseline entries that are wrong: a file in another area's baseline, an unknown rule. */
+export function baselineErrors({ merged, sourceOf }) {
   return Object.entries(merged).flatMap(([rel, counts]) => [
-    ...(present.has(rel) ? [] : [`${rel}: no such file: run npm run raw-elements:shrink`]),
     ...(sourceOf[rel] === areaOf(rel)
       ? []
       : [`${rel}: listed in ${sourceOf[rel]}.json, belongs in ${areaOf(rel)}.json`]),

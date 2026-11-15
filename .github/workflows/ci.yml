@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Merge queue: the same checks on the queued merge commit, against the queue's base.
+  merge_group:
   # Nightly full unit suite; pull requests run only the tests affected by the diff.
   schedule:
     - cron: '23 3 * * *'
@@ -12,7 +14,9 @@ on:
 # Third-party actions are pinned by commit SHA (the comment names the tag). `npm ci --ignore-scripts`: no dependency's
 # install script runs (none is needed: vue-demi's postinstall only re-selects the Vue 3 build it ships by default).
 env:
-  BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+  BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event_name == 'merge_group' && github.event.merge_group.base_sha || github.event.before }}
+  # Pull requests and the merge queue check only what the diff touches; main, the nightly run and manual runs check everything.
+  DIFF_ONLY: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
 
 jobs:
   # Pushes that touch only docs or deploy scripts skip the heavy jobs below; a skipped job counts as a
@@ -58,7 +62,27 @@ jobs:
         run: npm ci --ignore-scripts && npm run test:scripts
 
   # lint, typecheck and test run in parallel; each skips (a pass) on docs-only pushes.
+  # ESLint and Prettier: only the changed files on pull requests and in the merge queue (both judge one file at a time;
+  # a tooling or scripts/ change lints everything, see scripts/lint-changed.sh), everything on main and nightly.
   lint:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: ${{ env.DIFF_ONLY != 'true' && 1 || 0 }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: |
+          if [ "$DIFF_ONLY" = true ]; then bash scripts/lint-changed.sh "$BASE"; else npx eslint . && npx prettier --check .; fi
+
+  # The repo's own lint rules (lint:tokens, palette, copy, dates, plan-codes), in parallel with ESLint.
+  lint-rules:
     needs: changes
     if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
@@ -70,7 +94,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --ignore-scripts
-      - run: npm run lint
+      - run: npm run lint:rules
 
   typecheck:
     needs: changes
@@ -93,8 +117,8 @@ jobs:
           restore-keys: tsbuild-${{ hashFiles('package-lock.json', 'tsconfig*.json') }}-
       - run: npm run typecheck
 
-  # Pull requests: one runner, only specs whose import graph touches a file changed since the base. Pushes to main,
-  # the nightly run and manual runs: the full suite in three shards.
+  # Pull requests and the merge queue: one runner, only specs whose import graph touches a file changed since the base.
+  # Pushes to main, the nightly run and manual runs: the full suite in three shards.
   test:
     needs: changes
     if: needs.changes.outputs.code == 'true'
@@ -103,11 +127,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: ${{ fromJSON(github.event_name == 'pull_request' && '[1]' || '[1, 2, 3]') }}
+        shard: ${{ fromJSON((github.event_name == 'pull_request' || github.event_name == 'merge_group') && '[1]' || '[1, 2, 3]') }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
-          fetch-depth: ${{ github.event_name != 'pull_request' && 1 || 0 }}
+          fetch-depth: ${{ env.DIFF_ONLY != 'true' && 1 || 0 }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
@@ -115,10 +139,25 @@ jobs:
       - run: npm ci --ignore-scripts
       - name: unit tests
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
           SHARD: ${{ matrix.shard }}/${{ strategy.job-total }}
         run: |
-          if [ -n "$BASE_SHA" ]; then npm test -- --changed "$BASE_SHA" --passWithNoTests && npm run test:scanners; else npm test -- --shard="$SHARD"; fi
+          if [ "$DIFF_ONLY" = true ]; then npm test -- --changed "$BASE" --passWithNoTests; else npm test -- --shard="$SHARD"; fi
+
+  # Scanner specs read the whole source tree, so `--changed` never selects them: pull requests and the merge queue run
+  # them here, in parallel with the unit tests (the full suite on main and nightly already includes them).
+  scanners:
+    needs: changes
+    if: needs.changes.outputs.code == 'true' && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run test:scanners
 
   # Contract with backend-v2: every inline script of the built index.html (what deploys) has its hash in the CSP of
   # backend main's deploy/nginx/qhhoj.conf. A changed pre-paint script needs its hash merged there first.
@@ -141,9 +180,9 @@ jobs:
           sparse-checkout: deploy/nginx
       - run: node scripts/deploy/check-csp-hash.mjs dist/index.html backend/deploy/nginx/qhhoj.conf
 
-  # The required status check: green when lint, typecheck, test and csp passed or were skipped.
+  # The required status check: green when lint, lint-rules, typecheck, test, scanners and csp passed or were skipped.
   check:
-    needs: [changes, lint, typecheck, test, csp]
+    needs: [changes, lint, lint-rules, typecheck, test, scanners, csp]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5
