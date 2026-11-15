@@ -2,6 +2,7 @@
 import { computed, reactive, useId } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import CodeEditor from '@/components/CodeEditor.vue';
+import { blockHeldEnter } from '@/components/submit-key';
 import AppButton from '@/components/ui/AppButton.vue';
 import Notice from '@/components/ui/Notice.vue';
 import { formatMemoryLimit, formatNumber, formatTimeLimit } from '@/lib/format';
@@ -196,6 +197,7 @@ function loadDroppedFile(event: DragEvent) {
         class="shrink-0"
         :class="[REGION_ORDER.submitTopRow, $slots.actions ? 'ml-1' : 'ml-auto']"
         :aria-keyshortcuts="submitAriaShortcut()"
+        @keydown="blockHeldEnter"
         >{{ $t(submitLabelKey) }}<KeyHint :keys="shortcutHint"
       /></AppButton>
     </div>
@@ -305,6 +307,7 @@ function loadDroppedFile(event: DragEvent) {
       :aria-describedby="submitDescribedBy"
       class="shrink-0"
       :class="REGION_ORDER.submit"
+      @keydown="blockHeldEnter"
       >{{ $t(submitLabelKey) }}</AppButton
     >
   </form>
