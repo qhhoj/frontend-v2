@@ -6,7 +6,7 @@ import Modal from './Modal.vue';
 
 const dialog = () => document.body.querySelector<HTMLElement>('[role="dialog"]')!;
 const pressEscape = () =>
-  document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', bubbles: true }));
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 
 describe('Modal', () => {
   it('fills a phone screen only when lg', async () => {
@@ -20,6 +20,21 @@ describe('Modal', () => {
     mountComponent(Modal, { props: { visible: true, title: 'A' } });
     await flushPromises();
     expect(dialog().className).not.toContain('max-sm:w-screen');
+  });
+
+  it('leaves an Escape that ends an input method composition alone, and keeps the browser from closing it', async () => {
+    const open = mountComponent(Modal, { props: { visible: true, title: 'A' } });
+    await flushPromises();
+    const escape = new KeyboardEvent('keydown', {
+      key: 'Escape',
+      isComposing: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    document.dispatchEvent(escape);
+    await flushPromises();
+    expect(open.emitted('update:visible')).toBeUndefined();
+    expect(escape.defaultPrevented).toBe(true); // no native `cancel`, which would close it anyway
   });
 
   it('closes on Escape, and stays open when not closable', async () => {

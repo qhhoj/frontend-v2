@@ -6,6 +6,7 @@ import type { CatalogItem } from '@/api/types/problems';
 import AppButton from '@/components/ui/AppButton.vue';
 import Chip from '@/components/ui/Chip.vue';
 import Popover from '@/components/ui/Popover.vue';
+import { isComposing } from '@/components/ui/keys';
 import SearchInput from '@/components/ui/SearchInput.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import { translate } from '@/i18n';
@@ -41,7 +42,6 @@ const searchText = useDebouncedText(
   (search) => emit('update', { search }),
 );
 const router = useRouter();
-const IME_KEY_CODE = 229;
 /** A code Enter asked for before the list had it: opened when the list for that search arrives. */
 let awaitedCode: string | null = null;
 const openProblem = (code: string) => {
@@ -68,7 +68,7 @@ watch(
 /** Enter opens a pasted problem link, or the problem whose code was typed in full; any other text stays a search. */
 function openExact(event: KeyboardEvent) {
   // An Enter that confirms an IME candidate (Vietnamese Telex, VNI) is not a submit.
-  if (event.isComposing || event.keyCode === IME_KEY_CODE) return;
+  if (isComposing(event)) return;
   event.preventDefault();
   const { code, isLink } = problemSearchIntent(searchText.value);
   if (code === '') return;

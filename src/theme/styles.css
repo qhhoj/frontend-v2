@@ -18,9 +18,13 @@
 
 /* Phones and touch screens: a coarse pointer, or a viewport up to 640 px (a phone held either way is never wider than that in portrait). */
 @custom-variant touch (@media (pointer: coarse), (max-width: 40rem));
-/* The public rail (AppRail): 56 px icons from md, the full 224 px from 1100 px. */
+/* Its opposite, for keyboard hints: a fine pointer that can hover, on a viewport wider than 640 px. Tailwind cannot negate
+   `touch` (`not-touch:` generates no CSS for a media query list). */
+@custom-variant no-touch (@media (hover: hover) and (pointer: fine) and (width > 40rem));
+/* The public rail (AppRail): 56 px icons from md, the full 224 px from 1100 px. The two edges are exact complements (range
+   syntax), so exactly one applies at every width, 1100 px included. */
 @custom-variant rail-wide (@media (min-width: 68.75rem));
-@custom-variant max-rail-wide (@media (max-width: 68.7499rem));
+@custom-variant max-rail-wide (@media (width < 68.75rem));
 
 /* Only semantic names exist: Tailwind's palette, fonts, radii and shadows are dropped. */
 @theme {

@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import { nextTick, useTemplateRef, watch } from 'vue';
 import { FOCUSABLE, trapTab } from './focus-trap';
+import { yieldsToComposition } from './keys';
 import { usePopup } from './popup';
 
 /**
@@ -50,7 +51,8 @@ function hide() {
 
 /** Escape is taken here (`preventDefault`), so a dialog the popover sits in stays open. */
 function onKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape' || event.code === 'Escape') {
+  if (yieldsToComposition(event)) return;
+  if (event.key === 'Escape') {
     event.preventDefault();
     hide();
   } else if (event.key === 'Tab' && panel.value) trapTab(event, panel.value);

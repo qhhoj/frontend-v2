@@ -4,6 +4,7 @@ import type { Component } from 'vue';
 import { computed, ref, useId, useTemplateRef, watch } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import { useRouter } from 'vue-router';
+import { yieldsToComposition } from './keys';
 import { usePopup } from './popup';
 
 export interface MenuEntry {
@@ -105,6 +106,7 @@ const KEYS: Record<string, () => void> = {
 };
 /** Escape is taken here (`preventDefault`), so a dialog the menu sits in stays open. Tab moves on from the opener. */
 function onKeydown(event: KeyboardEvent) {
+  if (yieldsToComposition(event)) return;
   if (event.key === 'Tab') return closeToOpener();
   const action = KEYS[event.key];
   if (!action) return;

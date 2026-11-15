@@ -1,11 +1,13 @@
 import { flushPromises } from '@vue/test-utils';
+import { defineComponent, h } from 'vue';
 import { beforeEach, describe, expect, it } from 'vitest';
+import Modal from '@/components/ui/Modal.vue';
 import { announcement, contestDetail, participationSummary } from '@/test/fixtures';
 import { contestListRoutes, contestPageRoutes } from '@/test/contest-routes';
 import { latestEventSource, pageStreams } from '@/test/fake-event-source';
 import { mockApi, ok, page, sequence } from '@/test/mock-api';
 import type { MockHandler } from '@/test/mock-api';
-import { mountApp } from '@/test/mount';
+import { mountApp, mountComponent } from '@/test/mount';
 import { signedInViewer } from '@/test/problem-routes';
 
 const FAR = '2999-01-01T00:00:00Z';
@@ -107,5 +109,26 @@ describe('announcement alert of the contest the viewer is in', () => {
     const { wrapper } = await mountApp('/contests');
     expect(openStreams()).toEqual([]);
     expect(alert(wrapper).exists()).toBe(false);
+  });
+
+  it('moves into an open dialog, so it is seen and spoken over it', async () => {
+    mockApi({
+      ...inContest(),
+      ...contestPageRoutes(contestDetail()),
+      'GET /contests/r42/announcements': sequence(
+        page([]),
+        page([announcement(1, { title: 'Bài C: sửa giới hạn' })]),
+      ),
+    });
+    await mountApp('/contests/r42');
+    mountComponent(defineComponent({ setup: () => () => h(Modal, { visible: true, title: 'A' }) }));
+    await flushPromises();
+    latestEventSource().emit('announcement', {
+      contestId: 'c',
+      announcementId: announcement(1).id,
+    });
+    await flushPromises();
+    const region = document.querySelector('dialog [data-testid="contest-announcement-live"]');
+    expect(region?.textContent).toContain('Bài C: sửa giới hạn');
   });
 });

@@ -71,7 +71,7 @@ describe('Popover', () => {
 
   it('gives focus back to its opener when Escape closes it', async () => {
     await open();
-    byId('first').dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', bubbles: true }));
+    byId('first').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     await vi.waitFor(() => expect(popoverEl()).toBeNull());
     expect(document.activeElement).toBe(byId('opener'));
   });

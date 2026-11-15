@@ -1,5 +1,6 @@
 import { computed, onBeforeUnmount, onMounted, onUnmounted, shallowReactive, watch } from 'vue';
 import type { Ref } from 'vue';
+import { yieldsToComposition } from './keys';
 
 /**
  * The open modal dialogs (`Modal`, `Drawer`), oldest first. `showModal()` makes the rest of the page inert, so the last one
@@ -19,7 +20,6 @@ function unlockScroll() {
   if (--scrollLocks === 0) document.documentElement.style.overflow = '';
 }
 
-const isEscape = (event: KeyboardEvent) => event.key === 'Escape' || event.code === 'Escape';
 /** A click on the `::backdrop` lands on the dialog itself, outside its box. */
 function isBackdropClick(event: MouseEvent, dialog: HTMLDialogElement) {
   if (event.target !== dialog) return false;
@@ -86,7 +86,7 @@ export function useModalDialog(
   function onKeydown(event: KeyboardEvent) {
     const element = dialog.value;
     if (!element || topDialog.value !== element) return;
-    if (event.defaultPrevented || !isEscape(event)) return;
+    if (event.defaultPrevented || event.key !== 'Escape' || yieldsToComposition(event)) return;
     event.preventDefault();
     if (options.isClosable()) visible.value = false;
   }
