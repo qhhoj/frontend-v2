@@ -232,18 +232,18 @@ const scoreHeaderKey = computed(() =>
                 }}</Chip>
               </span>
             </th>
-            <td class="overflow-hidden px-1.5 whitespace-nowrap">
-              <span class="font-bold">
+            <td class="overflow-hidden px-1.5 leading-none whitespace-nowrap">
+              <span class="block text-base font-bold">
                 <template v-if="row.isDisqualified">—</template>
                 <template v-else>{{ viewOf(row).total }}</template>
               </span>
               <small
                 v-if="hasCombinedScore && !row.isDisqualified"
-                class="ml-1 text-tiny font-medium text-muted"
+                class="mt-0.5 block text-tiny font-normal text-muted"
                 >{{ viewOf(row).time }}</small
               >
             </td>
-            <td v-if="hasTimeColumn" class="overflow-hidden whitespace-nowrap">
+            <td v-if="hasTimeColumn" class="overflow-hidden text-meta whitespace-nowrap text-muted">
               {{ row.isDisqualified ? '—' : viewOf(row).time }}
             </td>
             <td

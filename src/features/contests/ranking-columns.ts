@@ -23,6 +23,8 @@ const ROOT_PX = 16;
 /** `text-sm` (cells, scores) and `text-tiny` (times, phone mini cells). */
 const TEXT_PX = 14;
 const TINY_PX = 11;
+/** The total score column prints `text-base`. */
+const TOTAL_PX = 16;
 const textRem = (text: string, fontPx: number) => (text.length * MONO_EM * fontPx) / ROOT_PX;
 /** A 4 px gap between parts, and 4 px spare so a hover ring or a rounding never clips. */
 const GAP_REM = 0.25;
@@ -30,14 +32,15 @@ const SPARE_REM = 0.25;
 /** Widths move in half-rem steps, so a poll that adds one character rarely moves the board. */
 const roundUp = (rem: number) => Math.ceil(rem * 2) / 2;
 
-/** The cell's padding (td 2 px and box 4 px each side), its star, its text and its time on one line. */
+/** The cell's padding (td 2 px and box 4 px each side); the score (with its star) and the time are two lines, so the wider one counts. */
 const CELL_PADDING_REM = 0.75;
 const STAR_REM = 0.75 + GAP_REM;
 const cellRem = (view: RankingCellView) =>
   CELL_PADDING_REM +
-  (view.kind === 'first-solve' ? STAR_REM : 0) +
-  textRem(view.text, TEXT_PX) +
-  (view.time ? GAP_REM + textRem(view.time, TINY_PX) : 0) +
+  Math.max(
+    (view.kind === 'first-solve' ? STAR_REM : 0) + textRem(view.text, TEXT_PX),
+    view.time ? textRem(view.time, TINY_PX) : 0,
+  ) +
   SPARE_REM;
 
 /** One width for every problem column: the widest cell of the board. */
@@ -47,7 +50,7 @@ export const problemColumnRem = (views: Iterable<RankingCellView>) => {
   return roundUp(widest);
 };
 
-/** The score cell's padding (6 px each side), the total and the time beside it on points boards. */
+/** The score cell's padding (6 px each side); the total (large) and the time under it on points boards are two lines, so the wider one counts. */
 const SCORE_PADDING_REM = 0.75;
 export const scoreColumnRem = (scores: Iterable<{ total: string; time?: string }>) => {
   let widest = SCORE_COLUMN_REM;
@@ -55,8 +58,7 @@ export const scoreColumnRem = (scores: Iterable<{ total: string; time?: string }
     widest = Math.max(
       widest,
       SCORE_PADDING_REM +
-        textRem(total, TEXT_PX) +
-        (time ? GAP_REM + textRem(time, TINY_PX) : 0) +
+        Math.max(textRem(total, TOTAL_PX), time ? textRem(time, TINY_PX) : 0) +
         SPARE_REM,
     );
   return roundUp(widest);

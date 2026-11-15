@@ -4,9 +4,9 @@ import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
 import type { RankingCellView } from '@/lib/ranking-cells';
-import { KIND_CLASSES, PARTIAL_CLASSES } from './ranking-cell-classes';
+import { TABLE_CELL_CLASSES, TABLE_CELL_TIME_CLASSES } from './ranking-cell-classes';
 
-/** One line per cell: the board row is 36 px (`--qh-row-dense`), the cell box 32 px inside it. */
+/** The board row is 36 px (`--qh-row-dense`), the cell box 32 px inside it: the score and, under it, the time. */
 const CELL_BOX_CLASS = 'h-8';
 
 const props = defineProps<{ view: RankingCellView; to?: RouteLocationRaw }>();
@@ -25,22 +25,23 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
       :is="to ? RouterLink : 'span'"
       v-else
       :to="to"
-      class="flex items-center justify-center gap-1 overflow-hidden rounded-cell px-1 text-center whitespace-nowrap tabular-nums"
+      class="flex flex-col items-center justify-center overflow-hidden rounded-cell px-1 text-center leading-none whitespace-nowrap tabular-nums"
       :class="[
         CELL_BOX_CLASS,
-        KIND_CLASSES[view.kind],
-        view.partialStep && PARTIAL_CLASSES[view.partialStep],
+        TABLE_CELL_CLASSES[view.kind],
         to && 'cursor-pointer transition-shadow hover:ring-2 hover:ring-line-strong',
       ]"
       :title="view.time"
     >
-      <Star v-if="view.kind === 'first-solve'" aria-hidden="true" class="size-3 shrink-0" />
-      <span aria-hidden="true" class="shrink-0 font-semibold">{{ view.text }}</span>
+      <span aria-hidden="true" class="flex items-center gap-1 text-sm font-semibold">
+        <Star v-if="view.kind === 'first-solve'" class="size-3 shrink-0" />{{ view.text }}
+      </span>
       <span
         v-if="view.time"
         aria-hidden="true"
         data-testid="cell-time"
-        class="min-w-0 truncate text-tiny font-medium"
+        class="mt-0.5 max-w-full truncate text-tiny font-normal"
+        :class="TABLE_CELL_TIME_CLASSES[view.kind]"
         >{{ view.time }}</span
       >
       <span class="sr-only">{{ $t(view.labelKey, view.labelParams, labelCount) }}</span>

@@ -1428,13 +1428,13 @@
     },
     "legend": {
       "firstSolve": "giải đầu tiên",
-      "solved": "+n: giải sau n lần sai, kèm thời điểm",
-      "failed": "−n: n lần sai",
+      "solved": "+n: giải sau n lần sai, thời điểm giải ở dòng dưới",
+      "failed": "−n đỏ: n lần sai",
       "pending": "?n: chờ công bố",
       "firstPoints": "đủ điểm và giải đầu tiên",
       "fullPoints": "nền xanh: đủ điểm của bài",
-      "partialPoints": "Một phần điểm, nền đậm dần theo ba mức",
-      "zeroPoints": "0: đã nộp nhưng chưa được điểm",
+      "partialPoints": "số điểm không nền: một phần điểm của bài",
+      "zeroPoints": "0 đỏ: đã nộp nhưng chưa được điểm",
       "notAttempted": "trống: chưa nộp",
       "button": "Chú giải"
     },
