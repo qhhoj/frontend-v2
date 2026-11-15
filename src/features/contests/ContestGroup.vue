@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import Chip from '@/components/ui/Chip.vue';
 import { computed, watch } from 'vue';
 import type { ContestPhase } from '@/api/types/contests';
-import SeeAllLink from '@/components/ui/SeeAllLink.vue';
+import PageSection from '@/components/ui/PageSection.vue';
 import QueryState from '@/components/QueryState.vue';
 import SubmissionPager from '@/features/submissions/SubmissionPager.vue';
 import { phaseAt } from '@/lib/contest-time';
@@ -36,13 +35,19 @@ const props = defineProps<{
   listRoute?: ContestListRoute;
 }>();
 const listPage = computed<ContestListRoute>(() => props.listRoute ?? { name: 'contests' });
-const emit = defineEmits<{ page: [page: number] }>();
+/** `count` reports the group's total (null while unknown) to the page's toolbar. */
+const emit = defineEmits<{ page: [page: number]; count: [total: number | null] }>();
 const locale = useLocaleStore();
 const { t } = useI18n();
 const query = computed(() => groupQuery(props.filters, props.phase, props.organizationId));
 const { data: list, isPending, error, refetch } = useContestListQuery(query);
 const contests = computed(() => list.value?.items ?? []);
 const total = computed(() => list.value?.meta.total ?? 0);
+watch(
+  () => list.value?.meta.total ?? null,
+  (value) => emit('count', value),
+  { immediate: true },
+);
 const isSingleGroup = computed(() => props.filters.phase === props.phase);
 const isPaged = computed(() => isPagedGroup(props.filters, props.phase));
 const isFiltered = computed(() =>
@@ -97,8 +102,6 @@ const toggleTarget = computed(() => ({
     page: 1,
   }),
 }));
-const headingId = computed(() => `contest-group-${props.phase}`);
-const countId = computed(() => `contest-group-${props.phase}-count`);
 /** A page past the last one comes back empty: say so, rather than that the phase has no contests. */
 const isPastLastPage = computed(
   () => isPaged.value && props.filters.page > 1 && contests.value.length === 0,
@@ -114,24 +117,12 @@ const clearTagTarget = computed(() => ({
 </script>
 
 <template>
-  <section
+  <PageSection
     v-if="!isHidden"
-    :aria-labelledby="headingId"
-    :aria-describedby="hasItems ? countId : undefined"
-    class="flex flex-col gap-4"
+    :title="$t(`contests.phase.${phase}`)"
+    :count="hasItems ? countText : undefined"
+    :see-all="hasLink ? { to: toggleTarget, label: linkText } : undefined"
   >
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-baseline gap-2.5">
-        <h2 :id="headingId" class="section-title">
-          {{ $t(`contests.phase.${phase}`) }}
-        </h2>
-        <Chip v-if="hasItems" :id="countId" size="md">{{ countText }}</Chip>
-      </div>
-      <SeeAllLink v-if="hasLink" :to="toggleTarget"
-        >{{ linkText
-        }}<span class="sr-only">: {{ $t(`contests.phase.${phase}`) }}</span></SeeAllLink
-      >
-    </div>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><ContestListSkeletons :kind="phase" /></template>
       <ContestListEmpty
@@ -169,5 +160,5 @@ const clearTagTarget = computed(() => ({
         @update:page="(page) => emit('page', page)"
       />
     </QueryState>
-  </section>
+  </PageSection>
 </template>

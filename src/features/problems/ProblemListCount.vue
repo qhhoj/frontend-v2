@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
-
-/** The list's count ("214 đã giải · 1.483 bài") and the staff's "Tạo bài tập": one row at the top of the page. */
+/** The list's count ("214 đã giải · 1.483 bài"), at the right of the toolbar; read out politely when a filter changes it. */
 defineProps<{ text: string }>();
 </script>
 
 <template>
-  <div class="flex items-center justify-between gap-3">
-    <p data-testid="problems-count" class="font-mono text-meta text-muted tabular-nums">
-      {{ text }}
-    </p>
-    <CreateShortcut kind="problem" />
-  </div>
+  <p
+    data-testid="problems-count"
+    aria-live="polite"
+    class="font-mono text-meta text-muted tabular-nums"
+  >
+    {{ text }}
+  </p>
 </template>

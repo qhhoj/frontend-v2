@@ -5,8 +5,11 @@ import SearchInput from '@/components/ui/SearchInput.vue';
 import Toolbar from '@/components/ui/Toolbar.vue';
 import ToolbarSelect from '@/components/ToolbarSelect.vue';
 import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
-import { computed } from 'vue';
+import { computed, reactive } from 'vue';
+import type { ContestPhase } from '@/api/types/contests';
 import { translate } from '@/i18n';
+import { formatNumber } from '@/lib/format';
+import { useLocaleStore } from '@/stores/locale.store';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import { useContestTagsQuery } from './contest-extras.queries';
 import ContestGroup from './ContestGroup.vue';
@@ -20,6 +23,15 @@ const search = useDebouncedText(
   (text) => update({ search: text }),
 );
 const shownPhases = computed(() => (filters.value.phase ? [filters.value.phase] : PHASE_ORDER));
+const locale = useLocaleStore();
+/** Each group reports its total; the toolbar's count is their sum, shown once every shown group has answered. */
+const groupTotals = reactive<Partial<Record<ContestPhase, number | null>>>({});
+const countText = computed(() => {
+  const totals = shownPhases.value.map((phase) => groupTotals[phase]);
+  if (totals.some((total) => total === undefined || total === null)) return '';
+  const sum = totals.reduce<number>((acc, total) => acc + (total ?? 0), 0);
+  return translate('contests.list.count', { n: formatNumber(sum, locale.locale) }, sum);
+});
 /** The select's values are the URL's: `rated=1` for the rated-only choice, none for both. */
 const ratedOptions = computed(() => [
   { value: 'any', label: translate('contests.list.ratedAny') },
@@ -67,6 +79,15 @@ const tagName = computed(() => {
             class="w-full sm:w-auto"
           />
         </template>
+        <template #right>
+          <p
+            data-testid="contests-count"
+            aria-live="polite"
+            class="font-mono text-meta tabular-nums"
+          >
+            {{ countText }}
+          </p>
+        </template>
         <template #chips>
           <ContestTagFilter
             :tags="tags ?? []"
@@ -86,6 +107,7 @@ const tagName = computed(() => {
       :filters="listFilters"
       :tag-name="tagName"
       @page="(page) => update({ page })"
+      @count="(total) => (groupTotals[phase] = total)"
     />
   </PageLayout>
 </template>

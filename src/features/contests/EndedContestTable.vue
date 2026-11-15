@@ -39,7 +39,7 @@ const contestTarget = (contest: ContestListItem) => ({
   name: 'contest',
   params: { key: contest.key },
 });
-/** "Xem" only repeats the row's own link: the button stays for a call that says something else ("Quay lại kỳ thi"). */
+/** "Xem" only repeats the row's own link (on a phone too): the button stays for a call that says something else ("Quay lại kỳ thi"). */
 const hasOwnCall = (contest: ContestListItem) => callOf(contest).labelKey !== 'contests.list.view';
 /** The actions column is there only when a row has a button: otherwise it is an empty strip. */
 const hasActions = computed(() => props.contests.some((contest) => hasOwnCall(contest)));
@@ -83,6 +83,7 @@ const compactFacts = (contest: ContestListItem) => {
         <template #meta><FactLine :facts="compactFacts(contest)" /></template>
         <template #trail>
           <ContestCallLink
+            v-if="hasOwnCall(contest)"
             compact
             :contest-key="contest.key"
             :contest-name="contest.name"
@@ -156,9 +157,9 @@ const compactFacts = (contest: ContestListItem) => {
               <ViewerBadge :badge-key="callOf(contest).badgeKey" />
             </span>
           </td>
-          <td class="font-mono tabular-nums" :class="ENDED_CELL.participants">
+          <td class="font-mono whitespace-nowrap tabular-nums" :class="ENDED_CELL.participants">
             {{ formatNumber(contest.userCount, locale.locale) }}
-            <span v-if="contest.virtualCount" class="block text-caption text-muted">{{
+            <span v-if="contest.virtualCount" class="ml-1 text-caption text-muted">{{
               $t('contests.virtualExtra', {
                 count: formatNumber(contest.virtualCount, locale.locale),
               })
