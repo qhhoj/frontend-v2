@@ -1,14 +1,23 @@
 <script setup lang="ts">
-import { Snowflake, Timer } from 'lucide-vue-next';
+import { Printer, Snowflake, Timer } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { ContestDetail, ContestPhase } from '@/api/types/contests';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import Chip from '@/components/ui/Chip.vue';
+import type { MenuEntry } from '@/components/ui/Menu.vue';
+import PageHeader from '@/components/ui/PageHeader.vue';
+import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
+import { shortLinkPath } from '@/features/short-links/short-link-path';
+import UserLink from '@/components/UserLink.vue';
 import { formatLabel } from '@/lib/contest-format';
-import { ownEndTime, phaseAt } from '@/lib/contest-time';
+import { ownEndTime, phaseAt, spanMessage } from '@/lib/contest-time';
+import { formatNumber } from '@/lib/format';
+import { formatDate } from '@/lib/format-date';
+import { useLocaleStore } from '@/stores/locale.store';
 import { useI18n } from 'vue-i18n';
 import { useNow } from '@/lib/use-now';
+import ContestActions from '../ContestActions.vue';
 import ContestTabs from '../ContestTabs.vue';
 import { boardFreezeOf } from './board-freeze';
 import { useShownClock } from './header-clock';
@@ -59,6 +68,7 @@ const PHASE_DOT: Record<ContestPhase, string> = {
   ended: 'bg-line-strong',
 };
 const { t } = useI18n();
+const locale = useLocaleStore();
 const facts = computed(() => {
   const contest = props.contest;
   if (!contest) return [];
@@ -74,44 +84,70 @@ const facts = computed(() => {
     privacy,
   ].filter((fact): fact is string => fact !== null);
 });
+/** The contest's length and start, the one time fact the header carries (the clock and the bar say the rest). */
+const timeFact = computed(() => {
+  const contest = props.contest;
+  if (!contest) return '';
+  const span = spanMessage((Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000);
+  const start = formatDate(contest.startTime, 'datetime', locale.locale);
+  return `${start} (${t(span.key, span.params, span.count ?? 1)})`;
+});
+/** "In tất cả đề" sits in the header's "⋯" menu while the statements are listed. */
+const overflow = computed<MenuEntry[]>(() =>
+  props.contest?.problems
+    ? [
+        {
+          label: t('contests.problems.printAll'),
+          icon: Printer,
+          to: { name: 'contest-all', params: { key: props.contestKey } },
+        },
+      ]
+    : [],
+);
 const freeze = computed(() =>
   props.contest ? boardFreezeOf(props.contest, now.value, props.isBoardFrozen) : null,
 );
 </script>
 
 <template>
-  <div class="flex flex-col gap-2" data-testid="contest-page-header">
-    <nav :aria-label="$t('common.breadcrumb')" class="hidden text-caption text-muted md:block">
-      <RouterLink :to="{ name: 'contests' }" class="hover:text-content hover:underline">{{
-        $t('nav.contests')
-      }}</RouterLink>
-    </nav>
-    <header v-if="contest" class="flex flex-wrap items-center gap-x-3 gap-y-1">
-      <img
-        v-if="contest.logoOverrideImage"
-        :src="contest.logoOverrideImage"
-        alt=""
-        class="size-8 shrink-0 rounded-cell object-contain"
-      />
-      <div class="flex min-w-0 flex-1 basis-80 flex-wrap items-baseline gap-x-3 gap-y-0.5">
-        <h1 class="min-w-0 page-title [overflow-wrap:anywhere]">{{ contest.name }}</h1>
-        <p class="flex flex-wrap items-center gap-x-1.5 text-meta text-muted">
-          <span v-if="phase" class="inline-flex items-center gap-1.5 font-semibold text-content">
-            <span aria-hidden="true" :class="['size-2 rounded-pill', PHASE_DOT[phase]]" />{{
-              $t(`contests.phase.${phase}`)
-            }}
+  <div data-testid="contest-page-header">
+    <PageHeader v-if="contest" :title="contest.name" :overflow="overflow">
+      <template v-if="contest.logoOverrideImage" #start>
+        <img
+          :src="contest.logoOverrideImage"
+          alt=""
+          class="size-8 shrink-0 rounded-cell object-contain"
+        />
+      </template>
+      <template #meta>
+        <span v-if="phase" class="inline-flex items-center gap-1.5 font-semibold text-content">
+          <span aria-hidden="true" :class="['size-2 rounded-pill', PHASE_DOT[phase]]" />{{
+            $t(`contests.phase.${phase}`)
+          }}
+        </span>
+        <template v-for="fact in [...facts, timeFact]" :key="fact">
+          <span aria-hidden="true">·</span>
+          <span>{{ fact }}</span>
+        </template>
+        <span aria-hidden="true">·</span>
+        <span>{{
+          $t(
+            'contests.participants',
+            { count: formatNumber(contest.userCount, locale.locale) },
+            contest.userCount,
+          )
+        }}</span>
+        <template v-if="contest.authors.length">
+          <span aria-hidden="true" class="hidden md:inline">·</span>
+          <span class="hidden md:inline">
+            {{ $t('contests.detail.authors') }}
+            <template v-for="(author, index) in contest.authors" :key="author.id"
+              >{{ index ? ', ' : '' }}<UserLink :username="author.username" :rating="author.rating"
+            /></template>
           </span>
-          <template v-for="fact in facts" :key="fact">
-            <span aria-hidden="true">·</span>
-            <span>{{ fact }}</span>
-          </template>
-        </p>
-      </div>
-      <div
-        v-if="clockUntil || freeze"
-        data-testid="page-header-actions"
-        class="flex shrink-0 items-center gap-3"
-      >
+        </template>
+      </template>
+      <template #actions>
         <span
           v-if="freeze"
           data-testid="freeze-chip"
@@ -133,11 +169,18 @@ const freeze = computed(() =>
           <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
           <CountdownTimer :key="clockUntil" :until="clockUntil" @elapsed="emit('elapsed')" />
         </p>
+        <ContestActions :contest="contest" :current="participation" />
+        <ShortLinkButton compact :path="shortLinkPath({ kind: 'contest', key: contest.key })" />
+      </template>
+      <template #tabs>
+        <ContestTabs :contest-key="contestKey" :phase="contest.phase" :current="current" />
+      </template>
+    </PageHeader>
+    <template v-else>
+      <div data-skeleton-region="title" class="page-title">
+        <SkeletonBlock text class="w-80 max-w-full" />
       </div>
-    </header>
-    <div v-else data-skeleton-region="title" class="page-title">
-      <SkeletonBlock text class="w-80 max-w-full" />
-    </div>
-    <ContestTabs :contest-key="contestKey" :phase="contest?.phase" :current="current" />
+      <div class="mt-3"><ContestTabs :contest-key="contestKey" :current="current" /></div>
+    </template>
   </div>
 </template>

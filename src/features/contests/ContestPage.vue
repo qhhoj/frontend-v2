@@ -5,11 +5,8 @@ import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import CommentsSection from '@/features/comments/CommentsSection.vue';
-import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
-import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { phaseAt } from '@/lib/contest-time';
 import { usePageTitle } from '@/router/page-title';
-import ContestActions from './ContestActions.vue';
 import { useCurrentContest } from './bar/use-current-contest';
 import ContestAnnouncementsRail from './ContestAnnouncementsRail.vue';
 import ContestDetailSkeleton from './ContestDetailSkeleton.vue';
@@ -65,12 +62,7 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
     <template #skeleton><ContestDetailSkeleton /></template>
     <template v-if="contest">
       <!-- The card's hidden countdown tells the page when a phase flips. -->
-      <ContestHeaderCard :contest="contest" :run="run" @elapsed="onCountdownElapsed">
-        <template #actions>
-          <ContestActions :contest="contest" :current="current" />
-          <ShortLinkButton compact :path="shortLinkPath({ kind: 'contest', key: contest.key })" />
-        </template>
-      </ContestHeaderCard>
+      <ContestHeaderCard :contest="contest" :run="run" @elapsed="onCountdownElapsed" />
       <div class="flex min-w-0 flex-col gap-6">
         <ContestAnnouncementsRail v-if="isUnderway" :contest="contest" />
         <ContestJoinRulesCard

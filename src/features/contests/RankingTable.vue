@@ -16,7 +16,6 @@ import { isPenaltyFormat, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import RankingCell from './RankingCell.vue';
 import ScoreTick from './ScoreTick.vue';
-import RankingLegend from './RankingLegend.vue';
 import RankingList from './RankingList.vue';
 import RankingProblemHeader from './RankingProblemHeader.vue';
 import {
@@ -43,12 +42,9 @@ const props = defineProps<{
   problemNames?: ReadonlyMap<string, string>;
   /** The viewer may only see own submissions (backend narrows the list), so only their own row links. */
   ownSubmissionsOnly?: boolean;
-  /** Why cells show "?" while the board is frozen: a line in "Chú giải". */
-  freezeNote?: string;
   /** The rows shown are the previous board's while the new one loads: nothing ticks when it arrives. */
   isStale?: boolean;
 }>();
-defineSlots<{ tools?: () => unknown }>();
 /** Rank and name stay while the problem columns scroll (the rank column is `RANK_COLUMN_REM` = 5 rem = `left-20`). */
 const RANK_STICKY = 'sticky left-0 z-10 bg-surface-solid';
 /** Name sticks next to the rank while the problem columns scroll. */
@@ -77,7 +73,6 @@ const moveClass = computed(() => (isTicking.value ? MOVE_CLASS : ''));
 const focusRow = (participationId: string) =>
   focusTableRow(root.value, participationId, isMotionAllowed.value);
 defineExpose({ focusRow });
-const hasVirtualRows = computed(() => props.rows.some((row) => row.virtual > 0));
 /** Contest submissions of one user (and problem); undefined where the viewer may not see them. */
 const submissionsLink = (row: RankingRow, problem?: RankingProblem) => {
   if (!props.contestKey) return undefined;
@@ -135,20 +130,6 @@ const scoreHeaderKey = computed(() =>
 
 <template>
   <div ref="root" class="contents">
-    <div
-      data-testid="ranking-toolbar"
-      class="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2"
-    >
-      <slot name="tools" />
-      <div class="ml-auto">
-        <RankingLegend
-          :is-penalty="penalty"
-          :shows-time="context.showsTime"
-          :has-virtual-rows="hasVirtualRows"
-          :freeze-note="freezeNote"
-        />
-      </div>
-    </div>
     <EmptyState v-if="!ranking.rows.length">
       {{ $t('ranking.empty') }}
       <template v-if="contestKey" #action>

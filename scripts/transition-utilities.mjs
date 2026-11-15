@@ -30,7 +30,7 @@ export const ALLOWED = {
   },
   'features/contests/RankingList.vue': {
     'transition-transform':
-      'rows that change rank in the live board slide to their place (FLIP); off under reduced motion',
+      'rows that change rank in the live board slide to their place (FLIP), and a row chevron turns with the open state; off under reduced motion',
   },
   'components/ui/DataTable.vue': { 'transition-transform': CHEVRON },
   'components/ui/Disclosure.vue': { 'transition-transform': CHEVRON },
