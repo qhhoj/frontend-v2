@@ -22,16 +22,15 @@ API_ORIGIN=http://localhost:3001 npm run dev
 
 - `npm run api:gen` copies `../backend-v2/openapi.json` (or `OPENAPI_SPEC=/path/to/openapi.json`) to `src/api/generated/openapi.json`, records the backend commit in `openapi.source` and regenerates `schema.d.ts`; commit all three. `npm run api:check` (CI) fails when they disagree; `npm run api:check -- --backend` also fails when the snapshot lags the backend checkout.
 
-| Command                | Purpose                                                                                                                                                                                                         |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run dev`          | dev server on :5173                                                                                                                                                                                             |
-| `npm run build`        | typecheck (`vue-tsc --build`) and production build to `dist/`                                                                                                                                                   |
-| `npm run preview`      | serve `dist/` on :4173                                                                                                                                                                                          |
-| `npm test`             | Vitest: `*.node.spec.ts` in Node, the other specs in jsdom                                                                                                                                                      |
-| `npm run test:scripts` | Vitest: the specs of `scripts/` (api-gen, build helpers)                                                                                                                                                        |
-| `npm run lint`         | ESLint, `prettier --check`, `lint:tokens` (no colour literals outside the palette), `lint:palette` (contrast proof, generated files fresh), `lint:copy` (vi spelling, quotes), `lint:dates` (`formatDate` only) |
-| `npm run typecheck`    | `vue-tsc --build`                                                                                                                                                                                               |
-| `npm run check`        | lint, typecheck, test                                                                                                                                                                                           |
+| Command             | Purpose                                                                                                                                                                                                         |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`       | dev server on :5173                                                                                                                                                                                             |
+| `npm run build`     | typecheck (`vue-tsc --build`) and production build to `dist/`                                                                                                                                                   |
+| `npm run preview`   | serve `dist/` on :4173                                                                                                                                                                                          |
+| `npm test`          | Vitest: the unit specs (time, score and rating math, verdict mapping, the submit path)                                                                                                                          |
+| `npm run lint`      | ESLint, `prettier --check`, `lint:tokens` (no colour literals outside the palette), `lint:palette` (contrast proof, generated files fresh), `lint:copy` (vi spelling, quotes), `lint:dates` (`formatDate` only) |
+| `npm run typecheck` | `vue-tsc --build`                                                                                                                                                                                               |
+| `npm run check`     | lint, typecheck, test                                                                                                                                                                                           |
 
 UI journeys are checked by agent-run Markdown click-by-click test scripts, kept outside this repo; there is no browser test suite here.
 

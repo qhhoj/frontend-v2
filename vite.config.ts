@@ -53,13 +53,11 @@ export default defineConfig({
   server: { port: 5173, strictPort: true, proxy: { '/api': { target: apiOrigin } } },
   preview: { port: 4173, strictPort: true, proxy: { '/api': { target: apiOrigin } } },
   test: {
-    // Vitest returns '' for CSS ids by default; themes.node.spec reads the palette files with `?raw`.
-    css: { include: /\.css\?raw$/ },
     // Greetings and relative dates depend on the local hour.
     env: { TZ: 'UTC' },
     restoreMocks: true,
     unstubGlobals: true,
-    // `npm test` runs `node` and `dom`; `scripts` (the build and api-gen CLIs) runs in CI only when scripts/ changes.
+    // Unit tests only for time, score/rating math, verdict mapping and the submit path (docs/decisions.md).
     projects: [
       // No DOM and no setup.ts: about three times faster per file than jsdom.
       {
@@ -75,10 +73,6 @@ export default defineConfig({
           include: ['src/**/*.spec.ts'],
           exclude: ['src/**/*.node.spec.ts'],
         },
-      },
-      {
-        extends: true,
-        test: { name: 'scripts', environment: 'node', include: ['scripts/**/*.spec.ts'] },
       },
     ],
   },
