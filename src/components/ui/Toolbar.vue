@@ -5,6 +5,7 @@
  * (`aria-live="polite"`), then the sort, then one list-level toggle. `#chips`: the active filters, under the row.
  * The row wraps on a phone: the left group takes a line, the right group the next, and the right one stays right.
  */
+defineOptions({ name: 'UiToolbar' });
 defineSlots<{ left?: () => unknown; right?: () => unknown; chips?: () => unknown }>();
 </script>
 
