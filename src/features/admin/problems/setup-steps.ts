@@ -55,3 +55,16 @@ export function isSetupOpen(problem: EditableProblem, steps: readonly SetupStep[
   const beforePublishing = steps.filter((step) => step.id !== 'publish');
   return problem.isOrganizationPrivate || beforePublishing.some((step) => !step.isDone);
 }
+
+/** The setup steps each editor tab finishes; a tab not listed here has no setup state. */
+const TAB_STEPS: Readonly<Record<string, readonly SetupStepId[]>> = {
+  statements: ['statement'],
+  data: ['tests', 'scoring'],
+};
+
+/** Whether a tab's setup steps are all done: true or false, or null for a tab with no steps. */
+export function tabSetupDone(tabId: string, steps: readonly SetupStep[]): boolean | null {
+  const ids = TAB_STEPS[tabId];
+  if (!ids) return null;
+  return steps.filter((step) => ids.includes(step.id)).every((step) => step.isDone);
+}

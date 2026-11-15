@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { editableProblem, problemEditor, testCase } from '@/test/admin-fixtures/problems';
-import { isSetupOpen, nextStep, setupSteps } from './setup-steps';
+import { isSetupOpen, nextStep, setupSteps, tabSetupDone } from './setup-steps';
 
 const fresh = editableProblem({
   editor: { ...problemEditor(), description: '', translations: [] },
@@ -78,5 +78,14 @@ describe('isSetupOpen', () => {
   it('never shows on a public problem', () => {
     const published = editableProblem({ isPublic: true });
     expect(isSetupOpen(published, setupSteps(published, []))).toBe(false);
+  });
+});
+
+describe('tabSetupDone', () => {
+  it('says per tab whether its steps are done, and nothing for a tab without steps', () => {
+    const steps = setupSteps(fresh, []);
+    expect(tabSetupDone('statements', steps)).toBe(false);
+    expect(tabSetupDone('data', steps)).toBe(false);
+    expect(tabSetupDone('editorial', steps)).toBeNull();
   });
 });

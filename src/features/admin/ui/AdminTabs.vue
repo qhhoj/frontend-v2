@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import type { Component } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
 import { useRoute } from 'vue-router';
@@ -16,6 +17,10 @@ export interface AdminTab {
   countTestid?: string;
   /** Unsaved changes in the section: a dot and the count (Tabs `dirty`). */
   dirty?: number;
+  /** A red dot after the label, read as this text: the section holds something to fix (Tabs `alertLabel`). */
+  alertLabel?: string;
+  /** A 16 px icon before the label (Tabs `icon`). */
+  icon?: Component;
   testid?: string;
 }
 
