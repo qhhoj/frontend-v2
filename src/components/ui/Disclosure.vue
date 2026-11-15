@@ -2,12 +2,11 @@
 import { ChevronDown } from 'lucide-vue-next';
 import { useId } from 'vue';
 import Chip from './Chip.vue';
+import FoldPanel from './FoldPanel.vue';
 
 /**
  * Shows or hides a block behind one 44 px line: the label, an optional count and a chevron. `#summary` follows the label (a "set"
- * dot, a short value). The block stays in the DOM while closed so a form inside keeps its values. It opens and closes with a height change
- * (grid rows 0fr to 1fr); closed content is `invisible` and `inert`, so it leaves the tab order and the accessibility tree.
- * Under reduced motion --qh-duration is 0, so the change is instant.
+ * dot, a short value). The block stays in the DOM while closed so a form inside keeps its values. The panel is a `FoldPanel` (smooth height, inert while closed).
  */
 const open = defineModel<boolean>('open', { default: false });
 defineProps<{ label: string; count?: number | string | null }>();
@@ -33,15 +32,8 @@ const panelId = useId();
         :class="open && 'rotate-180'"
       />
     </button>
-    <div
-      :id="panelId"
-      class="grid grid-rows-[0fr] transition-[grid-template-rows,visibility] duration-(--qh-duration) ease-move"
-      :class="open ? 'grid-rows-[1fr] visible' : 'invisible'"
-      :inert="!open"
-    >
-      <div class="min-h-0 overflow-hidden">
-        <div class="pt-2"><slot /></div>
-      </div>
-    </div>
+    <FoldPanel :id="panelId" :open="open">
+      <div class="pt-2"><slot /></div>
+    </FoldPanel>
   </div>
 </template>

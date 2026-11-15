@@ -2,6 +2,7 @@
 import { ChevronRight, EyeOff } from 'lucide-vue-next';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import FoldPanel from '@/components/ui/FoldPanel.vue';
 import { voteComment } from '@/api/comments.api';
 import type { VoteScore } from '@/api/types/votes';
 import UserContent from '@/components/UserContent.vue';
@@ -21,7 +22,7 @@ import type { CommentQuote } from './comment-quote';
 
 /**
  * One comment of the flat list (layout C2): author, time, permalink and vote in the header; the quote of the comment it answers;
- * the body (or the edit form, the default slot, while `isEditing`); the actions. A folded comment (low score) is one line until shown.
+ * the body (or the edit form, the default slot, while `isEditing`); the actions. A folded comment (low score) is one line until shown; the line and the comment swap in `FoldPanel`s.
  * Reply is the one visible action; the rest sit in a "more actions" menu (delete last, in red). Moderators also get hidden comments (a dashed, muted card with a
  * "hidden" badge naming who hid it, a line saying users no longer see it, and Unhide); a deleted comment stays as a placeholder
  * so the replies quoting it keep their context.
@@ -119,162 +120,159 @@ const hasActionRow = computed(
 
 <template>
   <li :id="anchor" class="scroll-mt-24">
-    <AppButton
-      v-if="isFolded"
-      tone="row"
-      :aria-expanded="false"
-      class="border-dashed"
-      @click="isExpanded = true"
-    >
-      <template #icon><ChevronRight aria-hidden="true" class="size-4 shrink-0" /></template>
-      <span class="min-w-0 flex-1 [overflow-wrap:anywhere]">
-        {{
-          quote?.number
-            ? $t('comments.collapsedReply', {
-                number: entry.number,
-                author: authorName,
-                parent: quote.number,
-                score: signedScore(comment.score),
-              })
-            : $t('comments.collapsed', {
-                number: entry.number,
-                author: authorName,
-                score: signedScore(comment.score),
-              })
-        }}
-      </span>
-      <span class="font-semibold text-accent-text">{{ $t('common.show') }}</span>
-    </AppButton>
-    <article
-      v-else
-      :aria-labelledby="`${anchor}-h`"
-      :data-hidden="comment.hidden || undefined"
-      class="rounded-card border border-line px-4 pt-3 pb-1 sm:px-5 sm:pt-4"
-      :class="comment.hidden ? 'border-dashed bg-surface-strong' : 'bg-surface-solid'"
-    >
-      <p
-        v-if="comment.hidden"
-        data-testid="comment-hidden-notice"
-        class="mb-2 flex items-center gap-2 text-sm text-muted"
-      >
-        <EyeOff aria-hidden="true" class="size-4 shrink-0" />
-        {{ $t('comments.hidden.notice') }}
-      </p>
-      <header class="flex flex-wrap items-center gap-2">
-        <span :id="`${anchor}-h`" class="flex min-w-0 flex-1 flex-wrap items-center gap-x-2">
-          <UserLink
-            v-if="comment.author"
-            :username="comment.author.username"
-            :rating="comment.author.rating"
-            size="sm"
-          />
-          <span v-else class="font-semibold text-muted">{{ $t('comments.deletedAccount') }}</span>
-          <time
-            :datetime="comment.createdAt"
-            :title="formatDate(comment.createdAt, 'datetime', locale.locale)"
-            class="text-sm text-muted"
-          >
-            {{ formatAgo(comment.createdAt, now, locale.locale) }}
-          </time>
-          <AppButton
-            v-if="comment.revisions && !comment.deleted"
-            tone="link"
-            class="text-caption leading-4 text-muted"
-            :aria-label="$t('comments.editedLabel', { count: comment.revisions })"
-            @click="emit('history')"
-          >
-            {{ $t('comments.edited') }}
-          </AppButton>
-          <span v-if="isEditing" class="text-sm text-muted"
-            >· {{ $t('comments.composer.editing') }}</span
-          >
-          <template v-if="comment.hidden">
-            <Chip data-testid="comment-hidden-badge" tone="warning">{{
-              $t('comments.hidden.badge')
-            }}</Chip>
-            <span v-if="hiderName" class="text-sm text-muted">{{
-              $t('comments.hidden.by', { name: hiderName })
-            }}</span>
-          </template>
-          <a
-            :href="`#${anchor}`"
-            class="relative font-mono text-caption leading-4 text-muted hover:underline touch:after:absolute touch:after:-inset-3.5 touch:after:content-['']"
-            :aria-label="$t('comments.permalink', { number: entry.number })"
-          >
-            #{{ entry.number }}
-          </a>
-        </span>
-        <VoteControl
-          orientation="row"
-          class="-my-1 text-sm"
-          :score="comment.score"
-          :viewer-vote="comment.viewerVote"
-          :can-vote="canVote && !comment.deleted && !comment.hidden"
-          :disabled-reason="voteDisabledReason"
-          :send="send"
-        />
-      </header>
-      <a
-        v-if="quote"
-        :href="quote.href"
-        data-testid="comment-quote"
-        class="mt-1.5 mb-2 block rounded-row bg-surface-strong px-3 py-2 text-sm text-muted hover:bg-surface-hover hover:text-content"
-      >
-        <span class="font-semibold">
+    <FoldPanel v-if="comment.collapsed" :open="isFolded">
+      <AppButton tone="row" :aria-expanded="false" class="border-dashed" @click="isExpanded = true">
+        <template #icon><ChevronRight aria-hidden="true" class="size-4 shrink-0" /></template>
+        <span class="min-w-0 flex-1 [overflow-wrap:anywhere]">
           {{
-            quote.number
-              ? $t('comments.replyTo', {
-                  number: quote.number,
-                  author: quote.author ?? $t('comments.deletedAccount'),
+            quote?.number
+              ? $t('comments.collapsedReply', {
+                  number: entry.number,
+                  author: authorName,
+                  parent: quote.number,
+                  score: signedScore(comment.score),
                 })
-              : $t('comments.replyToUnknown')
+              : $t('comments.collapsed', {
+                  number: entry.number,
+                  author: authorName,
+                  score: signedScore(comment.score),
+                })
           }}
         </span>
-        <template v-if="quote.isDeleted"> {{ $t('comments.deleted.quote') }}</template>
-        <template v-else-if="quote.excerpt"> “{{ quote.excerpt }}”</template>
-      </a>
-      <slot v-if="isEditing" />
-      <p
-        v-else-if="comment.deleted"
-        data-testid="comment-deleted"
-        class="mt-1.5 mb-2 text-sm text-muted italic"
+        <span class="font-semibold text-accent-text">{{ $t('common.show') }}</span>
+      </AppButton>
+    </FoldPanel>
+    <FoldPanel :open="!isFolded">
+      <article
+        :aria-labelledby="`${anchor}-h`"
+        :data-hidden="comment.hidden || undefined"
+        class="rounded-card border border-line px-4 pt-3 pb-1 sm:px-5 sm:pt-4"
+        :class="comment.hidden ? 'border-dashed bg-surface-strong' : 'bg-surface-solid'"
       >
-        {{ $t('comments.deleted.placeholder') }}
-      </p>
-      <template v-else>
-        <div ref="body" class="mt-1.5 mb-2 overflow-hidden" :class="{ 'max-h-24': !isBodyOpen }">
-          <UserContent :html="comment.bodyHtml" :class="comment.hidden && 'text-muted'" />
+        <p
+          v-if="comment.hidden"
+          data-testid="comment-hidden-notice"
+          class="mb-2 flex items-center gap-2 text-sm text-muted"
+        >
+          <EyeOff aria-hidden="true" class="size-4 shrink-0" />
+          {{ $t('comments.hidden.notice') }}
+        </p>
+        <header class="flex flex-wrap items-center gap-2">
+          <span :id="`${anchor}-h`" class="flex min-w-0 flex-1 flex-wrap items-center gap-x-2">
+            <UserLink
+              v-if="comment.author"
+              :username="comment.author.username"
+              :rating="comment.author.rating"
+              size="sm"
+            />
+            <span v-else class="font-semibold text-muted">{{ $t('comments.deletedAccount') }}</span>
+            <time
+              :datetime="comment.createdAt"
+              :title="formatDate(comment.createdAt, 'datetime', locale.locale)"
+              class="text-sm text-muted"
+            >
+              {{ formatAgo(comment.createdAt, now, locale.locale) }}
+            </time>
+            <AppButton
+              v-if="comment.revisions && !comment.deleted"
+              tone="link"
+              class="text-caption leading-4 text-muted"
+              :aria-label="$t('comments.editedLabel', { count: comment.revisions })"
+              @click="emit('history')"
+            >
+              {{ $t('comments.edited') }}
+            </AppButton>
+            <span v-if="isEditing" class="text-sm text-muted"
+              >· {{ $t('comments.composer.editing') }}</span
+            >
+            <template v-if="comment.hidden">
+              <Chip data-testid="comment-hidden-badge" tone="warning">{{
+                $t('comments.hidden.badge')
+              }}</Chip>
+              <span v-if="hiderName" class="text-sm text-muted">{{
+                $t('comments.hidden.by', { name: hiderName })
+              }}</span>
+            </template>
+            <a
+              :href="`#${anchor}`"
+              class="relative font-mono text-caption leading-4 text-muted hover:underline touch:after:absolute touch:after:-inset-3.5 touch:after:content-['']"
+              :aria-label="$t('comments.permalink', { number: entry.number })"
+            >
+              #{{ entry.number }}
+            </a>
+          </span>
+          <VoteControl
+            orientation="row"
+            class="-my-1 text-sm"
+            :score="comment.score"
+            :viewer-vote="comment.viewerVote"
+            :can-vote="canVote && !comment.deleted && !comment.hidden"
+            :disabled-reason="voteDisabledReason"
+            :send="send"
+          />
+        </header>
+        <a
+          v-if="quote"
+          :href="quote.href"
+          data-testid="comment-quote"
+          class="mt-1.5 mb-2 block rounded-row bg-surface-strong px-3 py-2 text-sm text-muted hover:bg-surface-hover hover:text-content"
+        >
+          <span class="font-semibold">
+            {{
+              quote.number
+                ? $t('comments.replyTo', {
+                    number: quote.number,
+                    author: quote.author ?? $t('comments.deletedAccount'),
+                  })
+                : $t('comments.replyToUnknown')
+            }}
+          </span>
+          <template v-if="quote.isDeleted"> {{ $t('comments.deleted.quote') }}</template>
+          <template v-else-if="quote.excerpt"> “{{ quote.excerpt }}”</template>
+        </a>
+        <slot v-if="isEditing" />
+        <p
+          v-else-if="comment.deleted"
+          data-testid="comment-deleted"
+          class="mt-1.5 mb-2 text-sm text-muted italic"
+        >
+          {{ $t('comments.deleted.placeholder') }}
+        </p>
+        <template v-else>
+          <div ref="body" class="mt-1.5 mb-2 overflow-hidden" :class="{ 'max-h-24': !isBodyOpen }">
+            <UserContent :html="comment.bodyHtml" :class="comment.hidden && 'text-muted'" />
+          </div>
+          <AppButton
+            v-if="isBodyLong || isBodyOpen"
+            tone="link"
+            class="-mt-1 mb-2 text-sm"
+            :aria-expanded="isBodyOpen"
+            @click="isBodyOpen = !isBodyOpen"
+          >
+            {{ $t(isBodyOpen ? 'comments.showLess' : 'comments.showMore') }}
+          </AppButton>
+        </template>
+        <div v-if="hasActionRow" class="-ml-2.5 flex flex-wrap items-center gap-0.5 py-1">
+          <AppButton
+            v-if="canReply && !comment.deleted"
+            tone="ghost"
+            size="sm"
+            @click="emit('reply')"
+          >
+            {{ $t('comments.action.reply') }}
+          </AppButton>
+          <span
+            v-else-if="isPastReplyWindow && !comment.deleted"
+            class="px-2.5 text-caption leading-4 text-muted"
+          >
+            {{ $t('comments.tooOld') }}
+          </span>
+          <RowMenu v-if="menuItems.length" :items="menuItems" :label="$t('common.moreActions')" />
         </div>
-        <AppButton
-          v-if="isBodyLong || isBodyOpen"
-          tone="link"
-          class="-mt-1 mb-2 text-sm"
-          :aria-expanded="isBodyOpen"
-          @click="isBodyOpen = !isBodyOpen"
-        >
-          {{ $t(isBodyOpen ? 'comments.showLess' : 'comments.showMore') }}
-        </AppButton>
-      </template>
-      <div v-if="hasActionRow" class="-ml-2.5 flex flex-wrap items-center gap-0.5 py-1">
-        <AppButton
-          v-if="canReply && !comment.deleted"
-          tone="ghost"
-          size="sm"
-          @click="emit('reply')"
-        >
-          {{ $t('comments.action.reply') }}
-        </AppButton>
-        <span
-          v-else-if="isPastReplyWindow && !comment.deleted"
-          class="px-2.5 text-caption leading-4 text-muted"
-        >
-          {{ $t('comments.tooOld') }}
-        </span>
-        <RowMenu v-if="menuItems.length" :items="menuItems" :label="$t('common.moreActions')" />
-      </div>
-      <Notice v-if="unhideFailed" tone="danger" inline class="mb-2">
-        {{ $t('comments.unhideFailed') }}
-      </Notice>
-    </article>
+        <Notice v-if="unhideFailed" tone="danger" inline class="mb-2">
+          {{ $t('comments.unhideFailed') }}
+        </Notice>
+      </article>
+    </FoldPanel>
   </li>
 </template>
