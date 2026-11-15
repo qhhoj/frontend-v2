@@ -48,7 +48,7 @@ onBeforeUnmount(() => {
     ref="sheet"
     data-testid="admin-nav-sheet"
     :aria-labelledby="titleId"
-    class="m-0 h-dvh max-h-none w-full max-w-none bg-surface-solid p-0 text-content lg:hidden"
+    class="m-0 h-dvh max-h-none w-full max-w-none bg-surface-solid p-0 text-content rail-wide:hidden"
     @close="onClose"
   >
     <div class="flex h-full flex-col">

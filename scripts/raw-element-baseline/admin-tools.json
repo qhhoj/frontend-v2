@@ -24,15 +24,11 @@
   },
   "features/admin/shell/AdminNav.vue": {
     "button": 1,
-    "uppercase": 1,
     "verdict-tone": 2
   },
   "features/admin/shell/AdminNavSheet.vue": {
     "button": 1,
     "dialog": 1
-  },
-  "features/admin/shell/AdminTopBar.vue": {
-    "button": 2
   },
   "features/admin/shell/overview/OverviewTile.vue": {
     "AdminChip": 1,

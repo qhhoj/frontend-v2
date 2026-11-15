@@ -22,10 +22,11 @@ const isCurrent = (item: AdminNavItem) => isCurrentItem(item, route.path);
 /** The group holding the current screen never folds, so the nav always shows where the viewer is. */
 const holdsCurrent = (navGroup: AdminNavGroup) => navGroup.items.some((item) => isCurrent(item));
 
+/** The public rail's row: a 36 px row (44 on touch); the current screen is a panel with an accent edge. */
 const ITEM_CLASS =
-  'flex min-h-(--qa-control) items-center gap-2.5 rounded-cell px-2.5 text-sm hover:bg-surface-hover aria-[current=page]:bg-accent-soft aria-[current=page]:font-semibold aria-[current=page]:text-accent-soft-text';
+  "relative flex min-h-9 items-center gap-3 rounded-row border border-transparent px-2.5 text-sm font-semibold text-secondary transition-colors hover:bg-surface-hover hover:text-content touch:min-h-11 aria-[current=page]:border-line aria-[current=page]:bg-surface-solid aria-[current=page]:text-content aria-[current=page]:before:absolute aria-[current=page]:before:inset-y-1 aria-[current=page]:before:left-0 aria-[current=page]:before:w-0.5 aria-[current=page]:before:rounded-pill aria-[current=page]:before:bg-accent aria-[current=page]:before:content-['']";
 const GROUP_CLASS =
-  'flex min-h-8 w-full items-center justify-between rounded-cell px-2.5 text-caption leading-4 font-semibold tracking-wider text-muted uppercase touch:min-h-11';
+  'flex min-h-8 w-full items-center justify-between rounded-row px-2.5 text-caption leading-4 font-semibold text-muted touch:min-h-11';
 </script>
 
 <template>

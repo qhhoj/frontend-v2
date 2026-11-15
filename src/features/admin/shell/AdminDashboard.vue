@@ -10,12 +10,13 @@ import { buttonClass } from '../ui/controls';
 import AdminBit from './AdminBit.vue';
 import { QUICK_ACTIONS } from './admin-nav';
 import OverviewTiles from './overview/OverviewTiles.vue';
+import ContinueRecords from './recent/ContinueRecords.vue';
 import RecentScreens from './recent/RecentScreens.vue';
 
 /**
- * The admin home (pages/admin.md, "Dashboard"): the greeting with the one staff Bit and the quick actions, what waits for
- * staff, this account's shortcuts as one chip row, then the five newest changes as sentences. The sidebar lists every
- * screen, so this page does not.
+ * The admin home (pages/admin.md, "Dashboard"): the greeting with the one staff Bit and the quick actions (all secondary:
+ * which job is next depends on the account), "Tiếp tục" (the records this account had open, then its shortcuts), what waits for
+ * staff, then the five newest changes as sentences. The sidebar lists every screen, so this page does not.
  */
 const session = useSessionStore();
 const ACTION_ICONS = {
@@ -37,10 +38,10 @@ const actions = computed(() =>
       <template #start><AdminBit placement="greeting" /></template>
       <template v-if="actions.length" #actions>
         <RouterLink
-          v-for="(id, index) in actions"
+          v-for="id in actions"
           :key="id"
           :to="{ name: adminRouteName(id) }"
-          :class="buttonClass(index === 0 ? 'primary' : 'secondary')"
+          :class="buttonClass('secondary')"
         >
           <component
             :is="ACTION_ICONS[id as keyof typeof ACTION_ICONS]"
@@ -52,8 +53,9 @@ const actions = computed(() =>
         </RouterLink>
       </template>
     </PageHeader>
-    <OverviewTiles />
+    <ContinueRecords />
     <RecentScreens />
+    <OverviewTiles />
     <RecentChangesCard />
   </div>
 </template>

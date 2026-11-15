@@ -1,67 +1,53 @@
 <script setup lang="ts">
 import { Menu, Search, ShieldCheck } from 'lucide-vue-next';
 import BrandWordmark from '@/components/ui/BrandWordmark.vue';
+import IconButton from '@/components/ui/IconButton.vue';
+import AppearancePanel from '@/features/appearance/AppearancePanel.vue';
 import LocaleToggle from '@/features/shell/LocaleToggle.vue';
 import UserMenu from '@/features/shell/UserMenu.vue';
-import { shortcutHint } from './search/use-palette-shortcut';
 
 defineProps<{ isNavOpen: boolean }>();
 defineEmits<{ search: []; menu: [] }>();
 </script>
 
 <template>
-  <!-- One line at every width, nothing wraps: the "Quản trị" label shows from `sm`, the locale switch from `sm`, the staff badge from `xl`; below `lg` the search is an icon button and the back link lives in the nav sheet. -->
+  <!-- The bar over the page column, opaque like the public one: 56 px on a phone (menu, brand, search, account), 48 px from `lg`, where the rail holds the brand, search and account and the bar keeps the area label, language and look. -->
   <header
     data-testid="admin-topbar"
-    class="flex items-center gap-2 border-b border-line bg-surface-strong px-4 py-2 sm:gap-4 sm:px-6 sm:py-3"
+    class="flex h-14 items-center gap-1 border-b border-line bg-surface-solid px-2 rail-wide:h-12 rail-wide:gap-3 rail-wide:px-6 print:hidden"
   >
-    <div class="flex shrink-0 items-center gap-2">
-      <BrandWordmark :to="{ name: 'admin-dashboard' }" size="sm" />
-      <span class="hidden font-body text-sm font-semibold whitespace-nowrap text-muted sm:inline">{{
-        $t('admin.shell.title')
-      }}</span>
-    </div>
-    <span
-      data-testid="admin-staff-badge"
-      class="hidden shrink-0 items-center gap-1.5 rounded-pill bg-content px-3 py-1 text-caption leading-4 font-semibold whitespace-nowrap text-ground xl:inline-flex"
-    >
-      <ShieldCheck aria-hidden="true" class="size-3.5" />{{ $t('admin.shell.staffOnly') }}
-    </span>
-    <button
-      type="button"
-      data-testid="admin-search-button"
-      aria-keyshortcuts="Control+K Meta+K /"
-      class="ml-auto flex min-h-(--qa-control) min-w-(--qa-control) shrink-0 items-center whitespace-nowrap justify-center gap-2 rounded-cell border border-line-strong bg-surface-solid px-3 text-sm text-muted hover:bg-surface-hover lg:min-w-56 lg:justify-start"
-      @click="$emit('search')"
-    >
-      <Search aria-hidden="true" class="size-4" />
-      <span class="sr-only lg:not-sr-only">{{ $t('admin.shell.search.open') }}</span>
-      <kbd
-        aria-hidden="true"
-        class="ml-auto hidden rounded-row border border-line px-1.5 font-mono text-caption leading-4 lg:inline"
-        >{{ shortcutHint() }}</kbd
-      >
-    </button>
-    <!-- Below `lg` the link to the public site lives in the nav sheet. -->
-    <RouterLink
-      to="/"
-      class="hidden min-h-11 shrink-0 items-center text-sm font-semibold whitespace-nowrap text-accent-text underline lg:flex"
-    >
-      {{ $t('admin.shell.backToSite') }}
-    </RouterLink>
-    <!-- Below `sm` the switch lives in the phone nav sheet. -->
-    <span class="hidden sm:block"><LocaleToggle /></span>
-    <UserMenu />
-    <button
-      type="button"
+    <IconButton
       data-testid="admin-nav-open"
       aria-haspopup="dialog"
       :aria-expanded="isNavOpen"
-      :aria-label="$t('admin.shell.navOpen')"
-      class="flex size-11 shrink-0 items-center justify-center rounded-cell border border-line-strong bg-surface-solid hover:bg-surface-hover lg:hidden"
+      :label="$t('admin.shell.navOpen')"
+      class="rail-wide:hidden"
       @click="$emit('menu')"
     >
       <Menu aria-hidden="true" class="size-5" />
-    </button>
+    </IconButton>
+    <BrandWordmark size="sm" :to="{ name: 'admin-dashboard' }" class="px-1 rail-wide:hidden" />
+    <span class="truncate text-sm font-semibold text-muted rail-wide:hidden">{{
+      $t('admin.shell.title')
+    }}</span>
+    <span
+      data-testid="admin-staff-badge"
+      class="hidden items-center gap-1.5 text-sm font-semibold text-muted rail-wide:inline-flex"
+    >
+      <ShieldCheck aria-hidden="true" class="size-4" />{{ $t('admin.shell.staffOnly') }}
+    </span>
+    <div class="ml-auto flex shrink-0 items-center gap-1">
+      <IconButton
+        :label="$t('admin.shell.search.open')"
+        class="rail-wide:hidden"
+        @click="$emit('search')"
+      >
+        <Search aria-hidden="true" class="size-5" />
+      </IconButton>
+      <!-- Below `sm` the language switch lives in the phone nav sheet. -->
+      <span class="hidden sm:block"><LocaleToggle /></span>
+      <span class="hidden rail-wide:block"><AppearancePanel /></span>
+      <span class="rail-wide:hidden"><UserMenu /></span>
+    </div>
   </header>
 </template>
