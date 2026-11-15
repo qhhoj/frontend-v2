@@ -13,6 +13,7 @@ import HighPriorityBanner from '@/features/notifications/HighPriorityBanner.vue'
 import LiveAnnouncementAlert from '@/features/contests/live/LiveAnnouncementAlert.vue';
 import OfficialModeBanner from '@/features/official-mode/OfficialModeBanner.vue';
 import SiteNoticeBanner from '@/features/site-notice/SiteNoticeBanner.vue';
+import VerdictToastWatcher from '@/features/submissions/verdict-toast/VerdictToastWatcher.vue';
 import LoadingLayer from './LoadingLayer.vue';
 import CommandPalette from './search/CommandPalette.vue';
 import { navSectionOverride } from './nav-section';
@@ -89,6 +90,7 @@ const chipContest = computed(() => (isOnCurrentContest.value ? null : currentCon
       <CommandPalette v-model:visible="isSearchOpen" />
     </div>
     <LoadingLayer />
+    <VerdictToastWatcher />
     <BitRoamLayer />
   </div>
 </template>

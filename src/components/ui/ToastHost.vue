@@ -1,24 +1,67 @@
 <script setup lang="ts">
-import { CircleAlert, CircleCheck, Info, X } from 'lucide-vue-next';
+import { computed, nextTick, reactive, ref, watch } from 'vue';
+import type { DeepReadonly } from 'vue';
 import { translate } from '@/i18n';
-import AppButton from './AppButton.vue';
-import IconButton from './IconButton.vue';
-import { dismissToast, pauseToast, resumeToast, toasts } from './toasts';
+import ToastItem from './ToastItem.vue';
+import { dismissToast, holdToasts, releaseToasts, toasts } from './toasts';
 import type { Toast } from './toasts';
 
 /**
  * The toast stack: one polite region (a failure is an alert), bottom right, bottom centre on phones. Motion notes 4: a toast
- * rises 12 px on a spring, the others move up by ease-move, and one leaves with a 4 px fade.
- * Texts come from the global `translate`: the host outlives the component that mounted it.
+ * rises 12 px on a spring and one leaves with a 4 px fade. Several toasts rest as a short pile (the newest in front, the others
+ * peeking above it); hovering or focusing the stack spreads it into a list and pauses every self-close timer until the pointer
+ * and focus leave. Texts come from the global `translate`: the host outlives the component that mounted it.
  */
-const ICONS = { success: CircleCheck, danger: CircleAlert, info: Info } as const;
-const ICON_TONES = {
-  success: 'text-positive',
-  danger: 'text-negative',
-  info: 'text-info',
-} as const;
+/** Rows between cards and how far an older card peeks above the one in front, in px. */
+const GAP_PX = 8;
+const PEEK_PX = 8;
+const PILE_SCALE_STEP = 0.05;
+/** An older card in the pile is cut to this height, so a tall one never shows above the front card. */
+const PILE_CARD_MAX = '3rem';
 
-function undo(toast: Toast) {
+const hasPointer = ref(false);
+const hasFocus = ref(false);
+const isExpanded = computed(() => hasPointer.value || hasFocus.value);
+function setReading(pointer: boolean, focus: boolean) {
+  const wasExpanded = isExpanded.value;
+  hasPointer.value = pointer;
+  hasFocus.value = focus;
+  if (isExpanded.value === wasExpanded) return;
+  if (isExpanded.value) holdToasts();
+  else releaseToasts();
+}
+const root = ref<HTMLElement | null>(null);
+const onFocusOut = (event: FocusEvent) =>
+  setReading(hasPointer.value, root.value?.contains(event.relatedTarget as Node | null) ?? false);
+// A closed card takes its focus and pointer with it without a focusout or mouseleave: look again after each change.
+watch(
+  () => toasts.length,
+  async (count) => {
+    await nextTick();
+    const stillFocused = root.value?.contains(document.activeElement) ?? false;
+    setReading(count > 0 && hasPointer.value, stillFocused);
+  },
+);
+
+/** Natural height of each card, reported by the cards; the expanded list needs them to stack. */
+const heights = reactive<Record<number, number>>({});
+
+/** How far card `index` sits above the bottom when the stack is a list: the cards in front of it and a gap each. */
+function listOffset(index: number): number {
+  return toasts.slice(index + 1).reduce((sum, newer) => sum + (heights[newer.id] ?? 0) + GAP_PX, 0);
+}
+
+function pileStyle(index: number) {
+  const depth = toasts.length - 1 - index;
+  if (isExpanded.value) return { transform: `translateY(${-listOffset(index)}px)` };
+  return {
+    transform: `translateY(${-depth * PEEK_PX}px) scale(${1 - depth * PILE_SCALE_STEP})`,
+    maxHeight: depth > 0 ? PILE_CARD_MAX : undefined,
+    overflow: depth > 0 ? 'hidden' : undefined,
+  };
+}
+
+function undo(toast: DeepReadonly<Toast>) {
   dismissToast(toast.id);
   toast.undo?.();
 }
@@ -26,6 +69,7 @@ function undo(toast: Toast) {
 
 <template>
   <div
+    ref="root"
     data-testid="toasts"
     role="status"
     aria-live="polite"
@@ -34,40 +78,35 @@ function undo(toast: Toast) {
   >
     <TransitionGroup
       tag="ol"
-      class="m-0 flex w-full max-w-sm list-none flex-col gap-2 p-0"
+      class="m-0 grid w-full max-w-sm list-none p-0"
       enter-from-class="translate-y-3 opacity-0"
       enter-active-class="transition-[translate,opacity] duration-(--qh-duration) ease-spring"
       leave-active-class="transition-[translate,opacity] duration-(--qh-duration-fast) ease-exit"
       leave-to-class="translate-y-1 opacity-0"
-      move-class="transition-[translate] duration-(--qh-duration) ease-move"
+      move-class="transition-transform duration-(--qh-duration) ease-move"
+      @mouseenter="setReading(true, hasFocus)"
+      @mouseleave="setReading(false, hasFocus)"
+      @focusin="setReading(hasPointer, true)"
+      @focusout="onFocusOut"
     >
       <li
-        v-for="toast in toasts"
+        v-for="(toast, index) in toasts"
         :key="toast.id"
         :role="toast.tone === 'danger' ? 'alert' : undefined"
-        class="pointer-events-auto flex items-center gap-2.5 rounded-row border border-line-strong bg-surface-solid py-1.5 pr-1.5 pl-3 text-meta text-content shadow-float"
-        @mouseenter="pauseToast(toast.id)"
-        @mouseleave="resumeToast(toast.id)"
-        @focusin="pauseToast(toast.id)"
-        @focusout="resumeToast(toast.id)"
+        class="pointer-events-auto relative col-start-1 row-start-1 self-end"
+        :style="{ zIndex: index }"
       >
-        <component
-          :is="ICONS[toast.tone]"
-          aria-hidden="true"
-          class="size-4 shrink-0"
-          :class="ICON_TONES[toast.tone]"
-        />
-        <p class="m-0 min-w-0 flex-1 py-1">{{ toast.text }}</p>
-        <AppButton v-if="toast.undo" tone="ghost" size="sm" @click="undo(toast)">
-          {{ toast.undoLabel ?? translate('common.undo') }}
-        </AppButton>
-        <IconButton
-          size="sm"
-          :label="translate('common.toast.close')"
-          @click="dismissToast(toast.id)"
+        <div
+          class="pt-2 transition-transform duration-(--qh-duration) ease-move origin-bottom"
+          :style="pileStyle(index)"
         >
-          <X aria-hidden="true" />
-        </IconButton>
+          <ToastItem
+            :toast="toast"
+            @dismiss="dismissToast(toast.id)"
+            @undo="undo(toast)"
+            @measure="heights[toast.id] = $event"
+          />
+        </div>
       </li>
     </TransitionGroup>
   </div>
