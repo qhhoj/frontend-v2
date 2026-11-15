@@ -67,7 +67,6 @@ async function submit() {
     :lead="linkDead ? $t('auth.resetPassword.deadLead') : undefined"
     :lead-role="linkDead ? 'alert' : undefined"
     :centered="linkDead"
-    brand
   >
     <template v-if="linkDead" #badge>
       <InlineBit kind="sweat" class="self-center" />

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BitLoop from '@/components/BitLoop.vue';
 import Notice from '@/components/ui/Notice.vue';
 import { computed, nextTick, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
@@ -77,12 +78,15 @@ const attempt = () =>
 </script>
 
 <template>
-  <AuthLayout :title="$t('pages.login')" brand>
+  <AuthLayout :title="$t('pages.login')" centered>
+    <template #badge>
+      <BitLoop data-testid="login-bit" kind="welcome" class="self-center [--bit-px:4px]" />
+    </template>
     <form
       ref="formElement"
       method="post"
       novalidate
-      class="flex flex-col gap-4"
+      class="flex flex-col gap-5"
       @submit.prevent="submit"
     >
       <Notice v-if="notice" role="status" dismissible @dismiss="noticeDismissed = true">{{

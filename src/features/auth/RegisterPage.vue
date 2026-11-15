@@ -91,7 +91,7 @@ async function submit() {
 </script>
 
 <template>
-  <AuthLayout v-if="phase === 'sent'" :title="$t('auth.inbox.title')" centered brand>
+  <AuthLayout v-if="phase === 'sent'" :title="$t('auth.inbox.title')" centered>
     <template #badge>
       <InlineBit kind="envelope" class="self-center" />
     </template>
@@ -115,7 +115,6 @@ async function submit() {
     :lead="$t('auth.mailUnavailable.lead')"
     lead-role="alert"
     centered
-    brand
   >
     <template #badge>
       <InlineBit kind="sweat" class="self-center" />
@@ -129,7 +128,6 @@ async function submit() {
     :title="$t('auth.registerTitle')"
     :lead="$t('auth.registerLead')"
     width="double"
-    brand
   >
     <form ref="formElement" class="flex flex-col gap-5" @submit.prevent="submit">
       <div class="grid gap-4 sm:grid-cols-2">

@@ -121,7 +121,6 @@ onMounted(() => {
     :lead="card.leadKey ? $t(card.leadKey) : undefined"
     :lead-role="card.leadRole"
     :centered="card.bit !== undefined"
-    brand
   >
     <template v-if="card.bit" #badge>
       <InlineBit :kind="card.bit" class="self-center" />

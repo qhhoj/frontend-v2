@@ -732,11 +732,6 @@
     },
     "noAccountPrompt": "Chưa có tài khoản?",
     "resendLink": "Gửi lại email kích hoạt",
-    "brand": {
-      "headline": "Luyện thuật toán mỗi ngày, cùng Bit.",
-      "lead": "Nộp bài, xem kết quả chấm ngay và leo bảng xếp hạng.",
-      "counts": "{problems} bài · {users} thành viên"
-    },
     "notice": {
       "passwordReset": "Mật khẩu đã được đổi, hãy đăng nhập lại."
     },
