@@ -35,7 +35,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
       :to="{ name: 'post', params: { id: post.id } }"
       tabindex="-1"
       aria-hidden="true"
-      class="flex h-36 shrink-0 items-center justify-center overflow-hidden bg-accent-soft"
+      class="flex h-28 shrink-0 items-center justify-center overflow-hidden bg-accent-soft"
     >
       <img v-if="image" :src="image" alt="" loading="lazy" class="size-full object-cover" />
       <BitLoop v-else kind="writing" class="[--bit-px:5px]" />
@@ -45,7 +45,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         {{ $t('blog.pinnedLabel') }}
       </p>
       <h2
-        class="line-clamp-2 max-h-[2lh] text-subtitle leading-snug font-semibold [overflow-wrap:anywhere]"
+        class="line-clamp-2 max-h-[2lh] text-title leading-snug font-semibold [overflow-wrap:anywhere]"
       >
         <RouterLink
           :to="{ name: 'post', params: { id: post.id } }"
@@ -54,10 +54,10 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
           {{ post.title }}
         </RouterLink>
       </h2>
-      <p class="line-clamp-2 h-[2lh] leading-6 text-muted [overflow-wrap:anywhere]">
+      <p class="line-clamp-2 h-[2lh] text-sm leading-5 text-muted [overflow-wrap:anywhere]">
         {{ excerpt }}
       </p>
-      <footer class="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-sm text-muted">
+      <footer class="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-meta text-muted">
         <UserLink
           v-for="author in post.authors"
           :key="author.id"
