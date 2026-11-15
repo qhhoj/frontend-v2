@@ -55,21 +55,14 @@ const hasActionRow = computed(() => session.status === 'authenticated');
       <SkeletonBlock v-if="hasActionRow" pill class="h-11 w-full" />
     </div>
   </Card>
-  <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
+  <div class="flex flex-col gap-6">
+    <Card as="div" data-skeleton-region="rules" class="px-5 py-3">
+      <SkeletonBlock text class="w-2/3" />
+    </Card>
     <Card as="div" data-skeleton-region="problems" class="flex flex-col px-5">
       <div v-for="row in 3" :key="row" class="py-3">
         <SkeletonBlock text class="w-full" />
       </div>
     </Card>
-    <aside class="flex flex-col gap-5">
-      <Card as="div" data-skeleton-region="rules" class="p-5">
-        <dl class="flex flex-col gap-2.5 text-sm">
-          <div v-for="row in 6" :key="row" class="grid grid-cols-[8rem_minmax(0,1fr)] gap-3">
-            <dt><SkeletonBlock text class="w-20" /></dt>
-            <dd><SkeletonBlock text class="w-full" /></dd>
-          </div>
-        </dl>
-      </Card>
-    </aside>
   </div>
 </template>
