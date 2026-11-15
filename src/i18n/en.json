@@ -1816,7 +1816,6 @@
     "title": "Profile sections"
   },
   "orgs": {
-    "lead": "Classes, teams and clubs on QHHOJ",
     "open": "Open to join",
     "private": "Approval needed",
     "unlisted": "Hidden",
@@ -1857,7 +1856,9 @@
       "user": "User",
       "performancePoints": "PP",
       "points": "Points",
-      "problemCount": "Solved"
+      "problemCount": "Solved",
+      "organization": "Organization",
+      "join": "Joining"
     },
     "title": "Organizations",
     "filtersLabel": "Filter organizations",
@@ -1867,14 +1868,9 @@
       "open": "Open"
     },
     "rankLabel": "Rank",
-    "rankBadge": "Rank {rank}",
     "membersLabel": "Members",
-    "ppLabel": "Performance points",
     "act": {
-      "join": "Join",
-      "request": "Request",
-      "joined": "Joined",
-      "signIn": "Sign in"
+      "joined": "Joined"
     },
     "emptyPublicTitle": "No public organizations yet",
     "emptyPublicBody": "Once an organization goes public it will show up here.",
@@ -1886,13 +1882,15 @@
     "membersMeta": "{count} members",
     "manageCard": {
       "title": "Manage organization",
-      "lead": "You are an administrator",
       "shortcuts": "Management shortcuts",
       "problems": "The organization's problems",
       "contests": "The organization's contests",
       "requests": "Join requests",
       "pending": "{count} waiting"
-    }
+    },
+    "search": "Search organizations",
+    "showMore": "Show more",
+    "showLess": "Show less"
   },
   "orgMembership": {
     "signIn": "Sign in to join",

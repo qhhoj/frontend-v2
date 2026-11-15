@@ -1816,7 +1816,6 @@
     "title": "Mục hồ sơ"
   },
   "orgs": {
-    "lead": "Lớp, đội tuyển và câu lạc bộ trên QHHOJ",
     "open": "Mở tự do",
     "private": "Cần duyệt",
     "unlisted": "Ẩn",
@@ -1857,7 +1856,9 @@
       "user": "Người dùng",
       "performancePoints": "Điểm PP",
       "points": "Tổng điểm",
-      "problemCount": "Số bài giải"
+      "problemCount": "Số bài giải",
+      "organization": "Tổ chức",
+      "join": "Tham gia"
     },
     "title": "Tổ chức",
     "filtersLabel": "Lọc tổ chức",
@@ -1867,14 +1868,9 @@
       "open": "Mở tự do"
     },
     "rankLabel": "Hạng",
-    "rankBadge": "Hạng {rank}",
     "membersLabel": "Thành viên",
-    "ppLabel": "Điểm thành tích",
     "act": {
-      "join": "Tham gia",
-      "request": "Xin vào",
-      "joined": "Đã tham gia",
-      "signIn": "Đăng nhập"
+      "joined": "Đã tham gia"
     },
     "emptyPublicTitle": "Chưa có tổ chức công khai",
     "emptyPublicBody": "Khi một tổ chức được công khai, nó sẽ hiện ở đây.",
@@ -1886,13 +1882,15 @@
     "membersMeta": "{count} thành viên",
     "manageCard": {
       "title": "Quản lý tổ chức",
-      "lead": "Bạn là quản trị viên",
       "shortcuts": "Lối tắt quản lý",
       "problems": "Bài tập của tổ chức",
       "contests": "Kỳ thi của tổ chức",
       "requests": "Yêu cầu tham gia",
       "pending": "{count} chờ"
-    }
+    },
+    "search": "Tìm tổ chức",
+    "showMore": "Xem thêm",
+    "showLess": "Thu gọn"
   },
   "orgMembership": {
     "signIn": "Đăng nhập để tham gia",
