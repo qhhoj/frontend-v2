@@ -2,21 +2,20 @@
 import { computed } from 'vue';
 import type { UserPage } from '@/api/types/users';
 import Card from '@/components/ui/Card.vue';
-import StatGrid from '@/components/ui/StatGrid.vue';
-import type { StatItem } from '@/components/ui/StatGrid.vue';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
-import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
 
-interface StatTile extends StatItem {
-  /** Hidden below `md`: the phone shows the first four tiles only. */
-  phoneHidden?: boolean;
+interface StatRow {
+  label: string;
+  value: string;
+  /** What the number means, shown on hover or focus of the row. */
+  hint?: string;
 }
 
+/** The profile's numbers as a compact list (label muted on the left, value on the right) instead of tinted tiles; a value wraps rather than being cut. */
 const props = defineProps<{ user: UserPage }>();
 const locale = useLocaleStore();
-const isPhone = useMediaQuery(PHONE_QUERY);
 
 const count = (value: number, fractionDigits = 0) =>
   formatNumber(value, locale.locale, fractionDigits);
@@ -24,7 +23,7 @@ const count = (value: number, fractionDigits = 0) =>
 const isBanned = computed(() => props.user.displayRank === 'banned');
 const rankOf = (rank: number | null) => (rank === null || isBanned.value ? '—' : `#${count(rank)}`);
 
-const tiles = computed<StatTile[]>(() => [
+const rows = computed<StatRow[]>(() => [
   {
     label: translate('profile.ppRank'),
     value: rankOf(props.user.rank),
@@ -37,23 +36,29 @@ const tiles = computed<StatTile[]>(() => [
   },
   { label: translate('profile.pp'), value: count(props.user.performancePoints, 1) },
   { label: translate('profile.points'), value: count(props.user.points) },
-  {
-    label: translate('profile.solved'),
-    value: count(props.user.problemCount),
-    phoneHidden: true,
-  },
+  { label: translate('profile.solved'), value: count(props.user.problemCount) },
   {
     label: translate('profile.contribution'),
     value: count(props.user.contributionPoints),
     hint: translate('profile.contributionHint'),
-    phoneHidden: true,
   },
 ]);
-const shown = computed(() => tiles.value.filter((tile) => !(isPhone.value && tile.phoneHidden)));
 </script>
 
 <template>
   <Card data-testid="profile-stats" :title="$t('profile.stats')" padding="md">
-    <StatGrid :items="shown" :cols="2" mode="stat" />
+    <dl class="m-0 flex flex-col divide-y divide-line">
+      <div
+        v-for="row in rows"
+        :key="row.label"
+        :title="row.hint"
+        class="flex min-h-8 items-baseline justify-between gap-3 py-1.5 text-meta"
+      >
+        <dt class="text-muted">{{ row.label }}</dt>
+        <dd class="m-0 min-w-0 text-right font-mono font-semibold tabular-nums break-words">
+          {{ row.value }}
+        </dd>
+      </div>
+    </dl>
   </Card>
 </template>

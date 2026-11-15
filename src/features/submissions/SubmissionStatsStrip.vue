@@ -1,24 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { SubmissionStats } from '@/api/types/submissions';
-import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { NO_VALUE, formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
-import LiveToggle from './LiveToggle.vue';
 import VerdictDistributionBar from './VerdictDistributionBar.vue';
 
 /**
- * Today's numbers in one slim line ("1.284 đã chấm hôm nay · 61% chấp nhận · 2 chờ · 1/1 máy chấm"), the live pill, and
- * the bar of today's verdicts. A phone keeps the queue and the judges only, without the bar. `pending` shows
- * placeholders while the first answer loads; the live pill never waits for it.
+ * Today's numbers in one slim line ("1.284 đã chấm hôm nay · 61% chấp nhận · 2 chờ · 1/1 máy chấm") and the bar of today's verdicts. A phone keeps the queue and the judges only, without the bar. `pending` shows
+ * placeholders while the first answer loads.
  */
 const props = defineProps<{
   stats: SubmissionStats | undefined;
   pending?: boolean;
-  live: boolean;
 }>();
-const emit = defineEmits<{ 'update:live': [live: boolean] }>();
 const locale = useLocaleStore();
 const PERCENT = 100;
 
@@ -63,12 +58,9 @@ const figures = computed(() => {
 
 <template>
   <div data-testid="stats-strip" class="flex flex-col gap-3">
-    <Card
-      as="div"
-      class="flex flex-wrap items-center gap-x-5 gap-y-1 py-1 pr-1.5 pl-4 text-meta text-muted"
-    >
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-1 text-meta text-muted">
       <p v-if="!stats && !pending" class="sr-only">{{ $t('submissions.stats.unavailable') }}</p>
-      <dl class="m-0 flex flex-wrap items-center gap-x-5 gap-y-1 py-1.5">
+      <dl class="m-0 flex flex-wrap items-center gap-x-5 gap-y-1">
         <div
           v-for="figure in figures"
           :key="figure.id"
@@ -94,8 +86,7 @@ const figures = computed(() => {
           </dd>
         </div>
       </dl>
-      <LiveToggle :live="live" class="ml-auto" @update:live="emit('update:live', $event)" />
-    </Card>
+    </div>
     <VerdictDistributionBar v-if="verdicts.length" class="max-sm:hidden" :verdicts="verdicts" />
   </div>
 </template>

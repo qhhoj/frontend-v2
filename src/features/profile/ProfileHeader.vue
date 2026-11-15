@@ -54,33 +54,23 @@ const joinedLine = computed(() =>
 <template>
   <Card
     data-testid="profile-header"
-    class="grid gap-6 p-6 md:grid-cols-[minmax(0,1fr)_16rem] md:p-8"
+    class="grid gap-4 p-4 md:grid-cols-[minmax(0,1fr)_14rem] md:p-5"
   >
-    <div class="flex min-w-0 flex-col gap-4">
-      <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
-        <UserAvatar :username="user.username" :size="96" />
-        <div class="flex min-w-0 flex-col gap-1.5">
+    <div class="flex min-w-0 flex-col gap-3">
+      <div class="flex min-w-0 items-center gap-3 sm:gap-5">
+        <UserAvatar class="shrink-0 max-sm:hidden" :username="user.username" :size="96" />
+        <UserAvatar class="shrink-0 sm:hidden" :username="user.username" :size="32" />
+        <div class="flex min-w-0 flex-col gap-1">
           <div class="flex min-w-0 flex-wrap items-center gap-2">
             <Chip size="md">
               <span :class="tierClass">{{ $t(tierLabelKey) }}</span>
             </Chip>
             <Chip v-if="isOwn" size="md" tone="accent">{{ $t('profile.own') }}</Chip>
           </div>
-          <p class="text-muted">{{ joinedLine }}</p>
-          <ul v-if="user.organizations.length" class="mt-1 flex flex-wrap gap-1.5">
-            <li v-for="organization in user.organizations" :key="organization.id">
-              <Chip
-                interactive
-                :to="{ name: 'organization', params: { slug: organization.slug } }"
-                :title="organization.name"
-              >
-                {{ organization.shortName }}
-              </Chip>
-            </li>
-          </ul>
+          <p class="text-meta text-muted">{{ joinedLine }}</p>
         </div>
       </div>
-      <div v-if="isOwn || canBan || isSignedIn" class="flex flex-wrap items-center gap-2.5">
+      <div v-if="isOwn || canBan || isSignedIn" class="flex flex-wrap items-center gap-2">
         <template v-if="isOwn">
           <AppButton tone="primary" to="/settings">{{ $t('profile.edit') }}</AppButton>
           <AppButton to="/blog/new">{{ $t('profile.write') }}</AppButton>
@@ -110,22 +100,22 @@ const joinedLine = computed(() =>
     <div data-testid="rating-box" :class="RATING_BOX_CLASSES">
       <!-- Without a rating the box leads with the problems solved, a number a new student can raise every day. -->
       <template v-if="user.rating === null">
-        <p class="text-sm text-muted">{{ $t('profile.solvedLead') }}</p>
-        <p data-testid="rating-figure" class="font-display text-stat leading-10 font-semibold">
+        <p class="text-meta text-muted">{{ $t('profile.solvedLead') }}</p>
+        <p data-testid="rating-figure" class="font-display text-stat leading-9 font-semibold">
           {{ formatNumber(user.problemCount, locale.locale) }}
         </p>
       </template>
       <template v-else>
-        <p class="text-sm text-muted">{{ $t('profile.rating') }}</p>
+        <p class="text-meta text-muted">{{ $t('profile.rating') }}</p>
         <p
           data-testid="rating-figure"
           :class="tierClass"
-          class="font-display text-stat leading-10 font-semibold"
+          class="font-display text-stat leading-9 font-semibold"
         >
           {{ user.rating }}
         </p>
       </template>
-      <p v-if="user.rating !== null && user.ratingSummary" class="min-h-10 text-sm text-muted">
+      <p v-if="user.rating !== null && user.ratingSummary" class="min-h-10 text-meta text-muted">
         {{
           $t('profile.ratingSummary', {
             max: user.ratingSummary.max,

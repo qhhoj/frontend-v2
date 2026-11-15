@@ -2,27 +2,29 @@
 import type { SubmissionListItem } from '@/api/types/submissions';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import UserLink from '@/components/UserLink.vue';
+import { NO_VALUE, formatCaseMemory, formatCaseTime } from '@/lib/format';
 import { formatAgoCompact, formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import SubmissionPickBox from './SubmissionPickBox.vue';
 import SubmissionProblemName from './SubmissionProblemName.vue';
 import SubmissionSourceLink from './SubmissionSourceLink.vue';
-import SubmissionVerdictBlock from './SubmissionVerdictBlock.vue';
+import SubmissionVerdictCell from './SubmissionVerdictCell.vue';
 import type { ColumnKey } from './submission-table-cells';
-import { costText } from './submission-row';
+import { isFinished, scoreCellText } from './submission-row';
 import { useRowOpen } from './row-open';
-import { NO_VALUE } from '@/lib/format';
 
 /**
- * The submissions list for a narrow card (a phone, a tablet beside the filter rail): the verdict block, then up to four lines:
- * problem; user; age and language; and, once judged, time and memory. Shows the same columns as the table would. Keep `SubmissionTableSkeleton.vue` in step.
+ * The submissions list for a narrow card (a phone, a tablet beside the filter rail): two lines per row. First the verdict chip
+ * and the problem; then "score · time · memory · when · user · language", each only if its column is shown and the row has it.
+ * The whole row opens the submission. Keep `SubmissionTableSkeleton.vue` in step.
  */
 const props = defineProps<{
   submissions: SubmissionListItem[];
   columns: readonly ColumnKey[];
   highlightIds: ReadonlySet<string>;
   problemLabels: Record<string, string>;
+  contestPoints: Record<string, number>;
   pickedIds?: readonly string[];
   rankStart?: number;
   ownUsername?: string;
@@ -34,9 +36,17 @@ const RELATIVE_REFRESH_MS = 15_000;
 const now = useNow(RELATIVE_REFRESH_MS);
 const isShown = (key: ColumnKey) => props.columns.includes(key);
 const pickOrder = (id: string) => (props.pickedIds?.indexOf(id) ?? -1) + 1;
-/** The last line: time and memory, for a finished row only (an unfinished one has nothing to say there). */
-const costOf = (row: SubmissionListItem) =>
-  isShown('cost') && costText(row) !== NO_VALUE ? costText(row) : '';
+const scoreOf = (row: SubmissionListItem) =>
+  scoreCellText(
+    row,
+    locale.locale,
+    row.problem ? props.contestPoints[row.problem.code] : undefined,
+  );
+/** Time and memory of a finished row only: an unfinished one has nothing to say there. */
+const timeOf = (row: SubmissionListItem) =>
+  isFinished(row) && row.time !== null ? formatCaseTime(row.time) : '';
+const memoryOf = (row: SubmissionListItem) =>
+  isFinished(row) && row.memory !== null ? formatCaseMemory(row.memory) : '';
 </script>
 
 <template>
@@ -45,7 +55,7 @@ const costOf = (row: SubmissionListItem) =>
       v-for="(row, index) in submissions"
       :key="row.id"
       :data-id="row.id"
-      class="flex cursor-pointer items-center gap-3 border-t border-line px-3 py-2.5 first:border-t-0 hover:bg-surface-hover"
+      class="flex cursor-pointer items-center gap-2 border-t border-line px-3 py-2 first:border-t-0 hover:bg-surface-hover"
       :class="{
         'row-added': highlightIds.has(row.id),
         'bg-accent-soft hover:bg-accent-soft':
@@ -56,58 +66,66 @@ const costOf = (row: SubmissionListItem) =>
     >
       <span
         v-if="rankStart !== undefined"
-        class="w-6 shrink-0 self-start text-right text-sm leading-12 font-semibold text-muted tabular-nums"
+        class="w-6 shrink-0 self-start text-right text-sm leading-5 font-semibold text-muted tabular-nums"
         >{{ rankStart + index }}</span
       >
-      <SubmissionVerdictBlock :row="row" compact class="shrink-0 self-start" />
-      <div class="flex min-w-0 flex-1 flex-col gap-0.5">
-        <SubmissionProblemName
-          v-if="isShown('problem')"
-          :problem="row.problem"
-          :label="row.problem ? problemLabels[row.problem.code] : undefined"
-        />
-        <div v-if="isShown('user') && row.user" class="flex min-w-0 text-meta">
-          <UserLink :username="row.user.username" :rating="row.user.rating" />
+      <SubmissionPickBox
+        v-if="pickedIds"
+        :id="row.id"
+        :order="pickOrder(row.id)"
+        :picked-count="pickedIds.length"
+        @toggle="emit('togglePick', $event)"
+      />
+      <div class="flex min-w-0 flex-1 flex-col gap-1">
+        <div class="flex min-w-0 items-center gap-2 text-sm">
+          <SubmissionVerdictCell v-if="isShown('verdict')" :row="row" class="shrink-0" />
+          <SubmissionProblemName
+            v-if="isShown('problem')"
+            class="min-w-0 flex-1"
+            :problem="row.problem"
+            :label="row.problem ? problemLabels[row.problem.code] : undefined"
+          />
         </div>
-        <div
-          v-if="isShown('when') || isShown('language')"
-          class="flex min-w-0 items-center gap-1.5 text-caption leading-4 whitespace-nowrap text-muted"
+        <p
+          class="m-0 flex min-w-0 items-center gap-1 overflow-hidden text-caption leading-4 whitespace-nowrap text-muted [&>*+*]:before:mr-1 [&>*+*]:before:content-['·']"
         >
-          <time
-            v-if="isShown('when')"
-            class="shrink-0"
-            :datetime="row.date"
-            :title="formatDate(row.date, 'datetime', locale.locale)"
-            >{{ formatAgoCompact(row.date, now, locale.locale) }}</time
+          <template
+            v-for="(part, partIndex) in [
+              isShown('verdict') ? scoreOf(row) : '',
+              isShown('cost') ? timeOf(row) : '',
+              isShown('cost') ? memoryOf(row) : '',
+            ].filter(Boolean)"
+            :key="partIndex"
           >
-          <span v-if="isShown('when') && isShown('language')" aria-hidden="true">·</span>
+            <span class="shrink-0 font-mono tabular-nums">{{ part }}</span>
+          </template>
+          <template v-if="isShown('when')">
+            <time
+              class="shrink-0"
+              :datetime="row.date"
+              :title="formatDate(row.date, 'datetime', locale.locale)"
+              >{{ formatAgoCompact(row.date, now, locale.locale) }}</time
+            >
+          </template>
+          <template v-if="isShown('user') && row.user">
+            <UserLink
+              class="shrink-[2] !min-w-16"
+              :username="row.user.username"
+              :rating="row.user.rating"
+            />
+          </template>
           <template v-if="isShown('language')">
             <LanguageLabel
               v-if="row.language"
+              class="min-w-0 shrink-[8]"
               :language="row.language"
               :title="row.language.name"
             />
             <span v-else>{{ NO_VALUE }}</span>
           </template>
-        </div>
-        <div
-          v-if="costOf(row)"
-          class="font-mono text-caption leading-4 whitespace-nowrap text-muted"
-        >
-          {{ costOf(row) }}
-        </div>
+        </p>
       </div>
-      <!-- Stacked, not side by side: on a phone every pixel beside them goes to the problem name. -->
-      <div class="flex shrink-0 flex-col items-center">
-        <SubmissionPickBox
-          v-if="pickedIds"
-          :id="row.id"
-          :order="pickOrder(row.id)"
-          :picked-count="pickedIds.length"
-          @toggle="emit('togglePick', $event)"
-        />
-        <SubmissionSourceLink :id="row.id" />
-      </div>
+      <SubmissionSourceLink :id="row.id" class="shrink-0" />
     </li>
   </ul>
 </template>

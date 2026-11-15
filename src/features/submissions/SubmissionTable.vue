@@ -12,24 +12,25 @@ import SubmissionCompactList from './SubmissionCompactList.vue';
 import SubmissionPickBox from './SubmissionPickBox.vue';
 import SubmissionProblemName from './SubmissionProblemName.vue';
 import SubmissionSourceLink from './SubmissionSourceLink.vue';
-import SubmissionVerdictBlock from './SubmissionVerdictBlock.vue';
+import SubmissionVerdictCell from './SubmissionVerdictCell.vue';
 import {
   BODY_CELL_CLASSES,
-  COLUMN_TIER_CLASS,
-  HEADER_ROW_CLASSES,
   COMPACT_BELOW_PX,
   FULL_TABLE_CLASS,
   HEADER_CELL_CLASSES,
+  HEADER_ROW_CLASSES,
+  NUMBER_CELLS,
   TABLE_CARD_CLASS,
-  fullColumnClass,
+  cellsOf,
+  fullCellClass,
 } from './submission-table-cells';
-import type { ColumnKey, ColumnSlot } from './submission-table-cells';
-import { costText } from './submission-row';
+import type { CellKind, ColumnKey } from './submission-table-cells';
+import { isFinished, scoreCellText } from './submission-row';
 import { useRowOpen } from './row-open';
 import { useIsNarrow } from './use-card-compact';
-import { NO_VALUE } from '@/lib/format';
+import { NO_VALUE, formatCaseMemory, formatCaseTime } from '@/lib/format';
 
-/** Keep `SubmissionTableSkeleton.vue` in step: same card, header cells and row classes. */
+/** The dense submission table: one line per row, the whole row opens the submission. Keep `SubmissionTableSkeleton.vue` in step: same card, header cells and row classes. */
 const props = withDefaults(
   defineProps<{
     submissions: SubmissionListItem[];
@@ -40,24 +41,24 @@ const props = withDefaults(
     highlightIds?: ReadonlySet<string>;
     /** Problem code to the contest letter, shown before the name (contest lists only). */
     problemLabels?: Record<string, string>;
+    /** A contest's problems by code: the score reads as contest points over the contest problem's. */
+    contestPoints?: Record<string, number>;
     /** Rows picked for the diff, in pick order; given only to signed-in viewers of the list page (shows the "Chọn" column). */
     pickedIds?: readonly string[];
     /** Rank of the first row; given, a leading "#" column numbers the rows (the best-submissions ranking). */
     rankStart?: number;
     /** The viewer's username: their rows are tinted (the best-submissions ranking). */
     ownUsername?: string;
-    /** The problem code after its name, in muted mono. */
-    showProblemCode?: boolean;
   }>(),
   {
     showProblem: true,
     highlightIds: () => new Set<string>(),
     problemLabels: () => ({}),
+    contestPoints: () => ({}),
     columnKeys: undefined,
     pickedIds: undefined,
     rankStart: undefined,
     ownUsername: undefined,
-    showProblemCode: false,
   },
 );
 const bodyCell = BODY_CELL_CLASSES;
@@ -72,28 +73,25 @@ const pickOrder = (id: string) => (props.pickedIds?.indexOf(id) ?? -1) + 1;
 const RELATIVE_REFRESH_MS = 15_000;
 const now = useNow(RELATIVE_REFRESH_MS);
 
-const COLUMNS = [
-  { key: 'verdict', isNumber: false },
-  { key: 'problem', isNumber: false },
-  { key: 'user', isNumber: false },
-  { key: 'cost', isNumber: true },
-  { key: 'language', isNumber: false },
-  { key: 'when', isNumber: false },
-] as const;
-const columns = computed(() =>
-  COLUMNS.filter(
-    (column) =>
-      (props.showProblem || column.key !== 'problem') &&
-      (!props.columnKeys || props.columnKeys.includes(column.key)),
+const ALL_KEYS: readonly ColumnKey[] = ['verdict', 'problem', 'user', 'cost', 'language', 'when'];
+const shownKeys = computed(() =>
+  ALL_KEYS.filter(
+    (key) =>
+      (props.showProblem || key !== 'problem') &&
+      (!props.columnKeys || props.columnKeys.includes(key)),
   ),
 );
-const isShown = (key: ColumnKey) => columns.value.some((column) => column.key === key);
-const shownKeys = computed(() => columns.value.map((column) => column.key));
+const cells = computed(() => cellsOf(shownKeys.value));
 const isOwn = (row: SubmissionListItem) =>
   props.ownUsername !== undefined && row.user?.username === props.ownUsername;
-/** Only the full table has fixed column widths and tiers. */
-const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[key] ?? ''));
-const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
+const classOf = (kind: CellKind | 'pick' | 'source') => fullCellClass(kind);
+const contestMaxOf = (row: SubmissionListItem) =>
+  row.problem ? props.contestPoints[row.problem.code] : undefined;
+const NUMBER_ALIGN = 'text-right font-mono tabular-nums whitespace-nowrap';
+const timeText = (row: SubmissionListItem) =>
+  isFinished(row) && row.time !== null ? formatCaseTime(row.time) : NO_VALUE;
+const memoryText = (row: SubmissionListItem) =>
+  isFinished(row) && row.memory !== null ? formatCaseMemory(row.memory) : NO_VALUE;
 </script>
 
 <template>
@@ -104,13 +102,14 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
       :columns="shownKeys"
       :highlight-ids="highlightIds"
       :problem-labels="problemLabels"
+      :contest-points="contestPoints"
       :picked-ids="pickedIds"
       :rank-start="rankStart"
       :own-username="ownUsername"
       @toggle-pick="emit('togglePick', $event)"
     />
     <ScrollRegion v-else :label="$t('submissions.scrollRegion')">
-      <table class="w-full border-collapse text-sm" :class="columnKeys ? '' : FULL_TABLE_CLASS">
+      <table class="w-full border-collapse" :class="FULL_TABLE_CLASS">
         <caption class="sr-only">
           {{
             $t('submissions.listName')
@@ -118,7 +117,7 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
         </caption>
         <thead>
           <tr :class="HEADER_ROW_CLASSES">
-            <th v-if="isPicking" scope="col" :class="[HEADER_CELL_CLASSES, widthOf('pick')]">
+            <th v-if="isPicking" scope="col" :class="[HEADER_CELL_CLASSES, classOf('pick')]">
               {{ $t('sourceDiff.select.column') }}
             </th>
             <th
@@ -129,14 +128,18 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
               {{ $t('submissions.columns.rank') }}
             </th>
             <th
-              v-for="column in columns"
-              :key="column.key"
+              v-for="kind in cells"
+              :key="kind"
               scope="col"
-              :class="[HEADER_CELL_CLASSES, widthOf(column.key), { 'text-right': column.isNumber }]"
+              :class="[
+                HEADER_CELL_CLASSES,
+                classOf(kind),
+                { 'text-right': NUMBER_CELLS.has(kind) },
+              ]"
             >
-              {{ $t(`submissions.columns.${column.key}`) }}
+              {{ $t(`submissions.columns.${kind}`) }}
             </th>
-            <th scope="col" :class="[HEADER_CELL_CLASSES, widthOf('source')]">
+            <th scope="col" :class="[HEADER_CELL_CLASSES, classOf('source')]">
               <span class="sr-only">{{ $t('submissions.columns.source') }}</span>
             </th>
           </tr>
@@ -168,44 +171,52 @@ const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
             >
               {{ rankStart + index }}
             </td>
-            <td :class="bodyCell"><SubmissionVerdictBlock :row="row" /></td>
-            <td v-if="isShown('problem')" :class="[bodyCell, 'w-full max-w-0']">
-              <SubmissionProblemName
-                :problem="row.problem"
-                :label="row.problem ? problemLabels[row.problem.code] : undefined"
-                :show-code="showProblemCode"
-              />
-            </td>
-            <td v-if="isShown('user')" :class="[bodyCell, 'max-w-0']">
-              <UserLink v-if="row.user" :username="row.user.username" :rating="row.user.rating" />
-              <template v-else>{{ NO_VALUE }}</template>
-            </td>
-            <td
-              v-if="isShown('cost')"
-              :class="[
-                bodyCell,
-                tierOf('cost'),
-                'text-right font-mono text-meta whitespace-nowrap text-muted tabular-nums',
-              ]"
-            >
-              {{ costText(row) }}
-            </td>
-            <td
-              v-if="isShown('language')"
-              :class="[bodyCell, tierOf('language'), 'truncate text-muted']"
-              :title="row.language?.name"
-            >
-              <LanguageLabel v-if="row.language" :language="row.language" />
-              <template v-else>{{ NO_VALUE }}</template>
-            </td>
-            <td
-              v-if="isShown('when')"
-              :class="[bodyCell, tierOf('when'), 'whitespace-nowrap text-muted']"
-            >
-              <time :datetime="row.date" :title="formatDate(row.date, 'datetime', locale.locale)">{{
-                formatAgoCompact(row.date, now, locale.locale)
-              }}</time>
-            </td>
+            <template v-for="kind in cells" :key="kind">
+              <td v-if="kind === 'verdict'" :class="[bodyCell, classOf(kind)]">
+                <SubmissionVerdictCell :row="row" />
+              </td>
+              <td v-else-if="kind === 'score'" :class="[bodyCell, classOf(kind), NUMBER_ALIGN]">
+                {{ scoreCellText(row, locale.locale, contestMaxOf(row)) }}
+              </td>
+              <td v-else-if="kind === 'problem'" :class="[bodyCell, 'w-full max-w-0']">
+                <SubmissionProblemName
+                  :problem="row.problem"
+                  :label="row.problem ? problemLabels[row.problem.code] : undefined"
+                  show-code
+                />
+              </td>
+              <td v-else-if="kind === 'user'" :class="[bodyCell, classOf(kind), 'max-w-0']">
+                <UserLink v-if="row.user" :username="row.user.username" :rating="row.user.rating" />
+                <template v-else>{{ NO_VALUE }}</template>
+              </td>
+              <td
+                v-else-if="kind === 'time'"
+                :class="[bodyCell, classOf(kind), NUMBER_ALIGN, 'text-muted']"
+              >
+                {{ timeText(row) }}
+              </td>
+              <td
+                v-else-if="kind === 'memory'"
+                :class="[bodyCell, classOf(kind), NUMBER_ALIGN, 'text-muted']"
+              >
+                {{ memoryText(row) }}
+              </td>
+              <td
+                v-else-if="kind === 'language'"
+                :class="[bodyCell, classOf(kind), 'text-muted']"
+                :title="row.language?.name"
+              >
+                <LanguageLabel v-if="row.language" :language="row.language" />
+                <template v-else>{{ NO_VALUE }}</template>
+              </td>
+              <td v-else :class="[bodyCell, classOf(kind), 'whitespace-nowrap text-muted']">
+                <time
+                  :datetime="row.date"
+                  :title="formatDate(row.date, 'datetime', locale.locale)"
+                  >{{ formatAgoCompact(row.date, now, locale.locale) }}</time
+                >
+              </td>
+            </template>
             <td :class="bodyCell"><SubmissionSourceLink :id="row.id" /></td>
           </tr>
         </tbody>

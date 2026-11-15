@@ -101,11 +101,11 @@ describe('contest submissions tab', () => {
   });
 
   it.each([
-    ["its contest points over the contest problem's", 30, 'Điểm 60%'],
-    ["its own points over the problem's once no contest row holds any", null, 'Điểm 65%'],
+    ["its contest points over the contest problem's", 30, '30 / 50'],
+    ["its own points over the problem's once no contest row holds any", null, '65 / 100'],
   ])(
     'lists the site rows with the contest letter, scored by %s, without the site-wide stats',
-    async (_case, contestPoints, ringLabel) => {
+    async (_case, contestPoints, scoreText) => {
       vi.useFakeTimers({ now: RUNNING, toFake: ['Date'] });
       const problems = [contestProblem(0), contestProblem(1, { points: 50 })];
       const row = submissionItem({
@@ -123,10 +123,10 @@ describe('contest submissions tab', () => {
       });
       const { wrapper } = await mountApp('/contests/r42/submissions');
       expect(calls.some((call) => call.path === '/submissions/stats')).toBe(false);
-      const card = wrapper.get('[data-testid="submission-card-list"] [data-id="sub-b"]');
+      const card = wrapper.get('[data-id="sub-b"]');
       expect(card.text()).toContain('B');
       expect(card.text()).toContain('WA');
-      expect(card.get('[role="img"]').attributes('aria-label')).toBe(ringLabel);
+      expect(card.findAll('td')[1]?.text()).toBe(scoreText);
     },
   );
 

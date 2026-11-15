@@ -5,15 +5,16 @@ import ScrollRegion from '@/components/ScrollRegion.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
   BODY_CELL_CLASSES,
-  COLUMN_TIER_CLASS,
-  HEADER_ROW_CLASSES,
   COMPACT_BELOW_PX,
   FULL_TABLE_CLASS,
   HEADER_CELL_CLASSES,
+  HEADER_ROW_CLASSES,
+  NUMBER_CELLS,
   TABLE_CARD_CLASS,
-  fullColumnClass,
+  cellsOf,
+  fullCellClass,
 } from './submission-table-cells';
-import type { ColumnKey, ColumnSlot } from './submission-table-cells';
+import type { CellKind, ColumnKey } from './submission-table-cells';
 import { useIsNarrow } from './use-card-compact';
 
 /** Mirrors `SubmissionTable.vue` and `SubmissionCompactList.vue`: keep their card, table, header, cell and row classes in sync. */
@@ -27,29 +28,29 @@ const props = withDefaults(
   }>(),
   { showProblem: true, columnKeys: undefined, hasPickColumn: false },
 );
-const bodyCell = BODY_CELL_CLASSES;
-/** Header cell width, then the cell's own width, per column in the table's order. */
-const COLUMNS = [
-  { key: 'verdict', header: 'w-12', cell: 'w-[7.875rem]', isNumber: false },
-  { key: 'problem', header: 'w-12', cell: 'w-40', isNumber: false },
-  { key: 'user', header: 'w-16', cell: 'w-20', isNumber: false },
-  { key: 'cost', header: 'w-20', cell: 'w-28', isNumber: true },
-  { key: 'language', header: 'w-12', cell: 'w-12', isNumber: false },
-  { key: 'when', header: 'w-10', cell: 'w-10', isNumber: false },
-] as const;
-const columns = computed(() =>
-  COLUMNS.filter(
-    (column) =>
-      (props.showProblem || column.key !== 'problem') &&
-      (!props.columnKeys || props.columnKeys.includes(column.key)),
+/** The skeleton bar's width per cell. */
+const BAR: Record<CellKind, string> = {
+  verdict: 'w-12',
+  score: 'w-20',
+  problem: 'w-40',
+  user: 'w-20',
+  time: 'w-12',
+  memory: 'w-14',
+  language: 'w-16',
+  when: 'w-10',
+};
+const ALL_KEYS: readonly ColumnKey[] = ['verdict', 'problem', 'user', 'cost', 'language', 'when'];
+const shownKeys = computed(() =>
+  ALL_KEYS.filter(
+    (key) =>
+      (props.showProblem || key !== 'problem') &&
+      (!props.columnKeys || props.columnKeys.includes(key)),
   ),
 );
+const cells = computed(() => cellsOf(shownKeys.value));
 const card = ref<{ $el: HTMLElement } | null>(null);
 const isCompact = useIsNarrow(() => card.value?.$el ?? null, COMPACT_BELOW_PX);
-const isShown = (key: ColumnKey) => columns.value.some((column) => column.key === key);
-/** Only the full table has fixed column widths. */
-const widthOf = (key: ColumnSlot) => fullColumnClass(key, !props.columnKeys);
-const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[key] ?? ''));
+const classOf = (kind: CellKind | 'pick' | 'source') => fullCellClass(kind);
 </script>
 
 <template>
@@ -59,45 +60,39 @@ const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[k
         v-for="row in ROW_COUNT"
         :key="row"
         data-skeleton-region="row"
-        class="flex items-center gap-3 border-t border-line px-3 py-2.5 first:border-t-0"
+        class="flex items-center gap-2 border-t border-line px-3 py-2 first:border-t-0"
       >
-        <SkeletonBlock class="h-12 w-24 shrink-0 self-start" />
-        <div class="flex min-w-0 flex-1 flex-col gap-0.5">
-          <div v-if="isShown('problem')"><SkeletonBlock text class="w-32" /></div>
-          <div class="text-meta"><SkeletonBlock text class="w-28" /></div>
-          <div v-if="isShown('when') || isShown('language')" class="text-caption leading-4">
-            <SkeletonBlock text class="w-24" />
+        <SkeletonBlock v-if="hasPickColumn" round class="size-11 shrink-0" />
+        <div class="flex min-w-0 flex-1 flex-col gap-1">
+          <div class="flex items-center gap-2 text-sm">
+            <SkeletonBlock class="h-5 w-12 shrink-0" />
+            <SkeletonBlock v-if="shownKeys.includes('problem')" text class="w-32" />
           </div>
-          <div v-if="isShown('cost')" class="text-caption leading-4">
-            <SkeletonBlock text class="w-28" />
-          </div>
+          <div class="text-caption leading-4"><SkeletonBlock text class="w-40" /></div>
         </div>
-        <div class="flex shrink-0 flex-col items-center">
-          <SkeletonBlock v-if="hasPickColumn" round class="size-11" />
-          <SkeletonBlock class="size-7" />
-        </div>
+        <SkeletonBlock class="size-7 shrink-0" />
       </li>
     </ul>
     <ScrollRegion v-else placeholder label="">
-      <table
-        aria-hidden="true"
-        class="w-full border-collapse text-sm"
-        :class="columnKeys ? '' : FULL_TABLE_CLASS"
-      >
+      <table aria-hidden="true" class="w-full border-collapse" :class="FULL_TABLE_CLASS">
         <thead>
           <tr :class="HEADER_ROW_CLASSES">
-            <th v-if="hasPickColumn" scope="col" :class="[HEADER_CELL_CLASSES, widthOf('pick')]">
+            <th v-if="hasPickColumn" scope="col" :class="[HEADER_CELL_CLASSES, classOf('pick')]">
               <SkeletonBlock text class="w-10" />
             </th>
             <th
-              v-for="column in columns"
-              :key="column.key"
+              v-for="kind in cells"
+              :key="kind"
               scope="col"
-              :class="[HEADER_CELL_CLASSES, widthOf(column.key), { 'text-right': column.isNumber }]"
+              :class="[
+                HEADER_CELL_CLASSES,
+                classOf(kind),
+                { 'text-right': NUMBER_CELLS.has(kind) },
+              ]"
             >
-              <SkeletonBlock text :class="column.header" />
+              <SkeletonBlock text :class="BAR[kind]" />
             </th>
-            <th scope="col" :class="[HEADER_CELL_CLASSES, widthOf('source')]" />
+            <th scope="col" :class="[HEADER_CELL_CLASSES, classOf('source')]" />
           </tr>
         </thead>
         <tbody>
@@ -107,18 +102,22 @@ const tierOf = (key: ColumnKey) => (props.columnKeys ? '' : (COLUMN_TIER_CLASS[k
             data-skeleton-region="row"
             class="border-t border-line"
           >
-            <td v-if="hasPickColumn" :class="bodyCell">
+            <td v-if="hasPickColumn" :class="BODY_CELL_CLASSES">
               <SkeletonBlock round class="size-11" />
             </td>
             <td
-              v-for="column in columns"
-              :key="column.key"
-              :class="[bodyCell, tierOf(column.key), { 'text-right font-mono': column.isNumber }]"
+              v-for="kind in cells"
+              :key="kind"
+              :class="[
+                BODY_CELL_CLASSES,
+                classOf(kind),
+                { 'text-right font-mono': NUMBER_CELLS.has(kind) },
+              ]"
             >
-              <SkeletonBlock v-if="column.key === 'verdict'" :class="[column.cell, 'h-12']" />
-              <SkeletonBlock v-else text :class="column.cell" />
+              <SkeletonBlock v-if="kind === 'verdict'" class="h-5 w-12" />
+              <SkeletonBlock v-else text :class="BAR[kind]" />
             </td>
-            <td :class="bodyCell"><SkeletonBlock class="size-7" /></td>
+            <td :class="BODY_CELL_CLASSES"><SkeletonBlock class="size-7" /></td>
           </tr>
         </tbody>
       </table>
