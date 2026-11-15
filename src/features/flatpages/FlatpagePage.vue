@@ -60,7 +60,10 @@ usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : page.value?
       >
         <template #actions><AdminEditLink :to="flatpageEditTarget(session.user)" /></template>
       </PageHeader>
-      <UserContent :html="page.contentHtml" class="max-w-prose overflow-x-auto text-base leading-7" />
+      <UserContent
+        :html="page.contentHtml"
+        class="max-w-prose overflow-x-auto text-base leading-7"
+      />
     </article>
   </QueryState>
 </template>
