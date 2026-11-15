@@ -788,6 +788,31 @@
   white-space: pre;
 }
 
+/*
+ * Popup panels (`components/ui/popup.ts`: Popover, Menu, the ComboBox list): fixed beside their opener in the top layer.
+ * In `components` so a panel's own utilities (padding, border) win over these and the UA popover style loses to both.
+ * Without CSS anchor positioning, popup.ts writes `top` and `left`; without the Popover API, z-overlay lifts the panel.
+ */
+@layer components {
+  [data-popup] {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    z-index: var(--z-index-overlay);
+  }
+  @supports (anchor-name: --qh-popup) {
+    [data-popup] {
+      top: anchor(bottom);
+      left: anchor(left);
+      margin-top: 0.5rem;
+      position-try-fallbacks:
+        flip-block,
+        flip-inline,
+        flip-block flip-inline;
+    }
+  }
+}
+
 /* Printing the backup codes prints only them (ScratchCodesPanel sets the scope for the print call). */
 @media print {
   html[data-print-scope='codes'] body * {

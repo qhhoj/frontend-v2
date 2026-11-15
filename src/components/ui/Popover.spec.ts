@@ -2,6 +2,7 @@ import { flushPromises } from '@vue/test-utils';
 import { defineComponent, h, ref } from 'vue';
 import { describe, expect, it, vi } from 'vitest';
 import { mountComponent } from '@/test/mount';
+import Modal from './Modal.vue';
 import Popover from './Popover.vue';
 
 const byId = (id: string) => document.getElementById(id)!;
@@ -72,5 +73,28 @@ describe('Popover', () => {
     byId('outside').click();
     await vi.waitFor(() => expect(popoverEl()).toBeNull());
     expect(document.activeElement).toBe(byId('outside'));
+  });
+
+  it('takes Escape for itself inside a dialog: the popover closes, the dialog stays', async () => {
+    const onUpdate = vi.fn();
+    const popover = ref<InstanceType<typeof Popover>>();
+    mountComponent(
+      defineComponent({
+        setup: () => () =>
+          h(Modal, { visible: true, title: 'A', 'onUpdate:visible': onUpdate }, () => [
+            h('button', { id: 'opener', onClick: (event: Event) => popover.value?.toggle(event) }),
+            h(Popover, { ref: popover, label: 'Bộ lọc' }, () => h('button', { id: 'first' })),
+          ]),
+      }),
+    );
+    await flushPromises();
+    byId('opener').click();
+    await flushPromises();
+    byId('first').dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }),
+    );
+    await vi.waitFor(() => expect(document.querySelector('[data-popup]')).toBeNull());
+    expect(onUpdate).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(byId('opener'));
   });
 });
