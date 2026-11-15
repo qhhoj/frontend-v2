@@ -74,26 +74,16 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
             <ShortLinkButton compact :path="shortLinkPath({ kind: 'contest', key: contest.key })" />
           </template>
         </ContestHeaderCard>
-        <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
-          <div class="flex min-w-0 flex-col gap-6">
-            <ContestProblemsTable :contest="contest" />
-            <ContestIntroCard :contest="contest" />
-            <CommentsSection
-              v-if="!isUnderway"
-              type="contest"
-              :page-key="contest.key"
-              class="mt-2"
-            />
-          </div>
-          <aside :aria-label="$t('contests.detail.aside')" class="flex flex-col gap-6">
-            <ContestAnnouncementsRail v-if="isUnderway" :contest="contest" />
-            <ContestJoinRulesCard
-              :contest="contest"
-              :acceptance="acceptanceOf(contest.viewer.liveParticipation)"
-            />
-            <ContestRulesCard :contest="contest" />
-            <ContestAnnouncementsRail v-if="!isUnderway" :contest="contest" />
-          </aside>
+        <div class="flex min-w-0 flex-col gap-6">
+          <ContestAnnouncementsRail v-if="isUnderway" :contest="contest" />
+          <ContestJoinRulesCard
+            :contest="contest"
+            :acceptance="acceptanceOf(contest.viewer.liveParticipation)"
+          />
+          <ContestRulesCard :contest="contest" />
+          <ContestProblemsTable :contest="contest" />
+          <ContestIntroCard :contest="contest" />
+          <CommentsSection v-if="!isUnderway" type="contest" :page-key="contest.key" class="mt-2" />
         </div>
       </template>
     </QueryState>

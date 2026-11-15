@@ -126,6 +126,7 @@
       "freeze": "Freeze",
       "timeLeft": "Time left",
       "notStarted": "Not started yet",
+      "endedOn": "Ended at {time}",
       "endedAt": "Ended at {time}",
       "elapsed": "{span} in",
       "notFoundTitle": "Contest not found",
@@ -185,6 +186,8 @@
       }
     },
     "rules": {
+      "show": "Details",
+      "hide": "Collapse",
       "intro": "About",
       "title": "Format and rules",
       "format": "Format",

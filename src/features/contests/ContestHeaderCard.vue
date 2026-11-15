@@ -6,7 +6,7 @@ import Chip from '@/components/ui/Chip.vue';
 import UserLink from '@/components/UserLink.vue';
 import { phaseAt, spanMessage } from '@/lib/contest-time';
 import { formatNumber } from '@/lib/format';
-import { formatWeekdayDate } from '@/lib/format-date';
+import { formatDate, formatWeekdayDate } from '@/lib/format-date';
 import { formatDelta } from '@/lib/rating-delta';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -34,6 +34,9 @@ const now = useNow();
 const phase = computed(() => phaseAt(props.contest, now.value));
 /** The header's clock: the same rule as `ContestHeader`. */
 const isClockInHeader = computed(() => virtualRun.value !== null || phase.value === 'running');
+/** An ended contest (no virtual run) needs no bar: one line says when it ended and how long it lasted. */
+const isEndedLine = computed(() => phase.value === 'ended' && virtualRun.value === null);
+const endedOn = computed(() => formatDate(props.contest.endTime, 'datetime', locale.locale));
 const startMs = computed(() => Date.parse(props.contest.startTime));
 const lengthSpan = computed(() =>
   spanMessage((Date.parse(props.contest.endTime) - startMs.value) / 1000),
@@ -87,8 +90,11 @@ const oneDay = computed(() =>
           }}
         </p>
       </div>
-      <ContestTimeBar :contest="contest" :now="now" />
+      <ContestTimeBar v-if="!isEndedLine" :contest="contest" :now="now" />
       <p class="text-sm text-muted">
+        <template v-if="isEndedLine"
+          >{{ $t('contests.detail.endedOn', { time: endedOn }) }} ·
+        </template>
         <template v-if="oneDay">{{ oneDay }} · </template>
         {{ $t(lengthSpan.key, lengthSpan.params, lengthSpan.count ?? 1) }}
         <template v-if="elapsedSpan">
@@ -102,7 +108,7 @@ const oneDay = computed(() =>
       </p>
     </div>
     <div class="flex flex-col gap-4">
-      <div v-show="!isClockInHeader">
+      <div v-show="!isClockInHeader && !isEndedLine">
         <ContestCountdown
           :contest="contest"
           :virtual-run="virtualRun"
