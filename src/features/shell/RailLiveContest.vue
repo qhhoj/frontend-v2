@@ -10,6 +10,7 @@ import { solvedSummary } from '@/features/contests/own-result';
 import { formatNumber } from '@/lib/format';
 import { useMediaQuery } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
+import { useRailCollapse } from './use-rail-collapse';
 
 /**
  * The rail's card for the contest the viewer is in: its status, name, the clock, and for a contestant the rank and the
@@ -17,7 +18,7 @@ import { useLocaleStore } from '@/stores/locale.store';
  * or the board is frozen. The solved count comes from the contest's problem list (the contest page's query), re-read
  * after each of the viewer's verdicts. A spectator sees the clock only.
  */
-/** The rank and the solved count are drawn on the wide rail only; narrower, the list is not asked. */
+/** The rank and the solved count are drawn on the open rail only; narrower or collapsed, the list is not asked. */
 const WIDE_RAIL_QUERY = '(min-width: 68.75rem)';
 const props = defineProps<{ current: CurrentParticipation }>();
 const { t } = useI18n();
@@ -32,7 +33,8 @@ const statusText = computed(() => {
 
 const isContestant = computed(() => kind.value !== 'spectate');
 const isWideRail = useMediaQuery(WIDE_RAIL_QUERY);
-const isAsked = computed(() => isContestant.value && isWideRail.value);
+const { isCollapsed } = useRailCollapse();
+const isAsked = computed(() => isContestant.value && isWideRail.value && !isCollapsed.value);
 const contest = useContestQuery(contestKey, isAsked);
 /** The rank, from `standing`: null for a spectator, before the start, when the board is hidden and while it is frozen. */
 const rank = computed(() =>
@@ -58,18 +60,18 @@ const standing = computed(() =>
     :to="{ name: 'contest', params: { key: contestKey } }"
     data-testid="rail-live-contest"
     :title="current.contest.name"
-    class="flex flex-col gap-1 rounded-card border border-line bg-surface-solid p-3 transition-colors hover:border-line-strong max-rail-wide:items-center max-rail-wide:p-2"
+    class="flex flex-col gap-1 rounded-card border border-line bg-surface-solid p-3 transition-colors hover:border-line-strong rail-slim:items-center rail-slim:p-2"
   >
     <span class="flex items-center gap-1.5 text-caption leading-4 font-semibold text-positive">
       <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-positive" />
-      <span class="max-rail-wide:sr-only">{{ statusText }}</span>
+      <span class="rail-slim:sr-only">{{ statusText }}</span>
     </span>
-    <span class="truncate text-sm font-semibold text-content max-rail-wide:sr-only">{{
+    <span class="truncate text-sm font-semibold text-content rail-slim:sr-only">{{
       current.contest.name
     }}</span>
-    <span class="flex items-baseline gap-2 max-rail-wide:flex-col max-rail-wide:items-center">
+    <span class="flex items-baseline gap-2 rail-slim:flex-col rail-slim:items-center">
       <Timer aria-hidden="true" class="size-4 shrink-0 self-center text-muted" />
-      <span class="font-semibold text-content max-rail-wide:sr-only">
+      <span class="font-semibold text-content rail-slim:sr-only">
         <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
         <CountdownTimer
           :key="current.participation.endTime"
@@ -79,7 +81,7 @@ const standing = computed(() =>
       <span
         v-if="standing"
         data-testid="rail-live-standing"
-        class="text-meta text-muted max-rail-wide:sr-only"
+        class="text-meta text-muted rail-slim:sr-only"
         >{{ standing }}</span
       >
     </span>

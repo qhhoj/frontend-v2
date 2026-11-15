@@ -20,6 +20,7 @@ import TabBar from './TabBar.vue';
 import TopBar from './TopBar.vue';
 import { useAccountCacheSync } from './use-account-cache';
 import { useAccountThemeSync } from './use-account-theme';
+import { useRailCollapse } from './use-rail-collapse';
 
 /** Lazy: the admin nav and icons stay out of the bundle every visitor loads. */
 const AdminShell = defineAsyncComponent(() => import('@/features/admin/shell/AdminShell.vue'));
@@ -34,6 +35,7 @@ const { current: currentContest } = useCurrentContest(
   () => route.meta.layout !== 'admin' && route.meta.layout !== 'auth',
 );
 const isSearchOpen = ref(false);
+const { isCollapsed: isRailCollapsed } = useRailCollapse();
 /** On the contest's own pages its bar is the status; on every other page the top bar carries a chip instead. */
 const isOnCurrentContest = computed(
   () =>
@@ -69,7 +71,7 @@ const chipContest = computed(() => (isOnCurrentContest.value ? null : currentCon
       <slot />
     </main>
     <!-- Workbench: the rail (from md) beside the page column; on a phone the top bar and the tab bar. The rail and the bars are opaque, so the page background shows behind the page column only. -->
-    <div v-else class="flex flex-1">
+    <div v-else class="flex flex-1" :data-rail="isRailCollapsed ? 'collapsed' : 'open'">
       <AppRail :current="currentContest" @search="isSearchOpen = true" />
       <div class="flex min-w-0 flex-1 flex-col">
         <TopBar :live-contest="chipContest" @search="isSearchOpen = true" />

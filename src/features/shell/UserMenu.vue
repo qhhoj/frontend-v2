@@ -21,7 +21,7 @@ import { useAccountLinks } from './account-links';
  */
 withDefaults(defineProps<{ variant?: 'pill' | 'row' }>(), { variant: 'pill' });
 const ROW_TRIGGER =
-  'flex min-h-11 w-full items-center gap-2.5 rounded-row px-2 text-left text-sm font-semibold transition-colors hover:bg-surface-hover max-rail-wide:justify-center max-rail-wide:px-0';
+  'flex min-h-11 w-full items-center gap-2.5 rounded-row px-2 text-left text-sm font-semibold transition-colors hover:bg-surface-hover rail-slim:justify-center rail-slim:px-0';
 const session = useSessionStore();
 const route = useRoute();
 const logout = useLogout();
@@ -60,15 +60,12 @@ const openerOf = (button: unknown) => (button as { $el?: HTMLElement } | null)?.
         <UserAvatar :username="session.user.username" :size="28" class="shrink-0" />
         <span
           :class="[
-            'min-w-0 flex-1 truncate max-rail-wide:sr-only',
+            'min-w-0 flex-1 truncate rail-slim:sr-only',
             ratingTextClass(session.user.rating),
           ]"
           >{{ session.user.username }}</span
         >
-        <ChevronsUpDown
-          aria-hidden="true"
-          class="size-4 shrink-0 text-muted max-rail-wide:hidden"
-        />
+        <ChevronsUpDown aria-hidden="true" class="size-4 shrink-0 text-muted rail-slim:hidden" />
       </AppButton>
       <AppButton
         v-else
@@ -97,7 +94,7 @@ const openerOf = (button: unknown) => (button as { $el?: HTMLElement } | null)?.
   />
   <div v-else-if="variant === 'row'" class="flex flex-col gap-2">
     <IconButton
-      class="rail-wide:hidden"
+      class="rail-open:hidden"
       tone="secondary"
       :label="$t('account.login')"
       :to="{ name: 'login', query: { redirect: route.fullPath } }"
@@ -105,14 +102,14 @@ const openerOf = (button: unknown) => (button as { $el?: HTMLElement } | null)?.
       <LogIn aria-hidden="true" />
     </IconButton>
     <AppButton
-      class="max-rail-wide:hidden"
+      class="rail-slim:hidden"
       block
       :to="{ name: 'login', query: { redirect: route.fullPath } }"
     >
       {{ $t('account.login') }}
     </AppButton>
     <AppButton
-      class="max-rail-wide:hidden"
+      class="rail-slim:hidden"
       block
       tone="primary"
       :to="{ name: 'register', query: { redirect: route.fullPath } }"

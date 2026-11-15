@@ -45,6 +45,14 @@ describe('site search keys', () => {
     await vi.waitFor(() => expect(palette()).not.toBeNull());
   });
 
+  it('reads a bare [ as the rail key, never from a field or with a chord', async () => {
+    const { shellShortcutOf } = await import('./use-shell-shortcuts');
+    const key = (init: KeyboardEventInit) => new KeyboardEvent('keydown', { key: '[', ...init });
+    expect(shellShortcutOf(key({}))).toBe('rail');
+    expect(shellShortcutOf(key({ ctrlKey: true }))).toBeNull();
+    expect(shellShortcutOf(key({ altKey: true }))).toBeNull();
+  });
+
   it('opens the palette on / where the page has no search box', async () => {
     mockApi({ ...blogListRoutes, ...anonymousViewer });
     await mountApp('/blog');
