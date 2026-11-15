@@ -38,11 +38,11 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
 <template>
   <div
     v-if="user"
-    class="flex flex-col gap-6 lg:grid lg:items-start lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]"
+    class="flex flex-col gap-4 lg:grid lg:items-start lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]"
   >
     <ProfileStats :user="user" class="order-first lg:order-none lg:col-start-2 lg:row-start-1" />
 
-    <div class="flex min-w-0 flex-col gap-6 lg:col-start-1 lg:row-span-2 lg:row-start-1">
+    <div class="flex min-w-0 flex-col gap-4 lg:col-start-1 lg:row-span-2 lg:row-start-1">
       <Card data-testid="rating-card" :title="$t('ratingChart.title')" padding="md">
         <QueryState :loading="ratingsPending" :error="ratingsError" @retry="refetchRatings()">
           <template #skeleton><ProfileOverviewSkeleton part="chart" /></template>
@@ -78,7 +78,7 @@ const ratedCount = computed(() => ratedHistory(history.value).length);
       </QueryState>
     </div>
 
-    <div class="flex min-w-0 flex-col gap-6 lg:col-start-2 lg:row-start-2">
+    <div class="flex min-w-0 flex-col gap-4 lg:col-start-2 lg:row-start-2">
       <Card v-if="user.aboutHtml" :title="$t('profile.about')" padding="md">
         <UserContent :html="user.aboutHtml" />
       </Card>

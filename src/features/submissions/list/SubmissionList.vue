@@ -11,6 +11,8 @@ import { useSessionStore } from '@/stores/session.store';
 import DiffSelectionBar from '../DiffSelectionBar.vue';
 import LiveToggle from '../LiveToggle.vue';
 import SubmissionQuickFilters from '../SubmissionQuickFilters.vue';
+import SubmissionTable from '../SubmissionTable.vue';
+import SubmissionTableSkeleton from '../SubmissionTableSkeleton.vue';
 import SubmissionStatsStrip from '../SubmissionStatsStrip.vue';
 import { advancedFilterCount } from '../quick-filters';
 import { ALL_COLUMN_KEYS } from '../submission-table-cells';
@@ -18,8 +20,6 @@ import type { ColumnKey } from '../submission-table-cells';
 import { useSubmissionStatsQuery } from '../submissions.queries';
 import { useDiffPicks } from '../use-diff-picks';
 import LiveListNotices from './LiveListNotices.vue';
-import SubmissionCardList from './SubmissionCardList.vue';
-import SubmissionCardListSkeleton from './SubmissionCardListSkeleton.vue';
 import SubmissionFilterPanel from './SubmissionFilterPanel.vue';
 import type { ProblemPickerSource } from './problem-picker-options';
 import { fixedUserOf } from './submission-scope';
@@ -30,7 +30,7 @@ import { useSubmissionList } from './use-submission-list';
  * The one submission list: stats strip, quick filters, "Bộ lọc nâng cao", live notices, the list, its one pager at the foot, and its loading,
  * empty and error states. A page passes only its scope and what differs there: the problem box's choices, the
  * judging-state boxes, the columns and the unfiltered empty text. A contest's problem box also gives the rows their
- * letters and contest scores. The contest tab drops the site-wide stats (`showStats`); the live pill moves beside the chips.
+ * letters and contest scores. The contest tab drops the site-wide stats (`showStats`); the live pill sits at the end of the one toolbar row.
  */
 const props = withDefaults(
   defineProps<{
@@ -104,13 +104,15 @@ const advancedCount = computed(() => advancedFilterCount(filters.value, chipUser
 /** A link that carries a filter only the panel shows opens with the panel open, so the filter is visible. */
 const isAdvancedOpen = ref(advancedCount.value > 0);
 const toggleAdvanced = () => (isAdvancedOpen.value = !isAdvancedOpen.value);
-/** A contest's problems by code, for the rows' letters and contest scores; empty for any other scope. */
+/** A contest's problems by code: the rows' letters and the contest points their scores read against; empty for any other scope. */
 const contestProblems = computed(() =>
-  props.problemSource.kind === 'contest'
-    ? Object.fromEntries(
-        props.problemSource.problems.map(({ code, label, points }) => [code, { label, points }]),
-      )
-    : {},
+  props.problemSource.kind === 'contest' ? props.problemSource.problems : [],
+);
+const contestLabels = computed(() =>
+  Object.fromEntries(contestProblems.value.map(({ code, label }) => [code, label])),
+);
+const contestPoints = computed(() =>
+  Object.fromEntries(contestProblems.value.map(({ code, points }) => [code, points])),
 );
 
 /** Another page is a new list: bring its top (not the filters') into view, below the shell's header. */
@@ -124,13 +126,7 @@ watch(
 <template>
   <div class="flex min-w-0 flex-col gap-5">
     <p role="status" aria-live="polite" class="sr-only">{{ live.announcement.value }}</p>
-    <SubmissionStatsStrip
-      v-if="showStats"
-      :stats="stats"
-      :pending="isStatsPending"
-      :live="filters.live"
-      @update:live="update({ live: $event })"
-    />
+    <SubmissionStatsStrip v-if="showStats" :stats="stats" :pending="isStatsPending" />
     <div class="flex flex-col gap-3">
       <div class="flex flex-wrap items-center justify-between gap-3">
         <SubmissionQuickFilters
@@ -146,12 +142,7 @@ watch(
           @toggle-advanced="toggleAdvanced"
           @toggle-compare="toggleCompare"
         />
-        <!-- Without the stats strip its live pill moves here, so a list opened with live=0 can follow again. -->
-        <LiveToggle
-          v-if="!showStats"
-          :live="filters.live"
-          @update:live="update({ live: $event })"
-        />
+        <LiveToggle :live="filters.live" @update:live="update({ live: $event })" />
       </div>
       <SubmissionFilterPanel
         v-if="isAdvancedOpen"
@@ -180,7 +171,11 @@ watch(
         {{ $t('submissions.mineSummary', { count: formatNumber(mineTotal, locale.locale) }) }}
       </p>
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
-        <template #skeleton><SubmissionCardListSkeleton /></template>
+        <template #skeleton
+          ><SubmissionTableSkeleton
+            :column-keys="shownColumns"
+            :has-pick-column="isSignedIn && isComparing"
+        /></template>
         <Card v-if="!rows.length" as="div">
           <PageOutOfRange v-if="list && list.meta.page > 1" :meta="list.meta" :row-count="0" />
           <EmptyState v-else>
@@ -190,12 +185,13 @@ watch(
             /></template>
           </EmptyState>
         </Card>
-        <SubmissionCardList
+        <SubmissionTable
           v-else
           :submissions="rows"
-          :columns="shownColumns"
+          :column-keys="shownColumns"
           :highlight-ids="live.addedIds.value"
-          :contest-problems="contestProblems"
+          :problem-labels="contestLabels"
+          :contest-points="contestPoints"
           :picked-ids="isSignedIn && isComparing ? picks.picked.value : undefined"
           @toggle-pick="picks.toggle"
         />

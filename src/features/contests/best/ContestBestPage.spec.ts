@@ -44,9 +44,7 @@ describe('contest best submissions score', () => {
     });
     const { wrapper } = await mountApp('/contests/r42/problems/r42a/best');
     await vi.waitFor(() => expect(wrapper.findAll('tbody tr').length).toBe(2));
-    const scores = wrapper
-      .findAll('tbody tr')
-      .map((row) => row.find('a[href^="/submissions/"] span:nth-child(2)').text());
+    const scores = wrapper.findAll('tbody tr').map((row) => row.findAll('td')[2]?.text());
     expect(scores).toEqual(['300 / 300', '150 / 300']);
   });
 });

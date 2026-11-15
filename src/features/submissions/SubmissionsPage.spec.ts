@@ -165,7 +165,7 @@ describe('the submission list page', () => {
   });
 });
 
-describe('the submission cards', () => {
+describe('the submission rows', () => {
   const judged = submissionItem({
     testSummary: {
       unit: 'case',
@@ -176,17 +176,14 @@ describe('the submission cards', () => {
     },
   });
 
-  it('draws the per-test strip with a text line, so colour is not the only cue', async () => {
+  it('is a dense table: verdict, score, time and memory as the API sends them, and no per-test strip', async () => {
     mockApi({ ...signedInViewer(), ...submissionListRoutes, 'GET /submissions': page([judged]) });
     const { wrapper } = await openList();
-    const strip = wrapper.get('[data-id="sub-1"] [data-testid="test-strip"]');
-    expect(strip.get('[role="img"]').attributes('aria-label')).toBe('1/4 test đúng · 1 WA · 1 TLE');
-    expect(strip.findAll('[title]').map((cell) => cell.attributes('title'))).toEqual([
-      'Test 1: Chấp nhận (AC)',
-      'Test 2: Sai kết quả (WA)',
-      'Test 3: Quá thời gian (TLE)',
-      'Test 4: chưa chấm',
-    ]);
+    const cells = wrapper.findAll('[data-id="sub-1"] td').map((cell) => cell.text());
+    expect(cells[0]).toContain('AC');
+    expect(cells[1]).toBe('100 / 100');
+    expect(cells).toContain('0.04s');
+    expect(wrapper.find('[data-testid="test-strip"]').exists()).toBe(false);
   });
 
   it('scores a contest row by its problem points, not its contest points', async () => {
@@ -201,27 +198,16 @@ describe('the submission cards', () => {
       'GET /submissions': page([contestRow]),
     });
     const { wrapper } = await openList();
-    const ring = wrapper.get('[data-id="sub-1"] > [role="img"]');
-    expect(ring.attributes('aria-label')).toBe('Điểm 65%');
+    expect(wrapper.findAll('[data-id="sub-1"] td')[1]?.text()).toBe('65 / 100');
   });
 
-  it('names the test under the strip as the arrow keys move along it', async () => {
-    mockApi({ ...signedInViewer(), ...submissionListRoutes, 'GET /submissions': page([judged]) });
+  it('shows a queued row as waiting, with no score and no time', async () => {
+    const queued = submissionItem({ status: 'QU', result: null, points: null, time: null });
+    mockApi({ ...signedInViewer(), ...submissionListRoutes, 'GET /submissions': page([queued]) });
     const { wrapper } = await openList();
-    const strip = wrapper.get('[data-testid="test-strip"] [role="img"]');
-    await strip.trigger('focus');
-    await strip.trigger('keydown', { key: 'ArrowRight' });
-    await strip.trigger('keydown', { key: 'ArrowRight' });
-    expect(wrapper.get('[data-testid="test-strip"] p').text()).toBe('Test 2: Sai kết quả (WA)');
-  });
-
-  it('shows the card without a strip when the backend sends no summary (an older one omits the field)', async () => {
-    // JSON drops an undefined field: the response has no `testSummary` at all, as an older backend's.
-    const older = { ...judged, testSummary: undefined as unknown as null };
-    mockApi({ ...signedInViewer(), ...submissionListRoutes, 'GET /submissions': page([older]) });
-    const { wrapper } = await openList();
-    expect(wrapper.find('[data-id="sub-1"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="test-strip"]').exists()).toBe(false);
+    const cells = wrapper.findAll('[data-id="sub-1"] td').map((cell) => cell.text());
+    expect(cells[1]).toBe('Trong hàng đợi');
+    expect(cells).not.toContain('0.04s');
   });
 });
 
