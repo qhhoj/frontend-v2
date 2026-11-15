@@ -103,7 +103,8 @@ function panelIdOf(tabId: string) {
 <template>
   <ProblemArchivedNotice :code="problem.code" :organization-ids="problem.organizations" />
   <div :class="[layout.grid, paneIsOpen ? layout.columns.editor : '']" :style="stickyTop">
-    <!-- The left column: the header on the page background (sticky facts strip, tabs), then the statement card. -->
+    <!-- The left column: the header on the page background (sticky facts strip, tabs), then the statement card (statement tab only;
+         v-show keeps the tab panel the tabs point to). -->
     <div :class="['min-w-0', layout.left]">
       <ProblemHeader :problem="problem" :section="tab === 'editorial' ? 'editorial' : 'statement'">
         <template #actions>
@@ -138,6 +139,7 @@ function panelIdOf(tabId: string) {
         />
       </ProblemHeader>
       <Card
+        v-show="tab === DEFAULT_TAB"
         as="div"
         data-testid="statement-card"
         :variant="isPhone ? 'plain' : 'glass'"
