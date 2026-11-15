@@ -9,8 +9,10 @@ import { useSessionStore } from '@/stores/session.store';
 import { problemTypeLabel } from './problem-type-label';
 
 /**
- * The top of the statement card: code, group chip, title and edit link, the `strip` slot (the facts strip), a hairline,
- * then the tabs in the default slot. The `actions` slot (the submit button) sits right of the edit link, so it stays the right-most. The root is `contents`, so a sticky part of the strip sticks within the whole card.
+ * The top of the problem page, on the page background (not in the statement card): the section crumb, the title, a meta
+ * line (code, group chip), the edit link and the `actions` slot (the submit button, right-most), the `strip` slot (the
+ * facts strip), then the tabs in the default slot. The root is `contents`, so the sticky strip sticks within the parent
+ * that also holds the statement card.
  * Keep `ProblemHeaderSkeleton.vue` in step.
  */
 /** `section`: the tab being read; the edit link opens its editor tab. */
@@ -21,16 +23,14 @@ const session = useSessionStore();
 <template>
   <div data-testid="problem-header" class="contents">
     <PageHeader :title="problem.name">
-      <template #above>
-        <p class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm">
-          <span class="font-mono text-muted [overflow-wrap:anywhere]">{{ problem.code }}</span>
-          <Chip v-if="problem.group" data-testid="problem-group-chip" tone="accent">{{
-            problemTypeLabel(problem.group)
-          }}</Chip>
-          <Chip v-if="problem.externalJudge" data-testid="external-judge-badge">{{
-            $t('problem.externalJudge', { oj: problem.externalJudge.oj })
-          }}</Chip>
-        </p>
+      <template #meta>
+        <span class="font-mono [overflow-wrap:anywhere]">{{ problem.code }}</span>
+        <Chip v-if="problem.group" data-testid="problem-group-chip">{{
+          problemTypeLabel(problem.group)
+        }}</Chip>
+        <Chip v-if="problem.externalJudge" data-testid="external-judge-badge">{{
+          $t('problem.externalJudge', { oj: problem.externalJudge.oj })
+        }}</Chip>
       </template>
       <template #actions>
         <div class="flex flex-wrap items-center gap-2">
@@ -40,7 +40,6 @@ const session = useSessionStore();
       </template>
     </PageHeader>
     <slot name="strip" />
-    <hr class="-mx-6 mt-4 border-line sm:-mx-8" />
     <div v-if="$slots.default" class="mt-4"><slot /></div>
   </div>
 </template>

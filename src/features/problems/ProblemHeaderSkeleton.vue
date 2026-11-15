@@ -24,7 +24,6 @@ const STRIP_CELLS = 5;
       </div>
     </div>
     <p class="mt-1 text-meta"><SkeletonBlock text class="my-3.5 w-48" /></p>
-    <hr class="-mx-6 mt-4 border-line sm:-mx-8" />
     <div data-skeleton-region="tabs" class="mt-4 flex flex-wrap gap-2">
       <SkeletonBlock v-for="index in TAB_COUNT" :key="index" pill class="h-11 w-24" />
     </div>
