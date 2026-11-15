@@ -19,7 +19,7 @@ defineProps<{
     :to="{ name: 'problem', params: { code: problem.code }, query: { contest: contestKey } }"
     :title="name ? `${problem.code}: ${name}` : problem.code"
     class="inline-flex max-w-20 min-w-6 flex-col items-center cursor-pointer hover:text-accent-text hover:underline touch:-mx-2.5 touch:-my-3 touch:min-w-11 touch:px-2.5 touch:py-3"
-    >
+  >
     <span>{{ problem.label }}</span>
     <span v-if="name" class="block max-w-full truncate text-tiny font-normal text-muted">{{
       name

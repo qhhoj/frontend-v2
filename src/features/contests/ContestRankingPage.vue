@@ -93,7 +93,8 @@ const hiddenBodyKey = computed(() => {
 const search = ref('');
 /** Problem names by problem id: the board's columns carry only codes, the contest has the names. */
 const problemNames = computed(
-  () => new Map((contest.value?.problems ?? []).map((p) => [p.problemId, p.name])),
+  () =>
+    new Map((contest.value?.problems ?? []).map((problem) => [problem.problemId, problem.name])),
 );
 const locale = useLocaleStore();
 /** How this contest prints cells and scores; the table prints cells with it. */
