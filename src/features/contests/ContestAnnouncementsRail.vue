@@ -18,10 +18,7 @@ watch([viewerId, key], ([viewer, contestKey]) => loadSeenAnnouncement(viewer, co
 });
 /** Shown only while the contest runs and has announcements; the Thông báo tab holds the rest. */
 const RAIL_SIZE = 3;
-const { data } = useContestAnnouncementsQuery(
-  key,
-  ref(ANNOUNCEMENT_FIRST_PAGE),
-);
+const { data } = useContestAnnouncementsQuery(key, ref(ANNOUNCEMENT_FIRST_PAGE));
 const latest = computed(() => (data.value?.items ?? []).slice(0, RAIL_SIZE));
 /** "Trực tiếp" claims a live stream: not while the stream is down. */
 const isLive = computed(
