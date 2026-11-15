@@ -41,19 +41,26 @@ const MENU_ROOM: Record<TabsVariant, string> = {
 export const tabsList = (variant: TabsVariant, hasMenu: boolean) =>
   hasMenu ? `${LIST[variant]} ${MENU_ROOM[variant]}` : LIST[variant];
 
-/** A boxed tab: the accent-soft pair while current. */
+/** A boxed tab: the accent-soft text while current; its box is the sliding indicator behind it. */
 const PILL_TAB =
-  'min-h-(--qh-control) rounded-control border border-transparent px-2.5 hover:bg-surface-hover aria-[current=page]:border-accent aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent-soft-text aria-selected:border-accent aria-selected:bg-accent-soft aria-selected:text-accent-soft-text';
+  'min-h-(--qh-control) rounded-control border border-transparent px-2.5 not-aria-[current=page]:not-aria-selected:hover:bg-surface-hover aria-[current=page]:text-accent-soft-text aria-selected:text-accent-soft-text';
 
 export const TAB_CLASS: Record<TabsVariant, string> = {
   pill: PILL_TAB,
   underline:
-    '-mb-px min-h-(--qh-control) border-b-2 border-transparent px-2.5 focus-visible:-outline-offset-2 aria-[current=page]:border-accent aria-[current=page]:text-content aria-selected:border-accent aria-selected:text-content',
+    '-mb-px min-h-(--qh-control) border-b-2 border-transparent px-2.5 focus-visible:-outline-offset-2 aria-[current=page]:text-content aria-selected:text-content',
   rail: `${PILL_TAB} lg:flex-1`,
 };
 
+/** The sliding indicator, behind the tabs: the current tab's accent-soft box, or its 2 px accent underline. */
+export const TAB_INDICATOR: Record<TabsVariant, string> = {
+  pill: 'pointer-events-none absolute top-0 left-0 rounded-control border border-accent bg-accent-soft',
+  underline: 'pointer-events-none absolute top-0 left-0 bg-accent',
+  rail: 'pointer-events-none absolute top-0 left-0 rounded-control border border-accent bg-accent-soft',
+};
+
 export const TAB_BASE =
-  'inline-flex items-center gap-2 text-meta font-medium whitespace-nowrap text-muted hover:text-content aria-[current=page]:font-semibold aria-selected:font-semibold';
+  'relative inline-flex items-center gap-2 text-meta font-medium whitespace-nowrap text-muted hover:text-content aria-[current=page]:font-semibold aria-selected:font-semibold';
 
 /** The "⋯" button sits over the strip's right end: on the underline's baseline, or centred on the pill row. */
 export const MORE_CLASS: Record<TabsVariant, string> = {

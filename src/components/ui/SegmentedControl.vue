@@ -4,6 +4,7 @@ import type { RouteLocationRaw } from 'vue-router';
 import { RouterLink } from 'vue-router';
 import Chip from './Chip.vue';
 import StatusMark from './StatusMark.vue';
+import { SLIDE, useSlidingIndicator } from './useSlidingIndicator';
 
 export interface SegmentOption<V extends string | number = string> {
   value: V;
@@ -50,6 +51,11 @@ const props = withDefaults(
 const emit = defineEmits<{ 'update:modelValue': [value: Value] }>();
 const isNav = computed(() => props.options.some((option) => option.to));
 const frame = ref<HTMLElement | null>(null);
+const indicator = useSlidingIndicator(frame, '[data-segment]', [
+  () => props.modelValue,
+  () => props.options.map((option) => option.value).join(),
+  () => props.size,
+]);
 
 function revealCurrent() {
   const box = frame.value;
@@ -75,18 +81,20 @@ function stateOf(option: SegmentOption<Value>) {
  * is the full 44 px.
  */
 const FRAME_BASE =
-  'flex min-h-(--qh-control) gap-0.5 rounded-control bg-surface-strong p-0.5 inset-ring inset-ring-line touch:gap-0 touch:p-0';
+  'relative flex min-h-(--qh-control) gap-0.5 rounded-control bg-surface-strong p-0.5 inset-ring inset-ring-line touch:gap-0 touch:p-0';
 const FRAME = {
   md: FRAME_BASE,
   sm: `${FRAME_BASE} max-w-full flex-wrap self-start overflow-x-auto`,
 };
 const SEGMENT = {
-  md: 'inline-flex flex-1 items-center justify-center gap-1.5 px-2.5 py-0.5 leading-tight touch:min-h-11',
-  sm: 'inline-flex shrink-0 items-center gap-1.5 px-2.5 py-0.5 whitespace-nowrap touch:min-h-11',
+  md: 'relative inline-flex flex-1 items-center justify-center gap-1.5 px-2.5 py-0.5 leading-tight touch:min-h-11',
+  sm: 'relative inline-flex shrink-0 items-center gap-1.5 px-2.5 py-0.5 whitespace-nowrap touch:min-h-11',
 };
-/** The current segment: raised on the solid surface. Disabled keeps full-contrast text, no opacity. */
-const ACTIVE =
-  'border-line-strong bg-surface-solid font-semibold text-content disabled:bg-surface-hover';
+/** The current segment: bold, full-contrast text over the sliding indicator (raised on the solid surface). */
+const ACTIVE = 'border-transparent font-semibold text-content';
+/** The indicator behind the segments; disabled keeps the full-contrast text, no opacity. */
+const INDICATOR =
+  'pointer-events-none absolute top-0 left-0 rounded-cell border border-line-strong bg-surface-solid';
 const IDLE =
   'border-transparent text-muted hover:text-content disabled:border-line disabled:bg-surface-strong';
 
@@ -106,12 +114,19 @@ const segments = computed(() => props.options.map((option) => ({ option, dot: do
     :aria-label="label"
     :class="FRAME[size]"
   >
+    <span
+      v-if="indicator.visible.value"
+      aria-hidden="true"
+      :class="[INDICATOR, disabled && 'bg-surface-hover', indicator.animate.value && SLIDE]"
+      :style="indicator.style.value"
+    />
     <component
       :is="option.to ? RouterLink : 'button'"
       v-for="{ option, dot } in segments"
       :key="option.value"
       v-bind="stateOf(option)"
       :data-testid="option.testid"
+      data-segment
       class="rounded-cell border text-meta font-medium disabled:cursor-not-allowed"
       :class="[SEGMENT[size], option.value === modelValue ? ACTIVE : IDLE]"
       @click="option.to ? undefined : emit('update:modelValue', option.value)"
