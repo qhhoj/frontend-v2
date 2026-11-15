@@ -19,7 +19,6 @@ export const ALLOWED = {
   'features/submissions/list/TestStrip.vue': ['rounded-[2px]', 'rounded-[3px]'],
   'features/problems/ProblemTierMark.vue': ['rounded-[3px]'],
   'features/submissions/VerdictDistributionBar.vue': ['rounded-[3px]'],
-  'features/not-found/NotFoundPage.vue': ['rounded-[4px]'],
 };
 
 /** The arbitrary size, radius and z-index classes in the string literals of one source line, as written; comment lines are ignored. */
