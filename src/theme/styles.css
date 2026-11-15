@@ -272,6 +272,33 @@
   line-height: 1.75rem;
 }
 /* A card: the opaque surface and its hairline (the Glass blur and the background blobs were retired with palette A). */
+/* Whole-box link (kit: StretchedLink, Card `to`/`href`). The box is `box-link`; its one real link is `stretched-link`, whose
+   pseudo-element covers the box. Other links and controls inside rise above the cover. The ring goes around the box. */
+@utility stretched-link {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  &:focus-visible {
+    outline: none;
+  }
+}
+@utility box-link {
+  position: relative;
+  cursor: pointer;
+  &:hover {
+    background-color: var(--qh-surface-hover);
+  }
+  &:has(.stretched-link:focus-visible) {
+    outline: 2px solid var(--qh-focus-ring);
+    outline-offset: 2px;
+  }
+  & :is(a:not(.stretched-link), button, input, select, textarea, label, summary) {
+    position: relative;
+    z-index: 1;
+  }
+}
 @utility glass {
   background-color: var(--qh-surface);
   border: 1px solid var(--qh-line);

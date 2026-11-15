@@ -146,3 +146,7 @@ The kit part for each job is in `src/components/ui/README.md` (the one table; a 
 - Pure UI fixes need no new tests, but fix every spec the change breaks.
 - Take screenshots at 390 and 1440 px and look at them before calling it done.
 - Run `npm run lint` before a PR.
+
+## Whole-box links
+
+- A box (card, row, tile, list item) that stands for one destination is clickable as a whole, never only through its title or a small "Xem" button. Use `Card to`/`href` (+ `linkLabel` if untitled), `DataTable rowTo`, or `box-link` + `StretchedLink` for a custom box. Inner links and buttons that do something else stay clickable above the cover. Details: `src/components/ui/README.md`.

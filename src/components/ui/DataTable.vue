@@ -177,6 +177,9 @@ const HEAD_CELL = `h-7.5 ${CELL_BASE}`;
 const HEAD_TEXT = 'text-tiny font-semibold whitespace-nowrap text-muted';
 const SORT_BUTTON =
   'inline-flex min-h-6 items-center gap-1 rounded-cell hover:text-content touch:min-h-11';
+/** A `rowTo` row is one box: a pointer, and a ring around the row (not the link text) while its link has keyboard focus. */
+const ROW_LINK =
+  'cursor-pointer has-[.row-link:focus-visible]:outline-2 has-[.row-link:focus-visible]:-outline-offset-2 has-[.row-link:focus-visible]:outline-focus';
 const FRAME = computed(() => CARD_VARIANTS[isCompact.value ? 'flat' : 'glass']);
 const frameStyle = computed(() => (props.maxHeight ? { maxHeight: props.maxHeight } : undefined));
 
@@ -351,7 +354,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
           :key="rowKey(row)"
           v-bind="rowAttrs?.(row)"
           class="flex flex-col gap-1.5 border-b border-line px-4 py-3 last:border-b-0"
-          :class="[selected.has(rowKey(row)) && 'bg-accent-soft', rowTo && 'cursor-pointer']"
+          :class="[selected.has(rowKey(row)) && 'bg-accent-soft', rowTo && ROW_LINK]"
           @click="openRow(row, $event)"
           @auxclick="openRowInTab(row, $event)"
         >
@@ -366,7 +369,11 @@ const offset = computed(() => (props.selectable ? 1 : 0));
             <div class="flex min-w-0 flex-1 flex-wrap items-start gap-x-3 gap-y-1">
               <div class="min-w-0 flex-1 basis-28">
                 <slot :name="`cell-${primary!.key}`" :row="row">
-                  <RouterLink v-if="rowTo" :to="rowTo(row)" class="font-semibold hover:underline">
+                  <RouterLink
+                    v-if="rowTo"
+                    :to="rowTo(row)"
+                    class="row-link font-semibold outline-none hover:underline"
+                  >
                     {{ cellText(row, primary!.key) }}
                   </RouterLink>
                   <template v-else>{{ cellText(row, primary!.key) }}</template>
@@ -524,7 +531,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                 class="hover:bg-surface-hover"
                 :class="[
                   selected.has(rowKey(row)) && 'bg-accent-soft hover:bg-accent-soft',
-                  rowTo && 'cursor-pointer',
+                  rowTo && ROW_LINK,
                 ]"
                 @click="openRow(row, $event)"
                 @auxclick="openRowInTab(row, $event)"
@@ -553,7 +560,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                     <RouterLink
                       v-if="rowTo && column === primary"
                       :to="rowTo(row)"
-                      class="font-semibold hover:underline"
+                      class="row-link font-semibold outline-none hover:underline"
                     >
                       {{ cellText(row, column.key) }}
                     </RouterLink>
