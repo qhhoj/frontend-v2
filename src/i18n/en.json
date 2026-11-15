@@ -1430,13 +1430,13 @@
     },
     "legend": {
       "firstSolve": "first solve",
-      "solved": "+n: solved after n wrong tries, with the time",
-      "failed": "−n: n wrong tries",
+      "solved": "+n: solved after n wrong tries, solve time on the line below",
+      "failed": "red −n: n wrong tries",
       "pending": "?n: waiting to be revealed",
       "firstPoints": "full points and first to solve",
-      "fullPoints": "green: the problem's full points",
-      "partialPoints": "Partial points, tinted in three steps",
-      "zeroPoints": "0: submitted, no points yet",
+      "fullPoints": "green fill: the problem's full points",
+      "partialPoints": "plain score: part of the problem's points",
+      "zeroPoints": "red 0: submitted, no points yet",
       "notAttempted": "blank: not attempted",
       "button": "Legend"
     },
