@@ -14,12 +14,14 @@ import {
   MORE_CLASS,
   TAB_BASE,
   TAB_CLASS,
+  TAB_INDICATOR,
   TABS_FRAME,
   tabsList,
   tabsScroller,
 } from './Tabs.classes';
 import type { TabsVariant } from './Tabs.classes';
 import { useTabsOverflow } from './TabsOverflow';
+import { SLIDE, useSlidingIndicator } from './useSlidingIndicator';
 
 export interface TabItem {
   key: string;
@@ -83,6 +85,18 @@ const { hiddenKeys, measure } = useTabsOverflow(scroller, trigger, hasMenu, [
   () => props.items.length,
   () => route.fullPath,
 ]);
+/** The indicator slides to the current tab when the model, the router or the items change. */
+const indicator = useSlidingIndicator(
+  scroller,
+  '[data-tab-key]',
+  [
+    current,
+    () => route.fullPath,
+    () => props.variant,
+    () => props.items.map((item) => `${item.key}:${item.isCurrent}`).join(),
+  ],
+  () => props.variant === 'underline',
+);
 /** A tab out of view, hidden whole; the current one is always kept in view. */
 const isHidden = (item: TabItem) =>
   hiddenKeys.value.includes(item.key) && item.key !== current.value && !item.isCurrent;
@@ -172,6 +186,12 @@ const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
   >
     <div class="relative min-w-0 flex-1">
       <div ref="scroller" :class="tabsScroller(variant, hasMenu)" @scroll.passive="measure">
+        <span
+          v-if="indicator.visible.value"
+          aria-hidden="true"
+          :class="[TAB_INDICATOR[variant], indicator.animate.value && SLIDE]"
+          :style="indicator.style.value"
+        />
         <ul
           :class="tabsList(variant, hasMenu)"
           :role="isTablist ? 'tablist' : undefined"
