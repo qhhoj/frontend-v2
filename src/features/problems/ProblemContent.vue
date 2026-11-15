@@ -80,12 +80,13 @@ watch(
 const scaleContest = () => (props.contestIsLive === false ? null : props.contest);
 const submitForm = useSubmitForm(toRef(props, 'problem'), resubmitId, scaleContest);
 const scoreScale = useScoreScale(() => props.problem, scaleContest);
-// A submission sent here is followed to its verdict by the shell, which toasts it unless the result strip is on screen.
+// A submission sent here is followed to its verdict by the shell, which toasts it only once the viewer left this page: here the
+// result is always shown (the open pane, the header line beside the closed pane's button, or the phone sheet's bar).
 useVerdictToastTracking({
   submissionId: submitForm.lastSubmissionId,
   scale: () => scoreScale.value,
   wasSolvedBefore: () => props.problem.viewerStatus === 'solved',
-  isResultVisible: () => isSignedIn.value && (usesSheet.value || submitOpen.value),
+  isResultVisible: () => isSignedIn.value,
 });
 const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id === 'editorial'));
 const { t } = useI18n();

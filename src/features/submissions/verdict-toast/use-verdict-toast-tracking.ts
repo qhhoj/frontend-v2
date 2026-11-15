@@ -6,7 +6,7 @@ import { submissionsOnScreen, trackSubmission } from './tracked-submissions';
 /**
  * The problem page's part of the verdict toast: each submission sent from its form is handed to the shell, which follows it to
  * the final verdict even after the viewer leaves, and the page says while it shows the result so no toast repeats it.
- * `isResultVisible` is true while the result strip is on screen (open pane, or the phone sheet's bar).
+ * `isResultVisible` is true while the result strip is on screen (open pane, header line, or the phone sheet's bar).
  */
 export function useVerdictToastTracking(input: {
   submissionId: Ref<string | null>;
