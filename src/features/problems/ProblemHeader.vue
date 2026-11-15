@@ -10,7 +10,7 @@ import { problemTypeLabel } from './problem-type-label';
 
 /**
  * The top of the statement card: code, group chip, title and edit link, the `strip` slot (the facts strip), a hairline,
- * then the tabs in the default slot. The root is `contents`, so a sticky part of the strip sticks within the whole card.
+ * then the tabs in the default slot. The `actions` slot (the submit button) sits right of the edit link, so it stays the right-most. The root is `contents`, so a sticky part of the strip sticks within the whole card.
  * Keep `ProblemHeaderSkeleton.vue` in step.
  */
 /** `section`: the tab being read; the edit link opens its editor tab. */
@@ -33,7 +33,10 @@ const session = useSessionStore();
         </p>
       </template>
       <template #actions>
-        <AdminEditLink :to="problemEditTarget(session.user, props.problem, props.section)" />
+        <div class="flex flex-wrap items-center gap-2">
+          <AdminEditLink :to="problemEditTarget(session.user, props.problem, props.section)" />
+          <slot name="actions" />
+        </div>
       </template>
     </PageHeader>
     <slot name="strip" />
