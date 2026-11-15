@@ -1524,6 +1524,12 @@
     }
   },
   "submission": {
+    "step": {
+      "queued": "Đang chờ",
+      "processing": "Đang xử lý",
+      "running": "Test {test}/{total}",
+      "grading": "Đang chấm"
+    },
     "ringLabel": "Đã chấm {graded} trên {total} test",
     "ringLabelPoints": "Đã được {percent}% điểm",
     "provisional": "điểm tạm tính",

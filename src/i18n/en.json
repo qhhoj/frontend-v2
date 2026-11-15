@@ -1524,6 +1524,12 @@
     }
   },
   "submission": {
+    "step": {
+      "queued": "Queued",
+      "processing": "Processing",
+      "running": "Test {test}/{total}",
+      "grading": "Grading"
+    },
     "ringLabel": "Graded {graded} of {total} tests",
     "ringLabelPoints": "{percent}% of the points earned",
     "provisional": "provisional score",

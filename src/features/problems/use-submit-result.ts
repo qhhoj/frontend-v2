@@ -39,6 +39,12 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
   const progress = computed(() =>
     row.value && !isFinished.value ? ringProgress(row.value) : null,
   );
+  /** What the stepper shows while the grading goes on: the stream's status and test lead, then the stored row's. */
+  const step = computed(() => ({
+    status: live.status ?? row.value?.status ?? 'QU',
+    test: live.currentTestcase || row.value?.currentTestcase || 0,
+    total: row.value?.totalCases ?? null,
+  }));
   const partialShare = computed(() => {
     const max = scale.value.problemPoints;
     return verdict.value.code === PARTIAL_CODE && row.value?.points != null && max > 0
@@ -93,6 +99,7 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
   return {
     isEmpty: computed(() => !row.value || row.value.status === 'PD'),
     isFinished,
+    step,
     verdict,
     progress,
     partialShare,
