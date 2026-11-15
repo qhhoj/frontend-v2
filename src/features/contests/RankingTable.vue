@@ -4,7 +4,7 @@ import UserLink from '@/components/UserLink.vue';
 import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import AppButton from '@/components/ui/AppButton.vue';
-import { computed, ref } from 'vue';
+import { computed, ref, TransitionGroup } from 'vue';
 import { focusTableRow } from '@/lib/focus-table-row';
 import { medalClass } from '@/lib/medal';
 import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
@@ -15,6 +15,7 @@ import { deltaToneClass, formatDelta } from '@/lib/rating-delta';
 import { isPenaltyFormat, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import RankingCell from './RankingCell.vue';
+import ScoreTick from './ScoreTick.vue';
 import RankingLegend from './RankingLegend.vue';
 import RankingList from './RankingList.vue';
 import RankingProblemHeader from './RankingProblemHeader.vue';
@@ -27,6 +28,7 @@ import {
   timeColumnRem,
 } from './ranking-columns';
 import type { StatsColumns } from './ranking-columns';
+import { useLiveBoard } from './use-live-board';
 import { rowViewOf } from './ranking-row-view';
 import type { RowView } from './ranking-row-view';
 
@@ -43,6 +45,8 @@ const props = defineProps<{
   ownSubmissionsOnly?: boolean;
   /** Why cells show "?" while the board is frozen: a line in "Chú giải". */
   freezeNote?: string;
+  /** The rows shown are the previous board's while the new one loads: nothing ticks when it arrives. */
+  isStale?: boolean;
 }>();
 defineSlots<{ tools?: () => unknown }>();
 /** Rank and name stay while the problem columns scroll (the rank column is `RANK_COLUMN_REM` = 5 rem = `left-20`). */
@@ -55,6 +59,20 @@ const stickyBackground = (row: RankingRow) =>
 const penalty = computed(() => isPenaltyFormat(props.context.formatName));
 const root = ref<HTMLElement | null>(null);
 const isMotionAllowed = useMotionAllowed();
+const isLive = useLiveBoard(
+  () => props.ranking,
+  () => props.rows,
+  () => props.context,
+  () => props.isStale ?? false,
+);
+/** Numbers tick and rows move only when a poll changed the board and motion is allowed. */
+const isTicking = computed(() => isLive.value && isMotionAllowed.value);
+const MOVE_CLASS = 'transition-transform duration-(--qh-duration) ease-move';
+/** Above this many rows the rows jump instead of sliding (FLIP reads every row's box on every change). */
+const FLIP_MAX_ROWS = 100;
+/** The rows sit in a `TransitionGroup` whenever they may move: swapping it per poll would redraw every row and lose the change. */
+const isMovable = computed(() => isMotionAllowed.value && props.rows.length <= FLIP_MAX_ROWS);
+const moveClass = computed(() => (isTicking.value ? MOVE_CLASS : ''));
 /** Focuses a participation's name cell ("Về hàng của tôi"); false when the row is not shown. */
 const focusRow = (participationId: string) =>
   focusTableRow(root.value, participationId, isMotionAllowed.value);
@@ -149,6 +167,7 @@ const scoreHeaderKey = computed(() =>
       :has-combined-score="hasCombinedScore"
       :has-rating-column="hasRatingColumn"
       :link-of="submissionsLink"
+      :is-ticking="isTicking"
     />
     <ScrollRegion v-else :label="$t('ranking.scrollRegion')" :hint="$t('ranking.scrollHint')">
       <table class="w-full table-fixed border-collapse" :style="{ minWidth }">
@@ -200,7 +219,11 @@ const scoreHeaderKey = computed(() =>
             </th>
           </tr>
         </thead>
-        <tbody class="font-mono text-sm tabular-nums">
+        <component
+          :is="isMovable ? TransitionGroup : 'tbody'"
+          v-bind="isMovable ? { tag: 'tbody', moveClass } : {}"
+          class="font-mono text-sm tabular-nums"
+        >
           <tr
             v-for="row in rows"
             :key="row.participationId"
@@ -241,7 +264,7 @@ const scoreHeaderKey = computed(() =>
             <td class="overflow-hidden px-1.5 leading-none whitespace-nowrap">
               <span class="block text-base font-bold">
                 <template v-if="row.isDisqualified">—</template>
-                <template v-else>{{ viewOf(row).total }}</template>
+                <ScoreTick v-else :text="viewOf(row).total" :animate="isTicking" />
               </span>
               <small
                 v-if="hasCombinedScore && !row.isDisqualified"
@@ -271,9 +294,10 @@ const scoreHeaderKey = computed(() =>
               :key="cell.problemId"
               :view="cell.view"
               :to="cell.to"
+              :tick="isTicking"
             />
           </tr>
-        </tbody>
+        </component>
       </table>
     </ScrollRegion>
     <p

@@ -4,12 +4,13 @@ import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
 import type { RankingCellView } from '@/lib/ranking-cells';
+import ScoreTick from './ScoreTick.vue';
 import { TABLE_CELL_CLASSES, TABLE_CELL_TIME_CLASSES } from './ranking-cell-classes';
 
 /** The board row is 36 px (`--qh-row-dense`), the cell box 32 px inside it: the score and, under it, the time. */
 const CELL_BOX_CLASS = 'h-8';
 
-const props = defineProps<{ view: RankingCellView; to?: RouteLocationRaw }>();
+const props = defineProps<{ view: RankingCellView; to?: RouteLocationRaw; tick?: boolean }>();
 
 /** The spoken label pluralises on the number of tries (a label without tries is not plural). */
 const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
@@ -34,7 +35,10 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
       :title="view.time"
     >
       <span aria-hidden="true" class="flex items-center gap-1 text-sm font-semibold">
-        <Star v-if="view.kind === 'first-solve'" class="size-3 shrink-0" />{{ view.text }}
+        <Star v-if="view.kind === 'first-solve'" class="size-3 shrink-0" /><ScoreTick
+          :text="view.text"
+          :animate="tick"
+        />
       </span>
       <span
         v-if="view.time"

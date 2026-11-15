@@ -244,6 +244,7 @@ async function goToMyRow() {
             :problem-names="problemNames"
             :own-submissions-only="contest ? ownSubmissionsOnly(contest, now) : true"
             :freeze-note="freezeNote"
+            :is-stale="rankingStale"
           >
             <template #tools>
               <SearchInput
