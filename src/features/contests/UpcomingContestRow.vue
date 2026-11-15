@@ -42,29 +42,31 @@ const startsInText = computed(() =>
     :to="{ name: 'contest', params: { key: contest.key } }"
     :link-label="contest.name"
     data-testid="upcoming-contest"
-    class="flex min-w-0 grow basis-80 flex-col gap-2 p-4"
+    class="flex min-w-0 grow basis-96 flex-col gap-3 p-5"
   >
-    <div class="flex min-w-0 items-center gap-3">
+    <div class="flex min-w-0 items-center gap-4">
       <span
         data-testid="day-chip"
-        class="flex size-12 shrink-0 flex-col items-center justify-center rounded-row bg-accent-soft text-accent-soft-text"
+        class="flex size-16 shrink-0 flex-col items-center justify-center rounded-row bg-accent-soft text-accent-soft-text"
       >
-        <span class="font-display text-subtitle leading-none font-bold">{{ dayTile.day }}</span>
-        <span class="text-tiny font-semibold">{{ dayTile.month }}</span>
+        <span class="font-display text-display leading-none font-bold">{{ dayTile.day }}</span>
+        <span class="text-caption font-semibold">{{ dayTile.month }}</span>
+        <span v-if="dayTile.year" class="text-tiny leading-none">{{ dayTile.year }}</span>
       </span>
       <div class="min-w-0">
         <h3
           :title="contest.name"
-          class="truncate font-display text-subtitle leading-6 font-semibold"
+          class="truncate font-display text-subtitle leading-7 font-semibold"
         >
           {{ contest.name }}
         </h3>
-        <p class="truncate text-sm text-muted">
+        <p class="text-sm text-muted">
           <span class="font-mono font-semibold tabular-nums">{{ timeRange }}</span>
           · {{ durationText }}
         </p>
       </div>
     </div>
+    <p v-if="contest.summary" class="text-sm text-muted">{{ contest.summary }}</p>
     <div class="flex flex-wrap items-center gap-1.5 [&_a]:relative">
       <ContestChips :contest="contest" with-tags with-code-needed />
       <ViewerBadge :badge-key="call.badgeKey" />
@@ -73,9 +75,11 @@ const startsInText = computed(() =>
         <ContestEditLink :contest="contest" />
       </template>
     </div>
-    <div class="mt-auto flex items-center justify-between gap-3 pt-1">
+    <div class="mt-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-1">
       <p class="min-w-0 text-sm text-muted">
-        {{ $t('contests.list.startsIn', { relative: startsInText }) }}
+        <span class="whitespace-nowrap">{{
+          $t('contests.list.startsIn', { relative: startsInText })
+        }}</span>
         ·
         {{
           $t(
@@ -86,7 +90,6 @@ const startsInText = computed(() =>
         }}
       </p>
       <ContestCallLink
-        compact
         :contest-key="contest.key"
         :contest-name="contest.name"
         :label-key="call.labelKey"
