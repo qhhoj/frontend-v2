@@ -51,7 +51,7 @@ describe('problem list', () => {
   });
   afterEach(() => vi.useRealTimers());
 
-  it('sets the solved choice and the editorial filter, clears all, and the back button undoes a change', async () => {
+  it('sets the solved choice and the editorial filter, clears the chips but not the choice, and the back button undoes a change', async () => {
     const calls = mockApi({
       ...anonymous(),
       'GET /auth/me': signedIn(),
@@ -80,7 +80,7 @@ describe('problem list', () => {
     const clearAll = wrapper.findAll('button').find((button) => button.text() === 'Xóa tất cả')!;
     await clearAll.trigger('click');
     await flushPromises();
-    expect(router.currentRoute.value.query).toEqual({});
+    expect(router.currentRoute.value.query).toEqual({ unsolved: '1' });
   });
 
   it('offers to clear the filters inside an empty result, and only when there are filters', async () => {

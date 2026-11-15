@@ -67,7 +67,7 @@ const columns = computed<DataTableColumn[]>(() => [
     label: t('problems.columns.code'),
     mono: true,
     sort: sortOf('code', 'asc'),
-    cellClass: 'text-meta text-secondary',
+    cellClass: 'max-w-40 truncate text-meta text-secondary',
   },
   {
     key: 'name',
@@ -151,6 +151,10 @@ const pointsText = (problem: ProblemListItem) =>
     </template>
 
     <template #cell-status="{ row }"><ProblemStatusMark :status="row.viewerStatus" /></template>
+    <!-- A long code is cut (its full text is the tooltip), so the name keeps its room. -->
+    <template #cell-code="{ row }"
+      ><span :title="row.code">{{ row.code }}</span></template
+    >
     <template #cell-name="{ row }">
       <RouterLink
         :to="target(row.code)"

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
 import { translate } from '@/i18n';
@@ -12,12 +11,13 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import ProblemFilterChips from './ProblemFilterChips.vue';
 import ProblemFilters from './ProblemFilters.vue';
+import ProblemListCount from './ProblemListCount.vue';
 import ProblemPeek from './ProblemPeek.vue';
 import ProblemTable from './ProblemTable.vue';
 import { filterChips } from './problem-filter-chips';
 import { saveListSetup } from './problem-list-setup';
 import { useProblemListQuery, useProblemMetaQuery } from './problems.queries';
-import { useProblemFilters } from './use-problem-filters';
+import { NO_FILTERS, useProblemFilters } from './use-problem-filters';
 import type { ProblemFilters as Filters } from './use-problem-filters';
 import { useProblemPeek } from './use-problem-peek';
 
@@ -54,11 +54,15 @@ function change(patch: Partial<Filters>) {
   if (!username || !('solved' in patch || 'sort' in patch)) return;
   saveListSetup(username, { ...filters.value, ...patch });
 }
+/** The empty state's "Xóa bộ lọc": everything but the sort, the solved choice included (it may be what emptied the list). */
 const clearFilters = () => {
   clearAll();
   const username = session.user?.username;
   if (username) saveListSetup(username, { solved: 'any', sort: filters.value.sort });
 };
+/** The chip row's "Xóa tất cả" clears what the chips show: the solved choice has no chip, so it stays, like the sort. */
+const clearChips = () =>
+  update({ ...NO_FILTERS, solved: filters.value.solved, sort: filters.value.sort });
 
 /** A page past the end (a stale link, a shrunk list) or an unusable `?page=` is replaced by the nearest valid one. */
 watch([data, isPlaceholderData, () => router.currentRoute.value.query.page], () => {
@@ -99,14 +103,9 @@ const peek = useProblemPeek(problems);
 <template>
   <div class="page-column">
     <PageHeader class="sr-only" :title="$t('problems.title')" />
-    <Teleport defer to="#top-bar-actions" :disabled="isPhone">
-      <div class="flex items-center justify-between gap-3">
-        <p data-testid="problems-count" class="font-mono text-meta text-muted tabular-nums">
-          {{ countText }}
-        </p>
-        <CreateShortcut kind="problem" />
-      </div>
-    </Teleport>
+    <!-- Two branches, not a disabled Teleport: the top bar swaps its phone and desktop layouts, so the target comes and goes. -->
+    <ProblemListCount v-if="isPhone" :text="countText" />
+    <Teleport v-else defer to="#top-bar-actions"><ProblemListCount :text="countText" /></Teleport>
     <div class="flex flex-col gap-3">
       <ProblemFilters
         :filters="filters"
@@ -116,7 +115,7 @@ const peek = useProblemPeek(problems);
         :listed-codes="listedCodes"
         @update="change"
       />
-      <ProblemFilterChips :chips="chips" @remove="update" @clear-all="clearFilters" />
+      <ProblemFilterChips :chips="chips" @remove="update" @clear-all="clearChips" />
     </div>
     <div
       ref="listTop"
