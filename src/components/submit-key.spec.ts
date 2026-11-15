@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isRepeatedSubmitKey } from './code-editor-cm';
+import { isRepeatedSubmitKey } from './submit-key';
 
 const press = (init: Partial<KeyboardEventInit>) => new KeyboardEvent('keydown', init);
 

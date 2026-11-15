@@ -2,6 +2,7 @@ import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { Compartment, EditorState, Prec, type Extension } from '@codemirror/state';
 import { EditorView, drawSelection, keymap, lineNumbers } from '@codemirror/view';
 import { syntaxHighlight } from './code-syntax';
+import { isRepeatedSubmitKey } from './submit-key';
 
 export interface EditorOptions {
   doc: string;
@@ -43,11 +44,6 @@ const tokenTheme = EditorView.theme({
   '.cm-selectionBackground, &.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground':
     { backgroundColor: 'var(--qh-accent-soft)' },
 });
-
-/** A held Ctrl Enter repeats the key: only the first press may submit, or each repeat would spend an attempt. */
-export function isRepeatedSubmitKey(event: Pick<KeyboardEvent, 'key' | 'ctrlKey' | 'metaKey' | 'repeat'>): boolean {
-  return event.repeat && event.key === 'Enter' && (event.ctrlKey || event.metaKey);
-}
 
 function submitKeymap(onSubmit: EditorOptions['onSubmit']) {
   return onSubmit

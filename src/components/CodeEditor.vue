@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue';
 import type { EditorHandle } from './code-editor-cm';
+import { isRepeatedSubmitKey } from './submit-key';
 import { loadLanguagePack } from './code-languages';
 import { useLowPowerPainted } from '@/lib/use-low-power-painted';
 import { indentAt, outdentLineAt, writeEdit } from './tab-indent';
