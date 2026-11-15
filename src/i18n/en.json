@@ -1394,6 +1394,8 @@
       "pendingLabel": "Results pending"
     },
     "timeLeft": "Time left",
+    "showProblems": "Show the contestant's problems",
+    "hideProblems": "Hide the contestant's problems",
     "scrollRegion": "Scrollable ranking board",
     "columns": {
       "rank": "Rank",

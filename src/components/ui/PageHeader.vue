@@ -29,6 +29,8 @@ export interface PageCrumb {
  * A page with neither `crumbs` nor `back` shows its section as the one crumb ("Kỳ thi" over a contest's title), unless it is
  * the section's own root page, where the H1 says the same. The page's `back` is published (`page-back.ts`) so the phone top
  * bar can hide its own arrow.
+ * `#titleTools` holds icon buttons at the end of the title row, at every width (a phone keeps them off the actions row).
+ * `besideFrom="xl"` keeps the actions under the title until `xl`.
  * `#above` is a kicker line over the title (a code, chips, a summary) and `#lead` a lead that holds more than a string.
  */
 const props = withDefaults(
@@ -39,6 +41,8 @@ const props = withDefaults(
     back?: { to: RouteLocationRaw; label: string; ariaLabel?: string } | null;
     meta?: string[];
     overflow?: MenuEntry[];
+    /** The width from which the actions leave their row under the title and sit beside it: `md` (default) or `xl` (a wide action group). */
+    besideFrom?: 'md' | 'xl';
     /** Extra classes on the h1, for a title that carries a colour (a user's rating tier). */
     titleClass?: string;
   }>(),
@@ -49,6 +53,7 @@ const props = withDefaults(
     back: null,
     meta: () => [],
     overflow: () => [],
+    besideFrom: 'md',
   },
 );
 defineSlots<{
@@ -57,6 +62,7 @@ defineSlots<{
   meta?: () => unknown;
   lead?: () => unknown;
   actions?: () => unknown;
+  titleTools?: () => unknown;
   tabs?: () => unknown;
 }>();
 const slots = useSlots();
@@ -78,15 +84,21 @@ const hasActions = () => Boolean(slots.actions) || props.overflow.length > 0;
  */
 const CELL = {
   start: 'col-start-1 row-start-2 row-end-5 mr-3 self-center',
-  actions:
-    'col-span-full row-start-5 mt-3 flex flex-wrap items-center gap-2 md:col-span-1 md:col-start-3 md:row-start-3 md:row-end-5 md:mt-0 md:ml-4 md:self-start md:justify-end',
+  actions: 'col-span-full row-start-5 mt-3 flex flex-wrap items-center gap-2',
+};
+/** Where the actions sit once they are beside the title: the third column, top-aligned with the title. */
+const BESIDE = {
+  md: 'md:col-span-1 md:col-start-3 md:row-start-3 md:row-end-5 md:mt-0 md:ml-4 md:self-start md:justify-end',
+  xl: 'xl:col-span-1 xl:col-start-3 xl:row-start-3 xl:row-end-5 xl:mt-0 xl:ml-4 xl:self-start xl:justify-end',
+};
+const GRID = {
+  md: 'md:grid-cols-[auto_minmax(min(100%,16rem),1fr)_minmax(0,auto)]',
+  xl: 'xl:grid-cols-[auto_minmax(min(100%,16rem),1fr)_minmax(0,auto)]',
 };
 </script>
 
 <template>
-  <header
-    class="grid grid-cols-[auto_minmax(0,1fr)] md:grid-cols-[auto_minmax(min(100%,16rem),1fr)_minmax(0,auto)]"
-  >
+  <header class="grid grid-cols-[auto_minmax(0,1fr)]" :class="GRID[besideFrom]">
     <nav
       v-if="shownCrumbs.length > 0"
       :aria-label="$t('common.breadcrumb')"
@@ -117,12 +129,22 @@ const CELL = {
     <div v-if="slots.above" class="col-start-2 row-start-2 mb-1 min-w-0">
       <slot name="above" />
     </div>
-    <h1
-      class="col-start-2 row-start-3 min-w-0 page-title [overflow-wrap:anywhere]"
-      :class="titleClass"
+    <!-- Without `#titleTools` the wrapper takes no box (`contents`): the H1 stays the grid item. -->
+    <div
+      :class="
+        slots.titleTools ? 'col-start-2 row-start-3 flex min-w-0 items-start gap-2' : 'contents'
+      "
     >
-      {{ title }}
-    </h1>
+      <h1
+        class="col-start-2 row-start-3 min-w-0 page-title [overflow-wrap:anywhere]"
+        :class="[titleClass, slots.titleTools && 'flex-1']"
+      >
+        {{ title }}
+      </h1>
+      <div v-if="slots.titleTools" class="-my-1 flex shrink-0 items-center gap-1">
+        <slot name="titleTools" />
+      </div>
+    </div>
     <div
       v-if="meta.length > 0 || slots.meta || slots.lead || lead"
       class="col-start-2 row-start-4 min-w-0"
@@ -140,7 +162,11 @@ const CELL = {
       <div v-if="slots.lead" class="mt-0.5 text-sm text-muted"><slot name="lead" /></div>
       <p v-else-if="lead" class="mt-0.5 text-sm text-muted">{{ lead }}</p>
     </div>
-    <div v-if="hasActions()" data-testid="page-header-actions" :class="CELL.actions">
+    <div
+      v-if="hasActions()"
+      data-testid="page-header-actions"
+      :class="[CELL.actions, BESIDE[besideFrom]]"
+    >
       <Menu v-if="overflow.length > 0" :items="overflow" :label="$t('common.moreActions')">
         <template #trigger="{ toggle, open, setOpener }">
           <AppButton

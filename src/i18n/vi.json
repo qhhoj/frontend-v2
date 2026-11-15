@@ -1394,6 +1394,8 @@
       "pendingLabel": "Chờ công bố"
     },
     "timeLeft": "Thời gian còn lại",
+    "showProblems": "Mở các bài của thí sinh",
+    "hideProblems": "Thu gọn các bài của thí sinh",
     "scrollRegion": "Vùng cuộn bảng xếp hạng",
     "columns": {
       "rank": "Hạng",

@@ -8,6 +8,7 @@ import Card from '@/components/ui/Card.vue';
 import Notice from '@/components/ui/Notice.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
+import Toolbar from '@/components/ui/Toolbar.vue';
 import QueryState from '@/components/QueryState.vue';
 import { isPenaltyFormat, showsCellTime, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
@@ -19,6 +20,7 @@ import { reportBoardFrozen } from './bar/board-frozen-report';
 import { ownSubmissionsOnly } from './own-submissions';
 import RankingSkeleton from './RankingSkeleton.vue';
 import RankingFreezeNotice from './RankingFreezeNotice.vue';
+import RankingLegend from './RankingLegend.vue';
 import RankingTable from './RankingTable.vue';
 import { useContestQuery, useCurrentParticipationQuery, useRankingQuery } from './contests.queries';
 import VirtualOverlay from './replay/VirtualOverlay.vue';
@@ -161,6 +163,8 @@ const myRow = computed(() => {
   const virtualRow = run && own.find((row) => row.participationId === run.id);
   return virtualRow || own.find((row) => row.virtual === 0) || own[0] || null;
 });
+/** The legend's "virtual" line needs a virtual row among those shown. */
+const hasVirtualRows = computed(() => rows.value.some((row) => row.virtual > 0));
 const table = ref<{ focusRow(participationId: string): boolean } | null>(null);
 /** A search that hides the row is cleared first, so the jump always lands. */
 async function goToMyRow() {
@@ -190,82 +194,84 @@ async function goToMyRow() {
       >
         {{ $t(hiddenBodyKey) }}
       </Notice>
-      <!-- Picks the board, so it stays outside it: compare mode draws no board and still needs a way back. -->
-      <SegmentedControl
-        :label="$t('ranking.viewMode')"
-        :options="viewModes"
-        :model-value="viewMode"
-        data-testid="ranking-view-mode"
-        class="self-start whitespace-nowrap"
-        @update:model-value="setViewMode"
-      />
     </template>
   </QueryState>
-  <QueryState
-    v-if="contest && !isComparing"
-    :loading="rankingPending"
-    :error="ranking || isBoardHidden ? null : rankingError"
-    @retry="refetchRanking()"
-  >
-    <template #skeleton>
-      <div class="flex flex-col gap-5">
-        <RankingSkeleton :problem-count="problemCount" :has-time-column="skeletonHasTimeColumn" />
-      </div>
-    </template>
-    <div
-      v-if="ranking && (ranking.rows.length || !isBoardHidden)"
-      :aria-busy="rankingStale"
-      class="flex flex-col gap-5"
-    >
-      <Notice v-if="rankingRefreshFailed" tone="warning" bit="sweat" role="status">
-        {{ $t('ranking.refreshFailed') }}
-      </Notice>
-      <Card
-        id="ranking-board"
-        as="div"
-        tabindex="-1"
-        class="scroll-mt-4 overflow-hidden"
-        :class="{ 'opacity-60': rankingStale }"
-      >
-        <RankingTable
-          ref="table"
-          :ranking="ranking"
-          :rows="rows"
-          :context="rankingContext"
-          :viewer-id="session.user?.id ?? null"
-          :contest-key="key"
-          :problem-names="problemNames"
-          :own-submissions-only="contest ? ownSubmissionsOnly(contest, now) : true"
+  <div v-if="contest" class="flex flex-col gap-(--space-toolbar)">
+    <!-- The toolbar stays outside the board: compare mode draws no board and still needs the view toggle to go back. -->
+    <Toolbar>
+      <template #left>
+        <SearchInput
+          v-if="ranking && !isComparing"
+          v-model="search"
+          :label="$t('ranking.searchLabel')"
+          class="w-full sm:w-48"
+        />
+        <SegmentedControl
+          :label="$t('ranking.viewMode')"
+          :options="viewModes"
+          :model-value="viewMode"
+          data-testid="ranking-view-mode"
+          class="whitespace-nowrap"
+          @update:model-value="setViewMode"
+        />
+      </template>
+      <template v-if="ranking && !isComparing" #right>
+        <AppButton v-if="myRow" tone="primary" data-testid="my-row" @click="goToMyRow">
+          <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
+          {{
+            myRow.rank === null || myRow.isDisqualified
+              ? $t('replay.player.myRow')
+              : $t('ranking.myRow', { rank: myRow.rank })
+          }}
+        </AppButton>
+        <RankingLegend
+          :is-penalty="isPenaltyFormat(rankingContext.formatName)"
+          :shows-time="rankingContext.showsTime"
+          :has-virtual-rows="hasVirtualRows"
           :freeze-note="freezeNote"
-          :is-stale="rankingStale"
+        />
+      </template>
+    </Toolbar>
+    <QueryState
+      v-if="!isComparing"
+      :loading="rankingPending"
+      :error="ranking || isBoardHidden ? null : rankingError"
+      @retry="refetchRanking()"
+    >
+      <template #skeleton>
+        <div class="flex flex-col gap-5">
+          <RankingSkeleton :problem-count="problemCount" :has-time-column="skeletonHasTimeColumn" />
+        </div>
+      </template>
+      <div
+        v-if="ranking && (ranking.rows.length || !isBoardHidden)"
+        :aria-busy="rankingStale"
+        class="flex flex-col gap-5"
+      >
+        <Notice v-if="rankingRefreshFailed" tone="warning" bit="sweat" role="status">
+          {{ $t('ranking.refreshFailed') }}
+        </Notice>
+        <Card
+          id="ranking-board"
+          as="div"
+          tabindex="-1"
+          class="scroll-mt-4 overflow-hidden"
+          :class="{ 'opacity-60': rankingStale }"
         >
-          <template #tools>
-            <SearchInput
-              v-model="search"
-              :label="$t('ranking.searchLabel')"
-              class="w-full sm:w-48"
-            />
-            <AppButton
-              v-if="myRow && !isComparing"
-              tone="primary"
-              data-testid="my-row"
-              @click="goToMyRow"
-            >
-              <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
-              {{
-                myRow.rank === null || myRow.isDisqualified
-                  ? $t('replay.player.myRow')
-                  : $t('ranking.myRow', { rank: myRow.rank })
-              }}
-            </AppButton>
-          </template>
-        </RankingTable>
-      </Card>
-    </div>
-  </QueryState>
-  <VirtualOverlay
-    v-else-if="contest && virtualRun"
-    :contest="contest"
-    :participation="virtualRun"
-  />
+          <RankingTable
+            ref="table"
+            :ranking="ranking"
+            :rows="rows"
+            :context="rankingContext"
+            :viewer-id="session.user?.id ?? null"
+            :contest-key="key"
+            :problem-names="problemNames"
+            :own-submissions-only="contest ? ownSubmissionsOnly(contest, now) : true"
+            :is-stale="rankingStale"
+          />
+        </Card>
+      </div>
+    </QueryState>
+    <VirtualOverlay v-else-if="virtualRun" :contest="contest" :participation="virtualRun" />
+  </div>
 </template>

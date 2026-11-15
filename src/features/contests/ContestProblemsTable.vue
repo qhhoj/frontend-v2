@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import AppButton from '@/components/ui/AppButton.vue';
-import { Printer } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ContestDetail, ContestPhase, ContestProblem } from '@/api/types/contests';
 import Card from '@/components/ui/Card.vue';
+import PageSection from '@/components/ui/PageSection.vue';
 import FactLine from '@/components/FactLine.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import { formatNumber } from '@/lib/format';
@@ -34,6 +33,8 @@ const problems = computed(() => props.contest.problems ?? []);
 const hasOwnResults = computed(() =>
   problems.value.some((problem) => problem.viewerResult !== null),
 );
+/** The "Giới hạn" column shows only when the viewer sees a limit on some problem (else every cell is a dash). */
+const hasLimits = computed(() => problems.value.some((problem) => limitsText(problem) !== '—'));
 const context = computed(() => ownResultContext(props.contest, locale.locale));
 const solvedCounts = computed(() => solvedSummary(problems.value));
 const isCrowned = computed(() => props.contest.phase === 'ended' && solvedCounts.value.solved > 0);
@@ -63,34 +64,24 @@ const phoneFacts = (problem: ContestProblem) =>
 </script>
 
 <template>
-  <Card data-testid="contest-problems" class="overflow-hidden">
-    <p
-      v-if="isCrowned"
-      data-testid="solved-summary"
-      class="flex items-center gap-3 border-b border-line px-5 py-3 font-semibold"
-    >
-      <InlineBit kind="crown" />
-      {{
-        $t('contests.problems.solvedSummary', {
-          solved: solvedCounts.solved,
-          total: solvedCounts.total,
-        })
-      }}
-    </p>
-    <p v-if="!contest.problems" class="px-5 py-8 text-center text-muted">
-      {{ $t(HIDDEN_KEYS[contest.phase]) }}
-    </p>
-    <template v-else>
-      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
-        <h2 class="min-w-0 section-title whitespace-nowrap">
-          {{ $t('contests.problems.heading') }}
-          <span class="text-sm font-normal text-muted">({{ problems.length }})</span>
-        </h2>
-        <AppButton :to="{ name: 'contest-all', params: { key: contest.key } }" class="shrink-0">
-          <template #icon><Printer class="size-4" aria-hidden="true" /></template>
-          {{ $t('contests.problems.printAll') }}
-        </AppButton>
-      </div>
+  <Card v-if="!contest.problems" data-testid="contest-problems">
+    <p class="px-5 py-8 text-center text-muted">{{ $t(HIDDEN_KEYS[contest.phase]) }}</p>
+  </Card>
+  <PageSection v-else :title="$t('contests.problems.heading')" :count="problems.length">
+    <Card data-testid="contest-problems" class="overflow-hidden">
+      <p
+        v-if="isCrowned"
+        data-testid="solved-summary"
+        class="flex items-center gap-3 border-b border-line px-5 py-3 font-semibold"
+      >
+        <InlineBit kind="crown" />
+        {{
+          $t('contests.problems.solvedSummary', {
+            solved: solvedCounts.solved,
+            total: solvedCounts.total,
+          })
+        }}
+      </p>
       <table class="hidden w-full border-collapse md:table">
         <caption class="sr-only">
           {{
@@ -105,7 +96,7 @@ const phoneFacts = (problem: ContestProblem) =>
             <th scope="col" class="px-3 py-2 font-semibold">
               {{ $t('contests.problems.columns.name') }}
             </th>
-            <th scope="col" class="px-3 py-2 font-semibold whitespace-nowrap">
+            <th v-if="hasLimits" scope="col" class="px-3 py-2 font-semibold whitespace-nowrap">
               {{ $t('problemSwitcher.limitsColumn') }}
             </th>
             <th scope="col" class="px-3 py-2 text-right font-semibold">
@@ -122,10 +113,7 @@ const phoneFacts = (problem: ContestProblem) =>
             :key="problem.problemId"
             class="relative border-t border-line hover:bg-surface-hover"
           >
-            <th
-              scope="row"
-              class="px-5 py-2 text-left font-display text-section-legacy leading-7 font-bold"
-            >
+            <th scope="row" class="px-5 py-2 text-left font-display text-section font-bold">
               {{ problem.label }}
             </th>
             <td class="w-full max-w-0 min-w-28 px-3 py-2">
@@ -142,10 +130,13 @@ const phoneFacts = (problem: ContestProblem) =>
                 {{ capLines.get(problem.problemId) }}
               </span>
             </td>
-            <td class="px-3 py-2 font-mono text-meta whitespace-nowrap tabular-nums">
+            <td
+              v-if="hasLimits"
+              class="px-3 py-2 font-mono text-meta whitespace-nowrap tabular-nums"
+            >
               {{ limitsText(problem) }}
             </td>
-            <td class="px-3 py-2 text-right font-mono tabular-nums">
+            <td class="px-3 py-2 text-right font-mono whitespace-nowrap tabular-nums">
               {{ $t('contests.problems.pointsShort', { points: pointsOf(problem) }) }}
             </td>
             <td v-if="hasOwnResults" class="max-w-40 px-3 py-2 xl:max-w-none">
@@ -160,7 +151,7 @@ const phoneFacts = (problem: ContestProblem) =>
           :key="problem.problemId"
           class="relative flex min-h-14 items-center gap-3 border-t border-line px-3.5 py-3 first:border-t-0"
         >
-          <span class="w-7 font-display text-[22px] font-bold" aria-hidden="true">
+          <span class="w-7 font-display text-section font-bold" aria-hidden="true">
             {{ problem.label }}
           </span>
           <div class="min-w-0 flex-1">
@@ -175,6 +166,6 @@ const phoneFacts = (problem: ContestProblem) =>
           <OwnResultChip v-if="hasOwnResults" :problem="problem" :context="context" />
         </li>
       </ul>
-    </template>
-  </Card>
+    </Card>
+  </PageSection>
 </template>
