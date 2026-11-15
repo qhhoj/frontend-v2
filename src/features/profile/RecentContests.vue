@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { RatingHistoryEntry } from '@/api/types/users';
+import PageSection from '@/components/ui/PageSection.vue';
 import DataTable from '@/components/ui/DataTable.vue';
 import { NO_VALUE, signedScore } from '@/lib/format';
 import { recentContestColumns, recentContests } from './recent-contests';
@@ -22,32 +23,30 @@ const rowKey = (row: RecentContestRow) => row.key ?? `hidden-${rows.value.indexO
 </script>
 
 <template>
-  <DataTable
-    v-if="rows.length"
-    data-testid="recent-contests"
-    :columns="COLUMNS"
-    :rows="rows"
-    :row-key="rowKey"
-    :label="$t('profile.recent')"
-  >
-    <template #toolbar>
-      <h2 class="text-title leading-5.5 font-semibold">{{ $t('profile.recent') }}</h2>
-    </template>
-    <template #cell-name="{ row }">
-      <RouterLink
-        v-if="row.key"
-        :to="{ name: 'contest', params: { key: row.key } }"
-        class="font-semibold hover:underline"
-      >
-        {{ row.name }}
-      </RouterLink>
-      <span v-else class="text-muted">{{ $t('ratingChart.hiddenContest') }}</span>
-    </template>
-    <template #cell-rank="{ row }">{{ orDash(row.rank) }}</template>
-    <template #cell-performance="{ row }">{{ orDash(row.performance) }}</template>
-    <template #cell-rating="{ row }">{{ orDash(row.rating) }}</template>
-    <template #cell-delta="{ row }">
-      <span class="font-semibold" :class="deltaClass(row.delta)">{{ deltaText(row.delta) }}</span>
-    </template>
-  </DataTable>
+  <PageSection v-if="rows.length" :title="$t('profile.recent')">
+    <DataTable
+      data-testid="recent-contests"
+      :columns="COLUMNS"
+      :rows="rows"
+      :row-key="rowKey"
+      :label="$t('profile.recent')"
+    >
+      <template #cell-name="{ row }">
+        <RouterLink
+          v-if="row.key"
+          :to="{ name: 'contest', params: { key: row.key } }"
+          class="font-semibold hover:underline"
+        >
+          {{ row.name }}
+        </RouterLink>
+        <span v-else class="text-muted">{{ $t('ratingChart.hiddenContest') }}</span>
+      </template>
+      <template #cell-rank="{ row }">{{ orDash(row.rank) }}</template>
+      <template #cell-performance="{ row }">{{ orDash(row.performance) }}</template>
+      <template #cell-rating="{ row }">{{ orDash(row.rating) }}</template>
+      <template #cell-delta="{ row }">
+        <span class="font-semibold" :class="deltaClass(row.delta)">{{ deltaText(row.delta) }}</span>
+      </template>
+    </DataTable>
+  </PageSection>
 </template>
