@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 
-/** Mirrors `ProblemHeader.vue` and the tab row inside it: keep its boxes and text classes in sync. */
+/** Mirrors `ProblemHeader.vue` with the facts strip and the tab row inside it: keep its boxes and text classes in sync. */
 const TAB_COUNT = 3;
-const STRIP_CHIPS = 4;
-/** The layout's `strip` class: the strip shows below the rail's breakpoint (`lg`, or `xl` in a contest). */
-defineProps<{ stripClass: string }>();
+const STRIP_CELLS = 5;
 </script>
 
 <template>
@@ -16,10 +14,16 @@ defineProps<{ stripClass: string }>();
     <div data-skeleton-region="title" class="mt-1 page-title">
       <SkeletonBlock text class="w-3/4" />
     </div>
-    <!-- the limit strip, below the rail's breakpoint -->
-    <div data-skeleton-region="strip" :class="['mt-3 flex flex-wrap gap-1.5', stripClass]">
-      <SkeletonBlock v-for="index in STRIP_CHIPS" :key="index" pill class="h-7 w-20" />
+    <div
+      data-skeleton-region="strip"
+      class="mt-3 flex flex-wrap gap-px overflow-hidden rounded-row border border-line bg-line"
+    >
+      <div v-for="index in STRIP_CELLS" :key="index" class="grow basis-20 bg-surface px-3 py-1.5">
+        <SkeletonBlock text class="w-14 text-meta" />
+        <SkeletonBlock text class="w-10 text-sm" />
+      </div>
     </div>
+    <p class="mt-1 text-meta"><SkeletonBlock text class="my-3.5 w-48" /></p>
     <hr class="-mx-6 mt-4 border-line sm:-mx-8" />
     <div data-skeleton-region="tabs" class="mt-4 flex flex-wrap gap-2">
       <SkeletonBlock v-for="index in TAB_COUNT" :key="index" pill class="h-11 w-24" />

@@ -20,10 +20,11 @@ const props = defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;
   /**
-   * `dock` is the desktop strip (a wrapping row); `sheet` the phone's column that fills the sheet's height; `full` the
-   * full-screen panel: a header row (title, language, upload, actions, submit) over an editor that fills the rest.
+   * `pane` is the desktop column beside the statement: a bar (language, upload, actions, submit) over an editor that fills
+   * the rest; `full` the same as a full-screen panel, with the problem's name in the bar; `sheet` the phone's column that
+   * fills the sheet's height, the submit button under the editor.
    */
-  layout: 'dock' | 'sheet' | 'full';
+  layout: 'pane' | 'sheet' | 'full';
 }>();
 /** The same refs as `form`, unwrapped for the template. */
 const state = reactive(props.form);
@@ -48,9 +49,10 @@ const submitLabelKey = computed(() => {
 });
 
 /**
- * Where each region sits, top to bottom (dock: left to right, wrapping). The dock and the full-screen panel keep the
- * actions and the submit button in their top row beside the language, so it stays short: actions right-aligned, then a
- * 16 px gap and the submit button last, so a dismiss button is never next to it; the sheet puts the button below the editor.
+ * Where each region sits, top to bottom. The pane and the full-screen panel keep the actions and the submit button in their
+ * bar beside the language: actions right-aligned, then a 16 px gap and the submit button last, so a dismiss button is never
+ * next to it; the sheet puts the button below the editor. The result strip sits under the bar, beside Submit (Workbench),
+ * and on top of the sheet.
  */
 const REGION_ORDER = {
   languageRow: 'order-1',
@@ -68,18 +70,24 @@ const REGION_ORDER = {
  * Everything that differs between the layouts, so the template reads the same for all. The limits and the link to the
  * runtimes page sit under the editor beside the counter.
  */
+const FILLED_EDITOR = {
+  form: 'flex h-full min-h-0 flex-col gap-3',
+  languageRow: 'flex items-center gap-x-2',
+  body: 'flex min-h-0 flex-1 flex-col',
+  editor: 'min-h-0 flex-1 overflow-auto rounded-cell',
+  editorMinLines: 6,
+  editorFill:
+    'h-full !max-h-none [&_.code-editor-host]:h-full [&_.cm-editor]:h-full [&_.code-editor-fallback]:min-h-full',
+  counterRow: '',
+  submit: { size: 'md', block: false },
+  header: 'flex flex-wrap items-center gap-x-3 gap-y-2',
+  strip: 'order-1',
+  /** The contest line gets its own row under the bar, so the bar keeps to one row in a narrow pane. */
+  info: 'order-6 basis-full',
+} as const;
 const LAYOUTS = {
-  dock: {
-    form: 'flex flex-wrap items-center gap-x-3 gap-y-2',
-    languageRow: 'flex items-center gap-x-2',
-    body: 'basis-full',
-    editor: 'max-h-[30dvh] overflow-auto rounded-cell',
-    editorMinLines: 4,
-    editorFill: '',
-    counterRow: 'flex-1',
-    submit: { size: 'md', block: false },
-    header: 'contents',
-  },
+  pane: FILLED_EDITOR,
+  full: FILLED_EDITOR,
   sheet: {
     form: 'flex min-h-min flex-1 flex-col gap-3',
     languageRow: 'grid w-full grid-cols-[minmax(0,1fr)_auto] items-center',
@@ -91,23 +99,13 @@ const LAYOUTS = {
     counterRow: 'justify-between',
     submit: { size: 'lg', block: true },
     header: 'contents',
-  },
-  full: {
-    form: 'flex h-full min-h-0 flex-col gap-3',
-    languageRow: 'flex items-center gap-x-2',
-    body: 'flex min-h-0 flex-1 flex-col',
-    editor: 'min-h-0 flex-1 overflow-auto rounded-cell',
-    editorMinLines: 6,
-    editorFill:
-      'h-full !max-h-none [&_.code-editor-host]:h-full [&_.cm-editor]:h-full [&_.code-editor-fallback]:min-h-full',
-    counterRow: '',
-    submit: { size: 'md', block: false },
-    header: 'flex flex-wrap items-center gap-x-3 gap-y-2',
+    strip: 'order-first',
+    info: REGION_ORDER.info,
   },
 } as const;
 const classes = computed(() => LAYOUTS[props.layout]);
 const isSheet = computed(() => props.layout === 'sheet');
-/** Where the actions and submit sit: the top row of the dock and the full-screen panel, or under the sheet's editor. */
+/** Where the actions and submit sit: the bar of the pane and the full-screen panel, or under the sheet's editor. */
 const isTopRow = computed(() => props.layout !== 'sheet');
 const shortcutHint = submitShortcutHint();
 const hasSourceUpload = computed(() => !state.fileMode);
@@ -133,7 +131,8 @@ function loadDroppedFile(event: DragEvent) {
       v-if="state.lastSubmissionId || state.submitting"
       :result="form.result"
       :submission-id="state.submitting ? null : state.lastSubmissionId"
-      class="order-first w-full shrink-0"
+      class="w-full shrink-0"
+      :class="classes.strip"
     />
     <div :class="classes.header">
       <h2
@@ -157,12 +156,7 @@ function loadDroppedFile(event: DragEvent) {
           @pick="(file) => state.loadFile(file)"
         />
       </div>
-      <p
-        v-if="problem.contest"
-        class="text-sm"
-        :class="REGION_ORDER.info"
-        data-testid="submit-contest"
-      >
+      <p v-if="problem.contest" class="text-sm" :class="classes.info" data-testid="submit-contest">
         <RouterLink
           :to="`/contests/${encodeURIComponent(problem.contest.contestKey)}`"
           class="font-semibold text-accent underline"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from 'vue';
+import { computed, nextTick, reactive, ref, watch } from 'vue';
+import VerdictRing from '@/features/submissions/VerdictRing.vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import SubmitForm from './SubmitForm.vue';
 import SubmitSheetHeader from './SubmitSheetHeader.vue';
@@ -11,11 +12,14 @@ const SHEET_ID = 'submit-sheet';
 /** The bar and the open sheet are one surface in two sizes, on the page column: beside the rail, above the phone's tab bar. */
 const SHEET_SURFACE =
   'fixed right-0 bottom-[var(--tab-bar-height,0px)] left-[var(--shell-rail,0px)] z-30 rounded-t-card border-t border-line-accent bg-surface-solid pb-(--shell-inset-bottom)';
-defineProps<{
+const props = defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;
   isSignedIn: boolean;
 }>();
+/** The last result rides on the collapsed bar (P5), so the verdict shows without opening the sheet. */
+const result = reactive(props.form.result);
+const isSending = computed(() => props.form.submitting.value);
 const emit = defineEmits<{ fullscreen: [] }>();
 /** Per page load: no storage. The page starts it closed so the statement is what the viewer sees first. */
 const isExpanded = defineModel<boolean>('open', { required: true });
@@ -40,13 +44,31 @@ watch(isExpanded, async (expanded) => {
     :class="SHEET_SURFACE"
   >
     <SubmitSignInLink v-if="!isSignedIn" class="px-4 py-1" />
-    <SubmitSheetHeader
-      v-else
-      ref="header"
-      :is-expanded="false"
-      :controls-id="SHEET_ID"
-      @toggle="isExpanded = true"
-    />
+    <template v-else>
+      <SubmitSheetHeader
+        ref="header"
+        :is-expanded="false"
+        :controls-id="SHEET_ID"
+        @toggle="isExpanded = true"
+      >
+        <template v-if="form.lastSubmissionId.value || form.submitting.value" #result>
+          <VerdictRing
+            size="sm"
+            :progress="result.progress"
+            :verdict="result.verdict"
+            :share="result.partialShare"
+            :is-empty="isSending || result.isEmpty"
+          />
+          <span
+            data-testid="sheet-result"
+            class="min-w-0 truncate font-mono text-sm text-secondary tabular-nums"
+            >{{ isSending ? $t('submit.submitting') : result.text }}</span
+          >
+        </template>
+      </SubmitSheetHeader>
+      <!-- The strip inside the sheet announces the result while it is open; collapsed, the bar does. -->
+      <p role="status" class="sr-only">{{ isSending ? '' : result.announcement }}</p>
+    </template>
   </section>
   <section
     v-else

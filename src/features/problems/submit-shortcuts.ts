@@ -1,7 +1,7 @@
 import { isTypingTarget } from '@/lib/typing-target';
 
-/** A bare `s` outside a field or the editor: opens the submit dock. */
-export function isOpenDockShortcut(event: KeyboardEvent): boolean {
+/** A bare `s` outside a field or the editor: puts the caret in the submit pane's editor. */
+export function isFocusEditorShortcut(event: KeyboardEvent): boolean {
   if (event.defaultPrevented || event.isComposing || event.repeat) return false;
   if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return false;
   return event.key === 's' && !isTypingTarget(event.target);

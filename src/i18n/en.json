@@ -1185,11 +1185,6 @@
     "noSubmissions": "You have not submitted this problem yet.",
     "rail": {
       "railLabel": "Problem info",
-      "submit": {
-        "title": "Submit",
-        "open": "Submit",
-        "hint": "Opens the code editor at the bottom of the page."
-      },
       "facts": {
         "solvers": "Solvers",
         "io": "Input/Output",

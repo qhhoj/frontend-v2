@@ -1185,11 +1185,6 @@
     "noSubmissions": "Bạn chưa nộp bài này.",
     "rail": {
       "railLabel": "Thông tin bài",
-      "submit": {
-        "title": "Nộp bài",
-        "open": "Nộp bài",
-        "hint": "Mở khung soạn mã ở cuối trang."
-      },
       "facts": {
         "solvers": "Người giải",
         "io": "Nhập/xuất",

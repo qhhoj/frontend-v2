@@ -9,8 +9,8 @@ import { useSessionStore } from '@/stores/session.store';
 import { problemTypeLabel } from './problem-type-label';
 
 /**
- * The top of the statement card: code, group chip, title and edit link, the `strip` slot (the phone's limit strip), a
- * hairline, then the tabs in the default slot.
+ * The top of the statement card: code, group chip, title and edit link, the `strip` slot (the facts strip), a hairline,
+ * then the tabs in the default slot. The root is `contents`, so a sticky part of the strip sticks within the whole card.
  * Keep `ProblemHeaderSkeleton.vue` in step.
  */
 /** `section`: the tab being read; the edit link opens its editor tab. */
@@ -19,7 +19,7 @@ const session = useSessionStore();
 </script>
 
 <template>
-  <div data-testid="problem-header">
+  <div data-testid="problem-header" class="contents">
     <PageHeader :title="problem.name">
       <template #above>
         <p class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm">
