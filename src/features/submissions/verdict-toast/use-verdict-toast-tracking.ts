@@ -1,5 +1,6 @@
 import { onScopeDispose, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue';
+import type { ScoreScale } from '@/features/problems/submit-result';
 import { submissionsOnScreen, trackSubmission } from './tracked-submissions';
 
 /**
@@ -10,10 +11,11 @@ import { submissionsOnScreen, trackSubmission } from './tracked-submissions';
 export function useVerdictToastTracking(input: {
   submissionId: Ref<string | null>;
   wasSolvedBefore: () => boolean;
+  scale: () => ScoreScale;
   isResultVisible: () => boolean;
 }) {
   watch(input.submissionId, (id) => {
-    if (id) trackSubmission({ id, wasSolvedBefore: input.wasSolvedBefore() });
+    if (id) trackSubmission({ id, wasSolvedBefore: input.wasSolvedBefore(), scale: input.scale() });
   });
   let shown: string | null = null;
   const stopShowing = () => {
