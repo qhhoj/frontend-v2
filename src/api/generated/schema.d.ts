@@ -8733,6 +8733,8 @@ export interface components {
             name: string;
         };
         ContestListEditorResponse: {
+            /** @description Minutes before the end when the public ranking freezes; 0 for no freeze. */
+            frozenLastMinutes: number;
             /** @description Whether the contest is shown to users who may see it. */
             isVisible: boolean;
             /**
