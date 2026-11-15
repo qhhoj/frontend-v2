@@ -56,6 +56,7 @@ export const VERDICT_PARTS = [
   'features/problems/ProblemStatusMark.vue',
   'features/profile/ProfileSolvedTab.vue',
   'features/appearance/AppearancePreview.vue',
+  'components/ui/StatusStepper.vue',
 ];
 
 const STATE_WORD = /(?<![\w:@-])(?:disabled|busy|pending)(?![\w-])/;

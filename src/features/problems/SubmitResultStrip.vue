@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
+import StatusStepper from '@/components/ui/StatusStepper.vue';
 import VerdictRing from '@/features/submissions/VerdictRing.vue';
 import type { SubmitResult } from './use-submit-result';
 
@@ -30,6 +31,7 @@ const result = reactive(props.result);
       class="flex min-w-0 flex-1 flex-wrap gap-x-[2ch] font-mono text-sm tabular-nums"
     >
       <template v-if="submissionId === null">{{ $t('submit.submitting') }}</template>
+      <StatusStepper v-else-if="!result.isFinished && !result.isEmpty" v-bind="result.step" />
       <template v-else>
         <span
           v-for="(part, index) in result.textParts"

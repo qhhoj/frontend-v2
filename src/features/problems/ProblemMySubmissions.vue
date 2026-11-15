@@ -9,6 +9,7 @@ import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StateBit from '@/components/StateBit.vue';
+import StatusStepper from '@/components/ui/StatusStepper.vue';
 import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { GLOBAL_SCOPE } from '@/features/submissions/list/submission-scope';
 import { useScopedSubmissionListQuery } from '@/features/submissions/submissions.queries';
@@ -97,7 +98,12 @@ const rows = computed(() =>
           class="flex min-h-11 items-center gap-2.5 border-t border-line"
         >
           <RouterLink :to="{ name: 'submission', params: { id: submission.id } }">
-            <VerdictChip :verdict="submissionVerdictOf(submission)" />
+            <StatusStepper
+              v-if="IN_PROGRESS_STATUSES.includes(submission.status)"
+              :status="submission.status"
+              compact
+            />
+            <VerdictChip v-else :verdict="submissionVerdictOf(submission)" />
           </RouterLink>
           <p :data-scale="score.scale" :title="submission.contest?.name" class="min-w-0">
             <span class="font-mono font-bold tabular-nums">{{ score.value }}</span
