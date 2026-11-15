@@ -7,6 +7,8 @@ import type { Ref } from 'vue';
  */
 const openDialogs = shallowReactive<HTMLDialogElement[]>([]);
 export const topDialog = computed<HTMLDialogElement | null>(() => openDialogs.at(-1) ?? null);
+/** Clicks that closed a popup (`popup.ts`): the dismissable dialog under it does not close on the same click. */
+export const dismissingClicks = new WeakSet<Event>();
 
 /** The page stops scrolling under a modal; `scrollbar-gutter: stable` on `<html>` keeps the layout still. */
 let scrollLocks = 0;
@@ -119,7 +121,8 @@ export function useModalDialog(
     },
     onClick(event: MouseEvent) {
       const element = event.currentTarget as HTMLDialogElement;
-      const isDismissed = pressedOnBackdrop && isBackdropClick(event, element);
+      const isDismissed =
+        pressedOnBackdrop && isBackdropClick(event, element) && !dismissingClicks.has(event);
       pressedOnBackdrop = false;
       if (isDismissed && options.isDismissable() && options.isClosable()) visible.value = false;
     },

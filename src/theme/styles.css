@@ -792,25 +792,50 @@
  * Popup panels (`components/ui/popup.ts`: Popover, Menu, the ComboBox list): fixed beside their opener in the top layer.
  * In `components` so a panel's own utilities (padding, border) win over these and the UA popover style loses to both.
  * Without CSS anchor positioning, popup.ts writes `top` and `left`; without the Popover API, z-overlay lifts the panel.
+ * The size caps are percentages of the viewport less its scrollbar (a fixed panel's containing block), not 100vw.
  */
 @layer components {
   [data-popup] {
     position: fixed;
     inset: auto;
     margin: 0;
+    max-width: calc(100% - 1rem);
+    max-height: calc(100% - 1rem);
+    overflow: auto;
     z-index: var(--z-index-overlay);
   }
+  /* The gap is a block margin on both sides, so it stays when the panel flips above its opener. When no flip fits, the panel
+     is pinned 0.5rem from the left edge below its opener; when that does not fit either, 0.5rem from the top-left corner (the
+     size caps above make that always fit). Chromium tries at most five fallbacks. Chrome 125-127 reads `position-try-options`. */
   @supports (anchor-name: --qh-popup) {
     [data-popup] {
       top: anchor(bottom);
       left: anchor(left);
-      margin-top: 0.5rem;
+      margin-block: 0.5rem;
       position-try-fallbacks:
         flip-block,
         flip-inline,
-        flip-block flip-inline;
+        flip-block flip-inline,
+        --qh-popup-pinned,
+        --qh-popup-corner;
+      position-try-options:
+        flip-block,
+        flip-inline,
+        flip-block flip-inline,
+        --qh-popup-pinned,
+        --qh-popup-corner;
     }
   }
+}
+
+@position-try --qh-popup-pinned {
+  top: anchor(bottom);
+  left: 0.5rem;
+}
+@position-try --qh-popup-corner {
+  top: 0.5rem;
+  left: 0.5rem;
+  margin: 0;
 }
 
 /* Printing the backup codes prints only them (ScratchCodesPanel sets the scope for the print call). */
