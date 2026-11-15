@@ -169,7 +169,12 @@ const freeze = computed(() =>
           <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
           <CountdownTimer :key="clockUntil" :until="clockUntil" @elapsed="emit('elapsed')" />
         </p>
-        <ContestActions :contest="contest" :current="participation" />
+        <!-- Capped from `md`: a note under the button (virtual run, spectating) wraps instead of widening the column over the title. -->
+        <ContestActions
+          :contest="contest"
+          :current="participation"
+          class="md:max-w-80 md:items-end md:text-right"
+        />
         <ShortLinkButton compact :path="shortLinkPath({ kind: 'contest', key: contest.key })" />
       </template>
       <template #tabs>
