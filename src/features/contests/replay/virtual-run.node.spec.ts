@@ -21,6 +21,7 @@ const current = (
     endTime: '2026-10-09T13:00:00Z',
     ...overrides,
   }),
+  standing: null,
 });
 
 describe('virtualRunOf', () => {
