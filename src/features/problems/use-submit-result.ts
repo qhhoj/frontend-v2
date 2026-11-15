@@ -55,13 +55,13 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
     const format = (points: number) => formatNumber(points, locale.locale, SITE_DIGITS, false);
     return `${format(scoreBelowFull(score, max, SITE_DIGITS))} / ${format(max)}`;
   };
-  /** While grading: "Đang chấm · test 4". Finished: the score and where it failed ("0 / 1000 · lỗi ở test 1"); the ring
-   *  carries the verdict code, so the text never repeats it (M-12). */
-  const text = computed(() => {
+  /** While grading: "Đang chấm test 4". Finished: the score, then where it failed (["0 / 1000", "lỗi ở test 1"]); the
+   *  ring carries the verdict code, so the text never repeats it (M-12). A narrow strip wraps between the parts. */
+  const textParts = computed((): string[] => {
     if (!row.value || !isFinished.value) {
       const test = live.currentTestcase || row.value?.currentTestcase || 0;
       const label = translate(verdict.value.labelKey);
-      return test ? translate('submit.result.atTest', { verdict: label, test }) : label;
+      return [test ? translate('submit.result.atTest', { verdict: label, test }) : label];
     }
     const failed = firstFailedTest(row.value.cases);
     const parts: string[] = [];
@@ -71,8 +71,9 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
       parts.push(scoreText(score, max));
     }
     if (failed) parts.push(translate('submit.result.failedAt', { test: failed }));
-    return parts.length ? parts.join(' · ') : translate(verdict.value.labelKey);
+    return parts.length ? parts : [translate(verdict.value.labelKey)];
   });
+  const text = computed(() => textParts.value.join(' · '));
   /** What a screen reader hears once the grading ends: the verdict's name, then the text. */
   const announcement = computed(() => {
     if (!isFinished.value) return '';
@@ -95,6 +96,7 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
     verdict,
     progress,
     partialShare,
+    textParts,
     text,
     announcement,
   };

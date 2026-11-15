@@ -14,29 +14,29 @@ import { useSessionStore } from '@/stores/session.store';
 import EditorialTab from './EditorialTab.vue';
 import NoStatement from './NoStatement.vue';
 import PdfStatement from './PdfStatement.vue';
-import ProblemFactsCard from './ProblemFactsCard.vue';
 import ProblemHeader from './ProblemHeader.vue';
 import ProblemLimitStrip from './ProblemLimitStrip.vue';
 import ProblemLinksCard from './ProblemLinksCard.vue';
 import ProblemMySubmissions from './ProblemMySubmissions.vue';
-import ProblemSubmitCard from './ProblemSubmitCard.vue';
 import StatementBody from './StatementBody.vue';
+import ProblemTypesCard from './ProblemTypesCard.vue';
 import StatementNote from './StatementNote.vue';
-import SubmitDock from './SubmitDock.vue';
+import SubmitPane from './SubmitPane.vue';
 import { hasNoStatement } from './statement-presence';
-import type { PROBLEM_LAYOUT } from './problem-layout';
+import type { ProblemLayout } from './problem-layout';
 import { useScoreScale } from './use-contest-problem';
 import { useSubmitForm } from './use-submit-form';
 
 const DEFAULT_TAB = 'statement';
 /**
- * A loaded problem: header with tabs, the panels, the rail and the submit dock. The page keys it by code, so another problem
- * never inherits the typed code, pick or file.
+ * A loaded problem (Workbench split): left the statement card (header, facts strip, tabs), then the viewer's submissions,
+ * links, types and comments; right the submit pane. The page keys it by code, so another problem never inherits the typed
+ * code, pick or file.
  */
 const props = defineProps<{
   problem: ProblemDetail;
   tabs: { id: string; labelKey: string }[];
-  layout: (typeof PROBLEM_LAYOUT)[keyof typeof PROBLEM_LAYOUT];
+  layout: ProblemLayout;
   /** The viewer's contest holding this problem (its points and the viewer's cell replace the site-wide facts). */
   contest?: ContestDetail | null;
   /** False for an ended contest shown for context: submissions are practice ones, so they score on the site's scale. */
@@ -45,18 +45,25 @@ const props = defineProps<{
 const tab = defineModel<string>('tab', { required: true });
 defineEmits<{ gone: [] }>();
 const route = useRoute();
-// The submit form is this component's: beside the statement the rail's card opens the dock; where the rail stacks
-// under the statement (phones, tablets) the sheet's bar is the only way in.
+// The submit form is this component's: beside the statement the pane shows it; where the statement takes the whole column
+// (phones, tablets) the sheet does.
 const session = useSessionStore();
 const isSignedIn = computed(() => session.status === 'authenticated');
 const usesSheet = useMediaQuery(() => props.layout.stacked);
-/** Dock and sheet start closed, so the statement is what the viewer sees first. */
+/** The sheet starts closed, so the statement is what the viewer sees first. */
 const submitOpen = ref(false);
+/** The pane and the facts strip stick under whatever bar stays at the top: the impersonation banner, else the contest bar. */
+const IMPERSONATION_BANNER_HEIGHT = '3.5rem';
+const stickyTop = computed(() => ({
+  '--pane-top': session.impersonatorId
+    ? IMPERSONATION_BANNER_HEIGHT
+    : 'var(--contest-bar-height, 0px)',
+}));
 // An anonymous viewer would only get a 401 for the fetch, so it is not started.
 const resubmitId = computed(() =>
   isSignedIn.value && typeof route.query.resubmit === 'string' ? route.query.resubmit : null,
 );
-// `?resubmit=`: the prefilled code is the point of the visit, so the dock or sheet opens for it. Every time the id
+// `?resubmit=`: the prefilled code is the point of the visit, so the sheet opens for it (the pane is always open). Every time the id
 // appears, not only on load: an anonymous viewer arrives with it after signing in.
 watch(
   resubmitId,
@@ -80,7 +87,10 @@ function panelIdOf(tabId: string) {
 
 <template>
   <ProblemArchivedNotice :code="problem.code" :organization-ids="problem.organizations" />
-  <div :class="layout.grid">
+  <div
+    :class="[layout.grid, isSignedIn ? layout.columns.editor : layout.columns.signIn]"
+    :style="stickyTop"
+  >
     <!-- The statement tab's card carries the problem header; on the editorial tab the card is header and tabs only. -->
     <Card as="div" data-testid="statement-card" :class="['min-w-0 p-6 sm:p-8', layout.left]">
       <ProblemHeader :problem="problem" :section="tab === 'editorial' ? 'editorial' : 'statement'">
@@ -90,7 +100,7 @@ function panelIdOf(tabId: string) {
             :is-signed-in="isSignedIn"
             :has-editorial="hasEditorial"
             :contest="contest"
-            :class="layout.strip"
+            :cells-class="layout.facts"
           />
         </template>
         <Tabs
@@ -134,31 +144,17 @@ function panelIdOf(tabId: string) {
         </template>
       </div>
     </Card>
-    <aside
-      data-testid="problem-rail"
-      :aria-label="$t('problem.rail.railLabel')"
-      :class="['-m-1 flex min-w-0 flex-col gap-3.5 p-1', layout.rail]"
-    >
-      <ProblemSubmitCard v-if="!usesSheet" v-model:open="submitOpen" :is-signed-in="isSignedIn" />
-      <ProblemFactsCard
-        :problem="problem"
-        :is-signed-in="isSignedIn"
-        :contest="contest"
-        :narrow="layout.facts"
-      />
-      <ProblemMySubmissions v-if="isSignedIn" :code="problem.code" :scale="scoreScale" />
-      <ProblemLinksCard :problem="problem" :has-editorial="hasEditorial" :show-pdf="!usesSheet" />
-    </aside>
-    <div :class="['min-w-0', layout.left]">
-      <CommentsSection
-        v-if="tab === DEFAULT_TAB"
-        type="problem"
-        :page-key="problem.code"
-        :contest-key="problem.contest?.contestKey ?? null"
-        placeholder-key="comments.composer.problemPlaceholder"
-        fold-when-empty
-        class="mt-3"
-      />
+    <!-- Keyed by code: another problem never inherits the typed code, pick or file. -->
+    <SubmitPane
+      :key="problem.code"
+      v-model:open="submitOpen"
+      :problem="problem"
+      :form="submitForm"
+      :uses-sheet="usesSheet"
+      :is-signed-in="isSignedIn"
+      :place-class="isSignedIn ? layout.pane : layout.signIn"
+    />
+    <div :class="['@container flex min-w-0 flex-col gap-5', layout.left]">
       <div
         v-if="hasEditorial"
         :id="panelIdOf('editorial')"
@@ -170,15 +166,34 @@ function panelIdOf(tabId: string) {
         <!-- Mounted only while selected, so the editorial request is lazy. -->
         <EditorialTab v-if="tab === 'editorial'" :code="problem.code" @gone="$emit('gone')" />
       </div>
+      <aside
+        data-testid="problem-rail"
+        :aria-label="$t('problem.rail.railLabel')"
+        class="-mb-3.5 gap-3.5 @lg:columns-2"
+      >
+        <!-- Two columns of cards where the column is wide enough (512 px), each card whole in one column. -->
+        <ProblemMySubmissions
+          v-if="isSignedIn"
+          :code="problem.code"
+          :scale="scoreScale"
+          class="mb-3.5 break-inside-avoid"
+        />
+        <ProblemLinksCard
+          :problem="problem"
+          :has-editorial="hasEditorial"
+          :show-pdf="false"
+          class="mb-3.5 break-inside-avoid"
+        />
+        <ProblemTypesCard :problem="problem" class="mb-3.5 break-inside-avoid" />
+      </aside>
+      <CommentsSection
+        v-if="tab === DEFAULT_TAB"
+        type="problem"
+        :page-key="problem.code"
+        :contest-key="problem.contest?.contestKey ?? null"
+        placeholder-key="comments.composer.problemPlaceholder"
+        fold-when-empty
+      />
     </div>
   </div>
-  <!-- Keyed by code: another problem never inherits the typed code, pick or file. -->
-  <SubmitDock
-    :key="problem.code"
-    v-model:open="submitOpen"
-    :problem="problem"
-    :form="submitForm"
-    :uses-sheet="usesSheet"
-    :is-signed-in="isSignedIn"
-  />
 </template>

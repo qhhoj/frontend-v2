@@ -1161,8 +1161,7 @@
     "limits": {
       "time": "Time",
       "memory": "Memory",
-      "points": "Points",
-      "acRate": "AC rate"
+      "points": "Points"
     },
     "noStatement": {
       "title": "No statement yet",
@@ -1185,13 +1184,7 @@
     "noSubmissions": "You have not submitted this problem yet.",
     "rail": {
       "railLabel": "Problem info",
-      "submit": {
-        "title": "Submit",
-        "open": "Submit",
-        "hint": "Opens the code editor at the bottom of the page."
-      },
       "facts": {
-        "solvers": "Solvers",
         "io": "Input/Output",
         "input": "Input",
         "output": "Output",
@@ -1530,7 +1523,6 @@
       "sourceLength": "The source is longer than {max} characters."
     },
     "versions": "Compiler versions",
-    "close": "Close the submit panel",
     "result": {
       "atTest": "{verdict} on test {test}",
       "details": "See details",

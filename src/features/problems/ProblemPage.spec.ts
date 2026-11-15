@@ -277,21 +277,15 @@ describe('problem page inside a contest', () => {
     const nav = wrapper.get('nav[aria-label="Điều hướng chính"]');
     expect(nav.get('[aria-current="page"]').text()).toBe('Kỳ thi');
     await vi.waitFor(() =>
-      expect(wrapper.find('[data-testid="viewer-own-result"]').exists()).toBe(true),
+      expect(wrapper.find('[data-testid="strip-own-result"]').exists()).toBe(true),
     );
-    const facts = wrapper.get('[data-testid="problem-facts"]').text();
-    expect(facts).toContain('Điểm kỳ thi250');
-    expect(facts).not.toContain('Tỉ lệ AC');
     const strip = wrapper.get('[data-testid="problem-limit-strip"]');
-    expect(strip.text()).toContain('250');
-    expect(strip.find('[data-testid="strip-own-result"]').exists()).toBe(true);
+    expect(strip.get('[data-testid="strip-points"]').text()).toBe('Điểm kỳ thi250');
     expect(strip.find('[data-testid="strip-status"]').exists()).toBe(false);
     expect(strip.text()).not.toContain('người giải');
     expect(wrapper.get('[data-testid="rail-my-submissions"]').text()).toContain(
       '250 / 250 điểm kỳ thi',
     );
-    await wrapper.get('[data-testid="rail-submit"] button').trigger('click');
-    await flushPromises();
     expect(wrapper.get('[data-testid="submit-contest"]').text()).toContain(
       `Kỳ thi: ${solved.name}`,
     );
@@ -319,7 +313,7 @@ describe('problem page inside a contest', () => {
     expect(wrapper.get('nav[aria-label="Điều hướng chính"] [aria-current="page"]').text()).toBe(
       'Kỳ thi',
     );
-    expect(wrapper.get('[data-testid="problem-facts"]').text()).toContain('Điểm kỳ thi250');
+    expect(wrapper.get('[data-testid="strip-points"]').text()).toBe('Điểm kỳ thi250');
     expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(false);
   });
 

@@ -43,3 +43,19 @@ it('submits on Ctrl+Enter without adding a line', () => {
   expect(onSubmit).toHaveBeenCalledOnce();
   expect(view.state.doc.toString()).toBe('a');
 });
+
+it('does not submit on a held (repeated) Ctrl+Enter', () => {
+  const onSubmit = vi.fn();
+  const view = mountEditor('a', { anchor: 1, head: 1 }, onSubmit);
+  view.contentDOM.dispatchEvent(
+    new KeyboardEvent('keydown', {
+      key: 'Enter',
+      ctrlKey: true,
+      repeat: true,
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
+  expect(onSubmit).not.toHaveBeenCalled();
+  expect(view.state.doc.toString()).toBe('a');
+});
