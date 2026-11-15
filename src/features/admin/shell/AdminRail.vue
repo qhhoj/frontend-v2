@@ -20,10 +20,19 @@ defineEmits<{ search: [] }>();
 
 const route = useRoute();
 const navBox = ref<HTMLElement | null>(null);
-/** The nav scrolls inside the rail: bring the current row into view on load and on each route change. */
+/**
+ * The nav scrolls inside the rail: on load and on each route change, move only that box so the current row is inside it
+ * (scrollIntoView would also move the window). Nothing moves when the row is already visible.
+ */
 async function showCurrent() {
   await nextTick();
-  navBox.value?.querySelector('[aria-current="page"]')?.scrollIntoView?.({ block: 'nearest' });
+  const box = navBox.value;
+  const row = box?.querySelector<HTMLElement>('[aria-current="page"]');
+  if (!box || !row) return;
+  const boxRect = box.getBoundingClientRect();
+  const rowRect = row.getBoundingClientRect();
+  if (rowRect.top < boxRect.top) box.scrollTop += rowRect.top - boxRect.top;
+  else if (rowRect.bottom > boxRect.bottom) box.scrollTop += rowRect.bottom - boxRect.bottom;
 }
 onMounted(showCurrent);
 watch(() => route.path, showCurrent);
