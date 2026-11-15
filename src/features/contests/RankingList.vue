@@ -40,7 +40,7 @@ const scoreHeaderKey = computed(() =>
 );
 /** One width for every mini cell of the board, so the cells line up in columns across rows. */
 const miniWidth = computed(() => {
-  const cells = props.rows.flatMap((row) =>
+  const cells = props.ranking.rows.flatMap((row) =>
     props.viewOf(row).cells.map((cell) => ({
       label: cell.label,
       text: cell.view.kind === 'empty' ? '' : cell.view.text,
@@ -94,7 +94,7 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
                 cell.view.kind === 'empty' ? 'bg-surface-strong' : KIND_CLASSES[cell.view.kind],
                 cell.view.partialStep && PARTIAL_CLASSES[cell.view.partialStep],
               ]"
-              ><span aria-hidden="true" class="opacity-70">{{ cell.label }}</span
+              ><span aria-hidden="true">{{ cell.label }}</span
               ><span aria-hidden="true">{{ cell.view.kind === 'empty' ? '' : cell.view.text }}</span
               ><span class="sr-only"
                 >{{ cell.label }}:
