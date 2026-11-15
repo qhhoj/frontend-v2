@@ -6,6 +6,7 @@ import { ANNOUNCEMENT_FIRST_PAGE } from '@/api/contests.api';
 import InlineBit from '@/components/InlineBit.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import IconButton from '@/components/ui/IconButton.vue';
+import { topDialog } from '@/components/ui/modal-dialog';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { closedAlertMarks, loadSeenAnnouncement, seenAnnouncementId } from '../announcement-seen';
 import { useContestAnnouncementsQuery } from '../contests.queries';
@@ -20,6 +21,8 @@ import { useStreamedContest } from './use-streamed-contest';
  * region: a toast at the bottom right on a computer, a one-row banner under the contest bar on a phone. It goes once read
  * (the Announcements tab marks it) or closed; a close is kept in storage like the read mark.
  */
+// The root is a Teleport, so the shell's classes (print:hidden) go on the region itself.
+defineOptions({ inheritAttrs: false });
 const streamed = useStreamedContest();
 const route = useRoute();
 const viewerId = useViewerId();
@@ -66,60 +69,65 @@ const announcementsTab = computed(() => ({
 <template>
   <!-- One polite region, there before anything arrives: the alert and the paused notice are spoken as they appear, and on the
        Announcements tab (no alert there) the new title is. Nothing in it times out. On a computer the region is the corner
-       where the notice stacks above the toast. -->
-  <div
-    v-if="streamed.contest.value"
-    data-testid="contest-announcement-live"
-    role="status"
-    aria-live="polite"
-    class="flex flex-col md:fixed md:right-6 md:bottom-[calc(var(--dock-height,0px)+1.5rem)] md:z-toast md:w-96 md:gap-3"
-  >
-    <!-- Always there, so the title is spoken when it changes; empty off the tab, where the alert speaks instead. -->
-    <p class="sr-only">{{ isOnAnnouncementsTab ? message : '' }}</p>
-    <AnnouncementsPausedNotice
-      v-if="!isOnThisContest"
-      :contest-key="key"
-      class="max-md:page-gutter max-md:mt-3 md:mb-0 md:rounded-row md:border md:border-line md:bg-surface-solid md:p-3 md:shadow-float"
-    />
-    <aside
-      v-if="shown"
-      data-testid="announcement-alert"
-      :aria-label="$t('contests.announcements.alert.label')"
+       where the notice stacks above the toast. While a dialog is open the region moves into it, like the toast host: the
+       rest of the page is inert there, so it would be hidden and never spoken. -->
+  <Teleport :to="topDialog ?? 'body'" :disabled="!topDialog">
+    <div
+      v-if="streamed.contest.value"
+      v-bind="$attrs"
+      data-testid="contest-announcement-live"
+      role="status"
+      aria-live="polite"
+      class="flex flex-col md:fixed md:right-6 md:bottom-[calc(var(--dock-height,0px)+1.5rem)] md:z-toast md:w-96 md:gap-3"
+      :class="topDialog && 'max-md:fixed max-md:inset-x-0 max-md:bottom-0'"
     >
-      <!-- Phone: one row under the contest bar; the body stays on the Announcements tab. -->
-      <div
-        class="flex min-h-12 items-center gap-2 border-b border-l-3 border-b-line border-l-accent bg-surface py-1 pr-2 pl-4 md:hidden"
+      <!-- Always there, so the title is spoken when it changes; empty off the tab, where the alert speaks instead. -->
+      <p class="sr-only">{{ isOnAnnouncementsTab ? message : '' }}</p>
+      <AnnouncementsPausedNotice
+        v-if="!isOnThisContest"
+        :contest-key="key"
+        class="max-md:page-gutter max-md:mt-3 md:mb-0 md:rounded-row md:border md:border-line md:bg-surface-solid md:p-3 md:shadow-float"
+      />
+      <aside
+        v-if="shown"
+        data-testid="announcement-alert"
+        :aria-label="$t('contests.announcements.alert.label')"
       >
-        <p class="min-w-0 flex-1 truncate text-sm">
-          <span class="font-semibold">{{ $t('contests.announcements.alert.title') }}</span>
-          · {{ shown.title }}
-        </p>
-        <AppButton size="sm" tone="ghost" :to="announcementsTab">
-          {{ $t('contests.announcements.alert.view') }}
-        </AppButton>
-        <IconButton size="sm" :label="$t('common.close')" @click="close(shown.id)">
-          <X aria-hidden="true" class="size-4" />
-        </IconButton>
-      </div>
-      <div
-        class="flex items-start gap-3 rounded-row border border-accent bg-surface-solid p-4 max-md:hidden md:shadow-float"
-      >
-        <InlineBit kind="envelope" />
-        <div class="min-w-0 flex-1">
-          <p class="text-meta font-semibold">
-            {{ $t('contests.announcements.alert.title') }} · {{ streamed.contest.value.name }}
+        <!-- Phone: one row under the contest bar; the body stays on the Announcements tab. -->
+        <div
+          class="flex min-h-12 items-center gap-2 border-b border-l-3 border-b-line border-l-accent bg-surface py-1 pr-2 pl-4 md:hidden"
+        >
+          <p class="min-w-0 flex-1 truncate text-sm">
+            <span class="font-semibold">{{ $t('contests.announcements.alert.title') }}</span>
+            · {{ shown.title }}
           </p>
-          <p class="mt-0.5 line-clamp-2 text-sm">{{ shown.title }}</p>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <AppButton size="sm" tone="primary" :to="announcementsTab">
-              {{ $t('contests.announcements.alert.view') }}
-            </AppButton>
-            <AppButton size="sm" tone="ghost" @click="close(shown.id)">
-              {{ $t('common.close') }}
-            </AppButton>
+          <AppButton size="sm" tone="ghost" :to="announcementsTab">
+            {{ $t('contests.announcements.alert.view') }}
+          </AppButton>
+          <IconButton size="sm" :label="$t('common.close')" @click="close(shown.id)">
+            <X aria-hidden="true" class="size-4" />
+          </IconButton>
+        </div>
+        <div
+          class="flex items-start gap-3 rounded-row border border-accent bg-surface-solid p-4 max-md:hidden md:shadow-float"
+        >
+          <InlineBit kind="envelope" />
+          <div class="min-w-0 flex-1">
+            <p class="text-meta font-semibold">
+              {{ $t('contests.announcements.alert.title') }} · {{ streamed.contest.value.name }}
+            </p>
+            <p class="mt-0.5 line-clamp-2 text-sm">{{ shown.title }}</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <AppButton size="sm" tone="primary" :to="announcementsTab">
+                {{ $t('contests.announcements.alert.view') }}
+              </AppButton>
+              <AppButton size="sm" tone="ghost" @click="close(shown.id)">
+                {{ $t('common.close') }}
+              </AppButton>
+            </div>
           </div>
         </div>
-      </div>
-    </aside>
-  </div>
+      </aside>
+    </div>
+  </Teleport>
 </template>

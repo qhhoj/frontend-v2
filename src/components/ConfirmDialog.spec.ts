@@ -11,7 +11,7 @@ const buttonNamed = (name: string) =>
     (button) => button.textContent?.trim() === name,
   )!;
 const pressEscape = () =>
-  document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape', bubbles: true }));
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 const mountDialog = (props: Record<string, unknown>) =>
   mountComponent(ConfirmDialog, { props }) as unknown as VueWrapper<{
     visible: boolean;

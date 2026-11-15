@@ -6,7 +6,7 @@ defineProps<{ keys: string }>();
 <template>
   <kbd
     aria-hidden="true"
-    class="ml-2 hidden rounded-row border border-current px-1.5 font-mono text-caption leading-4 not-touch:inline"
+    class="ml-2 hidden rounded-row border border-current px-1.5 font-mono text-caption leading-4 no-touch:inline"
     >{{ keys }}</kbd
   >
 </template>

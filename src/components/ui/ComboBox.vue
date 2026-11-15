@@ -2,6 +2,7 @@
 import { ChevronDown, LoaderCircle, Search, X } from 'lucide-vue-next';
 import { computed, nextTick, ref, useAttrs, useId, useTemplateRef, watch } from 'vue';
 import { useFieldControl } from './FormField.control';
+import { yieldsToComposition } from './keys';
 import { usePopup } from './popup';
 
 /**
@@ -137,11 +138,12 @@ const listKeys = computed<Record<string, () => void>>(() => ({
     : { Home: () => move(0), End: () => move(shown.value.length - 1), ' ': pickActive }),
 }));
 function onListKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') event.stopPropagation(); // the submit sheet closes on any Escape that reaches it
+  if (yieldsToComposition(event)) return; // an input method's Enter or Escape is its own
   if (event.key === 'Tab') return close();
   const action = listKeys.value[event.key];
   if (!action) return;
   event.preventDefault();
-  if (event.key === 'Escape') event.stopPropagation(); // the submit sheet closes on any Escape that reaches it
   action();
 }
 const OPEN_KEYS = new Set(['Enter', ' ', 'ArrowDown', 'ArrowUp']);
