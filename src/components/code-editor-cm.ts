@@ -44,6 +44,11 @@ const tokenTheme = EditorView.theme({
     { backgroundColor: 'var(--qh-accent-soft)' },
 });
 
+/** A held Ctrl Enter repeats the key: only the first press may submit, or each repeat would spend an attempt. */
+export function isRepeatedSubmitKey(event: Pick<KeyboardEvent, 'key' | 'ctrlKey' | 'metaKey' | 'repeat'>): boolean {
+  return event.repeat && event.key === 'Enter' && (event.ctrlKey || event.metaKey);
+}
+
 function submitKeymap(onSubmit: EditorOptions['onSubmit']) {
   return onSubmit
     ? [
@@ -72,6 +77,7 @@ export function createEditor(host: HTMLElement, options: EditorOptions): EditorH
         drawSelection(),
         history(),
         // Ahead of the default keymap, which binds Mod-Enter to "insert blank line".
+        Prec.highest(EditorView.domEventHandlers({ keydown: isRepeatedSubmitKey })),
         Prec.highest(keymap.of(submitKeymap(options.onSubmit))),
         keymap.of([...defaultKeymap, ...historyKeymap]),
         tokenTheme,

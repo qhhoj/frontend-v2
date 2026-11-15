@@ -13,7 +13,7 @@ import LanguagePicker from './LanguagePicker.vue';
 import SourceUploadButton from './SourceUploadButton.vue';
 import SubmitResultStrip from './SubmitResultStrip.vue';
 import { useLocaleStore } from '@/stores/locale.store';
-import { submitShortcutHint } from './submit-shortcuts';
+import { submitAriaShortcut, submitShortcutHint } from './submit-shortcuts';
 import type { useSubmitForm } from './use-submit-form';
 
 const props = defineProps<{
@@ -74,7 +74,8 @@ const REGION_ORDER = {
 const FILLED_EDITOR = {
   form: 'flex h-full min-h-0 flex-col gap-3',
   languageRow: 'flex items-center gap-x-2',
-  body: 'flex min-h-0 flex-1 flex-col',
+  // The editor keeps a floor of 10 rem, so a message line above or below it never squeezes it away.
+  body: 'flex min-h-40 flex-1 flex-col',
   editor: 'min-h-0 flex-1 overflow-auto rounded-cell',
   editorMinLines: 6,
   editorFill:
@@ -194,7 +195,7 @@ function loadDroppedFile(event: DragEvent) {
         :aria-describedby="submitDescribedBy"
         class="shrink-0"
         :class="[REGION_ORDER.submitTopRow, $slots.actions ? 'ml-1' : 'ml-auto']"
-        aria-keyshortcuts="Control+Enter Meta+Enter"
+        :aria-keyshortcuts="submitAriaShortcut()"
         >{{ $t(submitLabelKey) }}<KeyHint :keys="shortcutHint"
       /></AppButton>
     </div>
@@ -238,7 +239,7 @@ function loadDroppedFile(event: DragEvent) {
       :id="errorId"
       tone="danger"
       inline
-      class="basis-full"
+      class="shrink-0"
       :class="REGION_ORDER.message"
     >
       {{ state.errorText }}
@@ -246,7 +247,7 @@ function loadDroppedFile(event: DragEvent) {
     <p
       v-else-if="blockedReason"
       :id="reasonId"
-      class="basis-full text-sm text-muted"
+      class="shrink-0 text-sm text-muted"
       :class="REGION_ORDER.message"
     >
       {{ blockedReason }}
@@ -254,7 +255,7 @@ function loadDroppedFile(event: DragEvent) {
     <p
       v-if="state.resubmitUnavailable"
       role="status"
-      class="basis-full text-sm text-muted"
+      class="shrink-0 text-sm text-muted"
       :class="REGION_ORDER.message"
     >
       {{ $t('submit.resubmitUnavailable') }}

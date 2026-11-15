@@ -124,7 +124,7 @@ function unloadEditor() {
 function onTextareaKeydown(event: KeyboardEvent) {
   if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
     event.preventDefault();
-    emit('requestSubmit');
+    if (!isRepeatedSubmitKey(event)) emit('requestSubmit');
     return;
   }
   if (!isLowPower.value) return;

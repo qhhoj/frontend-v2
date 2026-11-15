@@ -10,3 +10,7 @@ export function isFocusEditorShortcut(event: KeyboardEvent): boolean {
 /** The hint on the submit button: ⌘ Enter on Apple systems, Ctrl Enter elsewhere (both work everywhere). */
 export const submitShortcutHint = (platform = navigator.platform): string =>
   /Mac|iPhone|iPad/.test(platform) ? '⌘ Enter' : 'Ctrl Enter';
+
+/** The key the editor really binds (CodeMirror's `Mod`): Command on Apple systems, Control elsewhere. */
+export const submitAriaShortcut = (platform = navigator.platform): string =>
+  /Mac|iPhone|iPad/.test(platform) ? 'Meta+Enter' : 'Control+Enter';
