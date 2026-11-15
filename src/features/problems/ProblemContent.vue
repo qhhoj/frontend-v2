@@ -207,7 +207,6 @@ function panelIdOf(tabId: string) {
         :page-key="problem.code"
         :contest-key="problem.contest?.contestKey ?? null"
         placeholder-key="comments.composer.problemPlaceholder"
-        fold-when-empty
       />
     </div>
   </div>
