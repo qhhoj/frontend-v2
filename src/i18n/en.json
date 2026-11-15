@@ -1633,7 +1633,9 @@
     },
     "actions": {
       "problem": "Back to problem",
-      "resubmit": "Resubmit"
+      "resubmit": "Resubmit",
+      "resubmitFix": "Fix and resubmit",
+      "next": "Next problem"
     },
     "sourceLocked": {
       "signIn": "Sign in to see the source, if the problem allows it.",

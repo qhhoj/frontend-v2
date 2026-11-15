@@ -243,7 +243,7 @@ describe('submission page', () => {
     const { wrapper, router } = await openSubmission('sub-1');
     expect(router.currentRoute.value.name).toBe('submission');
     expect(wrapper.findAll('[data-testid="case-row"]')).toHaveLength(3);
-    expect(wrapper.get('[data-testid="hero-line"]').text()).toContain('Test 3 sai kết quả');
+    expect(wrapper.get('[data-testid="failing-test"]').text()).toContain('Test 3 sai kết quả');
     await flushPromises();
     expect(wrapper.get('[data-testid="source-locked"]').text()).toContain('Đăng nhập');
     expect(calls.some((call) => call.path.endsWith('/source'))).toBe(false);
@@ -251,7 +251,7 @@ describe('submission page', () => {
     expect(wrapper.find('a[href*="resubmit"]').exists()).toBe(false);
   });
 
-  it('gives the author Nộp lại as the one primary action, beside the way back to the problem', async () => {
+  it('after a wrong answer the author gets Sửa và nộp lại as the one primary action', async () => {
     mockApi({
       ...signedInViewer(),
       ...submissionPageRoutes(),
@@ -259,8 +259,23 @@ describe('submission page', () => {
     });
     const { wrapper } = await openSubmission('sub-1');
     const actions = wrapper.get('[data-testid="submission-hero"]').findAll('a');
-    expect(actions.map((link) => link.text())).toEqual(['Về đề bài', 'Nộp lại']);
-    expect(actions[1]!.attributes('href')).toContain('resubmit=sub-1');
+    expect(actions.map((link) => link.text())).toEqual(['Sửa và nộp lại', 'Về đề bài']);
+    expect(actions[0]!.attributes('href')).toContain('resubmit=sub-1');
+    expect(wrapper.get('[data-testid="failing-test"]').text()).toContain('Test 3 sai kết quả');
+  });
+
+  it('after an accepted run the author gets Bài tiếp theo first, to the unsolved problems', async () => {
+    mockApi({
+      ...signedInViewer(),
+      ...submissionPageRoutes(
+        submissionDetail({ result: 'AC', points: 100, casePoints: 20, caseTotal: 20 }),
+      ),
+      ...problemPageRoutes(),
+    });
+    const { wrapper } = await openSubmission('sub-1');
+    const actions = wrapper.get('[data-testid="submission-hero"]').findAll('a');
+    expect(actions.map((link) => link.text())).toEqual(['Bài tiếp theo', 'Nộp lại', 'Về đề bài']);
+    expect(actions[0]!.attributes('href')).toBe('/problems?unsolved=1');
   });
 
   it('never announces a bare final status while the final read is on its way, and shows no provisional score beside the final verdict', async () => {
@@ -408,6 +423,17 @@ describe('submission page of a contest submission', () => {
     expect(
       wrapper.get('[data-testid="overview-total"]').element.previousElementSibling?.textContent,
     ).toBe('Điểm bài');
+  });
+
+  it("opens the problem inside the contest from the hero's actions", async () => {
+    mockApi(routes({ date: '2026-10-08T09:58:00Z', contest: { ...block, minute: 118 } }));
+    const { wrapper } = await openSubmission('sub-1');
+    const hrefs = wrapper
+      .get('[data-testid="submission-hero"]')
+      .findAll('a')
+      .map((link) => link.attributes('href'));
+    expect(hrefs.length).toBeGreaterThan(0);
+    for (const href of hrefs) expect(href).toContain(`contest=${contest.key}`);
   });
 
   it("from an earlier run: contest points and the API's minute, no next problem", async () => {

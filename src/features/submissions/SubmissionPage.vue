@@ -122,6 +122,13 @@ const verdict = computed(() => {
     ? verdictOf({ status: streamStatus, result: null })
     : submissionVerdictOf(row.value);
 });
+/** After the author's full-score AC the way on is the problem list without the solved ones; contests have their own next step. */
+const nextTo = computed(() =>
+  canResubmit.value && verdict.value?.code === 'AC' && !inContest.value
+    ? { name: 'problems', query: { unsolved: '1' } }
+    : null,
+);
+
 /** Tests to sum up above the source (graded, or waiting while the grading goes on); without them (compile error, hidden
  * results) the result card is short and itself comes before the source. */
 const hasResultSummary = computed(() => {
@@ -175,6 +182,7 @@ const hasResultSummary = computed(() => {
             :is-live="isLive"
             :can-resubmit="canResubmit"
             :contest-score="contestScore"
+            :next-to="nextTo"
             :share-id="row.viewer.canShare ? row.id : null"
           >
             <SubmissionStaffPanel :key="row.id" :submission="row" />

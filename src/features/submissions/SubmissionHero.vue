@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Send } from 'lucide-vue-next';
 import { computed } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 import { FINISHED_STATUSES, IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import type { SubmissionDetail } from '@/api/types/submissions';
 import AppButton from '@/components/ui/AppButton.vue';
@@ -9,15 +10,15 @@ import BitMascot from '@/components/BitMascot.vue';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { translate } from '@/i18n';
 import { NO_VALUE, formatNumber, scoreBelowFull } from '@/lib/format';
 import { provisionalPoints, ringProgress } from '@/lib/grading';
-import { PARTIAL_CODE, verdictOfCode, type Verdict } from '@/lib/verdicts';
+import { PARTIAL_CODE, VERDICT_TONE_VARS, verdictOfCode, type Verdict } from '@/lib/verdicts';
 import { BIT_MOODS } from '@/mascot/bit-moods';
 import { verdictBitMood } from '@/mascot/verdict-bit';
 import { useLocaleStore } from '@/stores/locale.store';
 import ShareButton from '@/features/shares/ShareButton.vue';
+import TestStrip from './list/TestStrip.vue';
 import { heroParts } from './hero-line';
 import VerdictRing from './VerdictRing.vue';
 
@@ -45,6 +46,8 @@ const props = defineProps<{
   contestScore?: { points: string; max: string } | null;
   /** The submission's id when the viewer may share it (`viewer.canShare`): adds "Chia sẻ" to the actions. */
   shareId?: string | null;
+  /** Where "Bài tiếp theo" leads: set only for the author's own accepted submission outside a contest. */
+  nextTo?: RouteLocationRaw | null;
 }>();
 const locale = useLocaleStore();
 const format = (points: number) =>
@@ -65,6 +68,10 @@ const maxScore = computed(() =>
   !isProvisional.value && props.submission.points !== null && props.problemPoints !== null
     ? format(props.problemPoints)
     : null,
+);
+/** A contest submission opens the problem inside its contest (`?contest=`); a practice one opens the plain problem. */
+const contestQuery = computed(() =>
+  props.submission.contest ? { contest: props.submission.contest.key } : {},
 );
 const isFinished = computed(() => FINISHED_STATUSES.includes(props.submission.status));
 /** A partially correct score fills the ring by its share of the problem's points. */
@@ -96,18 +103,41 @@ const problemScore = computed(() =>
     ? translate('submission.contest.problemScore', { score: score.value, max: maxScore.value })
     : null,
 );
+const parts = computed(() => [
+  ...(problemScore.value ? [{ text: problemScore.value }] : []),
+  ...heroParts(props.submission),
+]);
+/** The first failing test gets its own line under the score; the rest (tests passed, time, memory) stays in the small line. */
+const failingTest = computed(() => {
+  const failed = parts.value.find((part) => 'key' in part && part.key === 'failed');
+  if (!failed || !('values' in failed) || !('status' in failed.values)) return null;
+  const verdict = translate(verdictOfCode(failed.values.status).labelKey);
+  return translate('submission.overview.failed', {
+    number: failed.values.number,
+    verdict: verdict.toLocaleLowerCase(locale.locale),
+  });
+});
 const line = computed(() =>
-  [...(problemScore.value ? [{ text: problemScore.value }] : []), ...heroParts(props.submission)]
+  parts.value
     .map((part) => {
       if ('text' in part) return part.text;
       if (part.key === 'passed') return translate('submission.overview.allPassed', part.values);
-      const verdict = translate(verdictOfCode(part.values.status).labelKey);
-      return translate('submission.overview.failed', {
-        number: part.values.number,
-        verdict: verdict.toLocaleLowerCase(locale.locale),
-      });
+      return null;
     })
+    .filter((text) => text !== null)
     .join(' · '),
+);
+/** The verdict name takes its tone's colour; AC pops once and WA nudges once (see the style block). */
+const nameColour = computed(() => `var(${VERDICT_TONE_VARS[props.verdict.tone]})`);
+const motion = computed(() => {
+  if (!isFinished.value) return null;
+  if (props.verdict.code === 'AC') return 'verdict-pop';
+  return props.verdict.code === 'WA' ? 'verdict-nudge' : null;
+});
+/** Failed: fix first. Accepted by the author: the next problem is the primary and resubmitting steps back. */
+const resubmitIsPrimary = computed(() => props.canResubmit && !props.nextTo);
+const resubmitLabel = computed(() =>
+  props.verdict.code === 'AC' ? 'submission.actions.resubmit' : 'submission.actions.resubmitFix',
 );
 const problem = computed(() => {
   const row = props.submission.problem;
@@ -122,25 +152,40 @@ const problem = computed(() => {
     class="@container min-w-0 overflow-hidden rounded-card"
   >
     <div class="flex flex-wrap items-center gap-x-6 gap-y-4 p-6 sm:p-8">
-      <VerdictRing
-        size="lg"
-        :progress="isFinished ? null : ringProgress(submission)"
-        :verdict="verdict"
-        :share="partialShare"
-        :is-empty="submission.status === 'PD'"
-      />
+      <div :class="motion" class="shrink-0">
+        <VerdictRing
+          size="lg"
+          :progress="isFinished ? null : ringProgress(submission)"
+          :verdict="verdict"
+          :share="partialShare"
+          :is-empty="submission.status === 'PD'"
+        />
+      </div>
       <div class="order-1 min-w-0 flex-1 basis-full @xl:order-none @xl:basis-40">
-        <p v-if="isLive" data-testid="grading-line" class="flex items-center gap-2 text-sm">
+        <p
+          v-if="isLive"
+          data-testid="grading-line"
+          class="flex items-center gap-2 text-display leading-9 font-semibold"
+          :style="{ color: nameColour }"
+        >
           <span
             aria-hidden="true"
             class="size-2.5 rounded-full bg-positive motion-safe:animate-pulse"
           />
           {{ $t(verdict.labelKey) }}
         </p>
-        <p v-else class="text-sm"><VerdictChip :verdict="verdict" named /></p>
+        <p
+          v-else
+          data-testid="verdict-name"
+          :class="motion"
+          class="text-display leading-9 font-semibold"
+          :style="{ color: nameColour }"
+        >
+          {{ $t(verdict.labelKey) }}
+        </p>
         <p
           data-testid="score"
-          class="mt-1 font-mono text-section leading-none font-semibold tabular-nums"
+          class="mt-1 font-mono text-score leading-none font-semibold tabular-nums"
         >
           <span class="text-score">
             <SkeletonBlock v-if="isProblemLoading" text class="w-40" />
@@ -148,16 +193,21 @@ const problem = computed(() => {
           </span>
           <template v-if="!isProblemLoading && scoreText.outOf"
             >{{ ' '
-            }}<span class="whitespace-nowrap text-muted">{{ scoreText.outOf }}</span></template
+            }}<span class="text-section whitespace-nowrap text-muted">{{
+              scoreText.outOf
+            }}</span></template
           >
         </p>
         <p v-if="isProvisional" data-testid="provisional" class="text-meta text-muted">
           {{ $t('submission.provisional') }}
         </p>
+        <p v-if="failingTest" data-testid="failing-test" class="mt-2 text-title font-semibold">
+          {{ failingTest }}
+        </p>
         <p
           v-if="line || submission.language"
           data-testid="hero-line"
-          class="mt-2 text-meta text-muted"
+          class="mt-1 text-meta text-muted"
         >
           {{ line }}
           <!-- The "·" wraps with the language, never alone at a line end. -->
@@ -182,21 +232,31 @@ const problem = computed(() => {
         :closed-eyes="bit.eyesShut"
         class="ml-auto [--bit-px:4px] @2xl:[--bit-px:6px]"
       />
-      <div v-if="problem || shareId" class="order-2 flex w-full flex-wrap gap-2 @xl:order-none">
-        <AppButton
-          v-if="problem"
-          :tone="canResubmit ? 'secondary' : 'primary'"
-          :to="{ name: 'problem', params: { code: problem } }"
-        >
-          {{ $t('submission.actions.problem') }}
+      <div v-if="submission.testSummary" class="order-2 w-full @xl:order-none">
+        <TestStrip :summary="submission.testSummary" :is-grading="!isFinished" />
+      </div>
+      <div v-if="problem || shareId" class="order-3 flex w-full flex-wrap gap-2 @xl:order-none">
+        <AppButton v-if="nextTo" tone="primary" :to="nextTo">
+          {{ $t('submission.actions.next') }}
         </AppButton>
         <AppButton
           v-if="canResubmit"
-          tone="primary"
-          :to="{ name: 'problem', params: { code: problem }, query: { resubmit: submission.id } }"
+          :tone="resubmitIsPrimary ? 'primary' : 'secondary'"
+          :to="{
+            name: 'problem',
+            params: { code: problem },
+            query: { ...contestQuery, resubmit: submission.id },
+          }"
         >
           <template #icon><Send aria-hidden="true" class="size-4" /></template>
-          {{ $t('submission.actions.resubmit') }}
+          {{ $t(resubmitLabel) }}
+        </AppButton>
+        <AppButton
+          v-if="problem"
+          :tone="canResubmit || nextTo ? 'secondary' : 'primary'"
+          :to="{ name: 'problem', params: { code: problem }, query: contestQuery }"
+        >
+          {{ $t('submission.actions.problem') }}
         </AppButton>
         <ShareButton v-if="shareId" :submission-id="shareId" />
       </div>
@@ -204,3 +264,25 @@ const problem = computed(() => {
     <slot />
   </Card>
 </template>
+
+<style scoped>
+/* AC: one pop (1 to 1.12 and back); WA: one 3 px nudge. Transform only; reduced motion shows none. */
+@keyframes verdict-pop {
+  50% {
+    transform: scale(1.12);
+  }
+}
+@keyframes verdict-nudge {
+  50% {
+    transform: translateX(-3px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .verdict-pop {
+    animation: verdict-pop 320ms var(--qh-ease-spring);
+  }
+  .verdict-nudge {
+    animation: verdict-nudge var(--qh-duration) var(--qh-ease);
+  }
+}
+</style>

@@ -1633,7 +1633,9 @@
     },
     "actions": {
       "problem": "Về đề bài",
-      "resubmit": "Nộp lại"
+      "resubmit": "Nộp lại",
+      "resubmitFix": "Sửa và nộp lại",
+      "next": "Bài tiếp theo"
     },
     "sourceLocked": {
       "signIn": "Đăng nhập để xem mã nguồn, nếu đề bài cho phép.",
