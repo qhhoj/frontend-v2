@@ -9,6 +9,10 @@ Why things are the way they are: [docs/decisions.md](docs/decisions.md).
 - Versions are exact in `package.json`. TypeScript stays on 5.9: typescript-eslint 8 supports `<6.1`
 - Tests: Vitest 5 + jsdom + @vue/test-utils
 
+## Before you push
+
+Run `npm run prepush`. It runs Prettier and ESLint `--fix` on the files you changed since `origin/main`, lowers the raw-element baselines (`raw-elements:shrink`) and runs the repo lint rules (`lint:tokens` and the others) in parallel. Commit what it changed. A PR that removes raw elements never fails CI for a stale baseline: `lint:tokens` only prints a notice, and only a count that goes up fails. PR and merge-queue CI lint only the changed files (`npm run lint:changed -- <base>`); pushes to `main` and the nightly run lint everything.
+
 ## Layout and names
 
 - Feature code lives in `src/features/<area>/`: `<Name>Page.vue` (routed), parts as `<Name>.vue`, `<area>.queries.ts`, `use-<name>.ts`

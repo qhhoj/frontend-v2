@@ -15,7 +15,13 @@
 import { hairlineControlBorders } from './control-borders.mjs';
 import { emptyStateOffences } from './empty-actions.mjs';
 import { rawHeadings } from './page-headings.mjs';
-import { baselineErrors, rawElementOffences, readBaselines } from './raw-elements.mjs';
+import {
+  baselineErrors,
+  goneEntries,
+  rawElementOffences,
+  readBaselines,
+  staleCounts,
+} from './raw-elements.mjs';
 import { retiredUtilities } from './retired-utilities.mjs';
 import { sourceTree } from './source-tree.mjs';
 import { stockUtilities } from './stock-utilities.mjs';
@@ -70,7 +76,7 @@ const CHECKS = [
     find: emptyStateOffences,
   },
   {
-    message: `Raw elements, old wrappers and retired classes above the file's count in scripts/raw-element-baseline/<area>.json (a file never gains one: use the kit part named on each line; a fixed file lowers its count with npm run raw-elements:shrink; docs/wrapper-migration.md):`,
+    message: `Raw elements, old wrappers and retired classes above the file's count in scripts/raw-element-baseline/<area>.json (a file never gains one: use the kit part named on each line; a fixed file's lower count is no failure, npm run prepush lowers it; docs/wrapper-migration.md):`,
     find: (source, rel) => rawElementOffences(source, rel, baselines.merged[rel]),
   },
   {
@@ -91,11 +97,21 @@ for (const { message, find } of CHECKS) {
   }
 }
 
-const strayEntries = baselineErrors(
-  baselines,
-  sources.map(({ rel }) => rel),
-);
+const strayEntries = baselineErrors(baselines);
 if (strayEntries.length) {
-  console.error(`Stale entries in scripts/raw-element-baseline/:\n${strayEntries.join('\n')}`);
+  console.error(`Wrong entries in scripts/raw-element-baseline/:\n${strayEntries.join('\n')}`);
   process.exit(1);
 }
+
+// A baseline above the real counts only means a PR removed raw elements: a notice, never a failure.
+const stale = [
+  ...sources.flatMap(({ rel, source }) => staleCounts(source, rel, baselines.merged[rel])),
+  ...goneEntries(
+    baselines,
+    sources.map(({ rel }) => rel),
+  ).map((rel) => `src/${rel}: file is gone`),
+];
+if (stale.length)
+  console.log(
+    `::notice title=Raw-element baseline can shrink::${stale.length} entries: run npm run raw-elements:shrink and commit.`,
+  );
