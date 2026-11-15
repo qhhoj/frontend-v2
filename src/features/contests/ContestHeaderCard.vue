@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed } from 'vue';
 import type { ContestDetail, ParticipationSummary } from '@/api/types/contests';
 import Card from '@/components/ui/Card.vue';
@@ -16,11 +15,12 @@ import { isOneDay } from './contest-clock';
 import { useContestTagsQuery } from './contest-extras.queries';
 import ContestCountdown from './ContestCountdown.vue';
 import ContestTimeBar from './ContestTimeBar.vue';
-import PhasePill from './PhasePill.vue';
 
 /**
- * `run`: the viewer's running participation here. The contest bar then carries the clock, so a phone drops the big
- * countdown; a run's countdown counts the run's own time (a virtual run, or a live window shorter than the contest).
+ * The detail tab's facts under `ContestHeader` (which has the name, the format chips and, while time runs, the clock):
+ * tags, summary, authors, the time bar, the countdown to the start or the end time, the viewer's rating change and the
+ * actions. `run`: the viewer's running participation here. While the header shows the clock (the contest runs, or the
+ * viewer's virtual run does) the big countdown stays hidden but mounted: it still tells the page when a phase flips.
  */
 const props = defineProps<{ contest: ContestDetail; run?: ParticipationSummary | null }>();
 const virtualRun = computed(() => (props.run && props.run.virtual > 0 ? props.run : null));
@@ -32,6 +32,8 @@ const locale = useLocaleStore();
 /** One clock for the card: the pill, the bar and the countdown switch on the same second. */
 const now = useNow();
 const phase = computed(() => phaseAt(props.contest, now.value));
+/** The header's clock: the same rule as `ContestHeader`. */
+const isClockInHeader = computed(() => virtualRun.value !== null || phase.value === 'running');
 const startMs = computed(() => Date.parse(props.contest.startTime));
 const lengthSpan = computed(() =>
   spanMessage((Date.parse(props.contest.endTime) - startMs.value) / 1000),
@@ -59,22 +61,13 @@ const oneDay = computed(() =>
   >
     <div class="flex min-w-0 flex-col gap-3">
       <div>
-        <PageHeader :title="contest.name">
-          <template #above>
-            <div class="flex flex-wrap items-center gap-1.5">
-              <PhasePill :phase="phase" />
-              <ContestChips :contest="contest" with-tags />
-            </div>
-          </template>
-          <template v-if="contest.logoOverrideImage" #start>
-            <img
-              :src="contest.logoOverrideImage"
-              alt=""
-              class="size-10 shrink-0 rounded-cell object-contain md:size-14"
-            />
-          </template>
-        </PageHeader>
-        <p v-if="contest.summary" class="mt-1 hidden text-muted md:block">
+        <div
+          v-if="contest.tags.length || contest.organizations.length"
+          class="mb-2 flex flex-wrap items-center gap-1.5"
+        >
+          <ContestChips :contest="contest" only-tags />
+        </div>
+        <p v-if="contest.summary" class="hidden text-muted md:block">
           {{ contest.summary }}
         </p>
         <p class="mt-1 hidden text-sm text-muted md:block">
@@ -108,16 +101,15 @@ const oneDay = computed(() =>
         </template>
       </p>
     </div>
-    <div
-      :class="['flex flex-col gap-4', virtualRun && 'rounded-row border border-line-accent p-4']"
-    >
-      <ContestCountdown
-        :contest="contest"
-        :virtual-run="virtualRun"
-        :live-run="liveRun"
-        :class="run && 'max-md:hidden'"
-        @elapsed="emit('elapsed')"
-      />
+    <div class="flex flex-col gap-4">
+      <div v-show="!isClockInHeader">
+        <ContestCountdown
+          :contest="contest"
+          :virtual-run="virtualRun"
+          :live-run="liveRun"
+          @elapsed="emit('elapsed')"
+        />
+      </div>
       <Chip
         v-if="ratingChange"
         data-testid="viewer-rating-change"

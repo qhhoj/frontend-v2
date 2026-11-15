@@ -13,9 +13,8 @@ import type { SubmissionScope } from '@/features/submissions/list/submission-sco
 import { useNow } from '@/lib/use-now';
 import { usePageTitle } from '@/router/page-title';
 import { useSessionStore } from '@/stores/session.store';
-import ContestCompactHeader from './ContestCompactHeader.vue';
 import ContestNotFound from './ContestNotFound.vue';
-import ContestTabs from './ContestTabs.vue';
+import ContestHeader from './bar/ContestHeader.vue';
 import { useContestQuery } from './contests.queries';
 import { ownSubmissionsOnly } from './own-submissions';
 
@@ -54,8 +53,7 @@ const emptyNextOf = (code: string): ContestProblem => {
   <div class="page-column">
     <ContestNotFound v-if="isMissing" />
     <template v-else>
-      <ContestTabs :contest-key="key" :phase="contest?.phase" />
-      <ContestCompactHeader v-if="contest" :contest="contest" />
+      <ContestHeader :contest-key="key" :contest="contest" />
       <div
         v-if="isOwnOnly && !isVisitorOnOwnList"
         data-testid="own-only"

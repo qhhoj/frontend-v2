@@ -1400,7 +1400,6 @@
       "notFoundTitle": "Không tìm thấy bảng xếp hạng",
       "notFoundBody": "Đường dẫn sai, đã tắt hoặc đã hết hạn."
     },
-    "summary": "{format} · {problems} bài · {participants}",
     "viewMode": "Chế độ bảng",
     "official": "Chính thức",
     "withVirtual": "Gồm thi ảo",
@@ -1412,8 +1411,11 @@
       "afterParticipation": "Bảng xếp hạng sẽ mở sau khi lượt tham gia của bạn kết thúc.",
       "afterContest": "Bảng xếp hạng sẽ mở sau khi kỳ thi kết thúc."
     },
-    "frozenTitle": "Bảng đang đóng băng",
     "frozenBody": "{minutes} phút cuối, kết quả mới hiện “?” đến khi công bố.",
+    "freeze": {
+      "label": "Đóng băng",
+      "pendingLabel": "Chờ công bố"
+    },
     "podium": "Top 3",
     "timeLeft": "Thời gian còn lại",
     "scrollRegion": "Vùng cuộn bảng xếp hạng",
@@ -1423,7 +1425,8 @@
       "penalty": "Phạt",
       "score": "Điểm",
       "scoreTime": "Điểm · giờ",
-      "ratingChange": "Δ rating"
+      "ratingChange": "Δ rating",
+      "scorePenalty": "Điểm · Phạt"
     },
     "legend": {
       "firstSolve": "giải đầu tiên",
@@ -1434,7 +1437,8 @@
       "fullPoints": "nền xanh: đủ điểm của bài",
       "partialPoints": "Một phần điểm, nền đậm dần theo ba mức",
       "zeroPoints": "0: đã nộp nhưng chưa được điểm",
-      "notAttempted": "trống: chưa nộp"
+      "notAttempted": "trống: chưa nộp",
+      "button": "Chú giải"
     },
     "cell": {
       "firstSolve": "Giải đầu tiên, sau {tries} lần sai, lúc {time}",
@@ -1447,6 +1451,7 @@
       "firstPointsAt": "Giải đầu tiên: {points} điểm, lúc {time}"
     },
     "empty": "Chưa có thí sinh.",
+    "emptyAction": "Xem đề bài",
     "disqualified": "Bị loại",
     "refreshFailed": "Không cập nhật được bảng, đang thử lại.",
     "scrollHint": "Vuốt ngang để xem các bài →",

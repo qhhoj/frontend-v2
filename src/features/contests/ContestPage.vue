@@ -19,7 +19,7 @@ import ContestJoinRulesCard from './ContestJoinRulesCard.vue';
 import ContestNotFound from './ContestNotFound.vue';
 import ContestProblemsTable from './ContestProblemsTable.vue';
 import ContestRulesCard from './ContestRulesCard.vue';
-import ContestTabs from './ContestTabs.vue';
+import ContestHeader from './bar/ContestHeader.vue';
 import { acceptanceOf } from './join-rules';
 import { useContestQuery } from './contests.queries';
 
@@ -66,7 +66,8 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><ContestDetailSkeleton /></template>
       <template v-if="contest">
-        <ContestTabs :contest-key="key" :phase="contest.phase" />
+        <!-- The card's hidden countdown tells the page when a phase flips, so the header's clock needs no handler here. -->
+        <ContestHeader :contest-key="key" :contest="contest" />
         <ContestHeaderCard :contest="contest" :run="run" @elapsed="onCountdownElapsed">
           <template #actions>
             <ContestActions :contest="contest" :current="current" />

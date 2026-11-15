@@ -40,6 +40,22 @@ describe('contest detail header', () => {
     expect(hatchStyle).toContain('width: 25%');
   });
 
+  it('shows the freeze chip beside the clock on a tab without the board', async () => {
+    vi.useFakeTimers({ now: Date.parse('2026-10-08T10:40:00Z'), toFake: ['Date'] });
+    mockApi({
+      ...anonymousViewer,
+      ...contestPageRoutes(
+        contestDetail({ viewer: contestViewer({ boardFrozenAt: '2026-10-08T10:24:37Z' }) }),
+      ),
+    });
+    const { wrapper } = await mountApp('/contests/r42');
+    const actions = wrapper.get(
+      '[data-testid="contest-page-header"] [data-testid="page-header-actions"]',
+    );
+    expect(actions.get('[data-testid="freeze-chip"]').text()).toContain('Đóng băng');
+    expect(actions.get('[data-testid="contest-clock"]').text()).toContain('00:44:37');
+  });
+
   it("shows the viewer's rating change once the contest's ratings are applied", async () => {
     vi.useFakeTimers({ now: RUNNING_NOW, toFake: ['Date'] });
     const chipOf = async (ratingChange: { rating: number; delta: number | null } | null) => {
@@ -75,7 +91,7 @@ describe('contest detail header', () => {
     vi.advanceTimersByTime(3000);
     await flushPromises();
     expect(calls.filter((call) => call.path === '/contests/r42')).toHaveLength(2);
-    expect(wrapper.get('[data-testid="contest-header"]').text()).toContain('Đang diễn ra');
+    expect(wrapper.get('[data-testid="contest-page-header"]').text()).toContain('Đang diễn ra');
     expect(wrapper.get('[role="timer"]').text()).toMatch(/^03:24:3\d$/);
   });
 

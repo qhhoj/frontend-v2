@@ -1400,7 +1400,6 @@
       "notFoundTitle": "Ranking not found",
       "notFoundBody": "This link is wrong, switched off or expired."
     },
-    "summary": "{format} · {problems} problem · {participants} | {format} · {problems} problems · {participants}",
     "viewMode": "Board mode",
     "official": "Official",
     "withVirtual": "Include virtual",
@@ -1412,8 +1411,11 @@
       "afterParticipation": "The ranking opens once your participation ends.",
       "afterContest": "The ranking opens once the contest ends."
     },
-    "frozenTitle": "The board is frozen",
     "frozenBody": "In the last {minutes} minute new results show \"?\" until they are revealed. | In the last {minutes} minutes new results show \"?\" until they are revealed.",
+    "freeze": {
+      "label": "Frozen",
+      "pendingLabel": "Results pending"
+    },
     "podium": "Top 3",
     "timeLeft": "Time left",
     "scrollRegion": "Scrollable ranking board",
@@ -1423,7 +1425,8 @@
       "penalty": "Penalty",
       "score": "Score",
       "scoreTime": "Score · time",
-      "ratingChange": "Δ rating"
+      "ratingChange": "Δ rating",
+      "scorePenalty": "Score · Penalty"
     },
     "legend": {
       "firstSolve": "first solve",
@@ -1434,7 +1437,8 @@
       "fullPoints": "green: the problem's full points",
       "partialPoints": "Partial points, tinted in three steps",
       "zeroPoints": "0: submitted, no points yet",
-      "notAttempted": "blank: not attempted"
+      "notAttempted": "blank: not attempted",
+      "button": "Legend"
     },
     "cell": {
       "firstSolve": "First solve, after {tries} wrong try, at {time} | First solve, after {tries} wrong tries, at {time}",
@@ -1447,6 +1451,7 @@
       "firstPointsAt": "First solve: {points} points at {time}"
     },
     "empty": "No contestants yet.",
+    "emptyAction": "See the problems",
     "disqualified": "Disqualified",
     "refreshFailed": "Could not refresh the board, retrying.",
     "scrollHint": "Swipe sideways to see the problems →",

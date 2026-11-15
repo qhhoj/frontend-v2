@@ -14,7 +14,7 @@ const run = (key: string, name: string) => ({
 describe('contest bar on contest pages (M-01)', () => {
   afterEach(() => vi.useRealTimers());
 
-  it("keeps only the status and the clock on the running contest's own pages", async () => {
+  it("steps aside on the running contest's own tabs, whose header carries the clock", async () => {
     vi.useFakeTimers({ now: NOW, toFake: ['Date'] });
     const contest = contestDetail({
       viewer: contestViewer({ isCurrent: true, inContest: true, liveStatus: 'participating' }),
@@ -25,10 +25,10 @@ describe('contest bar on contest pages (M-01)', () => {
       'GET /contests/current': ok(run(contest.key, contest.name)),
     });
     const { wrapper } = await mountApp(`/contests/${contest.key}`);
-    await vi.waitFor(() => expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(true));
-    const bar = wrapper.get('[data-testid="contest-bar"]');
-    expect(bar.find('nav').exists()).toBe(false);
-    expect(bar.find('[role="timer"]').exists()).toBe(true);
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="contest-clock"] [role="timer"]').exists()).toBe(true),
+    );
+    expect(wrapper.find('[data-testid="contest-bar"]').exists()).toBe(false);
   });
 
   it("links back to the viewer's contest from another contest's page", async () => {

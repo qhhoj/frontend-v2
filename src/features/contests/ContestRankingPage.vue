@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import PageHeader from '@/components/ui/PageHeader.vue';
 import { LocateFixed } from 'lucide-vue-next';
 import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import CountdownTimer from '@/components/CountdownTimer.vue';
-import EmptyState from '@/components/EmptyState.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import Notice from '@/components/ui/Notice.vue';
@@ -13,14 +10,13 @@ import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { rankingSummary } from './ranking-summary';
-import { ownEndTime } from '@/lib/contest-time';
 import { isPenaltyFormat, showsCellTime, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
-import ContestTabs from './ContestTabs.vue';
+import { boardFreezeOf } from './bar/board-freeze';
+import ContestHeader from './bar/ContestHeader.vue';
 import { ownSubmissionsOnly } from './own-submissions';
 import { podiumRows } from './podium-rows';
 import RankingSkeleton from './RankingSkeleton.vue';
@@ -53,12 +49,6 @@ const { data: current } = useCurrentParticipationQuery(needsCurrent);
 /** The viewer's running virtual run of this ended contest: the only case the real-board comparison exists. */
 const virtualRun = computed(() =>
   contest.value?.phase === 'ended' ? virtualRunOf(current.value, key.value, now.value) : null,
-);
-/** The viewer's live participation here: its window can close before the contest does (a timed contest). */
-const liveRun = computed(() =>
-  current.value?.contest.key === key.value && current.value.participation.virtual === 0
-    ? current.value.participation
-    : null,
 );
 /** A live virtual run opens the board with its virtual row; `?virtual=0` keeps the official board. */
 const withVirtual = computed(() => {
@@ -133,15 +123,14 @@ const skeletonHasTimeColumn = computed(
 const podium = computed(() => podiumRows(ranking.value?.rows ?? []));
 /** A podium of people who all scored nothing says nothing the board does not: it is shown once someone has points. */
 const hasPodium = computed(() => podium.value.some((row) => row.score > 0));
-const summary = computed(() =>
-  contest.value
-    ? rankingSummary(
-        contest.value.formatName,
-        ranking.value?.problems.length ?? contest.value.problems?.length ?? 0,
-        contest.value.userCount,
-      )
-    : '',
-);
+/** Why cells show "?": said in "Chú giải" while this board is frozen. */
+const freezeNote = computed(() => {
+  const freeze =
+    contest.value && ranking.value?.frozen ? boardFreezeOf(contest.value, now.value, true) : null;
+  if (!freeze || !contest.value) return undefined;
+  const minutes = contest.value.frozenLastMinutes;
+  return t(freeze.bodyKey, { minutes }, minutes);
+});
 type ViewMode = 'official' | 'virtual' | 'compare';
 const viewModes = computed(() => [
   { value: 'official' as const, label: t('ranking.official') },
@@ -188,66 +177,19 @@ async function goToMyRow() {
   <div class="page-column">
     <QueryState :loading="contestPending" :error="contestError" @retry="refetchContest()">
       <template #skeleton>
-        <SkeletonBlock data-skeleton-region="nav" pill class="h-[52px] w-72 max-w-full" />
-        <div class="flex flex-wrap items-end justify-between gap-4">
-          <div data-skeleton-region="title">
-            <div class="page-title">
-              <SkeletonBlock text class="w-80 max-w-full" />
-            </div>
-            <p class="mt-1 text-meta text-muted"><SkeletonBlock text class="w-56" /></p>
-          </div>
-          <div data-skeleton-region="controls" class="flex flex-wrap items-center gap-2.5">
-            <SkeletonBlock pill class="h-(--qh-control) w-44" />
-            <SkeletonBlock pill class="h-(--qh-control) w-48" />
-          </div>
+        <div data-skeleton-region="title" class="page-title">
+          <SkeletonBlock text class="w-80 max-w-full" />
         </div>
+        <SkeletonBlock data-skeleton-region="nav" class="h-(--qh-control-sm) w-96 max-w-full" />
       </template>
       <template v-if="contest">
-        <ContestTabs :contest-key="key" :phase="contest.phase" />
-        <PageHeader :title="contest.name">
-          <template #meta>{{ summary }}</template>
-          <template #actions>
-            <p
-              v-if="running"
-              class="glass flex h-(--qh-control) items-center gap-2.5 rounded-pill px-4.5"
-            >
-              <span aria-hidden="true" class="size-2 rounded-full bg-accent" />
-              <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
-              <CountdownTimer
-                :key="ownEndTime(contest.endTime, liveRun)"
-                :until="ownEndTime(contest.endTime, liveRun)"
-                class="font-semibold"
-                @elapsed="refetchContest()"
-              />
-            </p>
-            <SegmentedControl
-              :label="$t('ranking.viewMode')"
-              :options="viewModes"
-              :model-value="viewMode"
-              class="whitespace-nowrap"
-              @update:model-value="setViewMode"
-            />
-            <AppButton
-              v-if="myRow && !isComparing"
-              tone="primary"
-              data-testid="my-row"
-              @click="goToMyRow"
-            >
-              <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
-              {{
-                myRow.rank === null || myRow.isDisqualified
-                  ? $t('replay.player.myRow')
-                  : $t('ranking.myRow', { rank: myRow.rank })
-              }}
-            </AppButton>
-            <SearchInput
-              v-model="search"
-              :label="$t('ranking.searchLabel')"
-              class="w-full sm:w-48"
-            />
-          </template>
-        </PageHeader>
-        <RankingFreezeNotice :contest="contest" :is-board-frozen="ranking?.frozen ?? false" />
+        <ContestHeader
+          :contest-key="key"
+          :contest="contest"
+          :is-board-frozen="ranking?.frozen"
+          @elapsed="refetchContest()"
+        />
+        <RankingFreezeNotice :contest="contest" />
         <Notice
           v-if="isBoardHidden"
           role="status"
@@ -286,18 +228,21 @@ async function goToMyRow() {
           <RankingSkeleton :problem-count="problemCount" :has-time-column="skeletonHasTimeColumn" />
         </div>
       </template>
-      <Card v-if="!ranking?.rows.length && !isBoardHidden" as="div">
-        <EmptyState>{{ $t('ranking.empty') }}</EmptyState>
-      </Card>
-      <div v-else-if="ranking" :aria-busy="rankingStale" class="flex flex-col gap-5">
+      <div
+        v-if="ranking && (ranking.rows.length || !isBoardHidden)"
+        :aria-busy="rankingStale"
+        class="flex flex-col gap-5"
+      >
         <Notice v-if="rankingRefreshFailed" tone="warning" bit="sweat" role="status">
           {{ $t('ranking.refreshFailed') }}
         </Notice>
+        <!-- On a phone the list's first rows are the podium, so the board starts sooner. -->
         <RankingPodium
           v-if="hasPodium"
           :rows="podium"
           :problems="ranking.problems"
           :context="rankingContext"
+          class="max-sm:hidden"
           :class="{ 'opacity-60': rankingStale }"
         />
         <Card
@@ -315,7 +260,36 @@ async function goToMyRow() {
             :viewer-id="session.user?.id ?? null"
             :contest-key="key"
             :own-submissions-only="contest ? ownSubmissionsOnly(contest, now) : true"
-          />
+            :freeze-note="freezeNote"
+          >
+            <template #tools>
+              <SearchInput
+                v-model="search"
+                :label="$t('ranking.searchLabel')"
+                class="w-full sm:w-48"
+              />
+              <SegmentedControl
+                :label="$t('ranking.viewMode')"
+                :options="viewModes"
+                :model-value="viewMode"
+                class="whitespace-nowrap"
+                @update:model-value="setViewMode"
+              />
+              <AppButton
+                v-if="myRow && !isComparing"
+                tone="primary"
+                data-testid="my-row"
+                @click="goToMyRow"
+              >
+                <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
+                {{
+                  myRow.rank === null || myRow.isDisqualified
+                    ? $t('replay.player.myRow')
+                    : $t('ranking.myRow', { rank: myRow.rank })
+                }}
+              </AppButton>
+            </template>
+          </RankingTable>
         </Card>
       </div>
     </QueryState>
