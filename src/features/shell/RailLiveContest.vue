@@ -13,8 +13,8 @@ import { useLocaleStore } from '@/stores/locale.store';
 
 /**
  * The rail's card for the contest the viewer is in: its status, name, the clock, and for a contestant the rank and the
- * solved count. The rank is `standing.rank` of the participation (re-read every 2 minutes), as the board shows it (frozen
- * while frozen); it is left out when there is none. The solved count comes from the contest's problem list (the contest page's query), re-read
+ * solved count. The rank is `standing.rank` of the participation (re-read every 2 minutes); it is left out when there is none
+ * or the board is frozen. The solved count comes from the contest's problem list (the contest page's query), re-read
  * after each of the viewer's verdicts. A spectator sees the clock only.
  */
 /** The rank and the solved count are drawn on the wide rail only; narrower, the list is not asked. */
@@ -34,8 +34,10 @@ const isContestant = computed(() => kind.value !== 'spectate');
 const isWideRail = useMediaQuery(WIDE_RAIL_QUERY);
 const isAsked = computed(() => isContestant.value && isWideRail.value);
 const contest = useContestQuery(contestKey, isAsked);
-/** The viewer's rank, from the participation (`standing`): null for a spectator, before the start and when the board is hidden. */
-const rank = computed(() => props.current.standing?.rank ?? null);
+/** The rank, from `standing`: null for a spectator, before the start, when the board is hidden and while it is frozen. */
+const rank = computed(() =>
+  props.current.standing?.frozen ? null : (props.current.standing?.rank ?? null),
+);
 /** Null while the problems are not shown yet (before the start). */
 const solved = computed(() => {
   const problems = contest.data.value?.problems;

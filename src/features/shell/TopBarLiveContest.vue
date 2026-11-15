@@ -16,8 +16,10 @@ import { participationKind } from '@/features/contests/bar/current-contest';
 const props = defineProps<{ current: CurrentParticipation }>();
 const { t } = useI18n();
 const locale = useLocaleStore();
-/** The viewer's place as the board shows it (the frozen one during a freeze); none for a spectator or a hidden board. */
-const rank = computed(() => props.current.standing?.rank ?? null);
+/** The viewer's place; none for a spectator, a hidden board or a frozen one (the board shows no live place during a freeze). */
+const rank = computed(() =>
+  props.current.standing?.frozen ? null : (props.current.standing?.rank ?? null),
+);
 const kind = computed(() => participationKind(props.current.participation.virtual));
 const statusText = computed(() => {
   if (kind.value === 'virtual')
