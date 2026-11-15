@@ -69,6 +69,10 @@ const maxScore = computed(() =>
     ? format(props.problemPoints)
     : null,
 );
+/** A contest submission opens the problem inside its contest (`?contest=`); a practice one opens the plain problem. */
+const contestQuery = computed(() =>
+  props.submission.contest ? { contest: props.submission.contest.key } : {},
+);
 const isFinished = computed(() => FINISHED_STATUSES.includes(props.submission.status));
 /** A partially correct score fills the ring by its share of the problem's points. */
 const partialShare = computed(() => {
@@ -238,7 +242,11 @@ const problem = computed(() => {
         <AppButton
           v-if="canResubmit"
           :tone="resubmitIsPrimary ? 'primary' : 'secondary'"
-          :to="{ name: 'problem', params: { code: problem }, query: { resubmit: submission.id } }"
+          :to="{
+            name: 'problem',
+            params: { code: problem },
+            query: { ...contestQuery, resubmit: submission.id },
+          }"
         >
           <template #icon><Send aria-hidden="true" class="size-4" /></template>
           {{ $t(resubmitLabel) }}
@@ -246,7 +254,7 @@ const problem = computed(() => {
         <AppButton
           v-if="problem"
           :tone="canResubmit || nextTo ? 'secondary' : 'primary'"
-          :to="{ name: 'problem', params: { code: problem } }"
+          :to="{ name: 'problem', params: { code: problem }, query: contestQuery }"
         >
           {{ $t('submission.actions.problem') }}
         </AppButton>

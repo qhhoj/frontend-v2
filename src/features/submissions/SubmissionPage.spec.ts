@@ -425,6 +425,17 @@ describe('submission page of a contest submission', () => {
     ).toBe('Điểm bài');
   });
 
+  it("opens the problem inside the contest from the hero's actions", async () => {
+    mockApi(routes({ date: '2026-10-08T09:58:00Z', contest: { ...block, minute: 118 } }));
+    const { wrapper } = await openSubmission('sub-1');
+    const hrefs = wrapper
+      .get('[data-testid="submission-hero"]')
+      .findAll('a')
+      .map((link) => link.attributes('href'));
+    expect(hrefs.length).toBeGreaterThan(0);
+    for (const href of hrefs) expect(href).toContain(`contest=${contest.key}`);
+  });
+
   it("from an earlier run: contest points and the API's minute, no next problem", async () => {
     mockApi(routes({ date: '2026-10-08T07:00:00Z', contest: { ...block, minute: 42 } }));
     const { wrapper } = await openSubmission('sub-1');
