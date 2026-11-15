@@ -38,7 +38,6 @@
   --qh-verdict-sys-solid: var(--qh-verdict-ie-solid);
   --qh-verdict-sys-on: var(--qh-verdict-ie-on);
   --qh-verdict-partial: var(--qh-verdict-ac);
-  --qh-first-solve-bg-2: var(--qh-first-solve-bg);
   /* Six tags replace eight; stored tag-7 and tag-8 show as tag-5 until the backend migrates them (porting.md §1.4). */
   --qh-tag-7: var(--qh-tag-5);
   --qh-tag-7-bg: var(--qh-tag-5-bg);
