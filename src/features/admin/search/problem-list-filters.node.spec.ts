@@ -17,6 +17,13 @@ describe('staff problem list filters', () => {
     });
   });
 
+  it('turns the unfinished tab into the readiness filter', () => {
+    expect(listQueryOf(filtersFromQuery({ status: 'unfinished' }), undefined)).toMatchObject({
+      visibility: 'all',
+      status: 'unfinished',
+    });
+  });
+
   it('drops defaults and empty values from the address and restarts paging', () => {
     expect(
       filterQueryOf({ page: '4', q: 'dp', status: 'private' }, { status: 'all', q: '' }),
