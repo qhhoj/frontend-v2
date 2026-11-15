@@ -78,7 +78,7 @@ async function insertCanned(filled: string, title: string) {
 </script>
 
 <template>
-  <Card as="section" :class="isFolded ? 'p-1.5' : 'p-5'">
+  <Card as="section" :class="isFolded ? 'p-1.5' : 'p-4'">
     <form
       data-testid="ticket-reply"
       :data-folded="isFolded || undefined"

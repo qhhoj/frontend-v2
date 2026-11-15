@@ -2211,7 +2211,8 @@
       "failedTitle": "Chưa gửi được phiếu",
       "rateLimitedWait": "Bạn thử quá nhiều lần. Thử lại sau {seconds} giây."
     },
-    "title": "Phiếu hỗ trợ"
+    "title": "Phiếu hỗ trợ",
+    "pickOne": "Chọn một phiếu ở bên trái để xem nội dung."
   },
   "ticket": {
     "title": "Chi tiết phiếu",
