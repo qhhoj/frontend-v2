@@ -82,7 +82,6 @@ const shownKeys = computed(() =>
   ),
 );
 const cells = computed(() => cellsOf(shownKeys.value));
-const isShown = (kind: CellKind) => cells.value.includes(kind);
 const isOwn = (row: SubmissionListItem) =>
   props.ownUsername !== undefined && row.user?.username === props.ownUsername;
 const classOf = (kind: CellKind | 'pick' | 'source') => fullCellClass(kind);

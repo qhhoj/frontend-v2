@@ -1356,7 +1356,6 @@
     },
     "queued": "Trong hàng đợi",
     "queuedShort": "Chờ",
-    "gradingShort": "Chấm…",
     "rowLabel": "Bài nộp #{id} của {user} cho bài {problem}: {verdict}",
     "liveAdded": "Có {count} bài nộp mới | Có {count} bài nộp mới",
     "liveNew": "Có {count} bài nộp mới ở trang đầu | Có {count} bài nộp mới ở trang đầu",
