@@ -32,13 +32,13 @@ const signedInRoutes = (detail = problemDetail()) => ({
   ...problemPageRoutes(detail),
 });
 const openLanguageList = async (wrapper: VueWrapper) => {
-  await dockOf(wrapper).get('[data-pc-name="select"]').trigger('click');
+  await dockOf(wrapper).get('[role="combobox"]').trigger('click');
   await flushPromises();
 };
 const pickLanguage = async (name: string) => {
   const options = [...document.body.querySelectorAll<HTMLElement>('[role="option"]')];
   const target = options.find((option) => option.textContent?.includes(name))!;
-  target.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); // PrimeVue selects on mousedown
+  target.click();
   await flushPromises();
 };
 
@@ -65,7 +65,7 @@ describe('one way in', () => {
     mockApi(signedInRoutes());
     const { wrapper } = await openProblem();
     expect(wrapper.find('section[aria-label="Nộp bài"]').exists()).toBe(false);
-    expect(railCard(wrapper).find('[data-pc-name="select"]').exists()).toBe(false);
+    expect(railCard(wrapper).find('[role="combobox"]').exists()).toBe(false);
     await openDock(wrapper);
     expect(dockOf(wrapper).find('textarea').exists()).toBe(true);
     await dockOf(wrapper).get('button[aria-label="Đóng khung nộp bài"]').trigger('click');
@@ -243,9 +243,11 @@ describe('full screen', () => {
     const { wrapper } = await openProblem();
     await openDock(wrapper);
     await enter(wrapper);
-    const select = fullscreenPanel(wrapper).get('[data-pc-name="select"]');
-    select.element.setAttribute('aria-expanded', 'true');
+    const select = fullscreenPanel(wrapper).get('[role="combobox"]');
+    await select.trigger('click');
+    await flushPromises();
     await select.trigger('keydown', { key: 'Escape' });
+    expect(select.attributes('aria-expanded')).toBe('false');
     expect(wrapper.find('[aria-modal="true"]').exists()).toBe(true);
   });
 });
