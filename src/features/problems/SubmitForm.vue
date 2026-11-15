@@ -20,9 +20,10 @@ const props = defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;
   /**
-   * `pane` is the desktop column beside the statement: a bar (language, upload, actions, submit) over an editor that fills
-   * the rest; `full` the same as a full-screen panel, with the problem's name in the bar; `sheet` the phone's column that
-   * fills the sheet's height, the submit button under the editor.
+   * `pane` is the desktop column beside the statement: a bar (language, upload, submit) over an editor that fills the
+   * rest, and the slot `tools` (full screen) at the end of the line under the editor; `full` the same as a full-screen
+   * panel, with the problem's name and the slot `actions` in the bar; `sheet` the phone's column that fills the sheet's
+   * height, the submit button under the editor.
    */
   layout: 'pane' | 'sheet' | 'full';
 }>();
@@ -49,9 +50,9 @@ const submitLabelKey = computed(() => {
 });
 
 /**
- * Where each region sits, top to bottom. The pane and the full-screen panel keep the actions and the submit button in their
- * bar beside the language: actions right-aligned, then a 16 px gap and the submit button last, so a dismiss button is never
- * next to it; the sheet puts the button below the editor. The result strip sits under the bar, beside Submit (Workbench),
+ * Where each region sits, top to bottom. The pane and the full-screen panel keep the submit button in their bar beside
+ * the language, right-aligned. The full-screen panel's slot `actions` comes before it with a 16 px gap, so a dismiss
+ * button is never next to it; the sheet puts the button below the editor. The result strip sits under the bar (Workbench)
  * and on top of the sheet.
  */
 const REGION_ORDER = {
@@ -59,7 +60,7 @@ const REGION_ORDER = {
   info: 'order-2',
   upload: 'order-3',
   actions: 'order-4 ml-auto',
-  submitTopRow: 'order-5 ml-1',
+  submitTopRow: 'order-5',
   body: 'order-6',
   message: 'order-7',
   counterRow: 'order-8',
@@ -80,7 +81,7 @@ const FILLED_EDITOR = {
     'h-full !max-h-none [&_.code-editor-host]:h-full [&_.cm-editor]:h-full [&_.code-editor-fallback]:min-h-full',
   counterRow: '',
   submit: { size: 'md', block: false },
-  header: '@container/bar flex flex-wrap items-center gap-x-3 gap-y-2',
+  header: 'flex flex-wrap items-center gap-x-3 gap-y-2',
   strip: 'order-1',
   /** The contest line gets its own row under the bar, so the bar keeps to one row in a narrow pane. */
   info: 'order-6 basis-full',
@@ -192,7 +193,7 @@ function loadDroppedFile(event: DragEvent) {
         :loading="state.submitting"
         :aria-describedby="submitDescribedBy"
         class="shrink-0"
-        :class="REGION_ORDER.submitTopRow"
+        :class="[REGION_ORDER.submitTopRow, $slots.actions ? 'ml-1' : 'ml-auto']"
         aria-keyshortcuts="Control+Enter Meta+Enter"
         >{{ $t(submitLabelKey) }}<KeyHint :keys="shortcutHint"
       /></AppButton>
@@ -289,6 +290,9 @@ function loadDroppedFile(event: DragEvent) {
         class="inline-flex min-h-11 items-center text-muted underline hover:text-content"
         >{{ $t('submit.versions') }}</RouterLink
       >
+      <div v-if="$slots.tools" class="ml-auto">
+        <slot name="tools" />
+      </div>
     </div>
     <AppButton
       v-if="!isTopRow"

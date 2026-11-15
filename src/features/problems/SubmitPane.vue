@@ -117,7 +117,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
     :class="['flex min-h-80 min-w-0 flex-col p-3', placeClass]"
   >
     <SubmitForm :id="BODY_ID" :problem="problem" :form="form" layout="pane">
-      <template #actions>
+      <template #tools>
         <IconButton
           :id="FULLSCREEN_TOGGLE_ID"
           :label="$t('submit.fullscreen')"

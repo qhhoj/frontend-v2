@@ -84,7 +84,12 @@ describe('after a submit', () => {
     expect(router.currentRoute.value.path).toBe('/problems/duongdi');
     const strip = paneOf(wrapper).get('[data-testid="submit-result"]');
     const shown = strip.get('p[aria-hidden="true"]');
-    await vi.waitFor(() => expect(shown.text()).toBe('0 / 1600 · lỗi ở test 3'));
+    await vi.waitFor(() =>
+      expect(shown.findAll('span').map((part) => part.text())).toEqual([
+        '0 / 1600',
+        'lỗi ở test 3',
+      ]),
+    );
     // The ring shows the verdict; screen readers hear its name before the score.
     expect(strip.get('[role="status"]').text()).toMatch(/^\S.* · 0 \/ 1600 · lỗi ở test 3$/);
     expect(strip.get('[data-testid="submit-result-link"]').attributes('href')).toBe(
