@@ -163,6 +163,29 @@ describe('home', () => {
     expect(card.get('a[href="/contests/r42"]').text()).toBe('Vào thi');
   });
 
+  it('hides the own rank and score when the board is frozen', async () => {
+    const live = {
+      contest: {
+        key: 'r42',
+        name: 'QHH Round #42',
+        startTime: '2026-10-08T08:00:00Z',
+        endTime: '2026-10-08T11:24:37Z',
+      },
+      participation: participationSummary(),
+      standing: { rank: 7, score: 220, cumtime: 3180, frozen: true },
+    };
+    mockApi(
+      signedInRoutes({
+        'GET /contests/current': ok(live),
+        'GET /contests/r42/announcements': page([]),
+      }),
+    );
+    const { wrapper } = await mountApp('/');
+    await flushPromises();
+    expect(wrapper.get('[data-testid="live-contest"]').text()).toContain('QHH Round #42');
+    expect(wrapper.find('[data-testid="live-standing"]').exists()).toBe(false);
+  });
+
   it('shows no contest card when the viewer is in none', async () => {
     mockApi(signedInRoutes());
     const { wrapper } = await mountApp('/');

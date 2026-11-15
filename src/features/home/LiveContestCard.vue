@@ -23,9 +23,11 @@ const { current } = useCurrentContest();
 const kind = computed(() =>
   current.value ? participationKind(current.value.participation.virtual) : null,
 );
-const standing = computed(() =>
-  current.value && kind.value !== 'spectate' ? standingOf(current.value) : null,
-);
+/** Never a stale figure: on a frozen board the rank and the score are left out, as in the rail card. */
+const standing = computed(() => {
+  const own = current.value && kind.value !== 'spectate' ? standingOf(current.value) : null;
+  return own && !own.frozen ? own : null;
+});
 const statusKey = computed(() => {
   if (kind.value === 'spectate') return 'contestBar.spectate';
   return kind.value === 'virtual' ? 'contestBar.virtual' : 'rail.live';
