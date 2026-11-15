@@ -11,7 +11,6 @@ import { useNavSection } from '@/features/shell/nav-section';
 import { translate } from '@/i18n';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
-import { useSessionStore } from '@/stores/session.store';
 import ProblemContent from './ProblemContent.vue';
 import StatementSkeleton from './StatementSkeleton.vue';
 import { PROBLEM_LAYOUT } from './problem-layout';
@@ -50,8 +49,6 @@ const isNotFound = computed(
 
 usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : problem.value?.name));
 
-const session = useSessionStore();
-const hasEditor = computed(() => session.status === 'authenticated');
 /** The submit panel is open beside the statement: the page column widens to fit both. */
 const panelOpen = ref(false);
 const { isCollapsed: railCollapsed, toggle: toggleRail } = useProblemRailCollapse(panelOpen);
@@ -122,7 +119,7 @@ watch(
     <div class="flex min-w-0 flex-col gap-5">
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
-          <div :class="[layout.grid, hasEditor ? '' : layout.columns.signIn]">
+          <div :class="layout.grid">
             <StatementSkeleton header :class="layout.left" />
           </div>
         </template>

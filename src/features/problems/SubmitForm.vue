@@ -137,6 +137,8 @@ function loadDroppedFile(event: DragEvent) {
       class="w-full shrink-0"
       :class="classes.strip"
     />
+    <!-- The viewer's last submissions to this problem (the pane only), right under the result strip. -->
+    <div v-if="$slots.history" class="order-1 shrink-0"><slot name="history" /></div>
     <div :class="classes.header">
       <h2
         v-if="layout === 'full'"
