@@ -32,14 +32,12 @@ const showsManageCard = computed(
 <template>
   <div v-if="organization" class="flex max-w-4xl min-w-0 flex-col gap-5">
     <OrganizationManageCard v-if="showsManageCard" :organization="organization" />
-    <section
-      v-if="organization.aboutHtml || viewer?.canAdminister"
-      class="flex flex-col gap-2"
-      :aria-label="$t('orgs.about')"
-    >
-      <h2 class="section-title">{{ $t('orgs.about') }}</h2>
-      <OrganizationAboutText v-if="organization.aboutHtml" :html="organization.aboutHtml" />
-      <EmptyState v-else compact>{{ $t('orgs.noAbout') }}</EmptyState>
+    <section class="flex flex-col gap-2" :aria-label="$t('orgs.about')">
+      <template v-if="organization.aboutHtml || viewer?.canAdminister">
+        <h2 class="section-title">{{ $t('orgs.about') }}</h2>
+        <OrganizationAboutText v-if="organization.aboutHtml" :html="organization.aboutHtml" />
+        <EmptyState v-else compact>{{ $t('orgs.noAbout') }}</EmptyState>
+      </template>
       <p class="flex flex-wrap items-center gap-x-2 text-meta text-muted">
         <span>{{ $t('orgs.founded', { date: founded }) }}</span>
         <template v-if="organization.admins.length">

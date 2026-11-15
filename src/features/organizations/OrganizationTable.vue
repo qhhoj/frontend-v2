@@ -65,7 +65,7 @@ const columns = computed<DataTableColumn[]>(() => [
       <Chip v-if="memberIds.has(row.id)" tone="success" size="sm">{{ $t('orgs.act.joined') }}</Chip>
     </template>
     <template #card="{ row }">
-      <CompactListRow :to="target(row)" :title="row.name">
+      <CompactListRow data-testid="organization-row" :to="target(row)" :title="row.name">
         <template #meta>
           <span class="font-mono">{{ row.shortName }}</span>
           · {{ $t('orgs.membersMeta', { count: members(row) }) }}
