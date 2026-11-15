@@ -123,7 +123,11 @@ describe('TicketQueuePage', () => {
       await flushPromises();
       expect(observed).toContain(wrapper.get('[data-testid="queue-reply"]').element);
       expect(document.documentElement.style.scrollPaddingBottom).toBe('76px');
-      expect(scrollIntoView).toHaveBeenCalledTimes(1);
+      // The admin rail also scrolls its current nav row into view on load; only the page's own scrolls count here.
+      const pageScrolls = scrollIntoView.mock.contexts.filter(
+        (element) => !(element as Element).closest('[data-testid="admin-rail"]'),
+      );
+      expect(pageScrolls).toHaveLength(1);
       await router.replace('/admin/tickets');
       await flushPromises();
       expect(document.documentElement.style.scrollPaddingBottom).toBe('');
