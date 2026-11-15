@@ -4,8 +4,7 @@ import EmptyState from '@/components/EmptyState.vue';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import Card from '@/components/ui/Card.vue';
-import SeeAllLink from '@/components/ui/SeeAllLink.vue';
+import PageSection from '@/components/ui/PageSection.vue';
 import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { formatRelative } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
@@ -28,12 +27,14 @@ const visible = computed(() => (submissions.value ?? []).slice(0, VISIBLE));
 </script>
 
 <template>
-  <Card data-testid="recent-submissions" padding="sm" :title="$t('home.recentSubmissions')">
-    <template #actions>
-      <SeeAllLink :to="{ name: 'submissions', query: { user: username } }">{{
-        $t('common.viewAll')
-      }}</SeeAllLink>
-    </template>
+  <PageSection
+    data-testid="recent-submissions"
+    :title="$t('home.recentSubmissions')"
+    :see-all="{
+      to: { name: 'submissions', query: { user: username } },
+      label: $t('common.viewAll'),
+    }"
+  >
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <ul class="flex flex-col divide-y divide-line">
@@ -69,5 +70,5 @@ const visible = computed(() => (submissions.value ?? []).slice(0, VISIBLE));
         </li>
       </ul>
     </QueryState>
-  </Card>
+  </PageSection>
 </template>

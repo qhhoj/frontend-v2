@@ -1108,10 +1108,8 @@
       "evening": "Chào buổi tối, {username}"
     },
     "ratingDelta": "{delta} sau kỳ thi gần nhất",
-    "ratingTier": "Rating · {tier}",
-    "ratingChart": "Rating qua {count} kỳ thi, từ {first} đến {last}",
     "solved": "Đã giải",
-    "solvedUnrated": "Bài đã giải · chưa có rating",
+    "unrated": "Chưa có rating",
     "points": "Điểm",
     "rank": "Hạng",
     "recentSubmissions": "Bài nộp gần đây",
@@ -1132,11 +1130,8 @@
         "submissions": "bài nộp",
         "contests": "kỳ thi"
       },
-      "running": "Kỳ thi đang diễn ra",
       "allContests": "Tất cả kỳ thi",
-      "contestants": "{key} · {count} thí sinh",
       "elapsed": "Đã qua {percent}% thời gian",
-      "viewContest": "Xem kỳ thi",
       "newPosts": "Bài viết mới",
       "allPosts": "Tất cả bài viết",
       "score": "{score} điểm",
@@ -1149,9 +1144,7 @@
     "contestants": "{count} thí sinh",
     "continueHint": "Quay lại bài bạn đang làm dở",
     "liveEnter": "Vào thi",
-    "liveScore": "{score} điểm",
-    "upcoming": "Kỳ thi sắp tới",
-    "noUpcoming": "Chưa có kỳ thi nào được lên lịch."
+    "liveScore": "{score} điểm"
   },
   "problem": {
     "copySample": "Sao chép ví dụ",

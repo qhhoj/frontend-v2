@@ -1108,10 +1108,8 @@
       "evening": "Good evening, {username}"
     },
     "ratingDelta": "{delta} at the last contest",
-    "ratingTier": "Rating · {tier}",
-    "ratingChart": "Rating over {count} contest, from {first} to {last} | Rating over {count} contests, from {first} to {last}",
     "solved": "Solved",
-    "solvedUnrated": "Problems solved · no rating yet",
+    "unrated": "No rating yet",
     "points": "Points",
     "rank": "Rank",
     "recentSubmissions": "Recent submissions",
@@ -1132,11 +1130,8 @@
         "submissions": "submissions",
         "contests": "contests"
       },
-      "running": "Running contests",
       "allContests": "All contests",
-      "contestants": "{key} · {count} contestants",
       "elapsed": "{percent}% of the time has passed",
-      "viewContest": "View contest",
       "newPosts": "New posts",
       "allPosts": "All posts",
       "score": "{score} points",
@@ -1149,9 +1144,7 @@
     "contestants": "{count} contestants",
     "continueHint": "Back to the problem you left unfinished",
     "liveEnter": "Enter contest",
-    "liveScore": "{score} points",
-    "upcoming": "Upcoming contests",
-    "noUpcoming": "No contest is scheduled."
+    "liveScore": "{score} points"
   },
   "problem": {
     "copySample": "Copy sample",

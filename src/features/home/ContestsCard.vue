@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import type { ContestListItem, ContestListQuery } from '@/api/types/contests';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import Card from '@/components/ui/Card.vue';
+import PageSection from '@/components/ui/PageSection.vue';
 import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import { useRunningContestsQuery } from '@/features/community/community.queries';
 import { useSpanText } from '@/features/contests/use-span-text';
@@ -15,8 +15,8 @@ import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 
 /**
- * The signed-in home's contests: the running ones, then the next ones that have not started, one clickable row each.
- * Same two requests as the anonymous cards. `excludeKey` leaves out the contest the viewer is in (it has its own card);
+ * The home's contests (both homes): the running ones, then the next ones that have not started, one clickable row each.
+ * With none of either it is one line, not a section. `excludeKey` leaves out the contest the viewer is in (it has its own card);
  * one more running contest is asked so the list still fills.
  */
 const MAX_RUNNING = 3;
@@ -48,10 +48,21 @@ const ROW = 'flex min-h-9 items-center gap-3 py-1.5 text-content hover:bg-surfac
 </script>
 
 <template>
-  <Card data-testid="contests-card" padding="sm" :title="$t('nav.contests')">
-    <template #actions>
-      <SeeAllLink :to="{ name: 'contests' }">{{ $t('home.anon.allContests') }}</SeeAllLink>
-    </template>
+  <!-- Nothing running or scheduled: one line instead of a section. -->
+  <p
+    v-if="!isPending && !error && isEmpty"
+    data-testid="contests-card"
+    class="flex flex-wrap items-center gap-x-2 text-muted"
+  >
+    {{ $t('home.noLiveContest') }}
+    <SeeAllLink :to="{ name: 'contests' }">{{ $t('home.browseContests') }}</SeeAllLink>
+  </p>
+  <PageSection
+    v-else
+    data-testid="contests-card"
+    :title="$t('nav.contests')"
+    :see-all="{ to: { name: 'contests' }, label: $t('home.anon.allContests') }"
+  >
     <QueryState :loading="isPending" :error="error" @retry="retry()">
       <template #skeleton>
         <ul class="flex flex-col divide-y divide-line">
@@ -61,8 +72,7 @@ const ROW = 'flex min-h-9 items-center gap-3 py-1.5 text-content hover:bg-surfac
           </li>
         </ul>
       </template>
-      <p v-if="isEmpty" class="text-muted">{{ $t('home.noLiveContest') }}</p>
-      <ul v-else class="flex flex-col divide-y divide-line">
+      <ul class="flex flex-col divide-y divide-line">
         <li v-for="contest in runningItems" :key="contest.key" data-testid="running-row">
           <RouterLink :to="{ name: 'contest', params: { key: contest.key } }" :class="ROW">
             <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-positive" />
@@ -89,5 +99,5 @@ const ROW = 'flex min-h-9 items-center gap-3 py-1.5 text-content hover:bg-surfac
         </li>
       </ul>
     </QueryState>
-  </Card>
+  </PageSection>
 </template>

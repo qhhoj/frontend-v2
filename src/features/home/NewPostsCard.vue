@@ -2,9 +2,8 @@
 import Chip from '@/components/ui/Chip.vue';
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
-import Card from '@/components/ui/Card.vue';
+import PageSection from '@/components/ui/PageSection.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import { usePostsQuery } from '@/features/blog/blog.queries';
 import { formatNumber } from '@/lib/format';
@@ -18,10 +17,11 @@ const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
 </script>
 
 <template>
-  <Card data-testid="new-posts" padding="sm" :title="$t('home.anon.newPosts')">
-    <template #actions>
-      <SeeAllLink :to="{ name: 'blog' }">{{ $t('home.anon.allPosts') }}</SeeAllLink>
-    </template>
+  <PageSection
+    data-testid="new-posts"
+    :title="$t('home.anon.newPosts')"
+    :see-all="{ to: { name: 'blog' }, label: $t('home.anon.allPosts') }"
+  >
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <div class="flex flex-col gap-3">
@@ -51,5 +51,5 @@ const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
         </li>
       </ul>
     </QueryState>
-  </Card>
+  </PageSection>
 </template>
