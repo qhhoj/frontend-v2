@@ -3,6 +3,7 @@ import PageHeader from '@/components/ui/PageHeader.vue';
 import NewProblemsCard from '@/features/community/NewProblemsCard.vue';
 import RecentCommentsCard from '@/features/community/RecentCommentsCard.vue';
 import TopContributorsCard from '@/features/community/TopContributorsCard.vue';
+import { useCurrentContest } from '@/features/contests/bar/use-current-contest';
 import { useSessionStore } from '@/stores/session.store';
 import AnonymousHero from './AnonymousHero.vue';
 import ContinueCard from './ContinueCard.vue';
@@ -21,6 +22,7 @@ import UpcomingContestsCard from './UpcomingContestsCard.vue';
  * A visitor gets the sign-up card, then the public cards (contests, posts, leaderboards).
  */
 const session = useSessionStore();
+const { current } = useCurrentContest();
 </script>
 
 <template>
@@ -40,7 +42,7 @@ const session = useSessionStore();
         </div>
         <div class="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-4">
           <RatingHeroCard :username="session.user.username" class="order-3 lg:order-none" />
-          <RunningContestsCard narrow class="order-4 lg:order-none" />
+          <RunningContestsCard narrow :exclude-key="current?.contest.key" class="order-4 lg:order-none" />
           <UpcomingContestsCard class="order-5 lg:order-none" />
           <TopPerformersCard class="order-7 lg:order-none" />
           <TopContributorsCard :limit="3" class="order-8 lg:order-none" />

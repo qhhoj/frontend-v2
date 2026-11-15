@@ -19,11 +19,17 @@ import { formatNumber } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 
-/** Two running contests at most; the bar and the time left move every 30 s, which is a minute's precision. */
-/** `narrow`: the card sits in the side column, so the contests stack in one column whatever the window width. */
-defineProps<{ narrow?: boolean }>();
-const { data, isPending, error, refetch } = useRunningContestsQuery(2);
-const contests = computed(() => data.value?.items ?? []);
+/**
+ * Two running contests at most; the bar and the time left move every 30 s, which is a minute's precision.
+ * `narrow`: the card sits in the side column, so the contests stack in one column whatever the window width.
+ * `excludeKey`: a contest left out (the one the viewer is in has its own card); one more is asked so two still show.
+ */
+const MAX_SHOWN = 2;
+const props = defineProps<{ narrow?: boolean; excludeKey?: string }>();
+const { data, isPending, error, refetch } = useRunningContestsQuery(MAX_SHOWN + 1);
+const contests = computed(() =>
+  (data.value?.items ?? []).filter((contest) => contest.key !== props.excludeKey).slice(0, MAX_SHOWN),
+);
 const now = useNow(30_000);
 const locale = useLocaleStore();
 const spanText = useSpanText();
