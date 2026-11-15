@@ -18,6 +18,8 @@ export const ALLOWED = {
   'components/StatePanel.vue':
     'the state panel is the h1 of a page-level state and an h2 inside a card, chosen by `isPageHeading`',
   'features/not-found/NotFoundPage.vue': 'a centred error state under the 404 digits and Bit',
+  'features/contests/bar/ContestHeader.vue':
+    'one calm line: title, status and facts inline, the clock on the right, the tabs below (PageHeader stacks the meta under the title)',
   'features/contests/ContestNotFound.vue': 'a centred error state under Bit',
   'features/admin/shell/AdminForbidden.vue': 'a centred error state under Bit',
   'features/admin/shell/AdminPlaceholder.vue': 'a centred placeholder state under Bit',

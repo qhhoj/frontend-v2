@@ -38,11 +38,11 @@ const startsInText = computed(() =>
 <template>
   <li
     data-testid="upcoming-contest"
-    class="flex flex-wrap items-center gap-4 border-t border-line px-5 py-4 first:border-t-0"
+    class="relative flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line px-4 py-3 first:border-t-0 hover:bg-surface-hover md:px-5"
   >
     <span
       data-testid="day-chip"
-      class="flex size-16 shrink-0 flex-col items-center justify-center rounded-row bg-accent-soft text-accent-soft-text"
+      class="flex size-14 shrink-0 flex-col items-center justify-center rounded-row bg-accent-soft text-accent-soft-text"
     >
       <span class="font-display text-display leading-none font-bold">{{ dayTile.day }}</span>
       <span class="text-caption font-semibold">{{ dayTile.month }}</span>
@@ -50,15 +50,15 @@ const startsInText = computed(() =>
     </span>
     <!-- On a phone the name takes the rest of the day chip's line (basis 0 let the times share it, one word a line). -->
     <div class="min-w-0 flex-1 basis-[calc(100%-5rem)] sm:basis-0">
-      <h3 class="font-display text-subtitle leading-7 font-semibold">
+      <h3 class="font-display text-subtitle leading-6 font-semibold">
         <RouterLink
           :to="{ name: 'contest', params: { key: contest.key } }"
-          class="hover:text-accent-text"
+          class="after:absolute after:inset-0 hover:text-accent-text"
           >{{ contest.name }}</RouterLink
         >
       </h3>
       <p v-if="contest.summary" class="text-sm text-muted">{{ contest.summary }}</p>
-      <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
+      <div class="mt-1 flex flex-wrap items-center gap-1.5 [&_a]:relative">
         <ContestChips :contest="contest" with-tags with-code-needed />
         <ViewerBadge :badge-key="call.badgeKey" />
         <template v-if="withEdit">
@@ -83,6 +83,7 @@ const startsInText = computed(() =>
       }}
     </p>
     <ContestCallLink
+      compact
       :contest-key="contest.key"
       :contest-name="contest.name"
       :label-key="call.labelKey"
