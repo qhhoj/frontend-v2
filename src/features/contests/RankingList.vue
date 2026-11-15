@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, TransitionGroup } from 'vue';
+import { useMotionAllowed } from '@/lib/use-motion-allowed';
 import type { RouteLocationRaw } from 'vue-router';
 import type { Ranking, RankingRow } from '@/api/types/contests';
 import UserLink from '@/components/UserLink.vue';
 import Chip from '@/components/ui/Chip.vue';
 import { medalClass } from '@/lib/medal';
 import { deltaToneClass, formatDelta } from '@/lib/rating-delta';
+import ScoreTick from './ScoreTick.vue';
 import { KIND_CLASSES, PARTIAL_CLASSES } from './ranking-cell-classes';
 import { miniCellRem } from './ranking-columns';
 import type { RowView } from './ranking-row-view';
@@ -28,7 +30,16 @@ const props = defineProps<{
   hasCombinedScore: boolean;
   hasRatingColumn: boolean;
   linkOf: (row: RankingRow) => RouteLocationRaw | undefined;
+  /** A poll just changed the board and motion is allowed: numbers tick and rows move. */
+  isTicking: boolean;
 }>();
+const MOVE_CLASS = 'transition-[translate] duration-(--qh-duration) ease-move';
+/** Above this many rows the rows jump instead of sliding (FLIP reads every row's box on every change). */
+const FLIP_MAX_ROWS = 100;
+const isMotionAllowed = useMotionAllowed();
+/** The rows sit in a `TransitionGroup` whenever they may move: swapping it per poll would redraw every row and lose the change. */
+const isMovable = computed(() => isMotionAllowed.value && props.rows.length <= FLIP_MAX_ROWS);
+const moveClass = computed(() => (props.isTicking ? MOVE_CLASS : ''));
 /** Rank, name (the rest), score: one grid for the header line and every row. */
 const COLUMNS = 'grid grid-cols-[2.25rem_minmax(0,1fr)_5.5rem]';
 const problemRange = computed(() => {
@@ -58,7 +69,11 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
       <span class="px-2">{{ $t('ranking.columns.user') }} · {{ problemRange }}</span>
       <span class="px-2 text-right">{{ $t(scoreHeaderKey) }}</span>
     </p>
-    <ol :aria-label="$t('pages.ranking')">
+    <component
+      :is="isMovable ? TransitionGroup : 'ol'"
+      v-bind="isMovable ? { tag: 'ol', moveClass } : {}"
+      :aria-label="$t('pages.ranking')"
+    >
       <li
         v-for="row in rows"
         :key="row.participationId"
@@ -95,8 +110,11 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
                 cell.view.partialStep && PARTIAL_CLASSES[cell.view.partialStep],
               ]"
               ><span aria-hidden="true">{{ cell.label }}</span
-              ><span aria-hidden="true">{{ cell.view.kind === 'empty' ? '' : cell.view.text }}</span
-              ><span class="sr-only"
+              ><ScoreTick
+                aria-hidden="true"
+                :text="cell.view.kind === 'empty' ? '' : cell.view.text"
+                :animate="isTicking"
+              /><span class="sr-only"
                 >{{ cell.label }}:
                 {{
                   $t(
@@ -111,9 +129,9 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
         </div>
         <span class="px-2 py-2 text-right font-mono tabular-nums">
           <span class="sr-only">{{ $t(scoreHeaderKey) }}</span>
-          <span class="block text-sm font-bold">{{
-            row.isDisqualified ? '—' : viewOf(row).total
-          }}</span>
+          <span class="block text-sm font-bold"
+            ><ScoreTick :text="row.isDisqualified ? '—' : viewOf(row).total" :animate="isTicking"
+          /></span>
           <span
             v-if="(hasTimeColumn || hasCombinedScore) && !row.isDisqualified"
             class="block text-caption text-muted"
@@ -132,6 +150,6 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
           >
         </span>
       </li>
-    </ol>
+    </component>
   </div>
 </template>
