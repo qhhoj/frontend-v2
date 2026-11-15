@@ -82,9 +82,6 @@
     "button": 2,
     "controls": 2
   },
-  "features/admin/judges/JudgeStatusChip.vue": {
-    "AdminChip": 2
-  },
   "features/admin/judges/JudgesPage.vue": {
     "AdminNotice": 1,
     "AdminPageHeader": 1,
