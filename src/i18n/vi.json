@@ -1589,13 +1589,15 @@
       "extendedFeedback": "Phản hồi chi tiết",
       "output": "Đầu ra",
       "compileLogHidden": "Lỗi biên dịch. Thông báo biên dịch chỉ hiện cho người xem được mã nguồn.",
+      "expandAll": "Mở tất cả",
+      "collapseAll": "Thu gọn tất cả",
       "detailsTitle": "Chi tiết từng test"
     },
     "source": {
       "title": "Mã nguồn",
       "copy": "Sao chép mã nguồn",
       "collapse": "Thu gọn",
-      "expand": "Xem mã nguồn ({count} dòng)",
+      "expand": "Xem mã nguồn",
       "lines": "{count} dòng",
       "raw": "Xem mã nguồn thô",
       "rawShort": "Mã thô",

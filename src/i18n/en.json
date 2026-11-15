@@ -1589,13 +1589,15 @@
       "extendedFeedback": "Detailed feedback",
       "output": "Output",
       "compileLogHidden": "Compilation error. The compile log shows only to viewers who may see the source.",
+      "expandAll": "Expand all",
+      "collapseAll": "Collapse all",
       "detailsTitle": "Test details"
     },
     "source": {
       "title": "Source code",
       "copy": "Copy the source code",
       "collapse": "Collapse",
-      "expand": "Show source ({count} lines)",
+      "expand": "Show source",
       "lines": "{count} lines",
       "raw": "View raw source",
       "rawShort": "Raw",

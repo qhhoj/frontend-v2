@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import { ChevronRight } from 'lucide-vue-next';
+import { useRoute } from 'vue-router';
 import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
+import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { translate } from '@/i18n';
@@ -64,9 +67,28 @@ const batchRow = (batch: SubmissionBatch): GradedRow => ({
   details: [],
 });
 
+/** Every row starts closed so the result reads at a glance; a row with judge text opens on a click, or all at once. */
+const opened = ref(new Set<string>());
+const isOpen = (key: string) => opened.value.has(key);
+const toggle = (key: string) => {
+  if (!opened.value.delete(key)) opened.value.add(key);
+};
+const route = useRoute();
+/** A link to one test (`#case-<n>`, from the test squares) opens that test. */
+onMounted(() => {
+  if (route.hash.startsWith('#case-')) opened.value.add(route.hash.slice(1));
+});
+
 const gradedRows = computed(() =>
   props.cases ? props.cases.map(caseRow) : (props.batches ?? []).map(batchRow),
 );
+const expandable = computed(() => gradedRows.value.filter((row) => row.details.length > 0));
+const allOpen = computed(
+  () => expandable.value.length > 0 && expandable.value.every((row) => isOpen(row.key)),
+);
+const toggleAll = () => {
+  opened.value = allOpen.value ? new Set() : new Set(expandable.value.map((row) => row.key));
+};
 const pendingNumbers = computed(() =>
   pendingPositions(props.cases, props.totalCases, props.running),
 );
@@ -104,6 +126,14 @@ const isHidden = computed(
       </h2>
       <h2 v-else class="section-title">{{ $t('submission.cases.title') }}</h2>
       <span v-if="running" class="text-meta text-muted">{{ $t('submission.liveUpdates') }}</span>
+      <AppButton
+        v-if="expandable.length > 0"
+        size="sm"
+        data-testid="cases-toggle-all"
+        @click="toggleAll"
+      >
+        {{ allOpen ? $t('submission.cases.collapseAll') : $t('submission.cases.expandAll') }}
+      </AppButton>
     </div>
     <div v-if="compileError" class="px-6 pb-4 sm:px-8">
       <p class="text-meta text-muted">{{ $t('submission.cases.compileLog') }}</p>
@@ -144,14 +174,34 @@ const isHidden = computed(
               :id="row.key"
               data-testid="case-row"
               class="scroll-mt-20 border-t border-line"
-              :class="ROW_CARD"
+              :class="[
+                ROW_CARD,
+                row.details.length > 0 && 'cursor-pointer hover:bg-surface-strong',
+              ]"
+              @click="row.details.length > 0 && toggle(row.key)"
             >
               <th
                 scope="row"
                 class="text-left font-mono font-normal max-sm:text-meta max-sm:text-muted"
                 :class="[CELL, CELL_PLACES.test]"
               >
-                {{ row.label }}
+                <AppButton
+                  tone="ghost"
+                  size="sm"
+                  v-if="row.details.length > 0"
+                  class="font-mono"
+                  :aria-expanded="isOpen(row.key)"
+                  :aria-controls="`${row.key}-details`"
+                  @click.stop="toggle(row.key)"
+                >
+                  <ChevronRight
+                    aria-hidden="true"
+                    class="size-3.5 text-muted"
+                    :class="isOpen(row.key) && 'rotate-90'"
+                  />
+                  {{ row.label }}
+                </AppButton>
+                <template v-else>{{ row.label }}</template>
               </th>
               <td :class="[CELL, CELL_PLACES.result]">
                 <VerdictChip :verdict="row.verdict" named />
@@ -162,7 +212,7 @@ const isHidden = computed(
                 {{ row.points }}
               </td>
             </tr>
-            <tr v-if="row.details.length" class="max-sm:block">
+            <tr v-if="isOpen(row.key)" :id="`${row.key}-details`" class="max-sm:block">
               <td colspan="5" class="px-6 pb-3 max-sm:block max-sm:px-4 xl:px-3">
                 <CaseDetails :details="row.details" />
               </td>
