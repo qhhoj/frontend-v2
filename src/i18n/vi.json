@@ -1273,12 +1273,6 @@
     "solverCount": "{count} giải",
     "filterPanel": "Bộ lọc",
     "filterPanelShort": "Lọc",
-    "tier": {
-      "1": "Dễ",
-      "2": "Trung bình",
-      "3": "Khó",
-      "4": "Rất khó"
-    },
     "solvedShort": "{solved} đã giải",
     "partialHint": "chấm từng phần",
     "hasEditorialHint": "Chỉ bài đã có lời giải được công bố",
@@ -1287,12 +1281,6 @@
       "any": "Tất cả",
       "unsolved": "Chưa giải",
       "solved": "Đã giải"
-    },
-    "peek": {
-      "label": "Xem nhanh bài",
-      "lastSubmission": "Lần nộp gần nhất",
-      "open": "Mở bài",
-      "crowd": "AC {rate}% · {count} người đã giải"
     }
   },
   "submissions": {
