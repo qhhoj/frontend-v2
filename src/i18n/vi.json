@@ -1272,6 +1272,7 @@
     "filterPanel": "Bộ lọc",
     "filterPanelShort": "Lọc",
     "solvedShort": "{solved} đã giải",
+    "pointsValue": "{points} điểm",
     "partialHint": "chấm từng phần",
     "hasEditorialHint": "Chỉ bài đã có lời giải được công bố",
     "solvedFilter": {
