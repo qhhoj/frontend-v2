@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -14,8 +13,16 @@ const members = computed(() => query.data.value?.items ?? []);
 </script>
 
 <template>
-  <Card data-testid="top-members" padding="md" class="flex flex-col gap-3">
-    <h2 class="font-display text-base font-bold text-accent-text">{{ $t('orgs.topMembers') }}</h2>
+  <section data-testid="top-members" class="flex flex-col gap-2">
+    <div class="flex items-baseline justify-between gap-3">
+      <h2 class="section-title">{{ $t('orgs.topMembers') }}</h2>
+      <RouterLink
+        :to="{ name: 'organization-members', params: { slug } }"
+        class="text-sm font-semibold text-accent-text hover:underline"
+      >
+        {{ $t('orgs.allMembers') }}
+      </RouterLink>
+    </div>
     <QueryState
       :loading="query.isPending.value"
       :error="query.error.value"
@@ -28,11 +35,5 @@ const members = computed(() => query.data.value?.items ?? []);
       </template>
       <MemberRows :members="members" :columns="['performancePoints']" />
     </QueryState>
-    <RouterLink
-      :to="{ name: 'organization-members', params: { slug } }"
-      class="font-semibold text-accent-text hover:underline"
-    >
-      {{ $t('orgs.allMembers') }}
-    </RouterLink>
-  </Card>
+  </section>
 </template>

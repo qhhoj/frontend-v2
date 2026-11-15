@@ -6,9 +6,7 @@ import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
 import { organizationEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
-import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
-import { formatDate } from '@/lib/format-date';
 import { medalClass } from '@/lib/medal';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -21,9 +19,9 @@ import { membershipState } from './membership-state';
 import { joinModeKey, slotsLine } from './organization-facts';
 
 /**
- * The compact title row of the header band: a small logo; the name with the viewer's standing as a chip, the edit pencil
- * and the short-link icon; the facts on two lines at most on a phone (standing, then how to join, shorter words there); and on the right either
- * the way in (`MembershipPanel`) or, for a member, the ⋯ menu that holds "Rời tổ chức". `rank` is null while unknown.
+ * The calm title row: a small logo; the name with the viewer's standing as a chip, the edit pencil and the short-link icon;
+ * under it one line of facts (short name, members, how to join, places; rank and points from `md`); on the right the way in
+ * (`MembershipPanel`) or, for a member, the ⋯ menu that holds "Rời tổ chức". `rank` is null while unknown.
  */
 const props = defineProps<{ organization: OrganizationDetail; rank: number | null }>();
 /** On a phone the actions drop under the title; the lone ⋯ would take a row of its own, so it joins the chips line instead. */
@@ -35,30 +33,15 @@ const state = computed(() => membershipState(props.organization, session.user !=
 /** Members leave through ⋯, administrators too (the chip shows them as administrators, not members). */
 const isMember = computed(() => session.user !== null && !!props.organization.viewer?.isMember);
 const places = computed(() => slotsLine(props.organization));
-const founded = computed(() => formatDate(props.organization.createdAt, 'date', locale.locale));
+const hasPlacesCap = computed(() => props.organization.slots !== null);
 const memberCount = computed(() => formatNumber(props.organization.memberCount, locale.locale));
 const performancePoints = computed(() =>
   formatNumber(props.organization.performancePoints, locale.locale),
 );
-/** Standing, then how to join, in the short words. */
-const phoneLines = computed(() => [
-  [
-    props.rank === null ? null : `${translate('orgs.rankLabel')} #${props.rank}`,
-    translate('orgs.membersMeta', { count: memberCount.value }),
-    translate('orgs.pp', { pp: performancePoints.value }),
-  ]
-    .filter(Boolean)
-    .join(' · '),
-  [
-    translate(joinModeKey(props.organization.isOpen)),
-    translate(places.value.key, places.value.params ?? {}),
-  ].join(' · '),
-]);
 </script>
-
 <template>
   <PageHeader data-testid="organization-header" :title="organization.name">
-    <template #start><OrganizationLogo :organization="organization" /></template>
+    <template #start><OrganizationLogo :organization="organization" size="sm" /></template>
     <template #meta>
       <MembershipChip :state="state" />
       <AdminEditLink :to="editTarget" />
@@ -69,22 +52,18 @@ const phoneLines = computed(() => [
       <OrganizationMenu v-if="isMember && isPhone" :organization="organization" />
     </template>
     <template #lead>
-      <!-- Phone: two lines at most, each cut with an ellipsis; from md every fact on one wrapping line. -->
-      <div data-testid="organization-facts" class="min-w-0 tabular-nums">
-        <p class="truncate md:hidden">{{ phoneLines[0] }}</p>
-        <p class="truncate md:hidden">{{ phoneLines[1] }}</p>
-        <p class="flex flex-wrap gap-x-3 max-md:hidden">
-          <span class="font-mono">{{ organization.shortName }}</span>
-          <span v-if="rank !== null">
-            {{ $t('orgs.rankLabel') }} <b :class="medalClass(rank)">#{{ rank }}</b>
-          </span>
-          <span>{{ $t('orgs.membersMeta', { count: memberCount }) }}</span>
-          <span class="text-positive">{{ $t('orgs.ppMeta', { pp: performancePoints }) }}</span>
-          <span>{{ $t(joinModeKey(organization.isOpen)) }}</span>
-          <span>{{ $t(places.key, places.params ?? {}) }}</span>
-          <span>{{ $t('orgs.founded', { date: founded }) }}</span>
-        </p>
-      </div>
+      <p data-testid="organization-facts" class="flex min-w-0 flex-wrap gap-x-3 tabular-nums">
+        <span class="font-mono">{{ organization.shortName }}</span>
+        <span>{{ $t('orgs.membersMeta', { count: memberCount }) }}</span>
+        <span>{{ $t(joinModeKey(organization.isOpen)) }}</span>
+        <span v-if="hasPlacesCap">{{ $t(places.key, places.params ?? {}) }}</span>
+        <span v-if="rank !== null" class="max-md:hidden">
+          {{ $t('orgs.rankLabel') }} <b :class="medalClass(rank)">#{{ rank }}</b>
+        </span>
+        <span class="text-positive max-md:hidden">{{
+          $t('orgs.ppMeta', { pp: performancePoints })
+        }}</span>
+      </p>
     </template>
     <template #actions>
       <OrganizationMenu v-if="isMember && !isPhone" :organization="organization" />
