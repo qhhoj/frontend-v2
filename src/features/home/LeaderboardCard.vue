@@ -24,20 +24,20 @@ const lists = computed(() => [
     key: 'pp',
     title: 'home.anon.topPp',
     to: { name: 'users', query: { sort: 'performancePoints' } },
-    rows: performers.value.map((u) => ({
-      username: u.username,
-      rating: u.rating,
-      value: formatNumber(u.performancePoints, locale.locale),
+    rows: performers.value.map((user) => ({
+      username: user.username,
+      rating: user.rating,
+      value: formatNumber(user.performancePoints, locale.locale),
     })),
   },
   {
     key: 'contribution',
     title: 'blog.topContributors',
     to: { name: 'users', query: { sort: 'contributionPoints' } },
-    rows: contributors.value.map((u) => ({
-      username: u.username,
-      rating: u.rating,
-      value: formatNumber(u.contributionPoints, locale.locale),
+    rows: contributors.value.map((user) => ({
+      username: user.username,
+      rating: user.rating,
+      value: formatNumber(user.contributionPoints, locale.locale),
     })),
   },
 ]);
@@ -69,7 +69,11 @@ const lists = computed(() => [
                 :class="medalClass(index + 1) || 'text-muted'"
                 >{{ index + 1 }}</span
               >
-              <UserName :username="row.username" :rating="row.rating" class="min-w-0 flex-1 truncate" />
+              <UserName
+                :username="row.username"
+                :rating="row.rating"
+                class="min-w-0 flex-1 truncate"
+              />
               <span class="shrink-0 font-mono text-sm tabular-nums">{{ row.value }}</span>
             </li>
           </ol>
