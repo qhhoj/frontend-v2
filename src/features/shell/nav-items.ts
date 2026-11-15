@@ -8,8 +8,9 @@ import {
   Trophy,
 } from 'lucide-vue-next';
 import type { Component } from 'vue';
-import { computed, ref } from 'vue';
+import { computed, provide, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { CURRENT_SECTION_KEY } from '@/components/ui/page-section';
 import type { RouteLocationNormalized } from 'vue-router';
 import { preloadRoute } from '@/router/preload';
 import { useIsFirstNavigationPending } from '@/router/first-navigation';
@@ -92,4 +93,9 @@ export function useCurrentSection() {
       ) ?? null
     );
   });
+}
+
+/** Gives the pages below the shell their section, for the kit's `PageHeader` (the kit cannot import the shell). */
+export function providePageSection() {
+  provide(CURRENT_SECTION_KEY, useCurrentSection());
 }
