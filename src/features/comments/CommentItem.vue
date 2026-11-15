@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronRight, EyeOff } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { voteComment } from '@/api/comments.api';
 import type { VoteScore } from '@/api/types/votes';
@@ -60,6 +60,23 @@ const isExpanded = ref(false);
 const isFolded = computed(
   () => comment.value.collapsed && !comment.value.deleted && !isExpanded.value && !props.isEditing,
 );
+/** A long body shows four lines (`max-h-24` at the 24 px line) and a "Xem thêm" toggle; a short one shows neither. */
+const body = ref<HTMLElement | null>(null);
+const isBodyOpen = ref(false);
+const isBodyLong = ref(false);
+const measureBody = () => {
+  if (!body.value || isBodyOpen.value) return;
+  isBodyLong.value = body.value.scrollHeight > body.value.clientHeight + 1;
+};
+let bodyObserver: ResizeObserver | undefined;
+onMounted(() => {
+  void nextTick(measureBody);
+  if (typeof ResizeObserver === 'undefined' || !body.value) return;
+  bodyObserver = new ResizeObserver(measureBody);
+  bodyObserver.observe(body.value);
+});
+onBeforeUnmount(() => bodyObserver?.disconnect());
+watch(() => comment.value.bodyHtml, () => void nextTick(measureBody));
 const hiderName = computed(() => comment.value.hiddenBy?.username ?? null);
 const authorName = computed(() => comment.value.author?.username ?? t('comments.deletedAccount'));
 const send = (score: VoteScore) => voteComment(comment.value.id, score);
@@ -221,12 +238,20 @@ const hasActionRow = computed(
       >
         {{ $t('comments.deleted.placeholder') }}
       </p>
-      <UserContent
-        v-else
-        :html="comment.bodyHtml"
-        class="mt-1.5 mb-2"
-        :class="comment.hidden && 'text-muted'"
-      />
+      <template v-else>
+        <div ref="body" class="mt-1.5 mb-2 overflow-hidden" :class="isBodyOpen || 'max-h-24'">
+          <UserContent :html="comment.bodyHtml" :class="comment.hidden && 'text-muted'" />
+        </div>
+        <AppButton
+          v-if="isBodyLong || isBodyOpen"
+          tone="link"
+          class="-mt-1 mb-2 text-sm"
+          :aria-expanded="isBodyOpen"
+          @click="isBodyOpen = !isBodyOpen"
+        >
+          {{ $t(isBodyOpen ? 'comments.showLess' : 'comments.showMore') }}
+        </AppButton>
+      </template>
       <div v-if="hasActionRow" class="-ml-2.5 flex flex-wrap items-center gap-0.5 py-1">
         <AppButton
           v-if="canReply && !comment.deleted"

@@ -1985,6 +1985,8 @@
     "deletedAccount": "Tài khoản đã xóa",
     "inPage": "trong",
     "title": "Bình luận",
+    "showMore": "Xem thêm",
+    "showLess": "Thu gọn",
     "sectionLabel": "Bình luận về trang này",
     "count": "{count} bình luận",
     "pageOf": "trang {page} / {last}",

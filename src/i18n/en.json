@@ -1985,6 +1985,8 @@
     "deletedAccount": "Deleted account",
     "inPage": "on",
     "title": "Comments",
+    "showMore": "Show more",
+    "showLess": "Show less",
     "sectionLabel": "Comments on this page",
     "count": "{count} comment | {count} comments",
     "pageOf": "page {page} / {last}",
