@@ -18,10 +18,8 @@ import { useSessionStore } from '@/stores/session.store';
 import { boardFreezeOf } from './bar/board-freeze';
 import ContestHeader from './bar/ContestHeader.vue';
 import { ownSubmissionsOnly } from './own-submissions';
-import { podiumRows } from './podium-rows';
 import RankingSkeleton from './RankingSkeleton.vue';
 import RankingFreezeNotice from './RankingFreezeNotice.vue';
-import RankingPodium from './RankingPodium.vue';
 import RankingTable from './RankingTable.vue';
 import { useContestQuery, useCurrentParticipationQuery, useRankingQuery } from './contests.queries';
 import VirtualOverlay from './replay/VirtualOverlay.vue';
@@ -93,8 +91,13 @@ const hiddenBodyKey = computed(() => {
 });
 
 const search = ref('');
+/** Problem names by problem id: the board's columns carry only codes, the contest has the names. */
+const problemNames = computed(
+  () =>
+    new Map((contest.value?.problems ?? []).map((problem) => [problem.problemId, problem.name])),
+);
 const locale = useLocaleStore();
-/** How this contest prints cells and scores; the podium and the table share it. */
+/** How this contest prints cells and scores; the table prints cells with it. */
 const rankingContext = computed<RankingContext>(() => ({
   formatName: contest.value?.formatName ?? 'default',
   pointsPrecision: contest.value?.pointsPrecision ?? 0,
@@ -108,7 +111,6 @@ const rows = computed(() => {
   const all = ranking.value?.rows ?? [];
   return needle ? all.filter((row) => row.user.username.toLocaleLowerCase().includes(needle)) : all;
 });
-const PODIUM_SKELETON_CELLS = 3;
 /** The board's own problem list once it is known (a cached board), else the contest's: the skeleton has the table's column count. */
 const problemCount = computed(
   () => ranking.value?.problems.length ?? contest.value?.problems?.length ?? 0,
@@ -120,9 +122,6 @@ const skeletonHasTimeColumn = computed(
     isPenaltyFormat(contest.value.formatName) &&
     showsCumtime(contest.value.formatName),
 );
-const podium = computed(() => podiumRows(ranking.value?.rows ?? []));
-/** A podium of people who all scored nothing says nothing the board does not: it is shown once someone has points. */
-const hasPodium = computed(() => podium.value.some((row) => row.score > 0));
 /** Why cells show "?": said in "Chú giải" while this board is frozen. */
 const freezeNote = computed(() => {
   const freeze =
@@ -217,23 +216,6 @@ async function goToMyRow() {
     >
       <template #skeleton>
         <div class="flex flex-col gap-5">
-          <Card
-            as="div"
-            data-skeleton-region="podium"
-            class="grid divide-y divide-line overflow-hidden lg:grid-cols-3 lg:divide-x lg:divide-y-0"
-          >
-            <div
-              v-for="place in PODIUM_SKELETON_CELLS"
-              :key="place"
-              data-skeleton-region="podium-cell"
-              class="flex min-h-11.5 items-center gap-3 px-4 py-2 lg:px-5 lg:py-4"
-            >
-              <SkeletonBlock round class="size-7 shrink-0" />
-              <SkeletonBlock round class="size-6 shrink-0" />
-              <SkeletonBlock text class="w-1/2" />
-              <SkeletonBlock text class="ml-auto w-10" />
-            </div>
-          </Card>
           <RankingSkeleton :problem-count="problemCount" :has-time-column="skeletonHasTimeColumn" />
         </div>
       </template>
@@ -245,15 +227,6 @@ async function goToMyRow() {
         <Notice v-if="rankingRefreshFailed" tone="warning" bit="sweat" role="status">
           {{ $t('ranking.refreshFailed') }}
         </Notice>
-        <!-- On a phone the list's first rows are the podium, so the board starts sooner. -->
-        <RankingPodium
-          v-if="hasPodium"
-          :rows="podium"
-          :problems="ranking.problems"
-          :context="rankingContext"
-          class="max-sm:hidden"
-          :class="{ 'opacity-60': rankingStale }"
-        />
         <Card
           id="ranking-board"
           as="div"
@@ -268,6 +241,7 @@ async function goToMyRow() {
             :context="rankingContext"
             :viewer-id="session.user?.id ?? null"
             :contest-key="key"
+            :problem-names="problemNames"
             :own-submissions-only="contest ? ownSubmissionsOnly(contest, now) : true"
             :freeze-note="freezeNote"
           >

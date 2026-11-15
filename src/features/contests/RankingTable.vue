@@ -37,6 +37,8 @@ const props = defineProps<{
   viewerId: string | null;
   /** Cells link to the contest's submissions of that user and problem; absent on boards that cannot (replay). */
   contestKey?: string;
+  /** Problem names by problem id, shown short under each column label; absent where the board has no names. */
+  problemNames?: ReadonlyMap<string, string>;
   /** The viewer may only see own submissions (backend narrows the list), so only their own row links. */
   ownSubmissionsOnly?: boolean;
   /** Why cells show "?" while the board is frozen: a line in "Chú giải". */
@@ -190,7 +192,11 @@ const scoreHeaderKey = computed(() =>
               scope="col"
               class="px-1.5 py-2.5 font-bold text-content"
             >
-              <RankingProblemHeader :problem="problem" :contest-key="contestKey" />
+              <RankingProblemHeader
+                :problem="problem"
+                :name="problemNames?.get(problem.problemId)"
+                :contest-key="contestKey"
+              />
             </th>
           </tr>
         </thead>
