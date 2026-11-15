@@ -109,9 +109,11 @@ const setSolved = (solved: SolvedFilter) => emit('update', { solved });
       :class="isCompact ? 'basis-full' : 'max-w-80 min-w-44 flex-1'"
       @keydown.enter="openExact"
     />
+    <!-- The page-level (md) segments share their frame equally, so the frame gets the width of three labels on a
+         computer (the search yields first) and the room beside "Lọc" on a phone. -->
     <SegmentedControl
       v-if="signedIn"
-      size="sm"
+      :class="isCompact ? 'min-w-0 flex-1' : 'min-w-72 shrink-0'"
       :label="$t('problems.solvedFilter.label')"
       :options="SOLVED_CHOICES"
       :model-value="filters.solved"

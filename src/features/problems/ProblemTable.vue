@@ -67,7 +67,7 @@ const columns = computed<DataTableColumn[]>(() => [
     label: t('problems.columns.code'),
     mono: true,
     sort: sortOf('code', 'asc'),
-    cellClass: 'max-w-40 truncate text-meta text-secondary',
+    cellClass: 'max-w-32 truncate text-meta text-secondary',
   },
   {
     key: 'name',
@@ -81,7 +81,7 @@ const columns = computed<DataTableColumn[]>(() => [
           key: 'types',
           label: t('problems.columns.types'),
           hideBelow: 'lg' as const,
-          cellClass: 'w-56 max-w-56',
+          cellClass: 'w-40 max-w-40',
         },
       ]
     : []),
@@ -113,11 +113,11 @@ function namedTypes(problem: ProblemListItem) {
     .filter((type) => type.name !== UNCATEGORIZED_TYPE_NAME)
     .map((type) => problemTypeLabel(type));
 }
-/** Two type chips fit the column; the rest are counted, and all are named in the tooltip. */
-const SHOWN_TYPES = 2;
+/** One type chip fits the column; the rest are counted, and all are named in the tooltip. The name keeps the width. */
+const SHOWN_TYPES = 1;
 const rowAttrs = (problem: ProblemListItem) => ({
   'data-code': problem.code,
-  class: problem.code === props.peekCode ? 'bg-accent-soft hover:bg-accent-soft' : undefined,
+  class: problem.code === props.peekCode ? 'bg-accent-soft' : undefined,
 });
 const pointsText = (problem: ProblemListItem) =>
   formatProblemPoints(problem.points, problem.partial, locale.locale);

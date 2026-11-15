@@ -27,10 +27,14 @@ import { useProblemPeek } from './use-problem-peek';
  * beside it on a wide screen with a mouse.
  */
 const router = useRouter();
-const { filters, page, update, clearAll } = useProblemFilters();
+const { filters: urlFilters, page, update, clearAll } = useProblemFilters();
 const locale = useLocaleStore();
 const session = useSessionStore();
 const lang = computed(() => locale.locale);
+/** A signed-out viewer has no solved choice to see or change, so a `?unsolved=1` link must not narrow their list unseen. */
+const filters = computed<Filters>(() =>
+  session.user ? urlFilters.value : { ...urlFilters.value, solved: 'any' },
+);
 const { data: meta } = useProblemMetaQuery();
 const { data, isPending, error, refetch, isPlaceholderData } = useProblemListQuery(
   filters,

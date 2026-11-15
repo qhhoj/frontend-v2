@@ -1,4 +1,5 @@
 import { isProblemSort } from '@/api/types/problems';
+import { START_LOCATION } from 'vue-router';
 import type { LocationQuery, LocationQueryRaw, NavigationGuard } from 'vue-router';
 import { readStorage, writeStorage } from '@/lib/storage';
 import { useSessionStore } from '@/stores/session.store';
@@ -44,12 +45,24 @@ export const saveListSetup = (username: string, setup: ListSetup) =>
   writeStorage(KEY, JSON.stringify({ user: username, solved: setup.solved, sort: setup.sort }));
 
 /**
- * The list route's `beforeEnter`: entering a bare `/problems` (the rail link, a bookmark of the bare page) opens it with the
- * signed-in viewer's setup, as a redirect, so the bare list is never fetched or kept in history. Moves inside the list
- * (Back, "Xóa tất cả") never re-enter the route, so they never bring the setup back.
+ * Back or Forward: the browser is already on the target entry (vue-router keeps its path in `history.state.current`),
+ * while a push has not moved yet. The first load is excluded: there the entry is the target too, and it is a fresh visit.
  */
-export const restoreListSetup: NavigationGuard = (to) => {
+export const isHistoryMove = (isFirstLoad: boolean, stateCurrent: unknown, target: string) =>
+  !isFirstLoad && stateCurrent === target;
+
+/**
+ * The list route's `beforeEnter`: entering a bare `/problems` (the rail link, a bookmark, the first load) opens it with the
+ * signed-in viewer's setup, as a redirect, so the bare list is never fetched. Back or Forward onto a bare entry keeps it
+ * bare: a redirect there would push a new entry and drop the forward history. Moves inside the list (Back, "Xóa tất cả")
+ * never re-enter the route, so they never bring the setup back.
+ */
+export const restoreListSetup: NavigationGuard = (to, from) => {
   const username = useSessionStore().user?.username;
-  const query = username ? restoredQuery(to.query, readListSetup(username)) : null;
+  const state: unknown = typeof history === 'undefined' ? null : history.state;
+  const current =
+    state && typeof state === 'object' ? (state as { current?: unknown }).current : null;
+  if (!username || isHistoryMove(from === START_LOCATION, current, to.fullPath)) return true;
+  const query = restoredQuery(to.query, readListSetup(username));
   return query ? { ...to, query } : true;
 };

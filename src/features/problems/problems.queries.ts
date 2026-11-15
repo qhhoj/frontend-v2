@@ -86,7 +86,7 @@ export const useProblemQuery = (
   return useQuery({
     enabled,
     queryKey: computed(() => ['problems', 'detail', viewerId.value, code.value, lang.value]),
-    queryFn: () => fetchProblem(code.value, lang.value),
+    queryFn: ({ signal }) => fetchProblem(code.value, lang.value, signal),
     placeholderData: (previous, previousQuery) =>
       keepForSameProblem(previous, previousQuery, viewerId.value, code.value),
   });

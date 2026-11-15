@@ -2,7 +2,7 @@ import { computed, onBeforeUnmount, ref } from 'vue';
 import type { Ref } from 'vue';
 import type { ProblemListItem } from '@/api/types/problems';
 
-/** A row the pointer rests on this long is peeked; a sweep across the list asks for nothing. */
+/** A row the pointer or the focus rests on this long is peeked; a sweep or a held arrow key asks for nothing on the way. */
 const HOVER_MS = 150;
 
 const rowOf = (event: Event) =>
@@ -21,17 +21,16 @@ export function useProblemPeek(problems: Ref<readonly ProblemListItem[]>) {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const cancel = () => clearTimeout(timer);
 
-  function onPointerOver(event: PointerEvent) {
+  /** The row an event came from is peeked once nothing else happens for `HOVER_MS`. */
+  function peekAfterRest(event: Event) {
     cancel();
     const code = rowOf(event)?.dataset.code;
     if (code && code !== chosen.value) timer = setTimeout(() => (chosen.value = code), HOVER_MS);
   }
-  function onFocusIn(event: FocusEvent) {
-    const code = rowOf(event)?.dataset.code;
-    if (!code) return;
-    cancel();
-    chosen.value = code;
-  }
+  const onPointerOver = (event: PointerEvent) => peekAfterRest(event);
+  const onFocusIn = (event: FocusEvent) => {
+    if (rowOf(event)) peekAfterRest(event);
+  };
   function onKeydown(event: KeyboardEvent) {
     if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
     const row = rowOf(event);

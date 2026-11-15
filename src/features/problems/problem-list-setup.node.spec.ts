@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseListSetup, restoredQuery } from './problem-list-setup';
+import { isHistoryMove, parseListSetup, restoredQuery } from './problem-list-setup';
 
 const saved = (value: unknown) => JSON.stringify(value);
 
@@ -25,5 +25,11 @@ describe('the remembered problem list setup', () => {
     expect(restoredQuery({ page: '2' }, setup)).toBeNull();
     expect(restoredQuery({}, { solved: 'any', sort: null })).toBeNull();
     expect(restoredQuery({}, null)).toBeNull();
+  });
+
+  it('leaves Back and Forward alone, but restores on a push or the first load', () => {
+    expect(isHistoryMove(false, '/problems', '/problems')).toBe(true);
+    expect(isHistoryMove(false, '/', '/problems')).toBe(false);
+    expect(isHistoryMove(true, '/problems', '/problems')).toBe(false);
   });
 });
