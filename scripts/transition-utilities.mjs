@@ -32,6 +32,7 @@ export const ALLOWED = {
   'features/admin/shell/AdminNav.vue': { 'transition-transform': CHEVRON },
   'features/admin/tickets/TicketHandlingSection.vue': { 'transition-transform': CHEVRON },
   'features/organizations/manage/OrganizationInfoForm.vue': { 'transition-transform': CHEVRON },
+  'features/submissions/CasesTable.vue': { 'transition-transform': CHEVRON },
 };
 
 /** The bare transition classes in the string literals of one source line, without their variants; comment lines are ignored. */
