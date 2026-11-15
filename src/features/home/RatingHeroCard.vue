@@ -5,7 +5,6 @@ import BitLoop from '@/components/BitLoop.vue';
 import BitMascot from '@/components/BitMascot.vue';
 import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
-import StatGrid from '@/components/ui/StatGrid.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useRatingHistoryQuery, useUserPageQuery } from '@/features/users/users.queries';
@@ -39,7 +38,7 @@ const tier = computed(() => ratingTier(user.value?.rating ?? null));
 const greeting = greetingKey(new Date().getHours());
 /** An unrated student leads with the problems solved, a number that can grow every day; the rating once there is one. */
 const isRated = computed(() => tier.value !== null);
-/** The chart's box: a fixed 48 px band, at most 240 px wide, on the right of the card. */
+/** The chart's viewBox; it is drawn 40 px high and as wide as the card. */
 const CHART = { width: 240, height: 48 } as const;
 /** Two points make a bare diagonal that reads as a glitch, so the chart waits for a third. */
 const MIN_CHART_POINTS = 3;
@@ -73,7 +72,7 @@ const tiles = computed(() =>
 </script>
 
 <template>
-  <Card data-testid="rating-hero" padding="lg">
+  <Card data-testid="rating-hero" padding="sm">
     <div class="min-w-0">
       <QueryState
         :loading="isPending"
@@ -91,7 +90,10 @@ const tiles = computed(() =>
               <p data-skeleton-region="greeting" class="text-muted">
                 <SkeletonBlock text class="w-40" />
               </p>
-              <div data-skeleton-region="rating" class="mt-2 flex flex-wrap items-end gap-4">
+              <div
+                data-skeleton-region="rating"
+                class="mt-1 flex flex-wrap items-end gap-x-3 gap-y-1"
+              >
                 <SkeletonBlock class="h-15 w-44" />
                 <!-- The rank-up Bit's box (32 px, `--bit-px:2px`), so a rise does not move the row when it arrives. -->
                 <SkeletonBlock data-skeleton-region="rank-up" round class="mb-3 size-8 shrink-0" />
@@ -100,21 +102,21 @@ const tiles = computed(() =>
                 <SkeletonBlock text class="w-32" />
               </p>
             </div>
-            <!-- The hero Bit's box (16 pixels of 5 px, 7 px from sm up), so the card keeps its height. -->
-            <SkeletonBlock data-skeleton-region="bit" class="size-16 shrink-0" />
+            <!-- The hero Bit's box (16 pixels of 3 px), so the card keeps its height. -->
+            <SkeletonBlock data-skeleton-region="bit" class="size-12 shrink-0" />
           </div>
-          <div data-skeleton-region="chart" class="mt-4 flex h-12 justify-end">
+          <div data-skeleton-region="chart" class="mt-2 flex h-10 justify-end">
             <SkeletonBlock class="h-full w-full max-w-60" />
           </div>
-          <div class="mt-3 grid grid-cols-[repeat(auto-fit,minmax(6.5rem,1fr))] gap-3">
+          <div class="mt-3 flex flex-col divide-y divide-line">
             <div
               v-for="tile in 3"
               :key="tile"
               data-skeleton-region="tile"
-              class="min-w-0 rounded-row bg-surface-strong p-4"
+              class="flex items-baseline justify-between gap-3 py-1.5"
             >
               <p class="text-meta"><SkeletonBlock text class="w-14" /></p>
-              <p class="font-mono text-stat"><SkeletonBlock text class="w-20" /></p>
+              <p class="font-mono text-title"><SkeletonBlock text class="w-16" /></p>
             </div>
           </div>
         </template>
@@ -122,7 +124,7 @@ const tiles = computed(() =>
           <div class="flex items-start justify-between gap-4">
             <div class="min-w-0">
               <p class="text-muted">{{ $t(greeting, { username }) }}</p>
-              <div data-testid="rating-row" class="mt-2 flex flex-wrap items-end gap-4">
+              <div data-testid="rating-row" class="mt-1 flex flex-wrap items-end gap-x-3 gap-y-1">
                 <span
                   data-testid="hero-figure"
                   class="font-mono text-score leading-none font-semibold tracking-tight tabular-nums"
@@ -161,15 +163,15 @@ const tiles = computed(() =>
               data-testid="home-bit"
               :look="PLACEMENT_LOOKS.hero"
               blinks
-              class="[--bit-px:4px]"
+              class="[--bit-px:3px]"
             />
           </div>
-          <div v-if="showsChart" class="mt-4 flex justify-end">
+          <div v-if="showsChart" class="mt-2 flex justify-end">
             <svg
               data-testid="rating-chart"
               :viewBox="`0 0 ${CHART.width} ${CHART.height}`"
               preserveAspectRatio="none"
-              class="h-12 w-full max-w-60"
+              class="h-10 w-full"
               role="img"
               :aria-label="
                 $t(
@@ -210,7 +212,19 @@ const tiles = computed(() =>
               />
             </svg>
           </div>
-          <StatGrid mode="stat" :items="tiles" class="mt-3" />
+          <!-- Label and value on one row: a long figure (14.452,1) wraps or shrinks inside the card, it is never cut. -->
+          <dl class="m-0 mt-3 flex flex-col divide-y divide-line">
+            <div
+              v-for="tile in tiles"
+              :key="tile.label"
+              class="flex flex-wrap items-baseline justify-between gap-x-3 py-1.5"
+            >
+              <dt class="text-meta text-muted">{{ tile.label }}</dt>
+              <dd class="m-0 min-w-0 font-mono text-title font-semibold tabular-nums break-all">
+                {{ tile.value }}
+              </dd>
+            </div>
+          </dl>
         </template>
       </QueryState>
     </div>

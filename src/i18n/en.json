@@ -1147,6 +1147,7 @@
       "leaderboard": "Leaderboard",
       "noPerformers": "No one has performance points yet."
     },
+    "contestants": "{count} contestants",
     "continueHint": "Back to the problem you left unfinished",
     "liveEnter": "Enter contest",
     "liveScore": "{score} points",
