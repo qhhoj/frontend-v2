@@ -18,7 +18,7 @@ const REANNOUNCE_GAP_MS = 100;
 /**
  * What the page hears about notifications, whichever control shows them (the bell from `md`, the menu sheet on a phone):
  * the tab's live stream, the unread count, and a polite "2 thông báo mới" when the count rises (counts only, never per
- * row). Mounted once, by the header.
+ * row). Mounted once, by `NotificationAnnouncer`.
  */
 export function useNotificationAlerts() {
   useNotificationStream();
