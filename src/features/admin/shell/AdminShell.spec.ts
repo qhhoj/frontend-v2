@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { mockApi, ok, page, sequence } from '@/test/mock-api';
+import { fail, mockApi, ok, page, sequence } from '@/test/mock-api';
 import { submissionStats } from '@/test/fixtures';
 import { mountApp } from '@/test/mount';
 import { anonymousViewer, signedInViewer } from '@/test/problem-routes';
@@ -64,6 +64,28 @@ describe('AdminShell', () => {
     expect(dashboard).not.toContain('judge.');
     expect(wrapper.text()).not.toContain('Máy chấm');
     expect(wrapper.find('[data-testid="admin-bit"]').attributes('data-placement')).toBe('greeting');
+  });
+
+  it('forgets a remembered problem that returns 404 and fills the list from older ones', async () => {
+    const key = `qhhoj.admin.recent.${STAFF_ID}`;
+    const visit = (code: string) => ({
+      path: `/admin/problems/${code}/data`,
+      titleKey: 'admin.shell.screens.problemData',
+      detail: code,
+    });
+    localStorage.setItem(key, JSON.stringify([visit('deleted'), visit('aplusb')]));
+    mockApi({
+      ...staffViewer(['judge.edit_own_problem']),
+      'GET /problems': page([]),
+      'GET /problems/deleted': fail(404, 'not_found'),
+      ...problemEditorRoutes(editableProblem({ code: 'aplusb', name: 'A cộng B' })),
+    });
+    const { wrapper } = await mountApp('/admin');
+    await vi.waitFor(() =>
+      expect(wrapper.find('[data-testid="admin-continue"]').text()).toContain('A cộng B'),
+    );
+    await vi.waitFor(() => expect(localStorage.getItem(key)).not.toContain('deleted'));
+    localStorage.clear();
   });
 
   it('puts the figures that wait for staff ahead of the calm judging ones', async () => {

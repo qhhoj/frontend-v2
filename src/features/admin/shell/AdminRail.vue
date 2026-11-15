@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { House, Search } from 'lucide-vue-next';
+import { nextTick, onMounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import AppButton from '@/components/ui/AppButton.vue';
 import BrandWordmark from '@/components/ui/BrandWordmark.vue';
 import UserMenu from '@/features/shell/UserMenu.vue';
@@ -15,13 +17,23 @@ import type { NavCount } from './overview/admin-overview.queries';
  */
 defineProps<{ counts: Partial<Record<AdminNavId, NavCount>> }>();
 defineEmits<{ search: [] }>();
+
+const route = useRoute();
+const navBox = ref<HTMLElement | null>(null);
+/** The nav scrolls inside the rail: bring the current row into view on load and on each route change. */
+async function showCurrent() {
+  await nextTick();
+  navBox.value?.querySelector('[aria-current="page"]')?.scrollIntoView?.({ block: 'nearest' });
+}
+onMounted(showCurrent);
+watch(() => route.path, showCurrent);
 </script>
 
 <template>
   <aside
     data-testid="admin-rail"
     :aria-label="$t('admin.shell.railLabel')"
-    class="sticky top-0 hidden h-dvh w-(--qh-rail) shrink-0 flex-col gap-3 overflow-hidden border-r border-line bg-surface-strong px-3 py-2 lg:flex print:hidden"
+    class="sticky top-0 hidden h-dvh w-(--qh-rail) shrink-0 flex-col gap-3 overflow-hidden border-r border-line bg-surface-strong px-3 py-2 rail-wide:flex print:hidden"
   >
     <div class="flex min-h-11 items-center gap-2 px-1">
       <BrandWordmark size="sm" :to="{ name: 'admin-dashboard' }" />
@@ -40,7 +52,7 @@ defineEmits<{ search: [] }>();
         shortcutHint()
       }}</kbd>
     </AppButton>
-    <div class="-mx-1 min-h-0 flex-1 overflow-y-auto overscroll-contain px-1">
+    <div ref="navBox" class="-mx-1 min-h-0 flex-1 overflow-y-auto overscroll-contain px-1">
       <AdminNav :counts="counts" />
     </div>
     <div class="flex flex-col gap-1 border-t border-line pt-2">

@@ -1,3 +1,4 @@
+import { ApiError } from '@/api/client';
 import type { RecentScreen } from './recent-screens';
 
 /** The two kinds of record a setter comes back to: a problem or a contest, opened in one of its editor tabs. */
@@ -41,3 +42,7 @@ export function continueRecords(
   }
   return [...rows.values()].slice(0, limit);
 }
+
+/** A read that says the record does not exist (404) or is not the viewer's to open (403): its visits are not worth remembering. */
+export const isRecordGone = (error: unknown): boolean =>
+  error instanceof ApiError && (error.status === 404 || error.status === 403);

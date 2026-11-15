@@ -98,5 +98,12 @@ export function useRecentScreens() {
     lists.value = { ...lists.value, [viewerId.value]: next };
     writeStorage(storageKey(viewerId.value), JSON.stringify(next));
   }
-  return { recent, remember };
+  /** Drops every remembered page `isGone` names (a record that no longer exists or is no longer the viewer's). */
+  function forget(isGone: (path: string) => boolean) {
+    const next = recent.value.filter((entry) => !isGone(entry.path));
+    if (next.length === recent.value.length) return;
+    lists.value = { ...lists.value, [viewerId.value]: next };
+    writeStorage(storageKey(viewerId.value), JSON.stringify(next));
+  }
+  return { recent, remember, forget };
 }
