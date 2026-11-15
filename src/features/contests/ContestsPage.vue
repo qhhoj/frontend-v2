@@ -43,24 +43,24 @@ const tagName = computed(() => {
 <template>
   <div class="page-column">
     <PageHeader :title="$t('contests.title')">
-      <template #actions>
-        <SearchInput
-          v-model="search"
-          :label="$t('contests.list.search')"
-          :placeholder="$t('contests.list.searchPlaceholder')"
-          :maxlength="100"
-          class="w-full sm:w-64"
-        />
-        <ToolbarSelect
-          v-model="ratedChoice"
-          :label="$t('contests.list.ratedLabel')"
-          :options="ratedOptions"
-          :active="ratedChoice !== 'any'"
-          class="w-full sm:w-auto"
-        />
-        <CreateShortcut kind="contest" />
-      </template>
+      <template #actions><CreateShortcut kind="contest" /></template>
     </PageHeader>
+    <div class="flex flex-wrap items-center gap-2">
+      <SearchInput
+        v-model="search"
+        :label="$t('contests.list.search')"
+        :placeholder="$t('contests.list.searchPlaceholder')"
+        :maxlength="100"
+        class="w-full sm:w-64"
+      />
+      <ToolbarSelect
+        v-model="ratedChoice"
+        :label="$t('contests.list.ratedLabel')"
+        :options="ratedOptions"
+        :active="ratedChoice !== 'any'"
+        class="w-full sm:w-auto"
+      />
+    </div>
     <ContestTagFilter
       :tags="tags ?? []"
       :selected="filters.tag"
