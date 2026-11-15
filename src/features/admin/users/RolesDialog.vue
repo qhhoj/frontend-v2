@@ -8,7 +8,7 @@ import { BUTTON } from '../ui/controls';
 import RoleEditor from './RoleEditor.vue';
 import { usePermissionLabel } from './use-permission-label';
 import { usePermissionCatalogQuery, useRolesQuery } from './users.queries';
-import AdminChip from '../ui/AdminChip.vue';
+import Chip from '@/components/ui/Chip.vue';
 
 /** Roles (legacy groups): everyone with the users screen reads them; a superuser creates and edits them. */
 const visible = defineModel<boolean>('visible', { required: true });
@@ -100,7 +100,7 @@ const titleId = useId();
             </div>
             <ul v-if="opened === role.id" class="flex flex-wrap gap-1">
               <li v-for="code in role.permissions" :key="code">
-                <AdminChip tone="accent">{{ labelOf(code) }}</AdminChip>
+                <Chip tone="accent">{{ labelOf(code) }}</Chip>
               </li>
               <li v-if="role.permissions.length === 0" class="text-sm text-muted">
                 {{ $t('admin.users.access.noneHeld') }}

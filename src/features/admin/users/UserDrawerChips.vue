@@ -4,7 +4,7 @@ import { KeyRound, ShieldCheck, Trophy } from 'lucide-vue-next';
 import type { UserPage } from '@/api/types/users';
 import type { UserEdit } from '@/api/types/users-admin';
 import { isBannedPage } from '@/lib/user-ban';
-import AdminChip from '../ui/AdminChip.vue';
+import Chip from '@/components/ui/Chip.vue';
 import UserStatusChips from './UserStatusChips.vue';
 import type { UserStatus } from './users-list';
 
@@ -19,16 +19,16 @@ const status = computed<UserStatus>(() => {
 
 <template>
   <UserStatusChips :status="status" />
-  <AdminChip v-if="page.staff?.isSuperuser" tone="accent" :icon="ShieldCheck">
+  <Chip v-if="page.staff?.isSuperuser" tone="accent" :icon="ShieldCheck">
     {{ $t('admin.users.list.status.superuser') }}
-  </AdminChip>
-  <AdminChip v-else-if="edit?.isStaff" tone="info">
+  </Chip>
+  <Chip v-else-if="edit?.isStaff" tone="info">
     {{ $t('admin.users.list.status.staff') }}
-  </AdminChip>
-  <AdminChip v-if="edit?.hasTwoFactor" :icon="KeyRound">
+  </Chip>
+  <Chip v-if="edit?.hasTwoFactor" :icon="KeyRound">
     {{ $t('admin.users.edit.chips.twoFactor') }}
-  </AdminChip>
-  <AdminChip v-if="edit?.inContest" tone="caution" :icon="Trophy">
+  </Chip>
+  <Chip v-if="edit?.inContest" tone="warning" :icon="Trophy">
     {{ $t('admin.users.edit.chips.inContest') }}
-  </AdminChip>
+  </Chip>
 </template>

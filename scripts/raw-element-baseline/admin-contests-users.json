@@ -270,7 +270,6 @@
     "password": 1
   },
   "features/admin/users/PermissionChecklist.vue": {
-    "AdminChip": 2,
     "checkbox": 1,
     "controls": 3,
     "search": 1,
@@ -283,7 +282,6 @@
     "input": 1
   },
   "features/admin/users/RolesDialog.vue": {
-    "AdminChip": 1,
     "button": 3,
     "controls": 6
   },
@@ -307,9 +305,6 @@
   "features/admin/users/UserDrawer.vue": {
     "AdminDrawer": 1,
     "AdminNotice": 2
-  },
-  "features/admin/users/UserDrawerChips.vue": {
-    "AdminChip": 4
   },
   "features/admin/users/UserModerationPanel.vue": {
     "AdminField": 1,
@@ -346,9 +341,6 @@
   "features/admin/users/UserSecurityPanel.vue": {
     "AdminNotice": 1
   },
-  "features/admin/users/UserStatusChips.vue": {
-    "AdminChip": 2
-  },
   "features/admin/users/UserTwoFactorReset.vue": {
     "button": 1,
     "controls": 2
@@ -359,7 +351,6 @@
     "controls": 4
   },
   "features/admin/users/UsersTable.vue": {
-    "AdminChip": 2,
     "AdminDataTable": 1,
     "AdminUserLabel": 1,
     "button": 1,

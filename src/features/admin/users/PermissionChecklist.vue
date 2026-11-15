@@ -5,7 +5,7 @@ import { usePermissions } from '@/stores/use-permissions';
 import { INPUT } from '../ui/controls';
 import { checklistGroups } from './user-access';
 import { usePermissionLabel } from './use-permission-label';
-import AdminChip from '../ui/AdminChip.vue';
+import Chip from '@/components/ui/Chip.vue';
 
 /** Grouped, searchable permissions. The model is the directly granted codenames; `inherited` marks the ones a role grants. Read-only lists only what is held. */
 const selected = defineModel<string[]>({ required: true });
@@ -73,12 +73,12 @@ const toggle = (code: string, on: boolean) => {
             item.label
           }}</span>
           <span class="flex shrink-0 flex-wrap justify-end gap-1">
-            <AdminChip v-if="readonly && selected.includes(item.codename)">
+            <Chip v-if="readonly && selected.includes(item.codename)">
               {{ $t('admin.users.access.direct') }}
-            </AdminChip>
-            <AdminChip v-for="role in inherited.get(item.codename) ?? []" :key="role" tone="accent">
+            </Chip>
+            <Chip v-for="role in inherited.get(item.codename) ?? []" :key="role" tone="accent">
               {{ $t('admin.users.access.via', { role }) }}
-            </AdminChip>
+            </Chip>
           </span>
         </label>
       </fieldset>
