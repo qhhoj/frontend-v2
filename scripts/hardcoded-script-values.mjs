@@ -27,24 +27,24 @@ const isDesignNumber = (text) => !NOT_DESIGN.has(text.replace(/_/g, ''));
 export function withoutComments(source) {
   let out = '';
   let quote = '';
-  for (let i = 0; i < source.length; i++) {
-    const c = source[i];
-    const next = source[i + 1];
+  for (let index = 0; index < source.length; index++) {
+    const char = source[index];
+    const next = source[index + 1];
     if (quote) {
-      out += c;
-      if (c === '\\') out += source[++i] ?? '';
-      else if (c === quote) quote = '';
-    } else if (c === '/' && next === '/') {
-      while (i < source.length && source[i] !== '\n') i++;
+      out += char;
+      if (char === '\\') out += source[++index] ?? '';
+      else if (char === quote) quote = '';
+    } else if (char === '/' && next === '/') {
+      while (index < source.length && source[index] !== '\n') index++;
       out += '\n';
-    } else if (c === '/' && next === '*') {
-      const end = source.indexOf('*/', i + 2);
+    } else if (char === '/' && next === '*') {
+      const end = source.indexOf('*/', index + 2);
       const stop = end === -1 ? source.length : end + 2;
-      out += source.slice(i, stop).replace(/[^\n]/g, ' ');
-      i = stop - 1;
+      out += source.slice(index, stop).replace(/[^\n]/g, ' ');
+      index = stop - 1;
     } else {
-      if (c === '"' || c === "'" || c === '`') quote = c;
-      out += c;
+      if (char === '"' || char === "'" || char === '`') quote = char;
+      out += char;
     }
   }
   return out;
@@ -56,7 +56,7 @@ function scriptOnly(source, rel) {
   const keep = new Array(source.length).fill(false);
   for (const block of source.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)) {
     const start = block.index + block[0].indexOf('>') + 1;
-    for (let i = start; i < start + block[1].length; i++) keep[i] = true;
+    for (let index = start; index < start + block[1].length; index++) keep[index] = true;
   }
   return [...source].map((char, index) => (keep[index] || char === '\n' ? char : ' ')).join('');
 }
@@ -93,22 +93,22 @@ function callArguments(text, open) {
   let depth = 0;
   let quote = '';
   let start = open + 1;
-  for (let i = open; i < text.length; i++) {
-    const c = text[i];
+  for (let index = open; index < text.length; index++) {
+    const char = text[index];
     if (quote) {
-      if (c === '\\') i++;
-      else if (c === quote) quote = '';
-    } else if (c === '"' || c === "'" || c === '`') quote = c;
-    else if ('([{'.includes(c)) depth++;
-    else if (')]}'.includes(c)) {
+      if (char === '\\') index++;
+      else if (char === quote) quote = '';
+    } else if (char === '"' || char === "'" || char === '`') quote = char;
+    else if ('([{'.includes(char)) depth++;
+    else if (')]}'.includes(char)) {
       depth--;
       if (depth === 0) {
-        args.push({ at: start, text: text.slice(start, i).trim() });
+        args.push({ at: start, text: text.slice(start, index).trim() });
         return args;
       }
-    } else if (c === ',' && depth === 1) {
-      args.push({ at: start, text: text.slice(start, i).trim() });
-      start = i + 1;
+    } else if (char === ',' && depth === 1) {
+      args.push({ at: start, text: text.slice(start, index).trim() });
+      start = index + 1;
     }
   }
   return args;
