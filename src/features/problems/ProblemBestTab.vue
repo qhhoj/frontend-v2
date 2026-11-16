@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import EmptyState from '@/components/EmptyState.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import PageOutOfRange from '@/components/PageOutOfRange.vue';
@@ -20,6 +21,12 @@ const route = useRoute();
 const code = computed(() => String(route.params.code));
 const page = computed(() => pageFromQuery(route.query.page));
 const { data: list, isPending, error, refetch } = useBestSubmissionsQuery(code, page);
+/** The empty list's next step: back to the statement, keeping the contest the visitor came from. */
+const statementTo = computed(() => ({
+  name: 'problem',
+  params: { code: code.value },
+  query: route.query.contest ? { contest: route.query.contest } : {},
+}));
 const rankStart = computed(() => ((list.value?.meta.page ?? 1) - 1) * SUBMISSION_PAGE_SIZE + 1);
 </script>
 
@@ -30,7 +37,12 @@ const rankStart = computed(() => ((list.value?.meta.page ?? 1) - 1) * SUBMISSION
       <template #skeleton><SubmissionTableSkeleton :show-problem="false" /></template>
       <Card v-if="!list?.items.length" as="div">
         <PageOutOfRange v-if="list && list.meta.page > 1" :meta="list.meta" :row-count="0" />
-        <EmptyState v-else>{{ $t('submissions.best.empty') }}</EmptyState>
+        <EmptyState v-else>
+          {{ $t('submissions.best.empty') }}
+          <template #action>
+            <AppButton :to="statementTo">{{ $t('problem.tabs.statement') }}</AppButton>
+          </template>
+        </EmptyState>
       </Card>
       <template v-else>
         <SubmissionTable :submissions="list.items" :show-problem="false" :rank-start="rankStart" />
