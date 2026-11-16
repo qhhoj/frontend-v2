@@ -21,7 +21,7 @@ export const NAME_COLUMN_MAX_REM = 13.75;
 const NAME_FIXED_REM = 3;
 const NAME_CHAR_REM = 0.5;
 
-/** The board's numbers are IBM Plex Mono: every character is 0.6 em wide, so a text's width follows from its length. */
+/** The board's numbers are JetBrains Mono: every character is 0.6 em wide, so a text's width follows from its length. */
 const MONO_EM = 0.6;
 const ROOT_PX = 16;
 /** `text-sm` (cells, scores) and `text-tiny` (times, phone mini cells). */

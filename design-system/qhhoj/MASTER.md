@@ -35,7 +35,7 @@ The generator solves every value against its floor (body text 4.5:1 standard, 7:
 
 ## Typography
 
-- **IBM Plex Sans** for UI and headings (`--qh-font-display` is the body face), **IBM Plex Mono** for code and figures with `tabular-nums`. Self-hosted via `@fontsource` with the Vietnamese subset; Sans 400/500/600/700, Mono 400/600.
+- **Be Vietnam Pro** for UI and headings (`--qh-font-display` is the body face), **JetBrains Mono** for code and figures with `tabular-nums`. Self-hosted via `@fontsource` with the Vietnamese subset; Sans 400/500/600/700, Mono 400/600.
 - Type scale (font size only; leading comes from the primitives): `text-tiny` 11, `text-caption` 12, `text-meta` 13 (also the body size), `text-sm` 14, `text-base` 16 (prose, every input), `text-title` 17, `text-subtitle` 18, `text-section` 20, `text-page` 20 (the `page-title` h1 utility), `text-display` 28, `text-stat` 28 with `font-mono`, `text-hero` 40, `text-score` 40. No arbitrary `text-[Npx]` (`lint:tokens`).
 
 ## Shape, depth, motion

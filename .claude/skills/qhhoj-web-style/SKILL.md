@@ -9,7 +9,7 @@ Read `DESIGN.md` at the repo root first (tokens, colour cue map, recipes, owner 
 
 ## 1. Identity
 
-- Workbench is the QHHOJ design language (since 2026-11-15; it replaced Clay and Glass). Palette A, Paper & Ultramarine: warm paper ground, opaque cards, hairline borders, small radii, IBM Plex Sans for UI and headings, IBM Plex Mono for code and figures. Modes `light` and `dark` (`html[data-theme]`), contrast `standard` or `high` (`data-contrast`), five accents: ultramarine (default), teal, plum, terracotta, graphite (`data-accent`). Plus a page background (`data-background`, Blueprint by default).
+- Workbench is the QHHOJ design language (since 2026-11-15; it replaced Clay and Glass). Palette A, Paper & Ultramarine: warm paper ground, opaque cards, hairline borders, small radii, Be Vietnam Pro for UI and headings, JetBrains Mono for code and figures. Modes `light` and `dark` (`html[data-theme]`), contrast `standard` or `high` (`data-contrast`), five accents: ultramarine (default), teal, plum, terracotta, graphite (`data-accent`). Plus a page background (`data-background`, Blueprint by default).
 - Colours are generated: `npm run palette` writes `src/theme/palette/*.css` from `scripts/palette/paper.mjs`, solving every pair to its WCAG floor; `npm run lint:palette` (in `npm run lint`) fails on a failing pair or a stale file. Never hand-edit those files; never add a colour elsewhere.
 - Components never know the mode, contrast or accent. Use semantic utilities (`glass rounded-card` is an opaque card, `bg-surface`, `bg-accent`, `text-muted`, `text-secondary`, `border-line`).
 - Bit, the pixel mascot, keeps its sprite colours in every theme. Rules: `mascot.md`.
@@ -39,7 +39,7 @@ Other tokens:
 - Control height, three steps only: `md` 28 px `--qh-control` (every control, public and admin) · `sm` 24 px `--qh-control-sm` (inside a table or list row) · `lg` 36 px `--qh-control-lg` (submit card only). All three are 44 px or more on a coarse pointer or a phone. Page-level controls pass no `size`. Use as `h-(--qh-control)`.
 - Chips: `sm` 22 / `md` 28 px; an interactive chip gets its 44 px hit area from `::after`.
 - Dialog widths: `Modal` `sm` 480 · `md` 640 · `lg` 760, full screen under 640 px. No other widths.
-- Body text is 13 px (`body`); `font-display` is the body face (Plex Sans).
+- Body text is 13 px (`body`); `font-display` is the body face (Be Vietnam Pro).
 - Radius by role: controls `rounded-control` 4 · inputs, code and cells `rounded-cell` 4 · inset tiles, rows and notices `rounded-row` 6 · cards and dialogs `rounded-card` 6 (8 on phones) · `rounded-pill` only for switches, dots, avatars and chips. Tabs and segments are `rounded-control`/`rounded-cell`. A menu or popover is `rounded-row`.
 - Workbench sizes: `--qh-row` 32 px rows (`DataTable density="compact"`, menu and list options), `--qh-row-dense` 36 px (`comfortable`, board rows), 44 on touch; `--qh-rail` 224 px side rail.
 - Spacing: page blocks 24 (`gap-6`) · card padding from `Card padding` (16/20/24, up to 32) · form fields 20 apart (`gap-5`) · label to input 6 · button groups 8 (`gap-2`). Titles: card `text-title` (through `Card title`), section `section-title`, dialog `text-subtitle`; `text-caption` is the 12 px step.
