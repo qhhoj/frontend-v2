@@ -2,7 +2,6 @@
 import { computed, ref, watch } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
 import PageOutOfRange from '@/components/PageOutOfRange.vue';
-import Card from '@/components/ui/Card.vue';
 import Notice from '@/components/ui/Notice.vue';
 import Toolbar from '@/components/ui/Toolbar.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
@@ -190,15 +189,15 @@ watch(
             :column-keys="shownColumns"
             :has-pick-column="isSignedIn && isComparing"
         /></template>
-        <Card v-if="!rows.length" as="div">
+        <template v-if="!rows.length">
           <PageOutOfRange v-if="list && list.meta.page > 1" :meta="list.meta" :row-count="0" />
-          <EmptyState v-else>
+          <EmptyState v-else inline>
             {{ emptyText }}
             <template v-if="$slots.emptyAction" #action
               ><slot name="emptyAction" :filters="filters"
             /></template>
           </EmptyState>
-        </Card>
+        </template>
         <SubmissionTable
           v-else
           :submissions="rows"

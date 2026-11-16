@@ -13,10 +13,8 @@ import { useI18n } from 'vue-i18n';
 import { useContestListQuery } from './contests.queries';
 import ContestListEmpty from './ContestListEmpty.vue';
 import ContestListSkeletons from './ContestListSkeletons.vue';
-import EndedContestTable from './EndedContestTable.vue';
+import ContestRow from './ContestRow.vue';
 import { featuredFirst } from './featured-contest';
-import RunningContestCard from './RunningContestCard.vue';
-import UpcomingContestRow from './UpcomingContestRow.vue';
 import {
   OVERVIEW_PAGE_SIZE,
   PHASE_PAGE_SIZE,
@@ -57,7 +55,7 @@ const isPaged = computed(() => isPagedGroup(props.filters, props.phase));
 const isFiltered = computed(() =>
   Boolean(props.filters.search.trim() || props.filters.isRatedOnly || props.filters.tag),
 );
-/** A running contest's card counts the seconds: the group follows it to the second, so a card never sits at 00:00:00. */
+/** A running contest's row counts the seconds: the group follows it to the second, so a card never sits at 00:00:00. */
 const now = useNow(props.phase === 'running' ? 1000 : 15_000);
 /** A running contest leaves the list the moment its end passes, before the server answers. */
 const shownContests = computed(() =>
@@ -65,10 +63,24 @@ const shownContests = computed(() =>
     (contest) => props.phase !== 'running' || phaseAt(contest, now.value) === 'running',
   ),
 );
-/** Running and upcoming groups put the featured contest first: it is the large card, the rest fill a grid. */
+/** Running and upcoming groups put the viewer's own contest first, then the newest running or the soonest upcoming. */
 const orderedContests = computed(() =>
-  featuredFirst(shownContests.value, props.phase === 'running'),
+  props.phase === 'ended'
+    ? shownContests.value
+    : featuredFirst(shownContests.value, props.phase === 'running'),
 );
+/** An empty running group names the next contest: the upcoming list is read only then (it is the upcoming group's own query). */
+const wantsNext = computed(
+  () =>
+    props.phase === 'running' &&
+    !isFiltered.value &&
+    !isPending.value &&
+    !error.value &&
+    shownContests.value.length === 0,
+);
+const nextQuery = computed(() => groupQuery(props.filters, 'upcoming', props.organizationId));
+const { data: upcoming } = useContestListQuery(nextQuery, wantsNext);
+const nextContest = computed(() => featuredFirst(upcoming.value?.items ?? [], false)[0] ?? null);
 const hasRunEnded = computed(() => shownContests.value.length < contests.value.length);
 /** Then the server is asked once for the list without it. */
 watch(hasRunEnded, (isNowEnded) => {
@@ -91,11 +103,11 @@ const linkText = computed(() =>
 /** An empty overview group shows no count and no link: there is nothing to see. */
 const hasLink = computed(() => hasItems.value && (isSingleGroup.value || props.phase !== 'ended'));
 const hasItems = computed(() => isSingleGroup.value || total.value > 0);
-/** An empty running or upcoming group in the overview takes no room: only the groups with contests show. */
+/** An empty upcoming group in the overview takes no room. An empty running group stays as one line (the next contest), the ended one too. */
 const isHidden = computed(
   () =>
     !isSingleGroup.value &&
-    props.phase !== 'ended' &&
+    props.phase === 'upcoming' &&
     !isFiltered.value &&
     !isPending.value &&
     !error.value &&
@@ -133,37 +145,28 @@ const clearTagTarget = computed(() => ({
   >
     <template #lead><StatusDot :tone="PHASE_CUES[phase]" /></template>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
-      <template #skeleton><ContestListSkeletons :kind="phase" /></template>
+      <template #skeleton><ContestListSkeletons /></template>
       <ContestListEmpty
         v-if="!shownContests.length"
         :phase="phase"
         :is-filtered="isFiltered"
         :is-past-last-page="isPastLastPage"
-        :quiet="!isSingleGroup && !isFiltered"
         :first-page-target="firstPageTarget"
         :list-route="listPage"
         :tag-name="filters.tag ? (tagName ?? filters.tag) : null"
         :clear-tag-target="clearTagTarget"
+        :next-contest="nextContest"
       />
-      <!-- The first card (the featured contest) spans the row; the others sit in a grid of two or three columns. -->
-      <ul
-        v-else-if="phase !== 'ended'"
-        class="m-0 grid list-none grid-cols-1 gap-3 p-0 md:grid-cols-2 xl:grid-cols-3"
-      >
-        <component
-          :is="phase === 'running' ? RunningContestCard : UpcomingContestRow"
-          v-for="(contest, index) in orderedContests"
+      <ul v-else class="m-0 list-none p-0">
+        <ContestRow
+          v-for="contest in orderedContests"
           :key="contest.key"
           :contest="contest"
-          :featured="index === 0"
+          :phase="phase"
           :with-edit="Boolean(organizationId)"
+          :hide-organizations="Boolean(organizationId)"
         />
       </ul>
-      <EndedContestTable
-        v-else
-        :contests="shownContests"
-        :is-organization-scoped="Boolean(organizationId)"
-      />
       <SubmissionPager
         v-if="isPaged"
         :page="filters.page"

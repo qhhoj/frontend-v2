@@ -20,11 +20,11 @@ import { useLocaleStore } from '@/stores/locale.store';
 import ProblemStatusMark from './ProblemStatusMark.vue';
 
 /**
- * The problem list: the kit `DataTable` on a computer, one 32 px line per problem (48 px on a touch screen), and on a phone
- * compact rows instead of a table that scrolls sideways. One "Bài" column holds the name and, after it, the code in grey mono;
+ * The problem list: the kit `DataTable` as a frameless ledger (`variant="ledger"`) on a computer, one `--qh-row` line per
+ * problem (the touch height on a touch screen), and on a phone compact rows instead of a table that scrolls sideways. One "Bài" column holds the name and, after it, the code in grey mono;
  * points, acceptance and solvers are narrow fixed columns at the right, plain numbers under their headers (no unit in a row).
- * The acceptance number takes its colour from `acRateTextClass` (low = hard), on the table and the phone rows alike. Sorting is by the column headers; a third click on one returns to
- * the default order. An empty list under filters offers to clear them. Each table row carries `data-code` (the page loads
+ * The acceptance number takes its colour from `acRateTextClass` (low = hard), on the table and the phone rows alike. Sorting is by the column headers (only the sorted one shows its arrow, the others show
+ * it on hover); a third click on one returns to the default order. An empty list under filters offers to clear them. Each table row carries `data-code` (the page loads
  * that problem ahead on hover and focus).
  */
 const props = defineProps<{
@@ -82,6 +82,9 @@ const columns = computed<DataTableColumn[]>(() => [
     sort: sortOf('userCount', 'desc'),
   },
 ]);
+/** Ledger tweaks the kit has no prop for: unsorted headers show their arrow on hover only; phone rows and the cells at the row ends keep a small inset so a tinted row does not touch its content. */
+const LEDGER_CLASS =
+  '[&_thead_th:not([aria-sort])_svg]:invisible [&_thead_th:not([aria-sort])_button:hover_svg]:visible [&_li]:px-2 [&_li:last-child]:border-b [&_:is(th,td):first-child]:pl-2 [&_:is(th,td):last-child]:pr-2';
 const changeSort = (value: string | undefined) =>
   emit('sort', value !== undefined && isProblemSort(value) ? value : null);
 
@@ -93,12 +96,9 @@ function namedTypes(problem: ProblemListItem) {
 }
 /** One type chip, the rest counted in a "+N" that is never cut; all are named in the tooltip. The name keeps the width. */
 const SHOWN_TYPES = 1;
-/** Solved = full, tried and not solved = zero; not tried (or no viewer) stays plain. */
-const rowTone = (problem: ProblemListItem): CueTone | null => {
-  if (!props.signedIn) return null;
-  if (problem.viewerStatus === 'solved') return 'full';
-  return problem.viewerStatus === 'attempted' ? 'zero' : null;
-};
+/** Only a solved problem tints its row; tried and not tried show no tint (the status icon says it). */
+const rowTone = (problem: ProblemListItem): CueTone | null =>
+  props.signedIn && problem.viewerStatus === 'solved' ? 'full' : null;
 const phoneRowClass = (problem: ProblemListItem) => {
   const tone = rowTone(problem);
   return tone ? CUE_ROW[tone] : undefined;
@@ -113,9 +113,9 @@ const acRateText = (problem: ProblemListItem) =>
 </script>
 
 <template>
-  <!-- 32 px lines where the pointer is fine; a touch screen keeps the kit's 48 px rows, a finger's height. -->
   <DataTable
-    class="[&_tbody_td]:h-(--qh-row) touch:[&_tbody_td]:h-12"
+    variant="ledger"
+    :class="LEDGER_CLASS"
     :columns="columns"
     :rows="problems"
     :row-key="(problem) => problem.id"
@@ -131,7 +131,7 @@ const acRateText = (problem: ProblemListItem) =>
     @retry="emit('retry')"
   >
     <template #empty>
-      <EmptyState>
+      <EmptyState inline>
         {{ $t('problems.empty') }}
         <template v-if="filtered" #action>
           <AppButton @click="emit('clearFilters')">{{ $t('common.clearFilters') }}</AppButton>
@@ -190,9 +190,6 @@ const acRateText = (problem: ProblemListItem) =>
         <!-- Points: a plain number, no unit (as on the home's new problems). -->
         <template #trail>
           <span class="font-mono text-sm font-medium tabular-nums">{{ pointsText(row) }}</span>
-          <span class="text-caption text-muted tabular-nums">{{
-            $t('problems.solverCount', { count: formatNumber(row.userCount, locale.locale) })
-          }}</span>
         </template>
       </CompactListRow>
     </template>

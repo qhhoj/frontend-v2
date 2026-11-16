@@ -124,6 +124,7 @@ const CHIP =
             <SubmissionTable
               :submissions="rows"
               :show-problem="false"
+              variant="surface"
               :rank-start="rankStart"
               :own-username="session.user?.username"
             />

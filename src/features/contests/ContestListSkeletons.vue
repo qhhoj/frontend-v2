@@ -1,58 +1,23 @@
 <script setup lang="ts">
-import Card from '@/components/ui/Card.vue';
-import type { ContestPhase } from '@/api/types/contests';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import EndedContestSkeleton from './EndedContestSkeleton.vue';
 
-defineProps<{ kind: ContestPhase }>();
+/** The loading rows of any group: the shape of `ContestRow.vue` (name, facts, the cue at the right), one hairline under each. */
+const props = withDefaults(defineProps<{ rows?: number }>(), { rows: 3 });
 </script>
 
 <template>
-  <div v-if="kind === 'running'" class="grid gap-4 lg:grid-cols-2">
-    <Card
-      v-for="card in 2"
-      :key="card"
-      as="div"
-      data-skeleton-region="running-card"
-      class="flex flex-col gap-3 p-5"
-    >
-      <SkeletonBlock pill class="h-7 w-40" />
-      <div class="section-title">
-        <SkeletonBlock text class="w-3/4" />
-      </div>
-      <p class="font-mono text-meta"><SkeletonBlock text class="w-24" /></p>
-      <SkeletonBlock class="h-2 w-full" />
-      <p class="font-semibold"><SkeletonBlock text class="w-40" /></p>
-      <div class="flex items-center justify-between gap-3">
-        <p class="text-sm"><SkeletonBlock text class="w-28" /></p>
-        <SkeletonBlock pill class="h-11 w-28" />
-      </div>
-    </Card>
-  </div>
-  <Card v-else-if="kind === 'upcoming'" as="div">
-    <div
-      v-for="row in 3"
+  <ul aria-hidden="true" class="m-0 list-none p-0">
+    <li
+      v-for="row in props.rows"
       :key="row"
-      data-skeleton-region="upcoming-row"
-      class="flex flex-wrap items-center gap-4 border-t border-line px-5 py-4 first:border-t-0"
+      data-skeleton-region="contest-row"
+      class="flex min-h-(--qh-row) flex-wrap items-center gap-x-4 gap-y-1 border-b border-line py-2"
     >
-      <SkeletonBlock class="size-16 shrink-0 rounded-row" />
-      <div class="flex min-w-0 flex-1 flex-col gap-1.5">
-        <div class="font-display text-subtitle leading-7 font-semibold">
-          <SkeletonBlock text class="w-2/3" />
-        </div>
-        <p class="text-sm"><SkeletonBlock text class="w-1/2" /></p>
-        <div class="flex items-center gap-1.5">
-          <SkeletonBlock pill class="h-6.5 w-24" />
-          <SkeletonBlock text class="w-20" />
-        </div>
-      </div>
-      <div class="flex flex-col gap-1.5 text-sm">
-        <p class="font-mono"><SkeletonBlock text class="w-28" /></p>
-        <p class="text-muted"><SkeletonBlock text class="w-40" /></p>
-      </div>
-      <SkeletonBlock pill class="h-11 w-36" />
-    </div>
-  </Card>
-  <EndedContestSkeleton v-else />
+      <div class="min-w-0 basis-full md:flex-1 md:basis-0"><SkeletonBlock text class="w-48" /></div>
+      <p class="flex-1 font-mono text-meta md:w-72 md:flex-none">
+        <SkeletonBlock text class="w-56" />
+      </p>
+      <p class="md:w-36"><SkeletonBlock text class="ml-auto w-20" /></p>
+    </li>
+  </ul>
 </template>

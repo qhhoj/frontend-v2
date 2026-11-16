@@ -1,4 +1,4 @@
-import { TABLE_HEAD_CELL, TABLE_ROW_HEIGHT } from '@/components/ui/table-classes';
+import { TABLE_HEAD_CELL, TABLE_ROW_HEIGHT, TABLE_VARIANT } from '@/components/ui/table-classes';
 /** Columns a submission table can show, in table order. The verdict column holds the score; `cost` is "time · memory". */
 export type ColumnKey = 'verdict' | 'problem' | 'user' | 'cost' | 'language' | 'when';
 /** Every column, in table order. */
@@ -72,8 +72,28 @@ export const fullCellClass = (kind: CellKind | 'pick' | 'source') =>
 /** Numbers line up on the right. */
 export const NUMBER_CELLS: ReadonlySet<CellKind> = new Set(['score', 'time', 'memory']);
 
-/** Shared by `SubmissionTable.vue` and its skeleton, so the two cannot drift apart in height or width. */
-export const HEADER_CELL_CLASSES = `${TABLE_HEAD_CELL} px-2 first:pl-(--qh-pad-surface) last:pr-(--qh-pad-surface)`;
-export const BODY_CELL_CLASSES = `${TABLE_ROW_HEIGHT} px-2 align-middle text-body first:pl-(--qh-pad-surface) last:pr-(--qh-pad-surface)`;
-/** The header row: the same surface tone as the rows, like every table. */
-export const HEADER_ROW_CLASSES = 'text-left text-muted';
+/**
+ * `ledger` (the default): no frame, a hairline under every row, a stronger rule under the head, a small inset at the ends (the list
+ * sits on the page). `surface`: the list is inside a card of its own (the contest's best-submissions page), rows are told apart by a
+ * hairline above. The classes are shared by `SubmissionTable.vue` and its skeleton, so the two cannot drift apart in height or width.
+ */
+export type TableVariant = keyof typeof TABLE_VARIANT;
+/** The ends of a row keep a small inset in a ledger too: a row tinted by its verdict must not touch its first and last cell. */
+const CELL_EDGE: Record<TableVariant, string> = {
+  ledger: 'first:pl-2 last:pr-2',
+  surface: TABLE_VARIANT.surface.edge,
+};
+export const headerCellClasses = (variant: TableVariant) =>
+  `${TABLE_HEAD_CELL} px-2 ${CELL_EDGE[variant]}`;
+export const bodyCellClasses = (variant: TableVariant) =>
+  `${TABLE_ROW_HEIGHT} px-2 align-middle text-body ${CELL_EDGE[variant]}`;
+/** The header row: the same tone as the rows, like every table; the ledger rules it off. */
+export const headerRowClasses = (variant: TableVariant) =>
+  variant === 'ledger'
+    ? `text-left text-muted border-b ${TABLE_VARIANT.ledger.headRule}`
+    : 'text-left text-muted';
+/** The rule that tells rows apart: under each row in a ledger, above each one in a card. */
+export const ROW_RULE: Record<TableVariant, string> = {
+  ledger: 'border-b border-line',
+  surface: 'border-t border-line',
+};

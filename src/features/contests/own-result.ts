@@ -36,14 +36,13 @@ const CELL_TONES: Partial<Record<CellKind, CueTone>> = {
   'first-solve': 'full',
   solved: 'full',
   partial: 'partial',
-  failed: 'zero',
 };
 
-/** The cue of the viewer's own result on a problem: full, partial, zero after a try; none while untouched or pending. */
+/** The row cue of the viewer's own result: full or partial; a try with no points, untouched and pending carry none (icon only). */
 export function ownResultTone(problem: ContestProblem, context: RankingContext): CueTone | null {
   const view = ownResultView(problem, context);
   if (view.kind === 'cell') return CELL_TONES[view.cell.kind] ?? null;
-  return view.kind === 'attempted' ? 'zero' : null;
+  return null;
 }
 
 /** Attempts left under a cap, never below zero. */
