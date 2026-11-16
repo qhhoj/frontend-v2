@@ -1219,13 +1219,12 @@
     "pointsMin": "Points from",
     "pointsMax": "Points to",
     "columns": {
-      "problem": "Name",
+      "problem": "Problem",
       "types": "Type",
       "points": "Points",
       "acRate": "AC",
       "users": "Solved",
-      "status": "Status",
-      "code": "Code"
+      "status": "Status"
     },
     "solved": "Solved",
     "attempted": "Attempted",
@@ -1262,9 +1261,7 @@
     },
     "solverCount": "{count} solved",
     "filterPanel": "Filters",
-    "filterPanelShort": "Filter",
     "solvedShort": "{solved} solved",
-    "pointsValue": "{points} points",
     "partialHint": "partial scoring",
     "hasEditorialHint": "Only problems with a published editorial",
     "solvedFilter": {

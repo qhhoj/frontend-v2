@@ -5,7 +5,7 @@ import type { ContestDetail } from '@/api/types/contests';
 import type { ProblemDetail } from '@/api/types/problems';
 import PdfLink from './PdfLink.vue';
 import OwnResultChip from '@/features/contests/OwnResultChip.vue';
-import { formatMemoryLimit, formatNumber, formatTimeLimit } from '@/lib/format';
+import { formatMemoryLimit, formatNumber, formatPoints, formatTimeLimit } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useContestProblem } from './use-contest-problem';
 import { viewerStatusOf } from './viewer-status';
@@ -32,7 +32,7 @@ const route = useRoute();
 const locale = useLocaleStore();
 
 const status = computed(() => viewerStatusOf(props.problem.viewerStatus));
-const points = computed(() => formatNumber(props.problem.points, locale.locale, 2, false));
+const points = computed(() => formatPoints(props.problem.points, locale.locale));
 /** File I/O shows the exact names (the contestant types them into `freopen`/`assign`); standard I/O reads in words. */
 const ioCells = computed(() => {
   const { mode, inputFile, outputFile } = props.problem.io;

@@ -48,7 +48,7 @@ const clear = () => (typed.value = '');
       type="search"
       :aria-label="label"
       :placeholder="placeholder ?? label"
-      class="h-(--qh-control) w-full min-w-0 appearance-none rounded-cell border border-line-control bg-surface-solid pr-8 pl-8 text-meta text-content placeholder:text-muted [&::-webkit-search-cancel-button]:hidden"
+      class="h-(--qh-control) w-full min-w-0 appearance-none rounded-cell border border-line-control bg-surface-solid pr-8 pl-8 text-meta touch:pr-11 text-content placeholder:text-muted [&::-webkit-search-cancel-button]:hidden"
     />
     <button
       v-if="clearable && typed"

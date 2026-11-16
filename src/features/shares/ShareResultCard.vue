@@ -6,7 +6,7 @@ import Card from '@/components/ui/Card.vue';
 import VerdictChip from '@/components/ui/VerdictChip.vue';
 import VerdictRing from '@/features/submissions/VerdictRing.vue';
 import { translate } from '@/i18n';
-import { NO_VALUE, formatCaseMemory, formatCaseTime, formatNumber } from '@/lib/format';
+import { NO_VALUE, formatCaseMemory, formatCaseTime, formatPoints } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { PARTIAL_CODE, submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -15,7 +15,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 const props = defineProps<{ share: ShareView; copy: NonNullable<ShareView['copy']> }>();
 const locale = useLocaleStore();
 const SCORE_DIGITS = 2;
-const format = (points: number) => formatNumber(points, locale.locale, SCORE_DIGITS, false);
+const format = (points: number) => formatPoints(points, locale.locale, SCORE_DIGITS);
 
 const verdict = computed(() =>
   submissionVerdictOf({

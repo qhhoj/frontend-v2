@@ -13,6 +13,7 @@ import DataTable from '@/components/ui/DataTable.vue';
 import type { DataTableColumn } from '@/components/ui/DataTableColumns';
 import { formatNumber } from '@/lib/format';
 import { medalClass } from '@/lib/medal';
+import { ratingTextClass } from '@/lib/tier-classes';
 import { WIDE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -59,7 +60,7 @@ const columns = computed<DataTableColumn[]>(() => [
     label: t(column.labelKey),
     align: 'end' as const,
     sort: { desc: column.key },
-    cellClass: column.isActive ? 'font-bold text-positive' : undefined,
+    cellClass: column.isActive ? 'font-bold' : undefined,
   })),
 ]);
 const sortOptions = computed(() =>
@@ -76,6 +77,12 @@ const rowAttrs = (entry: LeaderboardEntry) => ({
 const valueOf = (entry: LeaderboardEntry, key: string) => {
   const value = entry[key as RankField];
   return value === null ? '—' : formatNumber(value, locale.locale);
+};
+
+/** The rating figure wears its tier colour (as the user's name does); the sorted number of another column stays green. */
+const valueClass = (entry: LeaderboardEntry, key: string) => {
+  if (key === 'rating') return ratingTextClass(entry.rating);
+  return key === props.sort ? 'text-positive' : undefined;
 };
 
 /** A hash on the URL (find my rank) brings its row into view once the rows are there. */
@@ -147,7 +154,7 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
     </template>
     <template #cell-organization="{ row }">{{ row.organization?.shortName ?? '—' }}</template>
     <template v-for="column in valueColumns" :key="column.key" #[`cell-${column.key}`]="{ row }">
-      {{ valueOf(row, column.key) }}
+      <span :class="valueClass(row, column.key)">{{ valueOf(row, column.key) }}</span>
     </template>
   </DataTable>
 </template>

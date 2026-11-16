@@ -15,7 +15,7 @@ import { formatClock, formatDate, formatRelative } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
-import { NO_VALUE, formatNumber, scoreBelowFull } from '@/lib/format';
+import { NO_VALUE, formatPoints, scoreBelowFull } from '@/lib/format';
 import { provisionalPoints, ringProgress } from '@/lib/grading';
 import { PARTIAL_CODE, VERDICT_TONE_VARS, verdictOfCode, type Verdict } from '@/lib/verdicts';
 import { BIT_MOODS } from '@/mascot/bit-moods';
@@ -63,8 +63,7 @@ const props = defineProps<{
 }>();
 const locale = useLocaleStore();
 const now = useNow(CLOCK_REFRESH_MS);
-const format = (points: number) =>
-  formatNumber(points, locale.locale, SCORE_FRACTION_DIGITS, false);
+const format = (points: number) => formatPoints(points, locale.locale, SCORE_FRACTION_DIGITS);
 
 /** A row still in progress has no final points: the share of the case points stands in for them. */
 const isProvisional = computed(() => IN_PROGRESS_STATUSES.includes(props.submission.status));

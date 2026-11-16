@@ -1219,13 +1219,12 @@
     "pointsMin": "Điểm từ",
     "pointsMax": "Điểm đến",
     "columns": {
-      "problem": "Tên bài",
+      "problem": "Bài",
       "types": "Dạng bài",
       "points": "Điểm",
       "acRate": "AC",
       "users": "Đã giải",
-      "status": "Trạng thái",
-      "code": "Mã"
+      "status": "Trạng thái"
     },
     "solved": "Đã giải",
     "attempted": "Đã thử",
@@ -1260,11 +1259,9 @@
       "acRate": "AC",
       "userCount": "Đã giải"
     },
-    "solverCount": "{count} giải",
+    "solverCount": "{count} đã giải",
     "filterPanel": "Bộ lọc",
-    "filterPanelShort": "Lọc",
     "solvedShort": "{solved} đã giải",
-    "pointsValue": "{points} điểm",
     "partialHint": "chấm từng phần",
     "hasEditorialHint": "Chỉ bài đã có lời giải được công bố",
     "solvedFilter": {
