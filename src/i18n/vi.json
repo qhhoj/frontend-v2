@@ -1457,6 +1457,9 @@
       "button": "Công bố kết quả",
       "confirmTitle": "Công bố kết quả cuối?",
       "confirmBody": "Bảng mở băng cho mọi người và được tính lại; thí sinh thấy kết quả thật ngay."
+    },
+    "pinned": {
+      "label": "Hàng của bạn"
     }
   },
   "formats": {

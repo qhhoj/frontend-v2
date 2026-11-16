@@ -1,24 +1,19 @@
 <script setup lang="ts">
-import Chip from '@/components/ui/Chip.vue';
-import UserLink from '@/components/UserLink.vue';
 import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import AppButton from '@/components/ui/AppButton.vue';
-import { computed, ref, TransitionGroup } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, TransitionGroup, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { focusTableRow } from '@/lib/focus-table-row';
-import { MEDAL_BADGE_SHAPE, medalBadgeClass } from '@/lib/medal';
 import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useMotionAllowed } from '@/lib/use-motion-allowed';
 import type { Ranking, RankingProblem, RankingRow } from '@/api/types/contests';
 import ScrollRegion from '@/components/ScrollRegion.vue';
-import { deltaTone, formatDelta } from '@/lib/rating-delta';
 import { isPenaltyFormat, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
-import RankingCell from './RankingCell.vue';
-import ScoreTick from './ScoreTick.vue';
 import RankingList from './RankingList.vue';
 import RankingProblemHeader from './RankingProblemHeader.vue';
+import RankingTableRow from './RankingTableRow.vue';
 import {
   RANK_COLUMN_REM,
   nameColumnRem,
@@ -46,14 +41,14 @@ const props = defineProps<{
   ownSubmissionsOnly?: boolean;
   /** The rows shown are the previous board's while the new one loads: nothing ticks when it arrives. */
   isStale?: boolean;
+  /** The viewer's row, kept as the first row of the board (and of the phone list) while it is among the rows shown. */
+  pinnedRow?: RankingRow | null;
 }>();
 /** Rank and name stay while the problem columns scroll (the rank column is `RANK_COLUMN_REM` = 3.5 rem = `left-14`). */
-const RANK_STICKY = 'sticky left-0 z-10 bg-surface-solid';
-/** Name sticks next to the rank while the problem columns scroll. */
-const NAME_STICKY = 'sticky left-14 z-10 bg-surface-solid';
-/** The viewer's row keeps its tint over the opaque sticky cells. */
-const stickyBackground = (row: RankingRow) =>
-  row.user.id === props.viewerId ? 'bg-linear-to-b from-surface-hover to-surface-hover' : '';
+const HEAD_STICKY = 'sticky top-(--contest-bar-height,0) bg-ground';
+const RANK_HEAD = `${HEAD_STICKY} left-0 z-20`;
+const NAME_HEAD = `${HEAD_STICKY} left-14 z-20`;
+const OTHER_HEAD = `${HEAD_STICKY} z-10`;
 const penalty = computed(() => isPenaltyFormat(props.context.formatName));
 const { t } = useI18n();
 const root = ref<HTMLElement | null>(null);
@@ -135,6 +130,40 @@ const nameRem = computed(() => nameColumnRem(props.ranking.rows.map(printedName)
 const tableWidth = computed(
   () => `${tableWidthRem(nameRem.value, props.ranking.problems.length, columns.value)}rem`,
 );
+/**
+ * The table head sticks under the contest's bar (`top: var(--contest-bar-height)`), which needs no scroll frame around the
+ * table: a frame that scrolls sideways is its own scroller and the head would stick to it, not to the page. So the table sits
+ * in a plain clipped box while it fits, and in the scroll frame only when it is wider than the room (then its head scrolls with it).
+ */
+const SLACK_PX = 1;
+const frame = ref<HTMLElement | null>(null);
+const tableEl = ref<HTMLElement | null>(null);
+const isScrolling = ref(false);
+function measure() {
+  if (frame.value && tableEl.value)
+    isScrolling.value = tableEl.value.offsetWidth > frame.value.clientWidth + SLACK_PX;
+}
+let observer: ResizeObserver | undefined;
+onMounted(() => {
+  measure();
+  if (typeof ResizeObserver === 'undefined' || !frame.value) return;
+  observer = new ResizeObserver(measure);
+  observer.observe(frame.value);
+});
+onBeforeUnmount(() => observer?.disconnect());
+watch([tableWidth, tableEl, frame], () => void nextTick(measure));
+const HEAD_CELL = 'h-(--qh-row-dense) border-b border-line-strong px-2.5 py-0 font-medium';
+/** What one board row needs; the pinned copy and the row in place are built the same way. */
+const rowProps = (row: RankingRow) => ({
+  row,
+  view: viewOf(row),
+  isViewer: row.user.id === props.viewerId,
+  link: submissionsLink(row),
+  hasTimeColumn: hasTimeColumn.value,
+  hasCombinedScore: hasCombinedScore.value,
+  hasRatingColumn: hasRatingColumn.value,
+  isTicking: isTicking.value,
+});
 const scoreHeaderKey = computed(() =>
   hasCombinedScore.value ? 'ranking.columns.scoreTime' : 'ranking.columns.score',
 );
@@ -161,141 +190,102 @@ const scoreHeaderKey = computed(() =>
       :has-rating-column="hasRatingColumn"
       :link-of="submissionsLink"
       :is-ticking="isTicking"
+      :pinned-row="pinnedRow ?? null"
     />
-    <ScrollRegion v-else :label="$t('ranking.scrollRegion')" :hint="$t('ranking.scrollHint')">
-      <table class="w-full table-fixed border-collapse" :style="{ minWidth: tableWidth }">
-        <colgroup>
-          <col :style="{ width: `${RANK_COLUMN_REM}rem` }" />
-          <col :style="{ width: `${nameRem}rem` }" />
-          <col :style="{ width: `${columns.scoreRem}rem` }" />
-          <col v-if="columns.timeRem" :style="{ width: `${columns.timeRem}rem` }" />
-          <col v-if="columns.ratingRem" :style="{ width: `${columns.ratingRem}rem` }" />
-          <col
-            v-for="problem in ranking.problems"
-            :key="problem.problemId"
-            :style="{ width: `${columns.problemRem}rem` }"
-          />
-        </colgroup>
-        <caption class="sr-only">
-          {{
-            $t('pages.ranking')
-          }}
-        </caption>
-        <thead>
-          <tr class="text-center text-meta text-muted">
-            <th scope="col" :class="[RANK_STICKY, 'w-14 px-3 py-2.5 text-right font-medium']">
-              <RankColumnHeader :label="$t('ranking.columns.rank')" />
-            </th>
-            <th scope="col" :class="[NAME_STICKY, 'px-2.5 py-2.5 text-left font-medium']">
-              {{ $t('ranking.columns.user') }}
-            </th>
-            <th scope="col" class="px-2.5 py-2.5 font-medium">
-              {{ $t(scoreHeaderKey) }}
-            </th>
-            <th v-if="hasTimeColumn" scope="col" class="px-2.5 py-2.5 font-medium">
-              {{ $t('ranking.columns.penalty') }}
-            </th>
-            <th v-if="hasRatingColumn" scope="col" class="px-2.5 py-2.5 font-medium">
-              {{ $t('ranking.columns.ratingChange') }}
-            </th>
-            <th
+    <div v-else ref="frame" class="overflow-x-clip">
+      <component
+        :is="isScrolling ? ScrollRegion : 'div'"
+        v-bind="
+          isScrolling ? { label: $t('ranking.scrollRegion'), hint: $t('ranking.scrollHint') } : {}
+        "
+      >
+        <table
+          ref="tableEl"
+          class="w-full table-fixed border-collapse"
+          :style="{ minWidth: tableWidth }"
+        >
+          <colgroup>
+            <col :style="{ width: `${RANK_COLUMN_REM}rem` }" />
+            <col :style="{ width: `${nameRem}rem` }" />
+            <col :style="{ width: `${columns.scoreRem}rem` }" />
+            <col v-if="columns.timeRem" :style="{ width: `${columns.timeRem}rem` }" />
+            <col v-if="columns.ratingRem" :style="{ width: `${columns.ratingRem}rem` }" />
+            <col
               v-for="problem in ranking.problems"
               :key="problem.problemId"
-              scope="col"
-              class="px-1.5 py-2.5 font-medium text-content"
-            >
-              <RankingProblemHeader
-                :problem="problem"
-                :name="problemNames?.get(problem.problemId)"
-                :contest-key="contestKey"
-              />
-            </th>
-          </tr>
-        </thead>
-        <component
-          :is="isMovable ? TransitionGroup : 'tbody'"
-          v-bind="isMovable ? { tag: 'tbody', moveClass } : {}"
-          class="font-mono text-sm tabular-nums"
-        >
-          <tr
-            v-for="row in rows"
-            :key="row.participationId"
-            :data-row-id="row.participationId"
-            class="border-t border-line text-center"
-            :class="{ 'bg-surface-hover': row.user.id === viewerId }"
-          >
-            <td
-              class="h-12 w-14 px-3 py-0 text-right"
-              :class="[RANK_STICKY, stickyBackground(row)]"
-            >
-              <span
-                :class="
-                  row.rank && !row.isDisqualified
-                    ? [MEDAL_BADGE_SHAPE, medalBadgeClass(row.rank)]
-                    : ''
-                "
-                >{{ row.isDisqualified ? '—' : (row.rank ?? '—') }}</span
-              >
-            </td>
-            <th
-              scope="row"
-              tabindex="-1"
-              class="overflow-hidden px-2.5 py-0 text-left font-body"
-              :class="[NAME_STICKY, stickyBackground(row)]"
-            >
-              <span class="flex items-center gap-2 whitespace-nowrap">
-                <UserLink
-                  :username="row.user.username"
-                  :rating="row.user.rating"
-                  :to="submissionsLink(row)"
-                  plain-avatar
-                  class="min-w-0 truncate [&_a]:font-medium"
-                />
-                <Chip v-if="row.virtual > 0">{{ $t('ranking.virtual') }}</Chip>
-                <Chip v-if="row.user.id === viewerId" tone="accent">{{ $t('common.you') }}</Chip>
-                <Chip v-if="row.isDisqualified" tone="danger">{{
-                  $t('ranking.disqualified')
-                }}</Chip>
-              </span>
-            </th>
-            <td class="overflow-hidden px-1.5 leading-none whitespace-nowrap">
-              <span class="block text-base font-bold">
-                <template v-if="row.isDisqualified">—</template>
-                <ScoreTick v-else :text="viewOf(row).total" :animate="isTicking" />
-              </span>
-              <small
-                v-if="hasCombinedScore && !row.isDisqualified"
-                class="mt-1 block text-tiny font-normal text-muted"
-                >{{ viewOf(row).time }}</small
-              >
-            </td>
-            <td v-if="hasTimeColumn" class="overflow-hidden text-meta whitespace-nowrap text-muted">
-              {{ row.isDisqualified ? '—' : viewOf(row).time }}
-            </td>
-            <td v-if="hasRatingColumn" data-testid="rating-change" class="px-2.5 whitespace-nowrap">
-              <template v-if="!row.ratingChange">—</template>
-              <Chip v-else :tone="deltaTone(row.ratingChange.delta)">{{
-                row.ratingChange.delta === null
-                  ? row.ratingChange.rating
-                  : `${formatDelta(row.ratingChange.delta)} → ${row.ratingChange.rating}`
-              }}</Chip>
-            </td>
-            <RankingCell
-              v-for="cell in viewOf(row).cells"
-              :key="cell.problemId"
-              :view="cell.view"
-              :to="cell.to"
-              :tick="isTicking"
+              :style="{ width: `${columns.problemRem}rem` }"
             />
-          </tr>
-        </component>
-      </table>
-    </ScrollRegion>
+          </colgroup>
+          <caption class="sr-only">
+            {{
+              $t('pages.ranking')
+            }}
+          </caption>
+          <thead>
+            <tr class="text-center text-small text-muted">
+              <th
+                scope="col"
+                :class="[
+                  RANK_HEAD,
+                  'h-(--qh-row-dense) w-14 border-b border-line-strong px-3 py-0 text-right font-medium',
+                ]"
+              >
+                <RankColumnHeader :label="$t('ranking.columns.rank')" />
+              </th>
+              <th
+                scope="col"
+                :class="[
+                  NAME_HEAD,
+                  'border-b border-line-strong px-2.5 py-0 text-left font-medium',
+                ]"
+              >
+                {{ $t('ranking.columns.user') }}
+              </th>
+              <th scope="col" :class="[OTHER_HEAD, HEAD_CELL]">
+                {{ $t(scoreHeaderKey) }}
+              </th>
+              <th v-if="hasTimeColumn" scope="col" :class="[OTHER_HEAD, HEAD_CELL]">
+                {{ $t('ranking.columns.penalty') }}
+              </th>
+              <th v-if="hasRatingColumn" scope="col" :class="[OTHER_HEAD, HEAD_CELL]">
+                {{ $t('ranking.columns.ratingChange') }}
+              </th>
+              <th
+                v-for="problem in ranking.problems"
+                :key="problem.problemId"
+                scope="col"
+                :class="[OTHER_HEAD, HEAD_CELL, 'px-1.5 text-content']"
+              >
+                <RankingProblemHeader
+                  :problem="problem"
+                  :name="problemNames?.get(problem.problemId)"
+                  :contest-key="contestKey"
+                />
+              </th>
+            </tr>
+          </thead>
+          <tbody v-if="pinnedRow" class="font-mono text-sm tabular-nums">
+            <RankingTableRow v-bind="rowProps(pinnedRow)" pinned />
+          </tbody>
+          <component
+            :is="isMovable ? TransitionGroup : 'tbody'"
+            v-bind="isMovable ? { tag: 'tbody', moveClass } : {}"
+            class="font-mono text-sm tabular-nums"
+          >
+            <RankingTableRow
+              v-for="row in rows"
+              :key="row.participationId"
+              v-bind="rowProps(row)"
+            />
+          </component>
+        </table>
+      </component>
+    </div>
     <p
       v-if="!rows.length && ranking.rows.length"
       role="status"
       data-testid="ranking-no-match"
-      class="border-t border-line px-5 py-6 text-center text-muted"
+      class="py-6 text-center text-muted"
     >
       {{ $t('ranking.noMatch') }}
     </p>

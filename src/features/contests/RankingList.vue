@@ -1,24 +1,16 @@
 <script setup lang="ts">
-import { ChevronDown, Star } from 'lucide-vue-next';
-import { computed, reactive, TransitionGroup } from 'vue';
+import { computed, TransitionGroup } from 'vue';
 import { useMotionAllowed } from '@/lib/use-motion-allowed';
 import type { RouteLocationRaw } from 'vue-router';
 import type { Ranking, RankingRow } from '@/api/types/contests';
-import UserLink from '@/components/UserLink.vue';
-import Chip from '@/components/ui/Chip.vue';
-import IconButton from '@/components/ui/IconButton.vue';
-import { MEDAL_BADGE_SHAPE, medalBadgeClass } from '@/lib/medal';
-import { deltaTone, formatDelta } from '@/lib/rating-delta';
-import ScoreTick from './ScoreTick.vue';
-import { TABLE_CELL_CLASSES } from './ranking-cell-classes';
-import { miniCellRem } from './ranking-columns';
+import RankingListRow from './RankingListRow.vue';
 import type { RowView } from './ranking-row-view';
 
 /**
- * The board on a phone (below `sm`): one line per contestant with rank, name and score. A tap on the row opens the mini cell
- * per problem under the name (the details are folded until asked). The mini cells wrap instead of scrolling; each shows its problem label and its cell's short text (`A +1`, `B ?2`,
- * `C 100`) on the cell's colours, all as wide as the widest one so they line up in columns, and is read out with its problem label. It is an ordered list, not a table: rows are
- * `li[data-row-id]` with a focusable `[data-row-focus]` name block, so "Về hàng của tôi" (`focusTableRow`) works on both.
+ * The board on a phone (below `sm`): one line per contestant with rank, name and score. A tap on the row opens its cells under
+ * the name as labelled cells (the details are folded until asked; see `RankingListRow`). The viewer's row is also kept first
+ * (`pinnedRow`). It is an ordered list, not a table: rows are `li[data-row-id]` with a focusable `[data-row-focus]` name block,
+ * so "Về hàng của tôi" (`focusTableRow`) works on both.
  */
 const props = defineProps<{
   ranking: Ranking;
@@ -34,6 +26,8 @@ const props = defineProps<{
   linkOf: (row: RankingRow) => RouteLocationRaw | undefined;
   /** A poll just changed the board and motion is allowed: numbers tick and rows move. */
   isTicking: boolean;
+  /** The viewer's row, kept first while it is among the rows shown. */
+  pinnedRow?: RankingRow | null;
 }>();
 const MOVE_CLASS = 'transition-transform duration-(--qh-duration) ease-move';
 /** Above this many rows the rows jump instead of sliding (FLIP reads every row's box on every change). */
@@ -51,27 +45,19 @@ const problemRange = computed(() => {
 const scoreHeaderKey = computed(() =>
   props.hasTimeColumn ? 'ranking.columns.scorePenalty' : 'ranking.columns.score',
 );
-/** One width for every mini cell of the board, so the cells line up in columns across rows. */
-const miniWidth = computed(() => {
-  const cells = props.ranking.rows.flatMap((row) =>
-    props.viewOf(row).cells.map((cell) => ({
-      label: cell.label,
-      text: cell.view.kind === 'empty' ? '' : cell.view.text,
-    })),
-  );
-  return `${miniCellRem(cells.length ? cells : props.ranking.problems.map(({ label }) => ({ label, text: '' })))}rem`;
-});
-/** The contestants whose problem cells are open. */
-const opened = reactive(new Set<string>());
-const isOpen = (row: RankingRow) => opened.has(row.participationId);
-function toggle(row: RankingRow) {
-  if (!opened.delete(row.participationId)) opened.add(row.participationId);
-}
-/** A tap on the row opens it; a tap on the name link or the button keeps its own action. */
-function onRowClick(event: MouseEvent, row: RankingRow) {
-  if (!(event.target as Element).closest('a, button')) toggle(row);
-}
 const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
+/** What one phone row needs; the pinned copy and the row in place are built the same way. */
+const rowProps = (row: RankingRow) => ({
+  row,
+  view: props.viewOf(row),
+  isViewer: isViewer(row),
+  link: props.linkOf(row),
+  hasTimeColumn: props.hasTimeColumn,
+  hasCombinedScore: props.hasCombinedScore,
+  hasRatingColumn: props.hasRatingColumn,
+  isTicking: props.isTicking,
+  columns: COLUMNS,
+});
 </script>
 
 <template>
@@ -82,107 +68,15 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
       <span class="px-2 text-right">{{ $t(scoreHeaderKey) }}</span>
       <span />
     </p>
+    <ol v-if="pinnedRow" :aria-label="$t('ranking.pinned.label')">
+      <RankingListRow v-bind="rowProps(pinnedRow)" pinned />
+    </ol>
     <component
       :is="isMovable ? TransitionGroup : 'ol'"
       v-bind="isMovable ? { tag: 'ol', moveClass } : {}"
       :aria-label="$t('pages.ranking')"
     >
-      <li
-        v-for="row in rows"
-        :key="row.participationId"
-        :data-row-id="row.participationId"
-        :class="[COLUMNS, 'border-t border-line', { 'bg-surface-hover': isViewer(row) }]"
-        @click="onRowClick($event, row)"
-      >
-        <span class="px-2 py-2 text-right font-mono tabular-nums">
-          <span class="sr-only">{{ $t('ranking.columns.rank') }}</span>
-          <span
-            :class="
-              row.rank && !row.isDisqualified ? [MEDAL_BADGE_SHAPE, medalBadgeClass(row.rank)] : ''
-            "
-            >{{ row.isDisqualified ? '—' : (row.rank ?? '—') }}</span
-          >
-        </span>
-        <div tabindex="-1" data-row-focus class="min-w-0 px-2 py-2">
-          <span class="flex min-w-0 flex-wrap items-center gap-1.5">
-            <UserLink
-              :username="row.user.username"
-              :rating="row.user.rating"
-              :to="linkOf(row)"
-              plain-avatar
-              class="min-w-0 truncate [&_a]:font-medium"
-            />
-            <Chip v-if="row.virtual > 0">{{ $t('ranking.virtual') }}</Chip>
-            <Chip v-if="isViewer(row)" tone="accent">{{ $t('common.you') }}</Chip>
-            <Chip v-if="row.isDisqualified" tone="danger">{{ $t('ranking.disqualified') }}</Chip>
-          </span>
-        </div>
-        <span class="px-2 py-2 text-right font-mono tabular-nums">
-          <span class="sr-only">{{ $t(scoreHeaderKey) }}</span>
-          <span class="block text-sm font-bold"
-            ><ScoreTick :text="row.isDisqualified ? '—' : viewOf(row).total" :animate="isTicking"
-          /></span>
-          <span
-            v-if="(hasTimeColumn || hasCombinedScore) && !row.isDisqualified"
-            class="block text-caption text-muted"
-            >{{ viewOf(row).time }}</span
-          >
-          <Chip
-            v-if="hasRatingColumn && row.ratingChange"
-            data-testid="rating-change"
-            :tone="deltaTone(row.ratingChange.delta)"
-            class="mt-0.5 whitespace-nowrap"
-            >{{
-              row.ratingChange.delta === null
-                ? row.ratingChange.rating
-                : `${formatDelta(row.ratingChange.delta)} → ${row.ratingChange.rating}`
-            }}</Chip
-          >
-        </span>
-        <span class="flex items-start justify-center pt-0.5">
-          <IconButton
-            :label="$t(isOpen(row) ? 'ranking.hideProblems' : 'ranking.showProblems')"
-            :aria-expanded="isOpen(row)"
-            @click="toggle(row)"
-          >
-            <ChevronDown
-              aria-hidden="true"
-              class="size-4 transition-transform duration-(--qh-duration) ease-move"
-              :class="isOpen(row) && 'rotate-180'"
-            />
-          </IconButton>
-        </span>
-        <span v-if="isOpen(row)" class="col-start-2 col-end-5 flex flex-wrap gap-0.5 px-2 pb-2">
-          <span
-            v-for="cell in viewOf(row).cells"
-            :key="cell.problemId"
-            :style="{ width: miniWidth }"
-            class="inline-flex h-4.5 items-center justify-center gap-0.5 rounded-cell px-0.5 font-mono text-tiny leading-none font-semibold tabular-nums"
-            :class="[
-              cell.view.kind === 'empty' ? 'bg-surface-strong' : TABLE_CELL_CLASSES[cell.view.kind],
-            ]"
-            ><span aria-hidden="true">{{ cell.label }}</span
-            ><Star
-              v-if="cell.view.kind === 'first-solve'"
-              aria-hidden="true"
-              class="size-2.5 text-cue-full"
-            /><ScoreTick
-              aria-hidden="true"
-              :text="cell.view.kind === 'empty' ? '' : cell.view.text"
-              :animate="isTicking"
-            /><span class="sr-only"
-              >{{ cell.label }}:
-              {{
-                $t(
-                  cell.view.labelKey,
-                  cell.view.labelParams,
-                  Number(cell.view.labelParams.tries ?? 1),
-                )
-              }}</span
-            ></span
-          >
-        </span>
-      </li>
+      <RankingListRow v-for="row in rows" :key="row.participationId" v-bind="rowProps(row)" />
     </component>
   </div>
 </template>

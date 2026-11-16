@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
@@ -24,7 +23,7 @@ const columns = computed(() => {
 </script>
 
 <template>
-  <Card as="div" class="overflow-hidden">
+  <div>
     <div
       data-skeleton-region="toolbar"
       class="flex items-center gap-2 border-b border-line px-3 py-2"
@@ -34,10 +33,10 @@ const columns = computed(() => {
     </div>
     <div
       data-skeleton-region="table-header"
-      class="grid items-center py-2.5 text-meta"
+      class="grid h-(--qh-row-dense) items-center border-b border-line-strong text-small"
       :style="columns"
     >
-      <span class="block px-5"><SkeletonBlock text class="w-8" /></span>
+      <span class="block px-3"><SkeletonBlock text class="w-8" /></span>
       <span class="block px-2.5"><SkeletonBlock text class="w-24" /></span>
       <span class="block px-2.5"><SkeletonBlock text class="w-full" /></span>
     </div>
@@ -45,15 +44,15 @@ const columns = computed(() => {
       v-for="row in ROWS"
       :key="row"
       data-skeleton-region="row"
-      class="grid h-(--qh-row-dense) items-center border-t border-line font-mono text-sm"
+      class="grid h-(--qh-row-dense) items-center border-b border-line font-mono text-sm"
       :style="columns"
     >
-      <span class="block px-5"><SkeletonBlock text class="w-8" /></span>
+      <span class="block px-3"><SkeletonBlock text class="w-8" /></span>
       <span class="flex min-w-0 items-center gap-2 px-2.5">
         <SkeletonBlock class="size-6 shrink-0" />
         <SkeletonBlock text class="w-40 max-w-full" />
       </span>
       <span class="block px-2.5"><SkeletonBlock text class="w-full" /></span>
     </div>
-  </Card>
+  </div>
 </template>
