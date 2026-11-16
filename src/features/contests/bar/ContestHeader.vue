@@ -113,13 +113,12 @@ const facts = computed<(Fact & { text: string })[]>(() => {
   ];
   return all.filter((fact): fact is Fact & { text: string } => fact.text !== null);
 });
-/** The contest's length and start, the one time fact the header carries (the clock and the bar say the rest). */
+/** The contest's start and length, the one time fact the header carries (the clock and the bar say the rest). Phones show the length only. */
 const timeFact = computed(() => {
   const contest = props.contest;
-  if (!contest) return '';
+  if (!contest) return null;
   const length = lengthText((Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000);
-  const start = formatDate(contest.startTime, 'datetime', locale.locale);
-  return `${start} (${length})`;
+  return { start: formatDate(contest.startTime, 'datetime', locale.locale), length };
 });
 /** "In tất cả đề" sits in the header's "⋯" menu while the statements are listed. */
 const overflow = computed<MenuEntry[]>(() =>
@@ -162,7 +161,10 @@ const freeze = computed(() =>
           <span :class="fact.wideOnly && 'max-md:hidden'">{{ fact.text }}</span>
         </template>
         <span aria-hidden="true">·</span>
-        <span>{{ timeFact }}</span>
+        <template v-if="timeFact">
+          <span class="max-md:hidden">{{ timeFact.start }} ({{ timeFact.length }})</span>
+          <span class="md:hidden">{{ timeFact.length }}</span>
+        </template>
         <Chip
           v-if="contest.requiresAccessCode"
           tone="attention"
