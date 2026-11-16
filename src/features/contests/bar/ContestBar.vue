@@ -95,7 +95,7 @@ const LINK = [
           COARSE_TARGET,
         ]"
       >
-        <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-accent" />
+        <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-cue-live" />
         <!-- A phone shows the dot; the status stays the link's name (M-02). -->
         <span class="truncate max-md:sr-only">{{ statusText }} · {{ current.contest.name }}</span>
       </RouterLink>

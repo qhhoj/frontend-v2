@@ -163,9 +163,13 @@ const freeze = computed(() =>
         </template>
         <span aria-hidden="true">·</span>
         <span>{{ timeFact }}</span>
-        <Chip v-if="contest.requiresAccessCode" tone="warning" :icon="Lock" class="max-md:hidden">{{
-          $t('contests.list.codeNeeded')
-        }}</Chip>
+        <Chip
+          v-if="contest.requiresAccessCode"
+          tone="attention"
+          :icon="Lock"
+          class="max-md:hidden"
+          >{{ $t('contests.list.codeNeeded') }}</Chip
+        >
         <span aria-hidden="true" class="max-md:hidden">·</span>
         <span class="max-md:hidden">{{
           $t(
@@ -210,7 +214,7 @@ const freeze = computed(() =>
             $t(freeze.bodyKey, { minutes: contest.frozenLastMinutes }, contest.frozenLastMinutes)
           "
         >
-          <Chip tone="info" :icon="Snowflake">{{ $t(freeze.labelKey) }}</Chip>
+          <Chip tone="attention" :icon="Snowflake">{{ $t(freeze.labelKey) }}</Chip>
           <span class="sr-only">{{
             $t(freeze.bodyKey, { minutes: contest.frozenLastMinutes }, contest.frozenLastMinutes)
           }}</span>

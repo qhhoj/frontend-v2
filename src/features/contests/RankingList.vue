@@ -10,7 +10,7 @@ import IconButton from '@/components/ui/IconButton.vue';
 import { medalClass } from '@/lib/medal';
 import { deltaToneClass, formatDelta } from '@/lib/rating-delta';
 import ScoreTick from './ScoreTick.vue';
-import { KIND_CLASSES } from './ranking-cell-classes';
+import { TABLE_CELL_CLASSES } from './ranking-cell-classes';
 import { miniCellRem } from './ranking-columns';
 import type { RowView } from './ranking-row-view';
 
@@ -157,13 +157,13 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
             :style="{ width: miniWidth }"
             class="inline-flex h-4.5 items-center justify-center gap-0.5 rounded-cell px-0.5 font-mono text-tiny leading-none font-semibold tabular-nums"
             :class="[
-              cell.view.kind === 'empty' ? 'bg-surface-strong' : KIND_CLASSES[cell.view.kind],
+              cell.view.kind === 'empty' ? 'bg-surface-strong' : TABLE_CELL_CLASSES[cell.view.kind],
             ]"
             ><span aria-hidden="true">{{ cell.label }}</span
             ><Star
               v-if="cell.view.kind === 'first-solve'"
               aria-hidden="true"
-              class="size-2.5"
+              class="size-2.5 text-cue-full"
             /><ScoreTick
               aria-hidden="true"
               :text="cell.view.kind === 'empty' ? '' : cell.view.text"

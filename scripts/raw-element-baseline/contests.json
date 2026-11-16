@@ -11,7 +11,6 @@
     "SubmissionPager": 1
   },
   "features/contests/ContestCountdown.vue": {
-    "status-colour": 1,
     "uppercase": 2
   },
   "features/contests/ContestDetailSkeleton.vue": {
@@ -30,9 +29,6 @@
   "features/contests/ContestTagFilter.vue": {
     "button": 2
   },
-  "features/contests/ContestTimeBar.vue": {
-    "status-colour": 1
-  },
   "features/contests/EndedContestSkeleton.vue": {
     "table": 1
   },
@@ -47,9 +43,6 @@
   },
   "features/contests/ProblemResultsTable.vue": {
     "table": 1
-  },
-  "features/contests/RankingFreezeNotice.vue": {
-    "status-colour": 1
   },
   "features/contests/RankingTable.vue": {
     "table": 1

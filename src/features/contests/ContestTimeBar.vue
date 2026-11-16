@@ -21,6 +21,8 @@ const isFreezeNearEnd = computed(
 /** Stripes in the theme's line and surface tokens, as the approved mock draws the frozen stretch. */
 const FREEZE_HATCH =
   'repeating-linear-gradient(45deg, var(--color-line-strong) 0 4px, var(--color-surface-hover) 4px 8px)';
+/** The filled part reads the phase: running green, over grey. The frozen stretch is the hatch and its amber label. */
+const fillClass = computed(() => (filledPercent.value >= 100 ? 'bg-cue-ended' : 'bg-cue-live'));
 /** The contest's two ends, written once under the bar, with dates when they fall on different days. */
 const labels = computed(() => timelineLabels(props.contest, locale.locale));
 const freezeClock = computed(() => {
@@ -38,7 +40,7 @@ const freezeClock = computed(() => {
       <!-- Under 10 % from the end the centred label would run off the bar: it sits flush right instead. -->
       <span
         data-testid="freeze-label"
-        class="absolute font-semibold whitespace-nowrap text-warning"
+        class="absolute font-semibold whitespace-nowrap text-cue-attention"
         :class="isFreezeNearEnd ? 'right-0' : '-translate-x-1/2'"
         :style="isFreezeNearEnd ? undefined : { left: `${freezePercent}%` }"
         >{{ $t('contests.detail.freezeAt', { time: freezeClock }) }}</span
@@ -56,7 +58,8 @@ const freezeClock = computed(() => {
         }"
       />
       <span
-        class="absolute inset-y-0 left-0 rounded-pill bg-accent"
+        class="absolute inset-y-0 left-0 rounded-pill"
+        :class="fillClass"
         :style="{ width: `${filledPercent}%` }"
       />
     </div>
