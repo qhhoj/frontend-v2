@@ -4,12 +4,17 @@ const isStaging = import.meta.env.VITE_STAGING === '1';
 </script>
 
 <template>
-  <p
+  <!-- An overlay, not a strip: it takes no layout space, so a full-height page never grows a scrollbar. Clicks pass through. -->
+  <div
     v-if="isStaging"
-    role="note"
-    data-testid="staging-banner"
-    class="m-0 bg-caution-strong px-4 py-1 text-center text-sm font-semibold text-on-caution-strong print:hidden"
+    class="pointer-events-none fixed inset-x-0 top-0 z-toast flex justify-center print:hidden"
   >
-    Staging · dữ liệu thật
-  </p>
+    <p
+      role="note"
+      data-testid="staging-banner"
+      class="mt-1 rounded-pill bg-caution-strong px-3 text-tiny font-semibold text-on-caution-strong opacity-90"
+    >
+      Staging · dữ liệu thật
+    </p>
+  </div>
 </template>
