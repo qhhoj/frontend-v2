@@ -70,13 +70,16 @@ const lineCount = computed(() => sourceLineCount(source.value));
 const lineNumbers = computed(() =>
   Array.from({ length: lineCount.value }, (_unused, index) => index + 1).join('\n'),
 );
-/** The code starts folded so the page reads at a glance, whatever its length; "View source" links (#source) open it. */
-const isHashOpen = () => route.hash === '#source';
-const isExpanded = ref(isHashOpen());
+/** A source up to this many lines opens unfolded, since the code is what most readers come for; a longer one opens folded. */
+const UNFOLDED_MAX_LINES = 200;
+/** The reader's own choice, null to follow the length; "View source" links (#source) open the source unfolded whatever its length. */
+const choiceFromHash = () => (route.hash === '#source' ? true : null);
+const expandChoice = ref<boolean | null>(choiceFromHash());
 watch(
   () => props.id,
-  () => (isExpanded.value = isHashOpen()),
+  () => (expandChoice.value = choiceFromHash()),
 );
+const isExpanded = computed(() => expandChoice.value ?? lineCount.value <= UNFOLDED_MAX_LINES);
 </script>
 
 <template>
@@ -85,13 +88,12 @@ watch(
       <h2 class="section-title">{{ $t('submission.source.title') }}</h2>
       <div class="flex flex-wrap items-center gap-2">
         <AppButton
-          v-if="data"
-          data-testid="source-toggle"
+          v-if="data && isExpanded"
           aria-controls="source-code"
-          :aria-expanded="isExpanded"
-          @click="isExpanded = !isExpanded"
+          :aria-expanded="true"
+          @click="expandChoice = false"
         >
-          {{ isExpanded ? $t('submission.source.collapse') : $t('submission.source.expand') }}
+          {{ $t('submission.source.collapse') }}
         </AppButton>
       </div>
     </div>
@@ -108,14 +110,6 @@ watch(
     </div>
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><SourceViewSkeleton /></template>
-      <SourceFileBar
-        v-if="data"
-        :id="id"
-        :filename="data.filename"
-        :language-key="languageKey"
-        :language-name="languageName"
-        :text="source"
-      />
       <div
         v-if="isExpanded"
         id="source-code"
@@ -129,6 +123,25 @@ watch(
         }}</pre>
         <pre ref="sourceBlock" class="pr-6"></pre>
       </div>
+      <div v-else class="px-6 pb-5">
+        <AppButton
+          block
+          data-testid="source-expand"
+          aria-controls="source-code"
+          :aria-expanded="false"
+          @click="expandChoice = true"
+        >
+          {{ $t('submission.source.expand', { count: lineCount }) }}
+        </AppButton>
+      </div>
+      <SourceFileBar
+        v-if="data"
+        :id="id"
+        :filename="data.filename"
+        :language-key="languageKey"
+        :language-name="languageName"
+        :text="source"
+      />
       <slot v-if="data" />
     </QueryState>
   </Card>

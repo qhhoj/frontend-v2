@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { NOTIFICATION_STATES } from '@/api/types/notifications';
 import EmptyState from '@/components/EmptyState.vue';
+import InlineBit from '@/components/InlineBit.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import AppButton from '@/components/ui/AppButton.vue';
@@ -55,12 +56,13 @@ const canReadAll = computed(() => unread.value > 0 && opener.canMarkRead.value);
 /** Why "mark all read" failed (the button reports it); its success is a toast. */
 const readAllFailureKey = ref<string | null>(null);
 const FILTER_CLASS =
-  'inline-flex min-h-9 items-center justify-between gap-3 rounded-row px-3 text-sm whitespace-nowrap touch:min-h-11';
+  'inline-flex min-h-11 items-center justify-between gap-3 rounded-pill px-4 text-sm whitespace-nowrap';
 </script>
 
 <template>
   <div class="page-column">
     <PageHeader :title="$t('notifications.title')" :lead="$t('notifications.lead')">
+      <template #start><InlineBit :kind="NOTIFICATION_BITS.header" /></template>
       <template v-if="canReadAll" #actions>
         <MarkAllReadButton @failed="readAllFailureKey = $event" />
       </template>
@@ -78,12 +80,12 @@ const FILTER_CLASS =
     <SettingsNotice v-if="opener.lastStaleId.value" tone="warning" :bit="NOTIFICATION_BITS.stale">
       {{ $t('notifications.staleOpened') }}
     </SettingsNotice>
-    <div class="grid gap-4 lg:grid-cols-[12rem_minmax(0,1fr)]">
+    <div class="grid gap-5 lg:grid-cols-[13rem_minmax(0,1fr)]">
       <nav
         :aria-label="`${$t('notifications.statusLabel')}, ${$t('notifications.kindLabel')}`"
         class="flex gap-1 overflow-x-auto lg:flex-col lg:self-start"
       >
-        <p class="hidden px-3 pb-1 text-caption leading-4 font-semibold text-muted lg:block">
+        <p class="hidden px-4 pb-1 text-caption leading-4 font-semibold text-muted lg:block">
           {{ $t('notifications.statusLabel') }}
         </p>
         <RouterLink
@@ -103,7 +105,7 @@ const FILTER_CLASS =
             {{ formatNumber(totals[option], locale.locale) }}
           </span>
         </RouterLink>
-        <p class="hidden px-3 pt-3 pb-1 text-caption leading-4 font-semibold text-muted lg:block">
+        <p class="hidden px-4 pt-3 pb-1 text-caption leading-4 font-semibold text-muted lg:block">
           {{ $t('notifications.kindLabel') }}
         </p>
         <RouterLink
@@ -124,7 +126,7 @@ const FILTER_CLASS =
       <Card
         as="section"
         data-testid="notifications-card"
-        class="p-3 sm:p-4 lg:self-start"
+        class="p-4 sm:p-6 lg:self-start"
         :aria-label="$t('notifications.title')"
       >
         <NotificationLoadError

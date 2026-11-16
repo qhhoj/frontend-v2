@@ -4,7 +4,6 @@ import { computed, ref, watch } from 'vue';
 import type { ContestDetail } from '@/api/types/contests';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AppButton from '@/components/ui/AppButton.vue';
-import StatusDot from '@/components/ui/StatusDot.vue';
 import { formatClock } from '@/lib/format-date';
 import type { ParticipationKind } from './bar/current-contest';
 
@@ -53,7 +52,7 @@ const LINK =
       </div>
     </template>
     <p v-else class="flex flex-wrap items-center gap-x-1.5 text-sm">
-      <StatusDot tone="live" />
+      <span aria-hidden="true" class="size-2 rounded-full bg-verdict-ac" />
       <strong>{{
         $t(kind === 'spectate' ? 'contests.actions.spectating' : 'contests.actions.inContest')
       }}</strong>

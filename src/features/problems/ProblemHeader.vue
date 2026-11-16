@@ -6,13 +6,11 @@ import type { ProblemSection } from '@/features/admin/edit-link/admin-edit-targe
 import type { ProblemDetail } from '@/api/types/problems';
 import Chip from '@/components/ui/Chip.vue';
 import { useSessionStore } from '@/stores/session.store';
-import { UNCATEGORIZED_TYPE_NAME, problemTypeLabel } from './problem-type-label';
+import { problemTypeLabel } from './problem-type-label';
 
 /**
- * The top of the problem page, on the page background (not in the statement card): the section crumb, the title, a meta
- * line (code, group chip), the edit link and the `actions` slot (the submit button, right-most), the `strip` slot (the
- * facts strip), then the tabs in the default slot. The root is `contents`, so the sticky strip sticks within the parent
- * that also holds the statement card.
+ * The top of the statement card: code, group chip, title and edit link, the `strip` slot (the phone's limit strip), a
+ * hairline, then the tabs in the default slot.
  * Keep `ProblemHeaderSkeleton.vue` in step.
  */
 /** `section`: the tab being read; the edit link opens its editor tab. */
@@ -21,27 +19,25 @@ const session = useSessionStore();
 </script>
 
 <template>
-  <div data-testid="problem-header" class="contents">
+  <div data-testid="problem-header">
     <PageHeader :title="problem.name">
-      <template #meta>
-        <span class="font-mono [overflow-wrap:anywhere]">{{ problem.code }}</span>
-        <Chip
-          v-if="problem.group && problem.group.name !== UNCATEGORIZED_TYPE_NAME"
-          data-testid="problem-group-chip"
-          >{{ problemTypeLabel(problem.group) }}</Chip
-        >
-        <Chip v-if="problem.externalJudge" data-testid="external-judge-badge">{{
-          $t('problem.externalJudge', { oj: problem.externalJudge.oj })
-        }}</Chip>
+      <template #above>
+        <p class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm">
+          <span class="font-mono text-muted [overflow-wrap:anywhere]">{{ problem.code }}</span>
+          <Chip v-if="problem.group" data-testid="problem-group-chip" tone="accent">{{
+            problemTypeLabel(problem.group)
+          }}</Chip>
+          <Chip v-if="problem.externalJudge" data-testid="external-judge-badge">{{
+            $t('problem.externalJudge', { oj: problem.externalJudge.oj })
+          }}</Chip>
+        </p>
       </template>
       <template #actions>
-        <div class="flex flex-wrap items-center gap-2">
-          <AdminEditLink :to="problemEditTarget(session.user, props.problem, props.section)" />
-          <slot name="actions" />
-        </div>
+        <AdminEditLink :to="problemEditTarget(session.user, props.problem, props.section)" />
       </template>
     </PageHeader>
     <slot name="strip" />
+    <hr class="-mx-6 mt-4 border-line sm:-mx-8" />
     <div v-if="$slots.default" class="mt-4"><slot /></div>
   </div>
 </template>

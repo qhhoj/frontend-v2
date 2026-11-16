@@ -211,7 +211,7 @@ const explanation = computed(() => {
       </table>
     </ScrollRegion>
     <div
-      class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-line px-4 py-4 sm:px-6"
+      class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t-2 border-content px-4 py-4 sm:px-6"
     >
       <span class="font-bold">{{
         $t(inContest ? 'submission.overview.problemTotal' : 'submission.overview.total')

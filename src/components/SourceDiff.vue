@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import Card from '@/components/ui/Card.vue';
+import GlassCard from '@/components/GlassCard.vue';
 import SummaryPill from '@/components/SourceDiffSummaryPill.vue';
 import { diffSummary, foldSameRuns, wordSegments } from '@/lib/line-diff';
 import type { DiffRow, Segment } from '@/lib/line-diff';
@@ -99,7 +99,7 @@ const phoneToneOf = (line: PhoneLine) => (line.kind === 'same' ? 'text-muted' : 
 </script>
 
 <template>
-  <Card as="div" data-testid="source-diff" class="overflow-hidden">
+  <GlassCard as="div" data-testid="source-diff" class="overflow-hidden">
     <ul data-testid="diff-summary" class="flex flex-wrap gap-2 px-5 py-4 text-sm sm:px-6">
       <li class="rounded-pill bg-verdict-ac-bg px-3 py-1 font-semibold text-verdict-ac">
         <SummaryPill
@@ -290,5 +290,5 @@ const phoneToneOf = (line: PhoneLine) => (line.kind === 'same' ? 'text-muted' : 
         </tbody>
       </table>
     </div>
-  </Card>
+  </GlassCard>
 </template>

@@ -3,16 +3,12 @@ import type { RouteLocationRaw } from 'vue-router';
 import BitSprite from '@/components/BitSprite.vue';
 import type { BitLook } from '@/mascot/bit-sprite';
 
-/** The QHHOJ wordmark: the display font (Be Vietnam Pro) bold with Bit in place of the "O" (the `o` slot swaps it). Bit stands on the baseline and is as tall as the capitals; his sprite colours are fixed in every theme. One link, the one place the brand text is drawn. */
+/** The QHHOJ wordmark: Space Grotesk bold with Bit in place of the "O" (the `o` slot swaps it). Bit stands on the baseline and is as tall as the capitals; his sprite colours are fixed in every theme. One link, the one place the brand text is drawn. */
 withDefaults(defineProps<{ to?: RouteLocationRaw; size?: 'sm' | 'md' | 'lg' }>(), {
   to: '/',
   size: 'md',
 });
-const SIZES = {
-  sm: 'text-subtitle',
-  md: 'text-section-legacy',
-  lg: 'text-display lg:text-page',
-} as const;
+const SIZES = { sm: 'text-subtitle', md: 'text-section', lg: 'text-display lg:text-page' } as const;
 const LOOK: BitLook = { headgear: 'none', palette: 'terracotta' };
 /** A 1 px halo in the theme's `--qh-bit-halo` (none on light grounds): on a dark header the sprite's brown outline would otherwise vanish and the mark read "QHHJ". */
 const HALO = ['1px 0', '-1px 0', '0 1px', '0 -1px']
@@ -23,7 +19,7 @@ const COLUMNS = 13;
 const ROWS = 9;
 const FIRST_COLUMN = 1;
 const FIRST_ROW = 5;
-/** Capital height of Be Vietnam Pro is about 0.7 em; one sprite pixel is that over the visible rows. */
+/** Capital height of Space Grotesk is about 0.7 em; one sprite pixel is that over the visible rows. */
 const PIXEL = `${0.7 / ROWS}em`;
 </script>
 

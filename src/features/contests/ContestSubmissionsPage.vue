@@ -13,7 +13,9 @@ import type { SubmissionScope } from '@/features/submissions/list/submission-sco
 import { useNow } from '@/lib/use-now';
 import { usePageTitle } from '@/router/page-title';
 import { useSessionStore } from '@/stores/session.store';
+import ContestCompactHeader from './ContestCompactHeader.vue';
 import ContestNotFound from './ContestNotFound.vue';
+import ContestTabs from './ContestTabs.vue';
 import { useContestQuery } from './contests.queries';
 import { ownSubmissionsOnly } from './own-submissions';
 
@@ -49,52 +51,56 @@ const emptyNextOf = (code: string): ContestProblem => {
 </script>
 
 <template>
-  <ContestNotFound v-if="isMissing" />
-  <template v-else>
-    <div
-      v-if="isOwnOnly && !isVisitorOnOwnList"
-      data-testid="own-only"
-      class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"
-    >
-      <h2 class="section-title">
-        {{ $t('contests.submissions.ownHeading') }}
-      </h2>
-      <p
-        class="flex items-center gap-1.5 text-meta text-muted"
-        :title="$t('contests.submissions.ownOnlyBody')"
+  <div class="page-column">
+    <ContestNotFound v-if="isMissing" />
+    <template v-else>
+      <ContestTabs :contest-key="key" :phase="contest?.phase" />
+      <ContestCompactHeader v-if="contest" :contest="contest" />
+      <div
+        v-if="isOwnOnly && !isVisitorOnOwnList"
+        data-testid="own-only"
+        class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"
       >
-        <Lock class="size-3.5" aria-hidden="true" />{{ $t('contests.submissions.onlyYou') }}
-        <span class="sr-only">{{ $t('contests.submissions.ownOnlyBody') }}</span>
-      </p>
-    </div>
-    <Notice
-      v-else-if="isVisitorOnOwnList"
-      data-testid="own-only"
-      :title="$t('contests.submissions.ownOnlyTitle')"
-    >
-      {{ $t('contests.submissions.ownOnlyBody') }}
-      <template #action>
-        <SubmitSignInLink label-key="contests.submissions.signIn" />
-      </template>
-    </Notice>
-    <SubmissionList
-      v-if="canAsk"
-      :scope="scope"
-      :problem-source="problemSource"
-      :show-stats="false"
-      show-status-groups
-      empty-key="contests.submissions.empty"
-    >
-      <template v-if="contest?.problems?.length" #emptyAction="{ filters }">
-        <AppButton
-          tone="secondary"
-          :to="{ name: 'problem', params: { code: emptyNextOf(filters.problem).code } }"
+        <h2 class="section-title">
+          {{ $t('contests.submissions.ownHeading') }}
+        </h2>
+        <p
+          class="flex items-center gap-1.5 text-meta text-muted"
+          :title="$t('contests.submissions.ownOnlyBody')"
         >
-          {{
-            $t('contests.submissions.openProblem', { label: emptyNextOf(filters.problem).label })
-          }}
-        </AppButton>
-      </template>
-    </SubmissionList>
-  </template>
+          <Lock class="size-3.5" aria-hidden="true" />{{ $t('contests.submissions.onlyYou') }}
+          <span class="sr-only">{{ $t('contests.submissions.ownOnlyBody') }}</span>
+        </p>
+      </div>
+      <Notice
+        v-else-if="isVisitorOnOwnList"
+        data-testid="own-only"
+        :title="$t('contests.submissions.ownOnlyTitle')"
+      >
+        {{ $t('contests.submissions.ownOnlyBody') }}
+        <template #action>
+          <SubmitSignInLink label-key="contests.submissions.signIn" />
+        </template>
+      </Notice>
+      <SubmissionList
+        v-if="canAsk"
+        :scope="scope"
+        :problem-source="problemSource"
+        :show-stats="false"
+        show-status-groups
+        empty-key="contests.submissions.empty"
+      >
+        <template v-if="contest?.problems?.length" #emptyAction="{ filters }">
+          <AppButton
+            tone="secondary"
+            :to="{ name: 'problem', params: { code: emptyNextOf(filters.problem).code } }"
+          >
+            {{
+              $t('contests.submissions.openProblem', { label: emptyNextOf(filters.problem).label })
+            }}
+          </AppButton>
+        </template>
+      </SubmissionList>
+    </template>
+  </div>
 </template>

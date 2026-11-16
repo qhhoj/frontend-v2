@@ -2,13 +2,12 @@
 import IconButton from '@/components/ui/IconButton.vue';
 import { useLocaleStore } from '@/stores/locale.store';
 
-defineProps<{ compact?: boolean }>();
 const locale = useLocaleStore();
 </script>
 
 <template>
   <IconButton
-    :compact="compact"
+    tone="secondary"
     :label="$t('locale.switchTo')"
     :lang="locale.locale === 'vi' ? 'en' : 'vi'"
     @click="locale.toggle()"

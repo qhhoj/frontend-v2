@@ -28,10 +28,6 @@ export const formatNumber = (
     useGrouping,
   }).format(value);
 
-/** Problem points and scores: Vietnamese grouping ("2.600"), at most two decimals. The one format for points everywhere. */
-export const formatPoints = (value: number, locale: Locale, fractionDigits = 2) =>
-  formatNumber(value, locale, fractionDigits);
-
 /**
  * The score to print with at most `fractionDigits` decimals out of `max`: a score short of `max` stays short of it once
  * rounded (99.995 of 100 prints 99.99, never 100). Without a known `max` it is the score itself.
@@ -53,6 +49,10 @@ export const scoreCut = (points: number, fractionDigits: number): number => {
   const scale = 10 ** fractionDigits;
   return Math.floor(Number((points * scale).toFixed(6))) / scale;
 };
+
+/** A problem's points as the old site showed them: `1500p` when tests score partially, else `1500`. */
+export const formatProblemPoints = (points: number, partial: boolean, locale: Locale) =>
+  `${formatNumber(points, locale, 2, false)}${partial ? 'p' : ''}`;
 
 /** A number with exactly `digits` decimals: `100` reads `100,0` at one, so weights and counted points line up. */
 export const formatFixed = (value: number, locale: Locale, digits: number) =>

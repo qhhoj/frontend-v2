@@ -257,14 +257,14 @@ watch(isRulesOpen, (isOpen) => {
         {{ actionLabel }}
       </AppButton>
       <p v-else class="text-muted">{{ actionLabel }}</p>
-      <p v-if="chosen.kind === 'virtual'" class="text-sm text-muted max-md:hidden">
+      <p v-if="chosen.kind === 'virtual'" class="text-sm text-muted">
         {{
           $t('contests.actions.virtualNote', {
             span: $t(virtualLength.key, virtualLength.params, virtualLength.count ?? 1),
           })
         }}
       </p>
-      <p v-if="chosen.kind === 'spectate'" class="text-sm text-muted max-md:hidden">
+      <p v-if="chosen.kind === 'spectate'" class="text-sm text-muted">
         {{ $t('contests.actions.spectateNote') }}
       </p>
     </template>

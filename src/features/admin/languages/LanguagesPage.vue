@@ -37,7 +37,7 @@ const judgeTotal = computed(() => judges.value?.length ?? null);
         <RouterLink
           v-if="canAdd"
           :to="{ name: 'admin-languageNew' }"
-          :class="buttonClass('secondary')"
+          :class="buttonClass('primary')"
         >
           {{ $t('admin.languages.actions.add') }}
         </RouterLink>

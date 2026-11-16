@@ -29,9 +29,9 @@ import { NO_VALUE } from '@/lib/format';
  * row of your own: an `<li>`); only one of the two is rendered, so row hooks such as `data-code` (`rowAttrs`) exist once.
  * `stack="scroll"`: always the table, scrolling sideways inside its card with the first `stickyColumns` columns pinned and a
  * shade beside them once scrolled.
- * Kit 2 rows (spec §4): the head and every row are 44 px (`density="compact"`: 40, admin and ranking; both 44 on touch), head 13 px
- * muted, the same surface tone as the rows (no fill), a hairline between rows and none around the 12 px surface. A row is at
- * least that tall: cells carry no vertical padding, so a two-line cell (a name over its code) grows its row. Body text is 15 px.
+ * `density="compact"` is the admin look (40 px rows, flat card, small pager); `comfortable` the public one (48 px rows, the
+ * page card, the regular pager). A row is at least that tall: cells carry no vertical padding, so a two-line cell (a name
+ * over its code) fits the 48 px. Both draw the header the same way: `text-meta text-muted`, sentence case.
  * `rowTo` makes a row open a page on click (Ctrl/Cmd or middle click: a new tab; never at the end of a text selection);
  * the primary cell is the link, so keyboard and screen readers use that.
  *
@@ -168,19 +168,13 @@ const growsOf = (column: DataTableColumn) =>
   column.grow ?? (!props.columns.some((other) => other.grow) && column === primary.value);
 const growClass = (column: DataTableColumn) => growsOf(column) && 'w-full max-w-0';
 const CELL_BASE =
-  'border-b border-line px-4 align-middle first:pl-(--qh-pad-surface) last:pr-(--qh-pad-surface) [overflow-wrap:anywhere] [:where(&)]:max-w-64';
-/** A body cell and a header cell are one row height: 44 px, or 40 px dense (admin, ranking); 44 on touch. */
-const CELL = computed(
-  () =>
-    `${isCompact.value ? 'h-(--qh-row-dense)' : 'h-(--qh-row)'} touch:h-(--qh-touch) ${CELL_BASE}`,
-);
-const HEAD_CELL = computed(() => CELL.value);
-const HEAD_TEXT = 'text-tiny font-semibold whitespace-nowrap text-muted';
+  'border-b border-line px-3 align-middle [overflow-wrap:anywhere] [:where(&)]:max-w-64';
+/** A body cell is the row's minimum height (admin 40 px, public 48 px); a header cell is as tall as an admin row, or 40 px. */
+const CELL = computed(() => `${isCompact.value ? 'h-(--qa-row)' : 'h-12'} ${CELL_BASE}`);
+const HEAD_CELL = computed(() => `${isCompact.value ? 'h-(--qa-row)' : 'h-10'} ${CELL_BASE}`);
+const HEAD_TEXT = 'text-meta font-semibold whitespace-nowrap text-muted';
 const SORT_BUTTON =
   'inline-flex min-h-6 items-center gap-1 rounded-cell hover:text-content touch:min-h-11';
-/** A `rowTo` row is one box: a pointer, and a ring around the row (not the link text) while its link has keyboard focus. */
-const ROW_LINK =
-  'cursor-pointer has-[.row-link:focus-visible]:outline-2 has-[.row-link:focus-visible]:-outline-offset-2 has-[.row-link:focus-visible]:outline-focus';
 const FRAME = computed(() => CARD_VARIANTS[isCompact.value ? 'flat' : 'glass']);
 const frameStyle = computed(() => (props.maxHeight ? { maxHeight: props.maxHeight } : undefined));
 
@@ -283,7 +277,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
             <span v-if="secondary.length"><SkeletonBlock text class="w-32" /></span>
           </li>
         </ul>
-        <table v-else class="w-full border-collapse text-meta [&_tr:last-child_td]:border-b-0">
+        <table v-else class="w-full border-collapse text-sm [&_tr:last-child_td]:border-b-0">
           <thead>
             <tr>
               <th v-if="selectable" scope="col" :class="[HEAD_CELL, 'w-10']" />
@@ -355,7 +349,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
           :key="rowKey(row)"
           v-bind="rowAttrs?.(row)"
           class="flex flex-col gap-1.5 border-b border-line px-4 py-3 last:border-b-0"
-          :class="[selected.has(rowKey(row)) && 'bg-accent-soft', rowTo && ROW_LINK]"
+          :class="[selected.has(rowKey(row)) && 'bg-accent-soft', rowTo && 'cursor-pointer']"
           @click="openRow(row, $event)"
           @auxclick="openRowInTab(row, $event)"
         >
@@ -370,11 +364,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
             <div class="flex min-w-0 flex-1 flex-wrap items-start gap-x-3 gap-y-1">
               <div class="min-w-0 flex-1 basis-28">
                 <slot :name="`cell-${primary!.key}`" :row="row">
-                  <RouterLink
-                    v-if="rowTo"
-                    :to="rowTo(row)"
-                    class="row-link font-semibold outline-none hover:underline"
-                  >
+                  <RouterLink v-if="rowTo" :to="rowTo(row)" class="font-semibold hover:underline">
                     {{ cellText(row, primary!.key) }}
                   </RouterLink>
                   <template v-else>{{ cellText(row, primary!.key) }}</template>
@@ -394,7 +384,8 @@ const offset = computed(() => (props.selectable ? 1 : 0));
           </div>
           <p
             v-if="secondary.length"
-            class="m-0 flex flex-wrap gap-x-4 gap-y-1 text-meta text-muted"
+            class="m-0 flex flex-wrap gap-x-4 gap-y-1 text-muted"
+            :class="isCompact ? 'text-meta' : 'text-sm'"
           >
             <span
               v-for="column in secondary"
@@ -458,7 +449,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
       <!-- The table. -->
       <ScrollRegion v-else :label="label" no-hint @scroll.capture.passive="onScroll">
         <div :class="maxHeight && 'overflow-y-auto'" :style="frameStyle">
-          <table class="w-full border-collapse text-meta [&_tbody_tr:last-child_td]:border-b-0">
+          <table class="w-full border-collapse text-sm [&_tbody_tr:last-child_td]:border-b-0">
             <caption class="sr-only">
               {{
                 label
@@ -532,7 +523,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                 class="hover:bg-surface-hover"
                 :class="[
                   selected.has(rowKey(row)) && 'bg-accent-soft hover:bg-accent-soft',
-                  rowTo && ROW_LINK,
+                  rowTo && 'cursor-pointer',
                 ]"
                 @click="openRow(row, $event)"
                 @auxclick="openRowInTab(row, $event)"
@@ -561,7 +552,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                     <RouterLink
                       v-if="rowTo && column === primary"
                       :to="rowTo(row)"
-                      class="row-link font-semibold outline-none hover:underline"
+                      class="font-semibold hover:underline"
                     >
                       {{ cellText(row, column.key) }}
                     </RouterLink>
@@ -582,7 +573,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
 
     <div
       v-if="hasFooter && (pager || $slots.footer)"
-      class="flex flex-wrap items-center gap-3 border-t border-line px-3 py-2 text-meta text-muted"
+      class="flex flex-wrap items-center gap-3 border-t border-line px-3 py-2 text-sm text-muted"
     >
       <slot name="footer">
         <span v-if="range" class="font-mono tabular-nums">{{

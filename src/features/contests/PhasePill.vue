@@ -4,11 +4,11 @@ import Chip from '@/components/ui/Chip.vue';
 import type { ChipTone } from '@/components/ui/Chip.vue';
 
 defineProps<{ phase: ContestPhase }>();
-/** The phase cues: running = live, upcoming = upcoming, ended = grey. */
+/** An ended contest wears the pending verdict's grey pair. */
 const PHASE_TONES: Record<ContestPhase, ChipTone> = {
-  running: 'live',
-  upcoming: 'upcoming',
-  ended: 'ended',
+  running: 'success',
+  upcoming: 'accent',
+  ended: 'P',
 };
 </script>
 

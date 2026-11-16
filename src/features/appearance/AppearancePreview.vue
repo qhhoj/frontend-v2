@@ -9,7 +9,7 @@ import Card from '@/components/ui/Card.vue';
       <div class="flex items-center justify-between gap-3">
         <h3 class="font-display text-[22px] font-bold">{{ $t('appearance.previewTitle') }}</h3>
         <span
-          class="rounded-pill bg-verdict-ac-solid px-3 py-1 font-mono text-caption leading-4 font-semibold text-verdict-ac-on"
+          class="rounded-pill bg-verdict-ac-bg px-3 py-1 font-mono text-caption leading-4 font-semibold text-verdict-ac"
         >
           AC
         </span>
@@ -19,7 +19,7 @@ import Card from '@/components/ui/Card.vue';
         <span class="text-accent-text underline">{{ $t('appearance.previewLink') }}</span>
       </p>
       <span
-        class="flex h-13 items-center justify-center rounded-control bg-accent font-display font-bold text-on-accent"
+        class="bg-gradient-accent flex h-13 items-center justify-center rounded-pill font-display font-bold text-on-accent"
       >
         {{ $t('appearance.previewSubmit') }}
       </span>
@@ -27,7 +27,7 @@ import Card from '@/components/ui/Card.vue';
     <span
       class="inline-flex h-10 w-fit items-center gap-2 rounded-pill border border-accent bg-accent-soft px-3.5 text-sm text-accent-soft-text"
     >
-      <span class="size-6 rounded-full bg-accent" />
+      <span class="bg-gradient-accent size-6 rounded-full" />
       {{ $t('appearance.previewTag') }}
     </span>
   </div>

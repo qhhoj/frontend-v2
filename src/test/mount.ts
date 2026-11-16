@@ -29,7 +29,7 @@ export async function mountApp(path: string, history: RouterHistory = createMemo
   await router.push(path);
   const wrapper = mount(App, {
     attachTo: document.body,
-    // Real transitions: a stubbed TransitionGroup renders no `tag` element.
+    // Real transitions: PrimeVue overlays emit show/hide from transition hooks; a stubbed TransitionGroup renders no `tag` element.
     global: {
       plugins: appPlugins({ pinia, router, queryClient }),
       stubs: { transition: false, 'transition-group': false },

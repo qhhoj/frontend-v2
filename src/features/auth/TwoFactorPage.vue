@@ -133,7 +133,7 @@ const signOut = useLogout(() => router.push({ name: 'login' }));
     <form
       v-if="view === 'app' || view === 'backup'"
       ref="formElement"
-      class="flex flex-col gap-5"
+      class="flex flex-col gap-4"
       @submit.prevent="submitCode"
     >
       <OtpInput

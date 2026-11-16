@@ -1,55 +1,8 @@
 {
-  "features/appearance/AccentChoice.vue": {
-    "hardcoded-value": 1
+  "features/shell/NavOverflowMenu.vue": {
+    "button": 1
   },
-  "features/appearance/AppearancePanel.vue": {
-    "hardcoded-value": 1
-  },
-  "features/appearance/BackgroundChoice.vue": {
-    "hardcoded-value": 1
-  },
-  "features/appearance/LevelSlider.vue": {
-    "hardcoded-value": 1
-  },
-  "features/bit-roam/BitRoamLayer.vue": {
-    "hardcoded-script-value": 2,
-    "hardcoded-value": 1
-  },
-  "features/bit-roam/PixelHearts.vue": {
-    "hardcoded-value": 2
-  },
-  "features/shell/AppFooter.vue": {
-    "hardcoded-value": 1
-  },
-  "features/shell/AppRail.vue": {
-    "hardcoded-value": 1,
-    "status-colour": 2
-  },
-  "features/shell/AppShell.vue": {
-    "hardcoded-value": 2
-  },
-  "features/shell/LoadingBit.vue": {
-    "hardcoded-value": 1
-  },
-  "features/shell/RailLiveContest.vue": {
-    "status-colour": 2
-  },
-  "features/shell/TopBarLiveContest.vue": {
-    "status-colour": 1
-  },
-  "features/shell/search/CommandPalette.vue": {
-    "hardcoded-value": 1
-  },
-  "features/shell/search/use-site-search.ts": {
-    "hardcoded-script-value": 1
-  },
-  "features/shell/use-loading-phase.ts": {
-    "hardcoded-script-value": 2
-  },
-  "features/shell/use-running-contest-count.ts": {
-    "hardcoded-script-value": 1
-  },
-  "features/short-links/ShortLinkButton.vue": {
-    "status-colour": 1
+  "features/shell/UserMenu.vue": {
+    "primevue": 2
   }
 }

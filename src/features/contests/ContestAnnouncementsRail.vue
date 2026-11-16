@@ -3,7 +3,9 @@ import Chip from '@/components/ui/Chip.vue';
 import { computed, ref, watch } from 'vue';
 import { ANNOUNCEMENT_FIRST_PAGE } from '@/api/contests.api';
 import type { ContestDetail } from '@/api/types/contests';
+import EmptyState from '@/components/EmptyState.vue';
 import Card from '@/components/ui/Card.vue';
+import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useViewerId } from '@/stores/use-viewer-id';
 import AnnouncementItem from './AnnouncementItem.vue';
 import { isUnread, loadSeenAnnouncement, seenAnnouncementId } from './announcement-seen';
@@ -16,9 +18,11 @@ const viewerId = useViewerId();
 watch([viewerId, key], ([viewer, contestKey]) => loadSeenAnnouncement(viewer, contestKey), {
   immediate: true,
 });
-/** Shown only while the contest runs and has announcements; the Thông báo tab holds the rest. */
 const RAIL_SIZE = 3;
-const { data } = useContestAnnouncementsQuery(key, ref(ANNOUNCEMENT_FIRST_PAGE));
+const { data, isPending, isSuccess } = useContestAnnouncementsQuery(
+  key,
+  ref(ANNOUNCEMENT_FIRST_PAGE),
+);
 const latest = computed(() => (data.value?.items ?? []).slice(0, RAIL_SIZE));
 /** "Trực tiếp" claims a live stream: not while the stream is down. */
 const isLive = computed(
@@ -27,11 +31,18 @@ const isLive = computed(
 </script>
 
 <template>
-  <Card v-if="latest.length" class="p-5">
+  <Card class="p-5">
     <div class="mb-1 flex items-center justify-between gap-3">
       <h2 class="section-title">{{ $t('contests.tabs.announcements') }}</h2>
       <Chip v-if="isLive" tone="success">{{ $t('contests.announcements.live') }}</Chip>
     </div>
+    <div v-if="isPending" data-skeleton-region="announcement-rail" class="flex flex-col gap-2 py-3">
+      <SkeletonBlock text class="w-2/3" />
+      <SkeletonBlock text class="w-full" />
+    </div>
+    <EmptyState v-else-if="isSuccess && !latest.length" compact>
+      {{ $t('contests.announcements.empty') }}
+    </EmptyState>
     <AnnouncementItem
       v-for="item in latest"
       :key="item.id"

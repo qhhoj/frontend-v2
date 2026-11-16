@@ -1,6 +1,4 @@
 import { readonly, shallowReactive } from 'vue';
-import type { RouteLocationRaw } from 'vue-router';
-import type { Verdict } from '@/lib/verdicts';
 
 /** The status tones a toast can take; `error` is the old name of `danger`, kept until its callers move. */
 export type ToastTone = 'success' | 'danger' | 'info' | 'error';
@@ -12,12 +10,6 @@ export interface ToastInput {
   undo?: () => void;
   /** The undo button's label when it is not "Hoàn tác" (e.g. "Gọi lại"). */
   undoLabel?: string;
-  /** Makes the whole toast a link to this place; following it closes the toast. */
-  to?: RouteLocationRaw;
-  /** A verdict chip before the text. */
-  verdict?: Verdict;
-  /** Bit pops once beside the chip (the first solve of a problem). Only with `verdict`. */
-  celebrate?: boolean;
 }
 
 export interface Toast {
@@ -26,9 +18,6 @@ export interface Toast {
   tone: Exclude<ToastTone, 'error'>;
   undo?: () => void;
   undoLabel?: string;
-  to?: RouteLocationRaw;
-  verdict?: Verdict;
-  celebrate?: boolean;
 }
 
 /** At most three toasts; a fourth pushes out the oldest that is not a failure (the oldest of all if every one is). */
@@ -53,7 +42,7 @@ export function dismissToast(id: number) {
 /** Starts (or restarts after a pause) the self-close timer of a toast that is not a failure. */
 export function resumeToast(id: number) {
   const toast = list.find((entry) => entry.id === id);
-  if (!toast || toast.tone === 'danger' || isHeld) return;
+  if (!toast || toast.tone === 'danger') return;
   clearTimeout(timers.get(id));
   timers.set(
     id,
@@ -66,20 +55,6 @@ export function pauseToast(id: number) {
   timers.delete(id);
 }
 
-/** Whether the viewer is reading the stack (hovered or focused): no toast closes itself, a new one included. */
-let isHeld = false;
-
-export function holdToasts() {
-  isHeld = true;
-  for (const toast of list) pauseToast(toast.id);
-}
-
-/** The viewer left the stack: every toast starts its full lifetime again. */
-export function releaseToasts() {
-  isHeld = false;
-  for (const toast of list) resumeToast(toast.id);
-}
-
 export function showToast(input: ToastInput): number {
   const tone = input.tone ?? 'success';
   const toast: Toast = {
@@ -88,9 +63,6 @@ export function showToast(input: ToastInput): number {
     tone: tone === 'error' ? 'danger' : tone,
     undo: input.undo,
     undoLabel: input.undoLabel,
-    to: input.to,
-    verdict: input.verdict,
-    celebrate: input.celebrate,
   };
   list.push(toast);
   while (list.length > MAX_TOASTS) {
@@ -106,5 +78,4 @@ export function clearToasts() {
   for (const toast of [...list]) dismissToast(toast.id);
   for (const timer of timers.values()) clearTimeout(timer);
   timers.clear();
-  isHeld = false;
 }

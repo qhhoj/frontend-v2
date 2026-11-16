@@ -1,26 +1,17 @@
 <script setup lang="ts">
+import Card from '@/components/ui/Card.vue';
 import UserLink from '@/components/UserLink.vue';
 import { computed } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
-import { formatDate } from '@/lib/format-date';
-import { useLocaleStore } from '@/stores/locale.store';
-import OrganizationAboutText from './OrganizationAboutText.vue';
+import UserContent from '@/components/UserContent.vue';
 import OrganizationManageCard from './OrganizationManageCard.vue';
 import OrganizationRecentPosts from './OrganizationRecentPosts.vue';
 import OrganizationTopMembers from './OrganizationTopMembers.vue';
 import { useOrganization } from './use-organization';
 
-/**
- * The default tab: one main column of plain sections: the manager's shortcuts, the about text (cut to a few lines),
- * the administrators on one line, the newest posts and the top members as compact rows.
- */
 const { query } = useOrganization();
-const locale = useLocaleStore();
 const organization = computed(() => query.data.value);
 const viewer = computed(() => organization.value?.viewer);
-const founded = computed(() =>
-  organization.value ? formatDate(organization.value.createdAt, 'date', locale.locale) : '',
-);
 const showsManageCard = computed(
   () =>
     viewer.value?.canAdminister === true ||
@@ -30,32 +21,39 @@ const showsManageCard = computed(
 </script>
 
 <template>
-  <div v-if="organization" class="flex max-w-4xl min-w-0 flex-col gap-5">
-    <OrganizationManageCard v-if="showsManageCard" :organization="organization" />
-    <section class="flex flex-col gap-2" :aria-label="$t('orgs.about')">
-      <template v-if="organization.aboutHtml || viewer?.canAdminister">
-        <h2 class="section-title">{{ $t('orgs.about') }}</h2>
-        <OrganizationAboutText v-if="organization.aboutHtml" :html="organization.aboutHtml" />
-        <EmptyState v-else compact>{{ $t('orgs.noAbout') }}</EmptyState>
-      </template>
-      <p class="flex flex-wrap items-center gap-x-2 text-meta text-muted">
-        <span>{{ $t('orgs.founded', { date: founded }) }}</span>
-        <template v-if="organization.admins.length">
-          <span aria-hidden="true">·</span>
-          <span data-testid="organization-admins" class="flex flex-wrap items-center gap-x-2">
-            {{ $t('orgs.admins') }}:
-            <UserLink
-              v-for="admin in organization.admins"
-              :key="admin.id"
-              :username="admin.username"
-              :rating="admin.rating"
-              size="sm"
-            />
-          </span>
-        </template>
-      </p>
-    </section>
-    <OrganizationRecentPosts :keeps-empty="viewer?.canAdminister === true" />
-    <OrganizationTopMembers v-if="organization.memberCount > 0" />
+  <div v-if="organization" class="grid items-start gap-5 lg:grid-cols-3">
+    <!-- 1B: right column on desktop, first under the header on a phone. -->
+    <OrganizationManageCard
+      v-if="showsManageCard"
+      :organization="organization"
+      class="lg:col-start-3 lg:row-start-1"
+    />
+    <div class="flex min-w-0 flex-col gap-5 lg:col-span-2 lg:row-span-2 lg:row-start-1">
+      <Card
+        v-if="organization.aboutHtml || viewer?.canAdminister"
+        class="flex flex-col gap-3 p-5 sm:p-6"
+      >
+        <h2 class="font-display text-base font-bold text-accent-text">{{ $t('orgs.about') }}</h2>
+        <UserContent v-if="organization.aboutHtml" :html="organization.aboutHtml" />
+        <EmptyState v-else>{{ $t('orgs.noAbout') }}</EmptyState>
+      </Card>
+      <OrganizationRecentPosts :keeps-empty="viewer?.canAdminister === true" />
+    </div>
+    <aside class="flex min-w-0 flex-col gap-5 lg:col-start-3">
+      <Card
+        v-if="organization.admins.length"
+        data-testid="organization-admins"
+        padding="md"
+        class="flex flex-col gap-3"
+      >
+        <h2 class="font-display text-base font-bold text-accent-text">{{ $t('orgs.admins') }}</h2>
+        <ul class="flex flex-col gap-2">
+          <li v-for="admin in organization.admins" :key="admin.id" class="flex items-center gap-2">
+            <UserLink :username="admin.username" :rating="admin.rating" size="sm" />
+          </li>
+        </ul>
+      </Card>
+      <OrganizationTopMembers v-if="organization.memberCount > 0" />
+    </aside>
   </div>
 </template>

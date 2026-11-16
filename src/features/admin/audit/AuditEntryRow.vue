@@ -6,7 +6,7 @@ import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { shortId } from '../ui/short-id';
-import Chip from '@/components/ui/Chip.vue';
+import AdminChip from '../ui/AdminChip.vue';
 import { useAuditLinkOf } from './use-audit-link';
 
 /** One change: when, who, what was done to which object, and the fields it touched (names only). */
@@ -44,7 +44,7 @@ const objectName = computed(() => props.entry.object.label ?? shortId(props.entr
     </span>
     <div class="flex min-w-0 flex-col gap-1">
       <p class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-        <Chip>{{ actionLabel }}</Chip>
+        <AdminChip>{{ actionLabel }}</AdminChip>
         <span class="text-muted">{{ typeLabel }}</span>
         <RouterLink
           v-if="link"

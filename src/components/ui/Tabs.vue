@@ -14,22 +14,19 @@ import {
   MORE_CLASS,
   TAB_BASE,
   TAB_CLASS,
-  TAB_INDICATOR,
   TABS_FRAME,
   tabsList,
   tabsScroller,
 } from './Tabs.classes';
 import type { TabsVariant } from './Tabs.classes';
 import { useTabsOverflow } from './TabsOverflow';
-import { SLIDE, useSlidingIndicator } from './useSlidingIndicator';
 
 export interface TabItem {
   key: string;
   label: string;
   /** A link tab: the section lives in the URL. Without `to` on every item the tabs are an in-page tablist. */
   to?: RouteLocationRaw;
-  /** Set on every item when the router's exact match is not enough (tabs told apart by a query, as `?tab=`): true lights the
-   *  tab, false keeps it dark even on an exact match. Left out, the router marks the exact match. */
+  /** Lights a link tab on a page that is not its own route; otherwise the router marks the exact match. */
   isCurrent?: boolean;
   /** A 16 px icon before the label (a side nav's sections). */
   icon?: Component;
@@ -50,7 +47,7 @@ export interface TabItem {
 }
 
 /**
- * A row of tabs. `underline` (the default, the old name) and `pill` both draw the pill row, the current tab filled; `rail` is a vertical side nav
+ * A row of tabs. `pill` is the public look; `underline` switches an admin page's sections; `rail` is a vertical side nav
  * from `lg` and the pill row below it. Link tabs mark the open one `aria-current="page"` (the `v-model` key, else the
  * router's exact match); without links the row is a tablist with a roving tabindex and arrow keys. `overflow="menu"`
  * hides a tab that does not fit whole (never the current one) and lists it behind a "⋯ Thêm" button; `scroll` lets the row
@@ -67,7 +64,7 @@ const props = withDefaults(
     moreLabel?: string;
     moreTestid?: string;
   }>(),
-  { variant: 'underline', overflow: 'menu', moreLabel: undefined, moreTestid: 'tabs-more' },
+  { variant: 'pill', overflow: 'menu', moreLabel: undefined, moreTestid: 'tabs-more' },
 );
 defineOptions({ name: 'UiTabs' });
 const current = defineModel<string>();
@@ -86,13 +83,6 @@ const { hiddenKeys, measure } = useTabsOverflow(scroller, trigger, hasMenu, [
   () => props.items.length,
   () => route.fullPath,
 ]);
-/** The indicator slides to the current tab when the model, the router or the items change. */
-const indicator = useSlidingIndicator(scroller, '[data-tab-key]', [
-  current,
-  () => route.fullPath,
-  () => props.variant,
-  () => props.items.map((item) => `${item.key}:${item.isCurrent}`).join(),
-]);
 /** A tab out of view, hidden whole; the current one is always kept in view. */
 const isHidden = (item: TabItem) =>
   hiddenKeys.value.includes(item.key) && item.key !== current.value && !item.isCurrent;
@@ -100,8 +90,7 @@ const isHidden = (item: TabItem) =>
 function linkCurrent(item: TabItem) {
   if (current.value !== undefined)
     return { 'aria-current': item.key === current.value ? 'page' : undefined };
-  if (item.isCurrent === undefined) return {};
-  return { 'aria-current': item.isCurrent ? 'page' : undefined };
+  return item.isCurrent ? { 'aria-current': 'page' } : {};
 }
 
 function tabAttrs(item: TabItem) {
@@ -183,12 +172,6 @@ const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
   >
     <div class="relative min-w-0 flex-1">
       <div ref="scroller" :class="tabsScroller(variant, hasMenu)" @scroll.passive="measure">
-        <span
-          v-if="indicator.visible.value"
-          aria-hidden="true"
-          :class="[TAB_INDICATOR[variant], indicator.animate.value && SLIDE]"
-          :style="indicator.style.value"
-        />
         <ul
           :class="tabsList(variant, hasMenu)"
           :role="isTablist ? 'tablist' : undefined"
@@ -255,7 +238,7 @@ const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
             <AppButton
               :ref="(el) => setOpener((el as { $el?: HTMLElement } | null)?.$el ?? null)"
               tone="ghost"
-              size="md"
+              :size="variant === 'underline' ? 'sm' : 'md'"
               :aria-label="triggerName"
               :data-testid="moreTestid"
               aria-haspopup="menu"

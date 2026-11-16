@@ -4,8 +4,7 @@ import { computed, toRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import type { ContestPhase } from '@/api/types/contests';
-import Tabs from '@/components/ui/Tabs.vue';
-import type { TabItem } from '@/components/ui/Tabs.vue';
+import PillTabs, { type PillTab } from '@/components/PillTabs.vue';
 import {
   contestEditTarget,
   type ContestEditScreen,
@@ -25,13 +24,12 @@ interface ContestTab {
   /** Shown only once the contest has ended (the replay answers 409 before). */
   isEndedOnly?: boolean;
 }
-/** In order of use: read the problems, watch the board, check own submissions, then announcements, stats and replay. */
 const TABS: ContestTab[] = [
   { name: 'contest', labelKey: 'contests.tabs.problems' },
-  { name: 'contest-ranking', labelKey: 'contests.tabs.ranking' },
-  { name: 'contest-submissions', labelKey: 'contests.tabs.submissions' },
   { name: 'contest-announcements', labelKey: 'contests.tabs.announcements' },
+  { name: 'contest-submissions', labelKey: 'contests.tabs.submissions' },
   { name: 'contest-stats', labelKey: 'contests.tabs.stats' },
+  { name: 'contest-ranking', labelKey: 'contests.tabs.ranking' },
   { name: 'contest-replay', labelKey: 'contests.tabs.replay', isEndedOnly: true },
 ];
 const visibleTabs = computed(() =>
@@ -68,22 +66,21 @@ const isStreaming = computed(
     !streamed.isPending.value &&
     streamed.contest.value?.key !== props.contestKey,
 );
-const tabs = computed<TabItem[]>(() => {
-  const own = visibleTabs.value.map((tab) => {
-    const hasUnread = tab.name === 'contest-announcements' && unread.value > 0;
-    return {
-      key: tab.name,
-      label: t(tab.labelKey),
-      to: { name: tab.name, params: { key: props.contestKey } },
-      isCurrent: tab.name === props.current,
-      count: hasUnread ? String(unread.value) : undefined,
-      countLabel: hasUnread
-        ? t('contests.announcements.unread', { count: unread.value }, unread.value)
+const tabs = computed<PillTab[]>(() => {
+  const own = visibleTabs.value.map((tab) => ({
+    key: tab.name,
+    label: t(tab.labelKey),
+    to: { name: tab.name, params: { key: props.contestKey } },
+    isCurrent: tab.name === props.current,
+    badge:
+      tab.name === 'contest-announcements' && unread.value > 0
+        ? {
+            text: String(unread.value),
+            tone: 'accent' as const,
+            srLabel: t('contests.announcements.unread', { count: unread.value }, unread.value),
+          }
         : undefined,
-      countTone: 'accent' as const,
-      countTestid: 'tab-badge',
-    };
-  });
+  }));
   const balloons = {
     key: 'contest-balloons',
     label: t('balloons.tab'),
@@ -101,6 +98,6 @@ const tabs = computed<TabItem[]>(() => {
 </script>
 
 <template>
-  <Tabs :items="tabs" :label="t('contests.tabs.label')" variant="underline" overflow="scroll" />
+  <PillTabs :tabs="tabs" :label="t('contests.tabs.label')" />
   <AnnouncementLiveRegion :contest-key="contestKey" :is-streaming="isStreaming" />
 </template>

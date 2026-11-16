@@ -2,7 +2,7 @@
 import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Lock } from 'lucide-vue-next';
-import Chip from '@/components/ui/Chip.vue';
+import AdminChip from '../ui/AdminChip.vue';
 import AdminField from '../ui/AdminField.vue';
 import { BUTTON, INPUT } from '../ui/controls';
 import type { SecretDraft } from './setting-values';
@@ -30,9 +30,9 @@ const cancelReplacing = () => (part.value = { ...part.value, isReplacing: false,
   <div class="flex flex-col gap-2">
     <div class="flex flex-wrap items-center gap-2">
       <span class="text-sm font-semibold">{{ label }}</span>
-      <Chip :tone="part.isSet ? 'accent' : 'neutral'" :icon="Lock">
+      <AdminChip :tone="part.isSet ? 'accent' : 'neutral'" :icon="Lock">
         {{ part.isSet ? t('admin.settings.chip.set') : t('admin.settings.chip.unset') }}
-      </Chip>
+      </AdminChip>
       <button
         v-if="!part.isReplacing"
         type="button"

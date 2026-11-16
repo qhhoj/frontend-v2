@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { QuotaMeter } from '@/api/types/organization-usage';
-import Card from '@/components/ui/Card.vue';
+import GlassCard from '@/components/GlassCard.vue';
 import ProgressBar from '@/components/ui/ProgressBar.vue';
 import type { ProgressTone } from '@/components/ui/ProgressBar.vue';
 import { meterPercent } from '@/lib/quota';
@@ -28,7 +28,7 @@ const state = computed(() => {
 </script>
 
 <template>
-  <Card as="div" data-testid="quota-meter" class="flex flex-col gap-2 p-5">
+  <GlassCard as="div" data-testid="quota-meter" class="flex flex-col gap-2 p-5">
     <div class="flex flex-wrap items-baseline justify-between gap-2">
       <h2 class="font-display text-base font-bold">{{ label }}</h2>
       <p class="font-semibold tabular-nums">{{ valueText }}</p>
@@ -43,5 +43,5 @@ const state = computed(() => {
       <span>{{ detail }}</span
       ><span v-if="!unlimited" class="tabular-nums">{{ percent.percent }}%</span>
     </div>
-  </Card>
+  </GlassCard>
 </template>

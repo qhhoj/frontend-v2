@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import PageHeader from '@/components/ui/PageHeader.vue';
 import { computed, ref } from 'vue';
-import Card from '@/components/ui/Card.vue';
+import GlassCard from '@/components/GlassCard.vue';
+import StateBit from '@/components/StateBit.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import FormField from '@/components/ui/FormField.vue';
@@ -37,8 +38,10 @@ const trimmedCode = computed(() => draft.problemCode.trim());
       <span>{{ $t('tickets.new.breadcrumb') }}</span>
     </p>
     <div class="grid gap-6 lg:grid-cols-[1fr_300px]">
-      <Card as="section" class="p-5 sm:p-6">
-        <PageHeader :title="$t('tickets.newTicket')" />
+      <GlassCard as="section" class="p-6 sm:p-8">
+        <PageHeader :title="$t('tickets.newTicket')">
+          <template #start><StateBit variant="writing" size="inline" /></template>
+        </PageHeader>
         <form ref="form" novalidate class="mt-6 flex flex-col gap-5" @submit.prevent="submit">
           <fieldset class="flex flex-col gap-3">
             <legend class="mb-2 text-sm font-semibold">{{ $t('tickets.new.about') }}</legend>
@@ -46,7 +49,7 @@ const trimmedCode = computed(() => draft.problemCode.trim());
               <label
                 v-for="option in KIND_OPTIONS"
                 :key="option.value"
-                class="flex cursor-pointer flex-col gap-1 rounded-row border p-3"
+                class="flex cursor-pointer flex-col gap-1 rounded-row border p-4"
                 :class="
                   draft.kind === option.value
                     ? 'border-accent bg-accent-soft'
@@ -112,9 +115,9 @@ const trimmedCode = computed(() => draft.problemCode.trim());
             </AppButton>
           </div>
         </form>
-      </Card>
+      </GlassCard>
 
-      <Card as="aside" class="h-fit p-6">
+      <GlassCard as="aside" class="h-fit p-6">
         <h2 class="font-display text-base font-bold">{{ $t('tickets.new.before') }}</h2>
         <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-muted">
           <li>
@@ -127,7 +130,7 @@ const trimmedCode = computed(() => draft.problemCode.trim());
           </li>
           <li>{{ $t('tickets.new.describe') }}</li>
         </ul>
-      </Card>
+      </GlassCard>
     </div>
   </div>
 </template>

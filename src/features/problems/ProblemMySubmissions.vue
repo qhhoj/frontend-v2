@@ -9,14 +9,11 @@ import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import StateBit from '@/components/StateBit.vue';
-import StatusStepper from '@/components/ui/StatusStepper.vue';
-import VerdictChip from '@/components/ui/VerdictChip.vue';
+import VerdictBadge from '@/components/VerdictBadge.vue';
 import { GLOBAL_SCOPE } from '@/features/submissions/list/submission-scope';
 import { useScopedSubmissionListQuery } from '@/features/submissions/submissions.queries';
 import type { SubmissionFilters } from '@/features/submissions/use-submission-filters';
-import { CUE_TEXT } from '@/components/ui/cue-tones';
-import type { CueTone } from '@/components/ui/cue-tones';
-import { formatPoints, scoreBelowFull } from '@/lib/format';
+import { formatNumber, scoreBelowFull } from '@/lib/format';
 import { formatAgoCompact } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { submissionVerdictOf } from '@/lib/verdicts';
@@ -58,17 +55,10 @@ const isJudging = computed(() => {
   const first = latest.value[0];
   return first !== undefined && IN_PROGRESS_STATUSES.includes(first.status);
 });
-/** The cue of a judged score: full at the maximum, zero at nothing, partial between; none while unjudged or when the maximum is unknown. */
-function scoreTone(points: number | null, max: number | null): CueTone | null {
-  if (points === null) return null;
-  if (points <= 0) return 'zero';
-  if (max === null) return null;
-  return points >= max ? 'full' : 'partial';
-}
 /** The score's value, and what it is out of with the scale's name: "250", "/ 250 điểm kỳ thi". */
 function scoreParts(submission: SubmissionListItem) {
   const { scale, points, max, digits } = railScore(submission, props.scale);
-  const format = (value: number) => formatPoints(value, locale.locale, digits);
+  const format = (value: number) => formatNumber(value, locale.locale, digits, false);
   const maxText = max === null ? '' : format(max);
   const outOf =
     scale === 'site'
@@ -77,7 +67,7 @@ function scoreParts(submission: SubmissionListItem) {
         ? t('problem.rail.mine.contestUnit')
         : t('submission.contest.outOf', { max: maxText });
   const value = points === null ? NO_SCORE : format(scoreBelowFull(points, max, digits));
-  return { value, outOf, scale, tone: scoreTone(points, max) };
+  return { value, outOf, scale };
 }
 const rows = computed(() =>
   latest.value.map((submission) => ({ submission, score: scoreParts(submission) })),
@@ -107,17 +97,10 @@ const rows = computed(() =>
           class="flex min-h-11 items-center gap-2.5 border-t border-line"
         >
           <RouterLink :to="{ name: 'submission', params: { id: submission.id } }">
-            <StatusStepper
-              v-if="IN_PROGRESS_STATUSES.includes(submission.status)"
-              :status="submission.status"
-              compact
-            />
-            <VerdictChip v-else :verdict="submissionVerdictOf(submission)" />
+            <VerdictBadge :verdict="submissionVerdictOf(submission)" size="sm" />
           </RouterLink>
           <p :data-scale="score.scale" :title="submission.contest?.name" class="min-w-0">
-            <span
-              :class="['font-mono font-bold tabular-nums', score.tone && CUE_TEXT[score.tone]]"
-              >{{ score.value }}</span
+            <span class="font-mono font-bold tabular-nums">{{ score.value }}</span
             >{{ ' ' }}<span class="text-meta whitespace-nowrap text-muted">{{ score.outOf }}</span>
           </p>
           <time :datetime="submission.date" class="ml-auto text-meta text-muted">{{

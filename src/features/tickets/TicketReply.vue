@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { computed, nextTick, ref } from 'vue';
 import { ApiError } from '@/api/client';
 import { postTicketMessage } from '@/api/tickets.api';
-import Card from '@/components/ui/Card.vue';
+import GlassCard from '@/components/GlassCard.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { translate } from '@/i18n';
 import { errorMessageKey } from '@/i18n/error-message';
@@ -78,7 +78,7 @@ async function insertCanned(filled: string, title: string) {
 </script>
 
 <template>
-  <Card as="section" :class="isFolded ? 'p-1.5' : 'p-4'">
+  <GlassCard as="section" :class="isFolded ? 'p-1.5' : 'p-5'">
     <form
       data-testid="ticket-reply"
       :data-folded="isFolded || undefined"
@@ -124,5 +124,5 @@ async function insertCanned(filled: string, title: string) {
         </AppButton>
       </div>
     </form>
-  </Card>
+  </GlassCard>
 </template>

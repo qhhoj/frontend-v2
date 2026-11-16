@@ -27,7 +27,7 @@ import { useOpenNotification } from './use-open-notification';
 
 /**
  * The bell beside the user menu (from `md`; a phone reaches notifications from the menu sheet); its drawer shows the
- * latest five rows. The live stream and the arrival announcements are `NotificationAnnouncer`'s (`useNotificationAlerts`).
+ * latest five rows. The live stream and the arrival announcements are the header's (`useNotificationAlerts`).
  */
 const session = useSessionStore();
 const locale = useLocaleStore();
@@ -37,7 +37,6 @@ const listQuery = useNotificationsQuery(DRAWER_QUERY, isOpen);
 const opener = useOpenNotification();
 
 const unread = computed(() => countQuery.data.value?.count ?? 0);
-defineProps<{ compact?: boolean }>();
 const badge = computed(() => unreadBadge(unread.value, locale.locale));
 const latest = computed(() => (listQuery.data.value?.items ?? []).slice(0, LATEST_ROWS));
 const bellLabel = computed(() =>
@@ -55,7 +54,7 @@ const readAllFailureKey = ref<string | null>(null);
 <template>
   <template v-if="session.user">
     <IconButton
-      :compact="compact"
+      tone="secondary"
       data-testid="notification-bell"
       class="relative"
       aria-haspopup="dialog"

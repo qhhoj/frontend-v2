@@ -49,7 +49,7 @@ watch(
           /></template>
         </span>
         <span>{{ formatDate(editorial.publishOn, 'date', locale.locale) }}</span>
-        <Chip v-if="!editorial.isPublic" tone="attention" size="md">{{
+        <Chip v-if="!editorial.isPublic" tone="accent" size="md">{{
           $t('problem.editorial.editorsOnly')
         }}</Chip>
       </p>

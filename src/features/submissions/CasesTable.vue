@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
-import { ChevronRight } from 'lucide-vue-next';
-import { useRoute } from 'vue-router';
+import { computed } from 'vue';
 import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
-import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
-import FoldPanel from '@/components/ui/FoldPanel.vue';
-import VerdictChip from '@/components/ui/VerdictChip.vue';
+import VerdictLabel from '@/components/VerdictLabel.vue';
 import { translate } from '@/i18n';
 import CaseDetails from './CaseDetails.vue';
 import { caseDetails, type CaseDetail } from './case-details';
@@ -18,7 +14,8 @@ import { formatCasePoints, pendingPositions } from './test-overview';
 /**
  * The result card ("Kết quả chấm"): the compile log, one row per test, then the `footer` slot (the subtasks and the total,
  * `TestOverview.vue`). Keep `CasesTableSkeleton.vue` in step: same card, header cells and row classes. Below `sm` the same rows lay out as cards
- * (test, verdict and points, then time and memory), so each test keeps one `#case-<n>` anchor. Cells pad 24 px on the left, the same edge as the card title.
+ * (test, verdict and points, then time and memory), so each test keeps one `#case-<n>` anchor. From `xl` the card sits in the
+ * page's narrow rail beside the source, so its cells tighten there (`xl:px-3`) and the table drops its minimum width.
  */
 const props = defineProps<{
   cases: SubmissionCase[] | null;
@@ -31,6 +28,8 @@ const props = defineProps<{
   compileError?: string | null;
   /** A compile error whose log this viewer may not read (it quotes the code): said instead of "no test results". */
   compileLogHidden?: boolean;
+  /** Below `xl` a summary card (`ResultSummaryCard.vue`) stands above the source, so this card is titled as the per-test details there. */
+  summarized?: boolean;
 }>();
 
 const locale = useLocaleStore();
@@ -65,35 +64,16 @@ const batchRow = (batch: SubmissionBatch): GradedRow => ({
   details: [],
 });
 
-/** Every row starts closed so the result reads at a glance; a row with judge text opens on a click, or all at once. */
-const opened = ref(new Set<string>());
-const isOpen = (key: string) => opened.value.has(key);
-const toggle = (key: string) => {
-  if (!opened.value.delete(key)) opened.value.add(key);
-};
-const route = useRoute();
-/** A link to one test (`#case-<n>`, from the test squares) opens that test. */
-onMounted(() => {
-  if (route.hash.startsWith('#case-')) opened.value.add(route.hash.slice(1));
-});
-
 const gradedRows = computed(() =>
   props.cases ? props.cases.map(caseRow) : (props.batches ?? []).map(batchRow),
 );
-const expandable = computed(() => gradedRows.value.filter((row) => row.details.length > 0));
-const allOpen = computed(
-  () => expandable.value.length > 0 && expandable.value.every((row) => isOpen(row.key)),
-);
-const toggleAll = () => {
-  opened.value = allOpen.value ? new Set() : new Set(expandable.value.map((row) => row.key));
-};
 const pendingNumbers = computed(() =>
   pendingPositions(props.cases, props.totalCases, props.running),
 );
 /** The phone card grid of a row and where each cell sits in it; from `sm` up they are plain table cells. */
 const ROW_CARD =
   'max-sm:grid max-sm:grid-cols-[auto_minmax(0,1fr)_auto] max-sm:items-center max-sm:gap-x-2.5 max-sm:gap-y-0.5 max-sm:px-4 max-sm:py-2.5';
-const CELL = 'px-6 py-3 max-sm:p-0';
+const CELL = 'px-6 py-3 max-sm:p-0 xl:px-3 xl:py-2.5';
 const NUMBER_CELL = `${CELL} text-right font-mono tabular-nums`;
 const CELL_PLACES = {
   test: 'max-sm:col-start-1 max-sm:row-start-1',
@@ -118,16 +98,12 @@ const isHidden = computed(
     class="scroll-mt-20 overflow-hidden rounded-card"
   >
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 pt-5 pb-3 sm:px-6">
-      <h2 class="section-title">{{ $t('submission.cases.title') }}</h2>
+      <h2 v-if="summarized" class="section-title">
+        <span class="xl:hidden">{{ $t('submission.cases.detailsTitle') }}</span>
+        <span class="max-xl:hidden">{{ $t('submission.cases.title') }}</span>
+      </h2>
+      <h2 v-else class="section-title">{{ $t('submission.cases.title') }}</h2>
       <span v-if="running" class="text-meta text-muted">{{ $t('submission.liveUpdates') }}</span>
-      <AppButton
-        v-if="expandable.length > 0"
-        size="sm"
-        data-testid="cases-toggle-all"
-        @click="toggleAll"
-      >
-        {{ allOpen ? $t('submission.cases.collapseAll') : $t('submission.cases.expandAll') }}
-      </AppButton>
     </div>
     <div v-if="compileError" class="px-6 pb-4 sm:px-8">
       <p class="text-meta text-muted">{{ $t('submission.cases.compileLog') }}</p>
@@ -155,7 +131,7 @@ const isHidden = computed(
               v-for="column in COLUMN_KEYS"
               :key="column"
               scope="col"
-              class="px-6 py-3 font-medium whitespace-nowrap"
+              class="px-6 py-3 font-medium whitespace-nowrap xl:px-3 xl:py-2.5"
               :class="{ 'text-right': column !== 'test' && column !== 'result' }"
             >
               {{ $t(`submission.cases.${column}`) }}
@@ -168,51 +144,25 @@ const isHidden = computed(
               :id="row.key"
               data-testid="case-row"
               class="scroll-mt-20 border-t border-line"
-              :class="[
-                ROW_CARD,
-                row.details.length > 0 && 'cursor-pointer hover:bg-surface-strong',
-              ]"
-              @click="row.details.length > 0 && toggle(row.key)"
+              :class="ROW_CARD"
             >
               <th
                 scope="row"
                 class="text-left font-mono font-normal max-sm:text-meta max-sm:text-muted"
                 :class="[CELL, CELL_PLACES.test]"
               >
-                <AppButton
-                  tone="ghost"
-                  size="sm"
-                  v-if="row.details.length > 0"
-                  class="font-mono"
-                  :aria-expanded="isOpen(row.key)"
-                  :aria-controls="`${row.key}-details`"
-                  @click.stop="toggle(row.key)"
-                >
-                  <ChevronRight
-                    aria-hidden="true"
-                    class="size-3.5 text-muted transition-transform duration-(--qh-duration) ease-move"
-                    :class="isOpen(row.key) && 'rotate-90'"
-                  />
-                  {{ row.label }}
-                </AppButton>
-                <template v-else>{{ row.label }}</template>
+                {{ row.label }}
               </th>
-              <td :class="[CELL, CELL_PLACES.result]">
-                <VerdictChip :verdict="row.verdict" named />
-              </td>
+              <td :class="[CELL, CELL_PLACES.result]"><VerdictLabel :verdict="row.verdict" /></td>
               <td :class="[NUMBER_CELL, CELL_PLACES.time]">{{ row.time }}</td>
               <td :class="[NUMBER_CELL, CELL_PLACES.memory]">{{ row.memory }}</td>
               <td :class="[NUMBER_CELL, CELL_PLACES.points, pointsClass(row.verdict)]">
                 {{ row.points }}
               </td>
             </tr>
-            <tr v-if="row.details.length > 0" :id="`${row.key}-details`" class="max-sm:block">
-              <td colspan="5" class="p-0 max-sm:block">
-                <FoldPanel :open="isOpen(row.key)">
-                  <div class="px-6 pb-3 max-sm:px-4">
-                    <CaseDetails :details="row.details" />
-                  </div>
-                </FoldPanel>
+            <tr v-if="row.details.length" class="max-sm:block">
+              <td colspan="5" class="px-6 pb-3 max-sm:block max-sm:px-4 xl:px-3">
+                <CaseDetails :details="row.details" />
               </td>
             </tr>
           </template>

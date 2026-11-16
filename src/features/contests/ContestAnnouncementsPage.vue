@@ -19,7 +19,9 @@ import {
   seenAnnouncementId,
 } from './announcement-seen';
 import ContestAnnouncementComposer from './ContestAnnouncementComposer.vue';
+import ContestCompactHeader from './ContestCompactHeader.vue';
 import ContestNotFound from './ContestNotFound.vue';
+import ContestTabs from './ContestTabs.vue';
 import { useContestAnnouncementsQuery, useContestQuery } from './contests.queries';
 import { isAnnouncementStreamPaused } from './use-announcement-feed';
 
@@ -70,45 +72,49 @@ const goTo = (next: number) =>
 </script>
 
 <template>
-  <ContestNotFound v-if="isMissing" />
-  <template v-else>
-    <ContestAnnouncementComposer v-if="contest?.viewer.canEdit" :contest="contest" />
-    <div v-if="isLive" class="flex justify-end">
-      <Chip tone="success">{{ $t('contests.announcements.live') }}</Chip>
-    </div>
-    <QueryState :loading="isPending" :error="error" @retry="refetch()">
-      <template #skeleton>
-        <Card as="div" class="px-5">
-          <div
-            v-for="row in 3"
-            :key="row"
-            data-skeleton-region="announcement"
-            class="flex flex-col gap-1.5 border-t border-line py-3.5 first:border-t-0"
-          >
-            <p class="text-caption"><SkeletonBlock text class="w-32" /></p>
-            <p class="font-semibold"><SkeletonBlock text class="w-2/3" /></p>
-            <SkeletonBlock text class="w-full" />
-          </div>
+  <div class="page-column">
+    <ContestNotFound v-if="isMissing" />
+    <template v-else>
+      <ContestTabs :contest-key="key" :phase="contest?.phase" />
+      <ContestCompactHeader v-if="contest" :contest="contest" />
+      <ContestAnnouncementComposer v-if="contest?.viewer.canEdit" :contest="contest" />
+      <div v-if="isLive" class="flex justify-end">
+        <Chip tone="success">{{ $t('contests.announcements.live') }}</Chip>
+      </div>
+      <QueryState :loading="isPending" :error="error" @retry="refetch()">
+        <template #skeleton>
+          <Card as="div" class="px-5">
+            <div
+              v-for="row in 3"
+              :key="row"
+              data-skeleton-region="announcement"
+              class="flex flex-col gap-1.5 border-t border-line py-3.5 first:border-t-0"
+            >
+              <p class="text-caption"><SkeletonBlock text class="w-32" /></p>
+              <p class="font-semibold"><SkeletonBlock text class="w-2/3" /></p>
+              <SkeletonBlock text class="w-full" />
+            </div>
+          </Card>
+        </template>
+        <Card v-if="!list?.items.length" as="div">
+          <EmptyState compact>{{ $t('contests.announcements.emptyPage') }}</EmptyState>
         </Card>
-      </template>
-      <Card v-if="!list?.items.length" as="div">
-        <EmptyState compact>{{ $t('contests.announcements.emptyPage') }}</EmptyState>
-      </Card>
-      <Card v-else as="div" class="px-5">
-        <AnnouncementItem
-          v-for="item in list.items"
-          :key="item.id"
-          :announcement="item"
-          :is-unread="isUnread(item, seenAtOpen)"
+        <Card v-else as="div" class="px-5">
+          <AnnouncementItem
+            v-for="item in list.items"
+            :key="item.id"
+            :announcement="item"
+            :is-unread="isUnread(item, seenAtOpen)"
+          />
+        </Card>
+        <SubmissionPager
+          :page="page"
+          :page-size="ANNOUNCEMENT_PAGE_SIZE"
+          :total="list?.meta.total"
+          :item-count="list?.items.length ?? 0"
+          @update:page="goTo"
         />
-      </Card>
-      <SubmissionPager
-        :page="page"
-        :page-size="ANNOUNCEMENT_PAGE_SIZE"
-        :total="list?.meta.total"
-        :item-count="list?.items.length ?? 0"
-        @update:page="goTo"
-      />
-    </QueryState>
-  </template>
+      </QueryState>
+    </template>
+  </div>
 </template>

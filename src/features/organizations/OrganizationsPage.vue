@@ -6,6 +6,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
+import StateBit from '@/components/StateBit.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import { pageFromQuery } from '@/lib/paging';
 import { formatNumber } from '@/lib/format';
@@ -14,14 +15,13 @@ import { useSessionStore } from '@/stores/session.store';
 import { usePermissions } from '@/stores/use-permissions';
 import AppButton from '@/components/ui/AppButton.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
-import type { OrganizationListItem } from '@/api/types/organizations';
 import type { SegmentOption } from '@/components/ui/SegmentedControl.vue';
 import CreateOrganizationDialog from './create/CreateOrganizationDialog.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
-import FilterBar from '@/components/ui/FilterBar.vue';
-import OrganizationTable from './OrganizationTable.vue';
-import OrganizationTableSkeleton from './OrganizationTableSkeleton.vue';
+import OrganizationCard from './OrganizationCard.vue';
+import OrganizationCardSkeleton from './OrganizationCardSkeleton.vue';
 import { useOrganizationsQuery } from './organizations.queries';
+import { rankByPoints } from './org-visuals';
 
 type Filter = 'all' | 'mine' | 'open';
 const FILTERS: Filter[] = ['all', 'mine', 'open'];
@@ -42,30 +42,23 @@ const myIds = computed(
 );
 const isSignedIn = computed(() => session.user !== null);
 
-/** The API orders by name; the search and the filter narrow the organizations of the page already loaded. */
-const items = computed(() => list.data.value?.items ?? []);
-const search = ref('');
-const predicates: Record<Filter, (item: OrganizationListItem) => boolean> = {
+/** The API orders by name; the rank is the place by performance points among the organizations loaded. */
+const ranked = computed(() => rankByPoints(list.data.value?.items ?? []));
+const predicates: Record<Filter, (entry: (typeof ranked.value)[number]) => boolean> = {
   all: () => true,
-  mine: (item) => myIds.value.has(item.id),
-  open: (item) => item.isOpen,
+  mine: ({ item }) => myIds.value.has(item.id),
+  open: ({ item }) => item.isOpen,
 };
-const matchesSearch = (item: OrganizationListItem) => {
-  const needle = search.value.trim().toLowerCase();
-  return !needle || `${item.name} ${item.shortName}`.toLowerCase().includes(needle);
-};
-const visible = computed(() =>
-  items.value.filter((item) => predicates[filter.value](item) && matchesSearch(item)),
-);
+const visible = computed(() => ranked.value.filter(predicates[filter.value]));
 const count = (key: Filter) =>
-  formatNumber(items.value.filter(predicates[key]).length, locale.locale);
+  formatNumber(ranked.value.filter(predicates[key]).length, locale.locale);
 const filters = computed<SegmentOption<Filter>[]>(() =>
   (isSignedIn.value ? FILTERS : FILTERS.filter((name) => name !== 'mine')).map((key) => ({
     value: key,
     label: `${t(`orgs.filters.${key}`)} · ${count(key)}`,
   })),
 );
-const isListEmpty = computed(() => items.value.length === 0);
+const isListEmpty = computed(() => ranked.value.length === 0);
 /** Legacy `CreateOrganization` is gated on `judge.add_organization` alone. */
 const { can } = usePermissions();
 const canCreate = computed(() => can('judge.add_organization'));
@@ -74,8 +67,16 @@ const isCreateOpen = ref(false);
 
 <template>
   <div class="page-column">
-    <PageHeader :title="$t('orgs.title')">
+    <PageHeader :title="$t('orgs.title')" :lead="$t('orgs.lead')">
+      <template #start><StateBit variant="community" size="inline" /></template>
       <template #actions>
+        <SegmentedControl
+          v-if="!isListEmpty"
+          v-model="filter"
+          :options="filters"
+          :label="$t('orgs.filtersLabel')"
+          size="sm"
+        />
         <AppButton
           v-if="canCreate"
           data-testid="create-organization"
@@ -90,19 +91,12 @@ const isCreateOpen = ref(false);
     </PageHeader>
     <CreateOrganizationDialog v-if="canCreate" v-model:visible="isCreateOpen" />
 
-    <FilterBar v-if="!isListEmpty" v-model:search="search" :search-label="$t('orgs.search')">
-      <template #view>
-        <SegmentedControl
-          v-model="filter"
-          :options="filters"
-          :label="$t('orgs.filtersLabel')"
-          size="sm"
-        />
-      </template>
-    </FilterBar>
-
     <QueryState :loading="list.isPending.value" :error="list.error.value" @retry="list.refetch()">
-      <template #skeleton><OrganizationTableSkeleton /></template>
+      <template #skeleton>
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <OrganizationCardSkeleton v-for="card in 6" :key="card" />
+        </div>
+      </template>
       <StatePanel
         v-if="isListEmpty"
         kind="communityEmpty"
@@ -115,7 +109,16 @@ const isCreateOpen = ref(false);
         :title="$t('orgs.emptyFilterTitle')"
         :body="$t('orgs.emptyFilterBody')"
       />
-      <OrganizationTable v-else :organizations="visible" :member-ids="myIds" />
+      <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <OrganizationCard
+          v-for="{ item, rank } in visible"
+          :key="item.id"
+          :organization="item"
+          :rank="rank"
+          :is-member="myIds.has(item.id)"
+          :is-signed-in="isSignedIn"
+        />
+      </div>
     </QueryState>
     <NumberedPager v-if="list.data.value" :meta="list.data.value.meta" :label="$t('orgs.pager')" />
   </div>

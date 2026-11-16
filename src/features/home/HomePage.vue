@@ -1,46 +1,39 @@
 <script setup lang="ts">
-import PageLayout from '@/components/ui/PageLayout.vue';
-import { useCurrentContest } from '@/features/contests/bar/use-current-contest';
-import { useSessionStore } from '@/stores/session.store';
-import AnonymousHeader from './AnonymousHeader.vue';
-import ContestsCard from './ContestsCard.vue';
-import ContinueCard from './ContinueCard.vue';
-import HomeHeader from './HomeHeader.vue';
-import LeaderboardCard from './LeaderboardCard.vue';
-import LiveContestCard from './LiveContestCard.vue';
-import NewPostsCard from './NewPostsCard.vue';
+import PageHeader from '@/components/ui/PageHeader.vue';
 import NewProblemsCard from '@/features/community/NewProblemsCard.vue';
-import RecentSubmissionsList from './RecentSubmissionsList.vue';
+import RecentCommentsCard from '@/features/community/RecentCommentsCard.vue';
+import TopContributorsCard from '@/features/community/TopContributorsCard.vue';
+import { useSessionStore } from '@/stores/session.store';
+import AnonymousHero from './AnonymousHero.vue';
+import NewPostsCard from './NewPostsCard.vue';
+import RatingHeroCard from './RatingHeroCard.vue';
+import RunningContestsCard from './RunningContestsCard.vue';
+import TopPerformersCard from './TopPerformersCard.vue';
 
 /**
- * One column, sections 40 px apart (layout plan §4.1, §4.2). Signed in: the header is the greeting with the rating line,
- * then the work in priority order: "Đang thi" (when the viewer is in a contest) and "Tiếp tục", the contests, my
- * submissions, then new problems and posts side by side. A visitor gets the sign-up header, then the contests (one line
- * when none), new problems, posts and, last, the leaderboard.
+ * One layout for visitors and signed-in users: only the top card differs (sign-up pitch, or the personal card);
+ * every card below it is the same component in both states.
  */
 const session = useSessionStore();
-const { current } = useCurrentContest();
 </script>
 
 <template>
-  <PageLayout v-if="session.user">
-    <template #header><HomeHeader :username="session.user.username" /></template>
-    <div class="flex flex-col gap-(--space-stack)">
-      <LiveContestCard />
-      <ContinueCard :username="session.user.username" />
+  <div class="page-column">
+    <PageHeader v-if="session.user" :title="$t('nav.home')" class="sr-only" />
+    <RatingHeroCard v-if="session.user" :username="session.user.username" />
+    <AnonymousHero v-else />
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
+      <div class="flex min-w-0 flex-col gap-6">
+        <RunningContestsCard />
+        <NewPostsCard />
+      </div>
+      <div class="flex min-w-0 flex-col gap-6">
+        <TopPerformersCard />
+        <TopContributorsCard :limit="3" />
+        <!-- At most 5 rows per side list, so the side column does not outgrow the main one. -->
+        <NewProblemsCard :limit="5" variant="home" />
+        <RecentCommentsCard :limit="4" />
+      </div>
     </div>
-    <ContestsCard :exclude-key="current?.contest.key" />
-    <RecentSubmissionsList :username="session.user.username" />
-    <div class="grid gap-x-8 gap-y-(--space-section) lg:grid-cols-2">
-      <NewProblemsCard :limit="5" />
-      <NewPostsCard />
-    </div>
-  </PageLayout>
-  <PageLayout v-else>
-    <template #header><AnonymousHeader /></template>
-    <ContestsCard />
-    <NewProblemsCard :limit="8" />
-    <NewPostsCard />
-    <LeaderboardCard />
-  </PageLayout>
+  </div>
 </template>

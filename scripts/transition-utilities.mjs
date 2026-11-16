@@ -16,21 +16,9 @@ export const ALLOWED = {
   'components/ui/Switch.vue': {
     'transition-transform': 'the thumb slides between the ends of the track',
   },
-  'components/ui/ToastHost.vue': {
-    'transition-transform':
-      'the toasts of a stack move between the pile and the expanded list, and the rest slide to their place when one leaves; off under reduced motion',
-  },
   'features/contests/replay/ReplayTable.vue': {
     'transition-transform':
       'rows that change rank slide to their place (FLIP); off under reduced motion',
-  },
-  'features/contests/RankingTable.vue': {
-    'transition-transform':
-      'rows that change rank in the live board slide to their place (FLIP); off under reduced motion',
-  },
-  'features/contests/RankingList.vue': {
-    'transition-transform':
-      'rows that change rank in the live board slide to their place (FLIP), and a row chevron turns with the open state; off under reduced motion',
   },
   'components/ui/DataTable.vue': { 'transition-transform': CHEVRON },
   'components/ui/Disclosure.vue': { 'transition-transform': CHEVRON },
@@ -44,7 +32,6 @@ export const ALLOWED = {
   'features/admin/shell/AdminNav.vue': { 'transition-transform': CHEVRON },
   'features/admin/tickets/TicketHandlingSection.vue': { 'transition-transform': CHEVRON },
   'features/organizations/manage/OrganizationInfoForm.vue': { 'transition-transform': CHEVRON },
-  'features/submissions/CasesTable.vue': { 'transition-transform': CHEVRON },
 };
 
 /** The bare transition classes in the string literals of one source line, without their variants; comment lines are ignored. */

@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import LanguageIcon from '@/components/language/LanguageIcon.vue';
-import Chip from '@/components/ui/Chip.vue';
+import AdminChip from '../ui/AdminChip.vue';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import type { AdminColumn } from '../ui/table/table-columns';
 import { hasVersionDrift } from './languages';
@@ -49,9 +49,9 @@ const percentOf = (count: number) =>
       <span v-else class="font-mono font-semibold">{{ row.key }}</span>
     </template>
     <template #cell-inProblem="{ row }">
-      <Chip v-if="row.includeInProblem" tone="accent">
+      <AdminChip v-if="row.includeInProblem" tone="accent">
         {{ $t('admin.languages.table.inProblemChip') }}
-      </Chip>
+      </AdminChip>
       <span v-else class="text-muted">—</span>
     </template>
     <template #cell-name="{ row }">
@@ -59,7 +59,7 @@ const percentOf = (count: number) =>
         <!-- Icon and a name that may wrap: this column shares the row with the per-judge versions. -->
         <LanguageIcon :language-key="row.key" />
         {{ row.name }}
-        <Chip v-if="row.fileOnly">{{ $t('admin.languages.table.fileOnly') }}</Chip>
+        <AdminChip v-if="row.fileOnly">{{ $t('admin.languages.table.fileOnly') }}</AdminChip>
       </span>
     </template>
     <template #cell-extension="{ row }">
@@ -85,9 +85,9 @@ const percentOf = (count: number) =>
         >
           {{ $t('admin.languages.table.onlineCount', { count: row.onlineJudges?.length ?? 0 }) }}
         </span>
-        <Chip v-if="hasVersionDrift(row)" tone="warning">
+        <AdminChip v-if="hasVersionDrift(row)" tone="caution">
           {{ $t('admin.languages.table.versionDrift') }}
-        </Chip>
+        </AdminChip>
       </span>
     </template>
     <template #cell-versions="{ row }">

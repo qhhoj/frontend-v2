@@ -1,19 +1,9 @@
 {
-  "features/account/data/data-export.ts": {
-    "hardcoded-script-value": 3
-  },
   "features/account/profile/IdentityFields.vue": {
     "AuthField": 1
   },
-  "features/account/profile/LengthCounter.vue": {
-    "status-colour": 1
-  },
   "features/account/profile/OrganizationsEditor.vue": {
-    "status-colour": 1,
     "verdict-tone": 2
-  },
-  "features/account/profile/ProfileSettingsPage.vue": {
-    "status-colour": 1
   },
   "features/account/profile/SaveErrorSummary.vue": {
     "verdict-tone": 2
@@ -31,35 +21,22 @@
     "AuthField": 1
   },
   "features/account/security/ScratchCodesPanel.vue": {
-    "button": 1,
-    "status-colour": 1
+    "button": 1
   },
   "features/account/security/SecondFactorCodeField.vue": {
-    "AuthField": 1,
-    "status-colour": 1
+    "AuthField": 1
   },
   "features/account/security/SocialLinksSection.vue": {
     "AuthField": 1
   },
   "features/account/security/TotpEnrollWizard.vue": {
-    "status-colour": 2,
     "verdict-tone": 1
   },
   "features/account/security/TotpRow.vue": {
-    "status-colour": 2,
     "verdict-tone": 1
-  },
-  "features/account/settings/SettingsCard.vue": {
-    "hardcoded-value": 1
   },
   "features/auth/AuthBadge.vue": {
     "verdict-tone": 6
-  },
-  "features/auth/AuthField.vue": {
-    "status-colour": 2
-  },
-  "features/auth/AuthLayout.vue": {
-    "hardcoded-value": 5
   },
   "features/auth/ChangePasswordForm.vue": {
     "AuthField": 1,
@@ -79,35 +56,21 @@
   },
   "features/auth/OtpInput.vue": {
     "fixed-size": 1,
-    "hardcoded-value": 1,
-    "input": 1,
-    "status-colour": 1
+    "input": 1
   },
   "features/auth/PasswordStrength.vue": {
-    "status-colour": 6,
     "verdict-tone": 2
   },
   "features/auth/RegisterPage.vue": {
-    "AuthField": 1,
-    "status-colour": 1
-  },
-  "features/auth/SocialButtons.vue": {
-    "hardcoded-value": 1
+    "AuthField": 1
   },
   "features/auth/TwoFactorPage.vue": {
     "AuthField": 1
   },
   "features/auth/UsernameField.vue": {
-    "AuthField": 1,
-    "status-colour": 2
-  },
-  "features/auth/use-cooldown.ts": {
-    "hardcoded-script-value": 1
+    "AuthField": 1
   },
   "features/auth/use-logout.ts": {
     "use-admin-toast": 1
-  },
-  "features/auth/use-username-availability.ts": {
-    "hardcoded-script-value": 1
   }
 }

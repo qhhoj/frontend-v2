@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue';
 import type { EditorHandle } from './code-editor-cm';
-import { isRepeatedSubmitKey } from './submit-key';
 import { loadLanguagePack } from './code-languages';
 import { useLowPowerPainted } from '@/lib/use-low-power-painted';
 import { indentAt, outdentLineAt, writeEdit } from './tab-indent';
@@ -125,7 +124,7 @@ function unloadEditor() {
 function onTextareaKeydown(event: KeyboardEvent) {
   if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
     event.preventDefault();
-    if (!isRepeatedSubmitKey(event)) emit('requestSubmit');
+    emit('requestSubmit');
     return;
   }
   if (!isLowPower.value) return;

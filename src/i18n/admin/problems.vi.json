@@ -1,7 +1,6 @@
 {
   "view": "Xem bài",
   "tabsLabel": "Các phần của bài",
-  "stepTodo": "Chưa xong",
   "tabs": {
     "general": "Thông tin chung",
     "statements": "Đề bài",

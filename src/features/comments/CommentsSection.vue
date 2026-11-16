@@ -36,7 +36,6 @@ import { useCommentJump } from './use-comment-jump';
  * The comments of one page, layout C2 ("flat, with quotes"): one list in time order, a reply quoting the comment it answers,
  * the composer (or why there is none, from the backend's `postBlock`) below; delete, report, and moderators' lock, hide and unhide
  * (moderators also get the hidden comments). `contestKey` links the announcements of the viewer's running contest.
- * The thread stays folded to one "Bình luận (N)" row until clicked; a gate, a lock, a failed load, or a link to one comment opens it.
  */
 const props = withDefaults(
   defineProps<{
@@ -44,8 +43,10 @@ const props = withDefaults(
     pageKey: string;
     contestKey?: string | null;
     placeholderKey?: string;
+    /** A page without comments shows one "Bình luận (0)" row that opens the section (the problem page). */
+    foldWhenEmpty?: boolean;
   }>(),
-  { contestKey: null, placeholderKey: undefined },
+  { contestKey: null, placeholderKey: undefined, foldWhenEmpty: false },
 );
 const PAGE_QUERY = 'commentPage';
 const MODERATE_PERMISSION = 'judge.change_comment';
@@ -77,18 +78,16 @@ const composerState = computed(() => data.value && composerStateOf(isSignedIn.va
 
 const entries = computed(() => flattenInTimeOrder(data.value?.comments ?? []));
 const isUnfolded = ref(false);
-/** The row's count: comments on this page, or the number of threads when the list has several pages. */
-const foldedCount = computed(() =>
-  data.value && lastPage.value > 1 ? data.value.pagination.total : entries.value.length,
-);
 const isFolded = computed(
   () =>
+    props.foldWhenEmpty &&
     !isUnfolded.value &&
-    !error.value &&
-    !route.hash.startsWith('#comment-') &&
-    route.query[PAGE_QUERY] === undefined &&
+    data.value !== undefined &&
+    data.value.pagination.page === 1 &&
+    entries.value.length === 0 &&
     // A gate or a lock is news in itself: it stays in sight.
-    !(data.value && (isContestHidden.value || data.value.pageLocked)),
+    !isContestHidden.value &&
+    !data.value.pageLocked,
 );
 const heading = ref<HTMLElement | null>(null);
 /** Opening the folded row puts focus on the section's heading, where the row was. */
@@ -269,7 +268,7 @@ useCommentJump({
     <h2 v-if="isFolded" id="comments-heading">
       <AppButton tone="row" data-testid="comments-fold" aria-expanded="false" @click="unfold">
         <span class="section-title text-content">{{ $t('comments.title') }}</span>
-        <span v-if="data" class="font-mono text-sm text-muted">({{ foldedCount }})</span>
+        <span class="font-mono text-sm text-muted">(0)</span>
         <ChevronDown aria-hidden="true" class="ml-auto size-5 text-muted" />
       </AppButton>
     </h2>

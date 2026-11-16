@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useQuery } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
 import type { MaybeRefOrGetter, Ref } from 'vue';
 import { fetchEditorial, fetchProblem, fetchProblemMeta, fetchProblems } from '@/api/problems.api';
@@ -71,20 +71,6 @@ const keepForSameProblem = <Data>(
     ? previous
     : undefined;
 
-const detailKey = (viewerId: string, code: string, lang: StatementLanguage) =>
-  ['problems', 'detail', viewerId, code, lang] as const;
-
-/** Loads a problem into the cache ahead of the click that opens it (a no-op while the cached one is fresh). */
-export function usePrefetchProblem(lang: Ref<StatementLanguage>) {
-  const client = useQueryClient();
-  const viewerId = useViewerId();
-  return (code: string) =>
-    void client.prefetchQuery({
-      queryKey: detailKey(viewerId.value, code, lang.value),
-      queryFn: ({ signal }) => fetchProblem(code, lang.value, signal),
-    });
-}
-
 /**
  * One problem in one statement language, per viewer (the detail carries the viewer's own status and contest).
  * A language switch keeps the old statement on screen while the other loads; another problem or another
@@ -99,8 +85,8 @@ export const useProblemQuery = (
   const viewerId = useViewerId();
   return useQuery({
     enabled,
-    queryKey: computed(() => detailKey(viewerId.value, code.value, lang.value)),
-    queryFn: ({ signal }) => fetchProblem(code.value, lang.value, signal),
+    queryKey: computed(() => ['problems', 'detail', viewerId.value, code.value, lang.value]),
+    queryFn: () => fetchProblem(code.value, lang.value),
     placeholderData: (previous, previousQuery) =>
       keepForSameProblem(previous, previousQuery, viewerId.value, code.value),
   });

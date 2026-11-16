@@ -4,8 +4,7 @@
     "AdminPageHeader": 1,
     "button": 2,
     "controls": 6,
-    "fixed-size": 2,
-    "status-colour": 1
+    "fixed-size": 2
   },
   "features/admin/contests/ContestsIndexPage.vue": {
     "AdminPageHeader": 1,
@@ -13,12 +12,10 @@
   },
   "features/admin/contests/actions/ContestActionCard.vue": {
     "button": 1,
-    "controls": 2,
-    "status-colour": 1
+    "controls": 2
   },
   "features/admin/contests/actions/ContestActionsTab.vue": {
     "fixed-size": 7,
-    "status-colour": 1,
     "uppercase": 1
   },
   "features/admin/contests/actions/ContestCloneCard.vue": {
@@ -31,34 +28,28 @@
   },
   "features/admin/contests/actions/ContestDeleteCard.vue": {
     "button": 1,
-    "controls": 1,
-    "status-colour": 2
+    "controls": 1
   },
   "features/admin/contests/actions/ContestFreezeLockCard.vue": {
     "button": 4,
     "controls": 7,
-    "hardcoded-script-value": 1,
-    "input": 1,
-    "status-colour": 1
+    "input": 1
   },
   "features/admin/contests/actions/ContestProblemOpsCard.vue": {
     "button": 2,
     "checkbox": 1,
     "controls": 5,
-    "select": 1,
-    "status-colour": 2
+    "select": 1
   },
   "features/admin/contests/actions/ContestPublishCard.vue": {
     "button": 2,
     "checkbox": 1,
-    "controls": 3,
-    "status-colour": 1
+    "controls": 3
   },
   "features/admin/contests/actions/PrepareDataDialog.vue": {
     "checkbox": 1,
     "controls": 3,
-    "input": 1,
-    "status-colour": 1
+    "input": 1
   },
   "features/admin/contests/actions/PublishResultTable.vue": {
     "AdminDataTable": 1
@@ -80,14 +71,7 @@
   "features/admin/contests/announcements/AnnouncementItem.vue": {
     "AdminRowMenu": 2,
     "button": 1,
-    "controls": 2,
-    "status-colour": 1
-  },
-  "features/admin/contests/announcements/AnnouncementPreview.vue": {
-    "status-colour": 2
-  },
-  "features/admin/contests/contest-ops.queries.ts": {
-    "hardcoded-script-value": 1
+    "controls": 2
   },
   "features/admin/contests/data/ContestExportCard.vue": {
     "button": 1,
@@ -96,10 +80,8 @@
   "features/admin/contests/data/FeedKeyCard.vue": {
     "button": 3,
     "controls": 7,
-    "hardcoded-script-value": 1,
     "input": 1,
-    "radio": 1,
-    "status-colour": 1
+    "radio": 1
   },
   "features/admin/contests/general/ContestAccessSection.vue": {
     "AdminField": 3,
@@ -162,9 +144,6 @@
     "controls": 4,
     "input": 2
   },
-  "features/admin/contests/general/ContestVisibilitySwitch.vue": {
-    "status-colour": 1
-  },
   "features/admin/contests/general/SectionJumpSelect.vue": {
     "controls": 1,
     "select": 1
@@ -172,27 +151,18 @@
   "features/admin/contests/general/TagChips.vue": {
     "button": 1,
     "controls": 2,
-    "input": 1,
-    "status-colour": 1
-  },
-  "features/admin/contests/general/contest-sections.ts": {
-    "hardcoded-script-value": 1
-  },
-  "features/admin/contests/general/contest-timeline.ts": {
-    "hardcoded-script-value": 1
+    "input": 1
   },
   "features/admin/contests/ghosts/ContestGhostsTab.vue": {
     "controls": 1
   },
   "features/admin/contests/ghosts/GhostCurrentCard.vue": {
     "button": 1,
-    "controls": 3,
-    "status-colour": 1
+    "controls": 3
   },
   "features/admin/contests/ghosts/GhostImportCard.vue": {
     "button": 2,
-    "controls": 3,
-    "status-colour": 4
+    "controls": 3
   },
   "features/admin/contests/ghosts/GhostPreviewTable.vue": {
     "AdminDataTable": 1
@@ -201,17 +171,12 @@
     "AdminDateTimeField": 1,
     "AdminField": 1,
     "controls": 2,
-    "input": 1,
-    "status-colour": 1
+    "input": 1
   },
   "features/admin/contests/lifecycle/ContestDeleteDialog.vue": {
     "AdminField": 1,
     "controls": 2,
-    "input": 1,
-    "status-colour": 1
-  },
-  "features/admin/contests/list/ContestBulkVisibilityDialog.vue": {
-    "status-colour": 1
+    "input": 1
   },
   "features/admin/contests/list/ContestFlagChips.vue": {
     "AdminChip": 2
@@ -227,6 +192,9 @@
     "controls": 4,
     "select": 4
   },
+  "features/admin/contests/list/ContestPhaseChip.vue": {
+    "AdminChip": 2
+  },
   "features/admin/contests/list/use-contest-row-menu.ts": {
     "AdminRowMenu": 2
   },
@@ -235,11 +203,7 @@
     "AdminField": 1,
     "controls": 4,
     "input": 1,
-    "radio": 2,
-    "status-colour": 1
-  },
-  "features/admin/contests/participants/BulkDisqualifyDialog.vue": {
-    "status-colour": 1
+    "radio": 2
   },
   "features/admin/contests/participants/ContestParticipantsTab.vue": {
     "AdminChip": 1,
@@ -255,8 +219,7 @@
     "select": 3
   },
   "features/admin/contests/participants/ParticipationDialogs.vue": {
-    "AdminDateTimeField": 1,
-    "status-colour": 4
+    "AdminDateTimeField": 1
   },
   "features/admin/contests/participants/use-participation-actions.ts": {
     "AdminRowMenu": 1
@@ -265,14 +228,12 @@
     "button": 3,
     "checkbox": 3,
     "controls": 12,
-    "input": 4,
-    "status-colour": 1
+    "input": 4
   },
   "features/admin/contests/problems/ContestProblemsTab.vue": {
     "button": 3,
     "checkbox": 1,
     "controls": 7,
-    "hardcoded-value": 1,
     "input": 1,
     "table": 1
   },
@@ -280,36 +241,28 @@
     "button": 1,
     "controls": 2,
     "disabled-opacity": 1,
-    "search": 1,
-    "status-colour": 1
+    "search": 1
   },
   "features/admin/contests/problems/ProblemCopyFrom.vue": {
     "button": 1,
     "controls": 3,
-    "input": 1,
-    "status-colour": 1
+    "input": 1
   },
   "features/admin/contests/ranking/OfficialRankingCard.vue": {
     "button": 3,
     "controls": 8,
     "input": 1,
-    "radio": 2,
-    "status-colour": 3
+    "radio": 2
   },
   "features/admin/contests/ranking/RankingLinkCard.vue": {
     "AdminDateTimeField": 1,
     "button": 3,
     "controls": 12,
     "input": 1,
-    "radio": 6,
-    "status-colour": 2
-  },
-  "features/admin/contests/ranking/ranking-link.ts": {
-    "hardcoded-script-value": 2
+    "radio": 6
   },
   "features/admin/users/CreatedUsersTable.vue": {
     "AdminDataTable": 1,
-    "status-colour": 1,
     "verdict-tone": 1
   },
   "features/admin/users/NewUserFields.vue": {
@@ -320,6 +273,7 @@
     "password": 1
   },
   "features/admin/users/PermissionChecklist.vue": {
+    "AdminChip": 2,
     "checkbox": 1,
     "controls": 3,
     "search": 1,
@@ -329,24 +283,20 @@
     "AdminField": 1,
     "button": 1,
     "controls": 4,
-    "input": 1,
-    "status-colour": 1
+    "input": 1
   },
   "features/admin/users/RolesDialog.vue": {
+    "AdminChip": 1,
     "button": 3,
     "controls": 6,
-    "hardcoded-value": 3
-  },
-  "features/admin/users/UnbanUserDialog.vue": {
-    "status-colour": 1
+    "primevue": 1
   },
   "features/admin/users/UserAccessSection.vue": {
     "button": 1
   },
   "features/admin/users/UserAccountPanel.vue": {
     "button": 1,
-    "controls": 2,
-    "status-colour": 2
+    "controls": 2
   },
   "features/admin/users/UserActivationRow.vue": {
     "button": 2,
@@ -355,14 +305,16 @@
   "features/admin/users/UserCreateDialog.vue": {
     "button": 2,
     "controls": 4,
-    "hardcoded-value": 3,
+    "primevue": 1,
     "radio": 1,
-    "status-colour": 1,
     "textarea": 1
   },
   "features/admin/users/UserDrawer.vue": {
     "AdminDrawer": 1,
     "AdminNotice": 2
+  },
+  "features/admin/users/UserDrawerChips.vue": {
+    "AdminChip": 4
   },
   "features/admin/users/UserModerationPanel.vue": {
     "AdminField": 1,
@@ -399,6 +351,9 @@
   "features/admin/users/UserSecurityPanel.vue": {
     "AdminNotice": 1
   },
+  "features/admin/users/UserStatusChips.vue": {
+    "AdminChip": 2
+  },
   "features/admin/users/UserTwoFactorReset.vue": {
     "button": 1,
     "controls": 2
@@ -409,6 +364,7 @@
     "controls": 4
   },
   "features/admin/users/UsersTable.vue": {
+    "AdminChip": 2,
     "AdminDataTable": 1,
     "AdminUserLabel": 1,
     "button": 1,

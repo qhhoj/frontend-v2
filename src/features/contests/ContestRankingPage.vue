@@ -1,26 +1,31 @@
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue';
 import { LocateFixed } from 'lucide-vue-next';
 import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
+import CountdownTimer from '@/components/CountdownTimer.vue';
+import EmptyState from '@/components/EmptyState.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import Notice from '@/components/ui/Notice.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
-import Toolbar from '@/components/ui/Toolbar.vue';
 import QueryState from '@/components/QueryState.vue';
+import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import { rankingSummary } from './ranking-summary';
+import { ownEndTime } from '@/lib/contest-time';
 import { isPenaltyFormat, showsCellTime, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
-import { boardFreezeOf } from './bar/board-freeze';
-import { reportBoardFrozen } from './bar/board-frozen-report';
+import ContestTabs from './ContestTabs.vue';
 import { ownSubmissionsOnly } from './own-submissions';
+import { podiumRows } from './podium-rows';
 import RankingSkeleton from './RankingSkeleton.vue';
 import RankingFreezeNotice from './RankingFreezeNotice.vue';
-import RankingLegend from './RankingLegend.vue';
+import RankingPodium from './RankingPodium.vue';
 import RankingTable from './RankingTable.vue';
 import { useContestQuery, useCurrentParticipationQuery, useRankingQuery } from './contests.queries';
 import VirtualOverlay from './replay/VirtualOverlay.vue';
@@ -49,6 +54,12 @@ const { data: current } = useCurrentParticipationQuery(needsCurrent);
 const virtualRun = computed(() =>
   contest.value?.phase === 'ended' ? virtualRunOf(current.value, key.value, now.value) : null,
 );
+/** The viewer's live participation here: its window can close before the contest does (a timed contest). */
+const liveRun = computed(() =>
+  current.value?.contest.key === key.value && current.value.participation.virtual === 0
+    ? current.value.participation
+    : null,
+);
 /** A live virtual run opens the board with its virtual row; `?virtual=0` keeps the official board. */
 const withVirtual = computed(() => {
   const asked = route.query.virtual;
@@ -75,9 +86,6 @@ const {
   computed(() => running.value || (withVirtual.value && virtualRun.value !== null)),
 );
 
-/** The layout's header shows the freeze chip from the board's own answer. */
-reportBoardFrozen(() => ranking.value?.frozen);
-
 /** The backend says the full board is closed to this viewer: it answers 403 or shows only their row. */
 const isBoardHidden = computed(
   () => contest.value !== undefined && !contest.value.viewer.canSeeFullScoreboard,
@@ -95,13 +103,8 @@ const hiddenBodyKey = computed(() => {
 });
 
 const search = ref('');
-/** Problem names by problem id: the board's columns carry only codes, the contest has the names. */
-const problemNames = computed(
-  () =>
-    new Map((contest.value?.problems ?? []).map((problem) => [problem.problemId, problem.name])),
-);
 const locale = useLocaleStore();
-/** How this contest prints cells and scores; the table prints cells with it. */
+/** How this contest prints cells and scores; the podium and the table share it. */
 const rankingContext = computed<RankingContext>(() => ({
   formatName: contest.value?.formatName ?? 'default',
   pointsPrecision: contest.value?.pointsPrecision ?? 0,
@@ -115,6 +118,7 @@ const rows = computed(() => {
   const all = ranking.value?.rows ?? [];
   return needle ? all.filter((row) => row.user.username.toLocaleLowerCase().includes(needle)) : all;
 });
+const PODIUM_SKELETON_CELLS = 3;
 /** The board's own problem list once it is known (a cached board), else the contest's: the skeleton has the table's column count. */
 const problemCount = computed(
   () => ranking.value?.problems.length ?? contest.value?.problems?.length ?? 0,
@@ -126,14 +130,18 @@ const skeletonHasTimeColumn = computed(
     isPenaltyFormat(contest.value.formatName) &&
     showsCumtime(contest.value.formatName),
 );
-/** Why cells show "?": said in "Chú giải" while this board is frozen. */
-const freezeNote = computed(() => {
-  const freeze =
-    contest.value && ranking.value?.frozen ? boardFreezeOf(contest.value, now.value, true) : null;
-  if (!freeze || !contest.value) return undefined;
-  const minutes = contest.value.frozenLastMinutes;
-  return t(freeze.bodyKey, { minutes }, minutes);
-});
+const podium = computed(() => podiumRows(ranking.value?.rows ?? []));
+/** A podium of people who all scored nothing says nothing the board does not: it is shown once someone has points. */
+const hasPodium = computed(() => podium.value.some((row) => row.score > 0));
+const summary = computed(() =>
+  contest.value
+    ? rankingSummary(
+        contest.value.formatName,
+        ranking.value?.problems.length ?? contest.value.problems?.length ?? 0,
+        contest.value.userCount,
+      )
+    : '',
+);
 type ViewMode = 'official' | 'virtual' | 'compare';
 const viewModes = computed(() => [
   { value: 'official' as const, label: t('ranking.official') },
@@ -163,8 +171,6 @@ const myRow = computed(() => {
   const virtualRow = run && own.find((row) => row.participationId === run.id);
   return virtualRow || own.find((row) => row.virtual === 0) || own[0] || null;
 });
-/** The legend's "virtual" line needs a virtual row among those shown. */
-const hasVirtualRows = computed(() => rows.value.some((row) => row.virtual > 0));
 const table = ref<{ focusRow(participationId: string): boolean } | null>(null);
 /** A search that hides the row is cleared first, so the jump always lands. */
 async function goToMyRow() {
@@ -179,78 +185,121 @@ async function goToMyRow() {
 </script>
 
 <template>
-  <QueryState :loading="contestPending" :error="contestError" @retry="refetchContest()">
-    <template #skeleton>
-      <!-- The layout's header already stands in for the title and the tabs. -->
-      <span hidden />
-    </template>
-    <template v-if="contest">
-      <RankingFreezeNotice :contest="contest" />
-      <Notice
-        v-if="isBoardHidden"
-        role="status"
-        :title="$t('ranking.hiddenTitle')"
-        data-testid="ranking-hidden"
-      >
-        {{ $t(hiddenBodyKey) }}
-      </Notice>
-    </template>
-  </QueryState>
-  <div v-if="contest" class="flex flex-col gap-(--space-toolbar)">
-    <!-- The toolbar stays outside the board: compare mode draws no board and still needs the view toggle to go back. -->
-    <Toolbar>
-      <template #left>
-        <SearchInput
-          v-if="ranking && !isComparing"
-          v-model="search"
-          :label="$t('ranking.searchLabel')"
-          class="w-full sm:w-48"
-        />
-        <SegmentedControl
-          :label="$t('ranking.viewMode')"
-          :options="viewModes"
-          :model-value="viewMode"
-          data-testid="ranking-view-mode"
-          class="whitespace-nowrap"
-          @update:model-value="setViewMode"
-        />
+  <div class="page-column">
+    <QueryState :loading="contestPending" :error="contestError" @retry="refetchContest()">
+      <template #skeleton>
+        <SkeletonBlock data-skeleton-region="nav" pill class="h-[52px] w-72 max-w-full" />
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div data-skeleton-region="title">
+            <div class="page-title">
+              <SkeletonBlock text class="w-80 max-w-full" />
+            </div>
+            <p class="mt-1 text-meta text-muted"><SkeletonBlock text class="w-56" /></p>
+          </div>
+          <div data-skeleton-region="controls" class="flex flex-wrap items-center gap-2.5">
+            <SkeletonBlock pill class="h-(--qh-control) w-44" />
+            <SkeletonBlock pill class="h-(--qh-control) w-48" />
+          </div>
+        </div>
       </template>
-      <template v-if="ranking && !isComparing" #right>
-        <AppButton v-if="myRow" tone="primary" data-testid="my-row" @click="goToMyRow">
-          <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
-          {{
-            myRow.rank === null || myRow.isDisqualified
-              ? $t('replay.player.myRow')
-              : $t('ranking.myRow', { rank: myRow.rank })
-          }}
-        </AppButton>
-        <RankingLegend
-          :is-penalty="isPenaltyFormat(rankingContext.formatName)"
-          :shows-time="rankingContext.showsTime"
-          :has-virtual-rows="hasVirtualRows"
-          :freeze-note="freezeNote"
-        />
+      <template v-if="contest">
+        <ContestTabs :contest-key="key" :phase="contest.phase" />
+        <PageHeader :title="contest.name">
+          <template #meta>{{ summary }}</template>
+          <template #actions>
+            <p
+              v-if="running"
+              class="glass flex h-(--qh-control) items-center gap-2.5 rounded-pill px-4.5"
+            >
+              <span aria-hidden="true" class="size-2 rounded-full bg-accent shadow-glow" />
+              <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
+              <CountdownTimer
+                :key="ownEndTime(contest.endTime, liveRun)"
+                :until="ownEndTime(contest.endTime, liveRun)"
+                class="font-semibold"
+                @elapsed="refetchContest()"
+              />
+            </p>
+            <SegmentedControl
+              :label="$t('ranking.viewMode')"
+              :options="viewModes"
+              :model-value="viewMode"
+              class="whitespace-nowrap"
+              @update:model-value="setViewMode"
+            />
+            <AppButton
+              v-if="myRow && !isComparing"
+              tone="primary"
+              data-testid="my-row"
+              @click="goToMyRow"
+            >
+              <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
+              {{
+                myRow.rank === null || myRow.isDisqualified
+                  ? $t('replay.player.myRow')
+                  : $t('ranking.myRow', { rank: myRow.rank })
+              }}
+            </AppButton>
+            <SearchInput
+              v-model="search"
+              :label="$t('ranking.searchLabel')"
+              class="w-full sm:w-48"
+            />
+          </template>
+        </PageHeader>
+        <RankingFreezeNotice :contest="contest" :is-board-frozen="ranking?.frozen ?? false" />
+        <Notice
+          v-if="isBoardHidden"
+          role="status"
+          :title="$t('ranking.hiddenTitle')"
+          data-testid="ranking-hidden"
+        >
+          {{ $t(hiddenBodyKey) }}
+        </Notice>
       </template>
-    </Toolbar>
+    </QueryState>
     <QueryState
-      v-if="!isComparing"
+      v-if="contest && !isComparing"
       :loading="rankingPending"
       :error="ranking || isBoardHidden ? null : rankingError"
       @retry="refetchRanking()"
     >
       <template #skeleton>
         <div class="flex flex-col gap-5">
+          <Card
+            as="div"
+            data-skeleton-region="podium"
+            class="grid divide-y divide-line overflow-hidden lg:grid-cols-3 lg:divide-x lg:divide-y-0"
+          >
+            <div
+              v-for="place in PODIUM_SKELETON_CELLS"
+              :key="place"
+              data-skeleton-region="podium-cell"
+              class="flex min-h-11.5 items-center gap-3 px-4 py-2 lg:px-5 lg:py-4"
+            >
+              <SkeletonBlock round class="size-7 shrink-0" />
+              <SkeletonBlock round class="size-6 shrink-0" />
+              <SkeletonBlock text class="w-1/2" />
+              <SkeletonBlock text class="ml-auto w-10" />
+            </div>
+          </Card>
           <RankingSkeleton :problem-count="problemCount" :has-time-column="skeletonHasTimeColumn" />
         </div>
       </template>
-      <div
-        v-if="ranking && (ranking.rows.length || !isBoardHidden)"
-        :aria-busy="rankingStale"
-        class="flex flex-col gap-5"
-      >
+      <Card v-if="!ranking?.rows.length && !isBoardHidden" as="div">
+        <EmptyState>{{ $t('ranking.empty') }}</EmptyState>
+      </Card>
+      <div v-else-if="ranking" :aria-busy="rankingStale" class="flex flex-col gap-5">
         <Notice v-if="rankingRefreshFailed" tone="warning" bit="sweat" role="status">
           {{ $t('ranking.refreshFailed') }}
         </Notice>
+        <RankingPodium
+          v-if="hasPodium"
+          :rows="podium"
+          :problems="ranking.problems"
+          :context="rankingContext"
+          :class="{ 'opacity-60': rankingStale }"
+        />
         <Card
           id="ranking-board"
           as="div"
@@ -265,13 +314,15 @@ async function goToMyRow() {
             :context="rankingContext"
             :viewer-id="session.user?.id ?? null"
             :contest-key="key"
-            :problem-names="problemNames"
             :own-submissions-only="contest ? ownSubmissionsOnly(contest, now) : true"
-            :is-stale="rankingStale"
           />
         </Card>
       </div>
     </QueryState>
-    <VirtualOverlay v-else-if="virtualRun" :contest="contest" :participation="virtualRun" />
+    <VirtualOverlay
+      v-else-if="contest && virtualRun"
+      :contest="contest"
+      :participation="virtualRun"
+    />
   </div>
 </template>

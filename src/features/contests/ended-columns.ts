@@ -1,18 +1,15 @@
-import { TABLE_HEAD_CELL, TABLE_ROW_HEIGHT } from '@/components/ui/table-classes';
-
 /**
  * Layout of the ended-contests table, shared with its skeleton so loading and loaded tables have the same columns.
- * Auto layout without a minimum width: the name column takes what the short columns leave and wraps, so the table never
- * scrolls sideways; a phone gets stacked rows instead (`EndedContestTable.vue`).
+ * Below `lg` the format column goes (the least useful one) so the name, date, count and action fit a tablet.
  */
-export const ENDED_TABLE_CLASS = 'w-full border-collapse text-body';
-export const ENDED_HEAD_ROW_CLASS = `text-left ${TABLE_HEAD_CELL}`;
+export const ENDED_TABLE_CLASS =
+  'w-full min-w-[800px] table-fixed border-collapse text-sm lg:min-w-[980px]';
+export const ENDED_HEAD_ROW_CLASS = 'text-left text-meta whitespace-nowrap text-muted';
 export const ENDED_ROW_CLASS = 'border-t border-line';
 export const ENDED_CELL = {
-  name: `px-5 ${TABLE_ROW_HEIGHT}`,
-  when: `px-3 whitespace-nowrap ${TABLE_ROW_HEIGHT}`,
-  length: `px-3 whitespace-nowrap ${TABLE_ROW_HEIGHT}`,
-  format: `px-3 whitespace-nowrap ${TABLE_ROW_HEIGHT}`,
-  participants: `px-3 text-right whitespace-nowrap ${TABLE_ROW_HEIGHT}`,
-  action: `px-5 text-right whitespace-nowrap ${TABLE_ROW_HEIGHT}`,
+  name: 'px-5 py-3',
+  when: 'w-48 px-3 py-3',
+  format: 'hidden w-52 px-3 py-3 lg:table-cell',
+  participants: 'w-28 px-3 py-3 text-right',
+  action: 'w-64 px-5 py-3 text-right',
 } as const;

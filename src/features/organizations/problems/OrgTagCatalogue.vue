@@ -3,7 +3,7 @@ import { Pencil, Plus, Trash2 } from 'lucide-vue-next';
 import { computed, ref, toRef } from 'vue';
 import type { ProblemTag } from '@/api/types/organization-problems';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import Card from '@/components/ui/Card.vue';
+import GlassCard from '@/components/GlassCard.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -64,7 +64,7 @@ function confirmDelete() {
 </script>
 
 <template>
-  <Card
+  <GlassCard
     as="section"
     data-testid="org-tag-catalogue"
     aria-labelledby="org-tags-title"
@@ -136,5 +136,5 @@ function confirmDelete() {
         <p v-if="removeFailure" role="alert" class="text-sm text-negative">{{ removeFailure }}</p>
       </template>
     </ConfirmDialog>
-  </Card>
+  </GlassCard>
 </template>

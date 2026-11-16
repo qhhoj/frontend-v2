@@ -8,7 +8,7 @@ import ShareDialog from './ShareDialog.vue';
 defineProps<{ submissionId: string }>();
 const isOpen = ref(false);
 const button = ref<{ $el: HTMLElement } | null>(null);
-/** The dialog is unmounted on close, so the opener takes focus back itself. */
+/** The dialog is unmounted on close, so PrimeVue cannot hand focus back: the opener takes it. */
 watch(isOpen, (open) => {
   if (!open) void nextTick(() => button.value?.$el.focus());
 });

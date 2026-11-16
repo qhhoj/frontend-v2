@@ -1,7 +1,6 @@
 # frontend-v2
 
-- Read `DESIGN.md` (tokens, colour cue map, kit recipes, owner Do's and Don'ts) before any UI work; `/dev/kit` (admin) shows every kit part and token.
-- UI work (components, pages, styles, mock-ups) follows the `qhhoj-web-style` skill (`.claude/skills/qhhoj-web-style/SKILL.md`): Workbench, the design language.
+- UI work (components, pages, styles, mock-ups) follows the `qhhoj-web-style` skill (`.claude/skills/qhhoj-web-style/SKILL.md`): Clay, the design language.
 
 ## Agent skills
 

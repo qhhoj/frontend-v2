@@ -1,11 +1,11 @@
 // The app sources the lint scripts read (scripts/check-tokens.mjs, scripts/raw-elements.mjs): .vue, .ts and .css under
-// src/, without specs, the machine-written `src/api/generated/`, the generated palette (src/theme/palette/, the one home of colour literals) and
+// src/, without specs, the machine-written `src/api/generated/`, the theme files (the one home of colour literals) and
 // Bit's sprite data (image-like palettes Bit keeps in every theme).
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const root = new URL('../src/', import.meta.url).pathname;
-const paletteDir = join(root, 'theme', 'palette');
+const themesDir = join(root, 'theme', 'themes');
 const generatedDir = join(root, 'api', 'generated');
 const spriteFiles = new Set([
   join(root, 'mascot', 'bit-sprite.ts'),
@@ -15,7 +15,7 @@ const spriteFiles = new Set([
 const files = (dir) =>
   readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const path = join(dir, entry.name);
-    if (entry.isDirectory()) return path === paletteDir || path === generatedDir ? [] : files(path);
+    if (entry.isDirectory()) return path === themesDir || path === generatedDir ? [] : files(path);
     return /\.(vue|ts|css)$/.test(entry.name) &&
       !entry.name.endsWith('.spec.ts') &&
       !spriteFiles.has(path)

@@ -33,7 +33,7 @@ export const VERDICT_TONES: Record<VerdictCode, VerdictTone> = {
   D: 'pending',
   PD: 'pending',
 };
-/** Tone classes of `VerdictChip`: tokens only (lint:tokens). */
+/** Tone classes shared by VerdictBadge and VerdictLabel: tokens only (lint:tokens). */
 export const VERDICT_TONE_CLASSES: Record<VerdictTone, string> = {
   ac: 'bg-verdict-ac-bg text-verdict-ac',
   pc: 'bg-partial-bg-2 text-verdict-partial',
@@ -53,18 +53,18 @@ export const VERDICT_TONE_VARS: Record<VerdictTone, string> = {
   ce: '--qh-verdict-ce',
   pending: '--qh-verdict-pending',
 };
-/** The solid verdict block of a submission row (each lane's label colour on its fill); pending keeps the soft tint. System outcomes (IE, AB) are the `sys` block. */
+/** The solid verdict block of a submission row (white text on a saturated fill); pending keeps the soft tint. System outcomes (IE, AB) are the dark `sys` block. */
 export type BlockTone = VerdictTone | 'sys';
 const SYSTEM_CODES: readonly VerdictCode[] = ['IE', 'AB'];
 export const BLOCK_TONE_CLASSES: Record<BlockTone, string> = {
-  ac: 'bg-verdict-ac-solid text-verdict-ac-on',
+  ac: 'bg-verdict-ac-solid text-on-verdict-solid',
   /** The partial ink is dark on light themes and pale on dark ones, so the text takes the card colour to stay readable on both. */
   pc: 'bg-verdict-partial text-surface-solid',
-  wa: 'bg-verdict-wa-solid text-verdict-wa-on',
-  tle: 'bg-verdict-tle-solid text-verdict-tle-on',
-  rte: 'bg-verdict-rte-solid text-verdict-rte-on',
-  ce: 'bg-verdict-ce-solid text-verdict-ce-on',
-  sys: 'bg-verdict-sys-solid text-verdict-sys-on',
+  wa: 'bg-verdict-wa-solid text-on-verdict-solid',
+  tle: 'bg-verdict-tle-solid text-on-verdict-solid',
+  rte: 'bg-verdict-rte-solid text-on-verdict-solid',
+  ce: 'bg-verdict-ce-solid text-on-verdict-solid',
+  sys: 'bg-verdict-sys-solid text-on-verdict-solid',
   pending: VERDICT_TONE_CLASSES.pending,
 };
 export const blockToneOf = ({ code, tone }: Verdict): BlockTone =>

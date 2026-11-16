@@ -2,7 +2,6 @@ import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { Compartment, EditorState, Prec, type Extension } from '@codemirror/state';
 import { EditorView, drawSelection, keymap, lineNumbers } from '@codemirror/view';
 import { syntaxHighlight } from './code-syntax';
-import { isRepeatedSubmitKey } from './submit-key';
 
 export interface EditorOptions {
   doc: string;
@@ -73,7 +72,6 @@ export function createEditor(host: HTMLElement, options: EditorOptions): EditorH
         drawSelection(),
         history(),
         // Ahead of the default keymap, which binds Mod-Enter to "insert blank line".
-        Prec.highest(EditorView.domEventHandlers({ keydown: isRepeatedSubmitKey })),
         Prec.highest(keymap.of(submitKeymap(options.onSubmit))),
         keymap.of([...defaultKeymap, ...historyKeymap]),
         tokenTheme,

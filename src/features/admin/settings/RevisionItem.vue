@@ -7,7 +7,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { BUTTON } from '../ui/controls';
 import { shortId } from '../ui/short-id';
 import { diffLines, hasSealedPart } from './revisions';
-import Chip from '@/components/ui/Chip.vue';
+import AdminChip from '../ui/AdminChip.vue';
 
 const props = defineProps<{
   revision: SettingRevision;
@@ -34,9 +34,9 @@ const lineText = (field: string, text: string) => (field === 'value' ? text : `$
         formatDate(revision.createdAt, 'datetime', locale.locale)
       }}</time>
       <span>· {{ revision.actor ? shortId(revision.actor) : '—' }}</span>
-      <Chip v-for="field in revision.changedFields" :key="field" class="font-mono">
+      <AdminChip v-for="field in revision.changedFields" :key="field" class="font-mono">
         {{ field }}
-      </Chip>
+      </AdminChip>
     </header>
     <div class="flex flex-col gap-1 font-mono text-sm">
       <p v-for="line in lines" :key="line.field" class="m-0">

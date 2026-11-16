@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import Dialog from 'primevue/dialog';
 import QueryState from '@/components/QueryState.vue';
-import Modal from '@/components/ui/Modal.vue';
 import { useInitYamlQuery } from './problem-data.queries';
 
 const isOpen = defineModel<boolean>('visible', { required: true });
@@ -12,7 +12,14 @@ const init = useInitYamlQuery(
 </script>
 
 <template>
-  <Modal v-model:visible="isOpen" :title="$t('admin.problems.data.init.title')" size="md">
+  <Dialog
+    v-model:visible="isOpen"
+    modal
+    :header="$t('admin.problems.data.init.title')"
+    :draggable="false"
+    :close-button-props="{ 'aria-label': $t('common.close') }"
+    class="w-[min(40rem,calc(100vw-2rem))]"
+  >
     <QueryState
       :loading="init.isPending.value"
       :error="init.error.value"
@@ -22,5 +29,5 @@ const init = useInitYamlQuery(
         class="max-h-[60vh] overflow-auto rounded-cell bg-surface-strong p-3 font-mono text-sm"
         >{{ init.data.value }}</pre>
     </QueryState>
-  </Modal>
+  </Dialog>
 </template>

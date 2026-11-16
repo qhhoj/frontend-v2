@@ -13,7 +13,6 @@ import DataTable from '@/components/ui/DataTable.vue';
 import type { DataTableColumn } from '@/components/ui/DataTableColumns';
 import { formatNumber } from '@/lib/format';
 import { medalClass } from '@/lib/medal';
-import { ratingTextClass } from '@/lib/tier-classes';
 import { WIDE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -21,7 +20,7 @@ import { boardColumns, rowAnchor, sortLocation } from './leaderboard-columns';
 import { revealRow } from './reveal-row';
 
 /**
- * The board: the kit `DataTable` (40 px rows). From `lg` up all five number columns show and any heading sorts; below it
+ * The board: the kit `DataTable` (48 px rows). From `lg` up all five number columns show and any heading sorts; below it
  * only the sorted number shows, and a select above the table sorts. A heading sorts one way, highest first.
  */
 const props = defineProps<{
@@ -60,7 +59,7 @@ const columns = computed<DataTableColumn[]>(() => [
     label: t(column.labelKey),
     align: 'end' as const,
     sort: { desc: column.key },
-    cellClass: column.isActive ? 'font-bold' : undefined,
+    cellClass: column.isActive ? 'font-bold text-positive' : undefined,
   })),
 ]);
 const sortOptions = computed(() =>
@@ -79,12 +78,6 @@ const valueOf = (entry: LeaderboardEntry, key: string) => {
   return value === null ? '—' : formatNumber(value, locale.locale);
 };
 
-/** The rating figure wears its tier colour (as the user's name does); the sorted number of another column stays green. */
-const valueClass = (entry: LeaderboardEntry, key: string) => {
-  if (key === 'rating') return ratingTextClass(entry.rating);
-  return key === props.sort ? 'text-positive' : undefined;
-};
-
 /** A hash on the URL (find my rank) brings its row into view once the rows are there. */
 const scrollToTarget = async () => {
   await nextTick();
@@ -101,7 +94,6 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
     :row-attrs="rowAttrs"
     :row-to="(entry) => ({ name: 'user', params: { username: entry.username } })"
     :label="$t('leaderboard.title')"
-    density="compact"
     stack="scroll"
     :sticky-columns="0"
     :skeleton-rows="12"
@@ -154,7 +146,7 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
     </template>
     <template #cell-organization="{ row }">{{ row.organization?.shortName ?? '—' }}</template>
     <template v-for="column in valueColumns" :key="column.key" #[`cell-${column.key}`]="{ row }">
-      <span :class="valueClass(row, column.key)">{{ valueOf(row, column.key) }}</span>
+      {{ valueOf(row, column.key) }}
     </template>
   </DataTable>
 </template>

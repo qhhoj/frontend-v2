@@ -1,16 +1,7 @@
-import {
-  Building2,
-  ChartColumn,
-  House,
-  ListChecks,
-  Newspaper,
-  Send,
-  Trophy,
-} from 'lucide-vue-next';
+import { BookOpen, Building2, House, ListChecks, Medal, Newspaper, Trophy } from 'lucide-vue-next';
 import type { Component } from 'vue';
-import { computed, provide, ref } from 'vue';
+import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { CURRENT_SECTION_KEY } from '@/components/ui/page-section';
 import type { RouteLocationNormalized } from 'vue-router';
 import { preloadRoute } from '@/router/preload';
 import { useIsFirstNavigationPending } from '@/router/first-navigation';
@@ -22,13 +13,13 @@ export interface NavItem {
   icon: Component;
 }
 
-/** The seven public sections, in the order of the rail and of the phone sheet (the tab bar keeps the first four). */
+/** The seven public sections, in the order of the desktop bar and of the phone sheet. */
 export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/', labelKey: 'nav.home', icon: House },
-  { path: '/problems', labelKey: 'nav.problems', icon: ListChecks },
+  { path: '/problems', labelKey: 'nav.problems', icon: BookOpen },
   { path: '/contests', labelKey: 'nav.contests', icon: Trophy },
-  { path: '/submissions', labelKey: 'nav.submissions', icon: Send },
-  { path: '/users', labelKey: 'nav.users', icon: ChartColumn },
+  { path: '/submissions', labelKey: 'nav.submissions', icon: ListChecks },
+  { path: '/users', labelKey: 'nav.users', icon: Medal },
   { path: '/blog', labelKey: 'nav.blog', icon: Newspaper },
   { path: '/organizations', labelKey: 'nav.organizations', icon: Building2 },
 ];
@@ -77,25 +68,4 @@ export function useNavLinkEvents() {
       if (opensHere && !isSameLocation(route, path)) pendingPath.value = path;
     },
   });
-}
-
-/**
- * The section of the page on screen (its claim through `useNavSection`, else its path), or null outside the seven. Unlike
- * `useIsNavCurrent` it ignores a pending click: the top bar's crumbs name the page that is shown.
- */
-export function useCurrentSection() {
-  const route = useRoute();
-  return computed(() => {
-    const claimed = navSectionOverride.value;
-    return (
-      NAV_ITEMS.find((item) =>
-        claimed === null ? isInSection(item.path, route.path) : item.path === claimed,
-      ) ?? null
-    );
-  });
-}
-
-/** Gives the pages below the shell their section, for the kit's `PageHeader` (the kit cannot import the shell). */
-export function providePageSection() {
-  provide(CURRENT_SECTION_KEY, useCurrentSection());
 }

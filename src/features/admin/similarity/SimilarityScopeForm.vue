@@ -2,7 +2,7 @@
 import { ref, useId, watch } from 'vue';
 import SettingsCard from '@/features/account/settings/SettingsCard.vue';
 import type { SimilarityScope, SimilarityScopeKind } from '@/api/types/similarity';
-import Chip from '@/components/ui/Chip.vue';
+import AdminChip from '../ui/AdminChip.vue';
 import { INPUT, buttonClass } from '../ui/controls';
 import { needsPermissionText } from '../ui/permission-text';
 import { scopeKindOf, scopeValueOf } from './similarity-runs';
@@ -36,7 +36,7 @@ const submitView = () => {
     :lead="$t('admin.similarity.scope.lead')"
   >
     <template #header-end>
-      <Chip>{{ needsPermissionText('judge.moss_contest') }}</Chip>
+      <AdminChip>{{ needsPermissionText('judge.moss_contest') }}</AdminChip>
     </template>
     <form class="flex flex-col gap-4" @submit.prevent="submitView">
       <fieldset class="flex flex-wrap gap-4">

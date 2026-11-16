@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Modal from '@/components/ui/Modal.vue';
+import Dialog from 'primevue/dialog';
 import { computed, ref, useId } from 'vue';
 import type { Role } from '@/api/types/users-admin';
 import QueryState from '@/components/QueryState.vue';
@@ -8,7 +8,7 @@ import { BUTTON } from '../ui/controls';
 import RoleEditor from './RoleEditor.vue';
 import { usePermissionLabel } from './use-permission-label';
 import { usePermissionCatalogQuery, useRolesQuery } from './users.queries';
-import Chip from '@/components/ui/Chip.vue';
+import AdminChip from '../ui/AdminChip.vue';
 
 /** Roles (legacy groups): everyone with the users screen reads them; a superuser creates and edits them. */
 const visible = defineModel<boolean>('visible', { required: true });
@@ -23,15 +23,18 @@ const retry = () => Promise.all([rolesQuery.refetch(), catalogQuery.refetch()]);
 const permissionLabel = usePermissionLabel();
 const labelOf = (code: string) =>
   permissionLabel(code, catalogQuery.data.value?.find((entry) => entry.codename === code)?.label);
-/** The custom header slot has no title of the Modal's own, so the dialog is named by its heading here. */
+/** The custom header slot loses PrimeVue's own label, so the dialog is named by its heading here. */
 const titleId = useId();
 </script>
 
 <template>
-  <Modal
+  <Dialog
     v-model:visible="visible"
+    modal
+    :draggable="false"
     :style="{ width: '760px', maxWidth: 'calc(100vw - 2rem)' }"
-    :aria-labelledby="titleId"
+    :close-button-props="{ 'aria-label': $t('common.close') }"
+    :pt="{ root: { 'aria-labelledby': titleId } }"
   >
     <template #header>
       <h2 :id="titleId" class="font-display text-subtitle leading-7 font-semibold">
@@ -100,7 +103,7 @@ const titleId = useId();
             </div>
             <ul v-if="opened === role.id" class="flex flex-wrap gap-1">
               <li v-for="code in role.permissions" :key="code">
-                <Chip tone="accent">{{ labelOf(code) }}</Chip>
+                <AdminChip tone="accent">{{ labelOf(code) }}</AdminChip>
               </li>
               <li v-if="role.permissions.length === 0" class="text-sm text-muted">
                 {{ $t('admin.users.access.noneHeld') }}
@@ -110,5 +113,5 @@ const titleId = useId();
         </ul>
       </div>
     </QueryState>
-  </Modal>
+  </Dialog>
 </template>

@@ -23,11 +23,11 @@ export interface ContestListRoute {
 }
 
 export const PHASE_ORDER: readonly ContestPhase[] = ['running', 'upcoming', 'ended'];
-/** List B: every running contest, the next three, the first page of the ended ones. */
+/** List B: every running contest, the next three, the last five. */
 export const OVERVIEW_PAGE_SIZE: Record<ContestPhase, number> = {
   running: 100,
   upcoming: 3,
-  ended: 20,
+  ended: 5,
 };
 export const PHASE_PAGE_SIZE = 20;
 const MAX_SEARCH_LENGTH = 100;
@@ -69,25 +69,21 @@ export const toContestListLocation = (filters: ContestListFilters): LocationQuer
   tag: filters.tag ?? undefined,
 });
 
-/** Ended contests are the long list: they page in the overview too. Running and upcoming show their first page there. */
-export const isPagedGroup = (filters: ContestListFilters, phase: ContestPhase) =>
-  filters.phase === phase || phase === 'ended';
-
-/** What one group asks: running and upcoming show the first page in the overview, a single group or the ended ones page. */
+/** What one group asks: the overview shows the first page of each, a single group pages. */
 export function groupQuery(
   filters: ContestListFilters,
   phase: ContestPhase,
   organizationId?: string,
 ): ContestListQuery {
-  const isPaged = isPagedGroup(filters, phase);
+  const isSingleGroup = filters.phase === phase;
   return {
     phase,
     search: filters.search.trim() || undefined,
     rated: filters.isRatedOnly ? true : undefined,
     tag: filters.tag ?? undefined,
     organization: organizationId,
-    page: isPaged ? filters.page : 1,
-    pageSize: filters.phase === phase ? PHASE_PAGE_SIZE : OVERVIEW_PAGE_SIZE[phase],
+    page: isSingleGroup ? filters.page : 1,
+    pageSize: isSingleGroup ? PHASE_PAGE_SIZE : OVERVIEW_PAGE_SIZE[phase],
   };
 }
 

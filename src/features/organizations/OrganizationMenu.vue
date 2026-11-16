@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { Ellipsis } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import Menu from 'primevue/menu';
+import type { MenuItem } from 'primevue/menuitem';
+import { computed, nextTick, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import type { OrganizationDetail } from '@/api/types/organizations';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import IconButton from '@/components/ui/IconButton.vue';
-import Menu from '@/components/ui/Menu.vue';
-import type { MenuEntry } from '@/components/ui/Menu.vue';
 import Notice from '@/components/ui/Notice.vue';
 import { useToast } from '@/components/ui/use-toast';
 import OfficialLockNote from '@/features/official-mode/OfficialLockNote.vue';
@@ -49,6 +49,20 @@ function leave() {
   membership.leave();
 }
 const lock = useOfficialLock();
+const menu = ref<InstanceType<typeof Menu>>();
+const isMenuOpen = ref(false);
+/**
+ * The menu popup that held focus is gone when the dialog closes, so PrimeVue has no opener to return to. Cancel and Escape
+ * put focus back on the ⋯ button; after a confirm the button may be gone, and the dialog's own `returnFocusTo` decides.
+ */
+const root = ref<HTMLElement>();
+watch(isLeaveOpen, async (isOpen) => {
+  if (isOpen) return;
+  await nextTick();
+  const trigger = root.value?.querySelector('button');
+  if (trigger && (!document.activeElement || document.activeElement === document.body))
+    trigger.focus();
+});
 /** Each try starts clean: an earlier failure is not shown again. */
 function openLeave() {
   membership.reset();
@@ -59,8 +73,7 @@ const joinButton = () =>
   document.querySelector<HTMLElement>(
     '[data-testid="membership-panel"] button, [data-testid="membership-panel"] a',
   );
-/** The menu puts focus back on ⋯ before the item runs, so Cancel and Escape return there; after a confirm the dialog's `returnFocusTo` decides. */
-const items = computed<MenuEntry[]>(() => [{ label: t('orgMembership.leave'), run: openLeave }]);
+const items = computed<MenuItem[]>(() => [{ label: t('orgMembership.leave'), command: openLeave }]);
 const errorCopy = computed(() =>
   membership.error.value ? membershipErrorCopy('leave', membership.error.value) : null,
 );
@@ -73,21 +86,24 @@ const body = computed(() => {
 </script>
 
 <template>
-  <div data-testid="organization-menu">
-    <Menu :items="items" :label="$t('orgMembership.menu')">
-      <template #trigger="{ toggle, open, setOpener }">
-        <IconButton
-          :ref="(el) => setOpener((el as { $el?: HTMLElement } | null)?.$el ?? null)"
-          tone="secondary"
-          :label="$t('orgMembership.menu')"
-          aria-haspopup="menu"
-          :aria-expanded="open"
-          @click="toggle"
-        >
-          <Ellipsis aria-hidden="true" class="size-4" />
-        </IconButton>
-      </template>
-    </Menu>
+  <div ref="root" data-testid="organization-menu">
+    <IconButton
+      tone="secondary"
+      :label="$t('orgMembership.menu')"
+      aria-haspopup="menu"
+      :aria-expanded="isMenuOpen"
+      @click="menu?.toggle($event)"
+    >
+      <Ellipsis aria-hidden="true" class="size-4" />
+    </IconButton>
+    <Menu
+      ref="menu"
+      :model="items"
+      popup
+      :pt="{ root: { 'aria-label': $t('orgMembership.menu') } }"
+      @show="isMenuOpen = true"
+      @hide="isMenuOpen = false"
+    />
     <ConfirmDialog
       v-model:visible="isLeaveOpen"
       tone="danger"

@@ -23,7 +23,7 @@ import ContestDeleteDialog from '../lifecycle/ContestDeleteDialog.vue';
 import ContestBulkVisibilityDialog from './ContestBulkVisibilityDialog.vue';
 import ContestFlagChips from './ContestFlagChips.vue';
 import ContestListFilters from './ContestListFilters.vue';
-import ContestStateChip from './ContestStateChip.vue';
+import ContestPhaseChip from './ContestPhaseChip.vue';
 import ContestWindowText from './ContestWindowText.vue';
 import {
   activePanelFilters,
@@ -108,13 +108,12 @@ const columns = computed<AdminColumn[]>(() => [
     priority: 'primary',
     cellClass: 'min-w-48',
   },
-  { key: 'state', label: t('admin.contests.list.columns.state'), priority: 'badge' },
+  { key: 'phase', label: t('admin.contests.list.columns.phase'), priority: 'badge' },
   {
     key: 'time',
     label: t('admin.contests.list.columns.time'),
     priority: 'secondary',
     stacked: true,
-    cellClass: 'min-w-60 whitespace-nowrap',
     sort: { asc: 'oldest', desc: 'newest', first: 'desc' },
   },
   {
@@ -123,12 +122,7 @@ const columns = computed<AdminColumn[]>(() => [
     priority: 'secondary',
     align: 'end',
   },
-  {
-    key: 'flags',
-    label: t('admin.contests.list.columns.flags'),
-    priority: 'meta',
-    cellClass: 'min-w-64',
-  },
+  { key: 'flags', label: t('admin.contests.list.columns.flags'), priority: 'meta' },
 ]);
 const editTo = (contest: ContestListItem) => ({
   name: 'admin-contestGeneral',
@@ -243,9 +237,7 @@ const resultRows = computed(() =>
           ><HighlightedText :text="row.key" :query="filters.q"
         /></span>
       </template>
-      <template #cell-state="{ row }">
-        <ContestStateChip :phase="row.phase" :is-visible="row.editor?.isVisible" />
-      </template>
+      <template #cell-phase="{ row }"><ContestPhaseChip :phase="row.phase" /></template>
       <template #cell-time="{ row }">
         <ContestWindowText :start-time="row.startTime" :end-time="row.endTime" />
       </template>

@@ -1,7 +1,7 @@
 import { isTypingTarget } from '@/lib/typing-target';
 
-/** A bare `s` outside a field or the editor: puts the caret in the submit pane's editor. */
-export function isFocusEditorShortcut(event: KeyboardEvent): boolean {
+/** A bare `s` outside a field or the editor: opens the submit dock. */
+export function isOpenDockShortcut(event: KeyboardEvent): boolean {
   if (event.defaultPrevented || event.isComposing || event.repeat) return false;
   if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return false;
   return event.key === 's' && !isTypingTarget(event.target);
@@ -10,7 +10,3 @@ export function isFocusEditorShortcut(event: KeyboardEvent): boolean {
 /** The hint on the submit button: ⌘ Enter on Apple systems, Ctrl Enter elsewhere (both work everywhere). */
 export const submitShortcutHint = (platform = navigator.platform): string =>
   /Mac|iPhone|iPad/.test(platform) ? '⌘ Enter' : 'Ctrl Enter';
-
-/** The key the editor really binds (CodeMirror's `Mod`): Command on Apple systems, Control elsewhere. */
-export const submitAriaShortcut = (platform = navigator.platform): string =>
-  /Mac|iPhone|iPad/.test(platform) ? 'Meta+Enter' : 'Control+Enter';

@@ -1,80 +1,59 @@
 <!-- eslint-disable vue/multi-word-component-names -- the kit names primitives by role (docs/design-language.md). -->
 <script setup lang="ts">
-import { nextTick, useTemplateRef, watch } from 'vue';
-import { FOCUSABLE, trapTab } from './focus-trap';
-import { yieldsToComposition } from './keys';
-import { usePopup } from './popup';
+import PrimePopover from 'primevue/popover';
+import { computed, ref } from 'vue';
 
 /**
- * The one popover, a non-modal dialog beside its opener (`popup.ts`: top layer, anchored). It opens from `toggle($event)` of its
+ * The one popover: PrimeVue's Popover on the shared preset, behaving like `Modal`. It opens from `toggle($event)` of its
  * opener; focus moves to its first control (else the popover itself) and Tab stays inside. Escape closes it and focus returns
  * to the opener; so does `hide()`, for a popover closed from one of its own buttons, unless the action sent focus somewhere
  * else (a link that navigates, a field it opens). An outside click closes it and leaves focus where it was clicked.
  * Name it with `label`, or `labelledby` (the id of a title inside). `show` and `hide` fire on open and close.
  */
-defineProps<{ label?: string; labelledby?: string }>();
+const props = defineProps<{ label?: string; labelledby?: string }>();
 const emit = defineEmits<{ show: []; hide: [] }>();
 
-const panel = useTemplateRef<HTMLElement>('panel');
-const popup = usePopup(panel, () => popup.close());
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]):not([type=hidden]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const popover = ref<InstanceType<typeof PrimePopover>>();
+const body = ref<HTMLElement>();
+let opener: HTMLElement | null = null;
+const pt = computed(() => ({
+  root: { 'aria-label': props.label, 'aria-labelledby': props.labelledby },
+}));
+
+function toggle(event: Event) {
+  opener = event.currentTarget as HTMLElement | null;
+  popover.value?.toggle(event);
+}
 
 /** `preventScroll`: the popover is already beside its opener, the page must not jump to it. */
 function focusFirstControl() {
-  const first = panel.value?.querySelector<HTMLElement>(FOCUSABLE) ?? panel.value;
+  const first = body.value?.querySelector<HTMLElement>(FOCUSABLE) ?? body.value;
   first?.focus({ preventScroll: true });
-}
-watch(popup.isOpen, async (isOpen) => {
-  if (!isOpen) {
-    emit('hide');
-    return;
-  }
-  await nextTick();
-  focusFirstControl();
-  emit('show');
-});
-
-function toggle(event: Event) {
-  if (popup.isOpen.value) popup.close();
-  else popup.open(event.currentTarget as HTMLElement | null);
 }
 
 function isFocusLost() {
   const active = document.activeElement;
-  return !active || active === document.body || Boolean(panel.value?.contains(active));
+  return !active || active === document.body || Boolean(body.value?.contains(active));
 }
 
 function hide() {
   const returnsFocus = isFocusLost();
-  popup.close();
-  if (returnsFocus && popup.opener.value?.isConnected) popup.opener.value.focus();
+  popover.value?.hide();
+  if (returnsFocus && opener?.isConnected) opener.focus();
 }
 
-/** Escape is taken here (`preventDefault`), so a dialog the popover sits in stays open. */
-function onKeydown(event: KeyboardEvent) {
-  if (yieldsToComposition(event)) return;
-  if (event.key === 'Escape') {
-    event.preventDefault();
-    hide();
-  } else if (event.key === 'Tab' && panel.value) trapTab(event, panel.value);
+function onShow() {
+  focusFirstControl();
+  emit('show');
 }
 
 defineExpose({ toggle, hide });
 </script>
 
 <template>
-  <Teleport v-if="popup.isOpen.value" :to="popup.host.value">
-    <div
-      ref="panel"
-      popover="manual"
-      data-popup
-      role="dialog"
-      tabindex="-1"
-      :aria-label="label"
-      :aria-labelledby="labelledby"
-      class="rounded-card overlay-surface p-4 text-content outline-none"
-      @keydown="onKeydown"
-    >
-      <slot />
-    </div>
-  </Teleport>
+  <PrimePopover ref="popover" :pt="pt" @show="onShow" @hide="emit('hide')">
+    <div ref="body" tabindex="-1" class="outline-none"><slot /></div>
+  </PrimePopover>
 </template>

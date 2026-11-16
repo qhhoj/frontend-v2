@@ -36,7 +36,7 @@ const digitCells = (digit: keyof typeof DIGIT_ROWS) =>
           <span
             v-for="(filled, cell) in digitCells(digit)"
             :key="cell"
-            class="rounded-cell"
+            class="rounded-[4px]"
             :class="filled ? 'bg-line-strong' : ''"
           />
         </div>

@@ -50,17 +50,13 @@ export const useContestQuery = (
   });
 };
 
-/** Re-read while the viewer is in a contest, so the standing in the shell (rank, score) stays current; a viewer in none is not polled. */
-const CURRENT_POLL_MS = 120_000;
-
-/** The viewer's current participation (virtual run number, end and standing); asked only while in a contest. */
+/** The viewer's current participation (virtual run number and end); asked only while in a contest. */
 export const useCurrentParticipationQuery = (isEnabled: Ref<boolean>) => {
   const viewerId = useViewerId();
   return useQuery({
     enabled: isEnabled,
     queryKey: computed(() => ['contests', 'current', viewerId.value]),
     queryFn: fetchCurrentParticipation,
-    refetchInterval: (query) => (query.state.data ? CURRENT_POLL_MS : false),
   });
 };
 

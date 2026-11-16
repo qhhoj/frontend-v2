@@ -12,10 +12,14 @@ const ARBITRARY =
  */
 export const ALLOWED = {
   'features/contests/ContestProblemsTable.vue': ['text-[22px]'],
+  'features/auth/LoginBrandPanel.vue': ['text-[34px]'],
   'features/appearance/AppearancePreview.vue': ['text-[22px]'],
   'components/CryingBit.vue': ['rounded-[50%]'],
   'features/runtimes/JudgeCard.vue': ['rounded-[2px]'],
   'features/submissions/list/TestStrip.vue': ['rounded-[2px]', 'rounded-[3px]'],
+  'features/problems/ProblemTierMark.vue': ['rounded-[3px]'],
+  'features/submissions/VerdictDistributionBar.vue': ['rounded-[3px]'],
+  'features/not-found/NotFoundPage.vue': ['rounded-[4px]'],
 };
 
 /** The arbitrary size, radius and z-index classes in the string literals of one source line, as written; comment lines are ignored. */

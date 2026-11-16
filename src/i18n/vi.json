@@ -14,13 +14,7 @@
     "organizations": "Tổ chức",
     "more": "Thêm",
     "menu": "Menu",
-    "railCollapse": "Thu gọn thanh bên",
-    "railExpand": "Mở rộng thanh bên",
-    "runningCount": "{count} đang thi",
-    "me": "Tôi",
-    "back": "Quay lại",
-    "breadcrumb": "Vị trí trang",
-    "rail": "Thanh bên"
+    "openMenu": "Mở menu"
   },
   "pages": {
     "problem": "Bài tập",
@@ -64,10 +58,10 @@
     "contestReplay": "Phát lại",
     "contestBalloons": "Bóng bay",
     "contestBalloonsPrint": "Phiếu bóng bay",
+    "problemBest": "Bài nộp tốt nhất",
     "runtimes": "Máy chấm và ngôn ngữ",
     "postDrafts": "Bài nháp của tôi",
     "contestAll": "Tất cả đề",
-    "devKit": "Bộ thành phần",
     "contestProblemBest": "Bài nộp tốt nhất của bài",
     "paste": "Dán mã",
     "share": "Liên kết chia sẻ",
@@ -126,7 +120,6 @@
       "freeze": "Đóng băng",
       "timeLeft": "Còn lại",
       "notStarted": "Kỳ thi chưa bắt đầu",
-      "endedOn": "Kết thúc lúc {time}",
       "endedAt": "Đã kết thúc lúc {time}",
       "elapsed": "đã qua {span}",
       "notFoundTitle": "Không tìm thấy kỳ thi",
@@ -293,8 +286,8 @@
       "searchPlaceholder": "Tìm theo mã hoặc tên",
       "startsIn": "bắt đầu {relative}",
       "viewAndRegister": "Xem & đăng ký",
+      "endedRegion": "Bảng kỳ thi đã kết thúc, cuộn ngang",
       "shownOf": "{shown} trong {total}",
-      "count": "{n} kỳ thi",
       "view": "Xem",
       "codeNeeded": "Cần mã",
       "badges": {
@@ -304,8 +297,7 @@
       },
       "columns": {
         "contest": "Kỳ thi",
-        "when": "Ngày",
-        "length": "Thời lượng",
+        "when": "Ngày · thời lượng",
         "format": "Thể thức",
         "participants": "Thí sinh",
         "action": "Thao tác"
@@ -660,55 +652,37 @@
   },
   "appearance": {
     "title": "Giao diện",
+    "customLook": "Dùng giao diện riêng",
+    "customLookHelp": "Tắt: bạn thấy giao diện của trang. Bật: dùng các lựa chọn bên dưới.",
+    "styleAndMode": "Kiểu và chế độ",
+    "style": "Kiểu",
     "mode": "Chế độ",
     "modeOption": {
       "light": "Sáng",
       "dark": "Tối",
       "auto": "Theo máy"
     },
-    "contrast": "Độ tương phản",
-    "contrastHelp": "Cao: chữ, viền và màu kết quả đậm hơn. Khi chưa chọn, trang theo cài đặt của thiết bị.",
-    "contrastOption": {
-      "standard": "Chuẩn",
-      "high": "Cao"
-    },
-    "backgroundTitle": "Nền trang",
-    "backgroundHelp": "Họa tiết mờ sau trang; thẻ, bảng và chữ vẫn nằm trên nền đặc. Chế độ tiết kiệm pin hiện một màu phẳng.",
-    "background": {
-      "none": "Không",
-      "paper": "Giấy",
-      "grainy": "Hạt mịn",
-      "contour": "Đường đồng mức",
-      "halftone": "Chấm bán sắc",
-      "dither": "Điểm ảnh rải",
-      "stipple": "Chấm li ti",
-      "landscape": "Đồi núi"
-    },
-    "paletteTitle": "Bảng màu",
-    "paletteHelp": "Nền, chữ và màu kết quả của cả trang. Mỗi bảng đều được kiểm tra để chữ đủ rõ ở chế độ sáng, tối và tương phản cao. Lựa chọn lưu trong trình duyệt này.",
-    "palette": {
-      "catppuccin-mocha": "Catppuccin Mocha",
-      "catppuccin-frappe": "Catppuccin Frappé",
-      "palletism": "Palletism",
-      "wonderlist": "Wonderlist",
-      "motionin": "Motionin",
-      "iris": "Diên vĩ",
-      "lagoon": "Đầm phá",
-      "lotus": "Hồng sen",
-      "ink": "Mực",
-      "plum": "Mận",
-      "petrol": "Xanh dầu",
-      "paper": "Paper"
-    },
     "accentTitle": "Màu nhấn",
-    "accentHelp": "Mỗi màu đều được kiểm tra để chữ đủ rõ ở cả chế độ sáng, tối và tương phản cao.",
+    "accentHelp": "Mỗi màu đều được kiểm tra để chữ đủ rõ ở cả nền sáng lẫn tối.",
     "accent": {
-      "ultramarine": "Lam",
-      "teal": "Xanh két",
-      "plum": "Mận",
-      "terracotta": "Đất nung",
-      "graphite": "Than chì"
+      "clay": "Clay",
+      "orchid": "Orchid",
+      "ocean": "Ocean",
+      "mint": "Mint",
+      "sunset": "Sunset",
+      "gold": "Gold",
+      "mono": "Mono",
+      "red": "Đỏ"
     },
+    "glass": "Kính",
+    "glassOnly": "Glass và quầng sáng chỉ áp dụng cho giao diện Glass.",
+    "glassHelp": "Độ trong của các thẻ. Đặc là dễ đọc nhất và nhẹ nhất cho máy cũ.",
+    "glassStop": {
+      "clear": "Trong",
+      "frosted": "Mờ",
+      "solid": "Đặc"
+    },
+    "glow": "Quầng sáng nền",
     "reset": "Về mặc định của trang",
     "useSite": "Dùng mặc định của trang",
     "moreSettings": "Thêm trong Cài đặt",
@@ -721,7 +695,7 @@
     "showingSite": "Đang dùng giao diện của trang",
     "savedAccount": "Đã lưu vào tài khoản · áp dụng trên mọi thiết bị",
     "savedBrowser": "Đã lưu trong trình duyệt này · đăng nhập để dùng trên mọi thiết bị",
-    "migrated": "QHHOJ có giao diện mới. Lựa chọn cũ của bạn đã được chuyển sang màu gần nhất; đổi lại trong Cài đặt › Giao diện."
+    "solidByDevice": "Thiết bị của bạn yêu cầu giảm độ trong suốt, nên các thẻ luôn đặc."
   },
   "bitRoam": {
     "title": "Bit chạy quanh trang",
@@ -732,6 +706,14 @@
     "stillNote": "Bit đứng yên khi bật Chế độ tiết kiệm hoặc giảm chuyển động.",
     "resting": "Bit đi nghỉ đến hết phiên này",
     "callBack": "Gọi lại"
+  },
+  "theme": {
+    "styleClay": "Clay",
+    "styleGlass": "Glass",
+    "clayLight": "Clay sáng",
+    "clayDark": "Clay tối",
+    "glassDark": "Glass tối",
+    "glassLight": "Glass sáng"
   },
   "locale": {
     "switchTo": "Switch to English",
@@ -749,6 +731,11 @@
     },
     "noAccountPrompt": "Chưa có tài khoản?",
     "resendLink": "Gửi lại email kích hoạt",
+    "brand": {
+      "headline": "Luyện thuật toán mỗi ngày, cùng Bit.",
+      "lead": "Nộp bài, xem kết quả chấm ngay và leo bảng xếp hạng.",
+      "counts": "{problems} bài · {users} thành viên"
+    },
     "notice": {
       "passwordReset": "Mật khẩu đã được đổi, hãy đăng nhập lại."
     },
@@ -1124,8 +1111,10 @@
       "evening": "Chào buổi tối, {username}"
     },
     "ratingDelta": "{delta} sau kỳ thi gần nhất",
+    "ratingTier": "Rating · {tier}",
+    "ratingChart": "Rating qua {count} kỳ thi, từ {first} đến {last}",
     "solved": "Đã giải",
-    "unrated": "Chưa có rating",
+    "solvedUnrated": "Bài đã giải · chưa có rating",
     "points": "Điểm",
     "rank": "Hạng",
     "recentSubmissions": "Bài nộp gần đây",
@@ -1146,30 +1135,25 @@
         "submissions": "bài nộp",
         "contests": "kỳ thi"
       },
+      "running": "Kỳ thi đang diễn ra",
+      "allContests": "Tất cả kỳ thi",
+      "contestants": "{key} · {count} thí sinh",
       "elapsed": "Đã qua {percent}% thời gian",
+      "viewContest": "Xem kỳ thi",
       "newPosts": "Bài viết mới",
+      "allPosts": "Tất cả bài viết",
       "score": "{score} điểm",
       "topPp": "Top điểm PP",
       "pp": "{pp} PP",
       "leaderboard": "Bảng xếp hạng",
       "noPerformers": "Chưa có ai có điểm PP."
-    },
-    "contestants": "{count} thí sinh",
-    "continueHint": "Quay lại bài bạn đang làm dở",
-    "liveEnter": "Vào thi",
-    "liveScore": "{score} điểm"
+    }
   },
   "problem": {
     "copySample": "Sao chép ví dụ",
     "tabs": {
       "statement": "Đề bài",
-      "editorial": "Lời giải",
-      "submissions": "Bài nộp",
-      "mine": "Của tôi",
-      "best": "Tốt nhất"
-    },
-    "menu": {
-      "report": "Báo lỗi đề"
+      "editorial": "Lời giải"
     },
     "tabsLabel": "Mục của bài",
     "editorial": {
@@ -1178,7 +1162,8 @@
     "limits": {
       "time": "Thời gian",
       "memory": "Bộ nhớ",
-      "points": "Điểm"
+      "points": "Điểm",
+      "acRate": "Tỉ lệ AC"
     },
     "noStatement": {
       "title": "Chưa có đề bài",
@@ -1201,10 +1186,17 @@
     "noSubmissions": "Bạn chưa nộp bài này.",
     "rail": {
       "railLabel": "Thông tin bài",
+      "submit": {
+        "title": "Nộp bài",
+        "open": "Nộp bài",
+        "hint": "Mở khung soạn mã ở cuối trang."
+      },
       "facts": {
+        "solvers": "Người giải",
         "io": "Nhập/xuất",
         "input": "Nhập",
         "output": "Xuất",
+        "stdio": "Bàn phím / màn hình",
         "status": "Trạng thái",
         "untried": "Chưa thử",
         "contestPoints": "Điểm kỳ thi"
@@ -1215,24 +1207,34 @@
         "siteOutOf": "/ {max} điểm bài"
       },
       "links": {
+        "label": "Liên kết của bài",
+        "title": "Liên kết",
+        "submissions": "Tất cả bài nộp",
+        "best": "Bài nộp tốt nhất",
         "pdfStatement": "Đề bài PDF",
-        "material": "Tài liệu đính kèm"
+        "material": "Tài liệu đính kèm",
+        "report": "Báo lỗi bài này"
       }
     },
-    "pdfRender": "Tải PDF",
+    "pdfRender": "Tải đề dạng PDF",
     "externalJudge": "Chấm trên {oj}",
     "strip": {
       "partial": "từng phần",
-      "acRate": "Tỉ lệ AC",
-      "solvers": "Người giải"
+      "solves": "AC {rate}% · {count} người giải"
     }
   },
   "problems": {
     "title": "Bài tập",
     "results": "{n} kết quả",
+    "solvedCount": "Đã giải {solved} bài",
     "search": "Mã hoặc tên bài",
+    "types": "Lọc theo dạng bài",
+    "pointsAny": "Điểm",
+    "pointsFilter": "Lọc theo điểm",
     "listName": "Danh sách bài",
+    "pointsRange": "Điểm {min}–{max}",
     "pointsAnyBound": "Bất kỳ",
+    "pointsDone": "Xong",
     "pointsMin": "Điểm từ",
     "pointsMax": "Điểm đến",
     "columns": {
@@ -1259,12 +1261,15 @@
     "random": "Bài ngẫu nhiên",
     "randomNone": "Không có bài phù hợp.",
     "randomFailed": "Chưa chọn được bài, thử lại.",
+    "hideSolved": "Ẩn bài đã giải",
     "hasEditorial": "Có lời giải",
     "filtering": "Đang lọc:",
     "clearAll": "Xóa tất cả",
     "removeFilter": "Bỏ lọc: {name}",
     "pointsChip": "{min}–{max} điểm",
     "count": "{n} bài",
+    "legendPartial": "= chấm từng phần",
+    "legend": "Chú giải",
     "uncategorized": "Chưa phân loại",
     "attemptedLong": "Đã thử, chưa đúng",
     "notTried": "Chưa thử",
@@ -1276,16 +1281,13 @@
       "acRate": "AC",
       "userCount": "Đã giải"
     },
-    "solverCount": "{count} đã giải",
+    "solverCount": "{count} giải",
     "filterPanel": "Bộ lọc",
-    "solvedShort": "{solved} đã giải",
-    "partialHint": "chấm từng phần",
-    "hasEditorialHint": "Chỉ bài đã có lời giải được công bố",
-    "solvedFilter": {
-      "label": "Lọc theo bài đã giải",
-      "any": "Tất cả",
-      "unsolved": "Chưa giải",
-      "solved": "Đã giải"
+    "tier": {
+      "1": "Dễ",
+      "2": "Trung bình",
+      "3": "Khó",
+      "4": "Rất khó"
     }
   },
   "submissions": {
@@ -1305,9 +1307,7 @@
       "verdict": "Kết quả",
       "problem": "Bài",
       "user": "Người nộp",
-      "score": "Điểm",
-      "time": "Thời gian",
-      "memory": "Bộ nhớ",
+      "cost": "Thời gian · Bộ nhớ",
       "language": "Ngôn ngữ",
       "when": "Lúc",
       "source": "Mã nguồn",
@@ -1337,11 +1337,17 @@
       "positionOpen": "Trang {page}"
     },
     "stats": {
+      "judgedToday": "đã chấm hôm nay",
+      "acceptedToday": "chấp nhận",
+      "queue": "chờ",
       "judges": "máy chấm",
-      "noJudge": "không có máy chấm"
+      "noJudge": "không có máy chấm",
+      "unavailable": "Không có số liệu thống kê",
+      "distribution": "Kết quả chấm hôm nay theo loại"
     },
     "queued": "Trong hàng đợi",
     "queuedShort": "Chờ",
+    "gradingShort": "Chấm…",
     "rowLabel": "Bài nộp #{id} của {user} cho bài {problem}: {verdict}",
     "liveAdded": "Có {count} bài nộp mới | Có {count} bài nộp mới",
     "liveNew": "Có {count} bài nộp mới ở trang đầu | Có {count} bài nộp mới ở trang đầu",
@@ -1387,6 +1393,7 @@
       "notFoundTitle": "Không tìm thấy bảng xếp hạng",
       "notFoundBody": "Đường dẫn sai, đã tắt hoặc đã hết hạn."
     },
+    "summary": "{format} · {problems} bài · {participants}",
     "viewMode": "Chế độ bảng",
     "official": "Chính thức",
     "withVirtual": "Gồm thi ảo",
@@ -1398,14 +1405,10 @@
       "afterParticipation": "Bảng xếp hạng sẽ mở sau khi lượt tham gia của bạn kết thúc.",
       "afterContest": "Bảng xếp hạng sẽ mở sau khi kỳ thi kết thúc."
     },
+    "frozenTitle": "Bảng đang đóng băng",
     "frozenBody": "{minutes} phút cuối, kết quả mới hiện “?” đến khi công bố.",
-    "freeze": {
-      "label": "Đóng băng",
-      "pendingLabel": "Chờ công bố"
-    },
+    "podium": "Top 3",
     "timeLeft": "Thời gian còn lại",
-    "showProblems": "Mở các bài của thí sinh",
-    "hideProblems": "Thu gọn các bài của thí sinh",
     "scrollRegion": "Vùng cuộn bảng xếp hạng",
     "columns": {
       "rank": "Hạng",
@@ -1413,20 +1416,18 @@
       "penalty": "Phạt",
       "score": "Điểm",
       "scoreTime": "Điểm · giờ",
-      "ratingChange": "Δ rating",
-      "scorePenalty": "Điểm · Phạt"
+      "ratingChange": "Δ rating"
     },
     "legend": {
       "firstSolve": "giải đầu tiên",
-      "solved": "+n: giải sau n lần sai, thời điểm giải ở dòng dưới",
-      "failed": "−n đỏ: n lần sai",
+      "solved": "+n: giải sau n lần sai, kèm thời điểm",
+      "failed": "−n: n lần sai",
       "pending": "?n: chờ công bố",
       "firstPoints": "đủ điểm và giải đầu tiên",
       "fullPoints": "nền xanh: đủ điểm của bài",
-      "partialPoints": "số điểm không nền: một phần điểm của bài",
-      "zeroPoints": "0 đỏ: đã nộp nhưng chưa được điểm",
-      "notAttempted": "trống: chưa nộp",
-      "button": "Chú giải"
+      "partialPoints": "Một phần điểm, nền đậm dần theo ba mức",
+      "zeroPoints": "0: đã nộp nhưng chưa được điểm",
+      "notAttempted": "trống: chưa nộp"
     },
     "cell": {
       "firstSolve": "Giải đầu tiên, sau {tries} lần sai, lúc {time}",
@@ -1439,7 +1440,6 @@
       "firstPointsAt": "Giải đầu tiên: {points} điểm, lúc {time}"
     },
     "empty": "Chưa có thí sinh.",
-    "emptyAction": "Xem đề bài",
     "disqualified": "Bị loại",
     "refreshFailed": "Không cập nhật được bảng, đang thử lại.",
     "scrollHint": "Vuốt ngang để xem các bài →",
@@ -1518,6 +1518,7 @@
       "sourceLength": "Mã nguồn vượt quá {max} ký tự."
     },
     "versions": "Phiên bản trình dịch",
+    "close": "Đóng khung nộp bài",
     "result": {
       "atTest": "{verdict} test {test}",
       "details": "Xem chi tiết",
@@ -1525,18 +1526,20 @@
     }
   },
   "submission": {
-    "step": {
-      "queued": "Đang chờ",
-      "processing": "Đang xử lý",
-      "running": "Test {test}/{total}",
-      "grading": "Đang chấm"
-    },
     "ringLabel": "Đã chấm {graded} trên {total} test",
     "ringLabelPoints": "Đã được {percent}% điểm",
     "provisional": "điểm tạm tính",
     "liveUpdates": "Cập nhật trực tiếp",
     "staleReload": "Kết nối đã dừng; tải lại để xem trạng thái mới nhất",
     "reload": "Tải lại",
+    "facts": {
+      "problem": "Bài",
+      "user": "Người nộp",
+      "language": "Ngôn ngữ",
+      "judge": "Máy chấm",
+      "submitted": "Nộp lúc",
+      "contest": "Kỳ thi"
+    },
     "pretest": "Bài nộp này chỉ chấm với bộ test mẫu (pretest).",
     "overview": {
       "title": "Theo subtask",
@@ -1585,14 +1588,13 @@
       "extendedFeedback": "Phản hồi chi tiết",
       "output": "Đầu ra",
       "compileLogHidden": "Lỗi biên dịch. Thông báo biên dịch chỉ hiện cho người xem được mã nguồn.",
-      "expandAll": "Mở tất cả",
-      "collapseAll": "Thu gọn tất cả"
+      "detailsTitle": "Chi tiết từng test"
     },
     "source": {
       "title": "Mã nguồn",
       "copy": "Sao chép mã nguồn",
       "collapse": "Thu gọn",
-      "expand": "Xem mã nguồn",
+      "expand": "Xem mã nguồn ({count} dòng)",
       "lines": "{count} dòng",
       "raw": "Xem mã nguồn thô",
       "rawShort": "Mã thô",
@@ -1622,9 +1624,7 @@
     },
     "actions": {
       "problem": "Về đề bài",
-      "resubmit": "Nộp lại",
-      "resubmitFix": "Sửa và nộp lại",
-      "next": "Bài tiếp theo"
+      "resubmit": "Nộp lại"
     },
     "sourceLocked": {
       "signIn": "Đăng nhập để xem mã nguồn, nếu đề bài cho phép.",
@@ -1811,6 +1811,7 @@
     "title": "Mục hồ sơ"
   },
   "orgs": {
+    "lead": "Lớp, đội tuyển và câu lạc bộ trên QHHOJ",
     "open": "Mở tự do",
     "private": "Cần duyệt",
     "unlisted": "Ẩn",
@@ -1851,9 +1852,7 @@
       "user": "Người dùng",
       "performancePoints": "Điểm PP",
       "points": "Tổng điểm",
-      "problemCount": "Số bài giải",
-      "organization": "Tổ chức",
-      "join": "Tham gia"
+      "problemCount": "Số bài giải"
     },
     "title": "Tổ chức",
     "filtersLabel": "Lọc tổ chức",
@@ -1863,9 +1862,14 @@
       "open": "Mở tự do"
     },
     "rankLabel": "Hạng",
+    "rankBadge": "Hạng {rank}",
     "membersLabel": "Thành viên",
+    "ppLabel": "Điểm thành tích",
     "act": {
-      "joined": "Đã tham gia"
+      "join": "Tham gia",
+      "request": "Xin vào",
+      "joined": "Đã tham gia",
+      "signIn": "Đăng nhập"
     },
     "emptyPublicTitle": "Chưa có tổ chức công khai",
     "emptyPublicBody": "Khi một tổ chức được công khai, nó sẽ hiện ở đây.",
@@ -1877,15 +1881,13 @@
     "membersMeta": "{count} thành viên",
     "manageCard": {
       "title": "Quản lý tổ chức",
+      "lead": "Bạn là quản trị viên",
       "shortcuts": "Lối tắt quản lý",
       "problems": "Bài tập của tổ chức",
       "contests": "Kỳ thi của tổ chức",
       "requests": "Yêu cầu tham gia",
       "pending": "{count} chờ"
-    },
-    "search": "Tìm tổ chức",
-    "showMore": "Xem thêm",
-    "showLess": "Thu gọn"
+    }
   },
   "orgMembership": {
     "signIn": "Đăng nhập để tham gia",
@@ -1940,8 +1942,11 @@
     "readMore": "Đọc tiếp",
     "pager": "Trang bài viết",
     "empty": "Chưa có bài viết nào",
+    "recentComments": "Bình luận gần đây",
     "noComments": "Chưa có bình luận nào.",
     "newProblems": "Bài tập mới",
+    "problemLine": "{code} · {date}",
+    "problemPoints": "{points} điểm",
     "topContributors": "Top đóng góp",
     "toLeaderboard": "Bảng xếp hạng",
     "title": "Blog",
@@ -1981,8 +1986,6 @@
     "deletedAccount": "Tài khoản đã xóa",
     "inPage": "trong",
     "title": "Bình luận",
-    "showMore": "Xem thêm",
-    "showLess": "Thu gọn",
     "sectionLabel": "Bình luận về trang này",
     "count": "{count} bình luận",
     "pageOf": "trang {page} / {last}",
@@ -2197,8 +2200,7 @@
       "failedTitle": "Chưa gửi được phiếu",
       "rateLimitedWait": "Bạn thử quá nhiều lần. Thử lại sau {seconds} giây."
     },
-    "title": "Phiếu hỗ trợ",
-    "pickOne": "Chọn một phiếu ở bên trái để xem nội dung."
+    "title": "Phiếu hỗ trợ"
   },
   "ticket": {
     "title": "Chi tiết phiếu",
@@ -2332,19 +2334,20 @@
       "on": {
         "title": "Luôn bật",
         "body": "Ít hiệu ứng, chữ và màu giữ nguyên.",
-        "preview": "Bit tĩnh · nền phẳng"
+        "preview": "Bit tĩnh · không làm mờ"
       },
       "off": {
         "title": "Luôn tắt",
         "body": "Đủ hiệu ứng, kể cả khi máy yếu.",
-        "preview": "Bit chuyển động · nền họa tiết"
+        "preview": "Bit chuyển động · kính mờ"
       }
     },
     "machineOn": "Máy này: đang bật",
     "machineOff": "Máy này: đang tắt",
     "effectsTitle": "Khi bật",
     "effects": {
-      "background": "Nền trang hiện một màu phẳng, không họa tiết",
+      "blur": "Tắt làm mờ nền (kính mờ)",
+      "blobs": "Ẩn các vệt màu nền",
       "motion": "Bỏ hiệu ứng chuyển động",
       "bit": "Bit hiển thị hình tĩnh",
       "replay": "Phát lại bảng điểm không chuyển hàng",
@@ -2601,8 +2604,6 @@
     "accepted": "Đã đồng ý bản {revision} lúc {time}"
   },
   "problemSwitcher": {
-    "collapse": "Thu gọn danh sách bài",
-    "expand": "Mở rộng danh sách bài",
     "limitsColumn": "Giới hạn",
     "status": {
       "solved": "Đã giải",
@@ -3194,35 +3195,5 @@
         "body": "Người ra đề chỉ cho chủ bài nộp và người kiểm thử xem mã nguồn của đề này."
       }
     }
-  },
-  "rail": {
-    "next": {
-      "title": "Kỳ thi tiếp theo",
-      "startsIn": "bắt đầu sau {span}",
-      "endsAt": "kết thúc {date}",
-      "upcomingDot": "Có kỳ thi sắp diễn ra"
-    },
-    "live": "Đang thi",
-    "rank": "hạng {rank}"
-  },
-  "search": {
-    "title": "Tìm kiếm",
-    "label": "Tìm trang, bài tập, kỳ thi, người dùng",
-    "placeholder": "Tên trang, mã bài, tên kỳ thi…",
-    "results": "Kết quả tìm kiếm",
-    "searching": "Đang tìm…",
-    "failed": "Có nguồn không tìm được; kết quả có thể thiếu.",
-    "empty": "Không có kết quả.",
-    "emptyAdvice": "Không thấy gì khớp. Thử mã bài, tên kỳ thi hoặc phần đầu tên đăng nhập.",
-    "tooShort": "Gõ ít nhất {count} ký tự để tìm bài tập, kỳ thi và người dùng.",
-    "count": "{count} kết quả",
-    "keys": "↑ ↓ để chọn · Enter để mở · Esc để đóng",
-    "groups": {
-      "pages": "Trang",
-      "problems": "Bài tập",
-      "contests": "Kỳ thi",
-      "users": "Người dùng"
-    },
-    "inProblems": "Tìm trong danh sách bài tập"
   }
 }

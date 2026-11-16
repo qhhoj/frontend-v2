@@ -49,18 +49,18 @@ const posts = computed(() => data.value?.items ?? []);
             v-for="post in posts"
             :key="post.id"
             data-testid="draft-row"
-            class="relative flex items-center gap-x-3 gap-y-1 px-4 py-2.5 hover:bg-surface-hover sm:px-5"
+            class="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-4 sm:px-5"
           >
-            <Chip class="shrink-0" :tone="postStateOf(post) === 'draft' ? 'neutral' : 'accent'">
+            <Chip :tone="postStateOf(post) === 'draft' ? 'neutral' : 'accent'">
               {{ $t(`blog.drafts.state.${postStateOf(post)}`) }}
             </Chip>
             <RouterLink
               :to="{ name: 'post-edit', params: { id: post.id } }"
-              class="min-w-0 flex-1 truncate font-semibold after:absolute after:inset-0 hover:underline"
+              class="min-w-0 flex-1 basis-60 font-semibold [overflow-wrap:anywhere] hover:underline"
             >
               {{ post.title }}
             </RouterLink>
-            <time :datetime="post.publishOn" class="shrink-0 text-meta text-muted">
+            <time :datetime="post.publishOn" class="text-sm text-muted">
               {{
                 postStateOf(post) === 'scheduled'
                   ? $t('blog.drafts.publishesAt', {
