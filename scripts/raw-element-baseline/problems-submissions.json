@@ -6,11 +6,32 @@
     "button": 1,
     "disabled-opacity": 1
   },
+  "features/problems/PdfStatement.vue": {
+    "hardcoded-value": 1
+  },
+  "features/problems/ProblemFilterPanel.vue": {
+    "hardcoded-value": 1
+  },
+  "features/problems/ProblemPointsRange.vue": {
+    "hardcoded-value": 14
+  },
   "features/problems/SourceUploadButton.vue": {
     "file": 1
   },
+  "features/problems/StatementSkeleton.vue": {
+    "hardcoded-value": 1
+  },
   "features/problems/SubmitForm.vue": {
     "status-colour": 3
+  },
+  "features/problems/SubmitResultStrip.vue": {
+    "hardcoded-value": 1
+  },
+  "features/problems/SubmitSheet.vue": {
+    "hardcoded-value": 1
+  },
+  "features/problems/problem-layout.ts": {
+    "hardcoded-value": 2
   },
   "features/runtimes/JudgeCard.vue": {
     "verdict-tone": 1
@@ -20,14 +41,19 @@
     "verdict-tone": 1
   },
   "features/submissions/CasesTable.vue": {
+    "hardcoded-value": 1,
     "table": 1
   },
   "features/submissions/CasesTableSkeleton.vue": {
+    "hardcoded-value": 1,
     "table": 1
   },
   "features/submissions/CompareWithForm.vue": {
     "button": 1,
     "input": 1
+  },
+  "features/submissions/SubmissionHero.vue": {
+    "hardcoded-value": 1
   },
   "features/submissions/SubmissionLockControl.vue": {
     "button": 1,
@@ -43,9 +69,16 @@
     "table": 1
   },
   "features/submissions/TestOverview.vue": {
+    "hardcoded-value": 1,
     "table": 1
   },
   "features/submissions/list/LiveListNotices.vue": {
     "button": 1
+  },
+  "features/submissions/list/SubmissionFilterPanel.vue": {
+    "hardcoded-value": 1
+  },
+  "features/submissions/submission-table-cells.ts": {
+    "hardcoded-value": 5
   }
 }

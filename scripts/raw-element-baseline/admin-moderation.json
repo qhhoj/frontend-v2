@@ -33,7 +33,8 @@
     "controls": 3
   },
   "features/admin/audit/AuditEntryRow.vue": {
-    "AdminUserLabel": 1
+    "AdminUserLabel": 1,
+    "hardcoded-value": 1
   },
   "features/admin/audit/AuditFeed.vue": {
     "button": 1,

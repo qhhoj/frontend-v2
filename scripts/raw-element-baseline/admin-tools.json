@@ -1,6 +1,7 @@
 {
   "features/admin/rejudge/BulkRejudgePage.vue": {
-    "AdminPageHeader": 1
+    "AdminPageHeader": 1,
+    "hardcoded-value": 1
   },
   "features/admin/rejudge/RecentBatches.vue": {
     "AdminDataTable": 1
@@ -29,7 +30,8 @@
   },
   "features/admin/shell/AdminNavSheet.vue": {
     "button": 1,
-    "dialog": 1
+    "dialog": 1,
+    "hardcoded-value": 1
   },
   "features/admin/shell/overview/OverviewTile.vue": {
     "AdminChip": 1,
@@ -38,6 +40,7 @@
   },
   "features/admin/shell/search/AdminCommandPalette.vue": {
     "controls": 2,
+    "hardcoded-value": 1,
     "input": 1
   },
   "features/admin/shell/search/PaletteResults.vue": {
@@ -54,7 +57,8 @@
     "select": 2
   },
   "features/admin/similarity/PairSourcePane.vue": {
-    "AdminUserLabel": 1
+    "AdminUserLabel": 1,
+    "hardcoded-value": 1
   },
   "features/admin/similarity/PairsTable.vue": {
     "AdminDataTable": 1,
@@ -102,6 +106,7 @@
   "features/admin/submissions/AdminSubmissionTable.vue": {
     "AdminDataTable": 1,
     "AdminRowMenu": 2,
+    "hardcoded-value": 1,
     "use-admin-toast": 1
   },
   "features/admin/submissions/AdminSubmissionsPage.vue": {

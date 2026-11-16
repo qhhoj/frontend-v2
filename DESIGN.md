@@ -101,6 +101,14 @@ Don't:
 - Repeat a primary action in a row that is already a link.
 - Use emoji or text glyphs; use Lucide icons.
 
+## No hard-coded values
+
+Every value, from colour to spacing, comes from a variable, so a theme change swaps it in one place (owner rule, 2026-11-16).
+Token families: colour (`text-content`, `bg-surface`, `--qh-*`), type scale (`text-caption` ... `text-hero`), radius (`rounded-<role>`), shadow (`shadow-glow|float`), z (`z-<layer>`), motion (`--qh-duration-*`, `ease-*`), and Tailwind's own spacing and size steps (`p-4`, `gap-2`, `size-4`, `w-64`).
+`npm run lint:tokens` (rule `hardcoded-value`, `scripts/hardcoded-values.mjs`) refuses a file that gains an arbitrary value with a number (`w-[420px]`), a stock palette or white/black utility, an inline style or `<style>` length with a unit (`12px`, `0.2s`). 0, 50% and 100% pass.
+Existing hits sit in `scripts/raw-element-baseline/<area>.json` and only shrink (`npm run raw-elements:shrink`).
+To add a token: define it in `src/theme/styles.css` (`@theme`) or, for a colour, in `scripts/palette/paper.mjs` then `npm run palette`; use it by name. A value computed at run time (a FLIP transform, chart geometry) goes in `ALLOWED` in `scripts/hardcoded-values.mjs` with a one-line reason.
+
 ## 4. Known gaps
 
 - Cue tokens exist but most pages still use `text-positive`, `bg-warning-bg` and similar status classes (baselined under `status-colour`, 186 uses in 126 files). Convert page by page; the baseline only shrinks (`npm run raw-elements:shrink`).

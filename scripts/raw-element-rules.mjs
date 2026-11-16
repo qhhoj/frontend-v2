@@ -6,8 +6,10 @@
 // - imports that bypass the kit (scripts/wrapper-imports.mjs);
 // - class words the standard retires (PLAN §1.9): `uppercase` labels, fixed `size-/h-/min-h-[N px|rem]`, opacity on a
 //   disabled state, `verdict-*` colours outside the verdict parts, and status colours (positive, negative, warning, info)
-//   outside the kit: a status is a Chip or StatusDot tone, or a cue-* token (DESIGN.md).
+//   outside the kit: a status is a Chip or StatusDot tone, or a cue-* token (DESIGN.md);
+// - hard-coded values (scripts/hardcoded-values.mjs): a literal size, spacing, motion or colour that is not a token.
 import { classTokens, COMMENT_LINE, utilityOf } from './class-tokens.mjs';
+import { hardcodedValues } from './hardcoded-values.mjs';
 import { importUses, isKit } from './wrapper-imports.mjs';
 
 /** Element rules: the tag (lower case) or `input` type they match, and the kit part. */
@@ -68,6 +70,11 @@ const BOUND_STATE = /[:@\w.-]+\s*=\s*"\s*(?:disabled|busy|pending)\s*"/g;
 /** Whether a line's expression (not its quoted class words) names a disabled, busy or pending state. */
 const mentionsDisabledState = (line) =>
   STATE_WORD.test(line.replace(BOUND_STATE, '').replace(/(['`])(?:(?!\1).)*\1/g, ''));
+
+/** The rule of scripts/hardcoded-values.mjs: each of its lines names the token family to use. */
+export const HARDCODED_RULE = 'hardcoded-value';
+export const HARDCODED_USE =
+  'the token family named on the line (DESIGN.md, "No hard-coded values")';
 
 /** Class rules: whether a class word breaks it (for the file `rel`), and what to use instead. */
 export const CLASS_RULES = {
@@ -180,4 +187,5 @@ export const ruleUses = (source, rel) => [
   ...elementUses(source, rel),
   ...importUses(source, rel),
   ...classUses(source, rel),
+  ...hardcodedValues(source, rel).map((use) => ({ rule: HARDCODED_RULE, ...use })),
 ];
