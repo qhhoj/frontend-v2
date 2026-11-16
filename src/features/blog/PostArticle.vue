@@ -69,10 +69,7 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
         ><PostActions :post="post"
       /></template>
     </PageHeader>
-    <UserContent
-      class="post-body text-base leading-7 [&_pre]:text-sm [&_pre]:leading-6"
-      :html="post.contentHtml"
-    />
+    <UserContent class="post-body" :html="post.contentHtml" />
     <footer
       data-testid="post-actions"
       class="flex flex-wrap items-center gap-4 border-t border-line pt-4"

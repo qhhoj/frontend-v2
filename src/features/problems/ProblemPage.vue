@@ -5,24 +5,21 @@ import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import ContestProblemSwitcher from '@/features/contests/ContestProblemSwitcher.vue';
 import { useProblemRail } from '@/features/contests/use-problem-rail';
-import { useProblemRailCollapse } from '@/features/contests/use-problem-rail-collapse';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
 import { useNavSection } from '@/features/shell/nav-section';
 import { translate } from '@/i18n';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
-import { useSessionStore } from '@/stores/session.store';
 import ProblemContent from './ProblemContent.vue';
+import ProblemRailSkeleton from './ProblemRailSkeleton.vue';
 import StatementSkeleton from './StatementSkeleton.vue';
 import { PROBLEM_LAYOUT } from './problem-layout';
-import type { ProblemTab } from './problem-tab';
 import { useProblemQuery } from './problems.queries';
 
 const DEFAULT_TAB = 'statement';
 const route = useRoute();
 const router = useRouter();
 const locale = useLocaleStore();
-const session = useSessionStore();
 const code = computed(() => String(route.params.code));
 const { data: problem, isPending, error, refetch } = useProblemQuery(code, toRef(locale, 'locale'));
 
@@ -52,9 +49,6 @@ const isNotFound = computed(
 
 usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : problem.value?.name));
 
-/** The submit panel is open beside the statement: the page column widens to fit both. */
-const panelOpen = ref(false);
-const { isCollapsed: railCollapsed, toggle: toggleRail } = useProblemRailCollapse(panelOpen);
 const layout = computed(
   () => PROBLEM_LAYOUT[contest.value && railEntries.value ? 'contest' : 'plain'],
 );
@@ -65,54 +59,27 @@ watch(code, () => {
   editorialGone.value = false;
 });
 
-/** The route of each submission tab: the child route's name says which one is open. */
-const SUBMISSION_TAB_OF_ROUTE: Record<string, string> = {
-  'problem-submissions': 'submissions',
-  'problem-mine': 'mine',
-  'problem-best': 'best',
-};
-const isSignedIn = computed(() => session.status === 'authenticated');
-/** An ended contest the reader came from stays in the URL while they move between tabs. */
-const contextQuery = computed(() =>
-  queriedContestKey.value ? { contest: queriedContestKey.value } : {},
-);
-const linkTo = (name: string, query: Record<string, string> = {}) => ({
-  name,
-  params: { code: code.value },
-  query: { ...contextQuery.value, ...query },
-});
-/** Page tabs, each a link: statement and editorial are the problem route (`?tab=`), the rest are its child routes. */
-const tabs = computed<ProblemTab[]>(() => [
-  { id: DEFAULT_TAB, labelKey: 'problem.tabs.statement', to: linkTo('problem') },
+/** Page tabs; 8e adds `discussion` here. */
+const tabs = computed(() => [
+  { id: DEFAULT_TAB, labelKey: 'problem.tabs.statement' },
   ...(problem.value?.hasEditorial && !editorialGone.value
-    ? [
-        {
-          id: 'editorial',
-          labelKey: 'problem.tabs.editorial',
-          to: linkTo('problem', { tab: 'editorial' }),
-        },
-      ]
+    ? [{ id: 'editorial', labelKey: 'problem.tabs.editorial' }]
     : []),
-  { id: 'submissions', labelKey: 'problem.tabs.submissions', to: linkTo('problem-submissions') },
-  ...(isSignedIn.value
-    ? [{ id: 'mine', labelKey: 'problem.tabs.mine', to: linkTo('problem-mine') }]
-    : []),
-  { id: 'best', labelKey: 'problem.tabs.best', to: linkTo('problem-best') },
 ]);
 const requestedTab = computed(() => (typeof route.query.tab === 'string' ? route.query.tab : null));
-const isStatementRoute = computed(() => route.name === 'problem');
-/** The open tab: a child route's own, else the statement or (`?tab=editorial`) the editorial. */
-const tab = computed(() => {
-  const ofRoute = SUBMISSION_TAB_OF_ROUTE[String(route.name)];
-  if (ofRoute) return ofRoute;
-  return tabs.value.find((candidate) => candidate.id === requestedTab.value)?.id ?? DEFAULT_TAB;
+const tab = computed({
+  get: () => tabs.value.find((candidate) => candidate.id === requestedTab.value)?.id ?? DEFAULT_TAB,
+  set: (id: string) =>
+    void router.replace({
+      query: { ...route.query, tab: id === DEFAULT_TAB ? undefined : id },
+    }),
 });
 
 // An unknown or unavailable ?tab= (an editorial that does not exist) is dropped once the detail is known.
 watch(
   [problem, requestedTab, editorialGone],
   ([loaded, requested]) => {
-    if (isStatementRoute.value && loaded && requested !== null && tab.value !== requested)
+    if (loaded && requested !== null && tab.value !== requested)
       void router.replace({ query: { ...route.query, tab: undefined } });
   },
   { immediate: true },
@@ -126,15 +93,8 @@ watch(
     :class="[
       'page-column',
       contest && railEntries
-        ? [
-            'lg:grid lg:items-start',
-            railCollapsed
-              ? 'lg:grid-cols-[3rem_minmax(0,1fr)]'
-              : 'lg:grid-cols-[240px_minmax(0,1fr)]',
-          ]
-        : panelOpen
-          ? '[--page-width:120rem]'
-          : '[--page-width:80rem]',
+        ? 'lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start'
+        : '[--page-width:80rem]',
     ]"
   >
     <ContestProblemSwitcher
@@ -143,27 +103,25 @@ watch(
       :contest-name="contest.name"
       :entries="railEntries"
       :carries-contest="isReadOnlyContest"
-      :collapsed="railCollapsed"
-      @toggle="toggleRail"
     />
     <div class="flex min-w-0 flex-col gap-5">
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
           <div :class="layout.grid">
-            <StatementSkeleton header :class="layout.left" />
+            <StatementSkeleton header :strip-class="layout.strip" :class="layout.left" />
+            <ProblemRailSkeleton data-testid="problem-rail" :class="layout.rail" />
           </div>
         </template>
         <ProblemContent
           v-if="problem"
           :key="problem.code"
-          :tab="tab"
+          v-model:tab="tab"
           :problem="problem"
           :tabs="tabs"
           :layout="layout"
           :contest="contest && railEntries ? contest : null"
           :contest-is-live="!isReadOnlyContest"
           @gone="editorialGone = true"
-          @panel="panelOpen = $event"
         />
       </QueryState>
     </div>

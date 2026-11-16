@@ -12,7 +12,7 @@ defineProps<{ to: RouteLocationRaw; title: string }>();
 
 <template>
   <li
-    class="relative flex min-h-(--qh-row) items-center gap-3 border-line px-4 py-2 not-first:border-t hover:bg-surface-hover"
+    class="relative flex min-h-11 items-center gap-3 border-line px-4 py-3 not-first:border-t hover:bg-surface-hover"
   >
     <span v-if="$slots.lead" class="flex w-5 shrink-0 justify-center self-start pt-0.5">
       <slot name="lead" />
@@ -20,7 +20,7 @@ defineProps<{ to: RouteLocationRaw; title: string }>();
     <span class="flex min-w-0 flex-1 flex-col gap-0.5">
       <RouterLink
         :to="to"
-        class="line-clamp-2 text-body font-medium text-content after:absolute after:inset-0 hover:text-accent-text"
+        class="line-clamp-2 text-sm font-semibold text-content after:absolute after:inset-0 hover:text-accent-text"
         >{{ title }}</RouterLink
       >
       <span v-if="$slots.meta" class="text-caption text-muted">

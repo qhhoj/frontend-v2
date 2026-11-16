@@ -53,6 +53,8 @@ export default defineConfig({
   server: { port: 5173, strictPort: true, proxy: { '/api': { target: apiOrigin } } },
   preview: { port: 4173, strictPort: true, proxy: { '/api': { target: apiOrigin } } },
   test: {
+    // Vitest returns '' for CSS ids by default; problem-tier.node.spec reads the theme files with `?raw`.
+    css: { include: /\.css\?raw$/ },
     // Greetings and relative dates depend on the local hour.
     env: { TZ: 'UTC' },
     restoreMocks: true,

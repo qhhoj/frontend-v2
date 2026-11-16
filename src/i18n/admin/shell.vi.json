@@ -149,16 +149,5 @@
     "settings": "Cài đặt",
     "log": "Nhật ký",
     "types": "Danh mục bài tập"
-  },
-  "continue": {
-    "title": "Tiếp tục",
-    "draft": "Bản nháp",
-    "public": "Công khai",
-    "phase": {
-      "upcoming": "Sắp diễn ra",
-      "running": "Đang diễn ra",
-      "ended": "Đã kết thúc"
-    }
-  },
-  "railLabel": "Thanh bên quản trị"
+  }
 }

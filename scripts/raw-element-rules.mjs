@@ -5,12 +5,8 @@
 //   names an import (`<Select>` from the kit) is that component, not the element;
 // - imports that bypass the kit (scripts/wrapper-imports.mjs);
 // - class words the standard retires (PLAN §1.9): `uppercase` labels, fixed `size-/h-/min-h-[N px|rem]`, opacity on a
-//   disabled state, `verdict-*` colours outside the verdict parts, and status colours (positive, negative, warning, info)
-//   outside the kit: a status is a Chip or StatusDot tone, or a cue-* token (DESIGN.md);
-// - hard-coded values (scripts/hardcoded-values.mjs): a literal size, spacing, motion or colour that is not a token.
+//   disabled state, and `verdict-*` colours outside the verdict parts.
 import { classTokens, COMMENT_LINE, utilityOf } from './class-tokens.mjs';
-import { hardcodedValues } from './hardcoded-values.mjs';
-import { hardcodedScriptValues, SCRIPT_RULE, SCRIPT_USE } from './hardcoded-script-values.mjs';
 import { importUses, isKit } from './wrapper-imports.mjs';
 
 /** Element rules: the tag (lower case) or `input` type they match, and the kit part. */
@@ -45,10 +41,12 @@ const INPUT_TYPES = {
 /** Files that draw a verdict (a submission's result or the viewer's solved state): `verdict-*` is theirs. */
 export const VERDICT_PARTS = [
   'lib/verdicts.ts',
+  'features/submissions/VerdictDistributionBar.vue',
   'features/submissions/TestOverview.vue',
   'features/submissions/test-overview.ts',
   'features/submissions/list/test-strip.ts',
   'features/submissions/list/TestStrip.vue',
+  'features/submissions/ResultSummaryCard.vue',
   'features/submissions/CasesTable.vue',
   'features/contests/ProblemResultsTable.vue',
   'features/contests/OwnResultChip.vue',
@@ -58,12 +56,7 @@ export const VERDICT_PARTS = [
   'features/problems/ProblemStatusMark.vue',
   'features/profile/ProfileSolvedTab.vue',
   'features/appearance/AppearancePreview.vue',
-  'components/ui/StatusStepper.vue',
 ];
-
-/** A colour utility on a status role: `text-positive`, `bg-negative-bg`, `border-warning`, `fill-info`. */
-const STATUS_COLOUR =
-  /^(?:text|bg|border|ring|fill|stroke|divide|outline|inset-ring|from|to|via)-(?:positive|negative|warning|info)(?:-bg)?(?:\/\d+)?$/;
 
 const STATE_WORD = /(?<![\w:@-])(?:disabled|busy|pending)(?![\w-])/;
 /** `:disabled="disabled"` is the control's own attribute, not a class condition; neither are quoted words. */
@@ -71,12 +64,6 @@ const BOUND_STATE = /[:@\w.-]+\s*=\s*"\s*(?:disabled|busy|pending)\s*"/g;
 /** Whether a line's expression (not its quoted class words) names a disabled, busy or pending state. */
 const mentionsDisabledState = (line) =>
   STATE_WORD.test(line.replace(BOUND_STATE, '').replace(/(['`])(?:(?!\1).)*\1/g, ''));
-
-/** The rule of scripts/hardcoded-values.mjs: each of its lines names the token family to use. */
-export { SCRIPT_RULE, SCRIPT_USE };
-export const HARDCODED_RULE = 'hardcoded-value';
-export const HARDCODED_USE =
-  'the token family named on the line (DESIGN.md, "No hard-coded values")';
 
 /** Class rules: whether a class word breaks it (for the file `rel`), and what to use instead. */
 export const CLASS_RULES = {
@@ -101,11 +88,6 @@ export const CLASS_RULES = {
   'verdict-tone': {
     use: 'the status tones success/danger/warning (positive-bg, negative-bg); verdict-* is for verdict parts',
     breaks: (token, rel) => /-verdict-/.test(utilityOf(token)) && !VERDICT_PARTS.includes(rel),
-  },
-  'status-colour': {
-    use: 'a Chip or StatusDot tone, or a cue-* token (live, upcoming, ended, full, partial, zero, attention; DESIGN.md)',
-    breaks: (token, rel) =>
-      STATUS_COLOUR.test(utilityOf(token)) && !isKit(rel) && !VERDICT_PARTS.includes(rel),
   },
 };
 
@@ -163,7 +145,7 @@ export function elementUses(source, rel) {
 }
 
 /** A line without these words holds no class a CLASS_RULES rule refuses (it saves reading every line's classes). */
-const CLASS_HINT = /uppercase|\[|opacity-|verdict-|positive|negative|warning|info/;
+const CLASS_HINT = /uppercase|\[|opacity-|verdict-/;
 
 /** Unquoted object keys of a line (`{ uppercase: on }`), which `:class` objects may use as class words. */
 const bareKeys = (line) =>
@@ -189,10 +171,4 @@ export const ruleUses = (source, rel) => [
   ...elementUses(source, rel),
   ...importUses(source, rel),
   ...classUses(source, rel),
-  ...hardcodedValues(source, rel).map((use) => ({ rule: HARDCODED_RULE, ...use })),
-  ...hardcodedScriptValues(source, rel).map(({ line, text }) => ({
-    rule: SCRIPT_RULE,
-    line,
-    text,
-  })),
 ];

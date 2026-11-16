@@ -4,7 +4,6 @@ import type { RouteLocationRaw } from 'vue-router';
 import { RouterLink } from 'vue-router';
 import Chip from './Chip.vue';
 import StatusMark from './StatusMark.vue';
-import { SLIDE, useSlidingIndicator } from './useSlidingIndicator';
 
 export interface SegmentOption<V extends string | number = string> {
   value: V;
@@ -33,8 +32,7 @@ export interface SegmentDot {
 }
 
 /**
- * One choice out of two to four views (Kit 2): segments inside one pill track on the strong surface (L2), 36 px tall, the current one a
- * thumb on the page surface (L1, no shadow) that slides. `md` fills its width with equal segments (settings);
+ * One choice out of a few, as pills inside one pill frame. `md` fills its width with equal segments (settings);
  * `sm` is the admin chip density (a 44 px segment on a coarse pointer) and wraps on a narrow phone instead of being clipped, the
  * current segment scrolled into view when the row still overflows. Links make it a `nav`; buttons a `group` of `aria-pressed` toggles.
  */
@@ -51,11 +49,6 @@ const props = withDefaults(
 const emit = defineEmits<{ 'update:modelValue': [value: Value] }>();
 const isNav = computed(() => props.options.some((option) => option.to));
 const frame = ref<HTMLElement | null>(null);
-const indicator = useSlidingIndicator(frame, '[data-segment]', [
-  () => props.modelValue,
-  () => props.options.map((option) => option.value).join(),
-  () => props.size,
-]);
 
 function revealCurrent() {
   const box = frame.value;
@@ -75,25 +68,19 @@ function stateOf(option: SegmentOption<Value>) {
   return { type: 'button', disabled: props.disabled, 'aria-pressed': isCurrent };
 }
 
-/**
- * The frame is exactly one control tall (`--qh-control`: 36 px, 44 on touch), like every other toolbar control; the segments
- * stretch to fill it inside a 3 px inset (`--qh-control-inset`). On touch the inset is 0, so a segment is the full 44 px.
- */
-const FRAME_BASE =
-  'edge-high relative flex min-h-(--qh-control) gap-0.5 rounded-control bg-surface-strong p-(--qh-control-inset) touch:gap-0';
 const FRAME = {
-  md: `${FRAME_BASE} max-w-full overflow-x-auto [scrollbar-width:none]`,
-  sm: `${FRAME_BASE} max-w-full flex-wrap self-start overflow-x-auto`,
+  md: 'flex gap-1 rounded-pill bg-surface-strong p-1',
+  sm: 'flex max-w-full flex-wrap gap-0.5 self-start overflow-x-auto rounded-row border border-line-strong bg-surface-solid p-0.5',
 };
 const SEGMENT = {
-  md: 'relative inline-flex flex-1 items-center justify-center gap-1.5 px-(--qh-control-px-sm) whitespace-nowrap touch:min-h-11',
-  sm: 'relative inline-flex shrink-0 items-center gap-1.5 px-(--qh-control-px-sm) whitespace-nowrap touch:min-h-11',
+  md: 'min-h-11 flex-1 px-2 leading-tight',
+  sm: 'inline-flex min-h-7 shrink-0 items-center gap-1.5 px-3 font-semibold whitespace-nowrap touch:min-h-11',
 };
-/** The current segment: bold, full-contrast text over the sliding thumb. */
-const ACTIVE = 'font-semibold text-content';
-/** The indicator behind the segments; disabled keeps the full-contrast text, no opacity. */
-const INDICATOR = 'pointer-events-none absolute top-0 left-0 rounded-control bg-surface';
-const IDLE = 'text-muted hover:text-content';
+/** One active look for every tab set: accent-soft fill, accent border. Disabled keeps full-contrast text, no opacity. */
+const ACTIVE =
+  'border-accent bg-accent-soft font-semibold text-accent-soft-text disabled:border-line-strong disabled:bg-surface-hover disabled:text-content';
+const IDLE =
+  'border-transparent text-muted hover:text-content disabled:border-line disabled:bg-surface-strong';
 
 /** The option's dot: its own, else the red one `alertLabel` names. */
 function dotOf(option: SegmentOption<Value>): SegmentDot | undefined {
@@ -111,20 +98,13 @@ const segments = computed(() => props.options.map((option) => ({ option, dot: do
     :aria-label="label"
     :class="FRAME[size]"
   >
-    <span
-      v-if="indicator.visible.value"
-      aria-hidden="true"
-      :class="[INDICATOR, disabled && 'bg-surface-hover', indicator.animate.value && SLIDE]"
-      :style="indicator.style.value"
-    />
     <component
       :is="option.to ? RouterLink : 'button'"
       v-for="{ option, dot } in segments"
       :key="option.value"
       v-bind="stateOf(option)"
       :data-testid="option.testid"
-      data-segment
-      class="rounded-control text-body font-medium disabled:cursor-not-allowed"
+      class="rounded-pill border text-sm disabled:cursor-not-allowed"
       :class="[SEGMENT[size], option.value === modelValue ? ACTIVE : IDLE]"
       @click="option.to ? undefined : emit('update:modelValue', option.value)"
     >

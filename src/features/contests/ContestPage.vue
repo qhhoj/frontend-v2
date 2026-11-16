@@ -5,8 +5,11 @@ import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import CommentsSection from '@/features/comments/CommentsSection.vue';
+import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
+import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { phaseAt } from '@/lib/contest-time';
 import { usePageTitle } from '@/router/page-title';
+import ContestActions from './ContestActions.vue';
 import { useCurrentContest } from './bar/use-current-contest';
 import ContestAnnouncementsRail from './ContestAnnouncementsRail.vue';
 import ContestDetailSkeleton from './ContestDetailSkeleton.vue';
@@ -16,6 +19,7 @@ import ContestJoinRulesCard from './ContestJoinRulesCard.vue';
 import ContestNotFound from './ContestNotFound.vue';
 import ContestProblemsTable from './ContestProblemsTable.vue';
 import ContestRulesCard from './ContestRulesCard.vue';
+import ContestTabs from './ContestTabs.vue';
 import { acceptanceOf } from './join-rules';
 import { useContestQuery } from './contests.queries';
 
@@ -57,23 +61,40 @@ onBeforeUnmount(() => clearTimeout(catchUpTimer));
 </script>
 
 <template>
-  <ContestNotFound v-if="isMissing" />
-  <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
-    <template #skeleton><ContestDetailSkeleton /></template>
-    <template v-if="contest">
-      <!-- The card's hidden countdown tells the page when a phase flips. -->
-      <ContestHeaderCard :contest="contest" :run="run" @elapsed="onCountdownElapsed" />
-      <div class="flex min-w-0 flex-col gap-6">
-        <ContestAnnouncementsRail v-if="isUnderway" :contest="contest" />
-        <ContestJoinRulesCard
-          :contest="contest"
-          :acceptance="acceptanceOf(contest.viewer.liveParticipation)"
-        />
-        <ContestRulesCard :contest="contest" />
-        <ContestProblemsTable :contest="contest" />
-        <ContestIntroCard :contest="contest" />
-        <CommentsSection v-if="!isUnderway" type="contest" :page-key="contest.key" class="mt-2" />
-      </div>
-    </template>
-  </QueryState>
+  <div class="page-column">
+    <ContestNotFound v-if="isMissing" />
+    <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
+      <template #skeleton><ContestDetailSkeleton /></template>
+      <template v-if="contest">
+        <ContestTabs :contest-key="key" :phase="contest.phase" />
+        <ContestHeaderCard :contest="contest" :run="run" @elapsed="onCountdownElapsed">
+          <template #actions>
+            <ContestActions :contest="contest" :current="current" />
+            <ShortLinkButton compact :path="shortLinkPath({ kind: 'contest', key: contest.key })" />
+          </template>
+        </ContestHeaderCard>
+        <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)]">
+          <div class="flex min-w-0 flex-col gap-6">
+            <ContestProblemsTable :contest="contest" />
+            <ContestIntroCard :contest="contest" />
+            <CommentsSection
+              v-if="!isUnderway"
+              type="contest"
+              :page-key="contest.key"
+              class="mt-2"
+            />
+          </div>
+          <aside :aria-label="$t('contests.detail.aside')" class="flex flex-col gap-6">
+            <ContestAnnouncementsRail v-if="isUnderway" :contest="contest" />
+            <ContestJoinRulesCard
+              :contest="contest"
+              :acceptance="acceptanceOf(contest.viewer.liveParticipation)"
+            />
+            <ContestRulesCard :contest="contest" />
+            <ContestAnnouncementsRail v-if="!isUnderway" :contest="contest" />
+          </aside>
+        </div>
+      </template>
+    </QueryState>
+  </div>
 </template>

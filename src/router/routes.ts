@@ -1,6 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router';
 import { adminRoutes } from '@/features/admin/admin-routes';
-import { restoreListSetup } from '@/features/problems/problem-list-setup';
 import { USER_COMMENTS_PERMISSION } from '@/features/profile/user-comments-access';
 
 export const routes: RouteRecordRaw[] = [
@@ -15,34 +14,18 @@ export const routes: RouteRecordRaw[] = [
     name: 'problems',
     component: () => import('@/features/problems/ProblemsPage.vue'),
     meta: { titleKey: 'nav.problems' },
-    beforeEnter: restoreListSetup,
   },
   {
-    // The problem page is the frame: its header and tabs stay mounted while the tab changes (statement and editorial live
-    // in the frame itself; the three submission tabs are the children's content).
     path: '/problems/:code',
+    name: 'problem',
     component: () => import('@/features/problems/ProblemPage.vue'),
     meta: { titleKey: 'pages.problem' },
-    children: [
-      { path: '', name: 'problem', component: { render: () => null } },
-      {
-        path: 'submissions',
-        name: 'problem-submissions',
-        component: () => import('@/features/problems/ProblemSubmissionsTab.vue'),
-      },
-      {
-        path: 'mine',
-        name: 'problem-mine',
-        component: () => import('@/features/problems/ProblemSubmissionsTab.vue'),
-        props: { mine: true },
-        meta: { requiresAuth: true },
-      },
-      {
-        path: 'best',
-        name: 'problem-best',
-        component: () => import('@/features/problems/ProblemBestTab.vue'),
-      },
-    ],
+  },
+  {
+    path: '/problems/:code/best',
+    name: 'problem-best',
+    component: () => import('@/features/submissions/BestSubmissionsPage.vue'),
+    meta: { titleKey: 'pages.problemBest' },
   },
   {
     path: '/submissions',
@@ -87,47 +70,10 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'nav.contests' },
   },
   {
-    // One layout for the contest's tab pages: its header and tab strip stay mounted while the tab changes, so the tab indicator slides.
     path: '/contests/:key',
-    component: () => import('@/features/contests/ContestLayout.vue'),
-    children: [
-      {
-        path: '',
-        name: 'contest',
-        component: () => import('@/features/contests/ContestPage.vue'),
-        meta: { titleKey: 'pages.contest' },
-      },
-      {
-        path: 'announcements',
-        name: 'contest-announcements',
-        component: () => import('@/features/contests/ContestAnnouncementsPage.vue'),
-        meta: { titleKey: 'pages.contestAnnouncements' },
-      },
-      {
-        path: 'submissions',
-        name: 'contest-submissions',
-        component: () => import('@/features/contests/ContestSubmissionsPage.vue'),
-        meta: { titleKey: 'pages.contestSubmissions' },
-      },
-      {
-        path: 'stats',
-        name: 'contest-stats',
-        component: () => import('@/features/contests/ContestStatsPage.vue'),
-        meta: { titleKey: 'pages.contestStats' },
-      },
-      {
-        path: 'ranking',
-        name: 'contest-ranking',
-        component: () => import('@/features/contests/ContestRankingPage.vue'),
-        meta: { titleKey: 'pages.ranking' },
-      },
-      {
-        path: 'replay',
-        name: 'contest-replay',
-        component: () => import('@/features/contests/replay/ContestReplayPage.vue'),
-        meta: { titleKey: 'pages.contestReplay' },
-      },
-    ],
+    name: 'contest',
+    component: () => import('@/features/contests/ContestPage.vue'),
+    meta: { titleKey: 'pages.contest' },
   },
   {
     // Balloon volunteers in `balloonStaff` may be non-staff: no `adminArea`, the server answers 403/404.
@@ -154,6 +100,36 @@ export const routes: RouteRecordRaw[] = [
     name: 'contest-problem-best',
     component: () => import('@/features/contests/best/ContestBestPage.vue'),
     meta: { titleKey: 'pages.contestProblemBest' },
+  },
+  {
+    path: '/contests/:key/announcements',
+    name: 'contest-announcements',
+    component: () => import('@/features/contests/ContestAnnouncementsPage.vue'),
+    meta: { titleKey: 'pages.contestAnnouncements' },
+  },
+  {
+    path: '/contests/:key/submissions',
+    name: 'contest-submissions',
+    component: () => import('@/features/contests/ContestSubmissionsPage.vue'),
+    meta: { titleKey: 'pages.contestSubmissions' },
+  },
+  {
+    path: '/contests/:key/stats',
+    name: 'contest-stats',
+    component: () => import('@/features/contests/ContestStatsPage.vue'),
+    meta: { titleKey: 'pages.contestStats' },
+  },
+  {
+    path: '/contests/:key/ranking',
+    name: 'contest-ranking',
+    component: () => import('@/features/contests/ContestRankingPage.vue'),
+    meta: { titleKey: 'pages.ranking' },
+  },
+  {
+    path: '/contests/:key/replay',
+    name: 'contest-replay',
+    component: () => import('@/features/contests/replay/ContestReplayPage.vue'),
+    meta: { titleKey: 'pages.contestReplay' },
   },
   {
     path: '/public-rankings/:token',
@@ -410,13 +386,6 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.appearance' },
   },
   ...adminRoutes,
-  /** The kit gallery (DESIGN.md): admin-only like `/admin`; viewers who may enter no admin screen get the not-found page. */
-  {
-    path: '/dev/kit',
-    name: 'dev-kit',
-    component: () => import('@/features/dev/KitGalleryPage.vue'),
-    meta: { titleKey: 'pages.devKit', adminArea: true },
-  },
   /** Links the backend writes into mails, Discord and feeds (backend CONTRIBUTING, SPA contract); the hash is kept. */
   {
     path: '/post/:id',

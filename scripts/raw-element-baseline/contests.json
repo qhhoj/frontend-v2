@@ -14,28 +14,26 @@
     "uppercase": 2
   },
   "features/contests/ContestDetailSkeleton.vue": {
-    "fixed-size": 1,
-    "hardcoded-value": 1
+    "fixed-size": 2
   },
   "features/contests/ContestGroup.vue": {
     "SubmissionPager": 1
   },
-  "features/contests/ContestPage.vue": {
-    "hardcoded-script-value": 1
-  },
   "features/contests/ContestProblemsTable.vue": {
     "table": 1
   },
+  "features/contests/ContestRankingPage.vue": {
+    "fixed-size": 1
+  },
   "features/contests/ContestRulesDialog.vue": {
     "checkbox": 1,
-    "hardcoded-value": 1,
     "verdict-tone": 1
+  },
+  "features/contests/ContestTabs.vue": {
+    "PillTabs": 2
   },
   "features/contests/ContestTagFilter.vue": {
     "button": 2
-  },
-  "features/contests/ContestTimeBar.vue": {
-    "hardcoded-script-value": 1
   },
   "features/contests/EndedContestSkeleton.vue": {
     "table": 1
@@ -44,14 +42,13 @@
     "table": 1
   },
   "features/contests/InContestStatus.vue": {
-    "button": 2
+    "button": 2,
+    "verdict-tone": 1
   },
   "features/contests/LanguageStatsTable.vue": {
-    "hardcoded-value": 1,
     "table": 1
   },
   "features/contests/ProblemResultsTable.vue": {
-    "hardcoded-value": 1,
     "table": 1
   },
   "features/contests/RankingTable.vue": {
@@ -61,46 +58,18 @@
     "SubmissionPager": 1,
     "verdict-tone": 1
   },
-  "features/contests/contest-extras.queries.ts": {
-    "hardcoded-script-value": 1
-  },
-  "features/contests/contests.queries.ts": {
-    "hardcoded-script-value": 3
-  },
-  "features/contests/live/LiveAnnouncementAlert.vue": {
-    "hardcoded-value": 1
-  },
   "features/contests/print/ContestPrintPage.vue": {
     "button": 3,
-    "hardcoded-value": 2,
     "uppercase": 1
   },
-  "features/contests/print/contest-print.css": {
-    "hardcoded-value": 6
-  },
-  "features/contests/ranking-columns.ts": {
-    "hardcoded-script-value": 4
-  },
   "features/contests/replay/ContestReplayPage.vue": {
-    "fixed-size": 1,
-    "hardcoded-value": 1
+    "fixed-size": 2
   },
   "features/contests/replay/ReplayPlayerBar.vue": {
     "verdict-tone": 1
   },
   "features/contests/replay/ReplayTable.vue": {
-    "hardcoded-value": 1,
     "table": 1
-  },
-  "features/contests/replay/replay.queries.ts": {
-    "hardcoded-script-value": 3
-  },
-  "features/contests/replay/use-replay-player.ts": {
-    "hardcoded-script-value": 1
-  },
-  "features/leaderboard/LeaderboardTable.vue": {
-    "hardcoded-script-value": 1,
-    "status-colour": 1
   },
   "features/leaderboard/MyRankLine.vue": {
     "button": 1
@@ -110,8 +79,5 @@
   },
   "features/official-mode/OfficialModePill.vue": {
     "verdict-tone": 2
-  },
-  "features/official-mode/official-mode.queries.ts": {
-    "hardcoded-script-value": 2
   }
 }

@@ -14,12 +14,11 @@ export const viewportSize = () => ({
 });
 
 /**
- * The content column of the page: the content box of the element marked `data-page-column` (the phone's top bar or a
- * `PageLayout`), else the first `page-column` in the main area; both share one left and right edge. Null where there is
- * none (admin and sign-in layouts).
+ * The content column of the page: the content box of the element marked `data-page-column` (the public header, whose edges
+ * every page column shares), or null where there is none (admin and sign-in layouts).
  */
 export function pageColumn(): Column | null {
-  const element = document.querySelector<HTMLElement>('[data-page-column], #main .page-column');
+  const element = document.querySelector<HTMLElement>('[data-page-column]');
   if (!element) return null;
   const box = element.getBoundingClientRect();
   const style = getComputedStyle(element);

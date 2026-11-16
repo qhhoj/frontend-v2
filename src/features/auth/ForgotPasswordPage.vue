@@ -16,6 +16,7 @@ const sent = ref(false);
     :title="sent ? $t('auth.inbox.title') : $t('auth.forgotPassword.title')"
     :lead="sent ? undefined : $t('auth.forgotPassword.lead')"
     :centered="sent"
+    brand
   >
     <template v-if="sent" #badge>
       <InlineBit kind="envelope" class="self-center" />

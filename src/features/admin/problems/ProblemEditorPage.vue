@@ -18,8 +18,6 @@ import { OVERFLOW_ITEM, buttonClass } from '../ui/controls';
 import { isNotFound } from '../ui/admin-errors';
 import ProblemCloneDialog from './general/ProblemCloneDialog.vue';
 import { useEditableProblemQuery, useProblemEditingMetaQuery } from './problem-editing.queries';
-import { useProblemDataQuery } from './data/problem-data.queries';
-import { tabSetupDone, setupSteps } from './setup-steps';
 import { PROBLEM_TABS, problemTabComponent, problemTabOf } from './problem-tabs';
 import { STATEMENT_SLOTS, writtenSlots } from './statements/statement-drafts';
 
@@ -34,23 +32,6 @@ const isMissing = computed(() => isNotFound(problem.error.value));
 const canEdit = computed(() => Boolean(problem.data.value?.canEdit && problem.data.value.editor));
 const canClone = computed(() => canEdit.value && can('judge.clone_problem'));
 const isCloneOpen = ref(false);
-
-/** Setup state per tab: a check once its steps are done, a red dot ("Chưa xong") until then. Unknown test data shows no mark. */
-const data = useProblemDataQuery(code, canEdit);
-const steps = computed(() =>
-  problem.data.value ? setupSteps(problem.data.value, data.data.value?.cases ?? null) : null,
-);
-const tabs = computed(() =>
-  routeTabs(PROBLEM_TABS, { code: code.value }).map((item, index) => {
-    const id = PROBLEM_TABS[index]!.id;
-    const isKnown = id !== 'data' || Boolean(data.data.value);
-    const isDone = steps.value && isKnown ? tabSetupDone(id, steps.value) : null;
-    if (isDone === null) return item;
-    return isDone
-      ? { ...item, icon: Check }
-      : { ...item, alertLabel: translate('admin.problems.stepTodo') };
-  }),
-);
 
 /** The header's status chip: public (or shown to organization members only), a suggestion still under review, or private. */
 function statusOf(detail: EditableProblem): { key: string; tone: ChipTone; icon: typeof Globe } {
@@ -157,7 +138,11 @@ function openClone(close: () => void) {
           </template>
         </AdminPageHeader>
         <ProblemSetupChecklist v-if="canEdit" :problem="problem.data.value" />
-        <AdminTabs sticky :tabs="tabs" :label="$t('admin.problems.tabsLabel')" />
+        <AdminTabs
+          sticky
+          :tabs="routeTabs(PROBLEM_TABS, { code })"
+          :label="$t('admin.problems.tabsLabel')"
+        />
         <p v-if="!canEdit" role="alert" class="flex items-center gap-3">
           <AdminBit placement="forbidden" />{{ $t('admin.problems.cannotEdit', { code }) }}
         </p>

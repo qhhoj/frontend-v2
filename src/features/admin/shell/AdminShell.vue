@@ -5,7 +5,7 @@ import { useSessionStore } from '@/stores/session.store';
 import { canUseAdmin } from '../admin-access';
 import AdminForbidden from './AdminForbidden.vue';
 import '../ui/admin-density.css';
-import AdminRail from './AdminRail.vue';
+import AdminNav from './AdminNav.vue';
 import AdminNavSheet from './AdminNavSheet.vue';
 import AdminTopBar from './AdminTopBar.vue';
 import { useNavCounts } from './overview/admin-overview.queries';
@@ -52,24 +52,22 @@ watch(
 </script>
 
 <template>
-  <!-- The rail beside the page column, as in the public shell; the column draws its bar above `main`. -->
-  <div class="flex flex-1">
-    <AdminRail :counts="navCounts" @search="openPalette" />
-    <AdminNavSheet v-model:open="isPhoneNavOpen" :counts="navCounts" />
-    <div class="flex min-w-0 flex-1 flex-col">
-      <AdminTopBar
-        :is-nav-open="isPhoneNavOpen"
-        @search="openPalette"
-        @menu="isPhoneNavOpen = true"
-      />
-      <main id="main" tabindex="-1" class="relative min-w-0 flex-1 focus-visible:outline-none">
-        <!-- No width cap: tables use the width; a form page caps itself (880 px). -->
-        <div class="flex w-full flex-col gap-6 px-(--qa-gutter) py-6">
-          <slot v-if="isAllowed" />
-          <AdminForbidden v-else />
-        </div>
-      </main>
+  <AdminTopBar :is-nav-open="isPhoneNavOpen" @search="openPalette" @menu="isPhoneNavOpen = true" />
+  <div class="lg:grid lg:grid-cols-[var(--qa-sidebar)_minmax(0,1fr)]">
+    <!-- The column draws the border at full page height; the nav inside is sticky, one screen tall, with its own scroll. -->
+    <div class="hidden border-r border-line lg:block">
+      <aside class="sticky top-0 h-dvh overflow-y-auto overscroll-contain px-3 py-4">
+        <AdminNav :counts="navCounts" />
+      </aside>
     </div>
-    <AdminCommandPalette v-if="hasOpenedPalette" v-model:visible="isPaletteOpen" />
+    <AdminNavSheet v-model:open="isPhoneNavOpen" :counts="navCounts" />
+    <main id="main" tabindex="-1" class="relative min-w-0 focus-visible:outline-none">
+      <!-- No width cap: tables use the width; a form page caps itself (880 px). -->
+      <div class="flex w-full flex-col gap-6 px-(--qa-gutter) py-6">
+        <slot v-if="isAllowed" />
+        <AdminForbidden v-else />
+      </div>
+    </main>
   </div>
+  <AdminCommandPalette v-if="hasOpenedPalette" v-model:visible="isPaletteOpen" />
 </template>

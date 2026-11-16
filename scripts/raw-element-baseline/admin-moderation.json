@@ -8,6 +8,7 @@
     "button": 1
   },
   "features/admin/activity/ActivityTable.vue": {
+    "AdminChip": 2,
     "AdminDataTable": 1,
     "AdminUserLabel": 1,
     "button": 3,
@@ -19,28 +20,25 @@
   "features/admin/activity/LiveVisitorsCard.vue": {
     "AdminUserLabel": 1,
     "button": 2,
-    "controls": 3,
-    "hardcoded-script-value": 1
+    "controls": 3
   },
   "features/admin/activity/UserActivityPage.vue": {
     "AdminNotice": 1,
     "AdminPageHeader": 1,
     "button": 1,
-    "controls": 1,
-    "status-colour": 1
+    "controls": 1
   },
   "features/admin/activity/UserSummaryPanel.vue": {
     "button": 2,
     "controls": 3
   },
   "features/admin/audit/AuditEntryRow.vue": {
-    "AdminUserLabel": 1,
-    "hardcoded-value": 1
+    "AdminChip": 1,
+    "AdminUserLabel": 1
   },
   "features/admin/audit/AuditFeed.vue": {
     "button": 1,
-    "controls": 2,
-    "status-colour": 1
+    "controls": 2
   },
   "features/admin/audit/AuditFilters.vue": {
     "AdminDateTimeField": 2,
@@ -66,6 +64,7 @@
     "textarea": 1
   },
   "features/admin/comments/AdminCommentsTable.vue": {
+    "AdminChip": 3,
     "AdminDataTable": 1,
     "AdminRowMenu": 1,
     "button": 1,
@@ -90,6 +89,7 @@
     "use-admin-toast": 1
   },
   "features/admin/comments/CommentReportsTable.vue": {
+    "AdminChip": 4,
     "AdminDataTable": 1,
     "AdminRowMenu": 2,
     "button": 2,
@@ -114,7 +114,6 @@
     "checkbox": 1,
     "controls": 8,
     "input": 2,
-    "status-colour": 1,
     "textarea": 1
   },
   "features/admin/integrations/IntegrationClientsPage.vue": {
@@ -125,6 +124,7 @@
     "controls": 2
   },
   "features/admin/integrations/IntegrationClientsTable.vue": {
+    "AdminChip": 3,
     "AdminDataTable": 1,
     "button": 1,
     "controls": 1
@@ -150,13 +150,13 @@
     "AdminField": 2,
     "button": 1,
     "controls": 7,
-    "input": 2,
-    "status-colour": 1
+    "input": 2
   },
   "features/admin/short-links/ShortLinksPage.vue": {
     "AdminPageHeader": 1
   },
   "features/admin/short-links/ShortLinksTable.vue": {
+    "AdminChip": 1,
     "AdminDataTable": 1,
     "AdminRowMenu": 1
   },
@@ -179,8 +179,7 @@
   "features/admin/tickets/TicketQueueDetail.vue": {
     "button": 2,
     "checkbox": 1,
-    "controls": 2,
-    "status-colour": 1
+    "controls": 2
   },
   "features/admin/tickets/TicketQueueFilters.vue": {
     "AdminField": 1,
@@ -200,7 +199,6 @@
     "AdminChip": 1,
     "AdminDataTable": 1,
     "AdminUserLabel": 1,
-    "button": 1,
-    "hardcoded-script-value": 1
+    "button": 1
   }
 }

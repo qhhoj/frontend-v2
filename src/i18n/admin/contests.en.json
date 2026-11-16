@@ -36,10 +36,10 @@
     "empty": "No contests yet.",
     "columns": {
       "contest": "Contest",
-      "state": "State",
+      "phase": "Phase",
       "time": "Time",
       "users": "Participants",
-      "flags": "Notes"
+      "flags": "Status"
     },
     "window": "{start} → {end}",
     "scopeLabel": "Scope",
@@ -72,10 +72,6 @@
       "rated": "{value}",
       "from": "From {value}",
       "before": "Before {value}"
-    },
-    "state": {
-      "draft": "Draft",
-      "frozen": "Board frozen"
     },
     "badges": {
       "hidden": "Hidden",

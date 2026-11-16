@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/vue-query';
 import { fetchSocialProviders } from '@/api/auth.api';
+import { fetchHomeCounts } from '@/api/home.api';
 import { fetchOpenOrganizations } from '@/api/organizations.api';
 import { knownSocialProviders } from './social-providers';
 
@@ -13,6 +14,10 @@ export const useSocialProvidersQuery = () =>
     staleTime: FIVE_MINUTES,
     select: (result) => knownSocialProviders(result.providers),
   });
+
+/** The login screen's one counts line; decorative, so it is cached like the other reference data. */
+export const useSiteCountsQuery = () =>
+  useQuery({ queryKey: ['home', 'counts'], queryFn: fetchHomeCounts, staleTime: FIVE_MINUTES });
 
 /** Schools change rarely; the school picker reads the list once per visit. */
 export const useOpenOrganizationsQuery = () =>

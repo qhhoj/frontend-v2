@@ -2,10 +2,13 @@
 import Chip from '@/components/ui/Chip.vue';
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
-import PageSection from '@/components/ui/PageSection.vue';
+import Card from '@/components/ui/Card.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import StatePanel from '@/components/StatePanel.vue';
+import UserName from '@/components/UserName.vue';
 import { usePostsQuery } from '@/features/blog/blog.queries';
+import { summaryExcerpt } from '@/features/blog/post-summary';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -17,11 +20,10 @@ const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
 </script>
 
 <template>
-  <PageSection
-    data-testid="new-posts"
-    :title="$t('home.anon.newPosts')"
-    :see-all="{ to: { name: 'blog' }, label: $t('common.viewAll') }"
-  >
+  <Card data-testid="new-posts" padding="lg" :title="$t('home.anon.newPosts')">
+    <template #actions>
+      <SeeAllLink :to="{ name: 'blog' }">{{ $t('home.anon.allPosts') }}</SeeAllLink>
+    </template>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
         <div class="flex flex-col gap-3">
@@ -32,25 +34,32 @@ const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
         </div>
       </template>
       <StatePanel v-if="!posts.length" kind="communityEmpty" :title="$t('blog.empty')" />
-      <ul v-else class="flex flex-col divide-y divide-line">
-        <li
-          v-for="post in posts"
-          :key="post.id"
-          class="flex flex-wrap items-baseline gap-x-2 py-1.5 first:pt-0 last:pb-0 sm:flex-nowrap"
-        >
-          <Chip v-if="post.sticky" tone="accent">{{ $t('blog.pinned') }}</Chip>
+      <ul v-else class="flex flex-col gap-4">
+        <li v-for="post in posts" :key="post.id" class="flex flex-col gap-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <Chip class="font-mono tabular-nums">{{
+              $t('home.anon.score', { score: formatNumber(post.score, locale.locale) })
+            }}</Chip>
+            <Chip v-if="post.sticky" tone="accent">{{ $t('blog.pinned') }}</Chip>
+          </div>
           <RouterLink
             :to="{ name: 'post', params: { id: post.id } }"
-            class="min-w-0 flex-1 truncate font-semibold hover:underline max-sm:basis-full touch:-my-3.5 touch:py-3.5"
+            class="font-semibold hover:underline touch:-my-3.5 touch:py-3.5"
             >{{ post.title }}</RouterLink
           >
-          <!-- On phones the date and comment count sit under the title so the title gets the full width. -->
-          <span class="shrink-0 text-caption text-muted max-sm:basis-full">
+          <p class="line-clamp-2 text-sm text-muted">{{ summaryExcerpt(post.summaryHtml) }}</p>
+          <p class="text-caption leading-4 text-muted">
+            <template v-if="post.authors.length">
+              <template v-for="(author, index) in post.authors" :key="author.id"
+                ><template v-if="index">, </template
+                ><UserName :username="author.username" :rating="author.rating" /></template
+              >{{ ' · ' }}
+            </template>
             {{ formatDate(post.publishOn, 'short', locale.locale) }} ·
             {{ $t('blog.comments', { count: formatNumber(post.commentCount, locale.locale) }) }}
-          </span>
+          </p>
         </li>
       </ul>
     </QueryState>
-  </PageSection>
+  </Card>
 </template>

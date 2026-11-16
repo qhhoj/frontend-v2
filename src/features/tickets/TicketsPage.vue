@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, watchEffect } from 'vue';
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import EmptyState from '@/components/EmptyState.vue';
-import Card from '@/components/ui/Card.vue';
+import GlassCard from '@/components/GlassCard.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
@@ -14,18 +14,15 @@ import { useLocaleStore } from '@/stores/locale.store';
 import StaffTicketFilters from './StaffTicketFilters.vue';
 import TicketAlertsStrip from './TicketAlertsStrip.vue';
 import TicketFilterNav from './TicketFilterNav.vue';
-import TicketListPane from './TicketListPane.vue';
-import TicketListSkeleton from './TicketListSkeleton.vue';
-import TicketMasterDetail from './TicketMasterDetail.vue';
+import TicketTable from './TicketTable.vue';
+import TicketTableSkeleton from './TicketTableSkeleton.vue';
 import { ticketQueryFromRoute } from './ticket-filters';
-import { lastTicketFilters } from './ticket-list-memory';
 import { useTicketsQuery } from './tickets.queries';
 import { useTicketStream } from './use-ticket-stream';
 
 const route = useRoute();
 const locale = useLocaleStore();
 const filters = computed(() => ticketQueryFromRoute(route.query));
-watchEffect(() => (lastTicketFilters.value = filters.value));
 const { data, error, isPending, refetch } = useTicketsQuery(filters);
 const { isLive, announcement } = useTicketStream(null);
 
@@ -56,66 +53,54 @@ const isDefaultList = computed(
     <!-- Keyed by the whole URL: a Back or Forward to other filters remounts the inputs, so they never keep text from another query. -->
     <StaffTicketFilters :key="route.fullPath" :filters="filters" />
     <p class="sr-only" aria-live="polite">{{ announcement }}</p>
-    <TicketMasterDetail showing="list">
-      <template #list>
-        <Card as="div" class="overflow-hidden">
-          <QueryState :loading="isPending" :error="null">
-            <template #skeleton><TicketListSkeleton /></template>
-            <StatePanel
-              v-if="isSignedOut"
-              kind="signIn"
-              :title="$t('tickets.signInTitle')"
-              :body="$t('tickets.signInBody')"
+    <GlassCard as="div" class="overflow-hidden">
+      <QueryState :loading="isPending" :error="null">
+        <template #skeleton><TicketTableSkeleton /></template>
+        <StatePanel
+          v-if="isSignedOut"
+          kind="signIn"
+          :title="$t('tickets.signInTitle')"
+          :body="$t('tickets.signInBody')"
+        >
+          <AppButton tone="primary" :to="{ name: 'login', query: { redirect: route.fullPath } }">
+            {{ $t('tickets.signIn') }}
+          </AppButton>
+        </StatePanel>
+        <!-- A failed refresh keeps the rows already shown: the panel sits above them. -->
+        <StatePanel
+          v-else-if="error"
+          kind="error"
+          :title="$t('tickets.errorTitle')"
+          :body="$t('tickets.errorBody')"
+        >
+          <AppButton @click="refetch()">{{ $t('common.retry') }}</AppButton>
+        </StatePanel>
+        <template v-if="data && !isSignedOut">
+          <StatePanel
+            v-if="!tickets.length && isDefaultList"
+            kind="empty"
+            :title="$t('tickets.emptyTitle')"
+            :body="$t('tickets.emptyBody')"
+          >
+            <AppButton :to="{ name: 'ticket-new' }">
+              {{ $t('tickets.newTicket') }}
+            </AppButton>
+          </StatePanel>
+          <EmptyState v-else-if="!tickets.length">{{ $t('tickets.noMatch') }}</EmptyState>
+          <template v-else>
+            <TicketTable :tickets="tickets" />
+            <footer
+              class="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3 text-meta text-muted md:px-6"
             >
-              <AppButton
-                tone="primary"
-                :to="{ name: 'login', query: { redirect: route.fullPath } }"
-              >
-                {{ $t('tickets.signIn') }}
-              </AppButton>
-            </StatePanel>
-            <!-- A failed refresh keeps the rows already shown: the panel sits above them. -->
-            <StatePanel
-              v-else-if="error"
-              kind="error"
-              :title="$t('tickets.errorTitle')"
-              :body="$t('tickets.errorBody')"
-            >
-              <AppButton @click="refetch()">{{ $t('common.retry') }}</AppButton>
-            </StatePanel>
-            <template v-if="data && !isSignedOut">
-              <StatePanel
-                v-if="!tickets.length && isDefaultList"
-                kind="empty"
-                :title="$t('tickets.emptyTitle')"
-                :body="$t('tickets.emptyBody')"
-              >
-                <AppButton :to="{ name: 'ticket-new' }">
-                  {{ $t('tickets.newTicket') }}
-                </AppButton>
-              </StatePanel>
-              <EmptyState v-else-if="!tickets.length">{{ $t('tickets.noMatch') }}</EmptyState>
-              <template v-else>
-                <TicketListPane :tickets="tickets" />
-                <footer
-                  class="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-2.5 text-caption text-muted"
-                >
-                  <span>
-                    {{ $t('tickets.footer', { total: formatNumber(total, locale.locale) })
-                    }}<template v-if="isLive">{{ $t('ticket.liveFooter') }}</template>
-                  </span>
-                  <NumberedPager :meta="data.meta" :label="$t('tickets.pager')" />
-                </footer>
-              </template>
-            </template>
-          </QueryState>
-        </Card>
-      </template>
-      <p
-        class="rounded-card border border-dashed border-line-strong p-8 text-center text-meta text-muted"
-      >
-        {{ $t('tickets.pickOne') }}
-      </p>
-    </TicketMasterDetail>
+              <span>
+                {{ $t('tickets.footer', { total: formatNumber(total, locale.locale) })
+                }}<template v-if="isLive">{{ $t('ticket.liveFooter') }}</template>
+              </span>
+              <NumberedPager :meta="data.meta" :label="$t('tickets.pager')" />
+            </footer>
+          </template>
+        </template>
+      </QueryState>
+    </GlassCard>
   </div>
 </template>

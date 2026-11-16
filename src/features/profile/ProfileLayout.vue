@@ -5,11 +5,11 @@ import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
-import PageLayout from '@/components/ui/PageLayout.vue';
+import PageHeader from '@/components/ui/PageHeader.vue';
+import { ratingTextClass } from '@/lib/tier-classes';
 import { usePageTitle } from '@/router/page-title';
 import ProfileHeader from './ProfileHeader.vue';
 import ProfileHeaderSkeleton from './ProfileHeaderSkeleton.vue';
-import ProfileStats from './ProfileStats.vue';
 import ProfileTabsNav from './ProfileTabsNav.vue';
 import { useProfileUser } from './use-profile-user';
 
@@ -35,8 +35,7 @@ watch(user, (shown) => {
 </script>
 
 <template>
-  <PageLayout>
-    <template v-if="user && !isMissing" #header><ProfileHeader :user="user" /></template>
+  <div class="page-column">
     <StatePanel
       v-if="isMissing"
       kind="notFound"
@@ -48,11 +47,17 @@ watch(user, (shown) => {
     </StatePanel>
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><ProfileHeaderSkeleton /></template>
-      <div v-if="user" class="flex flex-col gap-(--space-stack)">
-        <ProfileStats :user="user" />
+      <template v-if="user">
+        <PageHeader
+          :title="user.username"
+          :title-class="ratingTextClass(user.rating)"
+          :crumbs="[{ label: $t('nav.users'), to: '/users' }]"
+          :back="{ to: '/users', label: $t('nav.users') }"
+        />
+        <ProfileHeader :user="user" />
         <ProfileTabsNav :username="user.username" />
         <RouterView />
-      </div>
+      </template>
     </QueryState>
-  </PageLayout>
+  </div>
 </template>

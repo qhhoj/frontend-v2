@@ -158,7 +158,7 @@ function keepFocusAbove() {
       :class="[
         variant === 'footer'
           ? 'flex-auto'
-          : 'sticky bottom-[var(--tab-bar-height,0px)] z-savebar -mx-[var(--qa-gutter,1rem)] border-t border-line bg-surface-solid px-[var(--qa-gutter,1rem)] py-3 pb-[max(0.75rem,var(--shell-inset-bottom,env(safe-area-inset-bottom)))]',
+          : 'sticky bottom-0 z-savebar -mx-[var(--qa-gutter,1rem)] border-t border-line bg-surface-solid px-[var(--qa-gutter,1rem)] py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]',
       ]"
     >
       <p role="status" class="flex min-w-0 flex-1 basis-48 items-center gap-2 text-sm">

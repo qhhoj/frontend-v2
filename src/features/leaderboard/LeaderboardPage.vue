@@ -27,8 +27,8 @@ const total = computed(() => formatNumber(data.value?.meta.total ?? 0, locale.lo
         {{ $t('leaderboard.lead', { total }) }}
         <MyRankLine v-if="session.user" :sort="sort" />
       </template>
+      <template #actions><UsernameJump /></template>
     </PageHeader>
-    <UsernameJump />
     <div ref="listTop" class="min-w-0">
       <LeaderboardTable
         :entries="entries"

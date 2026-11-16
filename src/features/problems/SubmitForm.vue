@@ -14,19 +14,17 @@ import LanguagePicker from './LanguagePicker.vue';
 import SourceUploadButton from './SourceUploadButton.vue';
 import SubmitResultStrip from './SubmitResultStrip.vue';
 import { useLocaleStore } from '@/stores/locale.store';
-import { submitAriaShortcut, submitShortcutHint } from './submit-shortcuts';
+import { submitShortcutHint } from './submit-shortcuts';
 import type { useSubmitForm } from './use-submit-form';
 
 const props = defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;
   /**
-   * `pane` is the desktop column beside the statement: a bar (language, upload, submit) over an editor that fills the
-   * rest, and the slot `tools` (full screen) at the end of the line under the editor; `full` the same as a full-screen
-   * panel, with the problem's name and the slot `actions` in the bar; `sheet` the phone's column that fills the sheet's
-   * height, the submit button under the editor.
+   * `dock` is the desktop strip (a wrapping row); `sheet` the phone's column that fills the sheet's height; `full` the
+   * full-screen panel: a header row (title, language, upload, actions, submit) over an editor that fills the rest.
    */
-  layout: 'pane' | 'sheet' | 'full';
+  layout: 'dock' | 'sheet' | 'full';
 }>();
 /** The same refs as `form`, unwrapped for the template. */
 const state = reactive(props.form);
@@ -51,17 +49,16 @@ const submitLabelKey = computed(() => {
 });
 
 /**
- * Where each region sits, top to bottom. The pane and the full-screen panel keep the submit button in their bar beside
- * the language, right-aligned. The full-screen panel's slot `actions` comes before it with a 16 px gap, so a dismiss
- * button is never next to it; the sheet puts the button below the editor. The result strip sits under the bar (Workbench)
- * and on top of the sheet.
+ * Where each region sits, top to bottom (dock: left to right, wrapping). The dock and the full-screen panel keep the
+ * actions and the submit button in their top row beside the language, so it stays short: actions right-aligned, then a
+ * 16 px gap and the submit button last, so a dismiss button is never next to it; the sheet puts the button below the editor.
  */
 const REGION_ORDER = {
   languageRow: 'order-1',
   info: 'order-2',
   upload: 'order-3',
   actions: 'order-4 ml-auto',
-  submitTopRow: 'order-5',
+  submitTopRow: 'order-5 ml-1',
   body: 'order-6',
   message: 'order-7',
   counterRow: 'order-8',
@@ -72,25 +69,18 @@ const REGION_ORDER = {
  * Everything that differs between the layouts, so the template reads the same for all. The limits and the link to the
  * runtimes page sit under the editor beside the counter.
  */
-const FILLED_EDITOR = {
-  form: 'flex h-full min-h-0 flex-col gap-3',
-  languageRow: 'flex items-center gap-x-2',
-  // The editor keeps a floor of 10 rem, so a message line above or below it never squeezes it away.
-  body: 'flex min-h-40 flex-1 flex-col',
-  editor: 'min-h-0 flex-1 overflow-auto rounded-cell',
-  editorMinLines: 6,
-  editorFill:
-    'h-full !max-h-none [&_.code-editor-host]:h-full [&_.cm-editor]:h-full [&_.code-editor-fallback]:min-h-full',
-  counterRow: '',
-  submit: { size: 'md', block: false },
-  header: 'flex flex-wrap items-center gap-x-3 gap-y-2',
-  strip: 'order-1',
-  /** The contest line gets its own row under the bar, so the bar keeps to one row in a narrow pane. */
-  info: 'order-6 basis-full',
-} as const;
 const LAYOUTS = {
-  pane: FILLED_EDITOR,
-  full: FILLED_EDITOR,
+  dock: {
+    form: 'flex flex-wrap items-center gap-x-3 gap-y-2',
+    languageRow: 'flex items-center gap-x-2',
+    body: 'basis-full',
+    editor: 'max-h-[30dvh] overflow-auto rounded-cell',
+    editorMinLines: 4,
+    editorFill: '',
+    counterRow: 'flex-1',
+    submit: { size: 'md', block: false },
+    header: 'contents',
+  },
   sheet: {
     form: 'flex min-h-min flex-1 flex-col gap-3',
     languageRow: 'grid w-full grid-cols-[minmax(0,1fr)_auto] items-center',
@@ -102,13 +92,23 @@ const LAYOUTS = {
     counterRow: 'justify-between',
     submit: { size: 'lg', block: true },
     header: 'contents',
-    strip: 'order-first',
-    info: REGION_ORDER.info,
+  },
+  full: {
+    form: 'flex h-full min-h-0 flex-col gap-3',
+    languageRow: 'flex items-center gap-x-2',
+    body: 'flex min-h-0 flex-1 flex-col',
+    editor: 'min-h-0 flex-1 overflow-auto rounded-cell',
+    editorMinLines: 6,
+    editorFill:
+      'h-full !max-h-none [&_.code-editor-host]:h-full [&_.cm-editor]:h-full [&_.code-editor-fallback]:min-h-full',
+    counterRow: '',
+    submit: { size: 'md', block: false },
+    header: 'flex flex-wrap items-center gap-x-3 gap-y-2',
   },
 } as const;
 const classes = computed(() => LAYOUTS[props.layout]);
 const isSheet = computed(() => props.layout === 'sheet');
-/** Where the actions and submit sit: the bar of the pane and the full-screen panel, or under the sheet's editor. */
+/** Where the actions and submit sit: the top row of the dock and the full-screen panel, or under the sheet's editor. */
 const isTopRow = computed(() => props.layout !== 'sheet');
 const shortcutHint = submitShortcutHint();
 const hasSourceUpload = computed(() => !state.fileMode);
@@ -134,11 +134,8 @@ function loadDroppedFile(event: DragEvent) {
       v-if="state.lastSubmissionId || state.submitting"
       :result="form.result"
       :submission-id="state.submitting ? null : state.lastSubmissionId"
-      class="w-full shrink-0"
-      :class="classes.strip"
+      class="order-first w-full shrink-0"
     />
-    <!-- The viewer's last submissions to this problem (the pane only), right under the result strip. -->
-    <div v-if="$slots.history" class="order-1 shrink-0"><slot name="history" /></div>
     <div :class="classes.header">
       <h2
         v-if="layout === 'full'"
@@ -161,7 +158,12 @@ function loadDroppedFile(event: DragEvent) {
           @pick="(file) => state.loadFile(file)"
         />
       </div>
-      <p v-if="problem.contest" class="text-sm" :class="classes.info" data-testid="submit-contest">
+      <p
+        v-if="problem.contest"
+        class="text-sm"
+        :class="REGION_ORDER.info"
+        data-testid="submit-contest"
+      >
         <RouterLink
           :to="`/contests/${encodeURIComponent(problem.contest.contestKey)}`"
           class="font-semibold text-accent underline"
@@ -180,7 +182,7 @@ function loadDroppedFile(event: DragEvent) {
       </p>
       <SourceUploadButton
         v-if="!isSheet && hasSourceUpload"
-        :icon-only="layout === 'pane'"
+        :icon-only="false"
         :class="REGION_ORDER.upload"
         @pick="(file) => state.loadFile(file)"
       />
@@ -192,14 +194,14 @@ function loadDroppedFile(event: DragEvent) {
         v-if="isTopRow"
         type="submit"
         tone="primary"
+        @keydown="blockHeldEnter"
         v-bind="classes.submit"
         :disabled="!state.canSubmit"
         :loading="state.submitting"
         :aria-describedby="submitDescribedBy"
         class="shrink-0"
-        :class="[REGION_ORDER.submitTopRow, $slots.actions ? 'ml-1' : 'ml-auto']"
-        :aria-keyshortcuts="submitAriaShortcut()"
-        @keydown="blockHeldEnter"
+        :class="REGION_ORDER.submitTopRow"
+        aria-keyshortcuts="Control+Enter Meta+Enter"
         >{{ $t(submitLabelKey) }}<KeyHint :keys="shortcutHint"
       /></AppButton>
     </div>
@@ -243,7 +245,7 @@ function loadDroppedFile(event: DragEvent) {
       :id="errorId"
       tone="danger"
       inline
-      class="shrink-0"
+      class="basis-full"
       :class="REGION_ORDER.message"
     >
       {{ state.errorText }}
@@ -251,7 +253,7 @@ function loadDroppedFile(event: DragEvent) {
     <p
       v-else-if="blockedReason"
       :id="reasonId"
-      class="shrink-0 text-sm text-muted"
+      class="basis-full text-sm text-muted"
       :class="REGION_ORDER.message"
     >
       {{ blockedReason }}
@@ -259,7 +261,7 @@ function loadDroppedFile(event: DragEvent) {
     <p
       v-if="state.resubmitUnavailable"
       role="status"
-      class="shrink-0 text-sm text-muted"
+      class="basis-full text-sm text-muted"
       :class="REGION_ORDER.message"
     >
       {{ $t('submit.resubmitUnavailable') }}
@@ -295,21 +297,18 @@ function loadDroppedFile(event: DragEvent) {
         class="inline-flex min-h-11 items-center text-muted underline hover:text-content"
         >{{ $t('submit.versions') }}</RouterLink
       >
-      <div v-if="$slots.tools" class="ml-auto">
-        <slot name="tools" />
-      </div>
     </div>
     <AppButton
       v-if="!isTopRow"
       type="submit"
       tone="primary"
+      @keydown="blockHeldEnter"
       v-bind="classes.submit"
       :disabled="!state.canSubmit"
       :loading="state.submitting"
       :aria-describedby="submitDescribedBy"
       class="shrink-0"
       :class="REGION_ORDER.submit"
-      @keydown="blockHeldEnter"
       >{{ $t(submitLabelKey) }}</AppButton
     >
   </form>

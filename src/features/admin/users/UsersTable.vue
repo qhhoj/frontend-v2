@@ -6,7 +6,7 @@ import type { TotalPageMeta } from '@/api/client';
 import type { StaffUser } from '@/api/types/users-admin';
 import { formatAgo, formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
-import Chip from '@/components/ui/Chip.vue';
+import AdminChip from '../ui/AdminChip.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
@@ -78,12 +78,12 @@ const columns = computed<AdminColumn[]>(() => [
       </div>
     </template>
     <template #cell-role="{ row }">
-      <Chip v-if="row.isSuperuser" tone="accent">
+      <AdminChip v-if="row.isSuperuser" tone="accent">
         {{ $t('admin.users.list.status.superuser') }}
-      </Chip>
-      <Chip v-else-if="row.isStaff" tone="info">
+      </AdminChip>
+      <AdminChip v-else-if="row.isStaff" tone="info">
         {{ $t('admin.users.list.status.staff') }}
-      </Chip>
+      </AdminChip>
       <span v-else class="text-muted">{{ memberRoleLabel(row.displayRank) }}</span>
     </template>
     <template #cell-status="{ row }"><UserStatusChips :status="userStatusOf(row)" /></template>

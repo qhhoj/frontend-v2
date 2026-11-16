@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { LogOut } from 'lucide-vue-next';
-import { watch } from 'vue';
+import { LogOut, Menu } from 'lucide-vue-next';
+import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import AppButton from '@/components/ui/AppButton.vue';
 import Drawer from '@/components/ui/Drawer.vue';
+import IconButton from '@/components/ui/IconButton.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import ModeChoice from '@/features/appearance/ModeChoice.vue';
 import { useLogout } from '@/features/auth/use-logout';
@@ -18,11 +19,11 @@ import { useAccountLinks } from './account-links';
 import { NAV_ITEMS, useIsNavCurrent, useNavLinkEvents } from './nav-items';
 
 /**
- * The sheet behind the tab bar's "Tôi" (`TabBar`, which owns the button). It rises from the bottom: the seven sections (the current one marked), then what the
+ * The phone header's menu. A sheet rises from the bottom: the seven sections (the current one marked), then what the
  * desktop row shows beside the navigation: the official-mode pill, the account (who is signed in, its pages in the
  * desktop menu's order and sign-out, or register for a visitor; sign-in and the bell stay in the header), the language
  * and the light/dark mode (the rest of the look is one link away). The drawer traps focus and closes on Esc; any
- * navigation closes it; focus goes back to the tab that opened it (the kit `Drawer`).
+ * navigation closes it; focus goes back to the menu button (the kit `Drawer`).
  */
 const LANGUAGES: ReadonlyArray<{ value: Locale; label: string }> = [
   { value: 'vi', label: 'Tiếng Việt' },
@@ -39,7 +40,7 @@ const links = useAccountLinks();
 const logout = useLogout();
 /** Until the session answers the sheet offers neither sign-out nor sign-in. */
 const isSessionPending = useIsFirstNavigationPending();
-const isOpen = defineModel<boolean>('open', { required: true });
+const isOpen = ref(false);
 const isCurrent = useIsNavCurrent();
 const linkEvents = useNavLinkEvents();
 watch(
@@ -49,6 +50,16 @@ watch(
 </script>
 
 <template>
+  <IconButton
+    tone="secondary"
+    data-testid="phone-menu"
+    aria-haspopup="dialog"
+    :aria-expanded="isOpen"
+    :label="$t('nav.openMenu')"
+    @click="isOpen = true"
+  >
+    <Menu aria-hidden="true" class="size-5" />
+  </IconButton>
   <Drawer v-model:visible="isOpen" side="bottom" :title="$t('nav.menu')">
     <nav :aria-label="$t('nav.main')">
       <RouterLink
@@ -93,7 +104,7 @@ watch(
     </div>
     <div>
       <p :class="HEADING">{{ $t('appearance.title') }}</p>
-      <ModeChoice />
+      <ModeChoice mode-only />
       <RouterLink
         :to="{ name: 'settings-appearance' }"
         class="mt-1 inline-flex min-h-11 items-center text-meta text-accent-text underline"

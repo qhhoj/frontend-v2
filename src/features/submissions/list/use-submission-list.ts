@@ -9,7 +9,7 @@ import { useLiveSubmissionList } from '../use-live-submission-list';
 import { useSubmissionFilters } from '../use-submission-filters';
 import { useSessionStore } from '@/stores/session.store';
 import { useInFlightPoll } from './use-in-flight-poll';
-import { fixedProblemOf, fixedUserOf } from './submission-scope';
+import { fixedUserOf } from './submission-scope';
 import type { SubmissionScope } from './submission-scope';
 
 /**
@@ -23,19 +23,12 @@ export function useSubmissionList(options: {
   emptyKey: MaybeRefOrGetter<string>;
 }) {
   const scope = computed(() => toValue(options.scope));
-  const { filters: rawFilters, update, reset } = useSubmissionFilters();
-  /** The scope's pinned problem and user replace the URL's, so the query and the live feed follow what is shown. */
-  const urlFilters = computed(() => ({
-    ...rawFilters.value,
-    problem: fixedProblemOf(scope.value) ?? rawFilters.value.problem,
-    user: fixedUserOf(scope.value) ?? rawFilters.value.user,
-  }));
-  /** What the chips, the count and the empty text describe: a pinned value is the page's own, not a filter. */
-  const filters = computed(() => ({
-    ...urlFilters.value,
-    problem: fixedProblemOf(scope.value) === null ? urlFilters.value.problem : '',
-    user: fixedUserOf(scope.value) === null ? urlFilters.value.user : '',
-  }));
+  const { filters: urlFilters, update, reset } = useSubmissionFilters();
+  /** A pinned user replaces the URL's, so the chips, the count and the empty text describe what is shown. */
+  const filters = computed(() => {
+    const fixedUser = fixedUserOf(scope.value);
+    return fixedUser === null ? urlFilters.value : { ...urlFilters.value, user: '' };
+  });
   const { data: meta } = useProblemMetaQuery();
   const listQuery = useScopedSubmissionListQuery(scope, urlFilters, options.enabled);
   const rows = computed(() => listQuery.data.value?.items ?? []);

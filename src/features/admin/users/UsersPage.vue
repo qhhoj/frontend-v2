@@ -116,7 +116,7 @@ const isRolesOpen = ref(false);
         <button
           v-if="can('auth.add_user')"
           type="button"
-          :class="BUTTON.secondary"
+          :class="BUTTON.primary"
           @click="isCreateOpen = true"
         >
           {{ $t('admin.users.create.open') }}

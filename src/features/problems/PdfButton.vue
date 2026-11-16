@@ -4,9 +4,7 @@ import { computed, onScopeDispose, ref, toRef, watch } from 'vue';
 import { problemPdfUrl } from '@/api/problems.api';
 import type { StatementLanguage } from '@/api/types/problems';
 import { translate } from '@/i18n';
-import IconButton from '@/components/ui/IconButton.vue';
 import AppButton from '@/components/ui/AppButton.vue';
-import Notice from '@/components/ui/Notice.vue';
 import { usePdfStatement } from './use-pdf-statement';
 import type { PdfFailure } from './use-pdf-statement';
 
@@ -17,7 +15,7 @@ const FAILURE_KEYS: Record<PdfFailure, string> = {
   failed: 'problem.pdfFailed',
 };
 
-const props = defineProps<{ code: string; lang: StatementLanguage; iconOnly?: boolean }>();
+const props = defineProps<{ code: string; lang: StatementLanguage }>();
 const { phase, failure, retryAt, start } = usePdfStatement(
   toRef(props, 'code'),
   toRef(props, 'lang'),
@@ -85,31 +83,8 @@ watch(
 
 <template>
   <div ref="root" class="relative">
-    <IconButton
-      v-if="iconOnly && phase === 'ready'"
-      tone="primary"
-      size="sm"
-      :href="href"
-      target="_blank"
-      rel="noopener"
-      :label="$t('problem.pdfOpen')"
-    >
-      <ExternalLink aria-hidden="true" />
-    </IconButton>
-    <IconButton
-      v-else-if="iconOnly"
-      size="sm"
-      :tone="phase === 'failed' ? 'danger' : 'secondary'"
-      data-testid="pdf-button"
-      :label="name"
-      :loading="busy"
-      :disabled="mustWait"
-      @click="onClick"
-    >
-      <FileText aria-hidden="true" />
-    </IconButton>
     <AppButton
-      v-else-if="phase === 'ready'"
+      v-if="phase === 'ready'"
       ref="link"
       tone="primary"
       size="sm"
@@ -137,13 +112,12 @@ watch(
       <template #icon><FileText class="size-4" aria-hidden="true" /></template>
       {{ mustWait ? `${secondsToRetry}s` : 'PDF' }}
     </AppButton>
-    <div
+    <span
       v-if="phase === 'failed'"
-      class="absolute top-full right-0 z-10 mt-2 w-56 rounded-row border border-line bg-surface-solid p-3 text-sm"
+      class="absolute top-full right-0 z-10 mt-2 w-56 rounded-row border border-line bg-surface-solid p-3 text-sm text-negative"
       aria-hidden="true"
+      >{{ $t(failureKey) }}</span
     >
-      <Notice tone="danger" inline :role="null">{{ $t(failureKey) }}</Notice>
-    </div>
     <span class="sr-only" role="status">{{
       phase === 'ready' ? $t('problem.pdfReady') : phase === 'failed' ? $t(failureKey) : ''
     }}</span>

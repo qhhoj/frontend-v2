@@ -1,8 +1,8 @@
-// Imports that bypass the src/components/ui/ kit (docs/wrapper-migration.md): the thin wrappers kept for old call sites.
-// Each is a rule of the raw-element ratchet (scripts/raw-elements.mjs): a file may keep the
+// Imports that bypass the src/components/ui/ kit (docs/wrapper-migration.md): the thin wrappers kept for old call sites, and
+// PrimeVue parts used directly. Each is a rule of the raw-element ratchet (scripts/raw-elements.mjs): a file may keep the
 // imports its area baseline (scripts/raw-element-baseline/<area>.json) counts, and gains none. eslint.config.js turns the
 // same rules into `no-restricted-imports` so the editor flags a new import as it is typed; a file listed for one wrapper
-// is still refused the others. Specs are not checked; the kit may import no wrapper.
+// is still refused the others. Specs are not checked; the kit may import PrimeVue but no wrapper.
 
 /** A wrapper rule: the wrapper's file under src/, and the kit part that replaces it. */
 const wrapper = (id, file, use, eslintTail) => ({ id, file, use, eslintTail });
@@ -19,6 +19,7 @@ export const WRAPPERS = [
   wrapper('AdminDataTable', 'features/admin/ui/table/AdminDataTable.vue', 'DataTable'),
   wrapper('AdminPageHeader', 'features/admin/ui/AdminPageHeader.vue', 'PageHeader'),
   wrapper('AdminNotice', 'features/admin/ui/feedback/AdminNotice.vue', 'Notice'),
+  wrapper('GlassCard', 'components/GlassCard.vue', 'Card'),
   wrapper('AdminDrawer', 'features/admin/ui/AdminDrawer.vue', 'Drawer'),
   wrapper('AdminRowMenu', 'features/admin/ui/table/AdminRowMenu.vue', 'RowMenu'),
   wrapper(
@@ -47,6 +48,13 @@ export const WRAPPERS = [
   wrapper('SettingsCard', 'features/account/settings/SettingsCard.vue', 'Card'),
 ];
 
+/** PrimeVue parts other than the config and its types are wrapped by the kit. */
+const PRIMEVUE = {
+  id: 'primevue',
+  use: 'the kit part over it: Modal/ConfirmDialog (dialog), Menu/RowMenu (menu), Drawer, Popover, ComboBox (select)',
+  bare: /^primevue\/(?!config$|menuitem$)/,
+};
+
 const EXTENSION = /\.(?:vue|ts|js|mjs)$/;
 const escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -58,9 +66,10 @@ export const IMPORT_RULES = [
     test: (resolved) => resolved.replace(EXTENSION, '') === file.replace(EXTENSION, ''),
     regex: `(^|/)${escape(eslintTail ?? file.replace(/^.*\//, '').replace(EXTENSION, ''))}(\\.(vue|ts|js))?$`,
   })),
+  { ...PRIMEVUE, test: (resolved) => PRIMEVUE.bare.test(resolved), regex: PRIMEVUE.bare.source },
 ];
 
-/** The kit may import no wrapper: a barrel there would hide one from every other file. */
+/** The kit may import PrimeVue (it wraps it) but no wrapper: a barrel there would hide one from every other file. */
 export const isKit = (rel) => rel.startsWith('components/ui/');
 
 /**
@@ -116,7 +125,10 @@ function nameUses(code, names) {
 }
 
 /** The rule an import path breaks for the file `rel`, or undefined. */
-const ruleOf = (path, rel) => IMPORT_RULES.find(({ test }) => test(resolveImport(path, rel)));
+const ruleOf = (path, rel) =>
+  IMPORT_RULES.find(
+    ({ id, test }) => !(isKit(rel) && id === 'primevue') && test(resolveImport(path, rel)),
+  );
 
 /** One use per reference to what a static import binds (at least the import itself): a listed file adds none unseen. */
 function staticUses(code, rel) {

@@ -6,20 +6,29 @@ import AppButton from '@/components/ui/AppButton.vue';
 import IconButton from '@/components/ui/IconButton.vue';
 import Popover from '@/components/ui/Popover.vue';
 import { translate } from '@/i18n';
+import { useMediaQuery } from '@/lib/use-media-query';
 import { PLACEMENT_LOOKS } from '@/mascot/bit-sprite';
+import { GLASS_STOPS, nearestGlassStop } from '@/theme/appearance';
 import { LOW_POWER_PREFERENCES } from '@/theme/low-power';
 import { useLowPowerStore } from '@/theme/low-power.store';
+import { useThemeStore } from '@/theme/theme.store';
 import AccentChoice from './AccentChoice.vue';
-import ContrastChoice from './ContrastChoice.vue';
 import ModeChoice from './ModeChoice.vue';
 import SegmentedChoice from './SegmentedChoice.vue';
 import { useAppearanceChoice } from './use-appearance-choice';
 
-defineProps<{ compact?: boolean }>();
 const TITLE_ID = 'appearance-panel-title';
-const { reset } = useAppearanceChoice();
+const theme = useThemeStore();
+const { shown, update, reset } = useAppearanceChoice();
+const reducedTransparency = useMediaQuery('(prefers-reduced-transparency: reduce)');
+/** Glass acts on the Glass themes only; in Clay the segments are inert (the stored level is kept). */
+const isGlassTheme = computed(() => theme.theme.glass);
 const popover = ref<InstanceType<typeof Popover>>();
 const isOpen = ref(false);
+const glassOptions = computed(() =>
+  GLASS_STOPS.map((stop) => ({ value: stop.value, label: translate(stop.labelKey) })),
+);
+const nearestStop = computed(() => nearestGlassStop(shown.value.glass));
 const lowPower = useLowPowerStore();
 const lowPowerOptions = computed(() =>
   LOW_POWER_PREFERENCES.map((value) => ({ value, label: translate(`lowPower.short.${value}`) })),
@@ -28,7 +37,7 @@ const lowPowerOptions = computed(() =>
 
 <template>
   <IconButton
-    :compact="compact"
+    tone="secondary"
     aria-haspopup="dialog"
     :aria-expanded="isOpen"
     :label="$t('appearance.title')"
@@ -44,14 +53,31 @@ const lowPowerOptions = computed(() =>
         </p>
         <BitMascot :look="PLACEMENT_LOOKS.hero" blinks class="[--bit-px:2px]" />
       </div>
-      <!-- The segmented groups (Mode, Contrast) name themselves. -->
+      <!-- ModeChoice's two groups (Style, Mode) name themselves. -->
       <ModeChoice />
-      <ContrastChoice />
       <div>
         <p class="mb-2 text-caption leading-4 font-semibold text-muted">
           {{ $t('appearance.accentTitle') }}
         </p>
         <AccentChoice />
+      </div>
+      <div>
+        <p class="mb-2 text-caption leading-4 font-semibold text-muted">
+          {{ $t('appearance.glass') }}
+        </p>
+        <SegmentedChoice
+          :label="$t('appearance.glass')"
+          :options="glassOptions"
+          :selected="nearestStop"
+          :disabled="reducedTransparency || !isGlassTheme"
+          @pick="(stop) => void update({ glass: stop })"
+        />
+        <p v-if="!isGlassTheme" class="mt-2 text-meta text-muted">
+          {{ $t('appearance.glassOnly') }}
+        </p>
+        <p v-else-if="reducedTransparency" class="mt-2 text-meta text-muted">
+          {{ $t('appearance.solidByDevice') }}
+        </p>
       </div>
       <div>
         <p class="mb-2 text-caption leading-4 font-semibold text-muted">

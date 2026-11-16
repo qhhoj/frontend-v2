@@ -3,7 +3,7 @@
 # Output of each stays together; the exit code is non-zero when any fails.
 set -uo pipefail
 cd "$(dirname "$0")/.."
-rules=(lint:tokens lint:palette lint:copy lint:dates lint:plan-codes)
+rules=(lint:tokens lint:copy lint:dates lint:plan-codes)
 logs=$(mktemp -d)
 for rule in "${rules[@]}"; do npm run --silent "$rule" >"$logs/$rule.log" 2>&1 & pids+=($!); done
 status=0

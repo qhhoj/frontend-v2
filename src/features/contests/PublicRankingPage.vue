@@ -4,13 +4,11 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import EmptyState from '@/components/EmptyState.vue';
 import Card from '@/components/ui/Card.vue';
-import Toolbar from '@/components/ui/Toolbar.vue';
 import QueryState from '@/components/QueryState.vue';
 import { ApiError } from '@/api/client';
-import { isPenaltyFormat, showsCellTime } from '@/lib/ranking-cells';
+import { showsCellTime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import { useLocaleStore } from '@/stores/locale.store';
-import RankingLegend from './RankingLegend.vue';
 import RankingSkeleton from './RankingSkeleton.vue';
 import RankingTable from './RankingTable.vue';
 import { usePublicRankingQuery } from './contests.queries';
@@ -50,16 +48,7 @@ const context = computed<RankingContext | null>(() => {
         <Card v-if="!data.ranking.rows.length" as="div">
           <EmptyState>{{ $t('ranking.empty') }}</EmptyState>
         </Card>
-        <Toolbar v-else>
-          <template #right>
-            <RankingLegend
-              :is-penalty="isPenaltyFormat(context.formatName)"
-              :shows-time="context.showsTime"
-              :has-virtual-rows="data.ranking.rows.some((row) => row.virtual > 0)"
-            />
-          </template>
-        </Toolbar>
-        <Card v-if="data.ranking.rows.length" as="div" class="overflow-hidden">
+        <Card v-else as="div" class="overflow-hidden">
           <RankingTable
             :ranking="data.ranking"
             :rows="data.ranking.rows"

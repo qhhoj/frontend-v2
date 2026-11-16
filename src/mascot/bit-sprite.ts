@@ -1,7 +1,7 @@
 /**
  * Bit, the QHHOJ pixel mascot (design-system/qhhoj/mascot.md): 16x16 grid data and the pure functions that turn it into frames.
  * The palettes below are sprite colours, not theme tokens: Bit keeps them in every theme, so this is the one source file
- * (besides src/theme/palette/*.css) allowed to hold colour literals; scripts/check-tokens.mjs skips it by name.
+ * (besides src/theme/themes/*.css) allowed to hold colour literals; scripts/check-tokens.mjs skips it by name.
  */
 export const SPRITE_SIZE = 16;
 

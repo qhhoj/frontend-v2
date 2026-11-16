@@ -85,7 +85,7 @@ function onDrawerHidden() {
         <button
           type="button"
           data-testid="integration-create"
-          :class="BUTTON.secondary"
+          :class="BUTTON.primary"
           :aria-disabled="isLocked || undefined"
           @click="isLocked || (isCreateOpen = true)"
         >

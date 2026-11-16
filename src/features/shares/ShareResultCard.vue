@@ -3,10 +3,10 @@ import { computed } from 'vue';
 import type { ShareView } from '@/api/types/shares';
 import FactLine from '@/components/FactLine.vue';
 import Card from '@/components/ui/Card.vue';
-import VerdictChip from '@/components/ui/VerdictChip.vue';
+import VerdictLabel from '@/components/VerdictLabel.vue';
 import VerdictRing from '@/features/submissions/VerdictRing.vue';
 import { translate } from '@/i18n';
-import { NO_VALUE, formatCaseMemory, formatCaseTime, formatPoints } from '@/lib/format';
+import { NO_VALUE, formatCaseMemory, formatCaseTime, formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { PARTIAL_CODE, submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -15,7 +15,7 @@ import { useLocaleStore } from '@/stores/locale.store';
 const props = defineProps<{ share: ShareView; copy: NonNullable<ShareView['copy']> }>();
 const locale = useLocaleStore();
 const SCORE_DIGITS = 2;
-const format = (points: number) => formatPoints(points, locale.locale, SCORE_DIGITS);
+const format = (points: number) => formatNumber(points, locale.locale, SCORE_DIGITS, false);
 
 const verdict = computed(() =>
   submissionVerdictOf({
@@ -59,8 +59,8 @@ const facts = computed(() =>
     <div class="flex items-center gap-5">
       <VerdictRing size="md" :progress="null" :verdict="verdict" :share="partialShare" />
       <div class="min-w-0">
-        <p class="text-sm"><VerdictChip :verdict="verdict" named /></p>
-        <p class="mt-1 font-mono text-section-legacy leading-none font-semibold tabular-nums">
+        <p class="text-sm"><VerdictLabel :verdict="verdict" /></p>
+        <p class="mt-1 font-mono text-section leading-none font-semibold tabular-nums">
           {{ score }}
           <span class="text-base text-muted"
             >/ {{ format(copy.problemPoints) }} {{ $t('share.result.points') }}</span

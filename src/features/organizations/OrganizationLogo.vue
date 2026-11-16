@@ -6,16 +6,15 @@ import { initialsOf, tileClass } from './org-visuals';
 const props = withDefaults(
   defineProps<{
     organization: { slug: string; name: string; shortName: string; logoOverrideImage?: string };
-    size?: 'sm' | 'md' | 'lg';
+    size?: 'md' | 'lg';
   }>(),
   { size: 'md' },
 );
-const SIZE_CLASSES = {
-  sm: 'size-7 rounded-cell text-caption leading-4',
-  md: 'size-12 rounded-cell text-subtitle leading-7',
-  lg: 'size-[76px] rounded-row text-page',
-} as const;
-const sizeClass = computed(() => SIZE_CLASSES[props.size]);
+const sizeClass = computed(() =>
+  props.size === 'lg'
+    ? 'size-[76px] rounded-row text-page'
+    : 'size-12 rounded-cell text-subtitle leading-7',
+);
 const initials = computed(() => initialsOf(props.organization.name, props.organization.shortName));
 </script>
 

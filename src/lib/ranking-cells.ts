@@ -1,6 +1,10 @@
 import type { ContestFormatName, ProblemCell, RankingProblem } from '@/api/types/contests';
+import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
-import { formatElapsed, formatNumber, scoreBelowFull } from './format';
+import { daysHoursOf } from './contest-time';
+import { formatElapsed, formatElapsedSeconds, formatNumber, scoreBelowFull } from './format';
+import { daysHoursText } from './use-countdown-text';
+import type { Translate } from './use-countdown-text';
 
 export type CellKind = 'empty' | 'first-solve' | 'solved' | 'partial' | 'failed' | 'pending';
 export interface RankingCellView {
@@ -52,15 +56,35 @@ const isFullPoints = (points: number, problem: RankingProblem) =>
 const NO_CUMTIME_FORMATS = new Set<ContestFormatName>(['ioi16', 'final_submission']);
 export const showsCumtime = (formatName: ContestFormatName) => !NO_CUMTIME_FORMATS.has(formatName);
 
-/** Every clock on the board (cell, total, multi-day too) reads `h:mm`, e.g. `107:20`; screen readers get the same text. */
-const elapsedShown = (seconds: number) => {
-  const shown = formatElapsed(seconds);
-  return { shown, spoken: shown };
-};
+/**
+ * From 100 hours a cell's clock (`2735:36:42`, or `2735:36` on penalty boards) no longer reads at a glance, nor fits
+ * the cell: it says `113 ng 23 g` instead. Below that, `H:MM:SS` fits up to 99:59:59.
+ */
+const LONG_CELL_SECONDS = 100 * 3600;
+/** A cell's solve time: shown short, and in full words for screen readers. */
+function cellElapsed(
+  seconds: number,
+  formatBelowLong: (seconds: number) => string,
+  locale: Locale,
+): { shown: string; spoken: string } {
+  if (seconds < LONG_CELL_SECONDS) {
+    const clock = formatBelowLong(seconds);
+    return { shown: clock, spoken: clock };
+  }
+  const inLocale: Translate = (key, named, plural) => translate(key, named, { locale, plural });
+  const span = daysHoursOf(seconds);
+  return {
+    shown: daysHoursText(inLocale, span, true),
+    spoken: daysHoursText(inLocale, span, false),
+  };
+}
 
-/** icpc counts minutes, every other format seconds (backend: libs/contests/src/formats); both print as `h:mm`. */
-export const formatCumtime = (formatName: ContestFormatName, cumtime: number) =>
-  formatElapsed(formatName === 'icpc' ? cumtime * 60 : cumtime);
+/**
+ * icpc counts minutes, every other format seconds (backend: libs/contests/src/formats). A total in seconds says days
+ * and hours from 100 hours, as the cells do.
+ */
+export const formatCumtime = (formatName: ContestFormatName, cumtime: number, locale: Locale) =>
+  formatName === 'icpc' ? String(cumtime) : cellElapsed(cumtime, formatElapsed, locale).shown;
 
 const EMPTY: RankingCellView = {
   kind: 'empty',
@@ -114,8 +138,13 @@ const READ_TRIES: Partial<Record<ContestFormatName, (cell: ProblemCell) => Tries
   vnoj: (cell) => ({ wrong: Number(cell.penalty ?? 0), pending: Number(cell.pending ?? 0) }),
 };
 
-function solvedPenaltyCell(cell: ProblemCell, wrong: number, isFirst: boolean): RankingCellView {
-  const time = elapsedShown(Number(cell.time ?? 0));
+function solvedPenaltyCell(
+  cell: ProblemCell,
+  wrong: number,
+  isFirst: boolean,
+  locale: Locale,
+): RankingCellView {
+  const time = cellElapsed(Number(cell.time ?? 0), formatElapsed, locale);
   return {
     kind: isFirst ? 'first-solve' : 'solved',
     text: `+${wrong || ''}`,
@@ -134,7 +163,7 @@ function penaltyCell(
   const { wrong, pending } = READ_TRIES[context.formatName]!(cell);
   const points = Number(cell.points ?? 0);
   // Solved only at full points (backend `isSolvedCell`): a partial contest problem gives part of them on icpc too.
-  if (isFullPoints(points, problem)) return solvedPenaltyCell(cell, wrong, isFirst);
+  if (isFullPoints(points, problem)) return solvedPenaltyCell(cell, wrong, isFirst, context.locale);
   if (pending > 0)
     return {
       kind: 'pending',
@@ -154,7 +183,9 @@ function penaltyCell(
 }
 
 const cellTime = (cell: ProblemCell, context: RankingContext) =>
-  context.showsTime && typeof cell.time === 'number' ? elapsedShown(cell.time) : undefined;
+  context.showsTime && typeof cell.time === 'number'
+    ? cellElapsed(cell.time, formatElapsedSeconds, context.locale)
+    : undefined;
 
 /** Full or partial points, with the time under them when the format has one. */
 function scoredCell(

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import Dialog from 'primevue/dialog';
 import CopyButton from '@/components/CopyButton.vue';
-import Modal from '@/components/ui/Modal.vue';
 import AdminStatus from './AdminStatus.vue';
 import { BUTTON } from './controls';
 
@@ -16,8 +16,7 @@ interface RevealKeyTexts {
 
 /**
  * Shows a secret once. Nothing dismisses it (Escape, the mask, the close button) until "saved" is checked. The dialog stays
- * mounted so focus returns to the opener when it hides; the parent keeps the key only while `visible`.
- * Focus starts on the saved box (`autofocus`), so the key is read and acknowledged before the close button is reached.
+ * mounted so PrimeVue returns focus to the opener when it hides; the parent keeps the key only while `visible`.
  */
 const props = defineProps<{
   visible: boolean;
@@ -27,7 +26,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ close: [] }>();
 const isSaved = ref(false);
-/** Escape and the mask would also reach this setter; the Modal switches them off, so only the close button gets here. */
+/** Escape and the mask would also reach this setter; the Dialog switches them off, so only the close button gets here. */
 const isOpen = computed({
   get: () => props.visible,
   set: (open: boolean) => {
@@ -42,13 +41,27 @@ watch(
   },
 );
 
+/** Focus starts on the saved box, so the key is read and acknowledged before the close button is reached. */
+function focusSavedBox() {
+  document.getElementById('key-saved')?.focus();
+}
+
 function close() {
   if (isSaved.value) isOpen.value = false;
 }
 </script>
 
 <template>
-  <Modal v-model:visible="isOpen" :title="header" :closable="false">
+  <Dialog
+    v-model:visible="isOpen"
+    modal
+    :header="header"
+    :draggable="false"
+    :closable="false"
+    :close-on-escape="false"
+    :dismissable-mask="false"
+    @show="focusSavedBox"
+  >
     <div class="flex flex-col gap-4">
       <AdminStatus kind="security" :text="texts.warning" />
       <div class="flex flex-col gap-2">
@@ -63,7 +76,7 @@ function close() {
         </div>
       </div>
       <label class="flex items-center gap-2">
-        <input id="key-saved" v-model="isSaved" type="checkbox" class="size-5" autofocus />
+        <input id="key-saved" v-model="isSaved" type="checkbox" class="size-5" />
         {{ texts.saved }}
       </label>
     </div>
@@ -78,5 +91,5 @@ function close() {
         {{ texts.close }}
       </button>
     </template>
-  </Modal>
+  </Dialog>
 </template>

@@ -37,7 +37,7 @@ async function submit() {
   <InboxNotice v-if="sent" :resend="resendMail">
     <slot name="sent" :email="maskEmail(sentTo)" />
   </InboxNotice>
-  <form v-else ref="formElement" class="flex flex-col gap-5" @submit.prevent="submit">
+  <form v-else ref="formElement" class="flex flex-col gap-4" @submit.prevent="submit">
     <AuthField
       v-model="email"
       type="email"

@@ -4,11 +4,12 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { NumberedPageMeta } from '@/api/client';
 import type { ProblemListItem } from '@/api/types/problems';
+import Chip from '@/components/ui/Chip.vue';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
-import Chip from '@/components/ui/Chip.vue';
+import AdminChip from '../ui/AdminChip.vue';
 import AdminUserLabel from '../ui/AdminUserLabel.vue';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
@@ -139,19 +140,19 @@ const menuItems = (code: string) =>
     </template>
     <template #cell-status="{ row }">
       <span class="inline-flex gap-1">
-        <Chip v-if="row.isPublic" tone="success" :icon="Globe">
+        <AdminChip v-if="row.isPublic" tone="positive" :icon="Globe">
           {{ $t('admin.problemList.status.public') }}
-        </Chip>
-        <Chip v-else-if="isSuggestedQueue" tone="warning" :icon="Lightbulb">{{
+        </AdminChip>
+        <AdminChip v-else-if="isSuggestedQueue" tone="caution" :icon="Lightbulb">{{
           $t('admin.problemList.status.suggested')
-        }}</Chip>
-        <Chip v-else :icon="Lock">{{ $t('admin.problemList.status.private') }}</Chip>
-        <Chip v-if="row.isOrganizationPrivate" tone="info" :icon="Building2">
+        }}</AdminChip>
+        <AdminChip v-else :icon="Lock">{{ $t('admin.problemList.status.private') }}</AdminChip>
+        <AdminChip v-if="row.isOrganizationPrivate" tone="info" :icon="Building2">
           {{ $t('admin.problemList.orgPrivate') }}
-        </Chip>
-        <Chip v-if="row.partial" :title="$t('admin.problemList.partialHint')">
+        </AdminChip>
+        <AdminChip v-if="row.partial" :title="$t('admin.problemList.partialHint')">
           {{ $t('admin.problemList.partial') }}
-        </Chip>
+        </AdminChip>
       </span>
     </template>
     <template #cell-setup="{ row }">

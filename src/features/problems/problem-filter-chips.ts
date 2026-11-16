@@ -48,8 +48,11 @@ const pointsChips = ({ pointsMin, pointsMax }: ProblemFilters): FilterChip[] =>
         },
       ];
 
-const editorialChips = (filters: ProblemFilters): FilterChip[] =>
-  filters.hasEditorial
+const flagChips = (filters: ProblemFilters): FilterChip[] => [
+  ...(filters.hideSolved
+    ? [{ key: 'hideSolved', label: translate('problems.hideSolved'), clear: { hideSolved: false } }]
+    : []),
+  ...(filters.hasEditorial
     ? [
         {
           key: 'hasEditorial',
@@ -57,16 +60,14 @@ const editorialChips = (filters: ProblemFilters): FilterChip[] =>
           clear: { hasEditorial: false },
         },
       ]
-    : [];
+    : []),
+];
 
-/**
- * One chip per active filter (a chip per picked type), in panel order. The solved choice has none: its segmented control
- * in the toolbar already shows it.
- */
+/** One chip per active filter (a chip per picked type), in toolbar order. */
 export const filterChips = (filters: ProblemFilters, catalog: Catalog): FilterChip[] => [
   ...searchChips(filters),
   ...groupChips(filters, catalog),
   ...typeChips(filters, catalog),
   ...pointsChips(filters),
-  ...editorialChips(filters),
+  ...flagChips(filters),
 ];

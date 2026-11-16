@@ -5,17 +5,14 @@ import { isProblemSort } from '@/api/types/problems';
 import { pageFromQuery } from '@/lib/paging';
 import type { ProblemListQuery, ProblemSort } from '@/api/types/problems';
 
-/** "Tất cả / Chưa giải / Đã giải": which problems by the viewer's own solve. */
-export type SolvedFilter = 'any' | 'unsolved' | 'solved';
-
 export interface ProblemFilters {
   search: string;
   groupId: string | null;
   typeIds: string[];
   pointsMin: number | null;
   pointsMax: number | null;
-  /** `?unsolved=1` (the old "Ẩn bài đã giải") or `?solved=1`. */
-  solved: SolvedFilter;
+  /** "Ẩn bài đã giải": only problems the viewer has not solved. */
+  hideSolved: boolean;
   hasEditorial: boolean;
   sort: ProblemSort | null;
 }
@@ -26,7 +23,7 @@ export const NO_FILTERS: ProblemFilters = {
   typeIds: [],
   pointsMin: null,
   pointsMax: null,
-  solved: 'any',
+  hideSolved: false,
   hasEditorial: false,
   sort: null,
 };
@@ -44,12 +41,6 @@ const integerOf = (value: LocationQueryValue | LocationQueryValue[] | undefined)
 const flagOf = (value: LocationQueryValue | LocationQueryValue[] | undefined) =>
   valuesOf(value)[0] === '1';
 
-/** `unsolved=1` wins over `solved=1`: it is the older key, so an old link keeps its meaning. */
-const solvedOf = (query: LocationQuery): SolvedFilter => {
-  if (flagOf(query.unsolved)) return 'unsolved';
-  return flagOf(query.solved) ? 'solved' : 'any';
-};
-
 /** The URL is the source of truth (filters survive reload and sharing); values the API would refuse are dropped. */
 export function parseProblemFilters(query: LocationQuery): ProblemFilters {
   const sort = valuesOf(query.sort)[0];
@@ -60,7 +51,7 @@ export function parseProblemFilters(query: LocationQuery): ProblemFilters {
     typeIds: valuesOf(query.type).filter((id) => UUID.test(id)),
     pointsMin: integerOf(query.min),
     pointsMax: integerOf(query.max),
-    solved: solvedOf(query),
+    hideSolved: flagOf(query.unsolved),
     hasEditorial: flagOf(query.editorial),
     sort: isProblemSort(sort) ? sort : null,
   };
@@ -72,8 +63,7 @@ export const toProblemQuery = (filters: ProblemFilters): LocationQueryRaw => ({
   type: filters.typeIds.length ? filters.typeIds : undefined,
   min: filters.pointsMin ?? undefined,
   max: filters.pointsMax ?? undefined,
-  unsolved: filters.solved === 'unsolved' ? '1' : undefined,
-  solved: filters.solved === 'solved' ? '1' : undefined,
+  unsolved: filters.hideSolved ? '1' : undefined,
   editorial: filters.hasEditorial ? '1' : undefined,
   sort: filters.sort ?? undefined,
 });
@@ -86,7 +76,7 @@ export const toApiFilters = (filters: ProblemFilters) =>
     typeIds: filters.typeIds.length ? filters.typeIds : undefined,
     pointsMin: filters.pointsMin ?? undefined,
     pointsMax: filters.pointsMax ?? undefined,
-    solved: filters.solved === 'any' ? undefined : filters.solved === 'solved',
+    solved: filters.hideSolved ? false : undefined,
     hasEditorial: filters.hasEditorial ? true : undefined,
   }) satisfies Partial<ProblemListQuery>;
 
@@ -103,12 +93,13 @@ export function useProblemFilters() {
   return { filters, page, update, clearAll };
 }
 
-/** How many of the filters behind the "Bộ lọc" button narrow the list; the points range counts once. */
+/** How many of the filters behind the phone's "Bộ lọc" button (all but search and sort) narrow the list; the points range counts once. */
 export function panelFilterCount(filters: ProblemFilters): number {
   return [
     filters.groupId !== null,
     filters.typeIds.length > 0,
     filters.pointsMin !== null || filters.pointsMax !== null,
+    filters.hideSolved,
     filters.hasEditorial,
   ].filter(Boolean).length;
 }

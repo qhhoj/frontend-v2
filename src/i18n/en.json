@@ -14,13 +14,7 @@
     "organizations": "Organizations",
     "more": "More",
     "menu": "Menu",
-    "railCollapse": "Collapse the sidebar",
-    "railExpand": "Expand the sidebar",
-    "runningCount": "{count} running",
-    "me": "Me",
-    "back": "Back",
-    "breadcrumb": "Breadcrumb",
-    "rail": "Sidebar"
+    "openMenu": "Open the menu"
   },
   "pages": {
     "problem": "Problem",
@@ -64,10 +58,10 @@
     "contestReplay": "Replay",
     "contestBalloons": "Balloons",
     "contestBalloonsPrint": "Balloon run sheet",
+    "problemBest": "Best submissions",
     "runtimes": "Judges and languages",
     "postDrafts": "My drafts",
     "contestAll": "All statements",
-    "devKit": "Kit gallery",
     "contestProblemBest": "Best submissions of a problem",
     "paste": "Paste code",
     "share": "Shared link",
@@ -126,7 +120,6 @@
       "freeze": "Freeze",
       "timeLeft": "Time left",
       "notStarted": "Not started yet",
-      "endedOn": "Ended at {time}",
       "endedAt": "Ended at {time}",
       "elapsed": "{span} in",
       "notFoundTitle": "Contest not found",
@@ -293,8 +286,8 @@
       "searchPlaceholder": "Search by key or name",
       "startsIn": "starts {relative}",
       "viewAndRegister": "View & register",
+      "endedRegion": "Ended contests, scrolls sideways",
       "shownOf": "{shown} of {total}",
-      "count": "{n} contest | {n} contests",
       "view": "View",
       "codeNeeded": "Code needed",
       "badges": {
@@ -304,8 +297,7 @@
       },
       "columns": {
         "contest": "Contest",
-        "when": "Date",
-        "length": "Length",
+        "when": "Date · length",
         "format": "Format",
         "participants": "Contestants",
         "action": "Action"
@@ -660,55 +652,37 @@
   },
   "appearance": {
     "title": "Appearance",
+    "customLook": "Use my own look",
+    "customLookHelp": "Off: you see the site's own look. On: your choices below.",
+    "styleAndMode": "Style and mode",
+    "style": "Style",
     "mode": "Mode",
     "modeOption": {
       "light": "Light",
       "dark": "Dark",
       "auto": "Device"
     },
-    "contrast": "Contrast",
-    "contrastHelp": "High: darker text, borders and verdict colours. Until you choose, the page follows your device.",
-    "contrastOption": {
-      "standard": "Standard",
-      "high": "High"
-    },
-    "backgroundTitle": "Page background",
-    "backgroundHelp": "A faint pattern behind the page; cards, tables and text stay on solid surfaces. Low-power mode shows a flat tint.",
-    "background": {
-      "none": "None",
-      "paper": "Paper",
-      "grainy": "Grainy gradient",
-      "contour": "Contour lines",
-      "halftone": "Halftone",
-      "dither": "Dithered",
-      "stipple": "Stippled",
-      "landscape": "Landscape"
-    },
-    "paletteTitle": "Colour palette",
-    "paletteHelp": "The page's grounds, text and result colours. Every palette is checked so text stays readable in light, dark and high contrast. The choice is kept in this browser.",
-    "palette": {
-      "catppuccin-mocha": "Catppuccin Mocha",
-      "catppuccin-frappe": "Catppuccin Frappé",
-      "palletism": "Palletism",
-      "wonderlist": "Wonderlist",
-      "motionin": "Motionin",
-      "iris": "Iris",
-      "lagoon": "Lagoon",
-      "lotus": "Lotus",
-      "ink": "Ink",
-      "plum": "Plum",
-      "petrol": "Petrol",
-      "paper": "Paper"
-    },
     "accentTitle": "Accent",
-    "accentHelp": "Every accent is checked for readable text in light, dark and high contrast.",
+    "accentHelp": "Every preset is checked for readable text in light and dark.",
     "accent": {
-      "ultramarine": "Ultramarine",
-      "teal": "Teal",
-      "plum": "Plum",
-      "terracotta": "Terracotta",
-      "graphite": "Graphite"
+      "clay": "Clay",
+      "orchid": "Orchid",
+      "ocean": "Ocean",
+      "mint": "Mint",
+      "sunset": "Sunset",
+      "gold": "Gold",
+      "mono": "Mono",
+      "red": "Red"
     },
+    "glass": "Glass",
+    "glassOnly": "Glass and glow only apply to the Glass themes.",
+    "glassHelp": "How see-through cards are. Solid is easiest to read and lightest on older devices.",
+    "glassStop": {
+      "clear": "Clear",
+      "frosted": "Frosted",
+      "solid": "Solid"
+    },
+    "glow": "Background glow",
     "reset": "Reset to site default",
     "useSite": "Use site default",
     "moreSettings": "More in Settings",
@@ -721,7 +695,7 @@
     "showingSite": "Showing the site's own look",
     "savedAccount": "Saved to your account · applies on every device",
     "savedBrowser": "Saved in this browser · sign in to keep it on every device",
-    "migrated": "QHHOJ has a new look. Your earlier choices moved to the nearest colours; change them in Settings › Appearance."
+    "solidByDevice": "Your device asks for less transparency, so cards stay solid."
   },
   "bitRoam": {
     "title": "Bits around the page",
@@ -732,6 +706,14 @@
     "stillNote": "The Bits stand still in low-power mode or with reduced motion.",
     "resting": "The Bits are resting until this session ends",
     "callBack": "Call back"
+  },
+  "theme": {
+    "styleClay": "Clay",
+    "styleGlass": "Glass",
+    "clayLight": "Clay light",
+    "clayDark": "Clay dark",
+    "glassDark": "Glass dark",
+    "glassLight": "Glass light"
   },
   "locale": {
     "switchTo": "Chuyển sang tiếng Việt",
@@ -749,6 +731,11 @@
     },
     "noAccountPrompt": "No account yet?",
     "resendLink": "Resend the activation email",
+    "brand": {
+      "headline": "Practice algorithms every day, with Bit.",
+      "lead": "Submit, see your verdict at once and climb the rankings.",
+      "counts": "{problems} problems · {users} members"
+    },
     "notice": {
       "passwordReset": "Your password was changed. Sign in again."
     },
@@ -1124,8 +1111,10 @@
       "evening": "Good evening, {username}"
     },
     "ratingDelta": "{delta} at the last contest",
+    "ratingTier": "Rating · {tier}",
+    "ratingChart": "Rating over {count} contest, from {first} to {last} | Rating over {count} contests, from {first} to {last}",
     "solved": "Solved",
-    "unrated": "No rating yet",
+    "solvedUnrated": "Problems solved · no rating yet",
     "points": "Points",
     "rank": "Rank",
     "recentSubmissions": "Recent submissions",
@@ -1146,30 +1135,25 @@
         "submissions": "submissions",
         "contests": "contests"
       },
+      "running": "Running contests",
+      "allContests": "All contests",
+      "contestants": "{key} · {count} contestants",
       "elapsed": "{percent}% of the time has passed",
+      "viewContest": "View contest",
       "newPosts": "New posts",
+      "allPosts": "All posts",
       "score": "{score} points",
       "topPp": "Top performance points",
       "pp": "{pp} PP",
       "leaderboard": "Leaderboard",
       "noPerformers": "No one has performance points yet."
-    },
-    "contestants": "{count} contestants",
-    "continueHint": "Back to the problem you left unfinished",
-    "liveEnter": "Enter contest",
-    "liveScore": "{score} points"
+    }
   },
   "problem": {
     "copySample": "Copy sample",
     "tabs": {
       "statement": "Statement",
-      "editorial": "Editorial",
-      "submissions": "Submissions",
-      "mine": "Mine",
-      "best": "Best"
-    },
-    "menu": {
-      "report": "Report a problem"
+      "editorial": "Editorial"
     },
     "tabsLabel": "Problem sections",
     "editorial": {
@@ -1178,7 +1162,8 @@
     "limits": {
       "time": "Time",
       "memory": "Memory",
-      "points": "Points"
+      "points": "Points",
+      "acRate": "AC rate"
     },
     "noStatement": {
       "title": "No statement yet",
@@ -1201,10 +1186,17 @@
     "noSubmissions": "You have not submitted this problem yet.",
     "rail": {
       "railLabel": "Problem info",
+      "submit": {
+        "title": "Submit",
+        "open": "Submit",
+        "hint": "Opens the code editor at the bottom of the page."
+      },
       "facts": {
+        "solvers": "Solvers",
         "io": "Input/Output",
         "input": "Input",
         "output": "Output",
+        "stdio": "Standard I/O",
         "status": "Status",
         "untried": "Not tried",
         "contestPoints": "Contest points"
@@ -1215,24 +1207,34 @@
         "siteOutOf": "/ {max} problem points"
       },
       "links": {
+        "label": "Problem links",
+        "title": "Links",
+        "submissions": "All submissions",
+        "best": "Best submissions",
         "pdfStatement": "PDF statement",
-        "material": "Attached material"
+        "material": "Attached material",
+        "report": "Report a problem with this task"
       }
     },
-    "pdfRender": "Download PDF",
+    "pdfRender": "Download statement as PDF",
     "externalJudge": "Judged on {oj}",
     "strip": {
       "partial": "partial",
-      "acRate": "AC rate",
-      "solvers": "Solvers"
+      "solves": "AC {rate}% · {count} solvers"
     }
   },
   "problems": {
     "title": "Problems",
     "results": "{n} result | {n} results",
+    "solvedCount": "{solved} solved",
     "search": "Code or name",
+    "types": "Filter by problem type",
+    "pointsAny": "Points",
+    "pointsFilter": "Filter by points",
     "listName": "Problem list",
+    "pointsRange": "Points {min}–{max}",
     "pointsAnyBound": "Any",
+    "pointsDone": "Done",
     "pointsMin": "Points from",
     "pointsMax": "Points to",
     "columns": {
@@ -1259,12 +1261,15 @@
     "random": "Random problem",
     "randomNone": "No matching problem.",
     "randomFailed": "Could not pick a problem, try again.",
+    "hideSolved": "Hide solved",
     "hasEditorial": "Has editorial",
     "filtering": "Filtering:",
     "clearAll": "Clear all",
     "removeFilter": "Remove filter: {name}",
     "pointsChip": "{min}–{max} points",
     "count": "{n} problem | {n} problems",
+    "legendPartial": "= partial scoring",
+    "legend": "Legend",
     "uncategorized": "Uncategorized",
     "attemptedLong": "Attempted, not solved",
     "notTried": "Not tried",
@@ -1278,14 +1283,11 @@
     },
     "solverCount": "{count} solved",
     "filterPanel": "Filters",
-    "solvedShort": "{solved} solved",
-    "partialHint": "partial scoring",
-    "hasEditorialHint": "Only problems with a published editorial",
-    "solvedFilter": {
-      "label": "Filter by solved",
-      "any": "All",
-      "unsolved": "Unsolved",
-      "solved": "Solved"
+    "tier": {
+      "1": "Easy",
+      "2": "Medium",
+      "3": "Hard",
+      "4": "Very hard"
     }
   },
   "submissions": {
@@ -1305,9 +1307,7 @@
       "verdict": "Verdict",
       "problem": "Problem",
       "user": "User",
-      "score": "Score",
-      "time": "Time",
-      "memory": "Memory",
+      "cost": "Time · Memory",
       "language": "Language",
       "when": "When",
       "source": "Source code",
@@ -1337,11 +1337,17 @@
       "positionOpen": "Page {page}"
     },
     "stats": {
+      "judgedToday": "judged today",
+      "acceptedToday": "accepted",
+      "queue": "waiting",
       "judges": "judges",
-      "noJudge": "no judge online"
+      "noJudge": "no judge online",
+      "unavailable": "Statistics unavailable",
+      "distribution": "Today's verdicts by result"
     },
     "queued": "In queue",
     "queuedShort": "Wait",
+    "gradingShort": "Grading",
     "rowLabel": "Submission #{id} by {user} on {problem}: {verdict}",
     "liveAdded": "{count} new submission | {count} new submissions",
     "liveNew": "{count} new submission on the first page | {count} new submissions on the first page",
@@ -1387,6 +1393,7 @@
       "notFoundTitle": "Ranking not found",
       "notFoundBody": "This link is wrong, switched off or expired."
     },
+    "summary": "{format} · {problems} problem · {participants} | {format} · {problems} problems · {participants}",
     "viewMode": "Board mode",
     "official": "Official",
     "withVirtual": "Include virtual",
@@ -1398,14 +1405,10 @@
       "afterParticipation": "The ranking opens once your participation ends.",
       "afterContest": "The ranking opens once the contest ends."
     },
+    "frozenTitle": "The board is frozen",
     "frozenBody": "In the last {minutes} minute new results show \"?\" until they are revealed. | In the last {minutes} minutes new results show \"?\" until they are revealed.",
-    "freeze": {
-      "label": "Frozen",
-      "pendingLabel": "Results pending"
-    },
+    "podium": "Top 3",
     "timeLeft": "Time left",
-    "showProblems": "Show the contestant's problems",
-    "hideProblems": "Hide the contestant's problems",
     "scrollRegion": "Scrollable ranking board",
     "columns": {
       "rank": "Rank",
@@ -1413,20 +1416,18 @@
       "penalty": "Penalty",
       "score": "Score",
       "scoreTime": "Score · time",
-      "ratingChange": "Δ rating",
-      "scorePenalty": "Score · Penalty"
+      "ratingChange": "Δ rating"
     },
     "legend": {
       "firstSolve": "first solve",
-      "solved": "+n: solved after n wrong tries, solve time on the line below",
-      "failed": "red −n: n wrong tries",
+      "solved": "+n: solved after n wrong tries, with the time",
+      "failed": "−n: n wrong tries",
       "pending": "?n: waiting to be revealed",
       "firstPoints": "full points and first to solve",
-      "fullPoints": "green fill: the problem's full points",
-      "partialPoints": "plain score: part of the problem's points",
-      "zeroPoints": "red 0: submitted, no points yet",
-      "notAttempted": "blank: not attempted",
-      "button": "Legend"
+      "fullPoints": "green: the problem's full points",
+      "partialPoints": "Partial points, tinted in three steps",
+      "zeroPoints": "0: submitted, no points yet",
+      "notAttempted": "blank: not attempted"
     },
     "cell": {
       "firstSolve": "First solve, after {tries} wrong try, at {time} | First solve, after {tries} wrong tries, at {time}",
@@ -1439,7 +1440,6 @@
       "firstPointsAt": "First solve: {points} points at {time}"
     },
     "empty": "No contestants yet.",
-    "emptyAction": "See the problems",
     "disqualified": "Disqualified",
     "refreshFailed": "Could not refresh the board, retrying.",
     "scrollHint": "Swipe sideways to see the problems →",
@@ -1518,6 +1518,7 @@
       "sourceLength": "The source is longer than {max} characters."
     },
     "versions": "Compiler versions",
+    "close": "Close the submit panel",
     "result": {
       "atTest": "{verdict} on test {test}",
       "details": "See details",
@@ -1525,18 +1526,20 @@
     }
   },
   "submission": {
-    "step": {
-      "queued": "Queued",
-      "processing": "Processing",
-      "running": "Test {test}/{total}",
-      "grading": "Grading"
-    },
     "ringLabel": "Graded {graded} of {total} tests",
     "ringLabelPoints": "{percent}% of the points earned",
     "provisional": "provisional score",
     "liveUpdates": "Live updates",
     "staleReload": "The connection stopped; reload to see the latest status",
     "reload": "Reload",
+    "facts": {
+      "problem": "Problem",
+      "user": "Author",
+      "language": "Language",
+      "judge": "Judge",
+      "submitted": "Submitted",
+      "contest": "Contest"
+    },
     "pretest": "This submission was graded on the pretests only.",
     "overview": {
       "title": "By subtask",
@@ -1585,14 +1588,13 @@
       "extendedFeedback": "Detailed feedback",
       "output": "Output",
       "compileLogHidden": "Compilation error. The compile log shows only to viewers who may see the source.",
-      "expandAll": "Expand all",
-      "collapseAll": "Collapse all"
+      "detailsTitle": "Test details"
     },
     "source": {
       "title": "Source code",
       "copy": "Copy the source code",
       "collapse": "Collapse",
-      "expand": "Show source",
+      "expand": "Show source ({count} lines)",
       "lines": "{count} lines",
       "raw": "View raw source",
       "rawShort": "Raw",
@@ -1622,9 +1624,7 @@
     },
     "actions": {
       "problem": "Back to problem",
-      "resubmit": "Resubmit",
-      "resubmitFix": "Fix and resubmit",
-      "next": "Next problem"
+      "resubmit": "Resubmit"
     },
     "sourceLocked": {
       "signIn": "Sign in to see the source, if the problem allows it.",
@@ -1811,6 +1811,7 @@
     "title": "Profile sections"
   },
   "orgs": {
+    "lead": "Classes, teams and clubs on QHHOJ",
     "open": "Open to join",
     "private": "Approval needed",
     "unlisted": "Hidden",
@@ -1851,9 +1852,7 @@
       "user": "User",
       "performancePoints": "PP",
       "points": "Points",
-      "problemCount": "Solved",
-      "organization": "Organization",
-      "join": "Joining"
+      "problemCount": "Solved"
     },
     "title": "Organizations",
     "filtersLabel": "Filter organizations",
@@ -1863,9 +1862,14 @@
       "open": "Open"
     },
     "rankLabel": "Rank",
+    "rankBadge": "Rank {rank}",
     "membersLabel": "Members",
+    "ppLabel": "Performance points",
     "act": {
-      "joined": "Joined"
+      "join": "Join",
+      "request": "Request",
+      "joined": "Joined",
+      "signIn": "Sign in"
     },
     "emptyPublicTitle": "No public organizations yet",
     "emptyPublicBody": "Once an organization goes public it will show up here.",
@@ -1877,15 +1881,13 @@
     "membersMeta": "{count} members",
     "manageCard": {
       "title": "Manage organization",
+      "lead": "You are an administrator",
       "shortcuts": "Management shortcuts",
       "problems": "The organization's problems",
       "contests": "The organization's contests",
       "requests": "Join requests",
       "pending": "{count} waiting"
-    },
-    "search": "Search organizations",
-    "showMore": "Show more",
-    "showLess": "Show less"
+    }
   },
   "orgMembership": {
     "signIn": "Sign in to join",
@@ -1940,8 +1942,11 @@
     "readMore": "Read more",
     "pager": "Post pages",
     "empty": "No posts yet",
+    "recentComments": "Recent comments",
     "noComments": "No comments yet.",
     "newProblems": "New problems",
+    "problemLine": "{code} · {date}",
+    "problemPoints": "{points} points",
     "topContributors": "Top contributors",
     "toLeaderboard": "Leaderboard",
     "title": "Blog",
@@ -1981,8 +1986,6 @@
     "deletedAccount": "Deleted account",
     "inPage": "on",
     "title": "Comments",
-    "showMore": "Show more",
-    "showLess": "Show less",
     "sectionLabel": "Comments on this page",
     "count": "{count} comment | {count} comments",
     "pageOf": "page {page} / {last}",
@@ -2197,8 +2200,7 @@
       "failedTitle": "The ticket was not sent",
       "rateLimitedWait": "Too many attempts. Try again in {seconds} seconds."
     },
-    "title": "Support tickets",
-    "pickOne": "Pick a ticket on the left to read it."
+    "title": "Support tickets"
   },
   "ticket": {
     "title": "Ticket",
@@ -2332,19 +2334,20 @@
       "on": {
         "title": "Always on",
         "body": "Fewer effects; text and colours stay.",
-        "preview": "Still Bit · flat background"
+        "preview": "Still Bit · no blur"
       },
       "off": {
         "title": "Always off",
         "body": "Every effect, even on a weak device.",
-        "preview": "Moving Bit · patterned background"
+        "preview": "Moving Bit · frosted glass"
       }
     },
     "machineOn": "This device: on",
     "machineOff": "This device: off",
     "effectsTitle": "When on",
     "effects": {
-      "background": "Page background shown as one flat colour",
+      "blur": "No background blur (frosted glass)",
+      "blobs": "Background colour blobs hidden",
       "motion": "No motion effects",
       "bit": "Bit is a still picture",
       "replay": "Ranking replay without moving rows",
@@ -2601,8 +2604,6 @@
     "accepted": "Accepted revision {revision} at {time}"
   },
   "problemSwitcher": {
-    "collapse": "Collapse the problem list",
-    "expand": "Expand the problem list",
     "limitsColumn": "Limits",
     "status": {
       "solved": "Solved",
@@ -3194,35 +3195,5 @@
         "body": "The setter shows this problem's source code only to the submission's owner and testers."
       }
     }
-  },
-  "rail": {
-    "next": {
-      "title": "Next contest",
-      "startsIn": "starts in {span}",
-      "endsAt": "ends {date}",
-      "upcomingDot": "A contest is coming up"
-    },
-    "live": "In contest",
-    "rank": "rank {rank}"
-  },
-  "search": {
-    "title": "Search",
-    "label": "Search pages, problems, contests, users",
-    "placeholder": "Page name, problem code, contest name…",
-    "results": "Search results",
-    "searching": "Searching…",
-    "failed": "A source could not be searched; results may be incomplete.",
-    "empty": "No results.",
-    "emptyAdvice": "Nothing matches. Try a problem code, a contest name or the start of a username.",
-    "tooShort": "Type at least {count} characters to search problems, contests and users.",
-    "count": "{count} result | {count} results",
-    "keys": "↑ ↓ to choose · Enter to open · Esc to close",
-    "groups": {
-      "pages": "Pages",
-      "problems": "Problems",
-      "contests": "Contests",
-      "users": "Users"
-    },
-    "inProblems": "Search the problem list"
   }
 }

@@ -2,8 +2,7 @@
 import { computed } from 'vue';
 
 /** `positive`/`negative` are the old names of `success`/`danger`. */
-export type ProgressTone =
-  'accent' | 'live' | 'success' | 'warning' | 'danger' | 'positive' | 'negative';
+export type ProgressTone = 'accent' | 'success' | 'warning' | 'danger' | 'positive' | 'negative';
 
 const props = withDefaults(
   defineProps<{
@@ -18,7 +17,6 @@ const props = withDefaults(
 
 const FILLS: Record<ProgressTone, string> = {
   accent: 'bg-accent',
-  live: 'bg-cue-live',
   success: 'bg-positive',
   warning: 'bg-warning',
   danger: 'bg-negative',

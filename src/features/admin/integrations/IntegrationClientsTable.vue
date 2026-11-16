@@ -5,8 +5,8 @@ import type { NumberedPageMeta } from '@/api/client';
 import type { IntegrationClient, IntegrationScope } from '@/api/types/integration-clients';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
-import Chip from '@/components/ui/Chip.vue';
-import type { ChipTone } from '@/components/ui/Chip.vue';
+import AdminChip from '../ui/AdminChip.vue';
+import type { ChipTone } from '../ui/AdminChip.vue';
 import { buttonClass } from '../ui/controls';
 import AdminDataTable from '../ui/table/AdminDataTable.vue';
 import type { AdminColumn } from '../ui/table/table-columns';
@@ -47,8 +47,8 @@ const stateOf = (client: IntegrationClient): ClientState => {
     : 'active';
 };
 const STATE_TONES: Record<ClientState, ChipTone> = {
-  active: 'success',
-  expired: 'warning',
+  active: 'positive',
+  expired: 'caution',
   revoked: 'neutral',
 };
 const stateText = (client: IntegrationClient) => {
@@ -89,13 +89,13 @@ const scopeText = (scope: IntegrationScope) =>
       }}</span>
     </template>
     <template #cell-state="{ row }">
-      <Chip :tone="STATE_TONES[stateOf(row)]">{{ stateText(row) }}</Chip>
+      <AdminChip :tone="STATE_TONES[stateOf(row)]">{{ stateText(row) }}</AdminChip>
     </template>
     <template #cell-scopes="{ row }">
       <span class="inline-flex flex-wrap gap-1">
-        <Chip v-for="scope in row.scopes" :key="scope" :title="scope">
+        <AdminChip v-for="scope in row.scopes" :key="scope" :title="scope">
           {{ scopeText(scope) }}
-        </Chip>
+        </AdminChip>
       </span>
     </template>
     <template #cell-lastUsed="{ row }">

@@ -17,8 +17,7 @@ import { isNotFound } from '../ui/admin-errors';
 import { CARD, OVERFLOW_ITEM, buttonClass } from '../ui/controls';
 import { useEditableContestQuery } from './contest-editing.queries';
 import { CONTEST_TABS, contestTabComponent, contestTabCount, contestTabOf } from './contest-tabs';
-import ContestStateChip from './list/ContestStateChip.vue';
-import { editorStateInputOf } from './list/contest-state';
+import ContestPhaseChip from './list/ContestPhaseChip.vue';
 import ContestWindowText from './list/ContestWindowText.vue';
 import ContestCloneDialog from './lifecycle/ContestCloneDialog.vue';
 import ContestDeleteDialog from './lifecycle/ContestDeleteDialog.vue';
@@ -87,7 +86,7 @@ function openDelete(close: () => void) {
         :back="{ to: LIST, label: $t('admin.contests.backToList') }"
       >
         <template #meta>
-          <ContestStateChip v-bind="editorStateInputOf(contest)" />
+          <ContestPhaseChip :phase="contest.phase" />
           <AdminChip>{{ formatLabel(contest.formatName) }}</AdminChip>
           <ContestWindowText :start-time="contest.startTime" :end-time="contest.endTime" />
           <span class="inline-flex items-center gap-1 whitespace-nowrap">

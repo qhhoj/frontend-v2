@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { Plus } from 'lucide-vue-next';
 import EmptyState from '@/components/EmptyState.vue';
-import Card from '@/components/ui/Card.vue';
+import GlassCard from '@/components/GlassCard.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import ContestGroup from '@/features/contests/ContestGroup.vue';
@@ -36,7 +36,7 @@ const hasNone = computed(() => anyContest.data.value?.meta.total === 0);
 </script>
 
 <template>
-  <Card v-if="hasNone" as="div" data-testid="org-contests-empty">
+  <GlassCard v-if="hasNone" as="div" data-testid="org-contests-empty">
     <EmptyState>{{ $t(canCreate ? 'orgs.noContestsCreator' : 'orgs.noContests') }}</EmptyState>
     <div v-if="canCreate" class="flex justify-center pb-6">
       <AppButton tone="primary" data-testid="org-tab-create-contest" :to="createTarget">
@@ -44,7 +44,7 @@ const hasNone = computed(() => anyContest.data.value?.meta.total === 0);
         {{ $t('create.contest') }}
       </AppButton>
     </div>
-  </Card>
+  </GlassCard>
   <div v-else-if="organizationId" class="flex flex-col gap-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <SearchInput

@@ -67,5 +67,3 @@ export function stripCounts(summary: TestSummary): StripCounts {
 /** The cell's colour as a token: its verdict's solid fill. */
 export const cellColourVar = (status: CaseCode) =>
   `--qh-verdict-${VERDICT_TONES[status] === 'pending' ? 'ce' : VERDICT_TONES[status]}-solid`;
-/** The cell's number colour as a token: the label colour its solid fill carries. */
-export const cellLabelVar = (status: CaseCode) => cellColourVar(status).replace(/-solid$/, '-on');

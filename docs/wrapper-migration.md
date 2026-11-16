@@ -4,7 +4,7 @@ The kit (`src/components/ui/`) has a part for every job. A ratchet holds the old
 (`5eecc7ca`, after the kit lanes K2-K6). It covers three kinds of use:
 
 - raw template elements;
-- imports of the thin wrappers kept for old call sites;
+- imports of the thin wrappers kept for old call sites, and direct PrimeVue parts;
 - class words the standard retires.
 
 No file may gain a use, and every fix lowers its count.
@@ -21,7 +21,7 @@ No file may gain a use, and every fix lowers its count.
     listed for one wrapper is still refused the others.
 - **Only shrink:** `scripts/raw-elements.first.json` keeps the first baselines (its hash is pinned: a deliberate edit, such as a rule that now sees more uses, needs the new `sha256sum scripts/raw-elements.first.json` in the spec; the failure message says so).
   `scripts/raw-elements.spec.ts` fails when a baseline holds a file or a count that the first one does not.
-- **Not checked:** specs, and the kit for raw elements (its job); a kit file importing a wrapper (a barrel) counts like any file. Opacity beside a `disabled`/`busy`/`pending` word in the same line counts as `disabled-opacity`; `{ uppercase: x }` counts as `uppercase`.
+- **Not checked:** specs, and the kit for raw elements and PrimeVue (its job); a kit file importing a wrapper (a barrel) counts like any file. Opacity beside a `disabled`/`busy`/`pending` word in the same line counts as `disabled-opacity`; `{ uppercase: x }` counts as `uppercase`.
 - **Bypasses closed:**
   - tags in any letter case (`<BUTTON>` renders a button);
   - `<component :is="'button'">`;
@@ -69,11 +69,13 @@ Uses, then files. The last M lane updates this table; the M lanes before it only
 | `AdminPageHeader`    | `features/admin/ui/AdminPageHeader.vue`           | 33 | 33 | `PageHeader`                                             |
 | `AdminRowMenu`       | `features/admin/ui/table/AdminRowMenu.vue`        | 29 | 18 | `RowMenu`                                                |
 | `AdminNotice`        | `features/admin/ui/feedback/AdminNotice.vue`      | 24 | 21 | `Notice`                                                 |
+| `GlassCard`          | `components/GlassCard.vue`                        | 23 | 20 | `Card`                                                   |
 | `SettingsNotice`     | `features/account/settings/SettingsNotice.vue`    | 27 | 20 | `Notice`                                                 |
 | `use-admin-toast`    | `features/admin/ui/feedback/use-admin-toast.ts`   | 18 | 18 | `useToast` (`components/ui/use-toast`)                   |
 | `AdminUserLabel`     | `features/admin/ui/AdminUserLabel.vue`            | 18 | 17 | `UserLink`                                               |
 | `SettingsCard`       | `features/account/settings/SettingsCard.vue`      | 19 | 17 | `Card`                                                   |
 | `AuthField`          | `features/auth/AuthField.vue`                     | 17 | 15 | `FormField` + `TextInput` or `PasswordInput`             |
+| `primevue`           | `primevue/*` (not `config`, not `menuitem` types) | 20 | 14 | `Modal`/`ConfirmDialog`, `Menu`/`RowMenu`, `Drawer`, `Popover`, `ComboBox` |
 | `AdminDateTimeField` | `features/admin/ui/form/AdminDateTimeField.vue`   | 15 | 11 | `DateTimeField scale="admin"`                            |
 | `AdminDrawer`        | `features/admin/ui/AdminDrawer.vue`               | 8 | 8 | `Drawer`                                                 |
 | `CommunityCard`      | `features/community/CommunityCard.vue`            | 5 | 5 | `Card` + `QueryState`                                    |
@@ -101,12 +103,10 @@ Not restricted, because they add behaviour the kit part lacks:
 | ------------------ | ---- | ----- | ---------------------------------------------------------------------------- |
 | `verdict-tone`     | 77   | 31    | the status tones (`positive-bg`, `negative-bg`, success/danger/warning)      |
 | `fixed-size`       | 75   | 38    | the size steps (icons `size-3.5/4/5`, controls `min-h-(--qh-control)`); a skeleton copies the real markup |
-| `status-colour`    | 186  | 126   | a Chip or StatusDot tone, or a `cue-*` token (`DESIGN.md`)                   |
 | `uppercase`        | 25   | 19    | sentence case, `text-caption font-semibold`                                  |
 | `disabled-opacity` | 3    | 3     | the kit control's muted disabled pair (`AppButton disabledReason`)           |
 
 - `fixed-size` is `size-`, `h-` or `min-h-` with a `[N px|rem]` value.
-- `status-colour` is a `positive`, `negative`, `warning` or `info` colour utility (`text-`, `bg-`, `border-` …, with or without `-bg`) outside the kit and the verdict parts.
 - `verdict-tone` is any `*-verdict-*` colour outside the verdict parts. Those parts are listed in `VERDICT_PARTS` and
   draw a submission's result or the viewer's solved state.
 

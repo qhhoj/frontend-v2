@@ -1,4 +1,4 @@
-import { computed, nextTick, onScopeDispose, reactive, ref, watch } from 'vue';
+import { computed, nextTick, onScopeDispose, ref, watch } from 'vue';
 import type { Ref } from 'vue';
 import { useSubmissionStatus } from '@/api/use-submission-status';
 import { IN_PROGRESS_STATUSES } from '@/api/types/submissions';
@@ -10,45 +10,21 @@ const ROW_REFETCH_DEBOUNCE_MS = 250;
 /** A judge faster than the debounce would otherwise never let the rows move until the end. */
 const ROW_REFETCH_MAX_WAIT_MS = 2000;
 
-/** How many page-owned (not passive) followers each submission has, per viewer: what a passive follower looks at. */
-const activeFollowers = reactive(new Map<string, number>());
-const followerKey = (viewer: string, id: string) => `${viewer} ${id}`;
-
 /**
  * The submission row kept up to date while it is judged. The stream is followed only while the stored row is
  * in progress. `useSubmissionStatus` reads the row once more when the stream ends (it invalidates the list, detail and stats),
  * so that final read is not repeated here.
  */
-export function useLiveSubmission(id: Ref<string>, options: { isPassive?: boolean } = {}) {
-  const viewer = useViewerId();
+export function useLiveSubmission(id: Ref<string>) {
   const submission = useSubmissionQuery(id);
-  const key = computed(() => (id.value ? followerKey(viewer.value, id.value) : null));
-  // A passive follower (the shell's verdict toast) opens the stream only while no page follows the same submission, so one
-  // submission never holds two connections; the page's final read refreshes the shared row the passive one reads.
-  if (!options.isPassive)
-    watch(
-      key,
-      (followed, _before, onCleanup) => {
-        if (followed === null) return;
-        activeFollowers.set(followed, (activeFollowers.get(followed) ?? 0) + 1);
-        onCleanup(() => {
-          const left = (activeFollowers.get(followed) ?? 1) - 1;
-          if (left > 0) activeFollowers.set(followed, left);
-          else activeFollowers.delete(followed);
-        });
-      },
-      { immediate: true },
-    );
-  const isFollowedByPage = () => key.value !== null && activeFollowers.has(key.value);
   /** Set for one tick by `refollow`: a followed id that stays the same would not reopen the stream. */
   const isPausedForRefollow = ref(false);
   const followedId = computed(() => {
     const status = submission.data.value?.status;
     const inProgress = status !== undefined && IN_PROGRESS_STATUSES.includes(status);
-    const isYielding = options.isPassive && isFollowedByPage();
-    return inProgress && !isPausedForRefollow.value && !isYielding ? id.value : null;
+    return inProgress && !isPausedForRefollow.value ? id.value : null;
   });
-  const live = useSubmissionStatus(followedId, viewer);
+  const live = useSubmissionStatus(followedId, useViewerId());
   const isLive = computed(() => followedId.value !== null && !live.done && !live.stale);
 
   let debounceTimer: ReturnType<typeof setTimeout> | undefined;

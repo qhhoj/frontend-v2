@@ -4,7 +4,6 @@ import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
-import PageLayout from '@/components/ui/PageLayout.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import type { PageCrumb } from '@/components/ui/PageHeader.vue';
 import InlineBit from '@/components/InlineBit.vue';
@@ -23,9 +22,12 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import CasesTable from './CasesTable.vue';
 import CasesTableSkeleton from './CasesTableSkeleton.vue';
+import ResultSummaryCard from './ResultSummaryCard.vue';
 import SourceView from './SourceView.vue';
 import SourceViewSkeleton from './SourceViewSkeleton.vue';
 import TestOverview from './TestOverview.vue';
+import SubmissionFacts from './SubmissionFacts.vue';
+import SubmissionFactsSkeleton from './SubmissionFactsSkeleton.vue';
 import SubmissionHero from './SubmissionHero.vue';
 import SubmissionHeroSkeleton from './SubmissionHeroSkeleton.vue';
 import SubmissionExternalRun from './SubmissionExternalRun.vue';
@@ -37,6 +39,19 @@ import InternalErrorNotice from './InternalErrorNotice.vue';
 import { isProblemDeleted } from './deleted-problem';
 import CompareWithForm from './CompareWithForm.vue';
 import { submissionShortId } from './submission-short-id';
+
+/**
+ * The score card (staff actions inside) beside the facts card from xl, three parts to two: the score is the page's main
+ * information and the facts are short rows, and an equal split left "100 / 100 điểm kỳ thi" too little room to stay on one
+ * line. The body below keeps the same columns (owner pick B): from xl the source in the wide one and the test results in
+ * the rail, so a failing test's feedback sits beside the code; below xl one column, the result summary, the source, then
+ * the full table. One DOM for both: the summary card hides from xl and the grid places the other two.
+ */
+const SUMMARY =
+  'grid grid-cols-[minmax(0,1fr)] gap-5 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:items-start';
+const STACK = 'flex min-w-0 flex-col gap-5';
+const SOURCE_PLACE = 'xl:col-start-1 xl:row-start-1';
+const RESULTS_PLACE = 'xl:col-start-2 xl:row-start-1';
 
 const route = useRoute();
 const locale = useLocaleStore();
@@ -107,25 +122,23 @@ const verdict = computed(() => {
     ? verdictOf({ status: streamStatus, result: null })
     : submissionVerdictOf(row.value);
 });
-/** After the author's full-score AC the way on is the problem list without the solved ones; contests have their own next step. */
-const nextTo = computed(() =>
-  canResubmit.value && verdict.value?.code === 'AC' && !inContest.value
-    ? { name: 'problems', query: { unsolved: '1' } }
-    : null,
-);
+/** Tests to sum up above the source (graded, or waiting while the grading goes on); without them (compile error, hidden
+ * results) the result card is short and itself comes before the source. */
+const hasResultSummary = computed(() => {
+  const cases = row.value?.cases;
+  return !!cases && (cases.length > 0 || (isLive.value && !!row.value?.totalCases));
+});
 </script>
 
 <template>
   <NotFoundPage v-if="isNotFound" />
-  <PageLayout v-else>
-    <template #header>
-      <PageHeader
-        :title="heading.title"
-        :crumbs="heading.crumbs"
-        :back="heading.back"
-        :meta="problemName ? [shortId] : []"
-      />
-    </template>
+  <div v-else class="page-column">
+    <PageHeader
+      :title="heading.title"
+      :crumbs="heading.crumbs"
+      :back="heading.back"
+      :meta="problemName ? [shortId] : []"
+    />
     <p role="status" aria-live="polite" class="sr-only">
       {{ verdict ? $t(verdict.labelKey) : '' }}
     </p>
@@ -142,28 +155,32 @@ const nextTo = computed(() =>
       @retry="query.refetch()"
     >
       <template #skeleton>
-        <div class="flex min-w-0 flex-col gap-(--space-section)">
+        <div :class="SUMMARY">
           <SubmissionHeroSkeleton />
-          <CasesTableSkeleton />
-          <SourceViewSkeleton />
+          <SubmissionFactsSkeleton />
+        </div>
+        <!-- Results first, as the page puts its result summary above the source below xl; from xl the grid places both. -->
+        <div :class="SUMMARY">
+          <CasesTableSkeleton :class="RESULTS_PLACE" />
+          <SourceViewSkeleton :class="SOURCE_PLACE" />
         </div>
       </template>
-      <div v-if="row && verdict" class="flex min-w-0 flex-col gap-(--space-section)">
-        <SubmissionHero
-          :submission="row"
-          :verdict="verdict"
-          :problem-name="problemName"
-          :in-contest="inContest"
-          :problem-points="problemQuery.data.value?.points ?? null"
-          :is-problem-loading="problemQuery.isLoading.value"
-          :is-live="isLive"
-          :can-resubmit="canResubmit"
-          :contest-score="contestScore"
-          :next-to="nextTo"
-          :share-id="row.viewer.canShare ? row.id : null"
-        >
-          <SubmissionStaffPanel :key="row.id" :submission="row" />
-        </SubmissionHero>
+      <div v-if="row && verdict" :class="STACK">
+        <div :class="SUMMARY">
+          <SubmissionHero
+            :submission="row"
+            :verdict="verdict"
+            :problem-points="problemQuery.data.value?.points ?? null"
+            :is-problem-loading="problemQuery.isLoading.value"
+            :is-live="isLive"
+            :can-resubmit="canResubmit"
+            :contest-score="contestScore"
+            :share-id="row.viewer.canShare ? row.id : null"
+          >
+            <SubmissionStaffPanel :key="row.id" :submission="row" />
+          </SubmissionHero>
+          <SubmissionFacts :submission="row" :problem-name="problemName" :in-contest="inContest" />
+        </div>
         <SubmissionNextStep v-if="inContest?.next" :next="inContest.next" />
         <p
           v-if="live.stale"
@@ -179,37 +196,51 @@ const nextTo = computed(() =>
         <InternalErrorNotice v-if="row.status === 'IE'" :message="row.error" />
         <SubmissionExternalRun v-if="row.externalRun" :run="row.externalRun" />
         <DeletedProblemNotice v-if="isDeletedProblem" :name="row.problem?.name ?? ''" />
-        <CasesTable
-          v-if="!isDeletedProblem"
-          :cases="row.cases"
-          :batches="row.batches"
-          :total-cases="row.totalCases"
-          :running="isLive"
-          :compile-error="row.status === 'CE' ? row.error : null"
-          :compile-log-hidden="row.status === 'CE' && !row.error"
-        >
-          <template #footer>
-            <TestOverview
-              :cases="row.cases"
-              :batches="row.batches"
-              :points="row.points"
-              :problem-points="row.problem?.points ?? null"
-              :case-points="row.casePoints"
-              :case-total="row.caseTotal"
-              :running="isLive"
-              :in-contest="contestScore !== null"
-            />
-          </template>
-        </CasesTable>
-        <SourceView
-          :id="row.id"
-          :access="row.sourceAccess"
-          :language-key="row.language?.key ?? null"
-          :language-name="row.language?.name ?? null"
-        >
-          <CompareWithForm :current-id="row.id" />
-        </SourceView>
+        <div :class="SUMMARY">
+          <ResultSummaryCard
+            v-if="!isDeletedProblem && hasResultSummary"
+            :key="row.id"
+            class="xl:hidden"
+            :cases="row.cases ?? []"
+            :batches="row.batches"
+            :total-cases="row.totalCases"
+            :running="isLive"
+          />
+          <SourceView
+            :id="row.id"
+            :class="isDeletedProblem ? 'xl:col-span-2' : SOURCE_PLACE"
+            :access="row.sourceAccess"
+            :language-key="row.language?.key ?? null"
+            :language-name="row.language?.name ?? null"
+          >
+            <CompareWithForm :current-id="row.id" />
+          </SourceView>
+          <CasesTable
+            v-if="!isDeletedProblem"
+            :class="[RESULTS_PLACE, !hasResultSummary && 'max-xl:order-first']"
+            :summarized="hasResultSummary"
+            :cases="row.cases"
+            :batches="row.batches"
+            :total-cases="row.totalCases"
+            :running="isLive"
+            :compile-error="row.status === 'CE' ? row.error : null"
+            :compile-log-hidden="row.status === 'CE' && !row.error"
+          >
+            <template #footer>
+              <TestOverview
+                :cases="row.cases"
+                :batches="row.batches"
+                :points="row.points"
+                :problem-points="row.problem?.points ?? null"
+                :case-points="row.casePoints"
+                :case-total="row.caseTotal"
+                :running="isLive"
+                :in-contest="contestScore !== null"
+              />
+            </template>
+          </CasesTable>
+        </div>
       </div>
     </QueryState>
-  </PageLayout>
+  </div>
 </template>

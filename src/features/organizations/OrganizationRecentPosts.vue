@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import CompactListRow from '@/components/CompactListRow.vue';
+import Card from '@/components/ui/Card.vue';
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import UserName from '@/components/UserName.vue';
+import UserLink from '@/components/UserLink.vue';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -24,16 +24,8 @@ const isEmpty = computed(() => query.isSuccess.value && posts.value.length === 0
 </script>
 
 <template>
-  <section v-if="!isEmpty || props.keepsEmpty" class="flex flex-col gap-2">
-    <div class="flex items-baseline justify-between gap-3">
-      <h2 class="section-title">{{ $t('orgs.posts') }}</h2>
-      <RouterLink
-        :to="{ name: 'organization-posts', params: { slug } }"
-        class="text-sm font-semibold text-accent-text hover:underline"
-      >
-        {{ $t('common.viewAll') }}
-      </RouterLink>
-    </div>
+  <Card v-if="!isEmpty || props.keepsEmpty" padding="md" class="flex flex-col gap-3">
+    <h2 class="font-display text-base font-bold text-accent-text">{{ $t('orgs.posts') }}</h2>
     <QueryState
       :loading="query.isPending.value"
       :error="query.error.value"
@@ -45,33 +37,36 @@ const isEmpty = computed(() => query.isSuccess.value && posts.value.length === 0
         </div>
       </template>
       <p v-if="posts.length === 0" class="text-sm text-muted">{{ $t('orgs.noPosts') }}</p>
-      <ul
-        v-else
-        class="m-0 list-none overflow-hidden rounded-row border border-line bg-surface-solid p-0"
-      >
-        <CompactListRow
-          v-for="post in posts"
-          :key="post.id"
-          :to="{ name: 'post', params: { id: post.id } }"
-          :title="post.title"
-        >
-          <template #meta>
-            <UserName
+      <ul v-else class="flex flex-col gap-3">
+        <li v-for="post in posts" :key="post.id" class="flex flex-col gap-1">
+          <RouterLink
+            :to="{ name: 'post', params: { id: post.id } }"
+            class="font-semibold hover:underline"
+          >
+            {{ post.title }}
+          </RouterLink>
+          <p class="flex flex-wrap gap-x-3 text-sm text-muted">
+            <UserLink
               v-if="post.authors[0]"
               :username="post.authors[0].username"
               :rating="post.authors[0].rating"
-              class="relative"
             />
-            · {{ formatDate(post.publishOn, 'date', locale.locale) }} ·
-            {{
+            <span>{{ formatDate(post.publishOn, 'date', locale.locale) }}</span>
+            <span>{{
               $t('orgs.postStats', {
                 score: formatNumber(post.score, locale.locale),
                 comments: formatNumber(post.commentCount, locale.locale),
               })
-            }}
-          </template>
-        </CompactListRow>
+            }}</span>
+          </p>
+        </li>
       </ul>
     </QueryState>
-  </section>
+    <RouterLink
+      :to="{ name: 'organization-posts', params: { slug } }"
+      class="font-semibold text-accent-text hover:underline"
+    >
+      {{ $t('common.viewAll') }}
+    </RouterLink>
+  </Card>
 </template>

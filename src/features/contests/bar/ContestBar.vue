@@ -8,7 +8,6 @@ import { navSectionOverride } from '@/features/shell/nav-section';
 import { usePublishedHeight } from '@/features/problems/use-dock-height';
 import { useSessionStore } from '@/stores/session.store';
 import { useUnreadAnnouncementCount } from '../announcement-seen';
-import { isClockShownFor } from './header-clock';
 import { participationKind } from './current-contest';
 
 /**
@@ -17,8 +16,7 @@ import { participationKind } from './current-contest';
  * where the status is its dot and only the ranking and the announcements stay as links (M-02, M-06); on a coarse pointer the bar
  * is 44 px and its links fill it, so each is a 44 px target (D-17). On the contest's
  * own pages its tab row is the navigation, so the bar keeps only the status and the clock: one active link and one
- * unread badge per screen (M-01, Q-B). While a `ContestHeader` (the tabs) shows this contest's clock it steps aside, so
- * the clock shows once; if that header has no clock yet (its contest still loading or failed) the bar stays. Shown by `AppShell` through `useCurrentContest`.
+ * unread badge per screen (M-01, Q-B). Shown by `AppShell` through `useCurrentContest`.
  */
 const props = defineProps<{ current: CurrentParticipation }>();
 const { t } = useI18n();
@@ -31,12 +29,9 @@ const statusText = computed(() => {
   return t(kind.value === 'spectate' ? 'contestBar.spectate' : 'contestBar.live');
 });
 const unread = useUnreadAnnouncementCount(contestKey);
-const isOnContestPage = computed(() => route.params.key === contestKey.value);
-/** The contest's own tab pages: once their `ContestHeader` shows this contest's clock, the bar is not needed. */
-const isSteppedAside = computed(() => isClockShownFor(contestKey.value));
 const root = ref<HTMLElement | null>(null);
-/** Sticky things below it (the print toolbar) clear it through `--contest-bar-height`; gone, it publishes nothing. */
-usePublishedHeight(root, '--contest-bar-height', () => true);
+/** Sticky things below it (the print toolbar) clear it through `--contest-bar-height`. */
+usePublishedHeight(root, '--contest-bar-height');
 /** The impersonation banner is the one sticky strip above: the bar then scrolls away rather than slide under it. */
 const session = useSessionStore();
 
@@ -63,6 +58,7 @@ const CLAIMED_BY: Record<string, string> = {
   problem: 'contest',
   submission: 'contest-submissions',
 };
+const isOnContestPage = computed(() => route.params.key === contestKey.value);
 const currentLink = computed(() =>
   navSectionOverride.value === '/contests' ? (CLAIMED_BY[String(route.name ?? '')] ?? null) : null,
 );
@@ -76,26 +72,22 @@ const LINK = [
 
 <template>
   <div
-    v-if="!isSteppedAside"
     ref="root"
     data-testid="contest-bar"
     :class="[
-      'z-header border-b border-line bg-surface-solid print:hidden',
+      'z-header border-b border-line bg-accent-soft print:hidden',
       !session.impersonatorId && 'sticky top-0',
     ]"
   >
-    <!-- The tint sits on an opaque surface: the page background stays behind main only. -->
-    <div
-      class="page-gutter flex h-10 items-center gap-2 border-l-3 border-l-cue-live bg-cue-live-bg touch:h-11 md:h-12 md:gap-3"
-    >
+    <div class="page-gutter flex h-10 items-center gap-2 touch:h-11 md:h-12 md:gap-3">
       <RouterLink
         :to="{ name: 'contest', params: { key: contestKey } }"
         :class="[
-          'flex min-w-0 items-center gap-1.5 text-sm font-semibold text-cue-live hover:underline',
+          'flex min-w-0 items-center gap-1.5 text-sm font-semibold text-accent-soft-text hover:underline',
           COARSE_TARGET,
         ]"
       >
-        <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-cue-live" />
+        <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-accent" />
         <!-- A phone shows the dot; the status stays the link's name (M-02). -->
         <span class="truncate max-md:sr-only">{{ statusText }} · {{ current.contest.name }}</span>
       </RouterLink>

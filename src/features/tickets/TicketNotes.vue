@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import type { TicketDetail } from '@/api/types/tickets';
-import Card from '@/components/ui/Card.vue';
+import GlassCard from '@/components/GlassCard.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { useTicketPatch } from './use-ticket-patch';
 
@@ -21,7 +21,7 @@ const save = () => patch({ notes: draft.value }, () => (isEdited.value = false))
 </script>
 
 <template>
-  <Card as="section" class="flex flex-col gap-3 p-5">
+  <GlassCard as="section" class="flex flex-col gap-3 p-5">
     <h2 class="text-sm font-semibold">
       {{ ticket.can.assign ? $t('ticket.notesInternal') : $t('ticket.notes') }}
     </h2>
@@ -47,5 +47,5 @@ const save = () => patch({ notes: draft.value }, () => (isEdited.value = false))
     <p v-if="failureKey" role="alert" class="text-meta text-negative">
       {{ $t(failureKey) }}
     </p>
-  </Card>
+  </GlassCard>
 </template>

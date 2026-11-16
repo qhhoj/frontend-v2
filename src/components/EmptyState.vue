@@ -20,10 +20,8 @@ withDefaults(defineProps<{ compact?: boolean; kind?: BitMood | BitKind }>(), {
 
 <template>
   <div
-    class="flex items-center gap-3 text-muted"
-    :class="
-      compact ? 'min-h-(--qh-row) justify-center px-4' : 'flex-col gap-2 px-6 py-8 text-center'
-    "
+    class="flex flex-col items-center gap-2 text-center text-muted"
+    :class="compact ? 'py-3' : 'px-6 py-8'"
   >
     <InlineBit v-if="compact" :kind="kind" />
     <BitMascot
@@ -34,6 +32,6 @@ withDefaults(defineProps<{ compact?: boolean; kind?: BitMood | BitKind }>(), {
       class="[--bit-px:4px] sm:[--bit-px:5px]"
     />
     <p><slot /></p>
-    <div v-if="$slots.action" :class="!compact && 'mt-2'"><slot name="action" /></div>
+    <div v-if="$slots.action" class="mt-2"><slot name="action" /></div>
   </div>
 </template>

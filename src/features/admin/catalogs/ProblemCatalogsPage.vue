@@ -46,7 +46,7 @@ watch(active, () => (creating.value = false));
   <div class="flex flex-col gap-4">
     <AdminPageHeader :title="$t('admin.shell.screens.types')" :lead="$t('admin.catalogs.lead')">
       <template v-if="active && can(active.addPermission)" #actions>
-        <button type="button" :class="buttonClass('secondary')" @click="creating = true">
+        <button type="button" :class="buttonClass('primary')" @click="creating = true">
           <Plus aria-hidden="true" class="size-4" :stroke-width="1.75" />
           {{ $t(`admin.catalogs.${active.id}.createTitle`) }}
         </button>

@@ -18,19 +18,14 @@ import type { ProblemPickerSource } from './problem-picker-options';
  * "Bộ lọc nâng cao": the filters the chips above the list do not set. The problem box is a typed code for the whole
  * site and a picker of the scope's problems otherwise; `showUser` is off when the scope pins the user.
  */
-const props = withDefaults(
-  defineProps<{
-    filters: SubmissionFilters;
-    problemSource: ProblemPickerSource;
-    showUser: boolean;
-    /** Off when the scope pins the problem (a problem's own tabs). */
-    showProblem?: boolean;
-    showStatusGroups: boolean;
-    /** The language choice, shown here only on a phone (the chip row holds it from sm). */
-    languages: Language[];
-  }>(),
-  { showProblem: true },
-);
+const props = defineProps<{
+  filters: SubmissionFilters;
+  problemSource: ProblemPickerSource;
+  showUser: boolean;
+  showStatusGroups: boolean;
+  /** The language choice, shown here only on a phone (the chip row holds it from sm). */
+  languages: Language[];
+}>();
 const emit = defineEmits<{ update: [patch: Partial<SubmissionFilters>]; reset: [] }>();
 
 /** The mock-up's six; a URL may carry any other valid result, the table's empty state then names it. */
@@ -104,10 +99,7 @@ const resultLabel = (code: SubmissionResult) => `${code} ${translate(`verdicts.$
       :languages="languages"
       @update="emit('update', $event)"
     />
-    <FormField
-      v-if="showProblem && problemSource.kind === 'code'"
-      :label="$t('submissions.rail.problemLabel')"
-    >
+    <FormField v-if="problemSource.kind === 'code'" :label="$t('submissions.rail.problemLabel')">
       <TextInput
         v-model="problemText"
         name="problem"
@@ -117,7 +109,7 @@ const resultLabel = (code: SubmissionResult) => `${code} ${translate(`verdicts.$
       />
     </FormField>
     <SubmissionProblemPicker
-      v-else-if="showProblem"
+      v-else
       :source="problemSource"
       :code="filters.problem"
       @pick="emit('update', { problem: $event })"

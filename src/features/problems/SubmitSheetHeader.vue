@@ -23,20 +23,17 @@ defineExpose({
 
 <template>
   <header v-if="!isExpanded">
-    <!-- The whole collapsed bar opens the sheet: label left, the last result (slot `result`), chevron right, 56 px tall (M-06). -->
+    <!-- The whole collapsed bar opens the sheet: label left, chevron right, 56 px tall (M-06). -->
     <AppButton
       ref="barButton"
       tone="row"
       :aria-expanded="false"
       :aria-controls="controlsId"
-      class="min-h-14 gap-3 rounded-none px-4"
+      class="min-h-14 justify-between rounded-none px-4"
       @click="emit('toggle')"
     >
-      <span class="shrink-0 font-display text-base font-bold text-content">{{
-        $t('submit.title')
-      }}</span>
-      <span class="flex min-w-0 flex-1 items-center justify-end gap-2"><slot name="result" /></span>
-      <ChevronUp class="size-5 shrink-0 text-muted" aria-hidden="true" />
+      <span class="font-display text-base font-bold text-content">{{ $t('submit.title') }}</span>
+      <ChevronUp class="size-5 text-muted" aria-hidden="true" />
     </AppButton>
   </header>
   <header v-else>

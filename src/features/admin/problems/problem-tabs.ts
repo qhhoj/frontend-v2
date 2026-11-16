@@ -1,7 +1,6 @@
 import { defineAsyncComponent } from 'vue';
 import type { Component } from 'vue';
 
-/** Tabs in setup order: information, statement, test data (tests and points), then the extras. */
 export const PROBLEM_TABS = [
   {
     id: 'general',
@@ -16,6 +15,12 @@ export const PROBLEM_TABS = [
     leadKey: 'admin.problems.leads.statements',
   },
   {
+    id: 'editorial',
+    routeName: 'admin-problemEditorial',
+    labelKey: 'admin.problems.tabs.editorial',
+    leadKey: 'admin.problems.leads.editorial',
+  },
+  {
     id: 'data',
     routeName: 'admin-problemData',
     labelKey: 'admin.problems.tabs.data',
@@ -26,12 +31,6 @@ export const PROBLEM_TABS = [
     routeName: 'admin-problemFiles',
     labelKey: 'admin.problems.tabs.files',
     leadKey: 'admin.problems.leads.files',
-  },
-  {
-    id: 'editorial',
-    routeName: 'admin-problemEditorial',
-    labelKey: 'admin.problems.tabs.editorial',
-    leadKey: 'admin.problems.leads.editorial',
   },
   {
     id: 'external',

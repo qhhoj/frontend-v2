@@ -3,13 +3,7 @@ import { computed, ref } from 'vue';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
-import {
-  LETTERED_CELLS_MAX,
-  cellColourVar,
-  cellLabelVar,
-  stripCells,
-  stripCounts,
-} from './test-strip';
+import { LETTERED_CELLS_MAX, cellColourVar, stripCells, stripCounts } from './test-strip';
 import type { StripCell, TestSummary } from './test-strip';
 
 /**
@@ -59,11 +53,9 @@ const line = computed(() => {
 const cellStyle = (cell: StripCell) => {
   if (cell.status === null) return {};
   const fill = `var(${cellColourVar(cell.status)})`;
-  const color = `var(${cellLabelVar(cell.status)})`;
-  if (cell.status === 'AC' || isLettered.value) return { background: fill, color };
+  if (cell.status === 'AC' || isLettered.value) return { background: fill };
   return {
     background: `repeating-linear-gradient(135deg, ${fill} 0 3px, var(--qh-surface-solid) 3px 4px)`,
-    color,
   };
 };
 
@@ -102,7 +94,7 @@ function move(event: KeyboardEvent) {
         aria-hidden="true"
         :title="cellLabel(cell)"
         :style="cellStyle(cell)"
-        class="flex min-w-0 flex-1 items-center justify-center font-mono text-tiny leading-none font-bold"
+        class="flex min-w-0 flex-1 items-center justify-center font-mono text-tiny leading-none font-bold text-on-verdict-solid"
         :class="[
           isLettered && 'rounded-[2px]',
           cell.status === null && 'border border-line-strong',

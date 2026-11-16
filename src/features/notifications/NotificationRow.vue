@@ -29,17 +29,17 @@ const hasChips = computed(() => !props.isStale);
   <li
     data-testid="notification-row"
     :data-unread="item.unread"
-    class="flex items-start gap-3 border-t border-line py-2 first:border-t-0"
+    class="flex items-start gap-3 border-t border-line py-3 first:border-t-0"
   >
     <span
       aria-hidden="true"
-      class="flex size-8 shrink-0 items-center justify-center rounded-cell bg-accent-soft text-accent-soft-text"
+      class="flex size-10 shrink-0 items-center justify-center rounded-cell bg-accent-soft text-accent-soft-text"
     >
-      <component :is="icon" class="size-4" />
+      <component :is="icon" class="size-5" />
     </span>
     <button
       type="button"
-      class="flex min-h-9 min-w-0 flex-1 flex-col gap-0.5 rounded-row px-1 touch:min-h-11 text-left hover:bg-surface-hover"
+      class="flex min-h-11 min-w-0 flex-1 flex-col gap-1 rounded-row px-1 text-left hover:bg-surface-hover"
       @click="emit('open', item)"
     >
       <span class="flex flex-wrap items-center gap-2">
@@ -67,12 +67,11 @@ const hasChips = computed(() => !props.isStale);
     <IconButton
       v-if="canMarkRead && item.unread"
       tone="secondary"
-      size="sm"
       class="shrink-0"
       :label="$t('notifications.markRead', { title })"
       @click="emit('markRead', item)"
     >
-      <Check aria-hidden="true" />
+      <Check aria-hidden="true" class="size-5" />
     </IconButton>
   </li>
 </template>

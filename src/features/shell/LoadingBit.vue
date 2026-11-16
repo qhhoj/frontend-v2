@@ -99,9 +99,7 @@ onBeforeUnmount(() => {
       :look="look"
       :step="legSteps[index]"
       class="pointer-events-none"
-      :class="
-        reducedMotion ? 'bottom-[calc(1rem+var(--tab-bar-height,0px))] left-4' : 'top-0 left-0'
-      "
+      :class="reducedMotion ? 'bottom-4 left-4' : 'top-0 left-0'"
     />
   </div>
 </template>

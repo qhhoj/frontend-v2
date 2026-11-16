@@ -5,7 +5,7 @@ import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
 import { userEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import UnbanUserDialog from '@/features/admin/users/UnbanUserDialog.vue';
 import AppButton from '@/components/ui/AppButton.vue';
-import PageHeader from '@/components/ui/PageHeader.vue';
+import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
 import UserAvatar from '@/mascot/avatar/UserAvatar.vue';
 import { translate } from '@/i18n';
@@ -13,13 +13,14 @@ import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { hasPermission } from '@/lib/permissions';
 import { ratingTier, tierColor } from '@/lib/rating-tiers';
-import { TIER_TEXT_CLASSES, ratingTextClass } from '@/lib/tier-classes';
+import { TIER_TEXT_CLASSES } from '@/lib/tier-classes';
 import { isBannedPage } from '@/lib/user-ban';
 import { useLocaleStore } from '@/stores/locale.store';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
 import { useSessionStore } from '@/stores/session.store';
 import BanUserDialog from './BanUserDialog.vue';
+import { RATING_BOX_CLASSES } from './profile-geometry';
 
 const props = defineProps<{ user: UserPage }>();
 const session = useSessionStore();
@@ -40,6 +41,7 @@ const canBan = computed(
 /** The inverse of the ban, for the same permission: unbanning an account that is not banned is a 409. */
 const canUnban = computed(() => canModerate.value && isBanned.value);
 const isUnbanOpen = ref(false);
+const isSignedIn = computed(() => session.status === 'authenticated');
 const joinedDate = computed(() => formatDate(props.user.dateJoined, 'date', locale.locale));
 /** The display name only when it adds something: it is often the username again. */
 const joinedLine = computed(() =>
@@ -50,72 +52,88 @@ const joinedLine = computed(() =>
 </script>
 
 <template>
-  <PageHeader
+  <Card
     data-testid="profile-header"
-    :title="user.username"
-    :title-class="ratingTextClass(user.rating)"
-    :crumbs="[{ label: $t('nav.users'), to: '/users' }]"
-    :back="{ to: '/users', label: $t('nav.users') }"
+    class="grid gap-6 p-6 md:grid-cols-[minmax(0,1fr)_16rem] md:p-8"
   >
-    <template #start>
-      <UserAvatar class="max-sm:hidden" :username="user.username" :size="96" />
-      <UserAvatar class="sm:hidden" :username="user.username" :size="32" />
-    </template>
-    <template #meta>
-      <span :class="tierClass">{{ $t(tierLabelKey) }}</span>
-      <span aria-hidden="true">·</span>
-      <span>{{ joinedLine }}</span>
-      <Chip v-if="isOwn" tone="accent">{{ $t('profile.own') }}</Chip>
-    </template>
-    <template v-if="banReason || canUnban" #lead>
-      <p data-testid="ban-status" class="text-cue-attention">
+    <div class="flex min-w-0 flex-col gap-4">
+      <div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+        <UserAvatar :username="user.username" :size="96" />
+        <div class="flex min-w-0 flex-col gap-1.5">
+          <div class="flex min-w-0 flex-wrap items-center gap-2">
+            <Chip size="md">
+              <span :class="tierClass">{{ $t(tierLabelKey) }}</span>
+            </Chip>
+            <Chip v-if="isOwn" size="md" tone="accent">{{ $t('profile.own') }}</Chip>
+          </div>
+          <p class="text-muted">{{ joinedLine }}</p>
+          <ul v-if="user.organizations.length" class="mt-1 flex flex-wrap gap-1.5">
+            <li v-for="organization in user.organizations" :key="organization.id">
+              <Chip
+                interactive
+                :to="{ name: 'organization', params: { slug: organization.slug } }"
+                :title="organization.name"
+              >
+                {{ organization.shortName }}
+              </Chip>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div v-if="isOwn || canBan || isSignedIn" class="flex flex-wrap items-center gap-2.5">
+        <template v-if="isOwn">
+          <AppButton tone="primary" to="/settings">{{ $t('profile.edit') }}</AppButton>
+          <AppButton to="/blog/new">{{ $t('profile.write') }}</AppButton>
+        </template>
+        <BanUserDialog v-else-if="canBan" :key="user.username" :username="user.username" />
+        <template v-else-if="canUnban">
+          <AppButton data-testid="unban-open" @click="isUnbanOpen = true">
+            {{ $t('profile.ban.unban') }}
+          </AppButton>
+          <UnbanUserDialog
+            :key="user.username"
+            v-model:visible="isUnbanOpen"
+            :username="user.username"
+          />
+        </template>
+        <AdminEditLink :to="editTarget" />
+        <ShortLinkButton :path="shortLinkPath({ kind: 'user', username: user.username })" />
+      </div>
+      <p v-if="banReason || canUnban" data-testid="ban-status" class="text-sm text-negative">
         {{
           banReason
             ? $t('profile.ban.bannedWithReason', { reason: banReason })
             : $t('profile.ban.banned')
         }}
       </p>
-    </template>
-    <template #actions>
-      <!-- Without a rating the figure is the problems solved, a number a new student can raise every day. -->
-      <div data-testid="rating-box" class="w-full md:text-right">
+    </div>
+    <div data-testid="rating-box" :class="RATING_BOX_CLASSES">
+      <!-- Without a rating the box leads with the problems solved, a number a new student can raise every day. -->
+      <template v-if="user.rating === null">
+        <p class="text-sm text-muted">{{ $t('profile.solvedLead') }}</p>
+        <p data-testid="rating-figure" class="font-display text-stat leading-10 font-semibold">
+          {{ formatNumber(user.problemCount, locale.locale) }}
+        </p>
+      </template>
+      <template v-else>
+        <p class="text-sm text-muted">{{ $t('profile.rating') }}</p>
         <p
           data-testid="rating-figure"
-          :class="user.rating === null ? undefined : tierClass"
-          class="font-display text-stat leading-9 font-semibold"
+          :class="tierClass"
+          class="font-display text-stat leading-10 font-semibold"
         >
-          {{ user.rating === null ? formatNumber(user.problemCount, locale.locale) : user.rating }}
+          {{ user.rating }}
         </p>
-        <p v-if="user.rating === null" class="text-caption text-muted">
-          {{ $t('profile.solvedLead') }}
-        </p>
-        <p v-else-if="user.ratingSummary" class="text-caption text-muted">
-          {{
-            $t('profile.ratingSummary', {
-              max: user.ratingSummary.max,
-              min: user.ratingSummary.min,
-              count: user.ratingSummary.contests,
-            })
-          }}
-        </p>
-      </div>
-      <template v-if="isOwn">
-        <AppButton tone="primary" to="/settings">{{ $t('profile.edit') }}</AppButton>
-        <AppButton to="/blog/new">{{ $t('profile.write') }}</AppButton>
       </template>
-      <BanUserDialog v-else-if="canBan" :key="user.username" :username="user.username" />
-      <template v-else-if="canUnban">
-        <AppButton data-testid="unban-open" @click="isUnbanOpen = true">
-          {{ $t('profile.ban.unban') }}
-        </AppButton>
-        <UnbanUserDialog
-          :key="user.username"
-          v-model:visible="isUnbanOpen"
-          :username="user.username"
-        />
-      </template>
-      <AdminEditLink :to="editTarget" />
-      <ShortLinkButton :path="shortLinkPath({ kind: 'user', username: user.username })" />
-    </template>
-  </PageHeader>
+      <p v-if="user.rating !== null && user.ratingSummary" class="min-h-10 text-sm text-muted">
+        {{
+          $t('profile.ratingSummary', {
+            max: user.ratingSummary.max,
+            min: user.ratingSummary.min,
+            count: user.ratingSummary.contests,
+          })
+        }}
+      </p>
+    </div>
+  </Card>
 </template>

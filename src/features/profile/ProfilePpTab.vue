@@ -8,7 +8,7 @@ import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import DataTable from '@/components/ui/DataTable.vue';
 import type { DataTableColumn } from '@/components/ui/DataTableColumns';
 import StatePanel from '@/components/StatePanel.vue';
-import VerdictChip from '@/components/ui/VerdictChip.vue';
+import VerdictLabel from '@/components/VerdictLabel.vue';
 import { translate } from '@/i18n';
 import { usePpQuery } from '@/features/users/users.queries';
 import { formatFixed, formatNumber, scoreCut } from '@/lib/format';
@@ -104,7 +104,7 @@ const verdictFor = (submission: PpSubmission): Verdict =>
           class="flex flex-col items-start gap-0.5 hover:underline"
         >
           <span class="flex items-center gap-2">
-            <VerdictChip :verdict="verdictFor(row.submission)" />
+            <VerdictLabel :verdict="verdictFor(row.submission)" short />
             <span class="font-mono text-meta tabular-nums">
               {{ row.submission.casePoints }}/{{ row.submission.caseTotal }}
             </span>
