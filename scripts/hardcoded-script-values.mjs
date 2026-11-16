@@ -58,7 +58,7 @@ function scriptOnly(source, rel) {
     const start = block.index + block[0].indexOf('>') + 1;
     for (let i = start; i < start + block[1].length; i++) keep[i] = true;
   }
-  return [...source].map((c, i) => (keep[i] || c === '\n' ? c : ' ')).join('');
+  return [...source].map((char, index) => (keep[index] || char === '\n' ? char : ' ')).join('');
 }
 
 const lineOf = (text, index) => text.slice(0, index).split('\n').length;
@@ -199,6 +199,6 @@ export function hardcodedScriptValues(source, rel) {
     : [];
   return [...found, ...template]
     .filter(({ text }) => !(text in allowed))
-    .sort((a, b) => a.line - b.line)
+    .sort((first, second) => first.line - second.line)
     .map(({ line, text, use, kind }) => ({ line, kind, text: `${kind}: ${text} -> ${use}` }));
 }
