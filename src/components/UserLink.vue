@@ -13,6 +13,8 @@ withDefaults(
     /** Avatar edge: xs 24 px, sm 28 px, md 32 px. */
     size?: 'xs' | 'sm' | 'md';
     showAvatar?: boolean;
+    /** The avatar without its coloured tile. */
+    plainAvatar?: boolean;
     /** Where the name links instead of the profile. */
     to?: RouteLocationRaw;
     /** `banned` and `deleted` show on the avatar. */
@@ -20,7 +22,15 @@ withDefaults(
     /** False: the name is plain text (a row that is already a link, or a name with no profile). */
     link?: boolean;
   }>(),
-  { size: 'xs', showAvatar: true, to: undefined, rating: undefined, status: 'active', link: true },
+  {
+    size: 'xs',
+    showAvatar: true,
+    plainAvatar: false,
+    to: undefined,
+    rating: undefined,
+    status: 'active',
+    link: true,
+  },
 );
 
 const AVATAR_PX = { xs: 24, sm: 28, md: 32 } as const;
@@ -31,7 +41,13 @@ const AVATAR_PX = { xs: 24, sm: 28, md: 32 } as const;
     class="inline-flex max-w-full min-w-0 items-center align-middle"
     :class="size === 'xs' ? 'gap-1.5' : 'gap-2'"
   >
-    <UserAvatar v-if="showAvatar" :username="username" :size="AVATAR_PX[size]" :status="status" />
+    <UserAvatar
+      v-if="showAvatar"
+      :username="username"
+      :size="AVATAR_PX[size]"
+      :status="status"
+      :plain="plainAvatar"
+    />
     <UserName
       v-if="link"
       :username="username"

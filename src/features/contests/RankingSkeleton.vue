@@ -4,21 +4,22 @@ import { computed } from 'vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
   DEFAULT_STATS_COLUMNS,
+  NAME_COLUMN_MAX_REM,
   RANK_COLUMN_REM,
   TIME_COLUMN_REM,
   statsWidthRem,
-  tableMinWidthRem,
+  tableWidthRem,
 } from './ranking-columns';
 
 const props = defineProps<{ problemCount: number; hasTimeColumn: boolean }>();
 const ROWS = 10;
-/** Same columns and minimum width as RankingTable's desktop table (which scrolls sideways below it): rank, name (the rest), then the score and problem columns together. */
+/** Same columns and minimum width as RankingTable's desktop table (which scrolls sideways below it): rank, name, then the score and problem columns together. */
 const columns = computed(() => {
   const stats = {
     ...DEFAULT_STATS_COLUMNS,
     timeRem: props.hasTimeColumn ? TIME_COLUMN_REM : null,
   };
-  return `grid-template-columns: ${RANK_COLUMN_REM}rem minmax(0, 1fr) ${statsWidthRem(props.problemCount, stats)}rem; min-width: ${tableMinWidthRem(props.problemCount, stats)}rem`;
+  return `grid-template-columns: ${RANK_COLUMN_REM}rem ${NAME_COLUMN_MAX_REM}rem ${statsWidthRem(props.problemCount, stats)}rem; width: ${tableWidthRem(NAME_COLUMN_MAX_REM, props.problemCount, stats)}rem`;
 });
 </script>
 

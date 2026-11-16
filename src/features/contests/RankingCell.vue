@@ -5,10 +5,10 @@ import { RouterLink } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
 import type { RankingCellView } from '@/lib/ranking-cells';
 import ScoreTick from './ScoreTick.vue';
-import { TABLE_CELL_CLASSES, TABLE_CELL_TIME_CLASSES } from './ranking-cell-classes';
+import { TABLE_CELL_CLASSES } from './ranking-cell-classes';
 
-/** The board row is 36 px (`--qh-row-dense`), the cell box 32 px inside it: the score and, under it, the time. */
-const CELL_BOX_CLASS = 'h-8';
+/** The board row is 48 px (`h-12`), the cell box 40 px inside it: the score and, under it, the time. */
+const CELL_BOX_CLASS = 'h-10';
 
 const props = defineProps<{ view: RankingCellView; to?: RouteLocationRaw; tick?: boolean }>();
 
@@ -17,7 +17,7 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
 </script>
 
 <template>
-  <td class="h-(--qh-row-dense) px-0.5 py-0">
+  <td class="h-12 px-0.5 py-0">
     <!-- An empty cell keeps the filled cell's box height so a row without attempts is as tall as the rest. -->
     <span v-if="view.kind === 'empty'" class="block" :class="CELL_BOX_CLASS"
       ><span class="sr-only">{{ $t(view.labelKey) }}</span></span
@@ -26,7 +26,7 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
       :is="to ? RouterLink : 'span'"
       v-else
       :to="to"
-      class="flex flex-col items-center justify-center overflow-hidden rounded-cell px-1 text-center leading-none whitespace-nowrap tabular-nums"
+      class="relative flex flex-col items-center justify-center overflow-hidden rounded-cell px-1 text-center leading-none whitespace-nowrap tabular-nums"
       :class="[
         CELL_BOX_CLASS,
         TABLE_CELL_CLASSES[view.kind],
@@ -34,18 +34,19 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
       ]"
       :title="view.time"
     >
-      <span aria-hidden="true" class="flex items-center gap-1 text-sm font-semibold">
-        <Star v-if="view.kind === 'first-solve'" class="size-3 shrink-0" /><ScoreTick
-          :text="view.text"
-          :animate="tick"
-        />
-      </span>
+      <Star
+        v-if="view.kind === 'first-solve'"
+        aria-hidden="true"
+        class="absolute top-0.5 right-0.5 size-2.5 text-verdict-ac"
+      />
+      <span aria-hidden="true" class="text-sm font-normal"
+        ><ScoreTick :text="view.text" :animate="tick"
+      /></span>
       <span
         v-if="view.time"
         aria-hidden="true"
         data-testid="cell-time"
-        class="mt-0.5 max-w-full truncate text-tiny font-normal"
-        :class="TABLE_CELL_TIME_CLASSES[view.kind]"
+        class="mt-0.5 max-w-full truncate text-tiny font-normal text-muted"
         >{{ view.time }}</span
       >
       <span class="sr-only">{{ $t(view.labelKey, view.labelParams, labelCount) }}</span>

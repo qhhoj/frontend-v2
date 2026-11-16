@@ -29,7 +29,7 @@ function buildRowCells(
       view: rankingCell(row.cells[problem.problemId], problem, row.id, context),
     })),
     score: totalScoreText(row.score, problems, context),
-    cumtime: formatCumtime(context.formatName, row.cumtime, context.locale),
+    cumtime: formatCumtime(context.formatName, row.cumtime),
     source: { revision: row.revision, context },
   };
 }

@@ -142,9 +142,9 @@ describe('ranking cells, points formats', () => {
     expect(rankingCell({ points: 100, time: 492 }, problem(), 'me', timedDefault)).toEqual({
       kind: 'solved',
       text: '100',
-      time: '0:08:12',
+      time: '0:08',
       labelKey: 'ranking.cell.pointsAt',
-      labelParams: { points: '100', time: '0:08:12' },
+      labelParams: { points: '100', time: '0:08' },
     });
     expect(
       rankingCell({ points: 100, time: 492 }, problem({ firstSolve: 'me' }), 'me', timedDefault),
@@ -159,7 +159,7 @@ describe('ranking cells, points formats', () => {
       kind: 'partial',
       partialStep: 1,
       text: '20',
-      time: '0:10:00',
+      time: '0:10',
     });
     expect(rankingCell({ points: 50, time: 0 }, problem(), 'me', timedDefault).partialStep).toBe(2);
     expect(rankingCell({ points: 99.5, time: 0 }, problem(), 'me', timedDefault).partialStep).toBe(
@@ -197,15 +197,15 @@ describe('ranking cells, points formats', () => {
       'me',
       context(format, 2, config),
     );
-    expect(view).toMatchObject({ kind: 'first-solve', time: '0:01:15' });
+    expect(view).toMatchObject({ kind: 'first-solve', time: '0:01' });
   });
 });
 
 describe('ranking helpers', () => {
   it('prints cumulative time in the unit its format stores', () => {
-    expect(formatCumtime('icpc', 512, 'en')).toBe('512');
-    expect(formatCumtime('vnoj', 3_540, 'en')).toBe('0:59');
-    expect(formatCumtime('ioi', 7_260, 'en')).toBe('2:01');
+    expect(formatCumtime('icpc', 512)).toBe('8:32');
+    expect(formatCumtime('vnoj', 3_540)).toBe('0:59');
+    expect(formatCumtime('ioi', 7_260)).toBe('2:01');
   });
 });
 
@@ -270,35 +270,17 @@ describe('ranking cells, zero-point problem', () => {
 });
 
 describe('ranking cells past 99 hours', () => {
-  const LONG = 113 * 86_400 + 23 * 3600 + 36 * 60;
-  const vi = { ...timedDefault, locale: 'vi' as const };
+  const LONG = 107 * 3600 + 20 * 60;
   const timeOf = (time: number, board: RankingContext = timedDefault) =>
     rankingCell({ points: 100, time }, problem(), 'me', board).time;
 
-  it('shows a long solve time as short days and hours, and says it in full words', () => {
-    const cell = rankingCell({ points: 100, time: LONG }, problem(), 'me', vi);
-    expect(cell.time).toBe('113 ng 23 g');
-    expect(cell.labelParams.time).toBe('113 ngày 23 giờ');
-    expect(timeOf(LONG)).toBe('113d 23h');
+  it('keeps hours and minutes for multi-day solve times, in cells and totals', () => {
+    expect(timeOf(LONG)).toBe('107:20');
     expect(rankingCell({ time: LONG, points: 100, tries: 1 }, problem(), 'me', icpc).time).toBe(
-      '113d 23h',
+      '107:20',
     );
-  });
-
-  it('says a total time of 100 hours or more in days and hours; icpc minutes stay a number', () => {
-    expect(formatCumtime('ioi', 100 * 3600 - 60, 'en')).toBe('99:59');
-    expect(formatCumtime('ioi', LONG, 'vi')).toBe('113 ng 23 g');
-    expect(formatCumtime('vnoj', LONG, 'en')).toBe('113d 23h');
-    expect(formatCumtime('icpc', 9_000, 'en')).toBe('9000');
-  });
-
-  it('switches at exactly 100 hours and drops zero hours', () => {
-    expect(timeOf(100 * 3600 - 1)).toBe('99:59:59');
-    expect(timeOf(100 * 3600, vi)).toBe('4 ng 4 g');
-    expect(timeOf(5 * 86_400, vi)).toBe('5 ng');
-    expect(
-      rankingCell({ time: 100 * 3600 - 60, points: 100, tries: 1 }, problem(), 'me', icpc).time,
-    ).toBe('99:59');
+    expect(formatCumtime('vnoj', LONG)).toBe('107:20');
+    expect(formatCumtime('icpc', 9_000)).toBe('150:00');
   });
 });
 
