@@ -2,6 +2,7 @@
 import { computed, reactive, useId } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import CodeEditor from '@/components/CodeEditor.vue';
+import { blockHeldEnter } from '@/components/submit-key';
 import AppButton from '@/components/ui/AppButton.vue';
 import Notice from '@/components/ui/Notice.vue';
 import { formatMemoryLimit, formatNumber, formatTimeLimit } from '@/lib/format';
@@ -193,6 +194,7 @@ function loadDroppedFile(event: DragEvent) {
         v-if="isTopRow"
         type="submit"
         tone="primary"
+        @keydown="blockHeldEnter"
         v-bind="classes.submit"
         :disabled="!state.canSubmit"
         :loading="state.submitting"
@@ -300,6 +302,7 @@ function loadDroppedFile(event: DragEvent) {
       v-if="!isTopRow"
       type="submit"
       tone="primary"
+      @keydown="blockHeldEnter"
       v-bind="classes.submit"
       :disabled="!state.canSubmit"
       :loading="state.submitting"
