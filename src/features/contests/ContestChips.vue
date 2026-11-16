@@ -35,7 +35,7 @@ const showOrganizations = computed(
   <template v-if="!onlyTags">
     <Chip v-if="!hideFormat">{{ formatLabel(contest.formatName) }}</Chip>
     <Chip v-if="contest.isRated" tone="accent" :icon="TrendingUp">{{ $t('contests.rated') }}</Chip>
-    <Chip v-if="withCodeNeeded && contest.requiresAccessCode" tone="warning" :icon="Lock">{{
+    <Chip v-if="withCodeNeeded && contest.requiresAccessCode" tone="attention" :icon="Lock">{{
       $t('contests.list.codeNeeded')
     }}</Chip>
     <Chip v-if="contest.isPrivate" tone="neutral">{{ $t('contests.private') }}</Chip>

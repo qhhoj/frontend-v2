@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import type { ContestListItem, ContestListQuery } from '@/api/types/contests';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import StatusDot from '@/components/ui/StatusDot.vue';
 import PageSection from '@/components/ui/PageSection.vue';
 import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import { useRunningContestsQuery } from '@/features/community/community.queries';
@@ -75,24 +76,21 @@ const ROW = 'flex min-h-9 items-center gap-3 py-1.5 text-content hover:bg-surfac
       <ul class="flex flex-col divide-y divide-line">
         <li v-for="contest in runningItems" :key="contest.key" data-testid="running-row">
           <RouterLink :to="{ name: 'contest', params: { key: contest.key } }" :class="ROW">
-            <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-positive" />
+            <StatusDot tone="live" />
             <span class="min-w-0 flex-1 truncate font-semibold">{{ contest.name }}</span>
             <span class="hidden shrink-0 font-mono text-meta text-muted sm:inline">{{
               $t('home.contestants', { count: formatNumber(contest.userCount, locale.locale) })
             }}</span>
-            <span class="shrink-0 text-meta font-semibold text-positive">{{
+            <span class="shrink-0 text-meta font-semibold text-cue-live">{{
               $t('contests.list.timeLeft', { span: timeLeftOf(contest) })
             }}</span>
           </RouterLink>
         </li>
         <li v-for="contest in upcomingItems" :key="contest.key" data-testid="upcoming-row">
           <RouterLink :to="{ name: 'contest', params: { key: contest.key } }" :class="ROW">
-            <span
-              aria-hidden="true"
-              class="size-2 shrink-0 rounded-full border border-line-strong"
-            />
+            <StatusDot tone="upcoming" />
             <span class="min-w-0 flex-1 truncate font-semibold">{{ contest.name }}</span>
-            <span class="shrink-0 font-mono text-meta text-muted">{{
+            <span class="shrink-0 font-mono text-meta text-cue-upcoming">{{
               formatDate(contest.startTime, 'datetime', locale.locale)
             }}</span>
           </RouterLink>

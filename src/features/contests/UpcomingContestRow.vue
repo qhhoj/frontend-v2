@@ -74,7 +74,7 @@ const startsInText = computed(() =>
     </div>
     <div class="mt-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-1">
       <p class="min-w-0 text-sm text-muted">
-        <span class="whitespace-nowrap">{{
+        <span class="whitespace-nowrap text-cue-upcoming">{{
           $t('contests.list.startsIn', { relative: startsInText })
         }}</span>
         ·
