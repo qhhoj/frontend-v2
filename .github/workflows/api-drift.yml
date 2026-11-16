@@ -9,7 +9,7 @@ name: API drift
 
 on:
   pull_request: { branches: [main, staging] }
-  merge_group: { branches: [main, staging] }
+  merge_group:
   push:
     branches: [main, staging]
   schedule:
