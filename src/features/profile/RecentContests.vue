@@ -17,7 +17,7 @@ const COLUMNS = computed(recentContestColumns);
 const orDash = (value: number | null) => (value === null ? NO_VALUE : String(Math.round(value)));
 const deltaText = (delta: number | null) => (delta === null ? NO_VALUE : signedScore(delta));
 const deltaClass = (delta: number | null) =>
-  delta === null || delta === 0 ? 'text-muted' : delta > 0 ? 'text-positive' : 'text-negative';
+  delta === null || delta === 0 ? 'text-muted' : delta > 0 ? 'text-cue-full' : 'text-cue-zero';
 /** A hidden contest has no key and no page: its row is a plain label (so no `rowTo`, which every row would need). */
 const rowKey = (row: RecentContestRow) => row.key ?? `hidden-${rows.value.indexOf(row)}`;
 </script>

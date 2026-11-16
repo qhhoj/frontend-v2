@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppButton from '@/components/ui/AppButton.vue';
+import FormFieldError from '@/components/ui/FormFieldError.vue';
 import { computed, nextTick, ref, useId } from 'vue';
 import { useRouter } from 'vue-router';
 import { diffRoute, parseSubmissionRef } from './diff-picks';
@@ -75,9 +76,7 @@ function submit() {
           {{ $t('sourceDiff.compare.submit') }}
         </AppButton>
       </div>
-      <p v-if="errorKey" :id="errorId" role="alert" class="text-meta text-negative">
-        {{ $t(errorKey) }}
-      </p>
+      <FormFieldError v-if="errorKey" :id="errorId" role="alert" :message="$t(errorKey)" />
       <p v-else class="text-meta text-muted">{{ $t('sourceDiff.compare.hint') }}</p>
     </form>
   </div>

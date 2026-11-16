@@ -25,7 +25,7 @@ import {
   fullCellClass,
 } from './submission-table-cells';
 import type { CellKind, ColumnKey } from './submission-table-cells';
-import { isFinished, scoreCellText } from './submission-row';
+import { isFinished, scoreCellText, scoreClass } from './submission-row';
 import { useRowOpen } from './row-open';
 import { useIsNarrow } from './use-card-compact';
 import { NO_VALUE, formatCaseMemory, formatCaseTime } from '@/lib/format';
@@ -175,7 +175,10 @@ const memoryText = (row: SubmissionListItem) =>
               <td v-if="kind === 'verdict'" :class="[bodyCell, classOf(kind)]">
                 <SubmissionVerdictCell :row="row" />
               </td>
-              <td v-else-if="kind === 'score'" :class="[bodyCell, classOf(kind), NUMBER_ALIGN]">
+              <td
+                v-else-if="kind === 'score'"
+                :class="[bodyCell, classOf(kind), NUMBER_ALIGN, scoreClass(row, contestMaxOf(row))]"
+              >
                 {{ scoreCellText(row, locale.locale, contestMaxOf(row)) }}
               </td>
               <td v-else-if="kind === 'problem'" :class="[bodyCell, 'w-full max-w-0']">

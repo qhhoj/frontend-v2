@@ -68,7 +68,7 @@ const joinedLine = computed(() =>
       <Chip v-if="isOwn" tone="accent">{{ $t('profile.own') }}</Chip>
     </template>
     <template v-if="banReason || canUnban" #lead>
-      <p data-testid="ban-status" class="text-negative">
+      <p data-testid="ban-status" class="text-cue-attention">
         {{
           banReason
             ? $t('profile.ban.bannedWithReason', { reason: banReason })
