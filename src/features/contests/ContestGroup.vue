@@ -4,6 +4,7 @@ import type { ContestPhase } from '@/api/types/contests';
 import PageSection from '@/components/ui/PageSection.vue';
 import QueryState from '@/components/QueryState.vue';
 import SubmissionPager from '@/features/submissions/SubmissionPager.vue';
+import StatusDot from '@/components/ui/StatusDot.vue';
 import { phaseAt } from '@/lib/contest-time';
 import { formatNumber } from '@/lib/format';
 import { useNow } from '@/lib/use-now';
@@ -40,6 +41,8 @@ const listPage = computed<ContestListRoute>(() => props.listRoute ?? { name: 'co
 const emit = defineEmits<{ page: [page: number]; count: [total: number | null] }>();
 const locale = useLocaleStore();
 const { t } = useI18n();
+/** A phase heading's dot: running = live, upcoming = upcoming, ended = ended. */
+const PHASE_CUES = { running: 'live', upcoming: 'upcoming', ended: 'ended' } as const;
 const query = computed(() => groupQuery(props.filters, props.phase, props.organizationId));
 const { data: list, isPending, error, refetch } = useContestListQuery(query);
 const contests = computed(() => list.value?.items ?? []);
@@ -128,6 +131,7 @@ const clearTagTarget = computed(() => ({
     :count="hasItems ? countText : undefined"
     :see-all="hasLink ? { to: toggleTarget, label: linkText } : undefined"
   >
+    <template #lead><StatusDot :tone="PHASE_CUES[phase]" /></template>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><ContestListSkeletons :kind="phase" /></template>
       <ContestListEmpty

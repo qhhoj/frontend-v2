@@ -93,7 +93,11 @@ const perParticipation = computed(() =>
       <div class="flex items-center gap-2 font-semibold">
         <InlineBit kind="contest" />
         <!-- One line, never split mid-phrase: the row wraps the button below instead. -->
-        <i18n-t keypath="contests.list.timeLeft" tag="p" class="whitespace-nowrap tabular-nums">
+        <i18n-t
+          keypath="contests.list.timeLeft"
+          tag="p"
+          class="whitespace-nowrap text-cue-live tabular-nums"
+        >
           <template #span><CountdownTimer :until="contest.endTime" /></template>
         </i18n-t>
       </div>
