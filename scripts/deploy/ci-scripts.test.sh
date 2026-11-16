@@ -22,6 +22,15 @@ resolve side >/dev/null 2>&1 && fail "a branch off origin/main must fail"
 resolve v9.0.0 >/dev/null 2>&1 && fail "a version tag off origin/main must fail"
 resolve '' >/dev/null 2>&1 && fail "the highest tag off origin/main must fail, not deploy"
 git -C "$repo" tag -d v9.0.0 >/dev/null
+# DEPLOY_BRANCH=staging: a commit on origin/staging deploys there, a commit only on main does not, other names fail
+git -C "$repo" update-ref refs/remotes/origin/staging side; side="$(git -C "$repo" rev-parse side)"
+staged() { (cd "$repo" && DEPLOY_BRANCH="$1" bash "$here/resolve-ref.sh" "$2"); }
+[ "$(staged staging side | sed -n 's/^tag=//p')" = "sha-${side:0:12}" ] || fail "a commit on origin/staging deploys to staging"
+git -C "$repo" -c user.email=t@t -c user.name=t -c commit.gpgSign=false commit -q --allow-empty -m main-only
+staged staging HEAD >/dev/null 2>&1 && fail "a main-only commit must not deploy to staging"
+git -C "$repo" reset -q --hard "$head"
+staged main side >/dev/null 2>&1 && fail "a staging-only commit must not deploy to main"
+staged prod HEAD >/dev/null 2>&1 && fail "an unknown DEPLOY_BRANCH must fail"
 
 gh_answers() { printf '%s\n' "$@" > "$bin/answers"; cat > "$bin/gh" <<EOT
 #!/usr/bin/env bash
