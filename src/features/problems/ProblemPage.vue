@@ -11,15 +11,18 @@ import { useNavSection } from '@/features/shell/nav-section';
 import { translate } from '@/i18n';
 import { usePageTitle } from '@/router/page-title';
 import { useLocaleStore } from '@/stores/locale.store';
+import { useSessionStore } from '@/stores/session.store';
 import ProblemContent from './ProblemContent.vue';
 import StatementSkeleton from './StatementSkeleton.vue';
 import { PROBLEM_LAYOUT } from './problem-layout';
+import type { ProblemTab } from './problem-tab';
 import { useProblemQuery } from './problems.queries';
 
 const DEFAULT_TAB = 'statement';
 const route = useRoute();
 const router = useRouter();
 const locale = useLocaleStore();
+const session = useSessionStore();
 const code = computed(() => String(route.params.code));
 const { data: problem, isPending, error, refetch } = useProblemQuery(code, toRef(locale, 'locale'));
 
@@ -62,27 +65,54 @@ watch(code, () => {
   editorialGone.value = false;
 });
 
-/** Page tabs; 8e adds `discussion` here. */
-const tabs = computed(() => [
-  { id: DEFAULT_TAB, labelKey: 'problem.tabs.statement' },
+/** The route of each submission tab: the child route's name says which one is open. */
+const SUBMISSION_TAB_OF_ROUTE: Record<string, string> = {
+  'problem-submissions': 'submissions',
+  'problem-mine': 'mine',
+  'problem-best': 'best',
+};
+const isSignedIn = computed(() => session.status === 'authenticated');
+/** An ended contest the reader came from stays in the URL while they move between tabs. */
+const contextQuery = computed(() =>
+  queriedContestKey.value ? { contest: queriedContestKey.value } : {},
+);
+const linkTo = (name: string, query: Record<string, string> = {}) => ({
+  name,
+  params: { code: code.value },
+  query: { ...contextQuery.value, ...query },
+});
+/** Page tabs, each a link: statement and editorial are the problem route (`?tab=`), the rest are its child routes. */
+const tabs = computed<ProblemTab[]>(() => [
+  { id: DEFAULT_TAB, labelKey: 'problem.tabs.statement', to: linkTo('problem') },
   ...(problem.value?.hasEditorial && !editorialGone.value
-    ? [{ id: 'editorial', labelKey: 'problem.tabs.editorial' }]
+    ? [
+        {
+          id: 'editorial',
+          labelKey: 'problem.tabs.editorial',
+          to: linkTo('problem', { tab: 'editorial' }),
+        },
+      ]
     : []),
+  { id: 'submissions', labelKey: 'problem.tabs.submissions', to: linkTo('problem-submissions') },
+  ...(isSignedIn.value
+    ? [{ id: 'mine', labelKey: 'problem.tabs.mine', to: linkTo('problem-mine') }]
+    : []),
+  { id: 'best', labelKey: 'problem.tabs.best', to: linkTo('problem-best') },
 ]);
 const requestedTab = computed(() => (typeof route.query.tab === 'string' ? route.query.tab : null));
-const tab = computed({
-  get: () => tabs.value.find((candidate) => candidate.id === requestedTab.value)?.id ?? DEFAULT_TAB,
-  set: (id: string) =>
-    void router.replace({
-      query: { ...route.query, tab: id === DEFAULT_TAB ? undefined : id },
-    }),
+const isStatementRoute = computed(() => route.name === 'problem');
+/** The open tab: a child route's own, else the statement or (`?tab=editorial`) the editorial. */
+const tab = computed(() => {
+  const ofRoute = SUBMISSION_TAB_OF_ROUTE[String(route.name)];
+  if (ofRoute) return ofRoute;
+  return tabs.value.find((candidate) => candidate.id === requestedTab.value)?.id ?? DEFAULT_TAB;
 });
 
 // An unknown or unavailable ?tab= (an editorial that does not exist) is dropped once the detail is known.
 watch(
   [problem, requestedTab, editorialGone],
   ([loaded, requested]) => {
-    if (loaded && requested !== null && tab.value !== requested)
+    if (isStatementRoute.value && loaded && requested !== null && tab.value !== requested)
       void router.replace({ query: { ...route.query, tab: undefined } });
   },
   { immediate: true },
@@ -126,7 +156,7 @@ watch(
         <ProblemContent
           v-if="problem"
           :key="problem.code"
-          v-model:tab="tab"
+          :tab="tab"
           :problem="problem"
           :tabs="tabs"
           :layout="layout"

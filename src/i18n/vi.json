@@ -64,7 +64,6 @@
     "contestReplay": "Phát lại",
     "contestBalloons": "Bóng bay",
     "contestBalloonsPrint": "Phiếu bóng bay",
-    "problemBest": "Bài nộp tốt nhất",
     "runtimes": "Máy chấm và ngôn ngữ",
     "postDrafts": "Bài nháp của tôi",
     "contestAll": "Tất cả đề",
@@ -1148,7 +1147,13 @@
     "copySample": "Sao chép ví dụ",
     "tabs": {
       "statement": "Đề bài",
-      "editorial": "Lời giải"
+      "editorial": "Lời giải",
+      "submissions": "Bài nộp",
+      "mine": "Của tôi",
+      "best": "Tốt nhất"
+    },
+    "menu": {
+      "report": "Báo lỗi đề"
     },
     "tabsLabel": "Mục của bài",
     "editorial": {
@@ -1194,13 +1199,8 @@
         "siteOutOf": "/ {max} điểm bài"
       },
       "links": {
-        "label": "Liên kết của bài",
-        "title": "Liên kết",
-        "submissions": "Tất cả bài nộp",
-        "best": "Bài nộp tốt nhất",
         "pdfStatement": "Đề bài PDF",
-        "material": "Tài liệu đính kèm",
-        "report": "Báo lỗi bài này"
+        "material": "Tài liệu đính kèm"
       }
     },
     "pdfRender": "Tải PDF",

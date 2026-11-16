@@ -78,12 +78,19 @@ function pageAfter(filters: SubmissionFilters, patch: Partial<SubmissionFilters>
   return changesOnlyLive ? filters.page : 1;
 }
 
+/** The query keys the filters own; any other key is the page's own (a problem tab's `?contest=`) and survives a filter change. */
+const FILTER_KEYS = Object.keys(toSubmissionQuery(parseSubmissionFilters({})));
+const otherKeysOf = (query: LocationQuery): LocationQueryRaw =>
+  Object.fromEntries(Object.entries(query).filter(([key]) => !FILTER_KEYS.includes(key)));
+
 export function useSubmissionFilters() {
   const route = useRoute();
   const router = useRouter();
   const filters = computed(() => parseSubmissionFilters(route.query));
   const update = (patch: Partial<SubmissionFilters>) =>
-    void router.replace({ query: toSubmissionQuery(withPatch(filters.value, patch)) });
-  const reset = () => void router.replace({ query: {} });
+    void router.replace({
+      query: { ...otherKeysOf(route.query), ...toSubmissionQuery(withPatch(filters.value, patch)) },
+    });
+  const reset = () => void router.replace({ query: otherKeysOf(route.query) });
   return { filters, update, reset };
 }
