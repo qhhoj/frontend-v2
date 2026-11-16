@@ -76,6 +76,7 @@ const perParticipation = computed(() =>
     <!-- The two ends sit under the bar, so dated labels never squeeze it on a phone. -->
     <div class="flex flex-col gap-1.5">
       <ProgressBar
+        tone="live"
         :value="progressPercent"
         :label="$t('home.anon.elapsed', { percent: progressPercent })"
       />

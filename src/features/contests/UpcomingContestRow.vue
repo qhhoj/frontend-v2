@@ -30,9 +30,11 @@ const timeRange = computed(
 const durationText = computed(() =>
   lengthText((Date.parse(props.contest.endTime) - Date.parse(props.contest.startTime)) / 1000),
 );
-const startsInText = computed(() =>
-  formatRelative(props.contest.startTime, now.value, locale.locale),
-);
+/** Mid-phrase: ICU capitalises some words ("Ngày mai"), so the first letter is lowered. */
+const startsInText = computed(() => {
+  const text = formatRelative(props.contest.startTime, now.value, locale.locale);
+  return text.charAt(0).toLowerCase() + text.slice(1);
+});
 </script>
 
 <template>
