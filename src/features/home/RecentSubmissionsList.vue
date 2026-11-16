@@ -1,20 +1,27 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import type { SubmissionListItem } from '@/api/types/submissions';
 import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import PageSection from '@/components/ui/PageSection.vue';
 import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import VerdictChip from '@/components/ui/VerdictChip.vue';
-import { formatNumber } from '@/lib/format';
 import { formatRelative } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
+import { useInFlightPoll } from '@/features/submissions/list/use-in-flight-poll';
+import { scoreCellText, scoreCue } from '@/features/submissions/submission-row';
 import { submissionVerdictOf } from '@/lib/verdicts';
+import { CUE_TEXT } from '@/components/ui/cue-tones';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useRecentSubmissionsQuery } from './home.queries';
 
-/** "Bài nộp của bạn": the five newest submissions of the viewer, one ledger row each (verdict, problem, score, time); the query is shared with "Làm tiếp", so it is one request. */
-const VISIBLE = 5;
+/**
+ * "Bài nộp gần đây": the eight newest submissions of the viewer, one ledger row each (verdict, problem, score in its cue, time).
+ * The query is shared with "Làm tiếp", so it is one request. A queued or grading row is read again by the same in-flight poll
+ * the submission list uses, so its verdict and score settle without a reload.
+ */
+const VISIBLE = 8;
 const PROBLEMS = { name: 'problems' };
 const props = defineProps<{ username: string }>();
 const {
@@ -26,6 +33,16 @@ const {
 const locale = useLocaleStore();
 const now = useNow(60_000);
 const visible = computed(() => (submissions.value ?? []).slice(0, VISIBLE));
+useInFlightPoll({
+  rows: computed(() => submissions.value ?? []),
+  enabled: computed(() => true),
+  refetchRows: async () => (await refetch()).data,
+});
+const scoreClass = (item: SubmissionListItem) => {
+  const cue = scoreCue(item, undefined);
+  return cue ? CUE_TEXT[cue] : 'text-muted';
+};
+const scoreOf = (item: SubmissionListItem) => scoreCellText(item, locale.locale, undefined);
 </script>
 
 <template>
@@ -61,12 +78,9 @@ const visible = computed(() => (submissions.value ?? []).slice(0, VISIBLE));
           >
             <VerdictChip :verdict="submissionVerdictOf(item)" />
             <span class="min-w-0 flex-1 truncate font-medium">{{ item.problem?.name ?? '—' }}</span>
-            <span
-              v-if="item.caseTotal > 0"
-              class="shrink-0 font-mono text-meta text-muted max-sm:hidden"
-              >{{ formatNumber(item.casePoints, locale.locale) }} /
-              {{ formatNumber(item.caseTotal, locale.locale) }}</span
-            >
+            <span class="shrink-0 font-mono text-meta max-sm:hidden" :class="scoreClass(item)">{{
+              scoreOf(item)
+            }}</span>
             <span class="w-24 shrink-0 text-right text-meta whitespace-nowrap text-muted">
               {{ formatRelative(item.date, now, locale.locale) }}
             </span>

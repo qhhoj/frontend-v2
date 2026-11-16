@@ -79,11 +79,8 @@ const score = (item: SubmissionListItem) =>
       <div class="min-w-0 flex-1">
         <p class="flex items-baseline gap-2">
           <span class="min-w-0 truncate font-semibold">{{ target.problem.name }}</span>
-          <span class="hidden shrink-0 font-mono text-meta text-muted sm:inline">{{
-            target.problem.code
-          }}</span>
         </p>
-        <p class="text-meta text-muted sm:truncate">{{ whenAndWhere(target) }}</p>
+        <p class="text-meta text-muted">{{ whenAndWhere(target) }}</p>
       </div>
       <Chip v-if="target.caseTotal > 0" :tone="cueOf(target)" class="font-mono">{{
         score(target)
