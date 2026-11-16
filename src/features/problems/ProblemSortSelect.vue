@@ -3,12 +3,13 @@ import { ArrowDownUp } from 'lucide-vue-next';
 import { isProblemSort } from '@/api/types/problems';
 import type { ProblemSort } from '@/api/types/problems';
 import ToolbarSelect from '@/components/ToolbarSelect.vue';
-import { buttonClasses } from '@/components/ui/button-classes';
+import IconButton from '@/components/ui/IconButton.vue';
+import Menu from '@/components/ui/Menu.vue';
 import { DEFAULT_SORT, sortOptions } from './problem-sort-options';
 
 /**
  * "Sắp xếp: Mới nhất ↓": every order the API offers. The default order is written to the URL as no sort. `iconOnly` (a phone's
- * toolbar) draws a square icon button; the native select covers it, invisible, so a tap anywhere on it opens the list.
+ * toolbar) draws a square icon button that opens a menu of the same orders.
  */
 const props = defineProps<{ sort: ProblemSort | null; iconOnly?: boolean }>();
 const emit = defineEmits<{ update: [sort: ProblemSort | null] }>();
@@ -17,27 +18,24 @@ const pick = (value: string) =>
 </script>
 
 <template>
-  <label
+  <Menu
     v-if="iconOnly"
-    class="relative"
-    :class="[
-      buttonClasses({ iconOnly: true }),
-      props.sort !== null && 'border-accent bg-accent-soft text-accent-soft-text',
-    ]"
-    :title="$t('problems.sort')"
+    :label="$t('problems.sort')"
+    :items="sortOptions().map((option) => ({ label: option.label, run: () => pick(option.value) }))"
   >
-    <ArrowDownUp class="size-4" aria-hidden="true" />
-    <select
-      :aria-label="$t('problems.sort')"
-      :value="props.sort ?? DEFAULT_SORT"
-      class="absolute -inset-px size-[calc(100%+2px)] cursor-pointer appearance-none text-base opacity-0"
-      @change="pick(($event.target as HTMLSelectElement).value)"
-    >
-      <option v-for="option in sortOptions()" :key="option.value" :value="option.value">
-        {{ option.label }}
-      </option>
-    </select>
-  </label>
+    <template #trigger="{ toggle, open, setOpener }">
+      <IconButton
+        :ref="(el) => setOpener((el as { $el?: HTMLElement } | null)?.$el ?? null)"
+        :label="$t('problems.sort')"
+        :pressed="props.sort !== null"
+        aria-haspopup="menu"
+        :aria-expanded="open"
+        @click="toggle"
+      >
+        <ArrowDownUp aria-hidden="true" />
+      </IconButton>
+    </template>
+  </Menu>
   <ToolbarSelect
     v-else
     :label="$t('problems.sort')"
