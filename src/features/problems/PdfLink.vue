@@ -10,7 +10,7 @@ import { hasTextStatement } from './statement-presence';
  * The problem's one PDF control: the uploaded statement as a link when there is one, else the button that renders the text
  * statement on request. Nothing when the problem has neither.
  */
-defineProps<{ problem: ProblemDetail }>();
+defineProps<{ problem: ProblemDetail; iconOnly?: boolean }>();
 const locale = useLocaleStore();
 </script>
 
@@ -28,5 +28,10 @@ const locale = useLocaleStore();
     <template #icon><FileText aria-hidden="true" class="size-4" /></template>
     PDF
   </AppButton>
-  <PdfButton v-else-if="hasTextStatement(problem)" :code="problem.code" :lang="locale.locale" />
+  <PdfButton
+    v-else-if="hasTextStatement(problem)"
+    :code="problem.code"
+    :lang="locale.locale"
+    :icon-only="iconOnly"
+  />
 </template>

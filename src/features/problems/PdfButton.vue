@@ -4,6 +4,7 @@ import { computed, onScopeDispose, ref, toRef, watch } from 'vue';
 import { problemPdfUrl } from '@/api/problems.api';
 import type { StatementLanguage } from '@/api/types/problems';
 import { translate } from '@/i18n';
+import IconButton from '@/components/ui/IconButton.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { usePdfStatement } from './use-pdf-statement';
 import type { PdfFailure } from './use-pdf-statement';
@@ -15,7 +16,7 @@ const FAILURE_KEYS: Record<PdfFailure, string> = {
   failed: 'problem.pdfFailed',
 };
 
-const props = defineProps<{ code: string; lang: StatementLanguage }>();
+const props = defineProps<{ code: string; lang: StatementLanguage; iconOnly?: boolean }>();
 const { phase, failure, retryAt, start } = usePdfStatement(
   toRef(props, 'code'),
   toRef(props, 'lang'),
@@ -83,8 +84,31 @@ watch(
 
 <template>
   <div ref="root" class="relative">
+    <IconButton
+      v-if="iconOnly && phase === 'ready'"
+      tone="primary"
+      size="sm"
+      :href="href"
+      target="_blank"
+      rel="noopener"
+      :label="$t('problem.pdfOpen')"
+    >
+      <ExternalLink aria-hidden="true" />
+    </IconButton>
+    <IconButton
+      v-else-if="iconOnly"
+      size="sm"
+      :tone="phase === 'failed' ? 'danger' : 'secondary'"
+      data-testid="pdf-button"
+      :label="name"
+      :loading="busy"
+      :disabled="mustWait"
+      @click="onClick"
+    >
+      <FileText aria-hidden="true" />
+    </IconButton>
     <AppButton
-      v-if="phase === 'ready'"
+      v-else-if="phase === 'ready'"
       ref="link"
       tone="primary"
       size="sm"

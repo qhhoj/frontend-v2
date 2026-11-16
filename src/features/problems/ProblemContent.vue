@@ -12,6 +12,7 @@ import ProblemArchivedNotice from '@/features/organizations/problems/ProblemArch
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useSessionStore } from '@/stores/session.store';
 import EditorialTab from './EditorialTab.vue';
+import PdfLink from './PdfLink.vue';
 import NoStatement from './NoStatement.vue';
 import PdfStatement from './PdfStatement.vue';
 import ProblemHeader from './ProblemHeader.vue';
@@ -109,6 +110,7 @@ function panelIdOf(tabId: string) {
       <ProblemHeader :problem="problem" :section="tab === 'editorial' ? 'editorial' : 'statement'">
         <template #actions>
           <!-- Wherever the bottom sheet is used its bar is the one submit entry (it shows for anonymous viewers too). -->
+          <PdfLink v-if="!problem.pdfStatementUrl" :problem="problem" icon-only />
           <div v-if="isSignedIn" :class="layout.hideWhenSheet">
             <SubmitOpenButton
               :form="submitForm"
@@ -125,7 +127,6 @@ function panelIdOf(tabId: string) {
           <ProblemLimitStrip
             :problem="problem"
             :is-signed-in="isSignedIn"
-            :has-editorial="hasEditorial"
             :contest="contest"
             :cells-class="layout.facts"
           />

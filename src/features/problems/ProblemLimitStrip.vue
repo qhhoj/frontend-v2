@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
 import type { ContestDetail } from '@/api/types/contests';
 import type { ProblemDetail } from '@/api/types/problems';
-import PdfLink from './PdfLink.vue';
 import OwnResultChip from '@/features/contests/OwnResultChip.vue';
+import { acRateTextClass } from '@/lib/ac-rate';
 import { formatMemoryLimit, formatNumber, formatPoints, formatTimeLimit } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useContestProblem } from './use-contest-problem';
@@ -12,7 +11,7 @@ import { viewerStatusOf } from './viewer-status';
 
 /**
  * The facts strip under the title (Workbench): one row of cells for the limits, the points, input/output and the viewer's
- * status, then one line of links (PDF, editorial) and the solve counts. `cellsClass` is the layout's: the cells stay in sight
+ * status, the AC rate (coloured) and the solver count. `cellsClass` is the layout's: the cells stay in sight
  * while the statement scrolls beside the editor. The root is `contents`, so the cells stick within the statement card.
  * Inside the viewer's contest the points are the contest's and the status is the viewer's own cell; the site-wide solve
  * counts are left out.
@@ -20,7 +19,6 @@ import { viewerStatusOf } from './viewer-status';
 const props = defineProps<{
   problem: ProblemDetail;
   isSignedIn: boolean;
-  hasEditorial: boolean;
   contest?: ContestDetail | null;
   cellsClass?: string;
 }>();
@@ -28,12 +26,11 @@ const { contestProblem, ownContext, contestPoints } = useContestProblem(
   () => props.problem,
   () => props.contest,
 );
-const route = useRoute();
 const locale = useLocaleStore();
 
 const status = computed(() => viewerStatusOf(props.problem.viewerStatus));
 const points = computed(() => formatPoints(props.problem.points, locale.locale));
-/** File I/O shows the exact names (the contestant types them into `freopen`/`assign`); standard I/O reads in words. */
+/** Only file I/O is a fact worth a cell: the exact names (the contestant types them into `freopen`/`assign`). Standard I/O is the default and shows nothing. */
 const ioCells = computed(() => {
   const { mode, inputFile, outputFile } = props.problem.io;
   return mode === 'file'
@@ -41,13 +38,12 @@ const ioCells = computed(() => {
         { key: 'input', label: 'problem.rail.facts.input', text: inputFile },
         { key: 'output', label: 'problem.rail.facts.output', text: outputFile },
       ]
-    : [{ key: 'stdio', label: 'problem.rail.facts.io', text: null }];
+    : [];
 });
 /** Cells grow to fill each row (a wrapped row has no empty gap) and never shrink below their value. */
 const CELL = 'grow basis-20 bg-surface px-3 py-1.5';
 const LABEL = 'text-meta text-muted';
 const VALUE = 'font-mono text-sm font-semibold whitespace-nowrap tabular-nums';
-const LINK = 'inline-flex min-h-11 items-center gap-1 font-semibold text-accent-text underline';
 </script>
 
 <template>
@@ -98,9 +94,21 @@ const LINK = 'inline-flex min-h-11 items-center gap-1 font-semibold text-accent-
               : 'text-sm font-semibold whitespace-nowrap'
           "
         >
-          {{ cell.text ?? $t('problem.rail.facts.stdio') }}
+          {{ cell.text }}
         </dd>
       </div>
+      <template v-if="contestPoints === null">
+        <div :class="CELL" data-testid="strip-ac-rate">
+          <dt :class="LABEL">{{ $t('problem.strip.acRate') }}</dt>
+          <dd :class="[VALUE, acRateTextClass(problem.acRate)]">
+            {{ formatNumber(problem.acRate, locale.locale, 1) }}%
+          </dd>
+        </div>
+        <div :class="CELL" data-testid="strip-solvers">
+          <dt :class="LABEL">{{ $t('problem.strip.solvers') }}</dt>
+          <dd :class="VALUE">{{ formatNumber(problem.userCount, locale.locale) }}</dd>
+        </div>
+      </template>
       <div v-if="contestProblem && ownContext" :class="CELL" data-testid="strip-own-result">
         <dt :class="LABEL">{{ $t('contests.problems.columns.own') }}</dt>
         <dd class="flex min-h-5 items-center">
@@ -112,21 +120,5 @@ const LINK = 'inline-flex min-h-11 items-center gap-1 font-semibold text-accent-
         <dd :class="['text-sm font-semibold', status.text]">{{ $t(status.key) }}</dd>
       </div>
     </dl>
-    <p class="mt-1 flex flex-wrap items-center gap-x-3 text-meta text-muted">
-      <!-- An uploaded PDF is shown inline right under the tabs; only the rendered one needs a button up here. -->
-      <PdfLink v-if="!problem.pdfStatementUrl" :problem="problem" />
-      <RouterLink
-        v-if="hasEditorial"
-        :to="{ query: { ...route.query, tab: 'editorial' } }"
-        :class="LINK"
-        >{{ $t('problem.tabs.editorial') }}</RouterLink
-      >
-      <span v-if="contestPoints === null" class="font-mono tabular-nums">{{
-        $t('problem.strip.solves', {
-          rate: formatNumber(problem.acRate, locale.locale, 1),
-          count: formatNumber(problem.userCount, locale.locale),
-        })
-      }}</span>
-    </p>
   </div>
 </template>
