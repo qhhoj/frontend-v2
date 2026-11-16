@@ -98,7 +98,7 @@ function revealCurrent() {
   if (props.overflow !== 'scroll') return;
   scroller.value
     ?.querySelector<HTMLElement>('[aria-current="page"], [aria-selected="true"]')
-    ?.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+    ?.scrollIntoView?.({ inline: 'nearest', block: 'nearest' });
 }
 onMounted(revealCurrent);
 watch(
