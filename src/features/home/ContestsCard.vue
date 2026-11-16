@@ -12,13 +12,10 @@ import { useRunningContestsQuery } from '@/features/community/community.queries'
 import { useSpanText } from '@/features/contests/use-span-text';
 import { useContestListQuery } from '@/features/contests/contests.queries';
 import { spanMessage } from '@/lib/contest-time';
-import { formatNumber } from '@/lib/format';
-import { formatDate } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
-import { useLocaleStore } from '@/stores/locale.store';
 
 /**
- * The home's contests (both homes): the running ones, then the next ones that have not started, one clickable row each.
+ * The home's contests (both homes): the running ones, then the next ones that have not started, one clickable row each (the name and the cue chip: the home puts it in the narrow column, and the date and the contestants are on the contest page).
  * With none running it is one inline line above the upcoming rows (with none of either, the line carries the way to the list). `excludeKey` leaves out the contest the viewer is in (it has its own card);
  * one more running contest is asked so the list still fills.
  */
@@ -40,7 +37,6 @@ const isPending = computed(() => running.isPending.value || upcoming.isPending.v
 const error = computed(() => running.error.value || upcoming.error.value);
 const isEmpty = computed(() => !runningItems.value.length && !upcomingItems.value.length);
 const now = useNow(30_000);
-const locale = useLocaleStore();
 const spanText = useSpanText();
 const timeLeftOf = (contest: ContestListItem) =>
   spanText(spanMessage((Date.parse(contest.endTime) - now.value) / 1000));
@@ -85,9 +81,6 @@ const ROW =
         >
           <RouterLink :to="{ name: 'contest', params: { key: contest.key } }" :class="ROW">
             <span class="min-w-0 flex-1 truncate font-semibold">{{ contest.name }}</span>
-            <span class="hidden shrink-0 font-mono text-meta text-muted sm:inline">{{
-              $t('home.contestants', { count: formatNumber(contest.userCount, locale.locale) })
-            }}</span>
             <Chip tone="live" dot>{{
               $t('contests.list.timeLeft', { span: timeLeftOf(contest) })
             }}</Chip>
@@ -101,9 +94,6 @@ const ROW =
         >
           <RouterLink :to="{ name: 'contest', params: { key: contest.key } }" :class="ROW">
             <span class="min-w-0 flex-1 truncate font-semibold">{{ contest.name }}</span>
-            <span class="hidden shrink-0 font-mono text-meta text-muted sm:inline">{{
-              formatDate(contest.startTime, 'datetime', locale.locale)
-            }}</span>
             <Chip tone="upcoming" dot>{{
               $t('contests.list.timeLeft', { span: timeToStartOf(contest) })
             }}</Chip>

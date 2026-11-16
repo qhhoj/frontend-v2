@@ -1128,6 +1128,8 @@
     "rating": "Rating",
     "points": "Điểm",
     "rank": "Hạng",
+    "posts": "Bài viết",
+    "mine": { "title": "Bài của tôi", "empty": "Bạn chưa có bài nào.", "create": "Tạo bài" },
     "recentSubmissions": "Bài nộp gần đây",
     "continue": {
       "title": "Làm tiếp",

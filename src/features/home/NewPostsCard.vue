@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { PostListItem } from '@/api/types/blog';
 import Chip from '@/components/ui/Chip.vue';
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
@@ -7,21 +8,23 @@ import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import { usePostsQuery } from '@/features/blog/blog.queries';
+import { summaryExcerpt } from '@/features/blog/post-summary';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 
-const POST_COUNT = 3;
+const POST_COUNT = 4;
 const BLOG = { name: 'blog' };
 const locale = useLocaleStore();
 const { data, isPending, error, refetch } = usePostsQuery('global', 1);
 const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
+const excerptOf = (post: PostListItem) => summaryExcerpt(post.summaryHtml);
 </script>
 
 <template>
   <PageSection
     data-testid="new-posts"
-    :title="$t('home.anon.newPosts')"
+    :title="$t('home.posts')"
     :see-all="{ to: { name: 'blog' }, label: $t('common.viewAll') }"
   >
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
@@ -40,22 +43,29 @@ const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
         </template>
       </EmptyState>
       <ul v-else class="flex flex-col divide-y divide-line">
-        <li
-          v-for="post in posts"
-          :key="post.id"
-          class="flex min-h-(--qh-row) flex-wrap items-center gap-x-2 py-1.5 sm:flex-nowrap"
-        >
-          <Chip v-if="post.sticky" tone="accent">{{ $t('blog.pinned') }}</Chip>
+        <li v-for="post in posts" :key="post.id">
           <RouterLink
             :to="{ name: 'post', params: { id: post.id } }"
-            class="min-w-0 flex-1 truncate font-semibold hover:underline max-sm:basis-full touch:-my-3.5 touch:py-3.5"
-            >{{ post.title }}</RouterLink
+            class="flex min-h-(--qh-row) flex-col justify-center gap-0.5 py-2 text-content hover:bg-surface-hover"
           >
-          <!-- On phones the date and comment count sit under the title so the title gets the full width. -->
-          <span class="shrink-0 text-caption text-muted max-sm:basis-full">
-            {{ formatDate(post.publishOn, 'short', locale.locale) }} ·
-            {{ $t('blog.comments', { count: formatNumber(post.commentCount, locale.locale) }) }}
-          </span>
+            <span class="flex min-w-0 items-center gap-2">
+              <Chip v-if="post.sticky" tone="accent" size="sm" class="shrink-0">{{
+                $t('blog.pinned')
+              }}</Chip>
+              <span class="min-w-0 flex-1 truncate font-semibold">{{ post.title }}</span>
+              <span class="shrink-0 text-caption whitespace-nowrap text-muted max-sm:hidden">
+                {{ $t('blog.comments', { count: formatNumber(post.commentCount, locale.locale) }) }}
+                · {{ formatDate(post.publishOn, 'short', locale.locale) }}
+              </span>
+            </span>
+            <span class="text-caption text-muted sm:hidden">
+              {{ $t('blog.comments', { count: formatNumber(post.commentCount, locale.locale) }) }}
+              · {{ formatDate(post.publishOn, 'short', locale.locale) }}
+            </span>
+            <span v-if="excerptOf(post)" class="truncate text-meta text-muted max-sm:hidden">{{
+              excerptOf(post)
+            }}</span>
+          </RouterLink>
         </li>
       </ul>
     </QueryState>

@@ -1,0 +1,86 @@
+<script setup lang="ts">
+import { Plus } from 'lucide-vue-next';
+import { computed } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
+import type { ProblemListItem } from '@/api/types/problems';
+import EmptyState from '@/components/EmptyState.vue';
+import QueryState from '@/components/QueryState.vue';
+import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import Chip from '@/components/ui/Chip.vue';
+import PageSection from '@/components/ui/PageSection.vue';
+import SeeAllLink from '@/components/ui/SeeAllLink.vue';
+import { translate } from '@/i18n';
+import { GAP_ROUTE, setupGapsOf } from '@/features/admin/search/problem-setup-marks';
+import { useMyProblemsQuery } from './home.queries';
+
+/**
+ * "Bài của tôi" (staff only): the problems the viewer may edit, unfinished first, one clickable row each with the same readiness
+ * mark as the admin problem list ("Chưa xong" with the gaps as the hint; a click goes to the tab that fixes the first gap).
+ * The header links to the list filtered to the viewer's own problems; the foot has "+ Tạo bài".
+ */
+const props = defineProps<{ username: string }>();
+const { data: problems, isPending, error, refetch } = useMyProblemsQuery(true);
+const mine = computed(() => problems.value ?? []);
+const listLink = computed<RouteLocationRaw>(() => ({
+  name: 'admin-problems',
+  query: { author: props.username },
+}));
+const gapsOf = (problem: ProblemListItem) => setupGapsOf(problem.setup) ?? [];
+const isUnfinished = (problem: ProblemListItem) => gapsOf(problem).length > 0;
+const gapText = (problem: ProblemListItem) =>
+  translate('admin.problemList.setup.missing', {
+    gaps: gapsOf(problem)
+      .map((gap) => translate(`admin.problemList.setup.gaps.${gap}`))
+      .join(', '),
+  });
+/** An unfinished row opens the tab that fixes its first gap; a finished one opens the editor. */
+const targetOf = (problem: ProblemListItem): RouteLocationRaw => ({
+  name: isUnfinished(problem) ? GAP_ROUTE[gapsOf(problem)[0]!] : 'admin-problemGeneral',
+  params: { code: problem.code },
+});
+const CREATE = { name: 'admin-problemNew' };
+</script>
+
+<template>
+  <PageSection
+    data-testid="my-problems"
+    :title="$t('home.mine.title')"
+    :see-all="{ to: listLink, label: $t('common.viewAll') }"
+  >
+    <QueryState :loading="isPending" :error="error" @retry="refetch()">
+      <template #skeleton>
+        <ul class="flex flex-col divide-y divide-line">
+          <li v-for="row in 3" :key="row" class="flex min-h-(--qh-row) items-center gap-3">
+            <span class="min-w-0 flex-1"><SkeletonBlock text class="w-2/3" /></span>
+            <SkeletonBlock text class="w-16" />
+          </li>
+        </ul>
+      </template>
+      <EmptyState v-if="!mine.length" inline>
+        {{ $t('home.mine.empty') }}
+        <template #action>
+          <SeeAllLink :to="CREATE">{{ $t('home.mine.create') }}</SeeAllLink>
+        </template>
+      </EmptyState>
+      <template v-else>
+        <ul class="flex flex-col divide-y divide-line">
+          <li v-for="problem in mine" :key="problem.code" data-testid="my-problem-row">
+            <RouterLink
+              :to="targetOf(problem)"
+              :title="isUnfinished(problem) ? gapText(problem) : undefined"
+              class="flex min-h-(--qh-row) items-center gap-3 text-content hover:bg-surface-hover touch:min-h-11"
+            >
+              <span class="min-w-0 flex-1 truncate font-medium">{{ problem.name }}</span>
+              <Chip v-if="isUnfinished(problem)" tone="attention" size="sm">{{
+                $t('admin.problemList.setup.unfinished')
+              }}</Chip>
+            </RouterLink>
+          </li>
+        </ul>
+        <SeeAllLink :to="CREATE" class="mt-1 gap-1"
+          ><Plus aria-hidden="true" class="size-4" />{{ $t('home.mine.create') }}</SeeAllLink
+        >
+      </template>
+    </QueryState>
+  </PageSection>
+</template>

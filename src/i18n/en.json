@@ -1128,6 +1128,12 @@
     "rating": "Rating",
     "points": "Points",
     "rank": "Rank",
+    "posts": "Posts",
+    "mine": {
+      "title": "My problems",
+      "empty": "You have no problems yet.",
+      "create": "New problem"
+    },
     "recentSubmissions": "Recent submissions",
     "continue": {
       "title": "Continue",
