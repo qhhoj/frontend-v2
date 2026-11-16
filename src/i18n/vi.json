@@ -3196,6 +3196,12 @@
     }
   },
   "rail": {
+    "next": {
+      "title": "Kỳ thi tiếp theo",
+      "startsIn": "bắt đầu sau {span}",
+      "endsAt": "kết thúc {date}",
+      "upcomingDot": "Có kỳ thi sắp diễn ra"
+    },
     "live": "Đang thi",
     "rank": "hạng {rank}"
   },

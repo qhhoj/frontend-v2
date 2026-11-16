@@ -4,6 +4,7 @@ import BitSprite from '@/components/BitSprite.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import BrandWordmark from '@/components/ui/BrandWordmark.vue';
 import IconButton from '@/components/ui/IconButton.vue';
+import StatusDot from '@/components/ui/StatusDot.vue';
 import AppearancePanel from '@/features/appearance/AppearancePanel.vue';
 import NotificationBell from '@/features/notifications/NotificationBell.vue';
 import type { CurrentParticipation } from '@/api/types/contests';
@@ -12,7 +13,8 @@ import type { BitLook } from '@/mascot/bit-sprite';
 import LocaleToggle from './LocaleToggle.vue';
 import { NAV_ITEMS, useIsNavCurrent, useNavLinkEvents } from './nav-items';
 import RailLiveContest from './RailLiveContest.vue';
-import { useRunningContestCount } from './use-running-contest-count';
+import RailNextContest from './RailNextContest.vue';
+import { useNextContest } from './use-next-contest';
 import { shortcutHint } from '@/lib/shortcut-hint';
 import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useRailCollapse } from './use-rail-collapse';
@@ -20,7 +22,7 @@ import UserMenu from './UserMenu.vue';
 
 /**
  * The desktop rail, from `md` up: the brand, the search button (Ctrl K), the seven sections (Kỳ thi with its count of
- * running contests), the contest the viewer is taking part in, and at the foot one row of icons (bell, language, look,
+ * running contests), the contest the viewer is taking part in (or else the next one to look at), and at the foot one row of icons (bell, language, look,
  * collapse; stacked in the narrow column) over the account. 224 px from 1100 px
  * (`rail-open`); below that, or when the viewer collapses it (button at the foot, `[`; AppShell sets `data-rail`), a 56 px
  * column of icons (44 px targets) whose labels stay their accessible names and tooltips. Opaque: the page background is
@@ -30,7 +32,7 @@ defineProps<{ current: CurrentParticipation | null }>();
 const emit = defineEmits<{ search: [] }>();
 const isCurrent = useIsNavCurrent();
 const linkEvents = useNavLinkEvents();
-const runningCount = useRunningContestCount();
+const { runningCount, next } = useNextContest();
 const { isCollapsed, toggle } = useRailCollapse();
 /** Below `md` the rail is hidden by CSS: its bell, language and look controls are not mounted then, so the phone's top bar owns the only bell. */
 const isPhone = useMediaQuery(PHONE_QUERY);
@@ -100,6 +102,18 @@ const CURRENT_ROW =
           class="shrink-0 text-caption leading-4 font-semibold text-positive rail-slim:sr-only"
           >{{ $t('nav.runningCount', { count: runningCount }) }}</span
         >
+        <!-- Nothing runs but a contest is coming: a blue dot, no count. -->
+        <StatusDot
+          v-if="item.path === '/contests' && runningCount === 0 && next"
+          tone="upcoming"
+          :label="$t('rail.next.upcomingDot')"
+          class="rail-slim:hidden"
+        />
+        <StatusDot
+          v-if="item.path === '/contests' && runningCount === 0 && next"
+          tone="upcoming"
+          class="absolute top-1.5 right-2 rail-open:hidden"
+        />
         <!-- The narrow rail has no room for the count: a dot on the icon, the count stays its accessible text. -->
         <span
           v-if="item.path === '/contests' && runningCount > 0"
@@ -108,6 +122,7 @@ const CURRENT_ROW =
         />
       </RouterLink>
     </nav>
+    <RailNextContest v-if="!current && next" :next="next" />
     <RailLiveContest v-if="current" :current="current" class="mt-auto" />
     <div :class="['flex flex-col gap-1 border-t border-line pt-2', !current && 'mt-auto']">
       <!-- Icons stay 24 px; each button is a 44 px target (the rail's 48 px inner width fits it). -->

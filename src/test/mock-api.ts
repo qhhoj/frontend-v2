@@ -49,17 +49,20 @@ export const SHELL_DEFAULTS: Readonly<Record<string, MockResponse>> = {
 };
 
 /**
- * The rail's "N đang thi" (`useRunningContestCount`): a one-row page of running contests on every public page. It shares
- * its path with the contest list, so it is told apart by its query and always answered here (no running contest),
+ * The rail's contest reads (`useNextContest`): a one-row page of running contests on every public page, and of upcoming
+ * ones when none runs. They share their path with the contest list, so they are told apart by their query and always answered here (no contest),
  * unrecorded, even where a test routes `GET /contests`.
  */
 const RUNNING_COUNT: MockResponse = {
   body: { data: [], meta: { page: 1, pageSize: 1, total: 0 } },
 };
+const RAIL_QUERIES = ['running', 'upcoming'].map((phase) =>
+  new URLSearchParams({ phase, pageSize: '1' }).toString(),
+);
 const isRunningCount = (call: { method: string; path: string; query: URLSearchParams }) =>
   call.method === 'GET' &&
   call.path === '/contests' &&
-  call.query.toString() === new URLSearchParams({ phase: 'running', pageSize: '1' }).toString();
+  RAIL_QUERIES.includes(call.query.toString());
 
 const responseOf = ({ status = 200, body, headers }: MockResponse) =>
   new Response(body === undefined ? null : JSON.stringify(body), {

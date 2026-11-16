@@ -3196,6 +3196,12 @@
     }
   },
   "rail": {
+    "next": {
+      "title": "Next contest",
+      "startsIn": "starts in {span}",
+      "endsAt": "ends {date}",
+      "upcomingDot": "A contest is coming up"
+    },
     "live": "In contest",
     "rank": "rank {rank}"
   },
