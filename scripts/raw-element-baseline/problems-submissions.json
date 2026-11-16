@@ -73,13 +73,12 @@
   "features/submissions/SubmissionCompactList.vue": {
     "hardcoded-script-value": 1
   },
-  "features/submissions/SubmissionHero.vue": {
-    "hardcoded-script-value": 1,
-    "hardcoded-value": 1
-  },
   "features/submissions/SubmissionLockControl.vue": {
     "button": 1,
     "controls": 2
+  },
+  "features/submissions/SubmissionMeta.vue": {
+    "hardcoded-script-value": 1
   },
   "features/submissions/SubmissionPickBox.vue": {
     "checkbox": 1

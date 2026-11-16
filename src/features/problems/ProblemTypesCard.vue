@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { ProblemDetail } from '@/api/types/problems';
-import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
 import Disclosure from '@/components/ui/Disclosure.vue';
 import { UNCATEGORIZED_TYPE_NAME, problemTypeLabel } from './problem-type-label';
 
 /**
- * The problem's types, behind a disclosure (open by default, so a reader who wants no hint can close it). The catch-all type
+ * The problem's types, behind a hairline-topped disclosure row (open by default, so a reader who wants no hint can close it). The catch-all type
  * says nothing (the header already shows the group): with named types only, the card is left out when there are none.
  */
 const props = defineProps<{ problem: ProblemDetail }>();
@@ -18,7 +17,7 @@ const types = computed(() =>
 </script>
 
 <template>
-  <Card v-if="types.length" padding="sm" data-testid="problem-types">
+  <div v-if="types.length" class="border-t border-line" data-testid="problem-types">
     <Disclosure
       v-model:open="typesShown"
       :label="$t('problems.columns.types')"
@@ -30,5 +29,5 @@ const types = computed(() =>
         </li>
       </ul>
     </Disclosure>
-  </Card>
+  </div>
 </template>

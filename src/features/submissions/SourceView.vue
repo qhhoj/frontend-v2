@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import AppButton from '@/components/ui/AppButton.vue';
+import CopyButton from '@/components/CopyButton.vue';
 import { computed, onMounted, ref, toRef, watch, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
 import type { SourceAccess } from '@/api/types/submissions';
-import Card from '@/components/ui/Card.vue';
 import Notice from '@/components/ui/Notice.vue';
 import QueryState from '@/components/QueryState.vue';
 import { aceForSubmissionKey } from '@/components/code-language-keys';
@@ -18,7 +18,7 @@ import SourceViewSkeleton from './SourceViewSkeleton.vue';
 import { useSubmissionSourceQuery } from './submissions.queries';
 
 /**
- * The source card. The source is asked for only with `access` granted; otherwise (and on a 401 or 403 from the source
+ * The source row, folded by default (header: title, copy, show). The file bar, the code and the compare link show once it is open. The source is asked for only with `access` granted; otherwise (and on a 401 or 403 from the source
  * endpoint) a notice says why, with "Đăng nhập" for a visitor. The default slot (the compare link) shows with the source.
  * Keep `SourceViewSkeleton.vue` in step: same card, header and line classes.
  */
@@ -80,10 +80,16 @@ watch(
 </script>
 
 <template>
-  <Card id="source" as="div" class="scroll-mt-20 overflow-hidden rounded-card">
-    <div class="flex flex-wrap items-center justify-between gap-3 px-6 pt-5 pb-3">
+  <section id="source" class="scroll-mt-20 border-t border-line">
+    <div class="flex min-h-(--qh-row) flex-wrap items-center justify-between gap-3">
       <h2 class="section-title">{{ $t('submission.source.title') }}</h2>
       <div class="flex flex-wrap items-center gap-2">
+        <CopyButton
+          v-if="data"
+          :text="source"
+          :label="$t('submission.source.copy')"
+          icon-only-on-phone
+        />
         <AppButton
           v-if="data"
           data-testid="source-toggle"
@@ -95,7 +101,7 @@ watch(
         </AppButton>
       </div>
     </div>
-    <div v-if="lockedText" data-testid="source-locked" class="px-6 pb-6">
+    <div v-if="lockedText" data-testid="source-locked" class="pb-6">
       <!-- compact: the sign-in button goes under the text, which keeps its width on a phone. -->
       <Notice compact>
         {{ lockedText }}
@@ -109,7 +115,7 @@ watch(
     <QueryState v-else :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton><SourceViewSkeleton /></template>
       <SourceFileBar
-        v-if="data"
+        v-if="data && isExpanded"
         :id="id"
         :filename="data.filename"
         :language-key="languageKey"
@@ -129,7 +135,7 @@ watch(
         }}</pre>
         <pre ref="sourceBlock" class="pr-6"></pre>
       </div>
-      <slot v-if="data" />
+      <slot v-if="data && isExpanded" />
     </QueryState>
-  </Card>
+  </section>
 </template>

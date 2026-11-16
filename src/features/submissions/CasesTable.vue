@@ -4,7 +4,6 @@ import { ChevronRight } from 'lucide-vue-next';
 import { useRoute } from 'vue-router';
 import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
 import AppButton from '@/components/ui/AppButton.vue';
-import Card from '@/components/ui/Card.vue';
 import FoldPanel from '@/components/ui/FoldPanel.vue';
 import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { translate } from '@/i18n';
@@ -13,7 +12,7 @@ import { caseDetails, type CaseDetail } from './case-details';
 import { NO_VALUE, formatCaseMemory, formatCaseTime } from '@/lib/format';
 import { PARTIAL_CODE, caseVerdictOf, type Verdict } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
-import { formatCasePoints, pendingPositions } from './test-overview';
+import { formatCasePoints, isFullCase, pendingPositions } from './test-overview';
 
 /**
  * The result card ("Kết quả chấm"): the compile log, one row per test, then the `footer` slot (the subtasks and the total,
@@ -44,6 +43,8 @@ interface GradedRow {
   memory: string;
   points: string;
   details: CaseDetail[];
+  /** Full points: the row the ledger leaves out until "Hiện tất cả". */
+  isFull: boolean;
 }
 
 const caseRow = (testCase: SubmissionCase): GradedRow => ({
@@ -54,6 +55,7 @@ const caseRow = (testCase: SubmissionCase): GradedRow => ({
   memory: formatCaseMemory(testCase.memory),
   points: formatCasePoints(testCase.points, testCase.total, locale.locale),
   details: caseDetails(testCase),
+  isFull: isFullCase(testCase),
 });
 const batchRow = (batch: SubmissionBatch): GradedRow => ({
   key: `batch-${batch.batch}`,
@@ -63,6 +65,7 @@ const batchRow = (batch: SubmissionBatch): GradedRow => ({
   memory: NO_VALUE,
   points: formatCasePoints(batch.points, batch.total, locale.locale),
   details: [],
+  isFull: batch.points >= batch.total,
 });
 
 /** Every row starts closed so the result reads at a glance; a row with judge text opens on a click, or all at once. */
@@ -74,11 +77,19 @@ const toggle = (key: string) => {
 const route = useRoute();
 /** A link to one test (`#case-<n>`, from the test squares) opens that test. */
 onMounted(() => {
-  if (route.hash.startsWith('#case-')) opened.value.add(route.hash.slice(1));
+  if (!route.hash.startsWith('#case-')) return;
+  opened.value.add(route.hash.slice(1));
+  isShowingAll.value = true;
 });
 
-const gradedRows = computed(() =>
+const allRows = computed(() =>
   props.cases ? props.cases.map(caseRow) : (props.batches ?? []).map(batchRow),
+);
+/** The ledger lists the tests that lost points; "Hiện tất cả" adds the full ones. A link to one test (`#case-<n>`) shows all. */
+const isShowingAll = ref(false);
+const fullCount = computed(() => allRows.value.filter((row) => row.isFull).length);
+const gradedRows = computed(() =>
+  isShowingAll.value ? allRows.value : allRows.value.filter((row) => !row.isFull),
 );
 const expandable = computed(() => gradedRows.value.filter((row) => row.details.length > 0));
 const allOpen = computed(
@@ -92,8 +103,8 @@ const pendingNumbers = computed(() =>
 );
 /** The phone card grid of a row and where each cell sits in it; from `sm` up they are plain table cells. */
 const ROW_CARD =
-  'max-sm:grid max-sm:grid-cols-[auto_minmax(0,1fr)_auto] max-sm:items-center max-sm:gap-x-2.5 max-sm:gap-y-0.5 max-sm:px-4 max-sm:py-2.5';
-const CELL = 'px-6 py-3 max-sm:p-0';
+  'max-sm:grid max-sm:grid-cols-[auto_minmax(0,1fr)_auto] max-sm:items-center max-sm:gap-x-2.5 max-sm:gap-y-0.5 max-sm:py-2.5';
+const CELL = 'px-3 py-3 max-sm:p-0';
 const NUMBER_CELL = `${CELL} text-right font-mono tabular-nums`;
 const CELL_PLACES = {
   test: 'max-sm:col-start-1 max-sm:row-start-1',
@@ -104,38 +115,48 @@ const CELL_PLACES = {
 } as const;
 const pointsClass = (verdict: Verdict) =>
   verdict.code === PARTIAL_CODE ? 'font-bold text-verdict-partial' : '';
-const hasRows = computed(() => gradedRows.value.length > 0 || pendingNumbers.value.length > 0);
+const hasRows = computed(() => allRows.value.length > 0 || pendingNumbers.value.length > 0);
 const isHidden = computed(
   () => props.cases === null && props.batches === null && !props.compileError,
 );
 </script>
 
 <template>
-  <Card
-    id="cases"
-    as="div"
-    data-testid="cases-card"
-    class="scroll-mt-20 overflow-hidden rounded-card"
-  >
-    <div class="flex flex-wrap items-baseline justify-between gap-x-4 px-4 pt-5 pb-3 sm:px-6">
+  <section id="cases" data-testid="cases-card" class="scroll-mt-20">
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 pb-3">
       <h2 class="section-title">{{ $t('submission.cases.title') }}</h2>
       <span v-if="running" class="text-meta text-muted">{{ $t('submission.liveUpdates') }}</span>
-      <AppButton
-        v-if="expandable.length > 0"
-        size="sm"
-        data-testid="cases-toggle-all"
-        @click="toggleAll"
-      >
-        {{ allOpen ? $t('submission.cases.collapseAll') : $t('submission.cases.expandAll') }}
-      </AppButton>
+      <div class="ml-auto flex flex-wrap items-center gap-2">
+        <AppButton
+          v-if="fullCount > 0"
+          size="sm"
+          data-testid="cases-show-all"
+          :aria-pressed="isShowingAll"
+          @click="isShowingAll = !isShowingAll"
+        >
+          {{
+            isShowingAll
+              ? $t('submission.strip.onlyLost')
+              : $t('submission.strip.showAll', { count: allRows.length })
+          }}
+        </AppButton>
+        <AppButton
+          v-if="expandable.length > 0"
+          size="sm"
+          data-testid="cases-toggle-all"
+          @click="toggleAll"
+        >
+          {{ allOpen ? $t('submission.cases.collapseAll') : $t('submission.cases.expandAll') }}
+        </AppButton>
+      </div>
     </div>
-    <div v-if="compileError" class="px-6 pb-4 sm:px-8">
+    <div v-if="compileError" class="pb-4">
       <p class="text-meta text-muted">{{ $t('submission.cases.compileLog') }}</p>
       <pre
         class="mt-1.5 max-h-96 overflow-auto rounded-cell bg-surface-strong p-4 font-mono text-meta leading-relaxed whitespace-pre"
         >{{ compileError }}</pre>
     </div>
-    <p v-if="isHidden" class="px-6 pb-6 text-muted sm:px-8">{{ $t('submission.casesHidden') }}</p>
+    <p v-if="isHidden" class="pb-6 text-muted">{{ $t('submission.casesHidden') }}</p>
     <div
       v-else-if="hasRows"
       tabindex="0"
@@ -155,7 +176,7 @@ const isHidden = computed(
               v-for="column in COLUMN_KEYS"
               :key="column"
               scope="col"
-              class="px-6 py-3 font-medium whitespace-nowrap"
+              class="px-3 py-3 font-medium whitespace-nowrap"
               :class="{ 'text-right': column !== 'test' && column !== 'result' }"
             >
               {{ $t(`submission.cases.${column}`) }}
@@ -163,6 +184,15 @@ const isHidden = computed(
           </tr>
         </thead>
         <tbody class="max-sm:block">
+          <tr
+            v-if="!gradedRows.length && !pendingNumbers.length"
+            data-testid="cases-all-full"
+            class="border-t border-line max-sm:block"
+          >
+            <td colspan="5" class="py-3 text-muted max-sm:block">
+              {{ $t('submission.strip.allFull', { count: allRows.length }) }}
+            </td>
+          </tr>
           <template v-for="row in gradedRows" :key="row.key">
             <tr
               :id="row.key"
@@ -209,7 +239,7 @@ const isHidden = computed(
             <tr v-if="row.details.length > 0" :id="`${row.key}-details`" class="max-sm:block">
               <td colspan="5" class="p-0 max-sm:block">
                 <FoldPanel :open="isOpen(row.key)">
-                  <div class="px-6 pb-3 max-sm:px-4">
+                  <div class="px-3 pb-3 max-sm:px-0">
                     <CaseDetails :details="row.details" />
                   </div>
                 </FoldPanel>
@@ -238,12 +268,12 @@ const isHidden = computed(
         </tbody>
       </table>
     </div>
-    <p v-else-if="compileLogHidden" class="px-6 pb-6 text-muted sm:px-8">
+    <p v-else-if="compileLogHidden" class="pb-6 text-muted">
       {{ $t('submission.cases.compileLogHidden') }}
     </p>
-    <p v-else-if="!compileError" class="px-6 pb-6 text-muted sm:px-8">
+    <p v-else-if="!compileError" class="pb-6 text-muted">
       {{ $t('submission.cases.none') }}
     </p>
     <slot name="footer" />
-  </Card>
+  </section>
 </template>

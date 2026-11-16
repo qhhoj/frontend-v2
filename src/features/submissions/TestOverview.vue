@@ -19,7 +19,7 @@ import {
   scoreConversion,
   type OverviewRow,
 } from './test-overview';
-import { NO_VALUE } from '@/lib/format';
+import { NO_VALUE, formatPoints as formatScore, scoreBelowFull } from '@/lib/format';
 
 /**
  * The foot of the result card (`CasesTable.vue`'s `footer` slot): with subtasks, one row each, one square per test filled by its
@@ -43,10 +43,14 @@ const props = defineProps<{
 }>();
 
 const PERCENT = 100;
+const SCORE_FRACTION_DIGITS = 2;
 const locale = useLocaleStore();
 const format = (value: number) => formatPoints(value, locale.locale);
 /** Earned points never read as `max` while short of it. */
 const formatEarned = (value: number, max: number) => formatEarnedPoints(value, max, locale.locale);
+/** The problem's score reads like the verdict strip's: grouped digits ("1.000"), never full while short of the maximum. */
+const problemScore = (points: number, max: number) =>
+  formatScore(scoreBelowFull(points, max, SCORE_FRACTION_DIGITS), locale.locale);
 const EARNED_TONE_CLASSES = {
   full: 'text-verdict-ac',
   none: 'text-verdict-wa',
@@ -100,7 +104,7 @@ const scoreText = computed(() => {
   if (props.running || props.points === null) return NO_VALUE;
   return props.problemPoints === null
     ? format(props.points)
-    : `${formatEarned(props.points, props.problemPoints)} / ${format(props.problemPoints)}`;
+    : `${problemScore(props.points, props.problemPoints)} / ${formatScore(props.problemPoints, locale.locale)}`;
 });
 const totalText = computed(() =>
   conversion.value
@@ -114,8 +118,8 @@ const explanation = computed(() => {
     parts: rows.value.map((row) => formatEarned(row.earned, row.max)).join(' + '),
     cases: formatCasePoints(props.casePoints, props.caseTotal, locale.locale),
     percent: formatEarned(conversion.value.share * PERCENT, PERCENT),
-    max: format(props.problemPoints),
-    points: formatEarned(props.points, props.problemPoints),
+    max: formatScore(props.problemPoints, locale.locale),
+    points: problemScore(props.points, props.problemPoints),
   };
   return translate(
     hasBatches.value ? 'submission.overview.explainMin' : 'submission.overview.explainSum',
@@ -129,7 +133,7 @@ const explanation = computed(() => {
     <ScrollRegion v-if="hasBatches" :label="$t('submission.overview.scrollRegion')">
       <table class="w-full border-collapse text-sm max-sm:block sm:min-w-[640px] xl:min-w-0">
         <caption
-          class="border-t border-line px-4 pt-4 pb-2 text-left text-sm font-bold max-sm:block sm:px-6"
+          class="border-t border-line px-3 pt-4 pb-2 text-left text-sm font-bold max-sm:block max-sm:px-0"
         >
           {{
             $t('submission.overview.title')
@@ -137,7 +141,7 @@ const explanation = computed(() => {
         </caption>
         <thead class="max-sm:sr-only">
           <tr class="text-left text-meta text-muted">
-            <th scope="col" class="px-4 py-2 font-medium sm:px-6">
+            <th scope="col" class="px-3 py-2 font-medium">
               {{ $t('submission.overview.group') }}
             </th>
             <th scope="col" class="px-3 py-2 font-medium max-sm:hidden xl:hidden">
@@ -146,7 +150,7 @@ const explanation = computed(() => {
             <th scope="col" class="px-3 py-2 font-medium">
               {{ $t('submission.overview.result') }}
             </th>
-            <th scope="col" class="px-4 py-2 text-right font-medium sm:px-6">
+            <th scope="col" class="px-3 py-2 text-right font-medium">
               {{ $t('submission.overview.points') }}
             </th>
           </tr>
@@ -156,9 +160,9 @@ const explanation = computed(() => {
             v-for="row in rows"
             :key="row.key"
             data-testid="overview-row"
-            class="border-t border-line max-sm:grid max-sm:grid-cols-[minmax(0,1fr)_auto] max-sm:gap-x-3 max-sm:gap-y-2 max-sm:px-4 max-sm:py-3"
+            class="border-t border-line max-sm:grid max-sm:grid-cols-[minmax(0,1fr)_auto] max-sm:gap-x-3 max-sm:gap-y-2 max-sm:py-3"
           >
-            <th scope="row" class="px-4 py-3.5 text-left align-top font-bold max-sm:p-0 sm:px-6">
+            <th scope="row" class="px-3 py-3.5 text-left align-top font-bold max-sm:p-0">
               <span class="whitespace-nowrap">{{ rowName(row) }}</span>
               <span
                 data-testid="overview-rule"
@@ -201,7 +205,7 @@ const explanation = computed(() => {
               </div>
             </td>
             <td
-              class="px-4 py-3.5 text-right font-mono font-bold whitespace-nowrap tabular-nums max-sm:col-start-2 max-sm:row-start-1 max-sm:p-0 sm:px-6"
+              class="px-3 py-3.5 text-right font-mono font-bold whitespace-nowrap tabular-nums max-sm:col-start-2 max-sm:row-start-1 max-sm:p-0"
               :class="running ? '' : EARNED_TONE_CLASSES[earnedTone(row.earned, row.max)]"
             >
               {{ earnedText(row) }}
@@ -211,7 +215,7 @@ const explanation = computed(() => {
       </table>
     </ScrollRegion>
     <div
-      class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-line px-4 py-4 sm:px-6"
+      class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-line px-3 py-4 max-sm:px-0"
     >
       <span class="font-bold">{{
         $t(inContest ? 'submission.overview.problemTotal' : 'submission.overview.total')
@@ -225,7 +229,7 @@ const explanation = computed(() => {
     <p
       v-if="explanation"
       data-testid="overview-explanation"
-      class="mx-4 mb-4 flex items-start gap-2.5 rounded-row bg-surface-strong px-4 py-2.5 text-meta sm:mx-6"
+      class="mb-4 flex items-start gap-2.5 rounded-row bg-surface-strong px-4 py-2.5 text-meta"
     >
       <Info class="mt-0.5 size-4 shrink-0 text-muted" aria-hidden="true" />
       <span
