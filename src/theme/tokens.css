@@ -70,6 +70,8 @@
   --page-split: 120rem;
   --page-read: 46rem;
   --qh-page-max: var(--page-wide);
+  /* The submit pane beside the problem statement (460 px). */
+  --pane-submit: 28.75rem;
   /* Vertical rhythm, 4 px base (layout plan §3); the phone values are in the media query below. */
   --space-page-top: 1.5rem;
   --space-header: 1rem;

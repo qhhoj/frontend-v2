@@ -13,6 +13,7 @@ import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { useMediaQuery } from '@/lib/use-media-query';
 import AppButton from './AppButton.vue';
 import { CARD_VARIANTS } from './Card.variants';
+import { TABLE_VARIANT } from './table-classes';
 import { useRowOpen } from './use-row-open';
 import BulkBar from './BulkBar.vue';
 import DataTableCheckbox from './DataTableCheckbox.vue';
@@ -60,6 +61,8 @@ const props = withDefaults(
     /** Caps the card's height so the header sticks while the rows scroll (a CSS length). */
     maxHeight?: string;
     density?: 'compact' | 'comfortable';
+    /** `surface` (default): a card. `ledger`: no frame, rows told apart by hairlines; for a list that is not a destination of its own. */
+    variant?: 'surface' | 'ledger';
     stack?: 'card' | 'scroll';
     /** `stack="card"`: the viewport width (px) below which rows become cards. */
     stackBelow?: number;
@@ -80,6 +83,7 @@ const props = withDefaults(
     emptyText: undefined,
     maxHeight: undefined,
     density: 'comfortable',
+    variant: 'surface',
     stack: 'card',
     stackBelow: 640,
     stickyColumns: 1,
@@ -104,6 +108,7 @@ defineSlots<
 const isNarrow = useMediaQuery(`(max-width: ${props.stackBelow - 0.02}px)`);
 const isCards = computed(() => props.stack === 'card' && isNarrow.value);
 const isCompact = computed(() => props.density === 'compact');
+const VARIANT = computed(() => TABLE_VARIANT[props.variant]);
 const labelOf = (row: Row) => props.rowLabel?.(row) ?? props.rowKey(row);
 const byPriority = (priority: DataTableColumn['priority']) =>
   props.columns.filter((column) => (column.priority ?? 'secondary') === priority);
@@ -167,21 +172,25 @@ const alignClass = (column: DataTableColumn) => {
 const growsOf = (column: DataTableColumn) =>
   column.grow ?? (!props.columns.some((other) => other.grow) && column === primary.value);
 const growClass = (column: DataTableColumn) => growsOf(column) && 'w-full max-w-0';
-const CELL_BASE =
-  'border-b border-line px-4 align-middle first:pl-(--qh-pad-surface) last:pr-(--qh-pad-surface) [overflow-wrap:anywhere] [:where(&)]:max-w-64';
+const CELL_BASE = 'border-b px-4 align-middle [overflow-wrap:anywhere] [:where(&)]:max-w-64';
 /** A body cell and a header cell are one row height: 44 px, or 40 px dense (admin, ranking); 44 on touch. */
-const CELL = computed(
+const CELL_SIZE = computed(
   () =>
     `${isCompact.value ? 'h-(--qh-row-dense)' : 'h-(--qh-row)'} touch:h-(--qh-touch) ${CELL_BASE}`,
 );
-const HEAD_CELL = computed(() => CELL.value);
+const CELL = computed(() => `${CELL_SIZE.value} border-line ${VARIANT.value.edge}`);
+const HEAD_CELL = computed(
+  () => `${CELL_SIZE.value} ${VARIANT.value.headRule} ${VARIANT.value.edge}`,
+);
 const HEAD_TEXT = 'text-tiny font-semibold whitespace-nowrap text-muted';
 const SORT_BUTTON =
   'inline-flex min-h-6 items-center gap-1 rounded-cell hover:text-content touch:min-h-11';
 /** A `rowTo` row is one box: a pointer, and a ring around the row (not the link text) while its link has keyboard focus. */
 const ROW_LINK =
   'cursor-pointer has-[.row-link:focus-visible]:outline-2 has-[.row-link:focus-visible]:-outline-offset-2 has-[.row-link:focus-visible]:outline-focus';
-const FRAME = computed(() => CARD_VARIANTS[isCompact.value ? 'flat' : 'glass']);
+const FRAME = computed(() =>
+  props.variant === 'ledger' ? '' : CARD_VARIANTS[isCompact.value ? 'flat' : 'glass'],
+);
 const frameStyle = computed(() => (props.maxHeight ? { maxHeight: props.maxHeight } : undefined));
 
 const range = computed(() => {
@@ -239,7 +248,7 @@ const SHADE =
 const headPin = (index: number) => {
   const pin = pinOf(index);
   return {
-    class: ['sticky top-0 bg-surface-solid', pin ? ['z-20', pin.class] : 'z-10'],
+    class: ['sticky top-0', VARIANT.value.pinTone, pin ? ['z-20', pin.class] : 'z-10'],
     style: pin?.style,
   };
 };
@@ -248,7 +257,7 @@ function pinOf(index: number) {
   if (index >= pinnedCount.value) return undefined;
   const isEdge = index === pinnedCount.value - 1 && isScrolledSideways.value;
   return {
-    class: ['sticky bg-surface-solid', isEdge && SHADE],
+    class: ['sticky', VARIANT.value.pinTone, isEdge && SHADE],
     style: { left: `${pinnedLefts.value[index] ?? 0}px` },
   };
 }
@@ -266,7 +275,8 @@ const offset = computed(() => (props.selectable ? 1 : 0));
     </BulkBar>
     <div
       v-else-if="$slots.toolbar"
-      class="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2"
+      class="flex flex-wrap items-center gap-2 border-b border-line py-2"
+      :class="VARIANT.bar"
     >
       <slot name="toolbar" />
     </div>
@@ -277,13 +287,14 @@ const offset = computed(() => (props.selectable ? 1 : 0));
           <li
             v-for="index in skeletonRows"
             :key="index"
-            class="flex flex-col gap-1.5 border-b border-line px-4 py-3 text-sm last:border-b-0"
+            class="flex flex-col gap-1.5 border-b border-line py-3 text-sm"
+            :class="VARIANT.stackedRow"
           >
             <span><SkeletonBlock text class="w-48" /></span>
             <span v-if="secondary.length"><SkeletonBlock text class="w-32" /></span>
           </li>
         </ul>
-        <table v-else class="w-full border-collapse text-meta [&_tr:last-child_td]:border-b-0">
+        <table v-else class="w-full border-collapse text-meta" :class="VARIANT.lastRowRule">
           <thead>
             <tr>
               <th v-if="selectable" scope="col" :class="[HEAD_CELL, 'w-10']" />
@@ -354,8 +365,12 @@ const offset = computed(() => (props.selectable ? 1 : 0));
           v-for="(row, index) in rows"
           :key="rowKey(row)"
           v-bind="rowAttrs?.(row)"
-          class="flex flex-col gap-1.5 border-b border-line px-4 py-3 last:border-b-0"
-          :class="[selected.has(rowKey(row)) && 'bg-accent-soft', rowTo && ROW_LINK]"
+          class="flex flex-col gap-1.5 border-b border-line py-3"
+          :class="[
+            VARIANT.stackedRow,
+            selected.has(rowKey(row)) && 'bg-accent-soft',
+            rowTo && ROW_LINK,
+          ]"
           @click="openRow(row, $event)"
           @auxclick="openRowInTab(row, $event)"
         >
@@ -458,7 +473,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
       <!-- The table. -->
       <ScrollRegion v-else :label="label" no-hint @scroll.capture.passive="onScroll">
         <div :class="maxHeight && 'overflow-y-auto'" :style="frameStyle">
-          <table class="w-full border-collapse text-meta [&_tbody_tr:last-child_td]:border-b-0">
+          <table class="w-full border-collapse text-meta" :class="VARIANT.lastRowRule">
             <caption class="sr-only">
               {{
                 label
@@ -518,7 +533,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                 <th
                   v-if="$slots.actions"
                   scope="col"
-                  :class="[HEAD_CELL, 'sticky top-0 z-10 bg-surface-solid']"
+                  :class="[HEAD_CELL, 'sticky top-0 z-10', VARIANT.pinTone]"
                 >
                   <span class="sr-only">{{ $t('common.table.actions') }}</span>
                 </th>
@@ -582,7 +597,8 @@ const offset = computed(() => (props.selectable ? 1 : 0));
 
     <div
       v-if="hasFooter && (pager || $slots.footer)"
-      class="flex flex-wrap items-center gap-3 border-t border-line px-3 py-2 text-meta text-muted"
+      class="flex flex-wrap items-center gap-3 py-2 text-meta text-muted"
+      :class="[VARIANT.bar, VARIANT.footerRule]"
     >
       <slot name="footer">
         <span v-if="range" class="font-mono tabular-nums">{{

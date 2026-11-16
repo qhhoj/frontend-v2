@@ -81,25 +81,29 @@ Cue tokens versus verdict tokens: a submission's own result parts (`VerdictChip`
 
 One job, one kit part (`src/components/ui/`); a job with a part never gets a hand-built recipe.
 
-| Job                              | Part                                                                     |
-| -------------------------------- | ------------------------------------------------------------------------ |
-| Page frame                       | `PageLayout` (width) + `PageHeader` (title, meta, actions)               |
-| Section of a page                | `PageSection` (title, count, see-all)                                    |
-| Row between header and content   | `Toolbar` (search left, count and sort right, chips below)               |
-| List of records                  | `DataTable` with `rowTo`; cards under 640 px                             |
-| Status, tag, count               | `Chip tone=` (cue, status or tag); `StatusDot` before a word             |
-| Verdict of a submission          | `VerdictChip`                                                            |
-| Buttons                          | `AppButton` (one primary per view), `IconButton`                         |
-| Text, number, date inputs        | `TextInput`, `DateTimeField`, `SelectField`, `TextArea` in `FormField`   |
-| Choice                           | `Checkbox`, `Switch`, `RadioGroup`, `ChoiceCards`, `SegmentedControl`    |
-| Switch between views of one page | `Tabs` (pill: the current tab is filled) or `SegmentedControl` (filters) |
-| Hide details until asked         | `Disclosure` / `FoldPanel`                                               |
-| Standing message                 | `Notice` next to its cause                                               |
-| Result of an action              | toast (`useToast`); a failure is also an inline `Notice`                 |
-| Row or card that opens a record  | `Card to`, `DataTable rowTo`, or `box-link` + `StretchedLink`            |
-| Menu, row actions                | `Menu`, `RowMenu` (destructive last)                                     |
-| Nothing here / loading           | `EmptyState` with `#action`; `QueryState` + `SkeletonBlock`              |
-| Save edits                       | `SaveBar` + `useLeaveGuard`                                              |
+| Job                              | Part                                                                                         |
+| -------------------------------- | -------------------------------------------------------------------------------------------- |
+| Page frame                       | `PageLayout` (width) + `PageHeader` (title, `facts`, actions)                                |
+| Section of a page                | `PageSection` (title, count, see-all)                                                        |
+| Row between header and content   | `Toolbar` (search left, count and sort right, chips below)                                   |
+| List of records                  | `DataTable` with `rowTo`; cards under 640 px; `variant="ledger"` on a page                   |
+| Status, tag, count               | `Chip tone=` (cue, status or tag); `StatusDot` before a word                                 |
+| Verdict of a submission          | `VerdictChip`                                                                                |
+| Buttons                          | `AppButton` (one primary per view), `IconButton`                                             |
+| Text, number, date inputs        | `TextInput`, `DateTimeField`, `SelectField`, `TextArea` in `FormField`                       |
+| Choice                           | `Checkbox`, `Switch`, `RadioGroup`, `ChoiceCards`, `SegmentedControl`                        |
+| Switch between views of one page | `Tabs` (pill: the current tab is filled) or `SegmentedControl` (filters)                     |
+| Hide details until asked         | `Disclosure` / `FoldPanel`                                                                   |
+| Standing message                 | `Notice` next to its cause                                                                   |
+| Result of an action              | toast (`useToast`); a failure is also an inline `Notice`                                     |
+| Row or card that opens a record  | `Card to`, `DataTable rowTo`, or `box-link` + `StretchedLink`                                |
+| Menu, row actions                | `Menu`, `RowMenu` (destructive last)                                                         |
+| Nothing here / loading           | `EmptyState` with `#action` (`inline` under a section title); `QueryState` + `SkeletonBlock` |
+| Save edits                       | `SaveBar` + `useLeaveGuard`                                                                  |
+
+### Frames
+
+A frame (card) goes only around one destination or one form; lists are ledgers. `DataTable` takes `variant`: `surface` (default) is the card, `ledger` has no fill, radius or end padding, a hairline under every row (the last too), a stronger rule under the head, `bg-surface-hover` on a row that opens a page, and one-line rows on a phone (title, caption line, value at the right). A ledger's empty state is `EmptyState inline` (one row, 24 px Bit, the fact, then the next fact). Page numbers go in `PageHeader facts` (mono value, optional cue tone), not in boxes; `PageSection count` is mono 13 px. `--pane-submit` (460 px) is the width of the submit pane beside the statement.
 
 ## 3. Do's and Don'ts (owner rules)
 

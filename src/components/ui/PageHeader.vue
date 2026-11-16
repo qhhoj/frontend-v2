@@ -8,7 +8,17 @@ import AppButton from './AppButton.vue';
 import Menu from './Menu.vue';
 import type { MenuEntry } from './Menu.vue';
 import { usePublishBack } from './page-back';
+import { CUE_TEXT } from './cue-tones';
+import type { CueTone } from './cue-tones';
 import { useInjectedSection } from './page-section';
+
+/** One fact of the meta line: "label value", the value in mono, a `tone` colours it with a cue (live, partial, ...). */
+export interface PageFact {
+  label?: string;
+  value: string;
+  mono?: boolean;
+  tone?: CueTone;
+}
 
 export interface PageCrumb {
   label: string;
@@ -31,6 +41,9 @@ export interface PageCrumb {
  * bar can hide its own arrow.
  * `#titleTools` holds icon buttons at the end of the title row, at every width (a phone keeps them off the actions row).
  * `besideFrom="xl"` keeps the actions under the title until `xl`.
+ * `facts` are the page's own numbers in the meta line ("Giới hạn 1 giây · Bộ nhớ 256 MB"): the label muted, the value in mono
+ * unless `mono` is false, a `tone` colours the value, "·" between facts. On a phone they wrap onto their own line under `meta`. They replace
+ * a hand-built `#meta` slot of boxes; `meta` and `#meta` stay.
  * `#above` is a kicker line over the title (a code, chips, a summary) and `#lead` a lead that holds more than a string.
  */
 const props = withDefaults(
@@ -40,6 +53,7 @@ const props = withDefaults(
     crumbs?: PageCrumb[];
     back?: { to: RouteLocationRaw; label: string; ariaLabel?: string } | null;
     meta?: string[];
+    facts?: PageFact[];
     overflow?: MenuEntry[];
     /** The width from which the actions leave their row under the title and sit beside it: `md` (default) or `xl` (a wide action group). */
     besideFrom?: 'md' | 'xl';
@@ -52,6 +66,7 @@ const props = withDefaults(
     crumbs: () => [],
     back: null,
     meta: () => [],
+    facts: () => [],
     overflow: () => [],
     besideFrom: 'md',
   },
@@ -146,11 +161,11 @@ const GRID = {
       </div>
     </div>
     <div
-      v-if="meta.length > 0 || slots.meta || slots.lead || lead"
+      v-if="meta.length > 0 || facts.length > 0 || slots.meta || slots.lead || lead"
       class="col-start-2 row-start-4 min-w-0"
     >
       <div
-        v-if="meta.length > 0 || slots.meta"
+        v-if="meta.length > 0 || facts.length > 0 || slots.meta"
         class="mt-1 flex flex-wrap items-center gap-2 text-meta text-muted"
       >
         <template v-for="(item, index) in meta" :key="index">
@@ -158,6 +173,26 @@ const GRID = {
           <span>{{ item }}</span>
         </template>
         <slot name="meta" />
+        <template v-if="facts.length > 0">
+          <span v-if="meta.length > 0" aria-hidden="true" class="max-md:hidden">·</span>
+          <dl
+            class="m-0 flex flex-wrap items-center gap-x-2 max-md:basis-full max-md:gap-x-3"
+            data-testid="page-facts"
+          >
+            <template v-for="(fact, index) in facts" :key="index">
+              <span v-if="index > 0" aria-hidden="true" class="max-md:hidden">·</span>
+              <div class="flex items-baseline gap-1">
+                <dt v-if="fact.label">{{ fact.label }}</dt>
+                <dd
+                  class="m-0"
+                  :class="[fact.mono !== false && 'font-mono', fact.tone && CUE_TEXT[fact.tone]]"
+                >
+                  {{ fact.value }}
+                </dd>
+              </div>
+            </template>
+          </dl>
+        </template>
       </div>
       <div v-if="slots.lead" class="mt-0.5 text-meta text-muted"><slot name="lead" /></div>
       <p v-else-if="lead" class="mt-0.5 text-meta text-muted">{{ lead }}</p>
