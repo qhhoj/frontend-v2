@@ -70,9 +70,9 @@ const ask = () => {
     @confirm="publish.mutate()"
   >
     <template #error>
-      <p v-if="publish.error.value" role="alert" class="text-sm text-negative">
+      <Notice v-if="publish.error.value" tone="danger" role="alert">
         {{ $t(errorMessageKey(publish.error.value)) }}
-      </p>
+      </Notice>
     </template>
   </ConfirmDialog>
 </template>
