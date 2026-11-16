@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { ContestListItem, ContestListQuery } from '@/api/types/contests';
+import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import Chip from '@/components/ui/Chip.vue';
@@ -18,9 +19,10 @@ import { useLocaleStore } from '@/stores/locale.store';
 
 /**
  * The home's contests (both homes): the running ones, then the next ones that have not started, one clickable row each.
- * With none of either it is one line, not a section. `excludeKey` leaves out the contest the viewer is in (it has its own card);
+ * With none running it is one inline line above the upcoming rows (with none of either, the line carries the way to the list). `excludeKey` leaves out the contest the viewer is in (it has its own card);
  * one more running contest is asked so the list still fills.
  */
+const CONTESTS = { name: 'contests' };
 const MAX_RUNNING = 3;
 const MAX_UPCOMING = 3;
 const props = defineProps<{ excludeKey?: string }>();
@@ -42,6 +44,8 @@ const locale = useLocaleStore();
 const spanText = useSpanText();
 const timeLeftOf = (contest: ContestListItem) =>
   spanText(spanMessage((Date.parse(contest.endTime) - now.value) / 1000));
+const timeToStartOf = (contest: ContestListItem) =>
+  spanText(spanMessage((Date.parse(contest.startTime) - now.value) / 1000));
 const retry = () => {
   void running.refetch();
   void upcoming.refetch();
@@ -51,17 +55,7 @@ const ROW =
 </script>
 
 <template>
-  <!-- Nothing running or scheduled: one line instead of a section. -->
-  <p
-    v-if="!isPending && !error && isEmpty"
-    data-testid="contests-card"
-    class="flex flex-wrap items-center gap-x-2 text-muted"
-  >
-    {{ $t('home.noLiveContest') }}
-    <SeeAllLink :to="{ name: 'contests' }">{{ $t('home.browseContests') }}</SeeAllLink>
-  </p>
   <PageSection
-    v-else
     data-testid="contests-card"
     :title="$t('nav.contests')"
     :see-all="{ to: { name: 'contests' }, label: $t('common.viewAll') }"
@@ -75,6 +69,13 @@ const ROW =
           </li>
         </ul>
       </template>
+      <!-- Nothing running: one line, then the upcoming rows. Nothing scheduled either: the same line with the way to the list. -->
+      <EmptyState v-if="!runningItems.length" inline data-testid="contests-empty">
+        {{ $t('home.noLiveContest') }}
+        <template #action>
+          <SeeAllLink v-if="isEmpty" :to="CONTESTS">{{ $t('home.browseContests') }}</SeeAllLink>
+        </template>
+      </EmptyState>
       <ul class="flex flex-col divide-y divide-line">
         <li
           v-for="contest in runningItems"
@@ -100,8 +101,11 @@ const ROW =
         >
           <RouterLink :to="{ name: 'contest', params: { key: contest.key } }" :class="ROW">
             <span class="min-w-0 flex-1 truncate font-semibold">{{ contest.name }}</span>
-            <Chip tone="upcoming" class="font-mono">{{
+            <span class="hidden shrink-0 font-mono text-meta text-muted sm:inline">{{
               formatDate(contest.startTime, 'datetime', locale.locale)
+            }}</span>
+            <Chip tone="upcoming" dot>{{
+              $t('contests.list.timeLeft', { span: timeToStartOf(contest) })
             }}</Chip>
           </RouterLink>
         </li>

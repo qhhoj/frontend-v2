@@ -13,10 +13,9 @@ import NewProblemsCard from '@/features/community/NewProblemsCard.vue';
 import RecentSubmissionsList from './RecentSubmissionsList.vue';
 
 /**
- * One column, sections 40 px apart (layout plan §4.1, §4.2). Signed in: the header is the greeting with the rating line,
- * then the work in priority order: "Đang thi" (when the viewer is in a contest) and "Tiếp tục", the contests, my
- * submissions, then new problems and posts side by side. A visitor gets the sign-up header, then the contests (one line
- * when none), new problems, posts and, last, the leaderboard.
+ * One column, sections 40 px apart (layout plan §4.1, §4.2). Signed in: the greeting with the viewer's numbers, "Đang thi" (when the
+ * viewer is in a contest), "Làm tiếp", the contests, my submissions beside new problems, then posts at full width. A visitor gets
+ * the sign-up header (one primary), then the contests, new problems, posts and, last, the leaderboard.
  */
 const session = useSessionStore();
 const { current } = useCurrentContest();
@@ -25,16 +24,14 @@ const { current } = useCurrentContest();
 <template>
   <PageLayout v-if="session.user">
     <template #header><HomeHeader :username="session.user.username" /></template>
-    <div class="flex flex-col gap-(--space-stack)">
-      <LiveContestCard />
-      <ContinueCard :username="session.user.username" />
-    </div>
+    <LiveContestCard />
+    <ContinueCard :username="session.user.username" />
     <ContestsCard :exclude-key="current?.contest.key" />
-    <RecentSubmissionsList :username="session.user.username" />
     <div class="grid gap-x-8 gap-y-(--space-section) lg:grid-cols-2">
+      <RecentSubmissionsList :username="session.user.username" />
       <NewProblemsCard :limit="5" />
-      <NewPostsCard />
     </div>
+    <NewPostsCard />
   </PageLayout>
   <PageLayout v-else>
     <template #header><AnonymousHeader /></template>

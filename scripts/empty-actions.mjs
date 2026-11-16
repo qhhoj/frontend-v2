@@ -30,7 +30,6 @@ export const BASELINE = {
   'features/contests/ContestListEmpty.vue': 1,
   'features/contests/PublicRankingPage.vue': 2,
   'features/contests/replay/ReplayEventFeed.vue': 1,
-  'features/home/RecentSubmissionsList.vue': 1,
   'features/notifications/NotificationBell.vue': 1,
   'features/notifications/NotificationsPage.vue': 1,
   'features/organizations/OrganizationAbout.vue': 1,
