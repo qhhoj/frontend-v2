@@ -12,6 +12,7 @@ import { useLocaleStore } from './stores/locale.store';
 import { useAppearanceStore } from './theme/appearance.store';
 import { migrateStoredLook } from './theme/legacy-look';
 import { useLowPowerStore } from './theme/low-power.store';
+import { usePaletteStore } from './theme/palette.store';
 import { useThemeStore } from './theme/theme.store';
 import './theme/styles.css';
 
@@ -34,6 +35,7 @@ for (const [plugin, ...options] of appPlugins({
   queryClient: createQueryClient(),
 }))
   app.use(plugin, ...options);
+usePaletteStore(pinia);
 useThemeStore(pinia);
 useAppearanceStore(pinia);
 useLowPowerStore(pinia);

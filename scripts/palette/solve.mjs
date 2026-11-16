@@ -12,6 +12,9 @@ import {
 import { FAILING_LANES, LANES, PARTIAL_ALPHAS } from './paper.mjs';
 
 export const WHITE = '#FFFFFF';
+
+/** A tint strength of the palette (`palette.tints[kind]` is [light, dark]). */
+const tintOf = (palette, mode, kind) => palette.tints[kind][isLight(mode) ? 0 : 1];
 /** Closest a verdict text may come to AC text, OKLab x100 under normal, deuteranopic and protanopic vision. */
 export const MIN_VERDICT_SEPARATION = 5;
 /** Smallest luminance ratio between adjacent text levels (text, secondary, muted), so the three stay distinct. */
@@ -99,17 +102,41 @@ function neutrals(palette, mode, floors, accents) {
 }
 
 /** Light mode: the lightest fill that carries white; ink only where the hue cannot carry white at a usable lightness. Dark mode: the darkest fill that carries ink. */
-function accentFill(palette, mode, [hue, chroma], floors) {
+function accentFill(palette, mode, id, floors) {
+  const [hue, chroma, official] = palette.accents[id];
   const { ground, surface } = palette[mode];
   const isNeutral = chroma < 0.02;
   const standsOut = (hex) =>
     contrast(hex, ground) >= floors.fill && contrast(hex, surface) >= floors.fill;
   const carries = (label) => (hex) => contrast(label, hex) >= floors.onFill && standsOut(hex);
   if (!isLight(mode))
-    return solveLightness(isNeutral ? 0.86 : 0.45, chroma, hue, carries(inkOf(palette)), 0.005);
+    return solveLightness(
+      official ?? (isNeutral ? 0.86 : 0.45),
+      chroma,
+      hue,
+      carries(inkOf(palette)),
+      0.005,
+    );
+  if (palette.inkLabel && id === palette.defaultAccent) {
+    // The brightest fill that stands out and carries an ink label, with room for the darker hover; high contrast falls back to white.
+    const hover = (hex) => oklch(lightnessOf(hex) - 0.025, chroma, hue);
+    const inked = (hex) =>
+      carries(inkOf(palette))(hex) && contrast(inkOf(palette), hover(hex)) >= floors.onFill;
+    try {
+      return solveLightness(0.8, chroma, hue, inked, -0.002);
+    } catch {
+      /* white label below */
+    }
+  }
   let fill = null;
   try {
-    fill = solveLightness(isNeutral ? 0.34 : 0.7, chroma, hue, carries(WHITE), -0.005);
+    fill = solveLightness(
+      official ?? (isNeutral ? 0.34 : 0.7),
+      chroma,
+      hue,
+      carries(WHITE),
+      -0.005,
+    );
   } catch {
     fill = null;
   }
@@ -118,9 +145,12 @@ function accentFill(palette, mode, [hue, chroma], floors) {
 }
 
 function accentTokens(palette, mode, id, floors) {
-  const [hue, chroma] = palette.accents[id];
-  const fill = accentFill(palette, mode, [hue, chroma], floors);
-  const soft = { hex: fill, alpha: chroma < 0.02 ? 0.1 : isLight(mode) ? 0.12 : 0.18 };
+  const [hue, chroma, official] = palette.accents[id];
+  const hued = accentFill(palette, mode, id, floors);
+  const inked = palette.inkFill && id === palette.defaultAccent;
+  // inkFill: the default accent's buttons are ink (dark in light mode, the surface in dark mode); links, rings and tints keep the hue.
+  const fill = inked ? (isLight(mode) ? inkOf(palette) : palette.light.surface) : hued;
+  const soft = { hex: hued, alpha: chroma < 0.02 ? 0.1 : tintOf(palette, mode, 'soft') };
   const grounds = groundsOf(palette, mode);
   const tinted = [...grounds, ...grounds.map((ground) => over(soft, ground))];
   const solve = (start, floor, backgrounds) =>
@@ -132,14 +162,24 @@ function accentTokens(palette, mode, id, floors) {
       stepOf(mode),
     );
   const pick = (light, dark) => (isLight(mode) ? light : dark);
+  const strongOf = () => {
+    if (inked) return oklch(lightnessOf(fill) + pick(0.12, -0.1), 0, 0);
+    const inkLabelled =
+      palette.inkLabel && id === palette.defaultAccent && contrast(WHITE, fill) < floors.onFill;
+    return oklch(
+      lightnessOf(fill) + (isLight(mode) && inkLabelled ? -0.025 : pick(-0.06, 0.06)),
+      chroma,
+      hue,
+    );
+  };
   return {
     fill,
-    strong: oklch(lightnessOf(fill) + pick(-0.06, 0.06), chroma, hue),
+    strong: strongOf(),
     on: labelOn(palette, fill),
-    text: solve(pick(0.75, 0.5), floors.link, tinted),
+    text: solve(pick(0.75, official ?? 0.5), floors.link, tinted),
     soft,
-    softText: solve(pick(0.7, 0.55), floors.softText, tinted),
-    ring: solve(pick(0.75, 0.5), floors.ring, grounds),
+    softText: solve(pick(0.7, official ?? 0.55), floors.softText, tinted),
+    ring: solve(pick(0.75, official ?? 0.5), floors.ring, grounds),
   };
 }
 
@@ -197,13 +237,21 @@ function laneSolids(palette, mode, floors, highContrast, accentFills) {
 }
 
 /** Text on a tint of the same hue, solved over the tint (and any `extraAlphas` of it) on every ground. */
-function tintedText(palette, mode, [hue, chroma], alpha, floor, extraAlphas = []) {
-  const tint = { hex: oklch(isLight(mode) ? 0.62 : 0.7, chroma, hue), alpha };
+function tintedText(
+  palette,
+  mode,
+  [hue, chroma, official],
+  alpha,
+  floor,
+  extraAlphas = [],
+  textStart = official ?? 0.7,
+) {
+  const tint = { hex: oklch(official ?? (isLight(mode) ? 0.62 : 0.7), chroma, hue), alpha };
   const tinted = [alpha, ...extraAlphas].flatMap((strength) =>
     groundsOf(palette, mode).map((ground) => over({ ...tint, alpha: strength }, ground)),
   );
   const text = solveLightness(
-    0.7,
+    textStart,
     chroma,
     hue,
     (hex) => worstContrast(hex, tinted) >= floor,
@@ -222,7 +270,7 @@ function separateAccepted(palette, mode, texts) {
 
 function lanes(palette, mode, floors, highContrast, accentFills) {
   const solids = laneSolids(palette, mode, floors, highContrast, accentFills);
-  const alpha = isLight(mode) ? 0.12 : 0.16;
+  const alpha = tintOf(palette, mode, 'lane');
   const solved = Object.fromEntries(
     LANES.map((lane) => {
       const partials = lane === 'ac' ? PARTIAL_ALPHAS : [];
@@ -233,6 +281,7 @@ function lanes(palette, mode, floors, highContrast, accentFills) {
         alpha,
         floors.laneText,
         partials,
+        0.7,
       );
       return [lane, { text, tint, solid: solids[lane], on: labelOn(palette, solids[lane]) }];
     }),
@@ -269,18 +318,24 @@ function textFamily(palette, mode, family) {
     ...softs.flatMap((soft) => grounds.map((ground) => over(soft, ground))),
   ];
   return Object.fromEntries(
-    Object.entries(family).map(([name, [hue, chroma]]) => [
+    Object.entries(family).map(([name, [hue, chroma, official]]) => [
       name,
-      solveLightness(0.7, chroma, hue, (hex) => worstContrast(hex, tinted) >= 4.6, stepOf(mode)),
+      solveLightness(
+        official ?? 0.7,
+        chroma,
+        hue,
+        (hex) => worstContrast(hex, tinted) >= 4.6,
+        stepOf(mode),
+      ),
     ]),
   );
 }
 
 /** Six tags: text on its own tint, and a dot (alternating dark and light, so they separate when hue is lost). */
 function tags(palette, mode) {
-  const alpha = isLight(mode) ? 0.13 : 0.16;
-  return palette.tags.map(([hue, chroma], index) => {
-    const { text, tint } = tintedText(palette, mode, [hue, chroma], alpha, 4.6);
+  const alpha = tintOf(palette, mode, 'tag');
+  return palette.tags.map(([hue, chroma, official], index) => {
+    const { text, tint } = tintedText(palette, mode, [hue, chroma, official], alpha, 4.6);
     const dotLightness = isLight(mode) ? (index % 2 ? 0.68 : 0.5) : index % 2 ? 0.64 : 0.8;
     return { text, tint, dot: oklch(dotLightness, chroma, hue) };
   });
@@ -308,6 +363,7 @@ function difficulty(palette, mode) {
 
 /** Every token value for one mode and contrast level. */
 export function solvePalette(palette, mode, level) {
+  if (palette.modes) palette = { ...palette, ...palette.modes[mode] };
   const floors = FLOORS[level];
   const highContrast = level === 'high';
   const accents = Object.fromEntries(

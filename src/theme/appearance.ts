@@ -1,7 +1,7 @@
 /**
  * A visitor's own look: an accent, a contrast level and a page background. Mode (light, dark or auto) is not part of
  * it: it stays the theme preference (`siteTheme` on the account). The backend stores the same shape (`appearance`).
- * Add an accent: its id here and in `scripts/palette/paper.mjs` (`npm run palette` writes its rules), the label in both
+ * Add an accent: its id here and in `scripts/palette/paper.mjs` (`npm run palette` writes its rules in every palette), the label in both
  * locales, the id in the pre-paint script's `accents`, and in the backend's `APPEARANCE_ACCENTS`.
  * Add a background: its id in `BACKGROUNDS`, a block in `backgrounds.css`, the label in both locales, the id in the
  * pre-paint script's `backgrounds`, and in the backend's `APPEARANCE_BACKGROUNDS`.
@@ -16,8 +16,8 @@ export const ACCENTS = [
 
 export type AccentId = (typeof ACCENTS)[number]['id'];
 
-/** The site's accent: what everyone without a look of their own sees. */
-export const DEFAULT_ACCENT: AccentId = 'ultramarine';
+/** The site's accent (Catppuccin's mauve): what everyone without a look of their own sees in the default palette. Another palette names its own (`defaultAccentOf`). */
+export const DEFAULT_ACCENT: AccentId = 'plum';
 
 /**
  * The eight accents of Clay and Glass, and the accent each one became (palette A, 2026-11-15): looks saved before are
@@ -34,7 +34,7 @@ export const LEGACY_ACCENTS: Readonly<Record<string, AccentId>> = {
   red: 'terracotta',
 };
 
-/** Standard, or the high-contrast overlay (`data-contrast="high"`, src/theme/palette/contrast-high.css). */
+/** Standard, or the high-contrast overlay (`data-contrast="high"`, every palette's file in src/theme/palette/). */
 export const CONTRASTS = [
   { id: 'standard', labelKey: 'appearance.contrastOption.standard' },
   { id: 'high', labelKey: 'appearance.contrastOption.high' },
@@ -68,9 +68,12 @@ export interface Appearance {
   background: BackgroundId;
 }
 
-/** The site's own look, at the contrast level the device asks for. Choosing anything starts from it. */
-export const siteLook = (contrast: ContrastId = 'standard'): Appearance => ({
-  accent: DEFAULT_ACCENT,
+/** The site's own look, at the contrast level the device asks for and the palette's default accent. Choosing anything starts from it. */
+export const siteLook = (
+  contrast: ContrastId = 'standard',
+  accent: AccentId = DEFAULT_ACCENT,
+): Appearance => ({
+  accent,
   contrast,
   background: DEFAULT_BACKGROUND,
 });

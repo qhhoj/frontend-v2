@@ -1,7 +1,7 @@
 export type ColorScheme = 'dark' | 'light';
 
 export interface ThemeDefinition {
-  /** `html[data-theme]` value and the value saved as a preference; its colours are src/theme/palette/paper-<id>.css. */
+  /** `html[data-theme]` value and the value saved as a preference; its colours are in every palette file of src/theme/palette/. */
   id: string;
   scheme: ColorScheme;
 }

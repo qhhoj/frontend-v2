@@ -684,6 +684,22 @@
       "stipple": "Chấm li ti",
       "landscape": "Đồi núi"
     },
+    "paletteTitle": "Bảng màu",
+    "paletteHelp": "Nền, chữ và màu kết quả của cả trang. Mỗi bảng đều được kiểm tra để chữ đủ rõ ở chế độ sáng, tối và tương phản cao. Lựa chọn lưu trong trình duyệt này.",
+    "palette": {
+      "catppuccin-mocha": "Catppuccin Mocha",
+      "catppuccin-frappe": "Catppuccin Frappé",
+      "palletism": "Palletism",
+      "wonderlist": "Wonderlist",
+      "motionin": "Motionin",
+      "iris": "Diên vĩ",
+      "lagoon": "Đầm phá",
+      "lotus": "Hồng sen",
+      "ink": "Mực",
+      "plum": "Mận",
+      "petrol": "Xanh dầu",
+      "paper": "Paper"
+    },
     "accentTitle": "Màu nhấn",
     "accentHelp": "Mỗi màu đều được kiểm tra để chữ đủ rõ ở cả chế độ sáng, tối và tương phản cao.",
     "accent": {

@@ -146,4 +146,4 @@ To add a screen: import the parts from `src/components/ui/` (see its README), no
 
 ## Licence
 
-AGPL-3.0 ([LICENSE](LICENSE)). The language logos in `src/assets/languages/` keep their own licences (CC0-1.0, MIT, Apache-2.0, Unlicense, and CC BY-SA 2.5/4.0 for PHP, Ruby, Rust and Zig), listed per file with their sources in [`src/assets/languages/LICENSES.md`](src/assets/languages/LICENSES.md). The marks are trademarks of their owners.
+AGPL-3.0 ([LICENSE](LICENSE)). The language logos in `src/assets/languages/` keep their own licences (CC0-1.0, MIT, Apache-2.0, Unlicense, and CC BY-SA 2.5/4.0 for PHP, Ruby, Rust and Zig), listed per file with their sources in [`src/assets/languages/LICENSES.md`](src/assets/languages/LICENSES.md). The marks are trademarks of their owners. The Catppuccin palettes use the colours of [Catppuccin](https://github.com/catppuccin/palette) (MIT, Copyright (c) 2021 Catppuccin), kept with its licence in [`scripts/palette/catppuccin/`](scripts/palette/catppuccin/LICENSE).

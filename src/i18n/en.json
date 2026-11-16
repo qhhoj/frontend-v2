@@ -684,6 +684,22 @@
       "stipple": "Stippled",
       "landscape": "Landscape"
     },
+    "paletteTitle": "Colour palette",
+    "paletteHelp": "The page's grounds, text and result colours. Every palette is checked so text stays readable in light, dark and high contrast. The choice is kept in this browser.",
+    "palette": {
+      "catppuccin-mocha": "Catppuccin Mocha",
+      "catppuccin-frappe": "Catppuccin Frappé",
+      "palletism": "Palletism",
+      "wonderlist": "Wonderlist",
+      "motionin": "Motionin",
+      "iris": "Iris",
+      "lagoon": "Lagoon",
+      "lotus": "Lotus",
+      "ink": "Ink",
+      "plum": "Plum",
+      "petrol": "Petrol",
+      "paper": "Paper"
+    },
     "accentTitle": "Accent",
     "accentHelp": "Every accent is checked for readable text in light, dark and high contrast.",
     "accent": {
