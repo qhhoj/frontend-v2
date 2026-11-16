@@ -18,16 +18,31 @@ export const routes: RouteRecordRaw[] = [
     beforeEnter: restoreListSetup,
   },
   {
+    // The problem page is the frame: its header and tabs stay mounted while the tab changes (statement and editorial live
+    // in the frame itself; the three submission tabs are the children's content).
     path: '/problems/:code',
-    name: 'problem',
     component: () => import('@/features/problems/ProblemPage.vue'),
     meta: { titleKey: 'pages.problem' },
-  },
-  {
-    path: '/problems/:code/best',
-    name: 'problem-best',
-    component: () => import('@/features/submissions/BestSubmissionsPage.vue'),
-    meta: { titleKey: 'pages.problemBest' },
+    children: [
+      { path: '', name: 'problem', component: { render: () => null } },
+      {
+        path: 'submissions',
+        name: 'problem-submissions',
+        component: () => import('@/features/problems/ProblemSubmissionsTab.vue'),
+      },
+      {
+        path: 'mine',
+        name: 'problem-mine',
+        component: () => import('@/features/problems/ProblemSubmissionsTab.vue'),
+        props: { mine: true },
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'best',
+        name: 'problem-best',
+        component: () => import('@/features/problems/ProblemBestTab.vue'),
+      },
+    ],
   },
   {
     path: '/submissions',

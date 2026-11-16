@@ -23,7 +23,7 @@ import { useDiffPicks } from '../use-diff-picks';
 import LiveListNotices from './LiveListNotices.vue';
 import SubmissionFilterPanel from './SubmissionFilterPanel.vue';
 import type { ProblemPickerSource } from './problem-picker-options';
-import { fixedUserOf } from './submission-scope';
+import { fixedProblemOf, fixedUserOf } from './submission-scope';
 import type { SubmissionScope } from './submission-scope';
 import { useSubmissionList } from './use-submission-list';
 
@@ -71,6 +71,7 @@ const hasNoJudge = computed(
 );
 /** The diff page needs a signed-in viewer, so only they pick rows. */
 const isSignedIn = computed(() => session.status === 'authenticated');
+const hasFixedProblem = computed(() => fixedProblemOf(props.scope) !== null);
 const hasFixedUser = computed(() => fixedUserOf(props.scope) !== null);
 /** "Của tôi" needs the viewer's name, and means nothing when the scope already shows only one user. */
 const chipUsername = computed(() =>
@@ -83,8 +84,10 @@ const isOwnList = computed(
     (chipUsername.value !== null && filters.value.user === chipUsername.value),
 );
 const shownColumns = computed(() => {
-  const columns = props.columnKeys ?? ALL_COLUMN_KEYS;
-  return isOwnList.value ? columns.filter((key) => key !== 'user') : columns;
+  const hidden: ColumnKey[] = [];
+  if (isOwnList.value) hidden.push('user');
+  if (hasFixedProblem.value) hidden.push('problem');
+  return (props.columnKeys ?? ALL_COLUMN_KEYS).filter((key) => !hidden.includes(key));
 });
 const picks = useDiffPicks();
 /** The rows' compare boxes wait behind "So sánh"; turning it off drops the picks. */
@@ -160,6 +163,7 @@ watch(
         :filters="filters"
         :problem-source="problemSource"
         :show-user="!hasFixedUser"
+        :show-problem="!hasFixedProblem"
         :show-status-groups="showStatusGroups"
         :languages="languages"
         @update="update"

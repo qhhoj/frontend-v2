@@ -17,7 +17,6 @@ import NoStatement from './NoStatement.vue';
 import PdfStatement from './PdfStatement.vue';
 import ProblemHeader from './ProblemHeader.vue';
 import ProblemLimitStrip from './ProblemLimitStrip.vue';
-import ProblemLinksCard from './ProblemLinksCard.vue';
 import ProblemMySubmissions from './ProblemMySubmissions.vue';
 import StatementBody from './StatementBody.vue';
 import ProblemTypesCard from './ProblemTypesCard.vue';
@@ -28,6 +27,8 @@ import SubmitSignInButton from './SubmitSignInButton.vue';
 import { useVerdictToastTracking } from '@/features/submissions/verdict-toast/use-toast-tracking';
 import { hasNoStatement } from './statement-presence';
 import type { ProblemLayout } from './problem-layout';
+import type { ProblemTab } from './problem-tab';
+import ProblemMoreMenu from './ProblemMoreMenu.vue';
 import { useScoreScale } from './use-contest-problem';
 import { useSubmitForm } from './use-submit-form';
 
@@ -38,14 +39,15 @@ const DEFAULT_TAB = 'statement';
  */
 const props = defineProps<{
   problem: ProblemDetail;
-  tabs: { id: string; labelKey: string }[];
+  /** The open tab's id. */
+  tab: string;
+  tabs: ProblemTab[];
   layout: ProblemLayout;
   /** The viewer's contest holding this problem (its points and the viewer's cell replace the site-wide facts). */
   contest?: ContestDetail | null;
   /** False for an ended contest shown for context: submissions are practice ones, so they score on the site's scale. */
   contestIsLive?: boolean;
 }>();
-const tab = defineModel<string>('tab', { required: true });
 const emit = defineEmits<{ gone: []; panel: [open: boolean] }>();
 const route = useRoute();
 // The submit form is this component's: beside the statement the pane shows it; where the statement takes the whole column
@@ -94,11 +96,15 @@ useVerdictToastTracking({
 const hasEditorial = computed(() => props.tabs.some((candidate) => candidate.id === 'editorial'));
 const { t } = useI18n();
 const tabItems = computed(() =>
-  props.tabs.map(({ id, labelKey }) => ({ key: id, label: t(labelKey), panelId: panelIdOf(id) })),
+  props.tabs.map(({ id, labelKey, to }) => ({
+    key: id,
+    label: t(labelKey),
+    to,
+    isCurrent: id === props.tab,
+  })),
 );
-function panelIdOf(tabId: string) {
-  return `problem-panel-${tabId}`;
-}
+/** The statement and the editorial are the frame's own panels; the submission tabs hand the space to the child route. */
+const isFramePanel = computed(() => props.tab === DEFAULT_TAB || props.tab === 'editorial');
 </script>
 
 <template>
@@ -111,6 +117,7 @@ function panelIdOf(tabId: string) {
         <template #actions>
           <!-- Wherever the bottom sheet is used its bar is the one submit entry (it shows for anonymous viewers too). -->
           <PdfLink v-if="!problem.pdfStatementUrl" :problem="problem" icon-only />
+          <ProblemMoreMenu :problem="problem" :is-signed-in="isSignedIn" />
           <div v-if="isSignedIn" :class="layout.hideWhenSheet">
             <SubmitOpenButton
               :form="submitForm"
@@ -131,13 +138,7 @@ function panelIdOf(tabId: string) {
             :cells-class="layout.facts"
           />
         </template>
-        <Tabs
-          v-if="tabs.length > 1"
-          v-model="tab"
-          :items="tabItems"
-          :label="$t('problem.tabsLabel')"
-          overflow="scroll"
-        />
+        <Tabs :items="tabItems" :label="$t('problem.tabsLabel')" overflow="scroll" />
       </ProblemHeader>
       <Card
         v-show="tab === DEFAULT_TAB"
@@ -146,13 +147,7 @@ function panelIdOf(tabId: string) {
         :variant="isPhone ? 'plain' : 'glass'"
         :class="['mt-4', isPhone ? '' : 'p-6 sm:p-8']"
       >
-        <div
-          :id="panelIdOf(DEFAULT_TAB)"
-          :role="tabs.length > 1 ? 'tabpanel' : undefined"
-          :aria-labelledby="tabs.length > 1 ? `${panelIdOf(DEFAULT_TAB)}-tab` : undefined"
-          :hidden="tab !== DEFAULT_TAB"
-          :tabindex="tab === DEFAULT_TAB ? 0 : undefined"
-        >
+        <div :hidden="tab !== DEFAULT_TAB">
           <template v-if="tab === DEFAULT_TAB">
             <StatementNote v-if="!problem.translated && !problem.pdfStatementUrl" class="mt-4" />
             <PdfStatement
@@ -179,6 +174,8 @@ function panelIdOf(tabId: string) {
           </template>
         </div>
       </Card>
+      <!-- The submission tabs: the child route's list or ranking, under the same header. -->
+      <RouterView v-if="!isFramePanel" />
     </div>
     <!-- Keyed by code: another problem never inherits the typed code, pick or file. -->
     <SubmitPane
@@ -191,15 +188,8 @@ function panelIdOf(tabId: string) {
       :place-class="layout.pane"
       :scale="scoreScale"
     />
-    <div :class="['@container flex min-w-0 flex-col gap-5', layout.left]">
-      <div
-        v-if="hasEditorial"
-        :id="panelIdOf('editorial')"
-        role="tabpanel"
-        :aria-labelledby="`${panelIdOf('editorial')}-tab`"
-        :hidden="tab !== 'editorial'"
-        :tabindex="tab === 'editorial' ? 0 : undefined"
-      >
+    <div v-if="isFramePanel" :class="['@container flex min-w-0 flex-col gap-5', layout.left]">
+      <div v-if="hasEditorial" :hidden="tab !== 'editorial'">
         <!-- Mounted only while selected, so the editorial request is lazy. -->
         <EditorialTab v-if="tab === 'editorial'" :code="problem.code" @gone="$emit('gone')" />
       </div>
@@ -213,12 +203,6 @@ function panelIdOf(tabId: string) {
           v-if="isSignedIn && usesSheet"
           :code="problem.code"
           :scale="scoreScale"
-          class="mb-3.5 break-inside-avoid"
-        />
-        <ProblemLinksCard
-          :problem="problem"
-          :has-editorial="hasEditorial"
-          :show-pdf="false"
           class="mb-3.5 break-inside-avoid"
         />
         <ProblemTypesCard :problem="problem" class="mb-3.5 break-inside-avoid" />

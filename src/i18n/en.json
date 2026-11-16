@@ -64,7 +64,6 @@
     "contestReplay": "Replay",
     "contestBalloons": "Balloons",
     "contestBalloonsPrint": "Balloon run sheet",
-    "problemBest": "Best submissions",
     "runtimes": "Judges and languages",
     "postDrafts": "My drafts",
     "contestAll": "All statements",
@@ -1147,7 +1146,13 @@
     "copySample": "Copy sample",
     "tabs": {
       "statement": "Statement",
-      "editorial": "Editorial"
+      "editorial": "Editorial",
+      "submissions": "Submissions",
+      "mine": "Mine",
+      "best": "Best"
+    },
+    "menu": {
+      "report": "Report a problem"
     },
     "tabsLabel": "Problem sections",
     "editorial": {
@@ -1193,13 +1198,8 @@
         "siteOutOf": "/ {max} problem points"
       },
       "links": {
-        "label": "Problem links",
-        "title": "Links",
-        "submissions": "All submissions",
-        "best": "Best submissions",
         "pdfStatement": "PDF statement",
-        "material": "Attached material",
-        "report": "Report a problem with this task"
+        "material": "Attached material"
       }
     },
     "pdfRender": "Download PDF",

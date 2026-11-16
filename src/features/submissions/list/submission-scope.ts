@@ -13,7 +13,8 @@ export const SUBMISSION_PAGE_SIZE = 50;
  * the same query and answer the same page, so a scope only picks the endpoint, its cache key and the fixed filters.
  */
 export type SubmissionScope =
-  | { kind: 'global' }
+  /** `fixedProblem` and `fixedUser` pin the list to one problem and one user whatever the URL says (a problem's tabs). */
+  | { kind: 'global'; fixedProblem?: string; fixedUser?: string }
   | { kind: 'organization'; slug: string }
   /** `fixedUser` narrows the list to one user whatever the URL says (the contestant's own-only list). */
   | { kind: 'contest'; key: string; fixedUser: string | null };
@@ -26,14 +27,18 @@ const statusesOf = (filters: SubmissionFilters) =>
 
 /** The user the scope pins, if any: it wins over the URL's `user`. */
 export const fixedUserOf = (scope: SubmissionScope): string | null =>
-  scope.kind === 'contest' ? scope.fixedUser : null;
+  (scope.kind === 'contest' || scope.kind === 'global' ? scope.fixedUser : null) ?? null;
+
+/** The problem the scope pins, if any: it wins over the URL's `problem`. */
+export const fixedProblemOf = (scope: SubmissionScope): string | null =>
+  (scope.kind === 'global' ? scope.fixedProblem : null) ?? null;
 
 /** The list filters as the API takes them (`live` is a view setting and stays out). */
 export const scopeApiQuery = (
   scope: SubmissionScope,
   filters: SubmissionFilters,
 ): SubmissionListQuery => ({
-  problem: filters.problem || undefined,
+  problem: fixedProblemOf(scope) ?? (filters.problem || undefined),
   user: fixedUserOf(scope) ?? (filters.user || undefined),
   result: filters.results.length ? filters.results : undefined,
   language: filters.languageIds.length ? filters.languageIds : undefined,
