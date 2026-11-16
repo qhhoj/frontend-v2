@@ -28,6 +28,10 @@ export const formatNumber = (
     useGrouping,
   }).format(value);
 
+/** Problem points and scores: Vietnamese grouping ("2.600"), at most two decimals. The one format for points everywhere. */
+export const formatPoints = (value: number, locale: Locale, fractionDigits = 2) =>
+  formatNumber(value, locale, fractionDigits);
+
 /**
  * The score to print with at most `fractionDigits` decimals out of `max`: a score short of `max` stays short of it once
  * rounded (99.995 of 100 prints 99.99, never 100). Without a known `max` it is the score itself.

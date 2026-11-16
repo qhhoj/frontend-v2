@@ -14,7 +14,7 @@ import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { GLOBAL_SCOPE } from '@/features/submissions/list/submission-scope';
 import { useScopedSubmissionListQuery } from '@/features/submissions/submissions.queries';
 import type { SubmissionFilters } from '@/features/submissions/use-submission-filters';
-import { formatNumber, scoreBelowFull } from '@/lib/format';
+import { formatPoints, scoreBelowFull } from '@/lib/format';
 import { formatAgoCompact } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
 import { submissionVerdictOf } from '@/lib/verdicts';
@@ -59,7 +59,7 @@ const isJudging = computed(() => {
 /** The score's value, and what it is out of with the scale's name: "250", "/ 250 điểm kỳ thi". */
 function scoreParts(submission: SubmissionListItem) {
   const { scale, points, max, digits } = railScore(submission, props.scale);
-  const format = (value: number) => formatNumber(value, locale.locale, digits, false);
+  const format = (value: number) => formatPoints(value, locale.locale, digits);
   const maxText = max === null ? '' : format(max);
   const outOf =
     scale === 'site'

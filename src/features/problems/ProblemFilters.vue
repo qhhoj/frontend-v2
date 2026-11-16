@@ -4,7 +4,6 @@ import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import type { CatalogItem } from '@/api/types/problems';
 import AppButton from '@/components/ui/AppButton.vue';
-import Chip from '@/components/ui/Chip.vue';
 import Popover from '@/components/ui/Popover.vue';
 import { isComposing } from '@/components/ui/keys';
 import Toolbar from '@/components/ui/Toolbar.vue';
@@ -22,9 +21,11 @@ import { panelFilterCount } from './use-problem-filters';
 import type { ProblemFilters, SolvedFilter } from './use-problem-filters';
 
 /**
- * The list's `Toolbar`. Left: search (Enter opens a typed code), the solved choice (signed in), "Bộ lọc" with the rarer
- * filters. Right: the count, the sort on a phone (its rows have no column headers; a computer sorts by the headers) and
- * the random pick. The default slot is the active-filter chips. On a phone the search takes its own line.
+ * The list's `Toolbar`. A computer: search (Enter opens a typed code), the solved choice (signed in), "Bộ lọc" with the rarer
+ * filters; at the right the count and the random pick (it sorts by the column headers). A phone: one row of the search, a
+ * filter icon button (with the count of active filters) and a sort icon button (its rows have no column headers); under
+ * it the count small and the solved choice. The random pick moves into the filter sheet. The default slot is the
+ * active-filter chips.
  */
 const props = withDefaults(
   defineProps<{
@@ -104,28 +105,32 @@ const setSolved = (solved: SolvedFilter) => emit('update', { solved });
         v-model="searchText"
         :label="$t('problems.searchLabel')"
         :placeholder="$t('problems.search')"
-        :class="isCompact ? 'basis-full' : 'max-w-80 min-w-44 flex-1'"
+        :class="isCompact ? 'min-w-0 flex-1 basis-0' : 'max-w-80 min-w-44 flex-1'"
         @keydown.enter="openExact"
       />
-      <!-- The page-level (md) segments share their frame equally, so the frame gets the width of three labels on a
-           computer (the search yields first) and the room beside "Lọc" on a phone. -->
+      <!-- The page-level (md) segments share their frame equally, so the frame gets the width of three labels. On a phone
+           the choice moves under the row, beside the count. -->
       <SegmentedControl
-        v-if="signedIn"
-        :class="isCompact ? 'min-w-0 flex-1' : 'min-w-72 shrink-0'"
+        v-if="signedIn && !isCompact"
+        class="min-w-72 shrink-0"
         :label="$t('problems.solvedFilter.label')"
         :options="SOLVED_CHOICES"
         :model-value="filters.solved"
         @update:model-value="setSolved"
       />
+      <!-- A phone: an icon button, the active-filter count beside the icon; its name is the label and the tooltip. -->
       <AppButton
         data-testid="problem-filter-panel-toggle"
+        :icon-only="isCompact && !panelCount"
+        :aria-label="isCompact ? $t('problems.filterPanel') : undefined"
+        :title="isCompact ? $t('problems.filterPanel') : undefined"
         aria-haspopup="dialog"
         :aria-expanded="isPanelOpen"
         @click="panel?.toggle($event)"
       >
         <template #icon><SlidersHorizontal class="size-4" aria-hidden="true" /></template>
-        {{ isCompact ? $t('problems.filterPanelShort') : $t('problems.filterPanel') }}
-        <Chip v-if="panelCount" size="sm" class="font-mono tabular-nums">{{ panelCount }}</Chip>
+        <template v-if="!isCompact">{{ $t('problems.filterPanel') }}</template>
+        <span v-if="panelCount" class="font-mono text-caption tabular-nums">{{ panelCount }}</span>
       </AppButton>
       <Popover
         ref="panel"
@@ -137,19 +142,34 @@ const setSolved = (solved: SolvedFilter) => emit('update', { solved });
           :filters="filters"
           :types="types"
           :groups="groups"
+          :with-random="isCompact"
           @update="emit('update', $event)"
         />
       </Popover>
-    </template>
-    <template #right>
-      <ProblemListCount :text="countText" />
       <ProblemSortSelect
         v-if="isCompact"
+        icon-only
         :sort="filters.sort"
         @update="emit('update', { sort: $event })"
       />
+    </template>
+    <template v-if="!isCompact" #right>
+      <ProblemListCount :text="countText" />
       <RandomProblemButton :filters="filters" labelled />
     </template>
-    <template v-if="$slots.default" #chips><slot /></template>
+    <template v-if="isCompact || $slots.default" #chips>
+      <div v-if="isCompact" class="flex items-center justify-between gap-3">
+        <ProblemListCount :text="countText" class="text-caption" />
+        <SegmentedControl
+          v-if="signedIn"
+          class="min-w-0 flex-1 basis-0 sm:max-w-72"
+          :label="$t('problems.solvedFilter.label')"
+          :options="SOLVED_CHOICES"
+          :model-value="filters.solved"
+          @update:model-value="setSolved"
+        />
+      </div>
+      <slot />
+    </template>
   </Toolbar>
 </template>
