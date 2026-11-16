@@ -73,7 +73,7 @@ export const fullCellClass = (kind: CellKind | 'pick' | 'source') =>
 export const NUMBER_CELLS: ReadonlySet<CellKind> = new Set(['score', 'time', 'memory']);
 
 /** Shared by `SubmissionTable.vue` and its skeleton, so the two cannot drift apart in height or width. */
-export const HEADER_CELL_CLASSES = `${TABLE_HEAD_CELL} px-2 first:pl-4 last:pr-3`;
-export const BODY_CELL_CLASSES = `${TABLE_ROW_HEIGHT} px-2 align-middle text-body first:pl-4 last:pr-3`;
+export const HEADER_CELL_CLASSES = `${TABLE_HEAD_CELL} px-2 first:pl-(--qh-pad-surface) last:pr-(--qh-pad-surface)`;
+export const BODY_CELL_CLASSES = `${TABLE_ROW_HEIGHT} px-2 align-middle text-body first:pl-(--qh-pad-surface) last:pr-(--qh-pad-surface)`;
 /** The header row: the same surface tone as the rows, like every table. */
 export const HEADER_ROW_CLASSES = 'text-left text-muted';

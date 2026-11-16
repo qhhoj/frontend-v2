@@ -163,7 +163,7 @@ const scoreHeaderKey = computed(() =>
       :is-ticking="isTicking"
     />
     <ScrollRegion v-else :label="$t('ranking.scrollRegion')" :hint="$t('ranking.scrollHint')">
-      <table class="table-fixed border-collapse" :style="{ width: tableWidth }">
+      <table class="w-full table-fixed border-collapse" :style="{ minWidth: tableWidth }">
         <colgroup>
           <col :style="{ width: `${RANK_COLUMN_REM}rem` }" />
           <col :style="{ width: `${nameRem}rem` }" />

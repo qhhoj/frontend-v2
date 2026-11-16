@@ -14,11 +14,11 @@ export const TIME_COLUMN_REM = 5;
 export const PROBLEM_COLUMN_REM = 4.5;
 /** "+42 → 1843": shown once the contest's ratings are applied. */
 export const RATING_COLUMN_REM = 8;
-/** The name column fits the longest name and stops at 220 px (13.75 rem); longer names are cut with a tooltip. */
-export const NAME_COLUMN_MIN_REM = 8;
-export const NAME_COLUMN_MAX_REM = 13.75;
+/** The name column fits the longest name and stops at 240 px (15 rem); longer names are cut with a tooltip. */
+export const NAME_COLUMN_MIN_REM = 10;
+export const NAME_COLUMN_MAX_REM = 15;
 /** Avatar (24 px), its gap and the cell's padding, then about 0.5 rem per character of the name (13 px, medium). */
-const NAME_FIXED_REM = 3;
+const NAME_FIXED_REM = 4.5;
 const NAME_CHAR_REM = 0.5;
 
 /** The board's numbers are JetBrains Mono: every character is 0.6 em wide, so a text's width follows from its length. */

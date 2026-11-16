@@ -168,7 +168,7 @@ const growsOf = (column: DataTableColumn) =>
   column.grow ?? (!props.columns.some((other) => other.grow) && column === primary.value);
 const growClass = (column: DataTableColumn) => growsOf(column) && 'w-full max-w-0';
 const CELL_BASE =
-  'border-b border-line px-3 align-middle [overflow-wrap:anywhere] [:where(&)]:max-w-64';
+  'border-b border-line px-4 align-middle first:pl-(--qh-pad-surface) last:pr-(--qh-pad-surface) [overflow-wrap:anywhere] [:where(&)]:max-w-64';
 /** A body cell and a header cell are one row height: 44 px, or 40 px dense (admin, ranking); 44 on touch. */
 const CELL = computed(
   () =>
