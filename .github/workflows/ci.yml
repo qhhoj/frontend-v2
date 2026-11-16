@@ -1,11 +1,12 @@
 name: CI
 
 on:
+  # main deploys qhhoj.com, staging deploys staging.qhhoj.com (deploy.yml): both are checked the same way.
   push:
-    branches: [main]
-  pull_request:
+    branches: [main, staging]
+  pull_request: { branches: [main, staging] }
   # Merge queue: the same checks on the queued merge commit, against the queue's base.
-  merge_group:
+  merge_group: { branches: [main, staging] }
   schedule:
     - cron: '23 3 * * *'
   workflow_dispatch:
