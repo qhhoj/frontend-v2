@@ -73,6 +73,8 @@ Colour is a cue: one meaning, the same on every page, as text or a light tint, n
 | `zero`      | wrong after a try (not tried stays empty) | red (verdict WA)    | tint                         |
 | `attention` | needs action or warning (access code)     | amber               | chip                         |
 
+Attempted, not solved: icon only, no row tint (owner 2026-11-16).
+
 Other colour meanings, unchanged: difficulty = AC-rate ramp (`src/lib/ac-rate.ts`); rating = tier colour (`tier-*`); rating change = `cue-full` for a gain, `cue-zero` for a loss; ranks 1 to 3 = `medal-gold|silver|bronze` or none; tags = `tag-1..8`.
 
 Cue tokens versus verdict tokens: a submission's own result parts (`VerdictChip`, test strip, cases table, ranking cells, problem status mark) keep `verdict-*` (lists in `scripts/raw-element-rules.mjs`, `VERDICT_PARTS`). Everything else that says live, upcoming, ended, full, partial, zero or needs-attention uses `cue-*`. `positive`/`negative`/`warning`/`info` remain for `Notice`, `ProgressBar`, `StatGrid` and toasts inside the kit; pages use a Chip or StatusDot tone, not those classes (lint rule `status-colour`).

@@ -96,12 +96,9 @@ function namedTypes(problem: ProblemListItem) {
 }
 /** One type chip, the rest counted in a "+N" that is never cut; all are named in the tooltip. The name keeps the width. */
 const SHOWN_TYPES = 1;
-/** Solved = full, tried and not solved = zero; not tried (or no viewer) stays plain. */
-const rowTone = (problem: ProblemListItem): CueTone | null => {
-  if (!props.signedIn) return null;
-  if (problem.viewerStatus === 'solved') return 'full';
-  return problem.viewerStatus === 'attempted' ? 'zero' : null;
-};
+/** Only a solved problem tints its row; tried and not tried show no tint (the status icon says it). */
+const rowTone = (problem: ProblemListItem): CueTone | null =>
+  props.signedIn && problem.viewerStatus === 'solved' ? 'full' : null;
 const phoneRowClass = (problem: ProblemListItem) => {
   const tone = rowTone(problem);
   return tone ? CUE_ROW[tone] : undefined;

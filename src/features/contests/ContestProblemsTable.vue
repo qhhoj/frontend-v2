@@ -54,7 +54,7 @@ const capLineOf = (problem: ContestProblem): string | null => {
   const left = attemptsLeftUnderCap(cap, problem.viewerResult.attempts);
   return `${text} (${t('contests.problems.left', { count: left }, left)})`;
 };
-/** A problem the viewer has a result on gets its row tint and edge: solved, partial or tried without points. */
+/** A problem the viewer has a result on gets its row tint and edge: solved or partial; a try without points shows no tint. */
 const rowCueOf = (problem: ContestProblem, map: Record<CueTone, string>) => {
   const tone = ownResultTone(problem, context.value);
   return tone ? map[tone] : '';

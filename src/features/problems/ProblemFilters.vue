@@ -99,6 +99,11 @@ const SOLVED_CHOICES = computed(() =>
 /** The phone's one-tap chips: each toggles its own choice against "all". */
 const SOLVED_CHIPS = computed(() => SOLVED_CHOICES.value.filter(({ value }) => value !== 'any'));
 const setSolved = (solved: SolvedFilter) => emit('update', { solved });
+/** The select reports a plain string; only a known choice is applied. */
+const pickSolved = (value: string) => {
+  const choice = SOLVED_CHOICES.value.find((option) => option.value === value);
+  if (choice) setSolved(choice.value);
+};
 </script>
 
 <template>
@@ -118,7 +123,7 @@ const setSolved = (solved: SolvedFilter) => emit('update', { solved });
         :options="SOLVED_CHOICES"
         :model-value="filters.solved"
         :active="filters.solved !== 'any'"
-        @update:model-value="setSolved"
+        @update:model-value="pickSolved"
       />
       <!-- A phone: an icon button, the active-filter count beside the icon; its name is the label and the tooltip. -->
       <AppButton
