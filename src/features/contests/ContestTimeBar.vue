@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { ContestDetail } from '@/api/types/contests';
-import { contestProgress, freezeFraction, freezeStart, isFrozenAt } from '@/lib/contest-time';
+import { contestProgress, freezeFraction, freezeStart } from '@/lib/contest-time';
 import { formatClock } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { timelineLabels } from './contest-clock';
@@ -21,11 +21,8 @@ const isFreezeNearEnd = computed(
 /** Stripes in the theme's line and surface tokens, as the approved mock draws the frozen stretch. */
 const FREEZE_HATCH =
   'repeating-linear-gradient(45deg, var(--color-line-strong) 0 4px, var(--color-surface-hover) 4px 8px)';
-/** The filled part reads the phase: running green, frozen (the last stretch) amber, over grey. */
-const fillClass = computed(() => {
-  if (filledPercent.value >= 100) return 'bg-cue-ended';
-  return isFrozenAt(props.contest, props.now) ? 'bg-cue-attention' : 'bg-cue-live';
-});
+/** The filled part reads the phase: running green, over grey. The frozen stretch is the hatch and its amber label. */
+const fillClass = computed(() => (filledPercent.value >= 100 ? 'bg-cue-ended' : 'bg-cue-live'));
 /** The contest's two ends, written once under the bar, with dates when they fall on different days. */
 const labels = computed(() => timelineLabels(props.contest, locale.locale));
 const freezeClock = computed(() => {
