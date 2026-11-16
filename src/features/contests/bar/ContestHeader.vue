@@ -73,15 +73,15 @@ useShownClock(
 );
 /** The status is a dot and a word; the rest is plain muted text after it: virtual run, format, rated, who may enter. */
 const PHASE_DOT: Record<ContestPhase, string> = {
-  running: 'bg-positive',
-  upcoming: 'bg-accent',
-  ended: 'bg-line-strong',
+  running: 'bg-cue-live',
+  upcoming: 'bg-cue-upcoming',
+  ended: 'bg-cue-ended',
 };
 /** The word takes the dot's colour: running green, upcoming blue, ended grey. */
 const PHASE_TEXT: Record<ContestPhase, string> = {
-  running: 'text-positive',
-  upcoming: 'text-accent-text',
-  ended: 'text-muted',
+  running: 'text-cue-live',
+  upcoming: 'text-cue-upcoming',
+  ended: 'text-cue-ended',
 };
 const { t } = useI18n();
 const locale = useLocaleStore();

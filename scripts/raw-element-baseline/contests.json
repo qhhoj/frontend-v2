@@ -58,9 +58,6 @@
     "SubmissionPager": 1,
     "verdict-tone": 1
   },
-  "features/contests/bar/ContestHeader.vue": {
-    "status-colour": 1
-  },
   "features/contests/print/ContestPrintPage.vue": {
     "button": 3,
     "uppercase": 1
