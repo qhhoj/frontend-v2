@@ -37,6 +37,7 @@
   "features/admin/contests/actions/ContestFreezeLockCard.vue": {
     "button": 4,
     "controls": 7,
+    "hardcoded-script-value": 1,
     "input": 1,
     "status-colour": 1
   },
@@ -85,6 +86,9 @@
   "features/admin/contests/announcements/AnnouncementPreview.vue": {
     "status-colour": 2
   },
+  "features/admin/contests/contest-ops.queries.ts": {
+    "hardcoded-script-value": 1
+  },
   "features/admin/contests/data/ContestExportCard.vue": {
     "button": 1,
     "controls": 3
@@ -92,6 +96,7 @@
   "features/admin/contests/data/FeedKeyCard.vue": {
     "button": 3,
     "controls": 7,
+    "hardcoded-script-value": 1,
     "input": 1,
     "radio": 1,
     "status-colour": 1
@@ -169,6 +174,12 @@
     "controls": 2,
     "input": 1,
     "status-colour": 1
+  },
+  "features/admin/contests/general/contest-sections.ts": {
+    "hardcoded-script-value": 1
+  },
+  "features/admin/contests/general/contest-timeline.ts": {
+    "hardcoded-script-value": 1
   },
   "features/admin/contests/ghosts/ContestGhostsTab.vue": {
     "controls": 1
@@ -292,6 +303,9 @@
     "input": 1,
     "radio": 6,
     "status-colour": 2
+  },
+  "features/admin/contests/ranking/ranking-link.ts": {
+    "hardcoded-script-value": 2
   },
   "features/admin/users/CreatedUsersTable.vue": {
     "AdminDataTable": 1,

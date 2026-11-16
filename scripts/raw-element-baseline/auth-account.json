@@ -1,4 +1,7 @@
 {
+  "features/account/data/data-export.ts": {
+    "hardcoded-script-value": 3
+  },
   "features/account/profile/IdentityFields.vue": {
     "AuthField": 1
   },
@@ -98,7 +101,13 @@
     "AuthField": 1,
     "status-colour": 2
   },
+  "features/auth/use-cooldown.ts": {
+    "hardcoded-script-value": 1
+  },
   "features/auth/use-logout.ts": {
     "use-admin-toast": 1
+  },
+  "features/auth/use-username-availability.ts": {
+    "hardcoded-script-value": 1
   }
 }

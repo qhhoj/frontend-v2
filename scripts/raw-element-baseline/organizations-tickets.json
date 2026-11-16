@@ -2,6 +2,12 @@
   "features/organizations/MemberRows.vue": {
     "table": 1
   },
+  "features/organizations/MemberTable.vue": {
+    "hardcoded-script-value": 1
+  },
+  "features/organizations/OrganizationAboutText.vue": {
+    "hardcoded-script-value": 1
+  },
   "features/organizations/OrganizationHeader.vue": {
     "status-colour": 1
   },
@@ -94,5 +100,11 @@
     "button": 1,
     "fixed-size": 1,
     "hardcoded-value": 1
+  },
+  "features/tickets/tickets.queries.ts": {
+    "hardcoded-script-value": 1
+  },
+  "features/tickets/use-ticket-stream.ts": {
+    "hardcoded-script-value": 1
   }
 }

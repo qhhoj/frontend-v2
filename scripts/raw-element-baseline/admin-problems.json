@@ -9,7 +9,8 @@
     "AdminPageHeader": 1,
     "button": 1,
     "controls": 2,
-    "fixed-size": 2
+    "fixed-size": 2,
+    "hardcoded-script-value": 1
   },
   "features/admin/problems/ProblemImportMenu.vue": {
     "button": 1,
@@ -103,6 +104,9 @@
     "radio": 1,
     "table": 1,
     "verdict-tone": 1
+  },
+  "features/admin/problems/data/problem-data.queries.ts": {
+    "hardcoded-script-value": 1
   },
   "features/admin/problems/editorial/ProblemEditorialTab.vue": {
     "AdminDateTimeField": 1,
@@ -237,6 +241,9 @@
     "AdminPageHeader": 1,
     "controls": 1
   },
+  "features/admin/problems/import/import-job.ts": {
+    "hardcoded-script-value": 1
+  },
   "features/admin/problems/lifecycle/DeletedProblemsPage.vue": {
     "AdminChip": 1,
     "AdminDataTable": 1,
@@ -316,6 +323,9 @@
     "AdminUserLabel": 1,
     "status-colour": 1
   },
+  "features/admin/problems/polygon/PolygonUpdateTarget.vue": {
+    "hardcoded-script-value": 1
+  },
   "features/admin/problems/polygon/PolygonWizardPage.vue": {
     "AdminPageHeader": 1,
     "controls": 2,
@@ -323,6 +333,12 @@
   },
   "features/admin/problems/polygon/WizardStepper.vue": {
     "verdict-tone": 2
+  },
+  "features/admin/problems/polygon/polygon.queries.ts": {
+    "hardcoded-script-value": 1
+  },
+  "features/admin/problems/polygon/use-link-check.ts": {
+    "hardcoded-script-value": 2
   },
   "features/admin/problems/statements/ProblemStatementsTab.vue": {
     "AdminField": 1,

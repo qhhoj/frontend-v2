@@ -46,6 +46,9 @@
   "features/admin/shell/search/PaletteResults.vue": {
     "uppercase": 1
   },
+  "features/admin/shell/search/admin-search.queries.ts": {
+    "hardcoded-script-value": 1
+  },
   "features/admin/similarity/FragmentList.vue": {
     "button": 1
   },
@@ -97,6 +100,9 @@
     "input": 1,
     "radio": 2
   },
+  "features/admin/similarity/similarity.queries.ts": {
+    "hardcoded-script-value": 1
+  },
   "features/admin/submissions/AdminSubmissionFilterBar.vue": {
     "AdminField": 2,
     "controls": 3,
@@ -113,6 +119,9 @@
     "AdminPageHeader": 1,
     "button": 3,
     "controls": 4
+  },
+  "features/admin/submissions/admin-submissions.queries.ts": {
+    "hardcoded-script-value": 1
   },
   "features/admin/ui/AdminCheckChips.vue": {
     "checkbox": 1,
@@ -140,10 +149,16 @@
     "status-colour": 1,
     "uppercase": 1
   },
+  "features/admin/ui/table/AdminDataTable.vue": {
+    "hardcoded-script-value": 1
+  },
   "features/admin/ui/table/standard-row-menu.ts": {
     "AdminRowMenu": 3
   },
   "features/admin/ui/use-admin-mutation.ts": {
     "use-admin-toast": 1
+  },
+  "features/admin/ui/use-chip-suggestions.ts": {
+    "hardcoded-script-value": 1
   }
 }
