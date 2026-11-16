@@ -1,1 +1,20 @@
-{}
+{
+  "features/home/ContestsCard.vue": {
+    "status-colour": 2
+  },
+  "features/home/LiveContestCard.vue": {
+    "status-colour": 2
+  },
+  "features/shell/AppRail.vue": {
+    "status-colour": 2
+  },
+  "features/shell/RailLiveContest.vue": {
+    "status-colour": 2
+  },
+  "features/shell/TopBarLiveContest.vue": {
+    "status-colour": 1
+  },
+  "features/short-links/ShortLinkButton.vue": {
+    "status-colour": 1
+  }
+}

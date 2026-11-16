@@ -11,10 +11,11 @@
     "SubmissionPager": 1
   },
   "features/contests/ContestCountdown.vue": {
+    "status-colour": 1,
     "uppercase": 2
   },
   "features/contests/ContestDetailSkeleton.vue": {
-    "fixed-size": 2
+    "fixed-size": 1
   },
   "features/contests/ContestGroup.vue": {
     "SubmissionPager": 1
@@ -29,6 +30,9 @@
   "features/contests/ContestTagFilter.vue": {
     "button": 2
   },
+  "features/contests/ContestTimeBar.vue": {
+    "status-colour": 1
+  },
   "features/contests/EndedContestSkeleton.vue": {
     "table": 1
   },
@@ -36,8 +40,7 @@
     "table": 1
   },
   "features/contests/InContestStatus.vue": {
-    "button": 2,
-    "verdict-tone": 1
+    "button": 2
   },
   "features/contests/LanguageStatsTable.vue": {
     "table": 1
@@ -45,12 +48,18 @@
   "features/contests/ProblemResultsTable.vue": {
     "table": 1
   },
+  "features/contests/RankingFreezeNotice.vue": {
+    "status-colour": 1
+  },
   "features/contests/RankingTable.vue": {
     "table": 1
   },
   "features/contests/balloons/BalloonsPage.vue": {
     "SubmissionPager": 1,
     "verdict-tone": 1
+  },
+  "features/contests/bar/ContestHeader.vue": {
+    "status-colour": 1
   },
   "features/contests/print/ContestPrintPage.vue": {
     "button": 3,
@@ -64,6 +73,9 @@
   },
   "features/contests/replay/ReplayTable.vue": {
     "table": 1
+  },
+  "features/leaderboard/LeaderboardTable.vue": {
+    "status-colour": 1
   },
   "features/leaderboard/MyRankLine.vue": {
     "button": 1

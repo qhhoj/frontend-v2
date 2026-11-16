@@ -44,14 +44,16 @@
     "AdminPageHeader": 1,
     "AdminRowMenu": 2,
     "button": 2,
-    "controls": 2
+    "controls": 2,
+    "status-colour": 1
   },
   "features/admin/contest-tags/TagContestsPanel.vue": {
     "AdminDrawer": 1,
     "button": 2,
     "checkbox": 2,
     "controls": 6,
-    "input": 1
+    "input": 1,
+    "status-colour": 2
   },
   "features/admin/judges/DisconnectDialog.vue": {
     "checkbox": 1
@@ -73,7 +75,8 @@
     "AdminDrawer": 1
   },
   "features/admin/judges/JudgeQueueCard.vue": {
-    "controls": 1
+    "controls": 1,
+    "status-colour": 3
   },
   "features/admin/judges/JudgeRuntimes.vue": {
     "AdminDataTable": 1
@@ -122,7 +125,8 @@
   },
   "features/admin/languages/LanguagesTable.vue": {
     "AdminDataTable": 1,
-    "details": 1
+    "details": 1,
+    "status-colour": 1
   },
   "features/admin/organizations/JoinRequestTable.vue": {
     "AdminChip": 1,
@@ -143,6 +147,7 @@
   "features/admin/organizations/OrganizationContext.vue": {
     "button": 1,
     "controls": 2,
+    "status-colour": 1,
     "use-admin-toast": 1
   },
   "features/admin/organizations/OrganizationDeleteCard.vue": {
@@ -197,6 +202,7 @@
     "input": 2
   },
   "features/admin/organizations/quotas/QuotaMeter.vue": {
+    "status-colour": 2,
     "verdict-tone": 2
   },
   "features/admin/organizations/quotas/QuotaOverviewPage.vue": {
@@ -218,6 +224,7 @@
     "checkbox": 1,
     "controls": 10,
     "input": 2,
+    "status-colour": 2,
     "textarea": 1
   },
   "features/admin/pages/FlatpageHistoryPanel.vue": {
@@ -226,7 +233,8 @@
     "table": 1
   },
   "features/admin/pages/FlatpagePreview.vue": {
-    "AdminChip": 1
+    "AdminChip": 1,
+    "status-colour": 1
   },
   "features/admin/pages/FlatpageRevisionRow.vue": {
     "AdminChip": 2,
@@ -245,12 +253,14 @@
   },
   "features/admin/settings/ClearSecretButton.vue": {
     "button": 1,
-    "controls": 2
+    "controls": 2,
+    "status-colour": 1
   },
   "features/admin/settings/DiscordWebhooksTable.vue": {
     "button": 5,
     "controls": 12,
-    "input": 1
+    "input": 1,
+    "status-colour": 1
   },
   "features/admin/settings/ExternalJudgeConnectionCheck.vue": {
     "button": 1,
@@ -259,7 +269,8 @@
   "features/admin/settings/OAuthClientField.vue": {
     "AdminField": 1,
     "controls": 2,
-    "input": 1
+    "input": 1,
+    "status-colour": 1
   },
   "features/admin/settings/PolygonConnectionCheck.vue": {
     "button": 1,
@@ -267,11 +278,13 @@
   },
   "features/admin/settings/RevisionItem.vue": {
     "button": 1,
-    "controls": 2
+    "controls": 2,
+    "status-colour": 2
   },
   "features/admin/settings/RevisionsPanel.vue": {
     "button": 3,
-    "controls": 7
+    "controls": 7,
+    "status-colour": 1
   },
   "features/admin/settings/ScalarSettingField.vue": {
     "AdminField": 1,
@@ -288,6 +301,7 @@
   "features/admin/settings/SettingBlock.vue": {
     "AdminNotice": 1,
     "controls": 1,
+    "status-colour": 1,
     "use-admin-toast": 1
   },
   "features/admin/settings/SettingInfo.vue": {

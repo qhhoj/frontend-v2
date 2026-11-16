@@ -17,7 +17,8 @@
   },
   "features/admin/problems/ProblemSetupChecklist.vue": {
     "button": 1,
-    "controls": 3
+    "controls": 3,
+    "status-colour": 5
   },
   "features/admin/problems/ProblemsIndexPage.vue": {
     "AdminPageHeader": 1,
@@ -29,7 +30,8 @@
     "controls": 18,
     "details": 1,
     "input": 7,
-    "select": 2
+    "select": 2,
+    "status-colour": 2
   },
   "features/admin/problems/data/CasesAutofill.vue": {
     "button": 1,
@@ -38,6 +40,7 @@
   "features/admin/problems/data/CasesEditor.vue": {
     "button": 2,
     "controls": 2,
+    "status-colour": 2,
     "table": 1
   },
   "features/admin/problems/data/CheckerPicker.vue": {
@@ -67,7 +70,8 @@
   },
   "features/admin/problems/data/DataSourceRow.vue": {
     "button": 1,
-    "controls": 1
+    "controls": 1,
+    "status-colour": 1
   },
   "features/admin/problems/data/GraderPicker.vue": {
     "AdminChoiceCards": 1
@@ -120,13 +124,15 @@
   "features/admin/problems/files/ProblemUploadCard.vue": {
     "button": 1,
     "controls": 2,
-    "fixed-size": 1
+    "fixed-size": 1,
+    "status-colour": 1
   },
   "features/admin/problems/general/LanguageLimitsTable.vue": {
     "button": 2,
     "controls": 7,
     "input": 2,
-    "select": 1
+    "select": 1,
+    "status-colour": 2
   },
   "features/admin/problems/general/ProblemBasicForm.vue": {
     "AdminField": 2,
@@ -145,7 +151,8 @@
     "button": 3,
     "checkbox": 1,
     "controls": 7,
-    "select": 3
+    "select": 3,
+    "status-colour": 3
   },
   "features/admin/problems/general/ProblemCloneDialog.vue": {
     "AdminField": 1,
@@ -154,7 +161,8 @@
   },
   "features/admin/problems/general/ProblemCodeField.vue": {
     "AdminField": 1,
-    "input": 1
+    "input": 1,
+    "status-colour": 1
   },
   "features/admin/problems/general/ProblemCreateForm.vue": {
     "AdminField": 6,
@@ -172,7 +180,8 @@
   "features/admin/problems/general/ProblemOrganizationsField.vue": {
     "button": 1,
     "controls": 1,
-    "select": 1
+    "select": 1,
+    "status-colour": 1
   },
   "features/admin/problems/general/ProblemPeopleSection.vue": {
     "AdminUserLabel": 1
@@ -184,16 +193,21 @@
   },
   "features/admin/problems/general/ProblemVisibilityCard.vue": {
     "AdminChip": 4,
-    "checkbox": 1
+    "checkbox": 1,
+    "status-colour": 2
   },
   "features/admin/problems/general/ProblemVisibilitySection.vue": {
     "AdminField": 1,
     "controls": 1,
     "select": 1
   },
+  "features/admin/problems/import/ImportCatalogFields.vue": {
+    "status-colour": 1
+  },
   "features/admin/problems/import/ImportCheckbox.vue": {
     "button": 1,
-    "checkbox": 1
+    "checkbox": 1,
+    "status-colour": 1
   },
   "features/admin/problems/import/ImportOptionsForm.vue": {
     "AdminField": 3,
@@ -202,10 +216,12 @@
     "details": 1,
     "input": 2,
     "radio": 1,
+    "status-colour": 3,
     "textarea": 1
   },
   "features/admin/problems/import/ImportProgress.vue": {
-    "controls": 2
+    "controls": 2,
+    "status-colour": 1
   },
   "features/admin/problems/import/ImportStepList.vue": {
     "verdict-tone": 4
@@ -236,9 +252,14 @@
     "controls": 1
   },
   "features/admin/problems/polygon/ImportOutcomeHeader.vue": {
+    "status-colour": 2,
     "verdict-tone": 4
   },
+  "features/admin/problems/polygon/ImportStepBar.vue": {
+    "status-colour": 3
+  },
   "features/admin/problems/polygon/ImportSummaryTable.vue": {
+    "status-colour": 2,
     "table": 1
   },
   "features/admin/problems/polygon/PackageStatePill.vue": {
@@ -250,6 +271,9 @@
   "features/admin/problems/polygon/PolygonConfigureStep.vue": {
     "button": 1,
     "controls": 1
+  },
+  "features/admin/problems/polygon/PolygonLanguageFields.vue": {
+    "status-colour": 1
   },
   "features/admin/problems/polygon/PolygonLinkOptionsDrawer.vue": {
     "AdminDrawer": 1
@@ -281,7 +305,8 @@
   "features/admin/problems/polygon/PolygonSyncHistory.vue": {
     "AdminChip": 1,
     "AdminDataTable": 1,
-    "AdminUserLabel": 1
+    "AdminUserLabel": 1,
+    "status-colour": 1
   },
   "features/admin/problems/polygon/PolygonWizardPage.vue": {
     "AdminPageHeader": 1,
@@ -305,7 +330,8 @@
   "features/admin/search/ProblemBulkVisibilityDialog.vue": {
     "checkbox": 1,
     "controls": 3,
-    "input": 1
+    "input": 1,
+    "status-colour": 1
   },
   "features/admin/search/ProblemListFilters.vue": {
     "AdminField": 3,

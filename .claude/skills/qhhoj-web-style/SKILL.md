@@ -5,7 +5,7 @@ description: Use for any QHHOJ frontend UI work — building or changing Vue com
 
 # Workbench — QHHOJ web style
 
-Follow this for every change that affects what the site looks like. Long form: `docs/design-language.md` (tokens, primitives, phases) and `design-system/qhhoj/MASTER.md` (themes, colour roles, checklist); page overrides in `design-system/qhhoj/pages/*.md`; Bit mascot in `design-system/qhhoj/mascot.md`.
+Read `DESIGN.md` at the repo root first (tokens, colour cue map, recipes, owner Do's and Don'ts; where it disagrees with this file, it wins). Follow this for every change that affects what the site looks like. Long form: `docs/design-language.md` (tokens, primitives, phases) and `design-system/qhhoj/MASTER.md` (themes, colour roles, checklist); page overrides in `design-system/qhhoj/pages/*.md`; Bit mascot in `design-system/qhhoj/mascot.md`.
 
 ## 1. Identity
 
@@ -27,9 +27,9 @@ Type scale (font size only; leading comes from the primitive or a `leading-*` cl
 | `text-base`                        | 16  | prose (Tailwind's, leading 24); every input on touch (`styles.css`)                         |
 | `text-title`                       | 17  | card titles (with `font-semibold`/`font-bold`)                                              |
 | `text-subtitle`                    | 18  | lead lines, dialog titles (add a `leading-*`)                                               |
-| `text-section`                     | 20  | section titles outside cards (add a `leading-*`)                                            |
+| `text-section`                     | 16  | section titles (`section-title`, `PageSection`)                                             |
 | `text-display`                     | 28  | display headings, big numbers (add a `leading-*`)                                           |
-| `page-title` utility / `text-page` | 20  | the one h1 per page                                                                         |
+| `page-title` utility / `text-page` | 24  | the one h1 per page                                                                         |
 | `text-stat`                        | 28  | stat values: `font-mono tabular-nums`; profile rating and overview tiles use `font-display` |
 | `text-hero`                        | 40  | countdowns only                                                                             |
 | `text-score`                       | 40  | the submission score, the home rating figure                                                |
@@ -44,7 +44,7 @@ Other tokens:
 - Workbench sizes: `--qh-row` 32 px rows (`DataTable density="compact"`, menu and list options), `--qh-row-dense` 36 px (`comfortable`, board rows), 44 on touch; `--qh-rail` 224 px side rail.
 - Spacing: page blocks 24 (`gap-6`) · card padding from `Card padding` (16/20/24, up to 32) · form fields 20 apart (`gap-5`) · label to input 6 · button groups 8 (`gap-2`). Titles: card `text-title` (through `Card title`), section `section-title`, dialog `text-subtitle`; `text-caption` is the 12 px step.
 - Z: `z-sticky` 10 · `z-savebar` 20 · `z-header` 30 · `z-bit` 40 · `z-overlay` 50 · `z-toast` 1200.
-- Colour roles: `content`, `secondary`, `muted`, `line`, `accent*`, `positive`, `negative`, `warning`/`warning-bg`, `info`/`info-bg`, `tag-1..6` (7 and 8 show as 5), `verdict-*` with `-bg`, `-solid` and the label `-on` (verdicts only), `tier-*`, `diff-1..4`.
+- Colour roles: `content`, `secondary`, `muted`, `line`, `accent*`, `cue-live|upcoming|ended|full|partial|zero|attention` with `-bg` and `-border` (the colour cue map in `DESIGN.md`; Chip and StatusDot take them as `tone`), `tag-1..8`, `verdict-*` with `-bg`, `-solid` and the label `-on` (verdict parts only), `tier-*`, `diff-1..4`. `positive`, `negative`, `warning`, `info` are the kit's own (Notice, ProgressBar, toasts); pages use a cue or a Chip tone (`lint:tokens` rule `status-colour`).
 - Control border: `border-line-control` on inputs, selects, textareas and secondary buttons (3:1 on their ground, WCAG 1.4.11); `border-line` stays the hairline of cards and dividers, `border-line-strong` the edge of menus and popovers.
 - Elevation: `shadow-float` on floating surfaces only (Modal, menus, popovers, toasts get it from the kit); everything else is flat.
 - Icons (Lucide): 14 dense admin chrome and small chips · 16 default · 20 hero and empty states, stroke 2 (Lucide's default; pass no `:stroke-width`). `IconButton` and `Chip` size an icon with no `size-*` class themselves. Glyphs (✓ ✗ ⋯ ↵) are icons.
@@ -133,8 +133,8 @@ The kit part for each job is in `src/components/ui/README.md` (the one table; a 
 
 - Lucide icons only (language marks through `LanguageIcon` excepted), no emoji, no text glyphs. `ExternalLink` only for links that leave the site.
 - Dates: only `formatDate` presets from `src/lib/format-date.ts` (`short`, `date`, `datetime`; seconds only in logs), never `toLocale*String` or `Intl.DateTimeFormat` (`npm run lint:dates`). Lists and feeds use the one relative helper with the absolute value in `title`; detail pages and logs show the absolute value. Typed dates use `DateTimeField` (site zone, labelled "GMT+7").
-- Numbers: `formatNumber` for every number, units and scores included; one space before a unit ("1,8 MB", "0,25 s"); scores through `formatFixed`/`scoreBelowFull`.
-- Tones, one vocabulary: `neutral · accent · success · warning · danger · info`. `verdict-*` classes appear only in verdict parts (`lib/verdicts.ts` is the one source).
+- Numbers: `formatNumber` for every number, units and scores included; points are grouped "2.600" with no unit on a row; lengths are `h:mm`; one space before a unit ("1,8 MB", "0,25 s"); scores through `formatFixed`/`scoreBelowFull`.
+- Tones, one vocabulary: `neutral · accent · success · warning · danger · info`, and the seven cues `live · upcoming · ended · full · partial · zero · attention` for a state with one fixed meaning. `verdict-*` classes appear only in verdict parts (`lib/verdicts.ts` is the one source); everything else uses a cue.
 - Show a fact once per screen: a rating, time, language or status is not repeated in two blocks; an empty block is hidden or merged into the nearest relevant card.
 - Empty states always offer one next step (`EmptyState`'s `#action`, `DataTable #emptyAction`; `lint:tokens` checks it); an unknown record id is a `StatePanel kind="notFound"` with a way back, never a bare line; a loading state is `QueryState` with a `#skeleton` shaped from the real component, never fixed pixel heights.
 - Person names in mock-ups, placeholders, examples and fixtures shown on screen: only `bitcoder` (a handle, not a real-looking personal name).

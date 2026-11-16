@@ -27,6 +27,28 @@
   --qh-info-bg: var(--qh-accent-soft);
   --qh-notice-info: var(--qh-accent-soft-text);
   --qh-notice-info-bg: var(--qh-accent-soft);
+  /* Cue tokens (DESIGN.md): one meaning each, the same on every page. Text, tint and border per cue, all aliases of palette tokens (the palette proves their contrast in every mode); the border is the text mixed into the page. A verdict's parts stay verdict-*; everything else that says live, upcoming, ended, full, partial, zero or needs-attention uses cue-*. */
+  --qh-cue-live: var(--qh-verdict-ac);
+  --qh-cue-live-bg: var(--qh-verdict-ac-bg);
+  --qh-cue-live-border: color-mix(in srgb, var(--qh-verdict-ac) 40%, transparent);
+  --qh-cue-upcoming: var(--qh-tag-1);
+  --qh-cue-upcoming-bg: var(--qh-tag-1-bg);
+  --qh-cue-upcoming-border: color-mix(in srgb, var(--qh-tag-1) 40%, transparent);
+  --qh-cue-ended: var(--qh-text-muted);
+  --qh-cue-ended-bg: var(--qh-surface-strong);
+  --qh-cue-ended-border: var(--qh-line-strong);
+  --qh-cue-full: var(--qh-verdict-ac);
+  --qh-cue-full-bg: var(--qh-verdict-ac-bg);
+  --qh-cue-full-border: color-mix(in srgb, var(--qh-verdict-ac) 40%, transparent);
+  --qh-cue-partial: var(--qh-verdict-tle);
+  --qh-cue-partial-bg: var(--qh-verdict-tle-bg);
+  --qh-cue-partial-border: color-mix(in srgb, var(--qh-verdict-tle) 40%, transparent);
+  --qh-cue-zero: var(--qh-verdict-wa);
+  --qh-cue-zero-bg: var(--qh-verdict-wa-bg);
+  --qh-cue-zero-border: color-mix(in srgb, var(--qh-verdict-wa) 40%, transparent);
+  --qh-cue-attention: var(--qh-verdict-tle);
+  --qh-cue-attention-bg: var(--qh-verdict-tle-bg);
+  --qh-cue-attention-border: color-mix(in srgb, var(--qh-verdict-tle) 40%, transparent);
   /* Clay names kept as aliases until the kit restyle (build plan step 3) moves their users to the palette names. Cards are always opaque now. */
   --qh-surface-solid: var(--qh-surface);
   --qh-skeleton: var(--qh-line);
