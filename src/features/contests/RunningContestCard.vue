@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import Card from '@/components/ui/Card.vue';
+import { CUE_ROW } from '@/components/ui/cue-tones';
+import Chip from '@/components/ui/Chip.vue';
 import ProgressBar from '@/components/ui/ProgressBar.vue';
 import { computed } from 'vue';
 import type { ContestListItem } from '@/api/types/contests';
@@ -43,7 +45,12 @@ const perParticipation = computed(() =>
     :to="{ name: 'contest', params: { key: contest.key } }"
     :link-label="contest.name"
     data-testid="running-contest"
-    :class="['flex min-w-0 flex-col gap-3 p-5', featured && 'col-span-full']"
+    variant="plain"
+    :class="[
+      'flex min-w-0 flex-col gap-3 rounded-card border border-line p-5',
+      CUE_ROW.live,
+      featured && 'col-span-full',
+    ]"
   >
     <div class="flex min-w-0 items-center gap-2.5">
       <PhasePill phase="running" />
@@ -93,13 +100,11 @@ const perParticipation = computed(() =>
       <div class="flex items-center gap-2 font-semibold">
         <InlineBit kind="contest" />
         <!-- One line, never split mid-phrase: the row wraps the button below instead. -->
-        <i18n-t
-          keypath="contests.list.timeLeft"
-          tag="p"
-          class="whitespace-nowrap text-cue-live tabular-nums"
-        >
-          <template #span><CountdownTimer :until="contest.endTime" /></template>
-        </i18n-t>
+        <Chip tone="live" size="md" class="tabular-nums">
+          <i18n-t keypath="contests.list.timeLeft" tag="span">
+            <template #span><CountdownTimer :until="contest.endTime" /></template>
+          </i18n-t>
+        </Chip>
       </div>
       <ContestCallLink
         :contest-key="contest.key"

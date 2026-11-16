@@ -135,7 +135,7 @@ const compactFacts = (contest: ContestListItem) => [
             <span class="flex flex-wrap items-center gap-x-2 gap-y-1">
               <RouterLink
                 :to="{ name: 'contest', params: { key: contest.key } }"
-                class="font-semibold hover:text-accent-text"
+                class="font-semibold text-cue-ended hover:text-accent-text"
                 >{{ contest.name }}</RouterLink
               >
               <ContestChips

@@ -3,7 +3,8 @@ import { computed, ref } from 'vue';
 import type { ContestListItem, ContestListQuery } from '@/api/types/contests';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import StatusDot from '@/components/ui/StatusDot.vue';
+import Chip from '@/components/ui/Chip.vue';
+import { CUE_ROW } from '@/components/ui/cue-tones';
 import PageSection from '@/components/ui/PageSection.vue';
 import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import { useRunningContestsQuery } from '@/features/community/community.queries';
@@ -45,7 +46,8 @@ const retry = () => {
   void running.refetch();
   void upcoming.refetch();
 };
-const ROW = 'flex min-h-9 items-center gap-3 py-1.5 text-content hover:bg-surface-hover touch:py-3';
+const ROW =
+  'flex min-h-9 items-center gap-3 py-1.5 pr-2 pl-3 text-content hover:bg-surface-hover touch:py-3';
 </script>
 
 <template>
@@ -74,25 +76,33 @@ const ROW = 'flex min-h-9 items-center gap-3 py-1.5 text-content hover:bg-surfac
         </ul>
       </template>
       <ul class="flex flex-col divide-y divide-line">
-        <li v-for="contest in runningItems" :key="contest.key" data-testid="running-row">
+        <li
+          v-for="contest in runningItems"
+          :key="contest.key"
+          data-testid="running-row"
+          :class="CUE_ROW.live"
+        >
           <RouterLink :to="{ name: 'contest', params: { key: contest.key } }" :class="ROW">
-            <StatusDot tone="live" />
             <span class="min-w-0 flex-1 truncate font-semibold">{{ contest.name }}</span>
             <span class="hidden shrink-0 font-mono text-meta text-muted sm:inline">{{
               $t('home.contestants', { count: formatNumber(contest.userCount, locale.locale) })
             }}</span>
-            <span class="shrink-0 text-meta font-semibold text-cue-live">{{
+            <Chip tone="live" dot>{{
               $t('contests.list.timeLeft', { span: timeLeftOf(contest) })
-            }}</span>
+            }}</Chip>
           </RouterLink>
         </li>
-        <li v-for="contest in upcomingItems" :key="contest.key" data-testid="upcoming-row">
+        <li
+          v-for="contest in upcomingItems"
+          :key="contest.key"
+          data-testid="upcoming-row"
+          :class="CUE_ROW.upcoming"
+        >
           <RouterLink :to="{ name: 'contest', params: { key: contest.key } }" :class="ROW">
-            <StatusDot tone="upcoming" />
             <span class="min-w-0 flex-1 truncate font-semibold">{{ contest.name }}</span>
-            <span class="shrink-0 font-mono text-meta text-cue-upcoming">{{
+            <Chip tone="upcoming" class="font-mono">{{
               formatDate(contest.startTime, 'datetime', locale.locale)
-            }}</span>
+            }}</Chip>
           </RouterLink>
         </li>
       </ul>

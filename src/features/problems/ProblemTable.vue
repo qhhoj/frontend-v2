@@ -11,6 +11,8 @@ import AppButton from '@/components/ui/AppButton.vue';
 import Chip from '@/components/ui/Chip.vue';
 import DataTable from '@/components/ui/DataTable.vue';
 import type { DataTableColumn } from '@/components/ui/DataTableColumns';
+import { CUE_ROW, CUE_TABLE_ROW } from '@/components/ui/cue-tones';
+import type { CueTone } from '@/components/ui/cue-tones';
 import { acRateTextClass } from '@/lib/ac-rate';
 import { formatNumber, formatPoints } from '@/lib/format';
 import { COMPACT_LIST_BELOW_PX } from '@/lib/use-media-query';
@@ -91,7 +93,20 @@ function namedTypes(problem: ProblemListItem) {
 }
 /** One type chip, the rest counted in a "+N" that is never cut; all are named in the tooltip. The name keeps the width. */
 const SHOWN_TYPES = 1;
-const rowAttrs = (problem: ProblemListItem) => ({ 'data-code': problem.code });
+/** Solved = full, tried and not solved = zero; not tried (or no viewer) stays plain. */
+const rowTone = (problem: ProblemListItem): CueTone | null => {
+  if (!props.signedIn) return null;
+  if (problem.viewerStatus === 'solved') return 'full';
+  return problem.viewerStatus === 'attempted' ? 'zero' : null;
+};
+const phoneRowClass = (problem: ProblemListItem) => {
+  const tone = rowTone(problem);
+  return tone ? CUE_ROW[tone] : undefined;
+};
+const rowAttrs = (problem: ProblemListItem) => {
+  const tone = rowTone(problem);
+  return { 'data-code': problem.code, class: tone ? CUE_TABLE_ROW[tone] : undefined };
+};
 const pointsText = (problem: ProblemListItem) => formatPoints(problem.points, locale.locale);
 const acRateText = (problem: ProblemListItem) =>
   `${formatNumber(problem.acRate, locale.locale, 1)}%`;
@@ -157,18 +172,18 @@ const acRateText = (problem: ProblemListItem) =>
       }}</span>
     </template>
     <template #cell-acRate="{ row }">
-      <span :class="acRateTextClass(row.acRate)">{{ acRateText(row) }}</span>
+      <span class="font-semibold" :class="acRateTextClass(row.acRate)">{{ acRateText(row) }}</span>
     </template>
     <template #cell-userCount="{ row }">{{ formatNumber(row.userCount, locale.locale) }}</template>
 
     <!-- Below `sm` a row is a compact list row. -->
     <template #card="{ row }">
-      <CompactListRow :to="target(row.code)" :title="row.name">
+      <CompactListRow :to="target(row.code)" :title="row.name" :class="phoneRowClass(row)">
         <template v-if="signedIn" #lead><ProblemStatusMark :status="row.viewerStatus" /></template>
         <template #meta>
           <span class="font-mono">{{ row.code }}</span>
           ·
-          <span class="whitespace-nowrap" :class="acRateTextClass(row.acRate)"
+          <span class="font-semibold whitespace-nowrap" :class="acRateTextClass(row.acRate)"
             >AC {{ acRateText(row) }}</span
           >
         </template>
