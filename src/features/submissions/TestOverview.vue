@@ -19,7 +19,7 @@ import {
   scoreConversion,
   type OverviewRow,
 } from './test-overview';
-import { NO_VALUE } from '@/lib/format';
+import { NO_VALUE, formatPoints as formatScore, scoreBelowFull } from '@/lib/format';
 
 /**
  * The foot of the result card (`CasesTable.vue`'s `footer` slot): with subtasks, one row each, one square per test filled by its
@@ -43,10 +43,14 @@ const props = defineProps<{
 }>();
 
 const PERCENT = 100;
+const SCORE_FRACTION_DIGITS = 2;
 const locale = useLocaleStore();
 const format = (value: number) => formatPoints(value, locale.locale);
 /** Earned points never read as `max` while short of it. */
 const formatEarned = (value: number, max: number) => formatEarnedPoints(value, max, locale.locale);
+/** The problem's score reads like the verdict strip's: grouped digits ("1.000"), never full while short of the maximum. */
+const problemScore = (points: number, max: number) =>
+  formatScore(scoreBelowFull(points, max, SCORE_FRACTION_DIGITS), locale.locale);
 const EARNED_TONE_CLASSES = {
   full: 'text-verdict-ac',
   none: 'text-verdict-wa',
@@ -100,7 +104,7 @@ const scoreText = computed(() => {
   if (props.running || props.points === null) return NO_VALUE;
   return props.problemPoints === null
     ? format(props.points)
-    : `${formatEarned(props.points, props.problemPoints)} / ${format(props.problemPoints)}`;
+    : `${problemScore(props.points, props.problemPoints)} / ${formatScore(props.problemPoints, locale.locale)}`;
 });
 const totalText = computed(() =>
   conversion.value
@@ -114,8 +118,8 @@ const explanation = computed(() => {
     parts: rows.value.map((row) => formatEarned(row.earned, row.max)).join(' + '),
     cases: formatCasePoints(props.casePoints, props.caseTotal, locale.locale),
     percent: formatEarned(conversion.value.share * PERCENT, PERCENT),
-    max: format(props.problemPoints),
-    points: formatEarned(props.points, props.problemPoints),
+    max: formatScore(props.problemPoints, locale.locale),
+    points: problemScore(props.points, props.problemPoints),
   };
   return translate(
     hasBatches.value ? 'submission.overview.explainMin' : 'submission.overview.explainSum',

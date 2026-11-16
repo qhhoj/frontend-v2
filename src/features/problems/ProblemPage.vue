@@ -133,7 +133,7 @@ watch(
               : 'lg:grid-cols-[var(--qh-rail)_minmax(0,1fr)]',
           ]
         : panelOpen
-          ? '[--page-width:var(--page-split)]'
+          ? '[--page-width:var(--page-split)] [--sample-min:100%]'
           : '[--page-width:var(--page-wide)]',
     ]"
   >

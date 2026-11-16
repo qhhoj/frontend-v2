@@ -2,12 +2,13 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import PageHeader from '@/components/ui/PageHeader.vue';
-import type { PageFact } from '@/components/ui/PageHeader.vue';
 import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
 import { problemEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
 import type { ProblemSection } from '@/features/admin/edit-link/admin-edit-targets';
 import type { ContestDetail } from '@/api/types/contests';
 import type { ProblemDetail } from '@/api/types/problems';
+import { CUE_TEXT } from '@/components/ui/cue-tones';
+import type { CueTone } from '@/components/ui/cue-tones';
 import Chip from '@/components/ui/Chip.vue';
 import OwnResultChip from '@/features/contests/OwnResultChip.vue';
 import { acRateTextClass } from '@/lib/ac-rate';
@@ -25,6 +26,15 @@ import { viewerStatusOf } from './viewer-status';
  * are the contest's and the status is the viewer's own cell; the site-wide solve counts are left out.
  * Keep `ProblemHeaderSkeleton.vue` in step.
  */
+/** One fact of the meta line: a muted label, then its value (mono unless `mono` is false; `tone` or `class` colour it). */
+interface ProblemFact {
+  label?: string;
+  value: string;
+  mono?: boolean;
+  tone?: CueTone;
+  class?: string;
+  testId?: string;
+}
 /** `section`: the tab being read; the edit link opens its editor tab. */
 const props = defineProps<{
   problem: ProblemDetail;
@@ -50,13 +60,13 @@ const pointsText = computed(
   () => contestPoints.value ?? formatPoints(props.problem.points, locale.locale),
 );
 /** Partial scoring says so right after the points (the site-wide scale only). */
-const partialFacts = computed<PageFact[]>(() =>
+const partialFacts = computed<ProblemFact[]>(() =>
   !inContest.value && props.problem.partial
     ? [{ value: t('problem.strip.partial'), mono: false }]
     : [],
 );
 /** File I/O names are facts worth a place: the contestant types them into `freopen`/`assign`. Standard I/O shows nothing. */
-const fileFacts = computed<PageFact[]>(() => {
+const fileFacts = computed<ProblemFact[]>(() => {
   const { mode, inputFile, outputFile } = props.problem.io;
   return mode === 'file'
     ? [
@@ -65,7 +75,7 @@ const fileFacts = computed<PageFact[]>(() => {
       ]
     : [];
 });
-const facts = computed<PageFact[]>(() => [
+const facts = computed<ProblemFact[]>(() => [
   { label: t('problem.limits.time'), value: formatTimeLimit(props.problem.timeLimit) },
   { label: t('problem.limits.memory'), value: formatMemoryLimit(props.problem.memoryLimit) },
   {
@@ -77,6 +87,12 @@ const facts = computed<PageFact[]>(() => [
   ...(inContest.value
     ? []
     : [
+        {
+          label: t('problem.strip.acRate'),
+          value: `${formatNumber(props.problem.acRate, locale.locale, 1)}%`,
+          class: acRateTextClass(props.problem.acRate),
+          testId: 'strip-ac-rate',
+        },
         {
           label: t('problem.strip.solvers'),
           value: formatNumber(props.problem.userCount, locale.locale),
@@ -97,31 +113,48 @@ const facts = computed<PageFact[]>(() => [
 
 <template>
   <div data-testid="problem-header" class="contents">
-    <PageHeader :title="problem.name" :facts="facts">
+    <PageHeader :title="problem.name">
       <template #meta>
-        <span class="font-mono [overflow-wrap:anywhere]">{{ problem.code }}</span>
-        <Chip
-          v-if="problem.group && problem.group.name !== UNCATEGORIZED_TYPE_NAME"
-          data-testid="problem-group-chip"
-          >{{ problemTypeLabel(problem.group) }}</Chip
-        >
-        <Chip v-if="problem.externalJudge" data-testid="external-judge-badge">{{
-          $t('problem.externalJudge', { oj: problem.externalJudge.oj })
-        }}</Chip>
-        <span v-if="!inContest" data-testid="strip-ac-rate" class="flex items-baseline gap-1">
-          {{ $t('problem.strip.acRate') }}
-          <span :class="['font-mono', acRateTextClass(problem.acRate)]"
-            >{{ formatNumber(problem.acRate, locale.locale, 1) }}%</span
+        <!-- One wrapping line, spaced by gaps: no separator character can end or start a wrapped line. -->
+        <div class="flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-1">
+          <span class="font-mono [overflow-wrap:anywhere]">{{ problem.code }}</span>
+          <Chip
+            v-if="problem.group && problem.group.name !== UNCATEGORIZED_TYPE_NAME"
+            data-testid="problem-group-chip"
+            >{{ problemTypeLabel(problem.group) }}</Chip
           >
-        </span>
-        <span
-          v-if="contestProblem && ownContext"
-          data-testid="strip-own-result"
-          class="flex items-baseline gap-1"
-        >
-          {{ $t('contests.problems.columns.own') }}
-          <OwnResultChip :problem="contestProblem" :context="ownContext" inline />
-        </span>
+          <Chip v-if="problem.externalJudge" data-testid="external-judge-badge">{{
+            $t('problem.externalJudge', { oj: problem.externalJudge.oj })
+          }}</Chip>
+          <dl class="contents" data-testid="page-facts">
+            <div
+              v-for="fact in facts"
+              :key="fact.label ?? fact.value"
+              :data-testid="fact.testId"
+              class="flex items-baseline gap-1"
+            >
+              <dt v-if="fact.label">{{ fact.label }}</dt>
+              <dd
+                class="m-0"
+                :class="[
+                  fact.mono !== false && 'font-mono',
+                  fact.tone && CUE_TEXT[fact.tone],
+                  fact.class,
+                ]"
+              >
+                {{ fact.value }}
+              </dd>
+            </div>
+          </dl>
+          <span
+            v-if="contestProblem && ownContext"
+            data-testid="strip-own-result"
+            class="flex items-baseline gap-1"
+          >
+            {{ $t('contests.problems.columns.own') }}
+            <OwnResultChip :problem="contestProblem" :context="ownContext" inline />
+          </span>
+        </div>
       </template>
       <template #actions>
         <div class="flex flex-wrap items-center gap-2">
