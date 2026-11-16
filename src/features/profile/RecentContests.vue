@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { RatingHistoryEntry } from '@/api/types/users';
+import Chip from '@/components/ui/Chip.vue';
 import PageSection from '@/components/ui/PageSection.vue';
 import DataTable from '@/components/ui/DataTable.vue';
 import { NO_VALUE, signedScore } from '@/lib/format';
+import { deltaTone } from '@/lib/rating-delta';
 import { recentContestColumns, recentContests } from './recent-contests';
 import type { RecentContestRow } from './recent-contests';
 
@@ -16,8 +18,6 @@ const COLUMNS = computed(recentContestColumns);
 
 const orDash = (value: number | null) => (value === null ? NO_VALUE : String(Math.round(value)));
 const deltaText = (delta: number | null) => (delta === null ? NO_VALUE : signedScore(delta));
-const deltaClass = (delta: number | null) =>
-  delta === null || delta === 0 ? 'text-muted' : delta > 0 ? 'text-cue-full' : 'text-cue-zero';
 /** A hidden contest has no key and no page: its row is a plain label (so no `rowTo`, which every row would need). */
 const rowKey = (row: RecentContestRow) => row.key ?? `hidden-${rows.value.indexOf(row)}`;
 </script>
@@ -45,7 +45,13 @@ const rowKey = (row: RecentContestRow) => row.key ?? `hidden-${rows.value.indexO
       <template #cell-performance="{ row }">{{ orDash(row.performance) }}</template>
       <template #cell-rating="{ row }">{{ orDash(row.rating) }}</template>
       <template #cell-delta="{ row }">
-        <span class="font-semibold" :class="deltaClass(row.delta)">{{ deltaText(row.delta) }}</span>
+        <Chip
+          v-if="deltaTone(row.delta) !== 'neutral'"
+          :tone="deltaTone(row.delta)"
+          class="font-mono tabular-nums"
+          >{{ deltaText(row.delta) }}</Chip
+        >
+        <span v-else class="font-semibold text-muted">{{ deltaText(row.delta) }}</span>
       </template>
     </DataTable>
   </PageSection>

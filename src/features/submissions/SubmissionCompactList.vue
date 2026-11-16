@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { SubmissionListItem } from '@/api/types/submissions';
+import Chip from '@/components/ui/Chip.vue';
+import { CUE_ROW } from '@/components/ui/cue-tones';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import UserLink from '@/components/UserLink.vue';
 import { NO_VALUE, formatCaseMemory, formatCaseTime } from '@/lib/format';
@@ -11,7 +13,7 @@ import SubmissionProblemName from './SubmissionProblemName.vue';
 import SubmissionSourceLink from './SubmissionSourceLink.vue';
 import SubmissionVerdictCell from './SubmissionVerdictCell.vue';
 import type { ColumnKey } from './submission-table-cells';
-import { isFinished, scoreCellText, scoreClass } from './submission-row';
+import { isFinished, scoreCellText, scoreCue } from './submission-row';
 import { useRowOpen } from './row-open';
 
 /**
@@ -38,6 +40,7 @@ const isShown = (key: ColumnKey) => props.columns.includes(key);
 const pickOrder = (id: string) => (props.pickedIds?.indexOf(id) ?? -1) + 1;
 const contestMaxOf = (row: SubmissionListItem) =>
   row.problem ? props.contestPoints[row.problem.code] : undefined;
+const rowCue = (row: SubmissionListItem) => scoreCue(row, contestMaxOf(row));
 const scoreOf = (row: SubmissionListItem) => scoreCellText(row, locale.locale, contestMaxOf(row));
 /** Time and memory of a finished row only: an unfinished one has nothing to say there. */
 const timeOf = (row: SubmissionListItem) =>
@@ -53,11 +56,14 @@ const memoryOf = (row: SubmissionListItem) =>
       :key="row.id"
       :data-id="row.id"
       class="flex cursor-pointer items-center gap-2 border-t border-line px-3 py-2 first:border-t-0 hover:bg-surface-hover"
-      :class="{
-        'row-added': highlightIds.has(row.id),
-        'bg-accent-soft hover:bg-accent-soft':
-          ownUsername !== undefined && row.user?.username === ownUsername,
-      }"
+      :class="[
+        { 'row-added': highlightIds.has(row.id) },
+        rowCue(row)
+          ? CUE_ROW[rowCue(row)!]
+          : ownUsername !== undefined &&
+            row.user?.username === ownUsername &&
+            'bg-accent-soft hover:bg-accent-soft',
+      ]"
       @click="openRow($event, row.id)"
       @auxclick="openRowInTab($event, row.id)"
     >
@@ -76,6 +82,14 @@ const memoryOf = (row: SubmissionListItem) =>
       <div class="flex min-w-0 flex-1 flex-col gap-1">
         <div class="flex min-w-0 items-center gap-2 text-sm">
           <SubmissionVerdictCell v-if="isShown('verdict')" :row="row" class="shrink-0" />
+          <template v-if="isShown('verdict') && scoreOf(row)">
+            <Chip v-if="rowCue(row)" :tone="rowCue(row)!" class="shrink-0 font-mono tabular-nums">{{
+              scoreOf(row)
+            }}</Chip>
+            <span v-else class="shrink-0 font-mono text-caption text-muted tabular-nums">{{
+              scoreOf(row)
+            }}</span>
+          </template>
           <SubmissionProblemName
             v-if="isShown('problem')"
             class="min-w-0 flex-1"
@@ -88,16 +102,12 @@ const memoryOf = (row: SubmissionListItem) =>
         >
           <template
             v-for="(part, partIndex) in [
-              {
-                text: isShown('verdict') ? scoreOf(row) : '',
-                tone: scoreClass(row, contestMaxOf(row)),
-              },
-              { text: isShown('cost') ? timeOf(row) : '', tone: '' },
-              { text: isShown('cost') ? memoryOf(row) : '', tone: '' },
+              { text: isShown('cost') ? timeOf(row) : '' },
+              { text: isShown('cost') ? memoryOf(row) : '' },
             ].filter((part) => part.text)"
             :key="partIndex"
           >
-            <span class="shrink-0 font-mono tabular-nums" :class="part.tone">{{ part.text }}</span>
+            <span class="shrink-0 font-mono tabular-nums">{{ part.text }}</span>
           </template>
           <template v-if="isShown('when')">
             <time

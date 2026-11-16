@@ -2,6 +2,8 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ContestDetail, ContestPhase, ContestProblem } from '@/api/types/contests';
+import { CUE_ROW, CUE_TABLE_ROW } from '@/components/ui/cue-tones';
+import type { CueTone } from '@/components/ui/cue-tones';
 import Card from '@/components/ui/Card.vue';
 import PageSection from '@/components/ui/PageSection.vue';
 import FactLine from '@/components/FactLine.vue';
@@ -10,7 +12,7 @@ import { formatNumber, formatPoints } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import OwnResultChip from './OwnResultChip.vue';
 import { limitsText } from './contest-limits';
-import { attemptsLeftUnderCap, ownResultContext, solvedSummary } from './own-result';
+import { attemptsLeftUnderCap, ownResultContext, ownResultTone, solvedSummary } from './own-result';
 
 const props = defineProps<{ contest: ContestDetail }>();
 const locale = useLocaleStore();
@@ -50,6 +52,11 @@ const capLineOf = (problem: ContestProblem): string | null => {
   if (!problem.viewerResult) return text;
   const left = attemptsLeftUnderCap(cap, problem.viewerResult.attempts);
   return `${text} (${t('contests.problems.left', { count: left }, left)})`;
+};
+/** A problem the viewer has a result on gets its row tint and edge: solved, partial or tried without points. */
+const rowCueOf = (problem: ContestProblem, map: Record<CueTone, string>) => {
+  const tone = ownResultTone(problem, context.value);
+  return tone ? map[tone] : '';
 };
 const capLines = computed(
   () => new Map(problems.value.map((problem) => [problem.problemId, capLineOf(problem)])),
@@ -112,6 +119,7 @@ const phoneFacts = (problem: ContestProblem) =>
             v-for="problem in contest.problems"
             :key="problem.problemId"
             class="relative border-t border-line hover:bg-surface-hover"
+            :class="rowCueOf(problem, CUE_TABLE_ROW)"
           >
             <th scope="row" class="px-5 py-2 text-left font-display text-section font-bold">
               {{ problem.label }}
@@ -150,6 +158,7 @@ const phoneFacts = (problem: ContestProblem) =>
           v-for="problem in contest.problems"
           :key="problem.problemId"
           class="relative flex min-h-14 items-center gap-3 border-t border-line px-3.5 py-3 first:border-t-0"
+          :class="rowCueOf(problem, CUE_ROW)"
         >
           <span class="w-7 font-display text-section font-bold" aria-hidden="true">
             {{ problem.label }}

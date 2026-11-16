@@ -61,8 +61,5 @@
   },
   "features/shares/ShareDialog.vue": {
     "status-colour": 2
-  },
-  "lib/rating-delta.ts": {
-    "status-colour": 2
   }
 }

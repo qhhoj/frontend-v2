@@ -2,6 +2,8 @@
 import { computed, ref } from 'vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
+import Chip from '@/components/ui/Chip.vue';
+import { CUE_TABLE_ROW } from '@/components/ui/cue-tones';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import UserLink from '@/components/UserLink.vue';
@@ -25,7 +27,7 @@ import {
   fullCellClass,
 } from './submission-table-cells';
 import type { CellKind, ColumnKey } from './submission-table-cells';
-import { isFinished, scoreCellText, scoreClass } from './submission-row';
+import { isFinished, scoreCellText, scoreCue } from './submission-row';
 import { useRowOpen } from './row-open';
 import { useIsNarrow } from './use-card-compact';
 import { NO_VALUE, formatCaseMemory, formatCaseTime } from '@/lib/format';
@@ -87,6 +89,7 @@ const isOwn = (row: SubmissionListItem) =>
 const classOf = (kind: CellKind | 'pick' | 'source') => fullCellClass(kind);
 const contestMaxOf = (row: SubmissionListItem) =>
   row.problem ? props.contestPoints[row.problem.code] : undefined;
+const rowCue = (row: SubmissionListItem) => scoreCue(row, contestMaxOf(row));
 const NUMBER_ALIGN = 'text-right font-mono tabular-nums whitespace-nowrap';
 const timeText = (row: SubmissionListItem) =>
   isFinished(row) && row.time !== null ? formatCaseTime(row.time) : NO_VALUE;
@@ -150,10 +153,12 @@ const memoryText = (row: SubmissionListItem) =>
             :key="row.id"
             :data-id="row.id"
             class="cursor-pointer border-t border-line hover:bg-surface-hover"
-            :class="{
-              'row-added': highlightIds.has(row.id),
-              'bg-accent-soft hover:bg-accent-soft': isOwn(row),
-            }"
+            :class="[
+              { 'row-added': highlightIds.has(row.id) },
+              rowCue(row)
+                ? CUE_TABLE_ROW[rowCue(row)!]
+                : isOwn(row) && 'bg-accent-soft hover:bg-accent-soft',
+            ]"
             @click="openRow($event, row.id)"
             @auxclick="openRowInTab($event, row.id)"
           >
@@ -175,11 +180,13 @@ const memoryText = (row: SubmissionListItem) =>
               <td v-if="kind === 'verdict'" :class="[bodyCell, classOf(kind)]">
                 <SubmissionVerdictCell :row="row" />
               </td>
-              <td
-                v-else-if="kind === 'score'"
-                :class="[bodyCell, classOf(kind), NUMBER_ALIGN, scoreClass(row, contestMaxOf(row))]"
-              >
-                {{ scoreCellText(row, locale.locale, contestMaxOf(row)) }}
+              <td v-else-if="kind === 'score'" :class="[bodyCell, classOf(kind), NUMBER_ALIGN]">
+                <Chip v-if="rowCue(row)" :tone="rowCue(row)!" class="font-mono tabular-nums">{{
+                  scoreCellText(row, locale.locale, contestMaxOf(row))
+                }}</Chip>
+                <template v-else>{{
+                  scoreCellText(row, locale.locale, contestMaxOf(row))
+                }}</template>
               </td>
               <td v-else-if="kind === 'problem'" :class="[bodyCell, 'w-full max-w-0']">
                 <SubmissionProblemName

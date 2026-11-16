@@ -60,7 +60,7 @@ const isFullScore = (points: number, total: number) => points >= total;
                 <span class="font-mono text-caption leading-4 text-muted">{{ problem.code }}</span>
               </div>
               <Chip
-                :tone="isFullScore(problem.points, problem.total) ? 'success' : 'warning'"
+                :tone="isFullScore(problem.points, problem.total) ? 'full' : 'partial'"
                 class="font-mono"
               >
                 {{

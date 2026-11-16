@@ -6,6 +6,7 @@ import type { ContestDetail, ContestPhase } from '@/api/types/contests';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import Chip from '@/components/ui/Chip.vue';
+import type { CueTone } from '@/components/ui/cue-tones';
 import IconButton from '@/components/ui/IconButton.vue';
 import Menu from '@/components/ui/Menu.vue';
 import type { MenuEntry } from '@/components/ui/Menu.vue';
@@ -71,17 +72,11 @@ useShownClock(
   () => props.contestKey,
   () => clockUntil.value !== null,
 );
-/** The status is a dot and a word; the rest is plain muted text after it: virtual run, format, rated, who may enter. */
-const PHASE_DOT: Record<ContestPhase, string> = {
-  running: 'bg-cue-live',
-  upcoming: 'bg-cue-upcoming',
-  ended: 'bg-cue-ended',
-};
-/** The word takes the dot's colour: running green, upcoming blue, ended grey. */
-const PHASE_TEXT: Record<ContestPhase, string> = {
-  running: 'text-cue-live',
-  upcoming: 'text-cue-upcoming',
-  ended: 'text-cue-ended',
+/** The status is a filled chip with its dot: running green, upcoming blue, ended grey. The rest of the line is plain muted text. */
+const PHASE_TONE: Record<ContestPhase, CueTone> = {
+  running: 'live',
+  upcoming: 'upcoming',
+  ended: 'ended',
 };
 const { t } = useI18n();
 const locale = useLocaleStore();
@@ -148,14 +143,7 @@ const freeze = computed(() =>
         />
       </template>
       <template #meta>
-        <span
-          v-if="phase"
-          :class="['inline-flex items-center gap-1.5 font-semibold', PHASE_TEXT[phase]]"
-        >
-          <span aria-hidden="true" :class="['size-2 rounded-pill', PHASE_DOT[phase]]" />{{
-            $t(`contests.phase.${phase}`)
-          }}
-        </span>
+        <Chip v-if="phase" :tone="PHASE_TONE[phase]" dot>{{ $t(`contests.phase.${phase}`) }}</Chip>
         <template v-for="fact in facts" :key="fact.text">
           <span aria-hidden="true" :class="fact.wideOnly && 'max-md:hidden'">·</span>
           <span :class="fact.wideOnly && 'max-md:hidden'">{{ fact.text }}</span>

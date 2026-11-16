@@ -45,7 +45,7 @@ export const TABLE_CARD_CLASS = '@container overflow-hidden';
 /** Cell widths of the full table; the problem cell takes the rest. Shared with the skeleton. */
 export const CELL_WIDTH_CLASS: Record<CellKind | 'pick' | 'source', string> = {
   pick: 'w-14',
-  verdict: 'w-20',
+  verdict: 'w-36',
   score: 'w-32',
   problem: '',
   user: 'w-32',
