@@ -1636,6 +1636,11 @@
       "problemScore": "Điểm bài {score} / {max}",
       "next": "Bài {label} · {name}",
       "minute": "{time} · phút {minute}"
+    },
+    "strip": {
+      "showAll": "Hiện tất cả ({count})",
+      "onlyLost": "Chỉ test chưa đúng",
+      "allFull": "Cả {count} test đều đúng."
     }
   },
   "states": {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Send } from 'lucide-vue-next';
 import { computed, toRef } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
@@ -7,6 +8,8 @@ import Card from '@/components/ui/Card.vue';
 import PageLayout from '@/components/ui/PageLayout.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import type { PageCrumb } from '@/components/ui/PageHeader.vue';
+import type { MenuEntry } from '@/components/ui/Menu.vue';
+import ShareButton from '@/features/shares/ShareButton.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
 import NotFoundPage from '@/features/not-found/NotFoundPage.vue';
@@ -28,6 +31,7 @@ import SourceViewSkeleton from './SourceViewSkeleton.vue';
 import TestOverview from './TestOverview.vue';
 import SubmissionHero from './SubmissionHero.vue';
 import SubmissionHeroSkeleton from './SubmissionHeroSkeleton.vue';
+import SubmissionMeta from './SubmissionMeta.vue';
 import SubmissionExternalRun from './SubmissionExternalRun.vue';
 import SubmissionStaffPanel from './SubmissionStaffPanel.vue';
 import { forbiddenMessageKey } from './forbidden-reason';
@@ -80,13 +84,35 @@ const heading = computed(() => {
   const nearest = parent[parent.length - 1]!;
   return {
     title: `${label}${problemName.value ?? shortId.value}`,
-    crumbs: parent,
+    crumbs: [...parent, { label: shortId.value, mono: true }],
     back: { to: nearest.to!, label: nearest.label },
   };
 });
 const canResubmit = computed(
   () => isOwn.value && problemCode.value !== null && !isDeletedProblem.value,
 );
+
+/** A contest submission opens the problem inside its contest (`?contest=`); a practice one opens the plain problem. */
+const problemRoute = computed(() => {
+  const problem = row.value?.problem;
+  if (!problem || problem.isDeleted) return null;
+  const query = row.value?.contest ? { contest: row.value.contest.key } : {};
+  return { name: 'problem', params: { code: problem.code }, query };
+});
+/** The author's way back to the editor with this code in it: a menu item, so "Về đề bài" stays the one primary. */
+const moreActions = computed<MenuEntry[]>(() => {
+  const target = problemRoute.value;
+  if (!canResubmit.value || !target || !row.value) return [];
+  const label =
+    verdict.value?.code === 'AC' ? 'submission.actions.resubmit' : 'submission.actions.resubmitFix';
+  return [
+    {
+      label: translate(label),
+      icon: Send,
+      to: { ...target, query: { ...target.query, resubmit: row.value.id } },
+    },
+  ];
+});
 
 const isNotFound = computed(
   () => query.error.value instanceof ApiError && query.error.value.code === 'not_found',
@@ -123,8 +149,19 @@ const nextTo = computed(() =>
         :title="heading.title"
         :crumbs="heading.crumbs"
         :back="heading.back"
-        :meta="problemName ? [shortId] : []"
-      />
+        :overflow="moreActions"
+      >
+        <template v-if="row" #meta
+          ><SubmissionMeta :submission="row" :in-contest="inContest"
+        /></template>
+        <template v-if="row && (problemRoute || nextTo || row.viewer.canShare)" #actions>
+          <AppButton v-if="nextTo" :to="nextTo">{{ $t('submission.actions.next') }}</AppButton>
+          <ShareButton v-if="row.viewer.canShare" :submission-id="row.id" />
+          <AppButton v-if="problemRoute" tone="primary" :to="problemRoute">{{
+            $t('submission.actions.problem')
+          }}</AppButton>
+        </template>
+      </PageHeader>
     </template>
     <p role="status" aria-live="polite" class="sr-only">
       {{ verdict ? $t(verdict.labelKey) : '' }}
@@ -152,15 +189,10 @@ const nextTo = computed(() =>
         <SubmissionHero
           :submission="row"
           :verdict="verdict"
-          :problem-name="problemName"
-          :in-contest="inContest"
           :problem-points="problemQuery.data.value?.points ?? null"
           :is-problem-loading="problemQuery.isLoading.value"
           :is-live="isLive"
-          :can-resubmit="canResubmit"
           :contest-score="contestScore"
-          :next-to="nextTo"
-          :share-id="row.viewer.canShare ? row.id : null"
         >
           <SubmissionStaffPanel :key="row.id" :submission="row" />
         </SubmissionHero>

@@ -4,19 +4,17 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import type { ContestDetail } from '@/api/types/contests';
 import type { ProblemDetail } from '@/api/types/problems';
-import Card from '@/components/ui/Card.vue';
 import Tabs from '@/components/ui/Tabs.vue';
 import UserName from '@/components/UserName.vue';
 import CommentsSection from '@/features/comments/CommentsSection.vue';
 import ProblemArchivedNotice from '@/features/organizations/problems/ProblemArchivedNotice.vue';
-import { PHONE_QUERY, useMediaQuery } from '@/lib/use-media-query';
+import { useMediaQuery } from '@/lib/use-media-query';
 import { useSessionStore } from '@/stores/session.store';
 import EditorialTab from './EditorialTab.vue';
 import PdfLink from './PdfLink.vue';
 import NoStatement from './NoStatement.vue';
 import PdfStatement from './PdfStatement.vue';
 import ProblemHeader from './ProblemHeader.vue';
-import ProblemLimitStrip from './ProblemLimitStrip.vue';
 import ProblemMySubmissions from './ProblemMySubmissions.vue';
 import StatementBody from './StatementBody.vue';
 import ProblemTypesCard from './ProblemTypesCard.vue';
@@ -34,7 +32,7 @@ import { useSubmitForm } from './use-submit-form';
 
 const DEFAULT_TAB = 'statement';
 /**
- * A loaded problem (Workbench split): left the header on the page background (facts strip, tabs) and the statement card, then links, types and comments; right the submit pane once the viewer opens it from the header. The page keys it by code, so another problem never inherits the typed
+ * A loaded problem (Workbench split): left the header on the page background (facts in its meta line, tabs) and the statement without a card, then links, types and comments; right the submit pane once the viewer opens it from the header. The page keys it by code, so another problem never inherits the typed
  * code, pick or file.
  */
 const props = defineProps<{
@@ -55,8 +53,6 @@ const route = useRoute();
 const session = useSessionStore();
 const isSignedIn = computed(() => session.status === 'authenticated');
 const usesSheet = useMediaQuery(() => props.layout.stacked);
-/** A phone: the statement drops its card frame and padding, the page gutter is the margin. */
-const isPhone = useMediaQuery(PHONE_QUERY);
 /** The pane and the sheet start closed, so the statement is what the viewer sees first; the header button opens them. */
 const submitOpen = ref(false);
 /** The pane takes a column beside the statement; the page widens its column for it. */
@@ -113,7 +109,12 @@ const isFramePanel = computed(() => props.tab === DEFAULT_TAB || props.tab === '
     <!-- The left column: the header on the page background (sticky facts strip, tabs), then the statement card (statement tab only;
          v-show keeps the tab panel the tabs point to). -->
     <div :class="['min-w-0', layout.left]">
-      <ProblemHeader :problem="problem" :section="tab === 'editorial' ? 'editorial' : 'statement'">
+      <ProblemHeader
+        :problem="problem"
+        :section="tab === 'editorial' ? 'editorial' : 'statement'"
+        :is-signed-in="isSignedIn"
+        :contest="contest"
+      >
         <template #actions>
           <!-- Wherever the bottom sheet is used its bar is the one submit entry (it shows for anonymous viewers too). -->
           <PdfLink v-if="!problem.pdfStatementUrl" :problem="problem" icon-only />
@@ -130,23 +131,9 @@ const isFramePanel = computed(() => props.tab === DEFAULT_TAB || props.tab === '
             <SubmitSignInButton />
           </div>
         </template>
-        <template #strip>
-          <ProblemLimitStrip
-            :problem="problem"
-            :is-signed-in="isSignedIn"
-            :contest="contest"
-            :cells-class="layout.facts"
-          />
-        </template>
         <Tabs :items="tabItems" :label="$t('problem.tabsLabel')" overflow="scroll" />
       </ProblemHeader>
-      <Card
-        v-show="tab === DEFAULT_TAB"
-        as="div"
-        data-testid="statement-card"
-        :variant="isPhone ? 'plain' : 'glass'"
-        :class="['mt-4', isPhone ? '' : 'p-6 sm:p-8']"
-      >
+      <div v-show="tab === DEFAULT_TAB" data-testid="statement-card" class="mt-4">
         <div :hidden="tab !== DEFAULT_TAB">
           <template v-if="tab === DEFAULT_TAB">
             <StatementNote v-if="!problem.translated && !problem.pdfStatementUrl" class="mt-4" />
@@ -173,7 +160,7 @@ const isFramePanel = computed(() => props.tab === DEFAULT_TAB || props.tab === '
             </p>
           </template>
         </div>
-      </Card>
+      </div>
       <!-- The submission tabs: the child route's list or ranking, under the same header. -->
       <RouterView v-if="!isFramePanel" />
     </div>
@@ -196,16 +183,15 @@ const isFramePanel = computed(() => props.tab === DEFAULT_TAB || props.tab === '
       <aside
         data-testid="problem-rail"
         :aria-label="$t('problem.rail.railLabel')"
-        class="-mb-3.5 gap-3.5 @lg:columns-2"
+        class="flex flex-col"
       >
-        <!-- Two columns of cards where the column is wide enough (512 px), each card whole in one column. -->
+        <!-- Folded rows on hairlines, no cards: the viewer's results and the types open on demand. -->
         <ProblemMySubmissions
           v-if="isSignedIn && usesSheet"
           :code="problem.code"
           :scale="scoreScale"
-          class="mb-3.5 break-inside-avoid"
         />
-        <ProblemTypesCard :problem="problem" class="mb-3.5 break-inside-avoid" />
+        <ProblemTypesCard :problem="problem" />
       </aside>
       <CommentsSection
         v-if="tab === DEFAULT_TAB"

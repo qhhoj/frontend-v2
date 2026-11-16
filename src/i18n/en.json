@@ -1636,6 +1636,11 @@
       "problemScore": "Problem score {score} / {max}",
       "next": "Problem {label} · {name}",
       "minute": "{time} · minute {minute}"
+    },
+    "strip": {
+      "showAll": "Show all ({count})",
+      "onlyLost": "Only tests that lost points",
+      "allFull": "All {count} tests passed."
     }
   },
   "states": {

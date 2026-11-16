@@ -105,9 +105,6 @@
   "lib/contest-time.ts": {
     "hardcoded-script-value": 2
   },
-  "lib/rating-delta.ts": {
-    "status-colour": 2
-  },
   "lib/server-clock-sync.ts": {
     "hardcoded-script-value": 1
   },
