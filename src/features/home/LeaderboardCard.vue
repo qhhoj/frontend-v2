@@ -46,7 +46,7 @@ const lists = computed(() => [
   <PageSection
     data-testid="leaderboard"
     :title="$t('home.anon.leaderboard')"
-    :see-all="{ to: { name: 'users' }, label: $t('home.anon.allUsers') }"
+    :see-all="{ to: { name: 'users' }, label: $t('common.viewAll') }"
   >
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>

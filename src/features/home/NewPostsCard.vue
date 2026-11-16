@@ -20,7 +20,7 @@ const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
   <PageSection
     data-testid="new-posts"
     :title="$t('home.anon.newPosts')"
-    :see-all="{ to: { name: 'blog' }, label: $t('home.anon.allPosts') }"
+    :see-all="{ to: { name: 'blog' }, label: $t('common.viewAll') }"
   >
     <QueryState :loading="isPending" :error="error" @retry="refetch()">
       <template #skeleton>
@@ -36,15 +36,16 @@ const posts = computed(() => (data.value?.items ?? []).slice(0, POST_COUNT));
         <li
           v-for="post in posts"
           :key="post.id"
-          class="flex items-baseline gap-2 py-1.5 first:pt-0 last:pb-0"
+          class="flex flex-wrap items-baseline gap-x-2 py-1.5 first:pt-0 last:pb-0 sm:flex-nowrap"
         >
           <Chip v-if="post.sticky" tone="accent">{{ $t('blog.pinned') }}</Chip>
           <RouterLink
             :to="{ name: 'post', params: { id: post.id } }"
-            class="min-w-0 flex-1 truncate font-semibold hover:underline touch:-my-3.5 touch:py-3.5"
+            class="min-w-0 flex-1 truncate font-semibold hover:underline max-sm:basis-full touch:-my-3.5 touch:py-3.5"
             >{{ post.title }}</RouterLink
           >
-          <span class="shrink-0 text-caption text-muted">
+          <!-- On phones the date and comment count sit under the title so the title gets the full width. -->
+          <span class="shrink-0 text-caption text-muted max-sm:basis-full">
             {{ formatDate(post.publishOn, 'short', locale.locale) }} ·
             {{ $t('blog.comments', { count: formatNumber(post.commentCount, locale.locale) }) }}
           </span>

@@ -19,7 +19,9 @@ defineProps<{
     <div class="mb-(--space-section-title) flex items-center gap-2">
       <h2 class="min-w-0 section-title">{{ title }}</h2>
       <span v-if="count !== undefined" class="text-sm text-muted">{{ count }}</span>
-      <SeeAllLink v-if="seeAll" :to="seeAll.to" class="ml-auto">{{ seeAll.label }}</SeeAllLink>
+      <SeeAllLink v-if="seeAll" :to="seeAll.to" class="ml-auto"
+        >{{ seeAll.label }}<span class="sr-only"> {{ title }}</span></SeeAllLink
+      >
     </div>
     <slot />
   </section>

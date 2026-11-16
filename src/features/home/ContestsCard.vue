@@ -61,7 +61,7 @@ const ROW = 'flex min-h-9 items-center gap-3 py-1.5 text-content hover:bg-surfac
     v-else
     data-testid="contests-card"
     :title="$t('nav.contests')"
-    :see-all="{ to: { name: 'contests' }, label: $t('home.anon.allContests') }"
+    :see-all="{ to: { name: 'contests' }, label: $t('common.viewAll') }"
   >
     <QueryState :loading="isPending" :error="error" @retry="retry()">
       <template #skeleton>
