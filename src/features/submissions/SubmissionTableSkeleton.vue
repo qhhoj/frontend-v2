@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import Card from '@/components/ui/Card.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
-  BODY_CELL_CLASSES,
   COMPACT_BELOW_PX,
   FULL_TABLE_CLASS,
-  HEADER_CELL_CLASSES,
-  HEADER_ROW_CLASSES,
   NUMBER_CELLS,
+  ROW_RULE,
   TABLE_CARD_CLASS,
+  bodyCellClasses,
   cellsOf,
   fullCellClass,
+  headerCellClasses,
+  headerRowClasses,
 } from './submission-table-cells';
 import type { CellKind, ColumnKey } from './submission-table-cells';
 import { useIsNarrow } from './use-card-compact';
@@ -48,19 +48,23 @@ const shownKeys = computed(() =>
   ),
 );
 const cells = computed(() => cellsOf(shownKeys.value));
-const card = ref<{ $el: HTMLElement } | null>(null);
-const isCompact = useIsNarrow(() => card.value?.$el ?? null, COMPACT_BELOW_PX);
+const frame = ref<HTMLElement | null>(null);
+const isCompact = useIsNarrow(() => frame.value, COMPACT_BELOW_PX);
+const variant = 'ledger';
+const bodyCell = bodyCellClasses(variant);
+const headerCell = headerCellClasses(variant);
 const classOf = (kind: CellKind | 'pick' | 'source') => fullCellClass(kind);
 </script>
 
 <template>
-  <Card ref="card" as="div" data-testid="submission-table-card" :class="TABLE_CARD_CLASS">
+  <div ref="frame" data-testid="submission-table-card" :class="TABLE_CARD_CLASS">
     <ul v-if="isCompact" aria-hidden="true" class="m-0 list-none p-0">
       <li
         v-for="row in ROW_COUNT"
         :key="row"
         data-skeleton-region="row"
-        class="flex items-center gap-2 border-t border-line px-3 py-2 first:border-t-0"
+        class="flex min-h-(--qh-row) items-center gap-2 py-2"
+        :class="ROW_RULE[variant]"
       >
         <SkeletonBlock v-if="hasPickColumn" round class="size-11 shrink-0" />
         <div class="flex min-w-0 flex-1 flex-col gap-1">
@@ -76,23 +80,19 @@ const classOf = (kind: CellKind | 'pick' | 'source') => fullCellClass(kind);
     <ScrollRegion v-else placeholder label="">
       <table aria-hidden="true" class="w-full border-collapse" :class="FULL_TABLE_CLASS">
         <thead>
-          <tr :class="HEADER_ROW_CLASSES">
-            <th v-if="hasPickColumn" scope="col" :class="[HEADER_CELL_CLASSES, classOf('pick')]">
+          <tr :class="headerRowClasses(variant)">
+            <th v-if="hasPickColumn" scope="col" :class="[headerCell, classOf('pick')]">
               <SkeletonBlock text class="w-10" />
             </th>
             <th
               v-for="kind in cells"
               :key="kind"
               scope="col"
-              :class="[
-                HEADER_CELL_CLASSES,
-                classOf(kind),
-                { 'text-right': NUMBER_CELLS.has(kind) },
-              ]"
+              :class="[headerCell, classOf(kind), { 'text-right': NUMBER_CELLS.has(kind) }]"
             >
               <SkeletonBlock text :class="BAR[kind]" />
             </th>
-            <th scope="col" :class="[HEADER_CELL_CLASSES, classOf('source')]" />
+            <th scope="col" :class="[headerCell, classOf('source')]" />
           </tr>
         </thead>
         <tbody>
@@ -100,27 +100,23 @@ const classOf = (kind: CellKind | 'pick' | 'source') => fullCellClass(kind);
             v-for="row in ROW_COUNT"
             :key="row"
             data-skeleton-region="row"
-            class="border-t border-line"
+            :class="ROW_RULE[variant]"
           >
-            <td v-if="hasPickColumn" :class="BODY_CELL_CLASSES">
+            <td v-if="hasPickColumn" :class="bodyCell">
               <SkeletonBlock round class="size-11" />
             </td>
             <td
               v-for="kind in cells"
               :key="kind"
-              :class="[
-                BODY_CELL_CLASSES,
-                classOf(kind),
-                { 'text-right font-mono': NUMBER_CELLS.has(kind) },
-              ]"
+              :class="[bodyCell, classOf(kind), { 'text-right font-mono': NUMBER_CELLS.has(kind) }]"
             >
               <SkeletonBlock v-if="kind === 'verdict'" class="h-5 w-12" />
               <SkeletonBlock v-else text :class="BAR[kind]" />
             </td>
-            <td :class="BODY_CELL_CLASSES"><SkeletonBlock class="size-7" /></td>
+            <td :class="bodyCell"><SkeletonBlock class="size-7" /></td>
           </tr>
         </tbody>
       </table>
     </ScrollRegion>
-  </Card>
+  </div>
 </template>

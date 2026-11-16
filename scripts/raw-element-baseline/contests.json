@@ -37,12 +37,6 @@
   "features/contests/ContestTimeBar.vue": {
     "hardcoded-script-value": 1
   },
-  "features/contests/EndedContestSkeleton.vue": {
-    "table": 1
-  },
-  "features/contests/EndedContestTable.vue": {
-    "table": 1
-  },
   "features/contests/InContestStatus.vue": {
     "button": 2
   },

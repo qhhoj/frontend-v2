@@ -288,10 +288,10 @@
       "ratedOnly": "Rated only",
       "allGroups": "View all groups",
       "timeLeft": "{span} left",
+      "next": "Next contest: {name} · {when}",
       "perParticipation": "{span} per participation, from the moment you enter",
       "enter": "Enter",
       "searchPlaceholder": "Search by key or name",
-      "startsIn": "starts {relative}",
       "viewAndRegister": "View & register",
       "shownOf": "{shown} of {total}",
       "count": "{n} contest | {n} contests",
@@ -313,7 +313,6 @@
       "empty": {
         "running": "No contest is running",
         "upcoming": "No upcoming contest",
-        "upcomingHint": "Nothing is scheduled yet. Meanwhile, take an ended contest as a virtual run.",
         "seeEnded": "See ended contests",
         "ended": "No contest has ended yet",
         "noMatch": "No contest matches these filters",
@@ -1282,12 +1281,16 @@
       "acRate": "AC",
       "userCount": "Solved"
     },
-    "solverCount": "{count} solved",
     "filterPanel": "Filters",
-    "solvedShort": "{solved} solved",
     "partialHint": "partial scoring",
     "hasEditorialHint": "Only problems with a published editorial",
+    "meta": {
+      "solvedLabel": "You solved",
+      "solvedOf": "{solved} / {total} problems",
+      "solvedOnly": "{solved} problems"
+    },
     "solvedFilter": {
+      "prefix": "Status",
       "label": "Filter by solved",
       "any": "All",
       "unsolved": "Unsolved",

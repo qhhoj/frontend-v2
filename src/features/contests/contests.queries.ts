@@ -28,9 +28,13 @@ export const rankingPollMs = (isLowPower: boolean) =>
   isLowPower ? LOW_POWER_RANKING_POLL_MS : RANKING_POLL_MS;
 
 /** A page of contests per viewer: after backend 4c every row carries the viewer's own state. */
-export const useContestListQuery = (query: Ref<ContestListQuery>) => {
+export const useContestListQuery = (
+  query: Ref<ContestListQuery>,
+  isEnabled: MaybeRefOrGetter<boolean> = true,
+) => {
   const viewerId = useViewerId();
   return useQuery({
+    enabled: () => toValue(isEnabled),
     queryKey: computed(() => ['contests', 'list', viewerId.value, query.value]),
     queryFn: () => fetchContests(query.value),
     placeholderData: computed(() => keepPreviousForSameViewer(VIEWER_KEY_INDEX, viewerId.value)),

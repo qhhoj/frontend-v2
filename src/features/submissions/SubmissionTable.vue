@@ -16,23 +16,27 @@ import SubmissionProblemName from './SubmissionProblemName.vue';
 import SubmissionSourceLink from './SubmissionSourceLink.vue';
 import SubmissionVerdictCell from './SubmissionVerdictCell.vue';
 import {
-  BODY_CELL_CLASSES,
   COMPACT_BELOW_PX,
   FULL_TABLE_CLASS,
-  HEADER_CELL_CLASSES,
-  HEADER_ROW_CLASSES,
   NUMBER_CELLS,
+  ROW_RULE,
   TABLE_CARD_CLASS,
+  bodyCellClasses,
   cellsOf,
   fullCellClass,
+  headerCellClasses,
+  headerRowClasses,
 } from './submission-table-cells';
-import type { CellKind, ColumnKey } from './submission-table-cells';
+import type { CellKind, ColumnKey, TableVariant } from './submission-table-cells';
 import { isFinished, scoreCellText, scoreCue } from './submission-row';
 import { useRowOpen } from './row-open';
 import { useIsNarrow } from './use-card-compact';
 import { NO_VALUE, formatCaseMemory, formatCaseTime } from '@/lib/format';
 
-/** The dense submission table: one line per row, the whole row opens the submission. Keep `SubmissionTableSkeleton.vue` in step: same card, header cells and row classes. */
+/**
+ * The dense submission table: one line per row, the whole row opens the submission. A frameless ledger by default; `variant="surface"`
+ * is for a table inside a card of its own. Keep `SubmissionTableSkeleton.vue` in step: same frame, header cells and row classes.
+ */
 const props = withDefaults(
   defineProps<{
     submissions: SubmissionListItem[];
@@ -51,8 +55,10 @@ const props = withDefaults(
     rankStart?: number;
     /** The viewer's username: their rows are tinted (the best-submissions ranking). */
     ownUsername?: string;
+    variant?: TableVariant;
   }>(),
   {
+    variant: 'ledger',
     showProblem: true,
     highlightIds: () => new Set<string>(),
     problemLabels: () => ({}),
@@ -63,12 +69,16 @@ const props = withDefaults(
     ownUsername: undefined,
   },
 );
-const bodyCell = BODY_CELL_CLASSES;
+const bodyCell = computed(() => bodyCellClasses(props.variant));
+const headerCell = computed(() => headerCellClasses(props.variant));
 const locale = useLocaleStore();
 const emit = defineEmits<{ togglePick: [id: string] }>();
 const { openRow, openRowInTab } = useRowOpen();
-const card = ref<{ $el: HTMLElement } | null>(null);
-const isCompact = useIsNarrow(() => card.value?.$el ?? null, COMPACT_BELOW_PX);
+const frame = ref<HTMLElement | { $el: HTMLElement } | null>(null);
+const isCompact = useIsNarrow(
+  () => (frame.value && '$el' in frame.value ? frame.value.$el : frame.value),
+  COMPACT_BELOW_PX,
+);
 const isPicking = computed(() => props.pickedIds !== undefined);
 const pickOrder = (id: string) => (props.pickedIds?.indexOf(id) ?? -1) + 1;
 /** "2 minutes ago" does not need a tick every second. */
@@ -98,7 +108,13 @@ const memoryText = (row: SubmissionListItem) =>
 </script>
 
 <template>
-  <Card ref="card" as="div" data-testid="submission-table-card" :class="TABLE_CARD_CLASS">
+  <component
+    :is="variant === 'surface' ? Card : 'div'"
+    ref="frame"
+    v-bind="variant === 'surface' ? { as: 'div' } : {}"
+    data-testid="submission-table-card"
+    :class="TABLE_CARD_CLASS"
+  >
     <SubmissionCompactList
       v-if="isCompact"
       :submissions="submissions"
@@ -109,6 +125,7 @@ const memoryText = (row: SubmissionListItem) =>
       :picked-ids="pickedIds"
       :rank-start="rankStart"
       :own-username="ownUsername"
+      :variant="variant"
       @toggle-pick="emit('togglePick', $event)"
     />
     <ScrollRegion v-else :label="$t('submissions.scrollRegion')">
@@ -119,30 +136,22 @@ const memoryText = (row: SubmissionListItem) =>
           }}
         </caption>
         <thead>
-          <tr :class="HEADER_ROW_CLASSES">
-            <th v-if="isPicking" scope="col" :class="[HEADER_CELL_CLASSES, classOf('pick')]">
+          <tr :class="headerRowClasses(variant)">
+            <th v-if="isPicking" scope="col" :class="[headerCell, classOf('pick')]">
               {{ $t('sourceDiff.select.column') }}
             </th>
-            <th
-              v-if="rankStart !== undefined"
-              scope="col"
-              :class="[HEADER_CELL_CLASSES, 'w-14 text-right']"
-            >
+            <th v-if="rankStart !== undefined" scope="col" :class="[headerCell, 'w-14 text-right']">
               {{ $t('submissions.columns.rank') }}
             </th>
             <th
               v-for="kind in cells"
               :key="kind"
               scope="col"
-              :class="[
-                HEADER_CELL_CLASSES,
-                classOf(kind),
-                { 'text-right': NUMBER_CELLS.has(kind) },
-              ]"
+              :class="[headerCell, classOf(kind), { 'text-right': NUMBER_CELLS.has(kind) }]"
             >
               {{ $t(`submissions.columns.${kind}`) }}
             </th>
-            <th scope="col" :class="[HEADER_CELL_CLASSES, classOf('source')]">
+            <th scope="col" :class="[headerCell, classOf('source')]">
               <span class="sr-only">{{ $t('submissions.columns.source') }}</span>
             </th>
           </tr>
@@ -152,8 +161,9 @@ const memoryText = (row: SubmissionListItem) =>
             v-for="(row, index) in submissions"
             :key="row.id"
             :data-id="row.id"
-            class="cursor-pointer border-t border-line hover:bg-surface-hover"
+            class="cursor-pointer hover:bg-surface-hover"
             :class="[
+              ROW_RULE[variant],
               { 'row-added': highlightIds.has(row.id) },
               rowCue(row)
                 ? CUE_TABLE_ROW[rowCue(row)!]
@@ -232,5 +242,5 @@ const memoryText = (row: SubmissionListItem) =>
         </tbody>
       </table>
     </ScrollRegion>
-  </Card>
+  </component>
 </template>

@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
+import type { PageFact } from '@/components/ui/PageHeader.vue';
 import PageLayout from '@/components/ui/PageLayout.vue';
 import { useUserPageQuery } from '@/features/users/users.queries';
 import { translate } from '@/i18n';
@@ -79,17 +80,38 @@ watch([data, isPlaceholderData, () => router.currentRoute.value.query.page], () 
 const listTop = ref<HTMLElement | null>(null);
 watch(page, () => listTop.value?.scrollIntoView({ block: 'start' }), { flush: 'post' });
 
-/** "214 đã giải · 1.483 bài", or "3 kết quả" under filters; the solved part for a signed-in viewer only. */
+/** "43 bài", or "3 kết quả" under filters: the result count only (the viewer's solved count is in the header). */
 const countText = computed(() => {
   const total = data.value?.meta.total;
   if (total === undefined) return '';
   const count = formatNumber(total, locale.locale);
-  const listed = isFiltered.value
+  return isFiltered.value
     ? translate('problems.results', { n: count }, total)
     : translate('problems.count', { n: count }, total);
-  if (!viewer.value) return listed;
+});
+
+/** The size of the whole catalogue, kept from the last unfiltered answer so the header does not change with a filter. */
+const catalogueTotal = ref<number | null>(null);
+watch(
+  [data, isFiltered, () => filters.value.search],
+  () => {
+    if (data.value && !isFiltered.value && !filters.value.search.trim())
+      catalogueTotal.value = data.value.meta.total;
+  },
+  { immediate: true },
+);
+/** The header's one fact for a signed-in viewer: "Bạn đã giải 12 / 55 bài" ("12 bài" while the catalogue size is unknown). */
+const facts = computed<PageFact[]>(() => {
+  if (!viewer.value) return [];
   const solved = formatNumber(viewer.value.problemCount, locale.locale);
-  return `${translate('problems.solvedShort', { solved })} · ${listed}`;
+  const value =
+    catalogueTotal.value === null
+      ? translate('problems.meta.solvedOnly', { solved })
+      : translate('problems.meta.solvedOf', {
+          solved,
+          total: formatNumber(catalogueTotal.value, locale.locale),
+        });
+  return [{ label: translate('problems.meta.solvedLabel'), value }];
 });
 
 const prefetch = usePrefetchProblem(lang);
@@ -104,7 +126,7 @@ function prefetchRow(event: Event) {
 <template>
   <PageLayout>
     <template #header>
-      <PageHeader :title="$t('problems.title')">
+      <PageHeader :title="$t('problems.title')" :facts="facts">
         <template #actions><CreateShortcut kind="problem" /></template>
       </PageHeader>
     </template>

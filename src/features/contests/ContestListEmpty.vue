@@ -2,12 +2,18 @@
 import AppButton from '@/components/ui/AppButton.vue';
 import { computed } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
-import type { ContestPhase } from '@/api/types/contests';
+import type { ContestListItem, ContestPhase } from '@/api/types/contests';
 import EmptyState from '@/components/EmptyState.vue';
-import Card from '@/components/ui/Card.vue';
 import { translate } from '@/i18n';
+import { formatDate } from '@/lib/format-date';
+import { useLocaleStore } from '@/stores/locale.store';
 import type { ContestListRoute } from './use-contest-list-filters';
 
+/**
+ * A group with nothing in it: one inline line (`EmptyState inline`), never a box. With a filter set the text says the filter is the
+ * reason. An empty "Đang diễn ra" names the next contest after "·" (`nextContest`), so the line still gives something to look
+ * forward to; an empty upcoming group points at the ended contests (a virtual run is the way to practise meanwhile).
+ */
 const props = defineProps<{
   phase: ContestPhase;
   isFiltered: boolean;
@@ -20,9 +26,10 @@ const props = defineProps<{
   clearTagTarget?: RouteLocationRaw;
   /** The page the list lives on; the ended-contests hint stays inside it. */
   listRoute?: ContestListRoute;
-  /** An empty overview group with no filter: one muted line, so the groups with contests stay near the top. */
-  quiet?: boolean;
+  /** The first upcoming contest, said after an empty running group. */
+  nextContest?: ContestListItem | null;
 }>();
+const locale = useLocaleStore();
 const isTagEmpty = computed(() => Boolean(props.tagName) && !props.isPastLastPage);
 /** With a filter set, the empty text says the filter is the reason, not that the phase is empty. */
 const messageText = computed(() => {
@@ -35,7 +42,6 @@ const messageText = computed(() => {
 const showsUpcomingHint = computed(
   () => props.phase === 'upcoming' && !props.isFiltered && !props.isPastLastPage,
 );
-/** An empty upcoming group points at the ended contests: a virtual run is the way to practise meanwhile. */
 const endedTarget = computed(() => ({
   ...(props.listRoute ?? { name: 'contests' }),
   query: { phase: 'ended' },
@@ -49,20 +55,31 @@ const action = computed(() => {
     return { to: endedTarget.value, labelKey: 'contests.list.empty.seeEnded' };
   return null;
 });
+const hasNext = computed(() => Boolean(props.nextContest) || isTagEmpty.value);
 </script>
 
 <template>
-  <p v-if="quiet" data-testid="quiet-empty" class="text-sm text-muted">{{ messageText }}</p>
-  <Card v-else as="div">
-    <EmptyState>
-      <span class="block font-semibold text-content">{{ messageText }}</span>
-      <span v-if="showsUpcomingHint" class="block">{{
-        $t('contests.list.empty.upcomingHint')
-      }}</span>
-      <span v-if="isTagEmpty" class="block">{{ $t('contestTags.emptyHint') }}</span>
-      <AppButton v-if="action" tone="secondary" :to="action.to" class="mt-3">{{
-        $t(action.labelKey)
-      }}</AppButton>
-    </EmptyState>
-  </Card>
+  <EmptyState inline data-testid="contest-list-empty">
+    {{ messageText }}
+    <template v-if="hasNext" #next>
+      <i18n-t v-if="nextContest" keypath="contests.list.next" tag="span">
+        <template #name>
+          <RouterLink
+            :to="{ name: 'contest', params: { key: nextContest.key } }"
+            class="font-semibold text-content hover:text-accent-text hover:underline"
+            >{{ nextContest.name }}</RouterLink
+          >
+        </template>
+        <template #when
+          ><span class="font-mono tabular-nums">{{
+            formatDate(nextContest.startTime, 'datetime', locale.locale)
+          }}</span></template
+        >
+      </i18n-t>
+      <template v-else>{{ $t('contestTags.emptyHint') }}</template>
+    </template>
+    <template v-if="action" #action>
+      <AppButton tone="link" :to="action.to">{{ $t(action.labelKey) }}</AppButton>
+    </template>
+  </EmptyState>
 </template>

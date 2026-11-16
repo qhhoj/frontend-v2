@@ -288,10 +288,10 @@
       "ratedOnly": "Chỉ tính rating",
       "allGroups": "Xem tất cả nhóm",
       "timeLeft": "còn {span}",
+      "next": "Kỳ thi tiếp theo: {name} · {when}",
       "perParticipation": "{span} mỗi lượt kể từ lúc vào thi",
       "enter": "Vào thi",
       "searchPlaceholder": "Tìm theo mã hoặc tên",
-      "startsIn": "bắt đầu {relative}",
       "viewAndRegister": "Xem & đăng ký",
       "shownOf": "{shown} trong {total}",
       "count": "{n} kỳ thi",
@@ -313,7 +313,6 @@
       "empty": {
         "running": "Không có kỳ thi nào đang diễn ra",
         "upcoming": "Chưa có kỳ thi sắp diễn ra",
-        "upcomingHint": "Hiện chưa có kỳ thi nào được lên lịch. Trong lúc chờ, hãy thi ảo một kỳ thi đã kết thúc.",
         "seeEnded": "Xem kỳ thi đã kết thúc",
         "ended": "Chưa có kỳ thi nào kết thúc",
         "noMatch": "Không có kỳ thi nào khớp bộ lọc",
@@ -1282,12 +1281,16 @@
       "acRate": "AC",
       "userCount": "Đã giải"
     },
-    "solverCount": "{count} đã giải",
     "filterPanel": "Bộ lọc",
-    "solvedShort": "{solved} đã giải",
     "partialHint": "chấm từng phần",
     "hasEditorialHint": "Chỉ bài đã có lời giải được công bố",
+    "meta": {
+      "solvedLabel": "Bạn đã giải",
+      "solvedOf": "{solved} / {total} bài",
+      "solvedOnly": "{solved} bài"
+    },
     "solvedFilter": {
+      "prefix": "Trạng thái",
       "label": "Lọc theo bài đã giải",
       "any": "Tất cả",
       "unsolved": "Chưa giải",

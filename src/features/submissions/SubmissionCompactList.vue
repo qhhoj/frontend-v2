@@ -12,7 +12,8 @@ import SubmissionPickBox from './SubmissionPickBox.vue';
 import SubmissionProblemName from './SubmissionProblemName.vue';
 import SubmissionSourceLink from './SubmissionSourceLink.vue';
 import SubmissionVerdictCell from './SubmissionVerdictCell.vue';
-import type { ColumnKey } from './submission-table-cells';
+import { ROW_RULE } from './submission-table-cells';
+import type { ColumnKey, TableVariant } from './submission-table-cells';
 import { isFinished, scoreCellText, scoreCue } from './submission-row';
 import { useRowOpen } from './row-open';
 
@@ -30,6 +31,8 @@ const props = defineProps<{
   pickedIds?: readonly string[];
   rankStart?: number;
   ownUsername?: string;
+  /** `ledger`: the rows sit on the page (no side padding, a rule under each); `surface`: inside a card. */
+  variant?: TableVariant;
 }>();
 const emit = defineEmits<{ togglePick: [id: string] }>();
 const locale = useLocaleStore();
@@ -55,8 +58,10 @@ const memoryOf = (row: SubmissionListItem) =>
       v-for="(row, index) in submissions"
       :key="row.id"
       :data-id="row.id"
-      class="flex cursor-pointer items-center gap-2 border-t border-line px-3 py-2 first:border-t-0 hover:bg-surface-hover"
+      class="flex min-h-(--qh-row) cursor-pointer items-center gap-2 py-2 hover:bg-surface-hover"
       :class="[
+        variant === 'surface' ? 'px-3 first:border-t-0' : 'px-2',
+        ROW_RULE[variant ?? 'ledger'],
         { 'row-added': highlightIds.has(row.id) },
         rowCue(row)
           ? CUE_ROW[rowCue(row)!]
