@@ -90,28 +90,16 @@ const countText = computed(() => {
     : translate('problems.count', { n: count }, total);
 });
 
-/** The size of the whole catalogue, kept from the last unfiltered answer so the header does not change with a filter. */
-const catalogueTotal = ref<number | null>(null);
-watch(
-  [data, isFiltered, () => filters.value.search],
-  () => {
-    if (data.value && !isFiltered.value && !filters.value.search.trim())
-      catalogueTotal.value = data.value.meta.total;
-  },
-  { immediate: true },
-);
-/** The header's one fact for a signed-in viewer: "Bạn đã giải 12 / 55 bài" ("12 bài" while the catalogue size is unknown). */
+/** The header's one fact for a signed-in viewer: "Bạn đã giải 12 bài", the site-wide count; the list size is in the toolbar. */
 const facts = computed<PageFact[]>(() => {
   if (!viewer.value) return [];
   const solved = formatNumber(viewer.value.problemCount, locale.locale);
-  const value =
-    catalogueTotal.value === null
-      ? translate('problems.meta.solvedOnly', { solved })
-      : translate('problems.meta.solvedOf', {
-          solved,
-          total: formatNumber(catalogueTotal.value, locale.locale),
-        });
-  return [{ label: translate('problems.meta.solvedLabel'), value }];
+  return [
+    {
+      label: translate('problems.meta.solvedLabel'),
+      value: translate('problems.meta.solvedOnly', { solved }),
+    },
+  ];
 });
 
 const prefetch = usePrefetchProblem(lang);

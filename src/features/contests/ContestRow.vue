@@ -84,7 +84,7 @@ const CUE_OF = { running: 'live', upcoming: 'upcoming', ended: 'ended' } as cons
       {{ facts.join(' · ') }}
     </p>
     <p
-      class="shrink-0 text-right text-meta whitespace-nowrap tabular-nums md:w-36"
+      class="shrink-0 text-right text-meta whitespace-nowrap tabular-nums md:w-44"
       :class="CUE_TEXT[CUE_OF[phase]]"
       :data-cue="CUE_OF[phase]"
     >

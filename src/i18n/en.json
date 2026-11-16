@@ -1286,7 +1286,6 @@
     "hasEditorialHint": "Only problems with a published editorial",
     "meta": {
       "solvedLabel": "You solved",
-      "solvedOf": "{solved} / {total} problems",
       "solvedOnly": "{solved} problems"
     },
     "solvedFilter": {

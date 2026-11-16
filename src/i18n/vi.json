@@ -1286,7 +1286,6 @@
     "hasEditorialHint": "Chỉ bài đã có lời giải được công bố",
     "meta": {
       "solvedLabel": "Bạn đã giải",
-      "solvedOf": "{solved} / {total} bài",
       "solvedOnly": "{solved} bài"
     },
     "solvedFilter": {
