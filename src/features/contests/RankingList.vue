@@ -96,9 +96,12 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
       >
         <span class="px-2 py-2 text-right font-mono tabular-nums">
           <span class="sr-only">{{ $t('ranking.columns.rank') }}</span>
-          <span :class="row.rank && !row.isDisqualified ? [MEDAL_BADGE_SHAPE, medalBadgeClass(row.rank)] : ''">{{
-            row.isDisqualified ? '—' : (row.rank ?? '—')
-          }}</span>
+          <span
+            :class="
+              row.rank && !row.isDisqualified ? [MEDAL_BADGE_SHAPE, medalBadgeClass(row.rank)] : ''
+            "
+            >{{ row.isDisqualified ? '—' : (row.rank ?? '—') }}</span
+          >
         </span>
         <div tabindex="-1" data-row-focus class="min-w-0 px-2 py-2">
           <span class="flex min-w-0 flex-wrap items-center gap-1.5">

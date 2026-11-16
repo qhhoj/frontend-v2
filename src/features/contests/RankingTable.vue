@@ -228,9 +228,14 @@ const scoreHeaderKey = computed(() =>
               class="h-12 w-14 px-3 py-0 text-right"
               :class="[RANK_STICKY, stickyBackground(row)]"
             >
-              <span :class="row.rank && !row.isDisqualified ? [MEDAL_BADGE_SHAPE, medalBadgeClass(row.rank)] : ''">{{
-                row.isDisqualified ? '—' : (row.rank ?? '—')
-              }}</span>
+              <span
+                :class="
+                  row.rank && !row.isDisqualified
+                    ? [MEDAL_BADGE_SHAPE, medalBadgeClass(row.rank)]
+                    : ''
+                "
+                >{{ row.isDisqualified ? '—' : (row.rank ?? '—') }}</span
+              >
             </td>
             <th
               scope="row"
