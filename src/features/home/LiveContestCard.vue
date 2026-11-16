@@ -4,6 +4,7 @@ import type { CurrentParticipation } from '@/api/types/contests';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
+import StatusDot from '@/components/ui/StatusDot.vue';
 import { participationKind } from '@/features/contests/bar/current-contest';
 import { useCurrentContest } from '@/features/contests/bar/use-current-contest';
 import { formatNumber } from '@/lib/format';
@@ -40,11 +41,11 @@ const format = (value: number) => formatNumber(value, locale.locale);
     v-if="current"
     data-testid="live-contest"
     padding="sm"
-    class="flex flex-wrap items-center gap-x-5 gap-y-2 border-l-4 border-l-positive"
+    class="flex flex-wrap items-center gap-x-5 gap-y-2 border-l-4 border-l-cue-live"
   >
     <div class="min-w-0 flex-1 basis-56">
-      <p class="flex items-center gap-1.5 text-meta font-semibold text-positive">
-        <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-positive" />
+      <p class="flex items-center gap-1.5 text-meta font-semibold text-cue-live">
+        <StatusDot tone="live" />
         {{ $t(statusKey, { run: current.participation.virtual }) }}
       </p>
       <h2 class="truncate text-title leading-5.5 font-semibold">{{ current.contest.name }}</h2>

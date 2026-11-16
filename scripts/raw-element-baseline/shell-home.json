@@ -1,10 +1,4 @@
 {
-  "features/home/ContestsCard.vue": {
-    "status-colour": 2
-  },
-  "features/home/LiveContestCard.vue": {
-    "status-colour": 2
-  },
   "features/shell/AppRail.vue": {
     "status-colour": 2
   },
