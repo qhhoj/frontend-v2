@@ -37,7 +37,7 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
       <Star
         v-if="view.kind === 'first-solve'"
         aria-hidden="true"
-        class="absolute top-0.5 right-0.5 size-2.5 text-verdict-ac"
+        class="absolute top-0.5 right-0.5 size-2.5 text-positive"
       />
       <span aria-hidden="true" class="text-sm font-normal"
         ><ScoreTick :text="view.text" :animate="tick"

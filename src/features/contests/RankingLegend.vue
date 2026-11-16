@@ -58,8 +58,8 @@ const isOpen = ref(false);
       <li v-if="isPenalty || showsTime" class="flex items-center gap-1.5">
         <span
           data-testid="first-solve-swatch"
-          class="relative inline-flex h-5 w-9 shrink-0 rounded-cell bg-verdict-ac-bg"
-          ><Star class="absolute top-0.5 right-0.5 size-2.5 text-verdict-ac" aria-hidden="true"
+          class="relative inline-flex h-5 w-9 shrink-0 rounded-cell bg-positive-bg"
+          ><Star class="absolute top-0.5 right-0.5 size-2.5 text-positive" aria-hidden="true"
         /></span>
         {{ $t(isPenalty ? 'ranking.legend.firstSolve' : 'ranking.legend.firstPoints') }}
       </li>

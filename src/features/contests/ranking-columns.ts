@@ -30,8 +30,7 @@ const TINY_PX = 11;
 /** The total score column prints `text-base`. */
 const TOTAL_PX = 16;
 const textRem = (text: string, fontPx: number) => (text.length * MONO_EM * fontPx) / ROOT_PX;
-/** A 4 px gap between parts, and 4 px spare so a hover ring or a rounding never clips. */
-const GAP_REM = 0.25;
+/** 4 px spare so a hover ring or a rounding never clips. */
 const SPARE_REM = 0.25;
 /** Widths move in half-rem steps, so a poll that adds one character rarely moves the board. */
 const roundUp = (rem: number) => Math.ceil(rem * 2) / 2;
