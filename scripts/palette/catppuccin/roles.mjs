@@ -9,10 +9,10 @@ const FLAVOURS = JSON.parse(readFileSync(new URL('./palette.json', import.meta.u
 const round = (value, digits) => Number(value.toFixed(digits));
 
 function hueChromaLightness(hex) {
-  const [lightness, a, b] = hexToOklab(hex);
+  const [lightness, greenRed, blueYellow] = hexToOklab(hex);
   return [
-    round(((Math.atan2(b, a) * 180) / Math.PI + 360) % 360, 4),
-    round(Math.hypot(a, b), 5),
+    round(((Math.atan2(blueYellow, greenRed) * 180) / Math.PI + 360) % 360, 4),
+    round(Math.hypot(greenRed, blueYellow), 5),
     round(lightness, 5),
   ];
 }
@@ -63,10 +63,10 @@ const ROLES = {
 
 const mixHex = (one, two) => {
   const channels = (hex) => [1, 3, 5].map((index) => parseInt(hex.slice(index, index + 2), 16));
-  const [a, b] = [channels(one), channels(two)];
-  return `#${a
+  const [first, second] = [channels(one), channels(two)];
+  return `#${first
     .map((value, index) =>
-      Math.round((value + b[index]) / 2)
+      Math.round((value + second[index]) / 2)
         .toString(16)
         .padStart(2, '0'),
     )
@@ -75,30 +75,33 @@ const mixHex = (one, two) => {
 
 /** Page, cards (mantle, as Catppuccin's side panes), strong cards, hover, hairlines. */
 const grounds = (flavour, hover) => {
-  const f = FLAVOURS[flavour];
+  const flavourColours = FLAVOURS[flavour];
   return Object.fromEntries(
     Object.entries({
-      ground: f.base,
-      surface: f.mantle,
-      strong: flavour === 'latte' ? mixHex(f.mantle, f.crust) : f.crust,
-      hover: hover(f),
-      line: f.surface1,
-      lineStrong: f.overlay0,
+      ground: flavourColours.base,
+      surface: flavourColours.mantle,
+      strong:
+        flavour === 'latte'
+          ? mixHex(flavourColours.mantle, flavourColours.crust)
+          : flavourColours.crust,
+      hover: hover(flavourColours),
+      line: flavourColours.surface1,
+      lineStrong: flavourColours.overlay0,
     }).map(([name, hex]) => [name, hex.toUpperCase()]),
   );
 };
 
 function modeInputs(flavour) {
-  const f = FLAVOURS[flavour];
+  const flavourColours = FLAVOURS[flavour];
   const named = (roles) =>
     Object.fromEntries(
-      Object.entries(roles).map(([role, name]) => [role, hueChromaLightness(f[name])]),
+      Object.entries(roles).map(([role, name]) => [role, hueChromaLightness(flavourColours[name])]),
     );
   return {
-    neutral: hueChromaLightness(f.text).slice(0, 2),
+    neutral: hueChromaLightness(flavourColours.text).slice(0, 2),
     accents: named(ROLES.accents),
     lanes: named(ROLES.lanes),
-    tags: ROLES.tags.map((name) => hueChromaLightness(f[name])),
+    tags: ROLES.tags.map((name) => hueChromaLightness(flavourColours[name])),
     tiers: named(ROLES.tiers),
     medals: named(ROLES.medals),
     syntax: named(ROLES.syntax),
@@ -107,9 +110,9 @@ function modeInputs(flavour) {
 
 /** Hover: Latte crust, Mocha surface0; Frappé base (white on its surface0 is 9.5:1, under the dark text floor of 11). */
 const HOVER = {
-  latte: (f) => f.crust,
-  mocha: (f) => f.surface0,
-  frappe: (f) => f.base,
+  latte: (flavourColours) => flavourColours.crust,
+  mocha: (flavourColours) => flavourColours.surface0,
+  frappe: (flavourColours) => flavourColours.base,
 };
 
 /** The palette overrides for Latte + a dark flavour. Tints are a little weaker in dark mode: the dark colours are pastels. */
