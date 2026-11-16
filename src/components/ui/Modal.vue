@@ -74,16 +74,18 @@ const handlers = useModalDialog(useTemplateRef<HTMLDialogElement>('dialog'), vis
       role="dialog"
       aria-modal="true"
       :aria-labelledby="labelledBy"
-      class="m-auto max-h-[calc(100dvh-2rem)] w-[min(28rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] flex-col rounded-card border border-line-strong bg-surface-solid p-0 text-content shadow-float outline-none transition-[opacity,scale] duration-(--qh-duration) ease-standard backdrop:bg-ground/70 backdrop:transition-opacity backdrop:duration-(--qh-duration-fast) open:flex starting:open:scale-96 starting:open:opacity-0 starting:open:backdrop:opacity-0"
+      class="m-auto max-h-[calc(100dvh-2rem)] w-[min(28rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] flex-col rounded-card overlay-surface p-0 text-content outline-none transition-[opacity,scale] duration-(--qh-duration) ease-standard backdrop:bg-ground/70 backdrop:transition-opacity backdrop:duration-(--qh-duration-fast) open:flex starting:open:scale-96 starting:open:opacity-0 starting:open:backdrop:opacity-0"
       :class="sizeClass"
       @cancel="handlers.onCancel"
       @close="handlers.onClose"
       @pointerdown="handlers.onPointerdown"
       @click="handlers.onClick"
     >
-      <header class="flex shrink-0 items-start justify-between gap-3 px-6 pt-5">
+      <header
+        class="flex shrink-0 items-start justify-between gap-3 px-(--qh-pad-dialog) pt-(--qh-pad-dialog)"
+      >
         <slot name="header">
-          <h2 :id="titleId" class="m-0 font-display text-section-legacy leading-7 font-semibold">
+          <h2 :id="titleId" class="m-0 font-display text-section font-semibold">
             {{ title }}
           </h2>
         </slot>
@@ -97,8 +99,12 @@ const handlers = useModalDialog(useTemplateRef<HTMLDialogElement>('dialog'), vis
         </IconButton>
       </header>
       <!-- A dialog taller than the screen scrolls here, so the header (close button) and footer stay on screen. -->
-      <div ref="body" class="min-h-0 overflow-y-auto px-6 py-4"><slot /></div>
-      <footer v-if="$slots.footer" ref="footer" class="flex shrink-0 justify-end gap-2.5 px-6 pb-5">
+      <div ref="body" class="min-h-0 overflow-y-auto px-(--qh-pad-dialog) py-4"><slot /></div>
+      <footer
+        v-if="$slots.footer"
+        ref="footer"
+        class="flex shrink-0 justify-end gap-2.5 px-(--qh-pad-dialog) pb-(--qh-pad-dialog)"
+      >
         <slot name="footer" />
       </footer>
     </dialog>

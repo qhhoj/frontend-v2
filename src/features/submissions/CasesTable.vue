@@ -18,7 +18,7 @@ import { formatCasePoints, pendingPositions } from './test-overview';
 /**
  * The result card ("Kết quả chấm"): the compile log, one row per test, then the `footer` slot (the subtasks and the total,
  * `TestOverview.vue`). Keep `CasesTableSkeleton.vue` in step: same card, header cells and row classes. Below `sm` the same rows lay out as cards
- * (test, verdict and points, then time and memory), so each test keeps one `#case-<n>` anchor. From `xl` the cells tighten (`xl:px-3`) and the table drops its minimum width.
+ * (test, verdict and points, then time and memory), so each test keeps one `#case-<n>` anchor. Cells pad 24 px on the left, the same edge as the card title.
  */
 const props = defineProps<{
   cases: SubmissionCase[] | null;
@@ -93,7 +93,7 @@ const pendingNumbers = computed(() =>
 /** The phone card grid of a row and where each cell sits in it; from `sm` up they are plain table cells. */
 const ROW_CARD =
   'max-sm:grid max-sm:grid-cols-[auto_minmax(0,1fr)_auto] max-sm:items-center max-sm:gap-x-2.5 max-sm:gap-y-0.5 max-sm:px-4 max-sm:py-2.5';
-const CELL = 'px-6 py-3 max-sm:p-0 xl:px-3 xl:py-2.5';
+const CELL = 'px-6 py-3 max-sm:p-0';
 const NUMBER_CELL = `${CELL} text-right font-mono tabular-nums`;
 const CELL_PLACES = {
   test: 'max-sm:col-start-1 max-sm:row-start-1',
@@ -155,7 +155,7 @@ const isHidden = computed(
               v-for="column in COLUMN_KEYS"
               :key="column"
               scope="col"
-              class="px-6 py-3 font-medium whitespace-nowrap xl:px-3 xl:py-2.5"
+              class="px-6 py-3 font-medium whitespace-nowrap"
               :class="{ 'text-right': column !== 'test' && column !== 'result' }"
             >
               {{ $t(`submission.cases.${column}`) }}
@@ -209,7 +209,7 @@ const isHidden = computed(
             <tr v-if="row.details.length > 0" :id="`${row.key}-details`" class="max-sm:block">
               <td colspan="5" class="p-0 max-sm:block">
                 <FoldPanel :open="isOpen(row.key)">
-                  <div class="px-6 pb-3 max-sm:px-4 xl:px-3">
+                  <div class="px-6 pb-3 max-sm:px-4">
                     <CaseDetails :details="row.details" />
                   </div>
                 </FoldPanel>

@@ -47,7 +47,7 @@ const retry = () => {
   void upcoming.refetch();
 };
 const ROW =
-  'flex min-h-9 items-center gap-3 py-1.5 pr-2 pl-3 text-content hover:bg-surface-hover touch:py-3';
+  'flex min-h-(--qh-row) items-center gap-3 pr-2 pl-3 text-content hover:bg-surface-hover';
 </script>
 
 <template>
@@ -69,7 +69,7 @@ const ROW =
     <QueryState :loading="isPending" :error="error" @retry="retry()">
       <template #skeleton>
         <ul class="flex flex-col divide-y divide-line">
-          <li v-for="row in 3" :key="row" class="flex items-center gap-3 py-2">
+          <li v-for="row in 3" :key="row" class="flex min-h-(--qh-row) items-center gap-3">
             <span class="min-w-0 flex-1"><SkeletonBlock text class="w-2/3" /></span>
             <SkeletonBlock text class="w-20" />
           </li>

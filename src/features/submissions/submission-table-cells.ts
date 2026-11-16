@@ -1,3 +1,4 @@
+import { TABLE_HEAD_CELL, TABLE_ROW_HEIGHT } from '@/components/ui/table-classes';
 /** Columns a submission table can show, in table order. The verdict column holds the score; `cost` is "time · memory". */
 export type ColumnKey = 'verdict' | 'problem' | 'user' | 'cost' | 'language' | 'when';
 /** Every column, in table order. */
@@ -72,9 +73,7 @@ export const fullCellClass = (kind: CellKind | 'pick' | 'source') =>
 export const NUMBER_CELLS: ReadonlySet<CellKind> = new Set(['score', 'time', 'memory']);
 
 /** Shared by `SubmissionTable.vue` and its skeleton, so the two cannot drift apart in height or width. */
-export const HEADER_CELL_CLASSES =
-  'h-8 px-2 text-tiny font-semibold whitespace-nowrap first:pl-4 last:pr-3';
-export const BODY_CELL_CLASSES =
-  'h-(--qh-row) px-2 align-middle text-meta first:pl-4 last:pr-3 touch:h-12';
-/** The header row: a tinted band above the first row. */
-export const HEADER_ROW_CLASSES = 'bg-surface-strong text-left text-muted';
+export const HEADER_CELL_CLASSES = `${TABLE_HEAD_CELL} px-2 first:pl-(--qh-pad-surface) last:pr-(--qh-pad-surface)`;
+export const BODY_CELL_CLASSES = `${TABLE_ROW_HEIGHT} px-2 align-middle text-body first:pl-(--qh-pad-surface) last:pr-(--qh-pad-surface)`;
+/** The header row: the same surface tone as the rows, like every table. */
+export const HEADER_ROW_CLASSES = 'text-left text-muted';

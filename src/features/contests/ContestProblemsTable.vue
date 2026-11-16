@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ContestDetail, ContestPhase, ContestProblem } from '@/api/types/contests';
+import { TABLE_HEAD_CELL, TABLE_ROW_HEIGHT } from '@/components/ui/table-classes';
 import { CUE_ROW, CUE_TABLE_ROW } from '@/components/ui/cue-tones';
 import type { CueTone } from '@/components/ui/cue-tones';
 import Card from '@/components/ui/Card.vue';
@@ -96,20 +97,20 @@ const phoneFacts = (problem: ContestProblem) =>
           }}
         </caption>
         <thead>
-          <tr class="text-left text-meta text-muted">
-            <th scope="col" class="px-5 py-3 font-semibold">
+          <tr :class="['text-left', TABLE_HEAD_CELL]">
+            <th scope="col" class="px-5 font-semibold">
               {{ $t('contests.problems.columns.label') }}
             </th>
-            <th scope="col" class="px-3 py-2 font-semibold">
+            <th scope="col" class="px-3 font-semibold">
               {{ $t('contests.problems.columns.name') }}
             </th>
-            <th v-if="hasLimits" scope="col" class="px-3 py-2 font-semibold whitespace-nowrap">
+            <th v-if="hasLimits" scope="col" class="px-3 font-semibold whitespace-nowrap">
               {{ $t('problemSwitcher.limitsColumn') }}
             </th>
-            <th scope="col" class="px-3 py-2 text-right font-semibold">
+            <th scope="col" class="px-3 text-right font-semibold">
               {{ $t('contests.problems.columns.points') }}
             </th>
-            <th v-if="hasOwnResults" scope="col" class="px-3 py-2 font-semibold whitespace-nowrap">
+            <th v-if="hasOwnResults" scope="col" class="px-3 font-semibold whitespace-nowrap">
               {{ $t('contests.problems.columns.own') }}
             </th>
           </tr>
@@ -121,33 +122,35 @@ const phoneFacts = (problem: ContestProblem) =>
             class="relative border-t border-line hover:bg-surface-hover"
             :class="rowCueOf(problem, CUE_TABLE_ROW)"
           >
-            <th scope="row" class="px-5 py-2 text-left font-display text-section font-bold">
+            <th
+              scope="row"
+              :class="['px-5 text-left font-display text-section font-bold', TABLE_ROW_HEIGHT]"
+            >
               {{ problem.label }}
             </th>
-            <td class="w-full max-w-0 min-w-28 px-3 py-2">
-              <RouterLink
-                :to="problemLink(problem)"
-                :title="problem.name"
-                class="block truncate font-semibold after:absolute after:inset-0 hover:text-accent-text"
-                >{{ problem.name }}</RouterLink
-              >
-              <span :title="problem.code" class="block truncate font-mono text-caption text-muted">
-                {{ problem.code }}
+            <td class="w-full max-w-0 min-w-28 px-3">
+              <span class="flex min-w-0 items-baseline gap-3">
+                <RouterLink
+                  :to="problemLink(problem)"
+                  :title="problem.name"
+                  class="truncate font-medium after:absolute after:inset-0 hover:text-accent-text"
+                  >{{ problem.name }}</RouterLink
+                >
+                <span :title="problem.code" class="shrink-0 font-mono text-small text-muted">
+                  {{ problem.code }}
+                </span>
               </span>
               <span v-if="capLines.get(problem.problemId)" class="block text-caption text-muted">
                 {{ capLines.get(problem.problemId) }}
               </span>
             </td>
-            <td
-              v-if="hasLimits"
-              class="px-3 py-2 font-mono text-meta whitespace-nowrap tabular-nums"
-            >
+            <td v-if="hasLimits" class="px-3 font-mono text-meta whitespace-nowrap tabular-nums">
               {{ hasLimit(problem) ? limitsText(problem) : '' }}
             </td>
-            <td class="px-3 py-2 text-right font-mono whitespace-nowrap tabular-nums">
+            <td class="px-3 text-right font-mono whitespace-nowrap tabular-nums">
               {{ pointsOf(problem) }}
             </td>
-            <td v-if="hasOwnResults" class="max-w-40 px-3 py-2 xl:max-w-none">
+            <td v-if="hasOwnResults" class="max-w-40 px-3 xl:max-w-none">
               <OwnResultChip :problem="problem" :context="context" />
             </td>
           </tr>
@@ -157,7 +160,7 @@ const phoneFacts = (problem: ContestProblem) =>
         <li
           v-for="problem in contest.problems"
           :key="problem.problemId"
-          class="relative flex min-h-14 items-center gap-3 border-t border-line px-3.5 py-3 first:border-t-0"
+          class="relative flex min-h-(--qh-row) items-center gap-3 border-t border-line px-3.5 py-2 first:border-t-0"
           :class="rowCueOf(problem, CUE_ROW)"
         >
           <span class="w-7 font-display text-section font-bold" aria-hidden="true">

@@ -52,12 +52,10 @@ const visible = computed(() => (submissions.value ?? []).slice(0, VISIBLE));
         <li v-for="item in visible" :key="item.id">
           <RouterLink
             :to="{ name: 'submission', params: { id: item.id } }"
-            class="flex min-h-9 items-center gap-3 py-1 text-content hover:bg-surface-hover touch:py-3"
+            class="flex min-h-(--qh-row) items-center gap-3 text-content hover:bg-surface-hover"
           >
             <VerdictChip :verdict="submissionVerdictOf(item)" />
-            <span class="min-w-0 flex-1 truncate font-semibold">{{
-              item.problem?.name ?? '—'
-            }}</span>
+            <span class="min-w-0 flex-1 truncate font-medium">{{ item.problem?.name ?? '—' }}</span>
             <span class="hidden shrink-0 text-meta text-muted sm:inline"
               ><LanguageLabel v-if="item.language" :language="item.language" /><template v-else
                 >—</template

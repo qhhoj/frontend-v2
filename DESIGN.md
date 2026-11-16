@@ -47,6 +47,8 @@ Radius by rule: a control is a pill (`rounded-control`, 999); a surface is 12 (`
 
 Surface levels, by tone not by line: L0 ground (`bg-ground`), L1 surface (`bg-surface`: Card, Panel, table, contest card), L2 strong (`bg-surface-strong`: fields, secondary buttons, segmented track, current tab, neutral chips, inset tiles, the rail), hover `bg-surface-hover`, L3 overlay (L1 + `shadow-float` + `--qh-ring-overlay`: Menu, Popover, Dialog, Sheet, Toast). A field is one level away from its container (an L2 field on L0 or L1, an L1 field on the L2 rail). Lines stay between rows inside one surface, between StatStrip cells, and as the ring on an overlay. An invalid field draws a red tint and a 1 px red ring. In contrast-high mode controls and surfaces get a 1 px `--qh-line-control` edge back (`edge-high` utility).
 
+Tables: every table, including the hand-built ones, takes its row and head height from `components/ui/table-classes.ts` (44, 40 dense, touch 44; head 13 semibold muted on the row surface; hairlines between rows, no frame). Floating layers (Menu, Popover, Dialog, Sheet, Toast) use the `overlay-surface` utility: surface tone, 1 px `--qh-line` ring, float shadow; Menu items are 40, radius 8. Step 2 removed no alias, because about 170 files still use the radius names and `text-sm`/`text-tiny`.
+
 Deprecated token names, kept as aliases while many files use them: `--qh-radius-card` (= `--qh-radius-surface`), `--qh-radius-row` (= `--qh-radius-nested`), `--qh-radius-cell` (= `--qh-radius-mark`), `--qh-radius-pill`, `Card` `padding` `sm` and `lg` (= `md`, 20), Tabs `variant="underline"` (draws the pill row, same as `pill`), the CSS class `glass` (no border now), `--qa-chip` (= `--qh-control`).
 
 ### Spacing, widths, radii

@@ -203,7 +203,7 @@ function onBoxKeydown(event: KeyboardEvent) {
       ref="panel"
       popover="manual"
       data-popup
-      class="rounded-row border border-line-strong bg-surface-solid p-1 text-content shadow-float"
+      class="rounded-card overlay-surface p-1 text-content"
       :style="{ minWidth: `${box?.offsetWidth ?? 0}px` }"
     >
       <div v-if="filter" class="relative p-1">
