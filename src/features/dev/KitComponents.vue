@@ -69,6 +69,7 @@ const columns = [
   { key: 'length', label: 'Thời lượng', align: 'end' as const },
   { key: 'date', label: 'Ngày', align: 'end' as const },
 ];
+const ledgerColumns = columns.map((column) => ({ ...column, grow: column.key === 'name' }));
 const rowKey = (row: FixtureRow) => row.code;
 const BUTTON_TONES = ['primary', 'secondary', 'ghost', 'danger', 'link'] as const;
 </script>
@@ -212,6 +213,23 @@ const BUTTON_TONES = ['primary', 'secondary', 'ghost', 'danger', 'link'] as cons
       </DataTable>
     </PageSection>
 
+    <PageSection title="Bảng không khung (ledger)" :count="TABLE_ROWS.length">
+      <DataTable
+        :columns="ledgerColumns"
+        :rows="TABLE_ROWS"
+        :row-key="rowKey"
+        :row-to="() => ({ name: 'dev-kit' })"
+        label="Bảng không khung mẫu"
+        variant="ledger"
+        density="compact"
+      />
+      <EmptyState inline class="mt-(--space-stack)">
+        Chưa có kỳ thi nào đang diễn ra.
+        <template #next>Kỳ thi tiếp theo: 21/11</template>
+        <template #action><AppButton size="sm">Xem lịch thi</AppButton></template>
+      </EmptyState>
+    </PageSection>
+
     <PageSection title="Thanh công cụ, đầu trang, menu">
       <div class="flex flex-col gap-4">
         <Toolbar>
@@ -226,6 +244,11 @@ const BUTTON_TONES = ['primary', 'secondary', 'ghost', 'danger', 'link'] as cons
             title="Tiêu đề trang mẫu"
             :crumbs="[{ label: 'Kỳ thi' }, { label: 'lamter_1', mono: true }]"
             :meta="['16/11/2026', '2:00']"
+            :facts="[
+              { label: 'Giới hạn', value: '1 giây' },
+              { label: 'Bộ nhớ', value: '256 MB' },
+              { value: 'Đang diễn ra', mono: false, tone: 'live' },
+            ]"
           >
             <template #actions><AppButton tone="primary">Hành động</AppButton></template>
           </PageHeader>
