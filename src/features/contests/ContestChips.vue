@@ -16,6 +16,8 @@ const props = defineProps<{
   hideOrganizations?: boolean;
   /** Only the organizations and tags: the contest header already shows the format and access chips. */
   onlyTags?: boolean;
+  /** The format has a column of its own (the ended table): only the access, rating and privacy chips remain. */
+  hideFormat?: boolean;
 }>();
 /** Read from the cache only: the list and the contest header fetch the catalogue; elsewhere tags stay neutral. */
 const { data: catalogue } = useContestTagsCache();
@@ -31,12 +33,12 @@ const showOrganizations = computed(
 
 <template>
   <template v-if="!onlyTags">
-    <Chip>{{ formatLabel(contest.formatName) }}</Chip>
+    <Chip v-if="!hideFormat">{{ formatLabel(contest.formatName) }}</Chip>
     <Chip v-if="contest.isRated" tone="accent" :icon="TrendingUp">{{ $t('contests.rated') }}</Chip>
-    <Chip v-if="withCodeNeeded && contest.requiresAccessCode" :icon="Lock">{{
+    <Chip v-if="withCodeNeeded && contest.requiresAccessCode" tone="warning" :icon="Lock">{{
       $t('contests.list.codeNeeded')
     }}</Chip>
-    <Chip v-if="contest.isPrivate">{{ $t('contests.private') }}</Chip>
+    <Chip v-if="contest.isPrivate" tone="neutral">{{ $t('contests.private') }}</Chip>
     <Chip v-else-if="contest.isOrganizationPrivate && !showOrganizations">{{
       $t('contests.organizationPrivate')
     }}</Chip>

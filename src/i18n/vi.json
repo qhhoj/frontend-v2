@@ -293,7 +293,6 @@
       "searchPlaceholder": "Tìm theo mã hoặc tên",
       "startsIn": "bắt đầu {relative}",
       "viewAndRegister": "Xem & đăng ký",
-      "endedRegion": "Bảng kỳ thi đã kết thúc, cuộn ngang",
       "shownOf": "{shown} trong {total}",
       "count": "{n} kỳ thi",
       "view": "Xem",
@@ -305,7 +304,8 @@
       },
       "columns": {
         "contest": "Kỳ thi",
-        "when": "Ngày · thời lượng",
+        "when": "Ngày",
+        "length": "Thời lượng",
         "format": "Thể thức",
         "participants": "Thí sinh",
         "action": "Thao tác"

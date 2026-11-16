@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Card from '@/components/ui/Card.vue';
-import ScrollRegion from '@/components/ScrollRegion.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import {
   ENDED_CELL,
@@ -15,7 +14,7 @@ const ROW_COUNT = 5;
 
 <template>
   <Card as="div" class="overflow-hidden">
-    <ScrollRegion placeholder label="">
+    <div>
       <table aria-hidden="true" :class="ENDED_TABLE_CLASS">
         <thead>
           <tr :class="ENDED_HEAD_ROW_CLASS">
@@ -23,6 +22,7 @@ const ROW_COUNT = 5;
               <SkeletonBlock text class="w-24" />
             </th>
             <th scope="col" :class="ENDED_CELL.when"><SkeletonBlock text class="w-20" /></th>
+            <th scope="col" :class="ENDED_CELL.length"><SkeletonBlock text class="w-16" /></th>
             <th scope="col" :class="ENDED_CELL.format"><SkeletonBlock text class="w-20" /></th>
             <th scope="col" :class="ENDED_CELL.participants">
               <SkeletonBlock text class="ml-auto w-16" />
@@ -42,16 +42,17 @@ const ROW_COUNT = 5;
               <span class="block font-mono text-caption"><SkeletonBlock text class="w-16" /></span>
             </td>
             <td :class="ENDED_CELL.when"><SkeletonBlock text class="w-28" /></td>
-            <td :class="ENDED_CELL.format"><SkeletonBlock pill class="h-6 w-24" /></td>
+            <td :class="ENDED_CELL.length"><SkeletonBlock text class="w-12" /></td>
+            <td :class="ENDED_CELL.format"><SkeletonBlock text class="w-16" /></td>
             <td :class="ENDED_CELL.participants">
               <SkeletonBlock text class="ml-auto w-10" />
             </td>
             <td :class="ENDED_CELL.action">
-              <SkeletonBlock pill class="ml-auto h-11 w-52" />
+              <SkeletonBlock pill class="ml-auto h-8 w-20" />
             </td>
           </tr>
         </tbody>
       </table>
-    </ScrollRegion>
+    </div>
   </Card>
 </template>

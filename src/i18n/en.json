@@ -293,7 +293,6 @@
       "searchPlaceholder": "Search by key or name",
       "startsIn": "starts {relative}",
       "viewAndRegister": "View & register",
-      "endedRegion": "Ended contests, scrolls sideways",
       "shownOf": "{shown} of {total}",
       "count": "{n} contest | {n} contests",
       "view": "View",
@@ -305,7 +304,8 @@
       },
       "columns": {
         "contest": "Contest",
-        "when": "Date · length",
+        "when": "Date",
+        "length": "Length",
         "format": "Format",
         "participants": "Contestants",
         "action": "Action"
