@@ -28,7 +28,8 @@ export interface TabItem {
   label: string;
   /** A link tab: the section lives in the URL. Without `to` on every item the tabs are an in-page tablist. */
   to?: RouteLocationRaw;
-  /** Lights a link tab on a page that is not its own route; otherwise the router marks the exact match. */
+  /** Set on every item when the router's exact match is not enough (tabs told apart by a query, as `?tab=`): true lights the
+   *  tab, false keeps it dark even on an exact match. Left out, the router marks the exact match. */
   isCurrent?: boolean;
   /** A 16 px icon before the label (a side nav's sections). */
   icon?: Component;
@@ -104,7 +105,8 @@ const isHidden = (item: TabItem) =>
 function linkCurrent(item: TabItem) {
   if (current.value !== undefined)
     return { 'aria-current': item.key === current.value ? 'page' : undefined };
-  return item.isCurrent ? { 'aria-current': 'page' } : {};
+  if (item.isCurrent === undefined) return {};
+  return { 'aria-current': item.isCurrent ? 'page' : undefined };
 }
 
 function tabAttrs(item: TabItem) {
