@@ -14,6 +14,8 @@ import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { GLOBAL_SCOPE } from '@/features/submissions/list/submission-scope';
 import { useScopedSubmissionListQuery } from '@/features/submissions/submissions.queries';
 import type { SubmissionFilters } from '@/features/submissions/use-submission-filters';
+import { CUE_TEXT } from '@/components/ui/cue-tones';
+import type { CueTone } from '@/components/ui/cue-tones';
 import { formatPoints, scoreBelowFull } from '@/lib/format';
 import { formatAgoCompact } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
@@ -56,6 +58,13 @@ const isJudging = computed(() => {
   const first = latest.value[0];
   return first !== undefined && IN_PROGRESS_STATUSES.includes(first.status);
 });
+/** The cue of a judged score: full at the maximum, zero at nothing, partial between; none while unjudged or when the maximum is unknown. */
+function scoreTone(points: number | null, max: number | null): CueTone | null {
+  if (points === null) return null;
+  if (points <= 0) return 'zero';
+  if (max === null) return null;
+  return points >= max ? 'full' : 'partial';
+}
 /** The score's value, and what it is out of with the scale's name: "250", "/ 250 điểm kỳ thi". */
 function scoreParts(submission: SubmissionListItem) {
   const { scale, points, max, digits } = railScore(submission, props.scale);
@@ -68,7 +77,7 @@ function scoreParts(submission: SubmissionListItem) {
         ? t('problem.rail.mine.contestUnit')
         : t('submission.contest.outOf', { max: maxText });
   const value = points === null ? NO_SCORE : format(scoreBelowFull(points, max, digits));
-  return { value, outOf, scale };
+  return { value, outOf, scale, tone: scoreTone(points, max) };
 }
 const rows = computed(() =>
   latest.value.map((submission) => ({ submission, score: scoreParts(submission) })),
@@ -106,7 +115,9 @@ const rows = computed(() =>
             <VerdictChip v-else :verdict="submissionVerdictOf(submission)" />
           </RouterLink>
           <p :data-scale="score.scale" :title="submission.contest?.name" class="min-w-0">
-            <span class="font-mono font-bold tabular-nums">{{ score.value }}</span
+            <span
+              :class="['font-mono font-bold tabular-nums', score.tone && CUE_TEXT[score.tone]]"
+              >{{ score.value }}</span
             >{{ ' ' }}<span class="text-meta whitespace-nowrap text-muted">{{ score.outOf }}</span>
           </p>
           <time :datetime="submission.date" class="ml-auto text-meta text-muted">{{

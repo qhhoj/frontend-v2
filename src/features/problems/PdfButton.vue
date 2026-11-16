@@ -6,6 +6,7 @@ import type { StatementLanguage } from '@/api/types/problems';
 import { translate } from '@/i18n';
 import IconButton from '@/components/ui/IconButton.vue';
 import AppButton from '@/components/ui/AppButton.vue';
+import Notice from '@/components/ui/Notice.vue';
 import { usePdfStatement } from './use-pdf-statement';
 import type { PdfFailure } from './use-pdf-statement';
 
@@ -136,12 +137,13 @@ watch(
       <template #icon><FileText class="size-4" aria-hidden="true" /></template>
       {{ mustWait ? `${secondsToRetry}s` : 'PDF' }}
     </AppButton>
-    <span
+    <div
       v-if="phase === 'failed'"
-      class="absolute top-full right-0 z-10 mt-2 w-56 rounded-row border border-line bg-surface-solid p-3 text-sm text-negative"
+      class="absolute top-full right-0 z-10 mt-2 w-56 rounded-row border border-line bg-surface-solid p-3 text-sm"
       aria-hidden="true"
-      >{{ $t(failureKey) }}</span
     >
+      <Notice tone="danger" inline :role="null">{{ $t(failureKey) }}</Notice>
+    </div>
     <span class="sr-only" role="status">{{
       phase === 'ready' ? $t('problem.pdfReady') : phase === 'failed' ? $t(failureKey) : ''
     }}</span>
