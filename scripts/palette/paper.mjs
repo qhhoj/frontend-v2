@@ -61,7 +61,7 @@ export const PAPER = {
     master: [55, 0.17],
     grandmaster: [25, 0.2],
   },
-  medals: { gold: [88, 0.14], silver: [250, 0.02], bronze: [50, 0.12] },
+  medals: { gold: [88, 0.14], silver: [240, 0.04], bronze: [50, 0.12] },
   syntax: {
     keyword: [25, 0.17],
     type: [300, 0.16],

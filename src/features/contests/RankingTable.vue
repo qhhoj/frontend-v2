@@ -5,6 +5,7 @@ import RankColumnHeader from '@/components/RankColumnHeader.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { computed, ref, TransitionGroup } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { focusTableRow } from '@/lib/focus-table-row';
 import { medalClass } from '@/lib/medal';
 import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
@@ -20,10 +21,11 @@ import RankingList from './RankingList.vue';
 import RankingProblemHeader from './RankingProblemHeader.vue';
 import {
   RANK_COLUMN_REM,
+  nameColumnRem,
   RATING_COLUMN_REM,
   problemColumnRem,
   scoreColumnRem,
-  tableMinWidthRem,
+  tableWidthRem,
   timeColumnRem,
 } from './ranking-columns';
 import type { StatsColumns } from './ranking-columns';
@@ -45,14 +47,15 @@ const props = defineProps<{
   /** The rows shown are the previous board's while the new one loads: nothing ticks when it arrives. */
   isStale?: boolean;
 }>();
-/** Rank and name stay while the problem columns scroll (the rank column is `RANK_COLUMN_REM` = 5 rem = `left-20`). */
+/** Rank and name stay while the problem columns scroll (the rank column is `RANK_COLUMN_REM` = 3.5 rem = `left-14`). */
 const RANK_STICKY = 'sticky left-0 z-10 bg-surface-solid';
 /** Name sticks next to the rank while the problem columns scroll. */
-const NAME_STICKY = 'sticky left-20 z-10 bg-surface-solid';
+const NAME_STICKY = 'sticky left-14 z-10 bg-surface-solid';
 /** The viewer's row keeps its tint over the opaque sticky cells. */
 const stickyBackground = (row: RankingRow) =>
   row.user.id === props.viewerId ? 'bg-linear-to-b from-surface-hover to-surface-hover' : '';
 const penalty = computed(() => isPenaltyFormat(props.context.formatName));
+const { t } = useI18n();
 const root = ref<HTMLElement | null>(null);
 const isMotionAllowed = useMotionAllowed();
 const isLive = useLiveBoard(
@@ -120,8 +123,17 @@ const columns = computed<StatsColumns>(() => {
     problemRem: problemColumnRem(views.flatMap((view) => view.cells.map((cell) => cell.view))),
   };
 });
-const minWidth = computed(
-  () => `${tableMinWidthRem(props.ranking.problems.length, columns.value)}rem`,
+/** A name's chips (virtual, "Bạn", disqualified) sit beside it, so their texts count toward its width. */
+const printedName = (row: RankingRow) =>
+  [
+    row.user.username,
+    row.virtual > 0 ? t('ranking.virtual') : '',
+    row.user.id === props.viewerId ? t('common.you') : '',
+    row.isDisqualified ? t('ranking.disqualified') : '',
+  ].join(' ');
+const nameRem = computed(() => nameColumnRem(props.ranking.rows.map(printedName)));
+const tableWidth = computed(
+  () => `${tableWidthRem(nameRem.value, props.ranking.problems.length, columns.value)}rem`,
 );
 const scoreHeaderKey = computed(() =>
   hasCombinedScore.value ? 'ranking.columns.scoreTime' : 'ranking.columns.score',
@@ -151,10 +163,10 @@ const scoreHeaderKey = computed(() =>
       :is-ticking="isTicking"
     />
     <ScrollRegion v-else :label="$t('ranking.scrollRegion')" :hint="$t('ranking.scrollHint')">
-      <table class="w-full table-fixed border-collapse" :style="{ minWidth }">
+      <table class="table-fixed border-collapse" :style="{ width: tableWidth }">
         <colgroup>
           <col :style="{ width: `${RANK_COLUMN_REM}rem` }" />
-          <col />
+          <col :style="{ width: `${nameRem}rem` }" />
           <col :style="{ width: `${columns.scoreRem}rem` }" />
           <col v-if="columns.timeRem" :style="{ width: `${columns.timeRem}rem` }" />
           <col v-if="columns.ratingRem" :style="{ width: `${columns.ratingRem}rem` }" />
@@ -190,7 +202,7 @@ const scoreHeaderKey = computed(() =>
               v-for="problem in ranking.problems"
               :key="problem.problemId"
               scope="col"
-              class="px-1.5 py-2.5 font-bold text-content"
+              class="px-1.5 py-2.5 font-medium text-content"
             >
               <RankingProblemHeader
                 :problem="problem"
@@ -213,7 +225,7 @@ const scoreHeaderKey = computed(() =>
             :class="{ 'bg-surface-hover': row.user.id === viewerId }"
           >
             <td
-              class="h-(--qh-row-dense) w-14 px-3 py-0 text-right"
+              class="h-12 w-14 px-3 py-0 text-right"
               :class="[
                 RANK_STICKY,
                 stickyBackground(row),
@@ -233,7 +245,8 @@ const scoreHeaderKey = computed(() =>
                   :username="row.user.username"
                   :rating="row.user.rating"
                   :to="submissionsLink(row)"
-                  class="min-w-0 truncate"
+                  plain-avatar
+                  class="min-w-0 truncate [&_a]:font-medium"
                 />
                 <Chip v-if="row.virtual > 0">{{ $t('ranking.virtual') }}</Chip>
                 <Chip v-if="row.user.id === viewerId" tone="accent">{{ $t('common.you') }}</Chip>
@@ -249,7 +262,7 @@ const scoreHeaderKey = computed(() =>
               </span>
               <small
                 v-if="hasCombinedScore && !row.isDisqualified"
-                class="mt-0.5 block text-tiny font-normal text-muted"
+                class="mt-1 block text-tiny font-normal text-muted"
                 >{{ viewOf(row).time }}</small
               >
             </td>

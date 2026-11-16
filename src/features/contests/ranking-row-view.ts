@@ -30,5 +30,5 @@ export const rowViewOf = (
     view: rankingCell(row.cells[problem.problemId], problem, row.participationId, context),
   })),
   total: totalScoreText(row.score, problems, context),
-  time: formatCumtime(context.formatName, row.cumtime, context.locale),
+  time: formatCumtime(context.formatName, row.cumtime),
 });

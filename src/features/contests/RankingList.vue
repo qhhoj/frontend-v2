@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronDown } from 'lucide-vue-next';
+import { ChevronDown, Star } from 'lucide-vue-next';
 import { computed, reactive, TransitionGroup } from 'vue';
 import { useMotionAllowed } from '@/lib/use-motion-allowed';
 import type { RouteLocationRaw } from 'vue-router';
@@ -10,7 +10,7 @@ import IconButton from '@/components/ui/IconButton.vue';
 import { medalClass } from '@/lib/medal';
 import { deltaToneClass, formatDelta } from '@/lib/rating-delta';
 import ScoreTick from './ScoreTick.vue';
-import { KIND_CLASSES, PARTIAL_CLASSES } from './ranking-cell-classes';
+import { KIND_CLASSES } from './ranking-cell-classes';
 import { miniCellRem } from './ranking-columns';
 import type { RowView } from './ranking-row-view';
 
@@ -107,7 +107,8 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
               :username="row.user.username"
               :rating="row.user.rating"
               :to="linkOf(row)"
-              class="min-w-0 truncate"
+              plain-avatar
+              class="min-w-0 truncate [&_a]:font-medium"
             />
             <Chip v-if="row.virtual > 0">{{ $t('ranking.virtual') }}</Chip>
             <Chip v-if="isViewer(row)" tone="accent">{{ $t('common.you') }}</Chip>
@@ -157,10 +158,13 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
             class="inline-flex h-4.5 items-center justify-center gap-0.5 rounded-cell px-0.5 font-mono text-tiny leading-none font-semibold tabular-nums"
             :class="[
               cell.view.kind === 'empty' ? 'bg-surface-strong' : KIND_CLASSES[cell.view.kind],
-              cell.view.partialStep && PARTIAL_CLASSES[cell.view.partialStep],
             ]"
             ><span aria-hidden="true">{{ cell.label }}</span
-            ><ScoreTick
+            ><Star
+              v-if="cell.view.kind === 'first-solve'"
+              aria-hidden="true"
+              class="size-2.5"
+            /><ScoreTick
               aria-hidden="true"
               :text="cell.view.kind === 'empty' ? '' : cell.view.text"
               :animate="isTicking"

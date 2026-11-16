@@ -8,8 +8,14 @@ import type { AvatarSize, AvatarStatus } from './bit-avatar';
  * so the picture is hidden from assistive technology. Fixed size, so it never shifts the layout.
  */
 const props = withDefaults(
-  defineProps<{ username: string; size: AvatarSize; status?: AvatarStatus }>(),
-  { status: 'active' },
+  defineProps<{
+    username: string;
+    size: AvatarSize;
+    status?: AvatarStatus;
+    /** No coloured tile behind the sprite (dense boards, where the tint reads as a cell colour). */
+    plain?: boolean;
+  }>(),
+  { status: 'active', plain: false },
 );
 
 const look = computed(() => avatarLook(props.username, props.status));
@@ -30,8 +36,8 @@ const radius = computed(() => `${Math.round(props.size * 0.22)}px`);
     :viewBox="`0 0 ${size} ${size}`"
     shape-rendering="crispEdges"
     :style="{
-      background: look.tile.colour,
-      borderRadius: radius,
+      background: plain ? undefined : look.tile.colour,
+      borderRadius: plain ? undefined : radius,
       imageRendering: 'pixelated',
     }"
   >
