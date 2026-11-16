@@ -11,7 +11,7 @@ import SubmissionProblemName from './SubmissionProblemName.vue';
 import SubmissionSourceLink from './SubmissionSourceLink.vue';
 import SubmissionVerdictCell from './SubmissionVerdictCell.vue';
 import type { ColumnKey } from './submission-table-cells';
-import { isFinished, scoreCellText } from './submission-row';
+import { isFinished, scoreCellText, scoreClass } from './submission-row';
 import { useRowOpen } from './row-open';
 
 /**
@@ -36,12 +36,9 @@ const RELATIVE_REFRESH_MS = 15_000;
 const now = useNow(RELATIVE_REFRESH_MS);
 const isShown = (key: ColumnKey) => props.columns.includes(key);
 const pickOrder = (id: string) => (props.pickedIds?.indexOf(id) ?? -1) + 1;
-const scoreOf = (row: SubmissionListItem) =>
-  scoreCellText(
-    row,
-    locale.locale,
-    row.problem ? props.contestPoints[row.problem.code] : undefined,
-  );
+const contestMaxOf = (row: SubmissionListItem) =>
+  row.problem ? props.contestPoints[row.problem.code] : undefined;
+const scoreOf = (row: SubmissionListItem) => scoreCellText(row, locale.locale, contestMaxOf(row));
 /** Time and memory of a finished row only: an unfinished one has nothing to say there. */
 const timeOf = (row: SubmissionListItem) =>
   isFinished(row) && row.time !== null ? formatCaseTime(row.time) : '';
@@ -91,13 +88,16 @@ const memoryOf = (row: SubmissionListItem) =>
         >
           <template
             v-for="(part, partIndex) in [
-              isShown('verdict') ? scoreOf(row) : '',
-              isShown('cost') ? timeOf(row) : '',
-              isShown('cost') ? memoryOf(row) : '',
-            ].filter(Boolean)"
+              {
+                text: isShown('verdict') ? scoreOf(row) : '',
+                tone: scoreClass(row, contestMaxOf(row)),
+              },
+              { text: isShown('cost') ? timeOf(row) : '', tone: '' },
+              { text: isShown('cost') ? memoryOf(row) : '', tone: '' },
+            ].filter((part) => part.text)"
             :key="partIndex"
           >
-            <span class="shrink-0 font-mono tabular-nums">{{ part }}</span>
+            <span class="shrink-0 font-mono tabular-nums" :class="part.tone">{{ part.text }}</span>
           </template>
           <template v-if="isShown('when')">
             <time

@@ -10,7 +10,7 @@ const emit = defineEmits<{ 'update:live': [live: boolean] }>();
   <AppButton
     tone="ghost"
     data-testid="live-toggle"
-    class="shrink-0 aria-pressed:!border-transparent aria-pressed:!bg-transparent aria-pressed:!text-positive"
+    class="shrink-0 aria-pressed:!border-transparent aria-pressed:!bg-transparent aria-pressed:!text-cue-live"
     :pressed="live"
     :title="$t('submissions.rail.live')"
     @click="emit('update:live', !live)"
@@ -19,7 +19,7 @@ const emit = defineEmits<{ 'update:live': [live: boolean] }>();
       <span
         aria-hidden="true"
         class="size-2 rounded-pill"
-        :class="live ? 'bg-positive motion-safe:animate-pulse' : 'bg-line-strong'"
+        :class="live ? 'bg-cue-live motion-safe:animate-pulse' : 'bg-line-strong'"
       />
     </template>
     {{ $t('submissions.live') }}

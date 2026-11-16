@@ -11,13 +11,7 @@
   "features/notifications/NotificationsPage.vue": {
     "SettingsNotice": 3
   },
-  "features/profile/ProfileHeader.vue": {
-    "status-colour": 1
-  },
   "features/profile/RatingChart.vue": {
-    "status-colour": 2
-  },
-  "features/profile/RecentContests.vue": {
     "status-colour": 2
   }
 }

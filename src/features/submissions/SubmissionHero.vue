@@ -16,6 +16,8 @@ import { useNow } from '@/lib/use-now';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
 import { NO_VALUE, formatPoints, scoreBelowFull } from '@/lib/format';
+import { CUE_TEXT } from '@/components/ui/cue-tones';
+import { scoreTone } from './submission-row';
 import { provisionalPoints, ringProgress } from '@/lib/grading';
 import { PARTIAL_CODE, VERDICT_TONE_VARS, verdictOfCode, type Verdict } from '@/lib/verdicts';
 import { BIT_MOODS } from '@/mascot/bit-moods';
@@ -109,6 +111,11 @@ const scoreText = computed(() =>
     ? { value: props.contestScore.points, outOf: contestOutOf.value }
     : { value: score.value, outOf: maxScore.value ? `/ ${maxScore.value}` : '' },
 );
+/** The score's cue once judged: the share of the problem's points (a contest score is the same share). */
+const scoreCue = computed(() => {
+  const tone = isFinished.value ? scoreTone(props.submission.points, props.problemPoints) : null;
+  return tone ? CUE_TEXT[tone] : '';
+});
 /** In a contest the problem's own score is the line's first part. */
 const problemScore = computed(() =>
   props.contestScore && maxScore.value
@@ -182,7 +189,7 @@ const problem = computed(() => {
         >
           <span
             aria-hidden="true"
-            class="size-2.5 rounded-full bg-positive motion-safe:animate-pulse"
+            class="size-2.5 rounded-full bg-cue-live motion-safe:animate-pulse"
           />
           {{ $t(verdict.labelKey) }}
         </p>
@@ -195,7 +202,11 @@ const problem = computed(() => {
         >
           {{ $t(verdict.labelKey) }}
         </p>
-        <p data-testid="score" class="font-mono text-stat leading-none font-semibold tabular-nums">
+        <p
+          data-testid="score"
+          class="font-mono text-stat leading-none font-semibold tabular-nums"
+          :class="scoreCue"
+        >
           <span class="text-stat">
             <SkeletonBlock v-if="isProblemLoading" text class="w-24" />
             <template v-else>{{ scoreText.value }}</template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import PageHeader from '@/components/ui/PageHeader.vue';
+import StatusDot from '@/components/ui/StatusDot.vue';
 import PageLayout from '@/components/ui/PageLayout.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -25,11 +26,7 @@ const { data: stats } = useSubmissionStatsQuery();
             data-testid="judge-status"
             class="inline-flex items-center gap-1.5 hover:text-content hover:underline"
           >
-            <span
-              aria-hidden="true"
-              class="size-2 rounded-pill"
-              :class="stats.judgesOnline > 0 ? 'bg-positive' : 'bg-negative'"
-            />
+            <StatusDot :tone="stats.judgesOnline > 0 ? 'live' : 'attention'" />
             <span class="font-mono tabular-nums"
               >{{ formatNumber(stats.judgesOnline, locale.locale) }}/{{
                 formatNumber(stats.judgesTotal, locale.locale)
