@@ -6,7 +6,7 @@ on:
     branches: [main, staging]
   pull_request: { branches: [main, staging] }
   # Merge queue: the same checks on the queued merge commit, against the queue's base.
-  merge_group: { branches: [main, staging] }
+  merge_group:
   schedule:
     - cron: '23 3 * * *'
   workflow_dispatch:
