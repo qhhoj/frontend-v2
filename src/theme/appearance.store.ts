@@ -3,6 +3,8 @@ import { computed, onScopeDispose, ref, watch } from 'vue';
 import { readStorage, writeStorage } from '@/lib/storage';
 import { DEFAULT_BACKGROUND, MORE_CONTRAST_QUERY, parseAppearance, siteLook } from './appearance';
 import type { Appearance, ContrastId } from './appearance';
+import { defaultAccentOf } from './palette';
+import { usePaletteStore } from './palette.store';
 
 /** This browser's own choice. */
 export const CHOICE_KEY = 'qhhoj.appearance';
@@ -40,6 +42,7 @@ interface LookSources {
 }
 
 export const useAppearanceStore = defineStore('appearance', () => {
+  const palette = usePaletteStore();
   // Unlike the theme store, no `resolvedBy` marker is needed: a look has no OS-dependent resolution, and a look painted
   // from this browser always equals `qhhoj.appearance`, so holding any painted look never shows a stale one.
   const paintedLook = readLook(PAINTED_KEY);
@@ -62,7 +65,9 @@ export const useAppearanceStore = defineStore('appearance', () => {
     return holdingPainted ? paintedLook : browser;
   });
   /** What the controls show: the look, else the site's own look at the device's contrast. */
-  const shown = computed(() => look.value ?? siteLook(deviceContrast.value));
+  const shown = computed(
+    () => look.value ?? siteLook(deviceContrast.value, defaultAccentOf(palette.current)),
+  );
   // Synchronous: the page must show a choice before the call returns, not on a later tick. Each action assigns
   // `sources` once, so this runs once with the final look.
   watch(

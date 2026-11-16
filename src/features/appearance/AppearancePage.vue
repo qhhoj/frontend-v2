@@ -14,6 +14,7 @@ import AppearancePreview from './AppearancePreview.vue';
 import BackgroundChoice from './BackgroundChoice.vue';
 import ContrastChoice from './ContrastChoice.vue';
 import LowPowerChoice from './LowPowerChoice.vue';
+import PaletteChoice from './PaletteChoice.vue';
 import ModeChoice from './ModeChoice.vue';
 import { useAppearanceChoice } from './use-appearance-choice';
 
@@ -43,6 +44,12 @@ const saveNoteKey = computed(() =>
     </div>
     <div class="flex flex-wrap items-start gap-5">
       <Card class="flex min-w-0 flex-[1_1_420px] flex-col gap-6 p-6">
+        <div>
+          <p class="font-semibold">{{ $t('appearance.paletteTitle') }}</p>
+          <p class="mt-1 text-meta text-muted">{{ $t('appearance.paletteHelp') }}</p>
+          <div class="mt-3"><PaletteChoice /></div>
+        </div>
+
         <div>
           <p class="font-semibold">{{ $t('appearance.mode') }}</p>
           <div class="mt-2.5"><ModeChoice /></div>

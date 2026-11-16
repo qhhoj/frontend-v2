@@ -1,5 +1,6 @@
-// Palette A, "Paper & Ultramarine": the inputs the generator turns into tokens. Hues and chromas are OKLCH
-// ([hue, chroma]); grounds are fixed hex. Change a value here, run `npm run palette`, commit the regenerated CSS.
+// "Paper & Ultramarine", the site's earlier palette and the base the others override (palettes.mjs): the inputs the
+// generator turns into tokens. Hues and chromas are OKLCH ([hue, chroma]); grounds are fixed hex. Change a value here,
+// run `npm run palette`, commit the regenerated CSS.
 export const LANES = ['ac', 'wa', 'tle', 'mle', 'rte', 'ce', 'ie', 'pending'];
 /** The failing verdicts whose text sits beside AC text (ranking cells, test strips): each must stay apart from AC under colour blindness. */
 export const FAILING_LANES = ['wa', 'tle', 'mle', 'rte'];
@@ -7,6 +8,8 @@ export const FAILING_LANES = ['wa', 'tle', 'mle', 'rte'];
 export const PARTIAL_ALPHAS = [0.08, 0.14, 0.2];
 
 export const PAPER = {
+  /** Tint strengths [light, dark]: the accent's soft fill, verdict lanes and tags. */
+  tints: { soft: [0.12, 0.18], lane: [0.12, 0.16], tag: [0.13, 0.16] },
   light: {
     ground: '#F6F1E7',
     surface: '#FFFEFA',

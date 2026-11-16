@@ -21,7 +21,7 @@ const { shown, update } = useAppearanceChoice();
       :pressed="shown.accent === preset.id"
       @click="update({ accent: preset.id })"
     >
-      <!-- The swatch carries its own accent's tokens (palette/accents.css matches any descendant [data-accent]). -->
+      <!-- The swatch carries its own accent's tokens (each palette's CSS matches any descendant [data-accent]). -->
       <span :data-accent="preset.id" class="size-7 rounded-full bg-accent" />
     </IconButton>
   </div>

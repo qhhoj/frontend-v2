@@ -41,7 +41,7 @@ function oklabToLinear([lightness, axisA, axisB]) {
   ];
 }
 
-const hexToOklab = (hex) => linearToOklab(hexToRgb(hex).map(toLinear));
+export const hexToOklab = (hex) => linearToOklab(hexToRgb(hex).map(toLinear));
 const oklabToHex = (lab) => rgbToHex(oklabToLinear(lab).map((channel) => toGamma(clamp(channel))));
 const inGamut = (linear) => linear.every((channel) => channel >= -0.0005 && channel <= 1.0005);
 const labOf = (lightness, chroma, radians) => [

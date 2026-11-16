@@ -4,6 +4,8 @@ import { useProfileSave } from '@/features/account/use-profile-save';
 import { toWireAppearance } from '@/theme/appearance';
 import type { Appearance } from '@/theme/appearance';
 import { useAppearanceStore } from '@/theme/appearance.store';
+import { DEFAULT_PALETTE } from '@/theme/palette';
+import { usePaletteStore } from '@/theme/palette.store';
 import { AUTO_THEME } from '@/theme/registry';
 import { useThemeStore } from '@/theme/theme.store';
 
@@ -11,6 +13,7 @@ import { useThemeStore } from '@/theme/theme.store';
 export function useAppearanceChoice() {
   const appearance = useAppearanceStore();
   const theme = useThemeStore();
+  const palette = usePaletteStore();
   const saveProfile = useProfileSave();
 
   /** Saves what is painted to the account in one request, plus `extra`; `appearance` is always the painted look. Anonymous visitors keep it in this browser. */
@@ -22,9 +25,10 @@ export function useAppearanceChoice() {
     appearance.choose({ ...appearance.shown, ...patch });
     return save();
   };
-  /** The site default: no look and theme `auto`, in one request. */
+  /** The site default: no look, the default palette and theme `auto`, in one request. */
   const reset = () => {
     appearance.choose(null);
+    palette.choose(DEFAULT_PALETTE);
     theme.choose(AUTO_THEME);
     return save({ siteTheme: AUTO_THEME });
   };
