@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Ellipsis, Printer, Snowflake, Timer } from 'lucide-vue-next';
+import { Ellipsis, Lock, Printer, Snowflake, Timer } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import type { ContestDetail, ContestPhase } from '@/api/types/contests';
@@ -14,7 +14,7 @@ import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
 import UserLink from '@/components/UserLink.vue';
 import { formatLabel } from '@/lib/contest-format';
-import { ownEndTime, phaseAt, spanMessage } from '@/lib/contest-time';
+import { ownEndTime, phaseAt } from '@/lib/contest-time';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -25,6 +25,7 @@ import ContestTabs from '../ContestTabs.vue';
 import { boardFreezeOf } from './board-freeze';
 import { useShownClock } from './header-clock';
 import { useCurrentContest } from './use-current-contest';
+import { useLengthText } from '../use-span-text';
 
 /**
  * The contest bar on the contest's own pages: the one H1 (the name), the phase and format chips, the clock while time runs, the
@@ -76,9 +77,20 @@ const PHASE_DOT: Record<ContestPhase, string> = {
   upcoming: 'bg-accent',
   ended: 'bg-line-strong',
 };
+/** The word takes the dot's colour: running green, upcoming blue, ended grey. */
+const PHASE_TEXT: Record<ContestPhase, string> = {
+  running: 'text-positive',
+  upcoming: 'text-accent-text',
+  ended: 'text-muted',
+};
 const { t } = useI18n();
 const locale = useLocaleStore();
-const facts = computed(() => {
+const lengthText = useLengthText();
+interface Fact {
+  text: string | null;
+  wideOnly: boolean;
+}
+const facts = computed<(Fact & { text: string })[]>(() => {
   const contest = props.contest;
   if (!contest) return [];
   const privacy = contest.isPrivate
@@ -86,20 +98,28 @@ const facts = computed(() => {
     : contest.isOrganizationPrivate
       ? t('contests.organizationPrivate')
       : null;
-  return [
-    run.value && run.value.virtual > 0 ? t('contestBar.virtual', { run: run.value.virtual }) : null,
-    formatLabel(contest.formatName),
-    contest.isRated ? t('contests.rated') : null,
-    privacy,
-  ].filter((fact): fact is string => fact !== null);
+  /** Under `md` only the format stays: the rest moves to the rules fold-out and the ranking tab. */
+  const all: Fact[] = [
+    {
+      text:
+        run.value && run.value.virtual > 0
+          ? t('contestBar.virtual', { run: run.value.virtual })
+          : null,
+      wideOnly: true,
+    },
+    { text: formatLabel(contest.formatName), wideOnly: false },
+    { text: contest.isRated ? t('contests.rated') : null, wideOnly: true },
+    { text: privacy, wideOnly: true },
+  ];
+  return all.filter((fact): fact is Fact & { text: string } => fact.text !== null);
 });
 /** The contest's length and start, the one time fact the header carries (the clock and the bar say the rest). */
 const timeFact = computed(() => {
   const contest = props.contest;
   if (!contest) return '';
-  const span = spanMessage((Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000);
+  const length = lengthText((Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000);
   const start = formatDate(contest.startTime, 'datetime', locale.locale);
-  return `${start} (${t(span.key, span.params, span.count ?? 1)})`;
+  return `${start} (${length})`;
 });
 /** "In tất cả đề" sits in the header's "⋯" menu while the statements are listed. */
 const overflow = computed<MenuEntry[]>(() =>
@@ -129,17 +149,25 @@ const freeze = computed(() =>
         />
       </template>
       <template #meta>
-        <span v-if="phase" class="inline-flex items-center gap-1.5 font-semibold text-content">
+        <span
+          v-if="phase"
+          :class="['inline-flex items-center gap-1.5 font-semibold', PHASE_TEXT[phase]]"
+        >
           <span aria-hidden="true" :class="['size-2 rounded-pill', PHASE_DOT[phase]]" />{{
             $t(`contests.phase.${phase}`)
           }}
         </span>
-        <template v-for="fact in [...facts, timeFact]" :key="fact">
-          <span aria-hidden="true">·</span>
-          <span>{{ fact }}</span>
+        <template v-for="fact in facts" :key="fact.text">
+          <span aria-hidden="true" :class="fact.wideOnly && 'max-md:hidden'">·</span>
+          <span :class="fact.wideOnly && 'max-md:hidden'">{{ fact.text }}</span>
         </template>
         <span aria-hidden="true">·</span>
-        <span>{{
+        <span>{{ timeFact }}</span>
+        <Chip v-if="contest.requiresAccessCode" tone="warning" :icon="Lock" class="max-md:hidden">{{
+          $t('contests.list.codeNeeded')
+        }}</Chip>
+        <span aria-hidden="true" class="max-md:hidden">·</span>
+        <span class="max-md:hidden">{{
           $t(
             'contests.participants',
             { count: formatNumber(contest.userCount, locale.locale) },

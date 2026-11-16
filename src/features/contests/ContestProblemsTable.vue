@@ -6,7 +6,7 @@ import Card from '@/components/ui/Card.vue';
 import PageSection from '@/components/ui/PageSection.vue';
 import FactLine from '@/components/FactLine.vue';
 import InlineBit from '@/components/InlineBit.vue';
-import { formatNumber } from '@/lib/format';
+import { formatNumber, formatPoints } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import OwnResultChip from './OwnResultChip.vue';
 import { limitsText } from './contest-limits';
@@ -16,7 +16,7 @@ const props = defineProps<{ contest: ContestDetail }>();
 const locale = useLocaleStore();
 const { t } = useI18n();
 const pointsOf = (problem: ContestProblem) =>
-  formatNumber(problem.points, locale.locale, props.contest.pointsPrecision);
+  formatPoints(problem.points, locale.locale, props.contest.pointsPrecision);
 const problemLink = (problem: ContestProblem) => ({
   name: 'problem',
   params: { code: problem.code },
@@ -29,12 +29,13 @@ const HIDDEN_KEYS: Record<ContestPhase, string> = {
   ended: 'contests.problems.hidden',
 };
 
+const hasLimit = (problem: ContestProblem) => limitsText(problem) !== '—';
 const problems = computed(() => props.contest.problems ?? []);
 const hasOwnResults = computed(() =>
   problems.value.some((problem) => problem.viewerResult !== null),
 );
 /** The "Giới hạn" column shows only when the viewer sees a limit on some problem (else every cell is a dash). */
-const hasLimits = computed(() => problems.value.some((problem) => limitsText(problem) !== '—'));
+const hasLimits = computed(() => problems.value.some(hasLimit));
 const context = computed(() => ownResultContext(props.contest, locale.locale));
 const solvedCounts = computed(() => solvedSummary(problems.value));
 const isCrowned = computed(() => props.contest.phase === 'ended' && solvedCounts.value.solved > 0);
@@ -53,13 +54,12 @@ const capLineOf = (problem: ContestProblem): string | null => {
 const capLines = computed(
   () => new Map(problems.value.map((problem) => [problem.problemId, capLineOf(problem)])),
 );
-/** A phone row's meta: code, attempt cap, limits, points; each a whole fact. */
+/** A phone row's meta: code, attempt cap, limits; each a whole fact (the points sit right of the row). */
 const phoneFacts = (problem: ContestProblem) =>
   [
     problem.code,
     capLines.value.get(problem.problemId),
-    limitsText(problem),
-    t('contests.problems.pointsShort', { points: pointsOf(problem) }),
+    hasLimit(problem) ? limitsText(problem) : null,
   ].filter((fact): fact is string => Boolean(fact));
 </script>
 
@@ -134,10 +134,10 @@ const phoneFacts = (problem: ContestProblem) =>
               v-if="hasLimits"
               class="px-3 py-2 font-mono text-meta whitespace-nowrap tabular-nums"
             >
-              {{ limitsText(problem) }}
+              {{ hasLimit(problem) ? limitsText(problem) : '' }}
             </td>
             <td class="px-3 py-2 text-right font-mono whitespace-nowrap tabular-nums">
-              {{ $t('contests.problems.pointsShort', { points: pointsOf(problem) }) }}
+              {{ pointsOf(problem) }}
             </td>
             <td v-if="hasOwnResults" class="max-w-40 px-3 py-2 xl:max-w-none">
               <OwnResultChip :problem="problem" :context="context" />
@@ -163,6 +163,7 @@ const phoneFacts = (problem: ContestProblem) =>
             >
             <FactLine class="font-mono text-caption text-muted" :facts="phoneFacts(problem)" />
           </div>
+          <span class="font-mono text-meta tabular-nums">{{ pointsOf(problem) }}</span>
           <OwnResultChip v-if="hasOwnResults" :problem="problem" :context="context" />
         </li>
       </ul>

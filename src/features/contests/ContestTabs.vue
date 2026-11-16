@@ -25,12 +25,13 @@ interface ContestTab {
   /** Shown only once the contest has ended (the replay answers 409 before). */
   isEndedOnly?: boolean;
 }
+/** In order of use: read the problems, watch the board, check own submissions, then announcements, stats and replay. */
 const TABS: ContestTab[] = [
   { name: 'contest', labelKey: 'contests.tabs.problems' },
-  { name: 'contest-announcements', labelKey: 'contests.tabs.announcements' },
-  { name: 'contest-submissions', labelKey: 'contests.tabs.submissions' },
-  { name: 'contest-stats', labelKey: 'contests.tabs.stats' },
   { name: 'contest-ranking', labelKey: 'contests.tabs.ranking' },
+  { name: 'contest-submissions', labelKey: 'contests.tabs.submissions' },
+  { name: 'contest-announcements', labelKey: 'contests.tabs.announcements' },
+  { name: 'contest-stats', labelKey: 'contests.tabs.stats' },
   { name: 'contest-replay', labelKey: 'contests.tabs.replay', isEndedOnly: true },
 ];
 const visibleTabs = computed(() =>

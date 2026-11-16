@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ContestDetail } from '@/api/types/contests';
-import Card from '@/components/ui/Card.vue';
 import Disclosure from '@/components/ui/Disclosure.vue';
 import { useLocaleStore } from '@/stores/locale.store';
 import { contestRules } from './contest-rules';
@@ -36,7 +35,7 @@ const summary = computed(() =>
 </script>
 
 <template>
-  <Card as="div" class="px-5 py-1">
+  <div class="border-b border-line">
     <Disclosure v-model:open="isOpen" :label="$t('contests.rules.title')">
       <template #summary>
         <span
@@ -56,5 +55,5 @@ const summary = computed(() =>
         </div>
       </dl>
     </Disclosure>
-  </Card>
+  </div>
 </template>
