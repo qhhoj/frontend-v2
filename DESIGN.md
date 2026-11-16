@@ -10,24 +10,51 @@ Values live in code: `src/theme/tokens.css`, `@theme` in `src/theme/styles.css`,
 
 ### Type roles
 
-| Class               | px    | Role                                             |
-| ------------------- | ----- | ------------------------------------------------ |
-| `text-page`         | 24    | the one H1 of a page (only through `PageHeader`) |
-| `text-section`      | 16    | section titles (`PageSection`, `section-title`)  |
-| `text-sm`           | 14    | list rows, phone cards, UI copy                  |
-| `text-meta`         | 13    | body, controls, hints, table cells               |
-| `text-caption`      | 12    | chips, small labels                              |
-| `text-tiny`         | 11    | counts, badges                                   |
-| `text-stat`/`score` | 28/40 | stat values and the submission score (mono)      |
+Kit 2 scale (spec `.batch/kit2/spec.md` §1b): IBM Plex Sans and Plex Mono, line height 1.5 (`--qh-leading`) for running text. Nothing is smaller than 13 px except the `kbd` hint (12 px).
 
-`text-title`, `text-subtitle` and `text-section-legacy` are old steps kept until their last user moves to a role. Figures, codes and times use `font-mono tabular-nums`. No `text-[13px]`, no stock `text-lg`.
+| Class               | px / line | Role                                                                          |
+| ------------------- | --------- | ----------------------------------------------------------------------------- |
+| `text-page`         | 28 / 36   | the one H1 of a page (only through `PageHeader`), weight 600                  |
+| `text-heading`      | 18 / 26   | Card and Panel title, Dialog title, section titles (`PageSection`)            |
+| `text-long`         | 16 / 26   | long reading: statements, contest intro, posts; `text-content` or `secondary` |
+| `text-body`         | 15 / 22   | table cells, list rows, buttons, fields, tabs, menu items (row names 500)     |
+| `text-meta`         | 14 / 21   | facts lines, form labels, counts, table footer                                |
+| `text-small`        | 13 / 20   | table head (600, muted), problem codes (mono), chip text (600)                |
+| `text-kbd`          | 12        | the `kbd` shortcut hint only                                                  |
+| `text-stat`/`score` | 28/40     | stat values and the submission score (mono)                                   |
+
+Deprecated type classes, kept as aliases until their last user moves to a role: `text-tiny` and `text-caption` (both now 13, = `text-small`), `text-section`, `text-title`, `text-subtitle` (all now 18, = `text-heading`), `text-section-legacy` (20), and `text-sm` (Tailwind's 14, use `text-meta`). Figures, codes and times use `font-mono tabular-nums`. No `text-[13px]`, no stock `text-lg`.
+
+### Geometry: heights, radii, surfaces
+
+Every value is a variable in `src/theme/tokens.css`; components never write a number. Under touch (`pointer: coarse` or 640 px and narrower) every control is 44 or more and every row at least 44.
+
+| Token                                                           | px             | Used by                                                                                                                        |
+| --------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `--qh-control-sm`                                               | 32             | only inside a table: row actions, the table pager                                                                              |
+| `--qh-control`                                                  | 36             | every toolbar and form control: Button, IconButton, Input, Search, Select, Segmented, Tabs, rail items, removable filter chips |
+| `--qh-control-lg`                                               | 40             | the primary action of a page or form                                                                                           |
+| `--qh-chip`                                                     | 24             | Chip, StatusPill, VerdictChip                                                                                                  |
+| `--qh-row`                                                      | 44             | every one-line list row and table head                                                                                         |
+| `--qh-row-dense`                                                | 40             | the ranking board, menu items                                                                                                  |
+| `--qh-touch`                                                    | 44             | the touch height of every control and row                                                                                      |
+| `--qh-control-px-sm` / `--qh-control-px` / `--qh-control-px-lg` | 14 / 16 / 20   | horizontal padding of sm / md / lg controls (a field with a leading icon uses 14)                                              |
+| `--qh-pad-surface`, `--qh-pad-dialog`                           | 20, 24         | padding of a surface (Card, Panel) and of a Dialog or Sheet                                                                    |
+| `--qh-gap-control`, `--qh-gap-block`                            | 10, 16         | gap between controls; between a toolbar and content or between surfaces                                                        |
+| `--qh-control-inset`                                            | 3 (0 on touch) | space between a segmented track and its thumb                                                                                  |
+
+Radius by rule: a control is a pill (`rounded-control`, 999); a surface is 12 (`rounded-card`, `--qh-radius-surface`); a box nested in a surface is 8 (`rounded-row`, `--qh-radius-nested`); a small square mark (checkbox, kbd, inline code) is 6 (`rounded-cell`, `--qh-radius-mark`). A multi-line field (TextArea, code editor) is a surface, not a control.
+
+Surface levels, by tone not by line: L0 ground (`bg-ground`), L1 surface (`bg-surface`: Card, Panel, table, contest card), L2 strong (`bg-surface-strong`: fields, secondary buttons, segmented track, current tab, neutral chips, inset tiles, the rail), hover `bg-surface-hover`, L3 overlay (L1 + `shadow-float` + `--qh-ring-overlay`: Menu, Popover, Dialog, Sheet, Toast). A field is one level away from its container (an L2 field on L0 or L1, an L1 field on the L2 rail). Lines stay between rows inside one surface, between StatStrip cells, and as the ring on an overlay. An invalid field draws a red tint and a 1 px red ring. In contrast-high mode controls and surfaces get a 1 px `--qh-line-control` edge back (`edge-high` utility).
+
+Deprecated token names, kept as aliases while many files use them: `--qh-radius-card` (= `--qh-radius-surface`), `--qh-radius-row` (= `--qh-radius-nested`), `--qh-radius-cell` (= `--qh-radius-mark`), `--qh-radius-pill`, `Card` `padding` `sm` and `lg` (= `md`, 20), Tabs `variant="underline"` (draws the pill row, same as `pill`), the CSS class `glass` (no border now), `--qa-chip` (= `--qh-control`).
 
 ### Spacing, widths, radii
 
 - Spacing roles (`--space-*`, smaller on a phone): `page-top` 24 · `header` 16 · `toolbar` 12 · `section` 40 · `section-title` 8 · `stack` 12. Use them as `gap-(--space-section)`, not raw numbers.
 - Page width by role (`PageLayout width`): `wide` 80 rem (lists, normal pages) · `split` 120 rem (statement beside submit) · `read` 46 rem (long reading, forms).
-- Controls: 28 px (`--qh-control`), 44 px or more on touch. Rows: 32 px compact, 36 px comfortable.
-- Radius by role: `rounded-cell` (inputs, cells) · `rounded-row` (rows, tiles, notices, menus) · `rounded-card` (cards, dialogs) · `rounded-pill` (chips, dots, switches only).
+- Controls 36, primary 40, 32 only inside tables; chips 24; rows 44 (ranking and menus 40); 44 on touch (geometry table above).
+- Radius by role: see the geometry section above (`rounded-control` pill, `rounded-card` 12, `rounded-row` 8, `rounded-cell` 6).
 - Motion only on colour, border and opacity; the kit carries real movement. Z layers: `z-sticky` `z-savebar` `z-header` `z-bit` `z-overlay` `z-toast`.
 
 ### Colour cue map
@@ -52,25 +79,25 @@ Cue tokens versus verdict tokens: a submission's own result parts (`VerdictChip`
 
 One job, one kit part (`src/components/ui/`); a job with a part never gets a hand-built recipe.
 
-| Job                              | Part                                                                   |
-| -------------------------------- | ---------------------------------------------------------------------- |
-| Page frame                       | `PageLayout` (width) + `PageHeader` (title, meta, actions)             |
-| Section of a page                | `PageSection` (title, count, see-all)                                  |
-| Row between header and content   | `Toolbar` (search left, count and sort right, chips below)             |
-| List of records                  | `DataTable` with `rowTo`; cards under 640 px                           |
-| Status, tag, count               | `Chip tone=` (cue, status or tag); `StatusDot` before a word           |
-| Verdict of a submission          | `VerdictChip`                                                          |
-| Buttons                          | `AppButton` (one primary per view), `IconButton`                       |
-| Text, number, date inputs        | `TextInput`, `DateTimeField`, `SelectField`, `TextArea` in `FormField` |
-| Choice                           | `Checkbox`, `Switch`, `RadioGroup`, `ChoiceCards`, `SegmentedControl`  |
-| Switch between views of one page | `Tabs` (underline) or `SegmentedControl` (filters)                     |
-| Hide details until asked         | `Disclosure` / `FoldPanel`                                             |
-| Standing message                 | `Notice` next to its cause                                             |
-| Result of an action              | toast (`useToast`); a failure is also an inline `Notice`               |
-| Row or card that opens a record  | `Card to`, `DataTable rowTo`, or `box-link` + `StretchedLink`          |
-| Menu, row actions                | `Menu`, `RowMenu` (destructive last)                                   |
-| Nothing here / loading           | `EmptyState` with `#action`; `QueryState` + `SkeletonBlock`            |
-| Save edits                       | `SaveBar` + `useLeaveGuard`                                            |
+| Job                              | Part                                                                     |
+| -------------------------------- | ------------------------------------------------------------------------ |
+| Page frame                       | `PageLayout` (width) + `PageHeader` (title, meta, actions)               |
+| Section of a page                | `PageSection` (title, count, see-all)                                    |
+| Row between header and content   | `Toolbar` (search left, count and sort right, chips below)               |
+| List of records                  | `DataTable` with `rowTo`; cards under 640 px                             |
+| Status, tag, count               | `Chip tone=` (cue, status or tag); `StatusDot` before a word             |
+| Verdict of a submission          | `VerdictChip`                                                            |
+| Buttons                          | `AppButton` (one primary per view), `IconButton`                         |
+| Text, number, date inputs        | `TextInput`, `DateTimeField`, `SelectField`, `TextArea` in `FormField`   |
+| Choice                           | `Checkbox`, `Switch`, `RadioGroup`, `ChoiceCards`, `SegmentedControl`    |
+| Switch between views of one page | `Tabs` (pill: the current tab is filled) or `SegmentedControl` (filters) |
+| Hide details until asked         | `Disclosure` / `FoldPanel`                                               |
+| Standing message                 | `Notice` next to its cause                                               |
+| Result of an action              | toast (`useToast`); a failure is also an inline `Notice`                 |
+| Row or card that opens a record  | `Card to`, `DataTable rowTo`, or `box-link` + `StretchedLink`            |
+| Menu, row actions                | `Menu`, `RowMenu` (destructive last)                                     |
+| Nothing here / loading           | `EmptyState` with `#action`; `QueryState` + `SkeletonBlock`              |
+| Save edits                       | `SaveBar` + `useLeaveGuard`                                              |
 
 ## 3. Do's and Don'ts (owner rules)
 

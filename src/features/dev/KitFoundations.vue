@@ -2,9 +2,9 @@
 import Card from '@/components/ui/Card.vue';
 import { CUE_TEXT } from '@/components/ui/cue-tones';
 import PageSection from '@/components/ui/PageSection.vue';
-import { BASE_COLOURS, CUES, RADII, SPACES, TYPE_ROLES, WIDTHS } from './kit-fixtures';
+import { BASE_COLOURS, CUES, HEIGHTS, RADII, SPACES, TYPE_ROLES, WIDTHS } from './kit-fixtures';
 
-/** Foundations of the kit gallery: type roles, spacing, page widths, radii, base colours and the cue map. */
+/** Foundations of the kit gallery: type roles, heights, spacing, page widths, radii, base colours and the cue map. */
 defineOptions({ name: 'KitFoundations' });
 const SWATCH = 'h-8 w-full rounded-cell border border-line-strong';
 </script>
@@ -12,21 +12,39 @@ const SWATCH = 'h-8 w-full rounded-cell border border-line-strong';
 <template>
   <div class="flex flex-col gap-(--space-section)">
     <PageSection title="Chữ">
-      <Card padding="sm" class="flex flex-col gap-2">
-        <div v-for="role in TYPE_ROLES" :key="role.token" class="flex items-baseline gap-4">
+      <Card padding="md" class="flex flex-col gap-2">
+        <div
+          v-for="role in TYPE_ROLES"
+          :key="role.token"
+          class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4"
+        >
           <p :class="role.token" class="min-w-0 flex-1 truncate font-semibold">Tiêu đề mẫu 2.600</p>
-          <p class="shrink-0 text-meta text-muted">
+          <p class="text-meta text-muted sm:shrink-0">
             <code class="font-mono">{{ role.token }}</code> · {{ role.size }} px · {{ role.use }}
           </p>
         </div>
-        <p class="font-mono text-sm">Mono (mã, con số): 1:30 · 16/11/2026 · 2.600</p>
+        <p class="font-mono text-meta">Mono (mã, con số): 1:30 · 16/11/2026 · 2.600</p>
+      </Card>
+    </PageSection>
+
+    <PageSection title="Chiều cao">
+      <Card padding="md" class="flex flex-col gap-3">
+        <div v-for="height in HEIGHTS" :key="height.token" class="flex items-center gap-4">
+          <div class="w-24 shrink-0 sm:w-64">
+            <div :class="height.class" class="w-full rounded-control bg-surface-strong" />
+          </div>
+          <p class="text-meta text-muted">
+            <code class="font-mono">{{ height.token }}</code> · {{ height.px }} px ·
+            {{ height.use }}
+          </p>
+        </div>
       </Card>
     </PageSection>
 
     <PageSection title="Khoảng cách">
       <Card padding="sm" class="flex flex-col gap-2">
         <div v-for="space in SPACES" :key="space.token" class="flex items-center gap-4">
-          <div class="w-64 shrink-0">
+          <div class="w-24 shrink-0 sm:w-64">
             <div :class="space.class" class="w-full bg-accent-soft" />
           </div>
           <p class="text-meta text-muted">
@@ -46,9 +64,9 @@ const SWATCH = 'h-8 w-full rounded-cell border border-line-strong';
             v-for="radius in RADII"
             :key="radius.name"
             :class="radius.class"
-            class="flex h-12 w-28 items-center justify-center border border-line-strong bg-surface-strong text-caption"
+            class="flex min-h-12 w-44 items-center justify-center bg-surface-strong px-2 text-center text-small"
           >
-            {{ radius.name }}
+            {{ radius.name }}: {{ radius.use }}
           </div>
         </div>
       </Card>

@@ -36,11 +36,11 @@ const { isCollapsed, toggle } = useRailCollapse();
 const isPhone = useMediaQuery(PHONE_QUERY);
 const BIT: BitLook = { headgear: 'none', palette: 'terracotta' };
 
-/** One row: 36 px for a mouse, 44 on touch; the current section is a panel with an accent edge. */
+/** One row: a control tall (36 px) for a mouse, 44 on touch; the current section is a panel with an accent edge. */
 const ROW =
-  'relative flex min-h-9 items-center gap-3 rounded-row border border-transparent px-2.5 text-sm font-semibold text-secondary transition-colors hover:bg-surface-hover hover:text-content touch:min-h-11 rail-slim:justify-center rail-slim:px-0';
+  'relative flex min-h-(--qh-control) items-center gap-3 rounded-control px-(--qh-control-px-sm) text-body font-semibold text-secondary transition-colors hover:bg-surface-hover hover:text-content touch:min-h-11 rail-slim:justify-center rail-slim:px-0';
 const CURRENT_ROW =
-  "border-line bg-surface-solid text-content before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-pill before:bg-accent before:content-['']";
+  "bg-surface text-content before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-pill before:bg-accent before:content-['']";
 </script>
 
 <template>
@@ -68,13 +68,13 @@ const CURRENT_ROW =
       aria-keyshortcuts="Control+K Meta+K"
       :aria-label="$t('search.title')"
       :title="$t('search.title')"
-      class="flex h-9 items-center gap-2 rounded-control border border-line-control bg-surface-solid px-2.5 text-sm text-muted transition-colors hover:text-content touch:h-11 rail-slim:justify-center rail-slim:px-0"
+      class="flex h-(--qh-control) items-center gap-2 rounded-control bg-surface px-(--qh-control-px-sm) text-body text-muted transition-colors hover:text-content touch:h-11 rail-slim:justify-center rail-slim:px-0"
       @click="emit('search')"
     >
       <Search aria-hidden="true" class="size-4 shrink-0" />
       <span class="flex-1 text-left rail-slim:sr-only">{{ $t('search.title') }}</span>
       <kbd
-        class="rounded-cell border border-line px-1.5 font-mono text-caption leading-5 rail-slim:hidden"
+        class="rounded-cell bg-surface-strong px-1.5 font-mono text-kbd leading-5 rail-slim:hidden"
         >{{ shortcutHint() }}</kbd
       >
     </AppButton>

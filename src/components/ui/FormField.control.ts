@@ -14,8 +14,10 @@ export const FIELD_CONTROL: InjectionKey<ComputedRef<FieldControl>> = Symbol('fi
 export const useFieldControl = () => inject(FIELD_CONTROL, undefined);
 
 /**
- * The frame every text control shares (Workbench): 13 px text (16 px on touch, styles.css, so iOS does not zoom), 4 px corners, the `line-control` border (3:1 on its ground, WCAG 1.4.11),
- * muted placeholder, a negative inset ring while invalid, the muted pair when disabled (no opacity). Height is added per control.
+ * The frame every text control shares (Kit 2): 15 px text on a 1.5 line (16 px on touch, styles.css, so iOS does not zoom), the strong surface (L2)
+ * with no line (contrast-high mode adds a 1 px edge, `edge-high`), muted placeholder, a red tint and ring while invalid (the one
+ * state that draws a line), muted text when disabled (no opacity). Height and radius are added per control: a pill for a
+ * line, the surface radius for a multi-line field.
  */
 export const CONTROL_FRAME =
-  'w-full min-w-0 rounded-cell border border-line-control bg-surface-solid px-2.5 text-meta text-content placeholder:text-muted aria-invalid:border-negative aria-invalid:inset-ring aria-invalid:inset-ring-negative disabled:cursor-not-allowed disabled:border-line disabled:bg-surface-strong disabled:text-muted';
+  'edge-high w-full min-w-0 bg-surface-strong px-(--qh-control-px) text-body text-content placeholder:text-muted aria-invalid:bg-negative-bg aria-invalid:inset-ring aria-invalid:inset-ring-negative disabled:cursor-not-allowed disabled:text-muted';

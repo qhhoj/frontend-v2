@@ -114,7 +114,7 @@ const scoreText = computed(() =>
 /** The score's pill once judged: the share of the problem's points (a contest score is the same share) as a tinted pill. */
 const scoreCue = computed(() => {
   const tone = isFinished.value ? scoreTone(props.submission.points, props.problemPoints) : null;
-  return tone ? `w-fit rounded-pill border px-3 py-1.5 ${CUE_CHIP[tone]}` : '';
+  return tone ? `w-fit rounded-pill px-3 py-1.5 ${CUE_CHIP[tone]}` : '';
 });
 /** In a contest the problem's own score is the line's first part. */
 const problemScore = computed(() =>

@@ -5,7 +5,7 @@ import type { ButtonSize, ButtonTone } from './button-classes';
 
 /**
  * A square, icon-only AppButton. `label` names it for assistive tech and as the hover tooltip; the icon goes in the slot.
- * `compact`: a 36 px button with a 40 px hit area (`::after`) for a dense bar such as the shell's top bar; on a coarse pointer it is the
+ * `compact`: a 32 px circle with a 40 px hit area (`::after`) for a dense bar such as the shell's top bar; on a coarse pointer it is the
  * `sm` height (44 px).
  * An icon without its own `size-*` class is drawn at the icon scale (docs/design-language.md): 16 px, 20 px in `lg`.
  */
@@ -34,12 +34,12 @@ withDefaults(
     disabledReason: undefined,
   },
 );
-/** The extra 2 px each side makes a 36 px button a 40 px target; neighbours 4 px apart do not overlap. */
-const COMPACT_HIT_AREA = "relative after:absolute after:-inset-0.5 after:content-['']";
+/** The extra 4 px each side makes a 32 px button a 40 px target; neighbours 8 px apart do not overlap. */
+const COMPACT_HIT_AREA = "relative after:absolute after:-inset-1 after:content-['']";
 const ICON_SIZES: Record<ButtonSize, string> = {
-  sm: '[&_svg:not([class*=size-])]:size-4',
-  md: '[&_svg:not([class*=size-])]:size-4',
-  lg: '[&_svg:not([class*=size-])]:size-5',
+  sm: '[&_svg:not([class*=size-])]:size-(--qh-control-icon)',
+  md: '[&_svg:not([class*=size-])]:size-(--qh-control-icon)',
+  lg: '[&_svg:not([class*=size-])]:size-(--qh-control-icon-lg)',
 };
 </script>
 

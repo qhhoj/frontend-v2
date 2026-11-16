@@ -52,7 +52,7 @@ const unreadLabel = computed(() =>
     data-testid="top-bar-live-contest"
     :title="current.contest.name"
     aria-haspopup="dialog"
-    class="relative inline-flex h-9 min-w-0 items-center gap-2 rounded-control px-2 text-sm font-semibold text-content hover:bg-surface-hover touch:h-11"
+    class="relative inline-flex h-(--qh-control) min-w-0 items-center gap-2 rounded-control px-2 text-sm font-semibold text-content hover:bg-surface-hover touch:h-11"
     @click="popover?.toggle($event)"
   >
     <component :is="stateIcon" aria-hidden="true" class="size-4 shrink-0 text-positive" />

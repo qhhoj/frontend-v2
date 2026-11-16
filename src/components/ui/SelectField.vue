@@ -20,14 +20,14 @@ const field = useFieldControl();
       v-model="model"
       :aria-describedby="field?.describedBy"
       :aria-invalid="field?.invalid"
-      :class="`${CONTROL_FRAME} h-(--qh-control) appearance-none pr-10`"
+      :class="`${CONTROL_FRAME} h-(--qh-control) appearance-none rounded-control pr-10`"
     >
       <option v-if="placeholder !== undefined" value="">{{ placeholder }}</option>
       <slot />
     </select>
     <ChevronDown
       aria-hidden="true"
-      class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted"
+      class="pointer-events-none absolute top-1/2 right-3 size-3.5 -translate-y-1/2 text-muted"
     />
   </span>
 </template>

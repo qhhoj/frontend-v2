@@ -173,8 +173,8 @@ function onBoxKeydown(event: KeyboardEvent) {
     :aria-describedby="describedBy ?? field?.describedBy"
     :aria-invalid="isInvalid || undefined"
     :aria-busy="loading || undefined"
-    class="relative flex h-(--qh-control) w-full min-w-0 cursor-pointer items-center rounded-cell border bg-surface-solid pl-2.5 text-meta text-content outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-    :class="isInvalid ? 'border-negative' : 'border-line-control'"
+    class="relative flex h-(--qh-control) w-full min-w-0 cursor-pointer items-center rounded-control bg-surface-strong pl-(--qh-control-px-sm) text-body text-content outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+    :class="isInvalid ? 'bg-negative-bg inset-ring inset-ring-negative' : 'edge-high'"
     @click="popup.isOpen.value ? close() : open()"
     @keydown="onBoxKeydown"
   >
@@ -221,7 +221,7 @@ function onBoxKeydown(event: KeyboardEvent) {
           :aria-controls="listId"
           :aria-activedescendant="activeId"
           :placeholder="filterPlaceholder"
-          class="h-(--qh-control) w-full rounded-cell border border-line-control bg-surface-solid pr-2.5 pl-8 text-meta text-content placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          class="edge-high h-(--qh-control) w-full rounded-control bg-surface-strong pr-2.5 pl-8 text-body text-content placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           @keydown="onListKeydown"
         />
       </div>
