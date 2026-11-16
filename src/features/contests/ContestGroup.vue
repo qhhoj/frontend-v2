@@ -13,6 +13,7 @@ import { useContestListQuery } from './contests.queries';
 import ContestListEmpty from './ContestListEmpty.vue';
 import ContestListSkeletons from './ContestListSkeletons.vue';
 import EndedContestTable from './EndedContestTable.vue';
+import { featuredFirst } from './featured-contest';
 import RunningContestCard from './RunningContestCard.vue';
 import UpcomingContestRow from './UpcomingContestRow.vue';
 import {
@@ -60,6 +61,10 @@ const shownContests = computed(() =>
   contests.value.filter(
     (contest) => props.phase !== 'running' || phaseAt(contest, now.value) === 'running',
   ),
+);
+/** Running and upcoming groups put the featured contest first: it is the large card, the rest fill a grid. */
+const orderedContests = computed(() =>
+  featuredFirst(shownContests.value, props.phase === 'running'),
 );
 const hasRunEnded = computed(() => shownContests.value.length < contests.value.length);
 /** Then the server is asked once for the list without it. */
@@ -136,13 +141,17 @@ const clearTagTarget = computed(() => ({
         :tag-name="filters.tag ? (tagName ?? filters.tag) : null"
         :clear-tag-target="clearTagTarget"
       />
-      <!-- Blocks wrap and grow, so the last row is filled: 1 block is the full width, 2 halves, 4 on a 3-wide row 3 and 1 wide. -->
-      <ul v-else-if="phase !== 'ended'" class="m-0 flex list-none flex-wrap gap-3 p-0">
+      <!-- The first card (the featured contest) spans the row; the others sit in a grid of two or three columns. -->
+      <ul
+        v-else-if="phase !== 'ended'"
+        class="m-0 grid list-none grid-cols-1 gap-3 p-0 md:grid-cols-2 xl:grid-cols-3"
+      >
         <component
           :is="phase === 'running' ? RunningContestCard : UpcomingContestRow"
-          v-for="contest in shownContests"
+          v-for="(contest, index) in orderedContests"
           :key="contest.key"
           :contest="contest"
+          :featured="index === 0"
           :with-edit="Boolean(organizationId)"
         />
       </ul>

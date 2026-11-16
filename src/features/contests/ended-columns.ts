@@ -1,15 +1,16 @@
 /**
  * Layout of the ended-contests table, shared with its skeleton so loading and loaded tables have the same columns.
- * Below `lg` the format column goes (the least useful one) so the name, date, count and action fit a tablet.
+ * Auto layout without a minimum width: the name column takes what the short columns leave and wraps, so the table never
+ * scrolls sideways; a phone gets stacked rows instead (`EndedContestTable.vue`).
  */
-export const ENDED_TABLE_CLASS =
-  'w-full min-w-[800px] table-fixed border-collapse text-sm lg:min-w-[980px]';
+export const ENDED_TABLE_CLASS = 'w-full border-collapse text-sm';
 export const ENDED_HEAD_ROW_CLASS = 'text-left text-meta whitespace-nowrap text-muted';
 export const ENDED_ROW_CLASS = 'border-t border-line';
 export const ENDED_CELL = {
   name: 'px-5 py-3',
-  when: 'w-48 px-3 py-3',
-  format: 'hidden w-52 px-3 py-3 lg:table-cell',
-  participants: 'w-28 px-3 py-3 text-right',
-  action: 'w-64 px-5 py-3 text-right',
+  when: 'px-3 py-3 whitespace-nowrap',
+  length: 'px-3 py-3 whitespace-nowrap',
+  format: 'px-3 py-3 whitespace-nowrap',
+  participants: 'px-3 py-3 text-right whitespace-nowrap',
+  action: 'px-5 py-3 text-right whitespace-nowrap',
 } as const;

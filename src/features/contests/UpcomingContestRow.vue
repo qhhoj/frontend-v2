@@ -2,7 +2,6 @@
 import { computed } from 'vue';
 import Card from '@/components/ui/Card.vue';
 import type { ContestListItem } from '@/api/types/contests';
-import { spanMessage } from '@/lib/contest-time';
 import { formatNumber } from '@/lib/format';
 import { formatClock, formatDayTile, formatRelative } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
@@ -12,13 +11,13 @@ import ContestChips from './ContestChips.vue';
 import ContestEditLink from './ContestEditLink.vue';
 import { listCallToAction } from './contest-action';
 import { endClockLabel } from './contest-clock';
-import { useSpanText } from './use-span-text';
+import { useLengthText } from './use-span-text';
 import ViewerBadge from './ViewerBadge.vue';
 
 /** `withEdit`: an organization's list, where its administrators get a pencil on the contests they edit. */
-const props = defineProps<{ contest: ContestListItem; withEdit?: boolean }>();
+const props = defineProps<{ contest: ContestListItem; withEdit?: boolean; featured?: boolean }>();
 const locale = useLocaleStore();
-const spanText = useSpanText();
+const lengthText = useLengthText();
 /** Relative start words move in minutes: a tick a minute is enough. */
 const now = useNow(60_000);
 const call = computed(() => listCallToAction(props.contest, now.value));
@@ -27,9 +26,7 @@ const timeRange = computed(
   () => `${formatClock(props.contest.startTime)}–${endClockLabel(props.contest)}`,
 );
 const durationText = computed(() =>
-  spanText(
-    spanMessage((Date.parse(props.contest.endTime) - Date.parse(props.contest.startTime)) / 1000),
-  ),
+  lengthText((Date.parse(props.contest.endTime) - Date.parse(props.contest.startTime)) / 1000),
 );
 const startsInText = computed(() =>
   formatRelative(props.contest.startTime, now.value, locale.locale),
@@ -42,7 +39,7 @@ const startsInText = computed(() =>
     :to="{ name: 'contest', params: { key: contest.key } }"
     :link-label="contest.name"
     data-testid="upcoming-contest"
-    class="flex min-w-0 grow basis-96 flex-col gap-3 p-5"
+    :class="['flex min-w-0 flex-col gap-3 p-5', featured && 'col-span-full']"
   >
     <div class="flex min-w-0 items-center gap-4">
       <span
@@ -66,7 +63,7 @@ const startsInText = computed(() =>
         </p>
       </div>
     </div>
-    <p v-if="contest.summary" class="text-sm text-muted">{{ contest.summary }}</p>
+    <p v-if="featured && contest.summary" class="text-sm text-muted">{{ contest.summary }}</p>
     <div class="flex flex-wrap items-center gap-1.5 [&_a]:relative">
       <ContestChips :contest="contest" with-tags with-code-needed />
       <ViewerBadge :badge-key="call.badgeKey" />

@@ -4,10 +4,8 @@ import { serverNow } from '@/lib/server-clock';
 import { CARD_VARIANTS } from '@/components/ui/Card.variants';
 import type { ContestListItem } from '@/api/types/contests';
 import CompactListRow from '@/components/CompactListRow.vue';
-import ScrollRegion from '@/components/ScrollRegion.vue';
 import { formatLabel } from '@/lib/contest-format';
 import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
-import { spanMessage } from '@/lib/contest-time';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { translate } from '@/i18n';
@@ -17,7 +15,6 @@ import FactLine from '@/components/FactLine.vue';
 import ContestCallLink from './ContestCallLink.vue';
 import ContestChips from './ContestChips.vue';
 import ContestEditLink from './ContestEditLink.vue';
-import ContestOrganizationChips from './ContestOrganizationChips.vue';
 import { listCallToAction } from './contest-action';
 import {
   ENDED_CELL,
@@ -25,7 +22,7 @@ import {
   ENDED_ROW_CLASS,
   ENDED_TABLE_CLASS,
 } from './ended-columns';
-import { useSpanText } from './use-span-text';
+import { useLengthText } from './use-span-text';
 import ViewerBadge from './ViewerBadge.vue';
 
 const props = defineProps<{
@@ -43,28 +40,21 @@ const contestTarget = (contest: ContestListItem) => ({
 const hasOwnCall = (contest: ContestListItem) => callOf(contest).labelKey !== 'contests.list.view';
 /** The actions column is there only when a row has a button: otherwise it is an empty strip. */
 const hasActions = computed(() => props.contests.some((contest) => hasOwnCall(contest)));
-const spanText = useSpanText();
+const lengthOf = useLengthText();
 /** Ended rows do not change with the clock, so each render reads it once. */
 const callOf = (contest: ContestListItem) => listCallToAction(contest, serverNow());
-/** The start date and the length, in one cell: `04/10 · 4 giờ`. */
-const whenText = (contest: ContestListItem) => {
-  const lengthSeconds = (Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000;
-  return `${formatDate(contest.startTime, 'short', locale.locale)} · ${spanText(spanMessage(lengthSeconds))}`;
-};
-/** A phone gets compact rows: name, then format · date · length · contestants (the format first, so it is never
- * the fact cut off), and the action at the end. */
+/** One date format (dd/MM/yyyy) and one length format (`useLengthText`) on every row. */
+const lengthSeconds = (contest: ContestListItem) =>
+  (Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000;
+const dateText = (contest: ContestListItem) => formatDate(contest.startTime, 'date', locale.locale);
+const lengthText = (contest: ContestListItem) => lengthOf(lengthSeconds(contest));
+/** A phone gets stacked rows: the name, then date · length · format, the contestants and the action at the end. */
 const isCompact = useMediaQuery(COMPACT_LIST_QUERY);
-const compactFacts = (contest: ContestListItem) => {
-  const lengthSeconds = (Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000;
-  return [
-    formatLabel(contest.formatName),
-    formatDate(contest.startTime, 'short', locale.locale),
-    spanText(spanMessage(lengthSeconds)),
-    translate('contests.list.contestantCount', {
-      count: formatNumber(contest.userCount, locale.locale),
-    }),
-  ];
-};
+const compactFacts = (contest: ContestListItem) => [
+  dateText(contest),
+  lengthText(contest),
+  formatLabel(contest.formatName),
+];
 </script>
 
 <template>
@@ -80,8 +70,18 @@ const compactFacts = (contest: ContestListItem) => {
         :to="{ name: 'contest', params: { key: contest.key } }"
         :title="contest.name"
       >
-        <template #meta><FactLine :facts="compactFacts(contest)" /></template>
+        <template #meta>
+          <FactLine :facts="compactFacts(contest)" />
+          <span class="mt-1 flex flex-wrap items-center gap-1.5 empty:hidden"
+            ><ContestChips :contest="contest" with-tags with-code-needed hide-format
+          /></span>
+        </template>
         <template #trail>
+          <span class="font-mono text-caption text-muted tabular-nums">{{
+            translate('contests.list.contestantCount', {
+              count: formatNumber(contest.userCount, locale.locale),
+            })
+          }}</span>
           <ContestCallLink
             v-if="hasOwnCall(contest)"
             compact
@@ -94,12 +94,7 @@ const compactFacts = (contest: ContestListItem) => {
       </CompactListRow>
     </ul>
   </div>
-  <ScrollRegion
-    v-else
-    data-testid="ended-contests"
-    :label="$t('contests.list.endedRegion')"
-    :class="[CARD_VARIANTS.glass, 'overflow-hidden']"
-  >
+  <div v-else data-testid="ended-contests" :class="[CARD_VARIANTS.glass, 'overflow-hidden']">
     <table :class="ENDED_TABLE_CLASS">
       <caption class="sr-only">
         {{
@@ -113,6 +108,9 @@ const compactFacts = (contest: ContestListItem) => {
           </th>
           <th scope="col" class="font-semibold" :class="ENDED_CELL.when">
             {{ $t('contests.list.columns.when') }}
+          </th>
+          <th scope="col" class="font-semibold" :class="ENDED_CELL.length">
+            {{ $t('contests.list.columns.length') }}
           </th>
           <th scope="col" class="font-semibold" :class="ENDED_CELL.format">
             {{ $t('contests.list.columns.format') }}
@@ -134,36 +132,34 @@ const compactFacts = (contest: ContestListItem) => {
           @auxclick="openInTab($event, contestTarget(contest))"
         >
           <th scope="row" class="text-left font-normal" :class="ENDED_CELL.name">
-            <RouterLink
-              :to="{ name: 'contest', params: { key: contest.key } }"
-              class="font-semibold hover:text-accent-text"
-              >{{ contest.name }}</RouterLink
-            >
+            <span class="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <RouterLink
+                :to="{ name: 'contest', params: { key: contest.key } }"
+                class="font-semibold hover:text-accent-text"
+                >{{ contest.name }}</RouterLink
+              >
+              <ContestChips
+                :contest="contest"
+                with-tags
+                with-code-needed
+                :hide-organizations="isOrganizationScoped"
+                hide-format
+              />
+              <ViewerBadge :badge-key="callOf(contest).badgeKey" />
+            </span>
             <span
               v-if="isOrganizationScoped"
               class="flex items-center gap-1 font-mono text-caption text-muted"
               >{{ contest.key }}<ContestEditLink :contest="contest"
             /></span>
-            <span
-              v-if="!isOrganizationScoped && contest.organizations.length"
-              class="mt-1 flex max-w-full flex-wrap gap-1.5"
-              ><ContestOrganizationChips :contest="contest"
-            /></span>
           </th>
-          <td class="whitespace-nowrap" :class="ENDED_CELL.when">{{ whenText(contest) }}</td>
-          <td :class="ENDED_CELL.format">
-            <span class="flex flex-wrap gap-1.5">
-              <ContestChips :contest="contest" with-tags with-code-needed hide-organizations />
-              <ViewerBadge :badge-key="callOf(contest).badgeKey" />
-            </span>
+          <td class="tabular-nums" :class="ENDED_CELL.when">{{ dateText(contest) }}</td>
+          <td class="font-mono tabular-nums" :class="ENDED_CELL.length">
+            {{ lengthText(contest) }}
           </td>
-          <td class="font-mono whitespace-nowrap tabular-nums" :class="ENDED_CELL.participants">
+          <td :class="ENDED_CELL.format">{{ formatLabel(contest.formatName) }}</td>
+          <td class="font-mono tabular-nums" :class="ENDED_CELL.participants">
             {{ formatNumber(contest.userCount, locale.locale) }}
-            <span v-if="contest.virtualCount" class="ml-1 text-caption text-muted">{{
-              $t('contests.virtualExtra', {
-                count: formatNumber(contest.virtualCount, locale.locale),
-              })
-            }}</span>
           </td>
           <td v-if="hasActions" :class="ENDED_CELL.action">
             <ContestCallLink
@@ -178,5 +174,5 @@ const compactFacts = (contest: ContestListItem) => {
         </tr>
       </tbody>
     </table>
-  </ScrollRegion>
+  </div>
 </template>
