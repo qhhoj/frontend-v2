@@ -109,7 +109,7 @@ The `API drift` workflow checks out the latest `qhhoj/backend-v2` release tag (`
 
 ## Releasing
 
-There are no versions, changesets or release PRs. `main` is protected: changes land only by squash-merged PR, with signed commits and the required checks (`changes`, `scripts`, `check`, `drift`) green. Every push to `main` triggers `.github/workflows/deploy.yml`, which waits for CI on that commit, builds with `GIT_SHA` and deploys through `qhhoj-deploy` (`releases/sha-<12>` + `current` symlink). Two quick merges deploy in order; a deploy that has not started is cancelled by the newer one. A deploy deferred by a running contest (exit 75) is retried. Redeploy by hand with the `deploy` workflow (`ref`, `force` skips the CI wait). The footer shows the commit and build date.
+There are no versions, changesets or release PRs. `main` is protected: changes land only by squash-merged PR, with signed commits and the required checks (`changes`, `scripts`, `check`, `drift`) green. Every push to `main` triggers `.github/workflows/deploy.yml`, which waits for CI on that commit, builds with `GIT_SHA` and deploys through `qhhoj-deploy` (`releases/sha-<12>` + `current` symlink). Two quick merges deploy in order; a deploy that has not started is cancelled by the newer one. A deploy deferred by a running contest (exit 75) is retried. Redeploy by hand with the `deploy` workflow (`target`, `ref`), run from the target's branch. The `staging` branch (protected like `main`) deploys the same way to staging.qhhoj.com (`qhhoj-deploy frontend-staging`, GitHub environment `staging`), built with `VITE_STAGING=1`, which shows a "Staging" strip on top; it uses the production api and data. The footer shows the commit and build date.
 
 ## Commits
 
