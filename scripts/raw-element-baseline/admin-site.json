@@ -98,6 +98,9 @@
     "controls": 3,
     "search": 1
   },
+  "features/admin/judges/queue.queries.ts": {
+    "hardcoded-script-value": 1
+  },
   "features/admin/languages/LanguageContentSection.vue": {
     "AdminField": 3,
     "controls": 3,

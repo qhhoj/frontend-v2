@@ -10,6 +10,7 @@
 // - hard-coded values (scripts/hardcoded-values.mjs): a literal size, spacing, motion or colour that is not a token.
 import { classTokens, COMMENT_LINE, utilityOf } from './class-tokens.mjs';
 import { hardcodedValues } from './hardcoded-values.mjs';
+import { hardcodedScriptValues, SCRIPT_RULE, SCRIPT_USE } from './hardcoded-script-values.mjs';
 import { importUses, isKit } from './wrapper-imports.mjs';
 
 /** Element rules: the tag (lower case) or `input` type they match, and the kit part. */
@@ -72,6 +73,7 @@ const mentionsDisabledState = (line) =>
   STATE_WORD.test(line.replace(BOUND_STATE, '').replace(/(['`])(?:(?!\1).)*\1/g, ''));
 
 /** The rule of scripts/hardcoded-values.mjs: each of its lines names the token family to use. */
+export { SCRIPT_RULE, SCRIPT_USE };
 export const HARDCODED_RULE = 'hardcoded-value';
 export const HARDCODED_USE =
   'the token family named on the line (DESIGN.md, "No hard-coded values")';
@@ -188,4 +190,9 @@ export const ruleUses = (source, rel) => [
   ...importUses(source, rel),
   ...classUses(source, rel),
   ...hardcodedValues(source, rel).map((use) => ({ rule: HARDCODED_RULE, ...use })),
+  ...hardcodedScriptValues(source, rel).map(({ line, text }) => ({
+    rule: SCRIPT_RULE,
+    line,
+    text,
+  })),
 ];

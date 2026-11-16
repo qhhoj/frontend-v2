@@ -14,6 +14,8 @@ import {
   CLASS_RULES,
   ELEMENT_RULES,
   HARDCODED_RULE,
+  SCRIPT_RULE,
+  SCRIPT_USE,
   HARDCODED_USE,
   ruleUses,
 } from './raw-element-rules.mjs';
@@ -117,6 +119,7 @@ export const KIT_PART = {
   ...Object.fromEntries(IMPORT_RULES.map(({ id, use }) => [id, use])),
   ...Object.fromEntries(Object.entries(CLASS_RULES).map(([id, { use }]) => [id, use])),
   [HARDCODED_RULE]: HARDCODED_USE,
+  [SCRIPT_RULE]: SCRIPT_USE,
 };
 
 /** Every area baseline from `dir`, merged: `{ rel: { rule: count } }`, and which file each entry came from. */

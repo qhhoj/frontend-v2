@@ -11,7 +11,14 @@
   "features/notifications/NotificationsPage.vue": {
     "SettingsNotice": 3
   },
+  "features/notifications/notifications.queries.ts": {
+    "hardcoded-script-value": 1
+  },
+  "features/notifications/use-notification-stream.ts": {
+    "hardcoded-script-value": 1
+  },
   "features/profile/RatingChart.vue": {
+    "hardcoded-script-value": 2,
     "status-colour": 2
   }
 }

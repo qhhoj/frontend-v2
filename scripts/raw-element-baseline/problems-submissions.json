@@ -6,11 +6,20 @@
     "button": 1,
     "disabled-opacity": 1
   },
+  "features/problems/PdfButton.vue": {
+    "hardcoded-script-value": 1
+  },
   "features/problems/PdfStatement.vue": {
     "hardcoded-value": 1
   },
+  "features/problems/ProblemContent.vue": {
+    "hardcoded-script-value": 1
+  },
   "features/problems/ProblemFilterPanel.vue": {
     "hardcoded-value": 1
+  },
+  "features/problems/ProblemMySubmissions.vue": {
+    "hardcoded-script-value": 1
   },
   "features/problems/ProblemPointsRange.vue": {
     "hardcoded-value": 14
@@ -33,12 +42,21 @@
   "features/problems/problem-layout.ts": {
     "hardcoded-value": 2
   },
+  "features/problems/use-pdf-statement.ts": {
+    "hardcoded-script-value": 1
+  },
+  "features/problems/use-sheet-drag.ts": {
+    "hardcoded-script-value": 1
+  },
   "features/runtimes/JudgeCard.vue": {
     "verdict-tone": 1
   },
   "features/runtimes/LanguageRow.vue": {
     "button": 1,
     "verdict-tone": 1
+  },
+  "features/runtimes/runtimes.queries.ts": {
+    "hardcoded-script-value": 1
   },
   "features/submissions/CasesTable.vue": {
     "hardcoded-value": 1,
@@ -52,7 +70,11 @@
     "button": 1,
     "input": 1
   },
+  "features/submissions/SubmissionCompactList.vue": {
+    "hardcoded-script-value": 1
+  },
   "features/submissions/SubmissionHero.vue": {
+    "hardcoded-script-value": 1,
     "hardcoded-value": 1
   },
   "features/submissions/SubmissionLockControl.vue": {
@@ -62,7 +84,11 @@
   "features/submissions/SubmissionPickBox.vue": {
     "checkbox": 1
   },
+  "features/submissions/SubmissionStaffPanel.vue": {
+    "hardcoded-script-value": 1
+  },
   "features/submissions/SubmissionTable.vue": {
+    "hardcoded-script-value": 1,
     "table": 1
   },
   "features/submissions/SubmissionTableSkeleton.vue": {
@@ -78,7 +104,23 @@
   "features/submissions/list/SubmissionFilterPanel.vue": {
     "hardcoded-value": 1
   },
+  "features/submissions/list/TestStrip.vue": {
+    "hardcoded-script-value": 1
+  },
+  "features/submissions/list/in-flight-poll.ts": {
+    "hardcoded-script-value": 1
+  },
   "features/submissions/submission-table-cells.ts": {
+    "hardcoded-script-value": 1,
     "hardcoded-value": 5
+  },
+  "features/submissions/submissions.queries.ts": {
+    "hardcoded-script-value": 1
+  },
+  "features/submissions/use-live-submission-list.ts": {
+    "hardcoded-script-value": 1
+  },
+  "features/submissions/use-live-submission.ts": {
+    "hardcoded-script-value": 2
   }
 }

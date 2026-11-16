@@ -12,6 +12,7 @@
     "hardcoded-value": 1
   },
   "features/bit-roam/BitRoamLayer.vue": {
+    "hardcoded-script-value": 2,
     "hardcoded-value": 1
   },
   "features/bit-roam/PixelHearts.vue": {
@@ -38,6 +39,15 @@
   },
   "features/shell/search/CommandPalette.vue": {
     "hardcoded-value": 1
+  },
+  "features/shell/search/use-site-search.ts": {
+    "hardcoded-script-value": 1
+  },
+  "features/shell/use-loading-phase.ts": {
+    "hardcoded-script-value": 2
+  },
+  "features/shell/use-running-contest-count.ts": {
+    "hardcoded-script-value": 1
   },
   "features/short-links/ShortLinkButton.vue": {
     "status-colour": 1

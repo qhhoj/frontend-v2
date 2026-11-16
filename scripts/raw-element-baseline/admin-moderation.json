@@ -19,7 +19,8 @@
   "features/admin/activity/LiveVisitorsCard.vue": {
     "AdminUserLabel": 1,
     "button": 2,
-    "controls": 3
+    "controls": 3,
+    "hardcoded-script-value": 1
   },
   "features/admin/activity/UserActivityPage.vue": {
     "AdminNotice": 1,
@@ -199,6 +200,7 @@
     "AdminChip": 1,
     "AdminDataTable": 1,
     "AdminUserLabel": 1,
-    "button": 1
+    "button": 1,
+    "hardcoded-script-value": 1
   }
 }
