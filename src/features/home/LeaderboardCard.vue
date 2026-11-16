@@ -6,7 +6,7 @@ import UserName from '@/components/UserName.vue';
 import PageSection from '@/components/ui/PageSection.vue';
 import { useHomeQuery } from '@/features/community/community.queries';
 import { formatNumber } from '@/lib/format';
-import { medalClass } from '@/lib/medal';
+import { medalBadgeClass } from '@/lib/medal';
 import { useLocaleStore } from '@/stores/locale.store';
 
 /**
@@ -65,8 +65,8 @@ const lists = computed(() => [
               class="flex items-center gap-2.5 py-1.5 first:pt-0 last:pb-0"
             >
               <span
-                class="w-5 shrink-0 text-right font-mono text-sm tabular-nums"
-                :class="medalClass(index + 1) || 'text-muted'"
+                class="flex size-5 shrink-0 items-center justify-center rounded-pill font-mono text-meta font-bold tabular-nums"
+                :class="medalBadgeClass(index + 1)"
                 >{{ index + 1 }}</span
               >
               <UserName

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import Card from '@/components/ui/Card.vue';
+import Chip from '@/components/ui/Chip.vue';
+import { CUE_ROW } from '@/components/ui/cue-tones';
 import type { ContestListItem } from '@/api/types/contests';
 import { formatNumber } from '@/lib/format';
 import { formatClock, formatDayTile, formatRelative } from '@/lib/format-date';
@@ -28,9 +30,11 @@ const timeRange = computed(
 const durationText = computed(() =>
   lengthText((Date.parse(props.contest.endTime) - Date.parse(props.contest.startTime)) / 1000),
 );
-const startsInText = computed(() =>
-  formatRelative(props.contest.startTime, now.value, locale.locale),
-);
+/** Mid-phrase: ICU capitalises some words ("Ngày mai"), so the first letter is lowered. */
+const startsInText = computed(() => {
+  const text = formatRelative(props.contest.startTime, now.value, locale.locale);
+  return text.charAt(0).toLowerCase() + text.slice(1);
+});
 </script>
 
 <template>
@@ -39,7 +43,12 @@ const startsInText = computed(() =>
     :to="{ name: 'contest', params: { key: contest.key } }"
     :link-label="contest.name"
     data-testid="upcoming-contest"
-    :class="['flex min-w-0 flex-col gap-3 p-5', featured && 'col-span-full']"
+    variant="plain"
+    :class="[
+      'flex min-w-0 flex-col gap-3 rounded-card border border-line p-5',
+      CUE_ROW.upcoming,
+      featured && 'col-span-full',
+    ]"
   >
     <div class="flex min-w-0 items-center gap-4">
       <span
@@ -74,9 +83,9 @@ const startsInText = computed(() =>
     </div>
     <div class="mt-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-1">
       <p class="min-w-0 text-sm text-muted">
-        <span class="whitespace-nowrap text-cue-upcoming">{{
+        <Chip tone="upcoming" size="md">{{
           $t('contests.list.startsIn', { relative: startsInText })
-        }}</span>
+        }}</Chip>
         ·
         {{
           $t(

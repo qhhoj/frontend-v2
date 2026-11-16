@@ -4,6 +4,7 @@ import type { CurrentParticipation } from '@/api/types/contests';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
+import { CUE_ROW } from '@/components/ui/cue-tones';
 import StatusDot from '@/components/ui/StatusDot.vue';
 import { participationKind } from '@/features/contests/bar/current-contest';
 import { useCurrentContest } from '@/features/contests/bar/use-current-contest';
@@ -40,8 +41,12 @@ const format = (value: number) => formatNumber(value, locale.locale);
   <Card
     v-if="current"
     data-testid="live-contest"
+    variant="plain"
     padding="sm"
-    class="flex flex-wrap items-center gap-x-5 gap-y-2 border-l-4 border-l-cue-live"
+    :class="[
+      'flex flex-wrap items-center gap-x-5 gap-y-2 rounded-card border border-line',
+      CUE_ROW.live,
+    ]"
   >
     <div class="min-w-0 flex-1 basis-56">
       <p class="flex items-center gap-1.5 text-meta font-semibold text-cue-live">

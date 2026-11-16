@@ -45,3 +45,26 @@ export const CUE_DOT: Record<CueTone, string> = {
   zero: 'bg-cue-zero',
   attention: 'bg-cue-attention',
 };
+
+/** A row whose whole meaning is a state: the light tint and a 3 px left edge (a list item or a card). */
+export const CUE_ROW: Record<CueTone, string> = {
+  live: 'bg-cue-live-bg border-l-3 border-l-cue-live',
+  upcoming: 'bg-cue-upcoming-bg border-l-3 border-l-cue-upcoming',
+  ended: 'bg-cue-ended-bg border-l-3 border-l-cue-ended',
+  full: 'bg-cue-full-bg border-l-3 border-l-cue-full',
+  partial: 'bg-cue-partial-bg border-l-3 border-l-cue-partial',
+  zero: 'bg-cue-zero-bg border-l-3 border-l-cue-zero',
+  attention: 'bg-cue-attention-bg border-l-3 border-l-cue-attention',
+};
+
+/** The same for a table row: the tint on the row, the edge on its first cell (a row has no border of its own). */
+export const CUE_TABLE_ROW: Record<CueTone, string> = {
+  live: 'bg-cue-live-bg [&>:first-child]:border-l-3 [&>:first-child]:border-l-cue-live',
+  upcoming: 'bg-cue-upcoming-bg [&>:first-child]:border-l-3 [&>:first-child]:border-l-cue-upcoming',
+  ended: 'bg-cue-ended-bg [&>:first-child]:border-l-3 [&>:first-child]:border-l-cue-ended',
+  full: 'bg-cue-full-bg [&>:first-child]:border-l-3 [&>:first-child]:border-l-cue-full',
+  partial: 'bg-cue-partial-bg [&>:first-child]:border-l-3 [&>:first-child]:border-l-cue-partial',
+  zero: 'bg-cue-zero-bg [&>:first-child]:border-l-3 [&>:first-child]:border-l-cue-zero',
+  attention:
+    'bg-cue-attention-bg [&>:first-child]:border-l-3 [&>:first-child]:border-l-cue-attention',
+};

@@ -7,3 +7,13 @@ export const medalClass = (rank: number) =>
       : rank === 3
         ? 'font-bold text-medal-bronze'
         : '';
+
+/** A filled badge for ranks 1 to 3 (medal colour behind the digit); other ranks get none. */
+export const medalBadgeClass = (rank: number) =>
+  rank === 1
+    ? 'bg-medal-gold text-surface-solid'
+    : rank === 2
+      ? 'bg-medal-silver text-surface-solid'
+      : rank === 3
+        ? 'bg-medal-bronze text-surface-solid'
+        : 'text-muted';

@@ -13,7 +13,7 @@ defineProps<{ status: ViewerStatus }>();
     viewBox="0 0 18 18"
     role="img"
     :aria-label="$t('problems.solved')"
-    class="text-positive"
+    class="text-cue-full"
   >
     <title>{{ $t('problems.solved') }}</title>
     <circle cx="9" cy="9" r="8" fill="currentColor" />
@@ -33,7 +33,7 @@ defineProps<{ status: ViewerStatus }>();
     viewBox="0 0 18 18"
     role="img"
     :aria-label="$t('problems.attemptedLong')"
-    class="text-verdict-tle"
+    class="text-cue-zero"
   >
     <title>{{ $t('problems.attemptedLong') }}</title>
     <circle cx="9" cy="9" r="7.2" stroke="currentColor" stroke-width="1.6" fill="none" />
