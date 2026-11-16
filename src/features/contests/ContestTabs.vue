@@ -49,6 +49,8 @@ const { data: contest } = useContestQuery(() => props.contestKey);
 const canViewBalloons = computed(() => contest.value?.viewer.canViewBalloons ?? false);
 const route = useRoute();
 const session = useSessionStore();
+/** The tab to light: the page's own `current`, else the route's name (the layout passes none, so a tab page lights its own tab). */
+const currentName = computed(() => props.current ?? String(route.name));
 /** The editor tab that matches a public contest page: the problem list opens Problems, the board opens Ranking; others General. */
 const EDIT_SCREEN_OF_PAGE: Record<string, ContestEditScreen> = {
   contest: 'contestProblems',
@@ -58,11 +60,7 @@ const EDIT_SCREEN_OF_PAGE: Record<string, ContestEditScreen> = {
 /** Editors' "Quản lý": the admin editor's tab that matches the page they are on. */
 const manageTarget = computed(() =>
   contest.value
-    ? contestEditTarget(
-        session.user,
-        contest.value,
-        EDIT_SCREEN_OF_PAGE[props.current ?? String(route.name)],
-      )
+    ? contestEditTarget(session.user, contest.value, EDIT_SCREEN_OF_PAGE[currentName.value])
     : null,
 );
 /** This page streams announcements while the contest can still get them, unless the app shell streams it (the viewer is in it). */
@@ -81,7 +79,7 @@ const tabs = computed<TabItem[]>(() => {
       key: tab.name,
       label: t(tab.labelKey),
       to: { name: tab.name, params: { key: props.contestKey } },
-      isCurrent: tab.name === props.current,
+      isCurrent: tab.name === currentName.value,
       count: hasUnread ? String(unread.value) : undefined,
       countLabel: hasUnread
         ? t('contests.announcements.unread', { count: unread.value }, unread.value)

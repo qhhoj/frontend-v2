@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Ellipsis } from 'lucide-vue-next';
 import type { Component } from 'vue';
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
 import { RouterLink, useRoute } from 'vue-router';
@@ -93,6 +93,18 @@ const indicator = useSlidingIndicator(scroller, '[data-tab-key]', [
   () => props.variant,
   () => props.items.map((item) => `${item.key}:${item.isCurrent}`).join(),
 ]);
+/** A scrolling row (a phone) opens with the current tab in view, and brings the new one in after a route change; no smooth scroll. */
+function revealCurrent() {
+  if (props.overflow !== 'scroll') return;
+  scroller.value
+    ?.querySelector<HTMLElement>('[aria-current="page"], [aria-selected="true"]')
+    ?.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+}
+onMounted(revealCurrent);
+watch(
+  () => [route.fullPath, current.value],
+  () => nextTick(revealCurrent),
+);
 /** A tab out of view, hidden whole; the current one is always kept in view. */
 const isHidden = (item: TabItem) =>
   hiddenKeys.value.includes(item.key) && item.key !== current.value && !item.isCurrent;

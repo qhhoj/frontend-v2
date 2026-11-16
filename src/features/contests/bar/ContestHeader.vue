@@ -101,6 +101,7 @@ const facts = computed<(Fact & { text: string })[]>(() => {
       wideOnly: true,
     },
     { text: formatLabel(contest.formatName), wideOnly: false },
+    { text: contest.isRated ? t('contests.rated') : null, wideOnly: false },
   ];
   return all.filter((fact): fact is Fact & { text: string } => fact.text !== null);
 });
@@ -267,7 +268,7 @@ const freeze = computed(() =>
       :aria-label="$t('contestBar.sticky.label')"
       data-testid="contest-sticky-bar"
       :class="[
-        'z-header -mt-3 flex items-center gap-3 border-b border-line bg-surface-solid py-1 md:-mt-2 print:static',
+        'z-header -mt-3 flex items-center gap-3 bg-surface py-1 md:-mt-2 print:static',
         isSticky && 'sticky top-0',
       ]"
     >
