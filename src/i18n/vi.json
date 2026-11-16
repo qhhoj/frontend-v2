@@ -1126,17 +1126,24 @@
     "ratingDelta": "{delta} sau kỳ thi gần nhất",
     "solved": "Đã giải",
     "unrated": "Chưa có rating",
+    "rating": "Rating",
     "points": "Điểm",
     "rank": "Hạng",
     "recentSubmissions": "Bài nộp gần đây",
-    "continue": "Tiếp tục: {problem}",
+    "continue": {
+      "title": "Làm tiếp",
+      "lastSubmission": "Lần nộp cuối {when}",
+      "failedAt": "{verdict} ở test {test}",
+      "failedBatch": "{verdict} ở nhóm {batch}",
+      "empty": "Bạn chưa có bài nào làm dở."
+    },
     "noSubmissions": "Bạn chưa nộp bài nào.",
     "noLiveContest": "Không có kỳ thi đang diễn ra.",
     "browseContests": "Xem các kỳ thi",
     "anon": {
       "title": "Quốc Học Huế Online Judge",
       "body": "Hệ thống chấm bài trực tuyến của Trường THPT Chuyên Quốc Học Huế.",
-      "register": "Đăng ký tài khoản",
+      "register": "Đăng ký",
       "signIn": "Đăng nhập",
       "problems": "Xem bài tập",
       "bit": "Bit đội mũ tốt nghiệp",
@@ -1155,7 +1162,6 @@
       "noPerformers": "Chưa có ai có điểm PP."
     },
     "contestants": "{count} thí sinh",
-    "continueHint": "Quay lại bài bạn đang làm dở",
     "liveEnter": "Vào thi",
     "liveScore": "{score} điểm"
   },

@@ -1126,17 +1126,24 @@
     "ratingDelta": "{delta} at the last contest",
     "solved": "Solved",
     "unrated": "No rating yet",
+    "rating": "Rating",
     "points": "Points",
     "rank": "Rank",
     "recentSubmissions": "Recent submissions",
-    "continue": "Continue: {problem}",
+    "continue": {
+      "title": "Continue",
+      "lastSubmission": "Last submission {when}",
+      "failedAt": "{verdict} on test {test}",
+      "failedBatch": "{verdict} on group {batch}",
+      "empty": "You have no unfinished problem."
+    },
     "noSubmissions": "You have not submitted anything yet.",
     "noLiveContest": "No contest is running.",
     "browseContests": "Browse contests",
     "anon": {
       "title": "Quoc Hoc Hue Online Judge",
       "body": "The online judge of Quoc Hoc Hue High School for the Gifted.",
-      "register": "Create an account",
+      "register": "Sign up",
       "signIn": "Sign in",
       "problems": "Browse problems",
       "bit": "Bit in a graduation cap",
@@ -1155,7 +1162,6 @@
       "noPerformers": "No one has performance points yet."
     },
     "contestants": "{count} contestants",
-    "continueHint": "Back to the problem you left unfinished",
     "liveEnter": "Enter contest",
     "liveScore": "{score} points"
   },

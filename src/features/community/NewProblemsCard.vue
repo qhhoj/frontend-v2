@@ -8,7 +8,10 @@ import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useHomeQuery } from './community.queries';
 
-/** The home's newest problems: the name (two lines on phones, the code under it), the code (wide screens) and the points as a number under the "Điểm" label. */
+/**
+ * The home's newest problems, one ledger row each: the name, the code (wide screens) and the points. `GET /home` sends no viewer status
+ * for them, so there is no solved or attempted mark.
+ */
 const props = defineProps<{ limit: number }>();
 const locale = useLocaleStore();
 const { data: home, isPending, error, refetch } = useHomeQuery();
@@ -30,14 +33,11 @@ const problems = computed(() => (home.value?.newProblems ?? []).slice(0, props.l
           </div>
         </div>
       </template>
-      <p class="flex justify-end text-caption text-muted">
-        <span class="w-12 text-right">{{ $t('home.points') }}</span>
-      </p>
       <ul class="flex flex-col divide-y divide-line">
         <li
           v-for="problem in problems"
           :key="problem.code"
-          class="box-link flex items-baseline gap-3 py-1.5 first:pt-0 last:pb-0"
+          class="box-link flex min-h-(--qh-row) items-center gap-3"
         >
           <div class="min-w-0 flex-1">
             <StretchedLink
@@ -47,8 +47,10 @@ const problems = computed(() => (home.value?.newProblems ?? []).slice(0, props.l
             >
             <span class="block text-caption text-muted sm:hidden">{{ problem.code }}</span>
           </div>
-          <span class="hidden shrink-0 text-caption text-muted sm:inline">{{ problem.code }}</span>
-          <span class="w-12 shrink-0 text-right font-mono text-sm tabular-nums text-muted">
+          <span class="hidden shrink-0 font-mono text-meta text-muted sm:inline">{{
+            problem.code
+          }}</span>
+          <span class="w-14 shrink-0 text-right font-mono text-meta tabular-nums text-muted">
             {{ formatNumber(problem.points, locale.locale) }}
           </span>
         </li>
