@@ -50,7 +50,6 @@ export const BACKGROUNDS = [
   { id: 'none', labelKey: 'appearance.background.none' },
   { id: 'paper', labelKey: 'appearance.background.paper' },
   { id: 'grainy', labelKey: 'appearance.background.grainy' },
-  { id: 'blueprint', labelKey: 'appearance.background.blueprint' },
   { id: 'contour', labelKey: 'appearance.background.contour' },
   { id: 'halftone', labelKey: 'appearance.background.halftone' },
   { id: 'dither', labelKey: 'appearance.background.dither' },
@@ -61,7 +60,7 @@ export const BACKGROUNDS = [
 export type BackgroundId = (typeof BACKGROUNDS)[number]['id'];
 
 /** What everyone has until they choose: signed out, signed in, with or without a personal look. */
-export const DEFAULT_BACKGROUND: BackgroundId = 'blueprint';
+export const DEFAULT_BACKGROUND: BackgroundId = 'none';
 
 export interface Appearance {
   accent: AccentId;
@@ -112,7 +111,7 @@ export const hasLegacyAccent = (value: unknown): boolean =>
   value !== null &&
   Object.hasOwn(LEGACY_ACCENTS, String((value as Record<string, unknown>).accent));
 
-/** The backend stores a look without the defaults (`contrast` standard, `background` blueprint): they are never sent. */
+/** The backend stores a look without the defaults (`contrast` standard, `background` none): they are never sent. */
 export const toWireAppearance = (look: Appearance | null) =>
   look && {
     accent: look.accent,

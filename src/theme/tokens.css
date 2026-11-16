@@ -7,8 +7,6 @@
   --qh-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
   /* Page background strength (theme/backgrounds.css): one fixed subtle level, no control. */
   --qh-background-level: 0.45;
-  /* The Blueprint background's line colour: the accent faintly over the ground (palette checks text on it). */
-  --qh-grid: color-mix(in srgb, var(--qh-accent) 14%, var(--qh-ground));
   /* Limit chips by meaning: time blue, memory violet, points gold. They reuse the tag colours, so the palette proves their contrast. */
   --qh-limit-time: var(--qh-tag-1);
   --qh-limit-time-bg: var(--qh-tag-1-bg);
