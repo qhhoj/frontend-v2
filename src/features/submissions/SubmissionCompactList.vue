@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SubmissionListItem } from '@/api/types/submissions';
 import Chip from '@/components/ui/Chip.vue';
-import { CUE_ROW } from '@/components/ui/cue-row';
+import { CUE_ROW } from '@/components/ui/cue-tones';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import UserLink from '@/components/UserLink.vue';
 import { NO_VALUE, formatCaseMemory, formatCaseTime } from '@/lib/format';
@@ -82,6 +82,14 @@ const memoryOf = (row: SubmissionListItem) =>
       <div class="flex min-w-0 flex-1 flex-col gap-1">
         <div class="flex min-w-0 items-center gap-2 text-sm">
           <SubmissionVerdictCell v-if="isShown('verdict')" :row="row" class="shrink-0" />
+          <template v-if="isShown('verdict') && scoreOf(row)">
+            <Chip v-if="rowCue(row)" :tone="rowCue(row)!" class="shrink-0 font-mono tabular-nums">{{
+              scoreOf(row)
+            }}</Chip>
+            <span v-else class="shrink-0 font-mono text-caption text-muted tabular-nums">{{
+              scoreOf(row)
+            }}</span>
+          </template>
           <SubmissionProblemName
             v-if="isShown('problem')"
             class="min-w-0 flex-1"
@@ -94,19 +102,12 @@ const memoryOf = (row: SubmissionListItem) =>
         >
           <template
             v-for="(part, partIndex) in [
-              {
-                text: isShown('verdict') ? scoreOf(row) : '',
-                tone: rowCue(row),
-              },
-              { text: isShown('cost') ? timeOf(row) : '', tone: null },
-              { text: isShown('cost') ? memoryOf(row) : '', tone: null },
+              { text: isShown('cost') ? timeOf(row) : '' },
+              { text: isShown('cost') ? memoryOf(row) : '' },
             ].filter((part) => part.text)"
             :key="partIndex"
           >
-            <Chip v-if="part.tone" :tone="part.tone" class="shrink-0 font-mono tabular-nums">{{
-              part.text
-            }}</Chip>
-            <span v-else class="shrink-0 font-mono tabular-nums">{{ part.text }}</span>
+            <span class="shrink-0 font-mono tabular-nums">{{ part.text }}</span>
           </template>
           <template v-if="isShown('when')">
             <time

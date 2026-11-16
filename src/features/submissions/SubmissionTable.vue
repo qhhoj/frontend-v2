@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
 import Chip from '@/components/ui/Chip.vue';
-import { CUE_ROW } from '@/components/ui/cue-row';
+import { CUE_TABLE_ROW } from '@/components/ui/cue-tones';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import UserLink from '@/components/UserLink.vue';
@@ -156,7 +156,7 @@ const memoryText = (row: SubmissionListItem) =>
             :class="[
               { 'row-added': highlightIds.has(row.id) },
               rowCue(row)
-                ? CUE_ROW[rowCue(row)!]
+                ? CUE_TABLE_ROW[rowCue(row)!]
                 : isOwn(row) && 'bg-accent-soft hover:bg-accent-soft',
             ]"
             @click="openRow($event, row.id)"
