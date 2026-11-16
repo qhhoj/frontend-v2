@@ -18,7 +18,7 @@ const panelId = useId();
   <div>
     <button
       type="button"
-      class="flex min-h-11 w-full items-center gap-2 rounded-row text-left text-sm font-semibold hover:text-accent-text"
+      class="flex min-h-(--qh-row) w-full items-center gap-2 rounded-row text-left text-body font-semibold hover:text-accent-text"
       :aria-expanded="open"
       :aria-controls="panelId"
       @click="open = !open"

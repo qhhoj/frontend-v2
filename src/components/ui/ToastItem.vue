@@ -84,7 +84,7 @@ onBeforeUnmount(() => observer?.disconnect());
 <template>
   <div
     ref="card"
-    class="flex touch-pan-y items-center gap-2.5 rounded-row border border-line-strong bg-surface-solid py-1.5 pr-1.5 pl-3 text-meta text-content shadow-float"
+    class="flex touch-pan-y items-center gap-2.5 rounded-card overlay-surface py-1.5 pr-1.5 pl-3 text-meta text-content"
     :class="{
       'box-link': toast.to,
       'transition-[translate,opacity] duration-(--qh-duration-fast)': !isDragging,

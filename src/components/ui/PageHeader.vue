@@ -151,7 +151,7 @@ const GRID = {
     >
       <div
         v-if="meta.length > 0 || slots.meta"
-        class="mt-1 flex flex-wrap items-center gap-2 text-caption text-muted"
+        class="mt-1 flex flex-wrap items-center gap-2 text-meta text-muted"
       >
         <template v-for="(item, index) in meta" :key="index">
           <span v-if="index > 0" aria-hidden="true">·</span>
@@ -159,8 +159,8 @@ const GRID = {
         </template>
         <slot name="meta" />
       </div>
-      <div v-if="slots.lead" class="mt-0.5 text-sm text-muted"><slot name="lead" /></div>
-      <p v-else-if="lead" class="mt-0.5 text-sm text-muted">{{ lead }}</p>
+      <div v-if="slots.lead" class="mt-0.5 text-meta text-muted"><slot name="lead" /></div>
+      <p v-else-if="lead" class="mt-0.5 text-meta text-muted">{{ lead }}</p>
     </div>
     <div
       v-if="hasActions()"

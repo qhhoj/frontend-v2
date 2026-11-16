@@ -127,16 +127,16 @@ function onKeydown(event: KeyboardEvent) {
       tabindex="-1"
       :aria-label="label"
       :aria-activedescendant="active >= 0 ? itemId(active) : undefined"
-      class="m-0 min-w-52 list-none rounded-row border border-line-strong bg-surface-solid p-1 text-content shadow-float outline-none"
+      class="m-0 min-w-60 list-none rounded-card overlay-surface p-1 text-content outline-none"
       @keydown="onKeydown"
     >
       <template v-for="(item, index) in entries" :key="index">
-        <li v-if="item.separated" role="separator" class="my-1 border-t border-line" />
+        <li v-if="item.separated" role="separator" class="mx-1.5 my-1 border-t border-line" />
         <li
           :id="itemId(index)"
           role="menuitem"
           :aria-disabled="item.disabled || undefined"
-          class="rounded-cell"
+          class="rounded-row"
           :class="[
             !item.disabled && 'hover:bg-surface-hover',
             active === index && 'bg-surface-hover outline-2 -outline-offset-2 outline-focus',
@@ -145,7 +145,7 @@ function onKeydown(event: KeyboardEvent) {
           <a
             :href="hrefOf(item)"
             tabindex="-1"
-            class="flex min-h-(--qh-row) items-center gap-2.5 px-2.5 text-meta no-underline touch:min-h-11"
+            class="flex min-h-(--qh-row-dense) items-center gap-2.5 px-3 text-body no-underline touch:min-h-(--qh-touch)"
             :class="
               item.disabled
                 ? 'cursor-not-allowed text-muted'

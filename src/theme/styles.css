@@ -338,6 +338,13 @@
     box-shadow: inset 0 0 0 1px var(--qh-line-control);
   }
 }
+/* L3 overlay (Menu, Popover, Dialog, Sheet, Toast): the one place a surface keeps a line, because it floats over any content (spec §3). */
+@utility overlay-surface {
+  background-color: var(--qh-surface-solid);
+  box-shadow:
+    var(--qh-ring-overlay),
+    var(--qh-shadow-float);
+}
 /* Contrast-high mode gives every control back a 1 px edge (WCAG 1.4.11); the default mode draws no line. An invalid field keeps its own red ring. */
 @utility edge-high {
   :root[data-contrast='high'] &:not([aria-invalid='true']) {

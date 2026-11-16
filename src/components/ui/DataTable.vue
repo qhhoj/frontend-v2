@@ -29,9 +29,9 @@ import { NO_VALUE } from '@/lib/format';
  * row of your own: an `<li>`); only one of the two is rendered, so row hooks such as `data-code` (`rowAttrs`) exist once.
  * `stack="scroll"`: always the table, scrolling sideways inside its card with the first `stickyColumns` columns pinned and a
  * shade beside them once scrolled.
- * Workbench rows (directions.md §2): `density="compact"` is 32 px (admin: flat card, small pager); `comfortable` 36 px (the
- * page card, the regular pager); both 44 px on touch. A row is at least that tall: cells carry no vertical padding, so a
- * two-line cell (a name over its code) grows its row. Body text is 13 px; the 30 px header is 11 px muted, sentence case.
+ * Kit 2 rows (spec §4): the head and every row are 44 px (`density="compact"`: 40, admin and ranking; both 44 on touch), head 13 px
+ * muted, the same surface tone as the rows (no fill), a hairline between rows and none around the 12 px surface. A row is at
+ * least that tall: cells carry no vertical padding, so a two-line cell (a name over its code) grows its row. Body text is 15 px.
  * `rowTo` makes a row open a page on click (Ctrl/Cmd or middle click: a new tab; never at the end of a text selection);
  * the primary cell is the link, so keyboard and screen readers use that.
  *
@@ -169,11 +169,12 @@ const growsOf = (column: DataTableColumn) =>
 const growClass = (column: DataTableColumn) => growsOf(column) && 'w-full max-w-0';
 const CELL_BASE =
   'border-b border-line px-3 align-middle [overflow-wrap:anywhere] [:where(&)]:max-w-64';
-/** A body cell is the row's minimum height (32 or 36 px, 44 on touch); a header cell is 30 px. */
+/** A body cell and a header cell are one row height: 44 px, or 40 px dense (admin, ranking); 44 on touch. */
 const CELL = computed(
-  () => `${isCompact.value ? 'h-(--qh-row)' : 'h-(--qh-row-dense)'} touch:h-11 ${CELL_BASE}`,
+  () =>
+    `${isCompact.value ? 'h-(--qh-row-dense)' : 'h-(--qh-row)'} touch:h-(--qh-touch) ${CELL_BASE}`,
 );
-const HEAD_CELL = `h-7.5 ${CELL_BASE}`;
+const HEAD_CELL = computed(() => CELL.value);
 const HEAD_TEXT = 'text-tiny font-semibold whitespace-nowrap text-muted';
 const SORT_BUTTON =
   'inline-flex min-h-6 items-center gap-1 rounded-cell hover:text-content touch:min-h-11';

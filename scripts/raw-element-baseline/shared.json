@@ -38,7 +38,7 @@
     "hardcoded-value": 1
   },
   "components/ui/Drawer.vue": {
-    "hardcoded-value": 5
+    "hardcoded-value": 4
   },
   "components/ui/FilterBar.vue": {
     "hardcoded-script-value": 1

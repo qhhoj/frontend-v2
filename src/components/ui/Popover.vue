@@ -71,7 +71,7 @@ defineExpose({ toggle, hide });
       tabindex="-1"
       :aria-label="label"
       :aria-labelledby="labelledby"
-      class="rounded-row border border-line-strong bg-surface-solid p-4 text-content shadow-float outline-none"
+      class="rounded-card overlay-surface p-4 text-content outline-none"
       @keydown="onKeydown"
     >
       <slot />
