@@ -10,7 +10,13 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLASS_RULES, ELEMENT_RULES, ruleUses } from './raw-element-rules.mjs';
+import {
+  CLASS_RULES,
+  ELEMENT_RULES,
+  HARDCODED_RULE,
+  HARDCODED_USE,
+  ruleUses,
+} from './raw-element-rules.mjs';
 import { sourceTree } from './source-tree.mjs';
 import { IMPORT_RULES } from './wrapper-imports.mjs';
 
@@ -110,6 +116,7 @@ export const KIT_PART = {
   ...ELEMENT_RULES,
   ...Object.fromEntries(IMPORT_RULES.map(({ id, use }) => [id, use])),
   ...Object.fromEntries(Object.entries(CLASS_RULES).map(([id, { use }]) => [id, use])),
+  [HARDCODED_RULE]: HARDCODED_USE,
 };
 
 /** Every area baseline from `dir`, merged: `{ rel: { rule: count } }`, and which file each entry came from. */

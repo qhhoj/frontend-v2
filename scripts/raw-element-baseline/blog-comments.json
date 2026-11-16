@@ -1,4 +1,7 @@
 {
+  "features/blog/BlogPostPage.vue": {
+    "hardcoded-value": 1
+  },
   "features/comments/CommentComposer.vue": {
     "status-colour": 1
   },

@@ -676,3 +676,7 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 
 - Cue tokens, DESIGN.md and `/dev/kit` (2026-11-16): seven named colour cues (live, upcoming, ended, full, partial, zero, attention) each with text, tint and border tokens (`cue-*`, aliases of palette tokens so contrast stays proven), Chip tones and a `StatusDot`; verdict parts keep `verdict-*`. New lint rule `status-colour` flags `text-positive`/`bg-negative-bg`-style classes outside the kit, baselined per file (only shrinks). `DESIGN.md` is the short rulebook agents read before UI work. `/dev/kit` (admin) renders every kit part and token. Why: owner review 11-16, "all pages lack the colour visual cue": one meaning per colour, enforced in one place.
 - Phone contest header and rating change (2026-11-16): under `md` the contest header hides the start date and the participant count (length stays); a rating change on the profile is `cue-full` for a gain and `cue-zero` for a loss. Why: owner review 11-16, header too tall on phones; gain/loss colours confirmed.
+
+## Tokens
+
+- No hard-coded values: the `hardcoded-value` lint rule (per-area baseline, a file never gains one) refuses literal sizes, spacing, motion and palette colours outside `src/theme/` — a theme swap must change one place (owner rule 2026-11-16).

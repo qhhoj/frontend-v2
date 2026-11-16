@@ -73,6 +73,10 @@ Thin wrappers kept for old call sites (ESLint rejects a new import of `AdminFiel
 
 The kit part for each job is in `src/components/ui/README.md` (the one table; a job with a part never gets a hand-built recipe).
 
+**No hard-coded values**
+
+- Every value comes from a token or a Tailwind step: no `w-[420px]`, no `style="width: 12px"`, no `12px` in `<style>`, no `bg-red-500` or `text-white`. Missing token: add it in `src/theme/styles.css`. Runtime-computed values go in `ALLOWED` in `scripts/hardcoded-values.mjs` with a reason. DESIGN.md, "No hard-coded values".
+
 **Touch and inputs**
 
 - Every interactive element has a hit area of at least 44×44 px on a coarse pointer (padding or `::after`); every text input renders 16 px text there (13 px with a mouse). OTP cells (60 px) and code editors are the exceptions.
