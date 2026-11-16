@@ -112,7 +112,7 @@ function styleLines(source) {
   const lines = new Set();
   for (const block of source.matchAll(STYLE_BLOCK)) {
     const first = source.slice(0, block.index).split('\n').length;
-    block[0].split('\n').forEach((_, offset) => lines.add(first + offset));
+    block[0].split('\n').forEach((line, offset) => lines.add(first + offset));
   }
   return lines;
 }
