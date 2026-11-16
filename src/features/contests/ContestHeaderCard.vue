@@ -43,7 +43,7 @@ const ratingChange = computed(() => props.contest.viewer.ratingChange);
 const ratingChangeTone = computed(() => {
   const delta = ratingChange.value?.delta;
   if (!delta) return 'neutral';
-  return delta > 0 ? 'success' : 'danger';
+  return delta > 0 ? 'full' : 'zero';
 });
 </script>
 

@@ -86,12 +86,12 @@ const LINK = [
   >
     <!-- The tint sits on an opaque surface: the page background stays behind main only. -->
     <div
-      class="page-gutter flex h-10 items-center gap-2 bg-accent-soft touch:h-11 md:h-12 md:gap-3"
+      class="page-gutter flex h-10 items-center gap-2 border-l-3 border-l-cue-live bg-cue-live-bg touch:h-11 md:h-12 md:gap-3"
     >
       <RouterLink
         :to="{ name: 'contest', params: { key: contestKey } }"
         :class="[
-          'flex min-w-0 items-center gap-1.5 text-sm font-semibold text-accent-soft-text hover:underline',
+          'flex min-w-0 items-center gap-1.5 text-sm font-semibold text-cue-live hover:underline',
           COARSE_TARGET,
         ]"
       >

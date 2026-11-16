@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { UserPage } from '@/api/types/users';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
-import { medalClass } from '@/lib/medal';
+import { MEDAL_BADGE_SHAPE, medalBadgeClass } from '@/lib/medal';
 import { useLocaleStore } from '@/stores/locale.store';
 
 interface StatRow {
@@ -23,7 +23,8 @@ const count = (value: number, fractionDigits = 0) =>
   formatNumber(value, locale.locale, fractionDigits);
 /** A banned account is out of the ranking, whatever rank the API still carries. */
 const isBanned = computed(() => props.user.displayRank === 'banned');
-const medalOf = (rank: number | null) => (rank === null || isBanned.value ? '' : medalClass(rank));
+const medalOf = (rank: number | null) =>
+  rank === null || isBanned.value ? '' : `${MEDAL_BADGE_SHAPE} ${medalBadgeClass(rank)}`;
 const rankOf = (rank: number | null) => (rank === null || isBanned.value ? '—' : `#${count(rank)}`);
 
 const rows = computed<StatRow[]>(() => [
@@ -57,8 +58,9 @@ const rows = computed<StatRow[]>(() => [
   >
     <div v-for="row in rows" :key="row.label" :title="row.hint" class="min-w-0">
       <dt class="text-caption text-muted">{{ row.label }}</dt>
-      <dd class="m-0 font-mono text-sm font-semibold tabular-nums break-words" :class="row.tone">
-        {{ row.value }}
+      <dd class="m-0 font-mono text-sm font-semibold tabular-nums break-words">
+        <span v-if="row.tone" :class="row.tone">{{ row.value }}</span>
+        <template v-else>{{ row.value }}</template>
       </dd>
     </div>
   </dl>

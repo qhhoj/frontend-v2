@@ -192,10 +192,7 @@ const hitWidth = computed(() => Math.max(spacing.value, 24));
       class="flex items-center gap-2 text-sm text-muted"
     >
       {{ $t('ratingChart.delta') }}
-      <Chip
-        size="md"
-        :tone="current.delta > 0 ? 'success' : current.delta < 0 ? 'danger' : 'neutral'"
-      >
+      <Chip size="md" :tone="current.delta > 0 ? 'full' : current.delta < 0 ? 'zero' : 'neutral'">
         {{ formatDelta(current.delta) }}
       </Chip>
     </p>

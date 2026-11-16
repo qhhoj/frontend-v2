@@ -1,7 +1,8 @@
 import type { ContestDetail, ContestProblem, RankingProblem } from '@/api/types/contests';
+import type { CueTone } from '@/components/ui/cue-tones';
 import type { Locale } from '@/i18n';
 import { rankingCell, showsCellTime } from '@/lib/ranking-cells';
-import type { RankingCellView, RankingContext } from '@/lib/ranking-cells';
+import type { CellKind, RankingCellView, RankingContext } from '@/lib/ranking-cells';
 
 export type OwnResultView =
   | { kind: 'cell'; cell: RankingCellView }
@@ -29,6 +30,20 @@ export function ownResultView(problem: ContestProblem, context: RankingContext):
   return result.attempts > 0
     ? { kind: 'attempted', attempts: result.attempts }
     : { kind: 'untouched' };
+}
+
+const CELL_TONES: Partial<Record<CellKind, CueTone>> = {
+  'first-solve': 'full',
+  solved: 'full',
+  partial: 'partial',
+  failed: 'zero',
+};
+
+/** The cue of the viewer's own result on a problem: full, partial, zero after a try; none while untouched or pending. */
+export function ownResultTone(problem: ContestProblem, context: RankingContext): CueTone | null {
+  const view = ownResultView(problem, context);
+  if (view.kind === 'cell') return CELL_TONES[view.cell.kind] ?? null;
+  return view.kind === 'attempted' ? 'zero' : null;
 }
 
 /** Attempts left under a cap, never below zero. */

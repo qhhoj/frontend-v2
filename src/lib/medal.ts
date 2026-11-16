@@ -17,3 +17,7 @@ export const medalBadgeClass = (rank: number) =>
       : rank === 3
         ? 'bg-medal-bronze text-surface-solid'
         : 'text-muted';
+
+/** Pill shape for a rank badge in a table cell; pair with `medalBadgeClass` for the fill. */
+export const MEDAL_BADGE_SHAPE =
+  'inline-flex h-6 min-w-6 items-center justify-center rounded-pill px-1.5 font-bold';

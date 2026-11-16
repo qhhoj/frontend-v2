@@ -7,8 +7,8 @@ import type { Ranking, RankingRow } from '@/api/types/contests';
 import UserLink from '@/components/UserLink.vue';
 import Chip from '@/components/ui/Chip.vue';
 import IconButton from '@/components/ui/IconButton.vue';
-import { medalClass } from '@/lib/medal';
-import { deltaToneClass, formatDelta } from '@/lib/rating-delta';
+import { MEDAL_BADGE_SHAPE, medalBadgeClass } from '@/lib/medal';
+import { deltaTone, formatDelta } from '@/lib/rating-delta';
 import ScoreTick from './ScoreTick.vue';
 import { TABLE_CELL_CLASSES } from './ranking-cell-classes';
 import { miniCellRem } from './ranking-columns';
@@ -94,12 +94,11 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
         :class="[COLUMNS, 'border-t border-line', { 'bg-surface-hover': isViewer(row) }]"
         @click="onRowClick($event, row)"
       >
-        <span
-          class="px-2 py-2.5 text-right font-mono tabular-nums"
-          :class="row.rank && !row.isDisqualified ? medalClass(row.rank) : ''"
-        >
+        <span class="px-2 py-2 text-right font-mono tabular-nums">
           <span class="sr-only">{{ $t('ranking.columns.rank') }}</span>
-          {{ row.isDisqualified ? '—' : (row.rank ?? '—') }}
+          <span :class="row.rank && !row.isDisqualified ? [MEDAL_BADGE_SHAPE, medalBadgeClass(row.rank)] : ''">{{
+            row.isDisqualified ? '—' : (row.rank ?? '—')
+          }}</span>
         </span>
         <div tabindex="-1" data-row-focus class="min-w-0 px-2 py-2">
           <span class="flex min-w-0 flex-wrap items-center gap-1.5">
@@ -125,16 +124,16 @@ const isViewer = (row: RankingRow) => row.user.id === props.viewerId;
             class="block text-caption text-muted"
             >{{ viewOf(row).time }}</span
           >
-          <span
+          <Chip
             v-if="hasRatingColumn && row.ratingChange"
             data-testid="rating-change"
-            class="block text-caption whitespace-nowrap"
-            :class="deltaToneClass(row.ratingChange.delta)"
+            :tone="deltaTone(row.ratingChange.delta)"
+            class="mt-0.5 whitespace-nowrap"
             >{{
               row.ratingChange.delta === null
                 ? row.ratingChange.rating
                 : `${formatDelta(row.ratingChange.delta)} → ${row.ratingChange.rating}`
-            }}</span
+            }}</Chip
           >
         </span>
         <span class="flex items-start justify-center pt-0.5">

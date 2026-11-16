@@ -11,7 +11,7 @@ import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
 import { ringFraction } from '@/lib/grading';
 import { submissionVerdictOf } from '@/lib/verdicts';
-import { CUE_TEXT, type CueTone } from '@/components/ui/cue-tones';
+import type { CueTone } from '@/components/ui/cue-tones';
 
 const PERCENT = 100;
 const POINT_FRACTION_DIGITS = 2;
@@ -53,15 +53,13 @@ export function scoreTone(points: number | null, max: number | undefined | null)
   return points >= max ? 'full' : 'partial';
 }
 
-/** The text class of a finished row's score (contest points over the contest problem's in a contest), or none. */
-export function scoreClass(row: SubmissionListItem, contestMax: number | undefined): string {
-  if (!isFinished(row)) return '';
+/** The cue of a finished row's score (contest points over the contest problem's in a contest), or none. */
+export function scoreCue(row: SubmissionListItem, contestMax: number | undefined): CueTone | null {
+  if (!isFinished(row)) return null;
   const contestPoints = row.contest?.points ?? null;
-  const tone =
-    contestMax !== undefined && contestPoints !== null
-      ? scoreTone(contestPoints, contestMax)
-      : scoreTone(row.points, row.problem?.points);
-  return tone ? CUE_TEXT[tone] : '';
+  return contestMax !== undefined && contestPoints !== null
+    ? scoreTone(contestPoints, contestMax)
+    : scoreTone(row.points, row.problem?.points);
 }
 
 /** The share of the points judged so far, `45%`; only a grading row with a known case count has one. */

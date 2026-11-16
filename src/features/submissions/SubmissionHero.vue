@@ -16,7 +16,7 @@ import { useNow } from '@/lib/use-now';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { translate } from '@/i18n';
 import { NO_VALUE, formatPoints, scoreBelowFull } from '@/lib/format';
-import { CUE_TEXT } from '@/components/ui/cue-tones';
+import { CUE_CHIP } from '@/components/ui/cue-tones';
 import { scoreTone } from './submission-row';
 import { provisionalPoints, ringProgress } from '@/lib/grading';
 import { PARTIAL_CODE, VERDICT_TONE_VARS, verdictOfCode, type Verdict } from '@/lib/verdicts';
@@ -111,10 +111,10 @@ const scoreText = computed(() =>
     ? { value: props.contestScore.points, outOf: contestOutOf.value }
     : { value: score.value, outOf: maxScore.value ? `/ ${maxScore.value}` : '' },
 );
-/** The score's cue once judged: the share of the problem's points (a contest score is the same share). */
+/** The score's pill once judged: the share of the problem's points (a contest score is the same share) as a tinted pill. */
 const scoreCue = computed(() => {
   const tone = isFinished.value ? scoreTone(props.submission.points, props.problemPoints) : null;
-  return tone ? CUE_TEXT[tone] : '';
+  return tone ? `w-fit rounded-pill border px-3 py-1.5 ${CUE_CHIP[tone]}` : '';
 });
 /** In a contest the problem's own score is the line's first part. */
 const problemScore = computed(() =>

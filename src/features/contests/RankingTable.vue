@@ -7,12 +7,12 @@ import AppButton from '@/components/ui/AppButton.vue';
 import { computed, ref, TransitionGroup } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { focusTableRow } from '@/lib/focus-table-row';
-import { medalClass } from '@/lib/medal';
+import { MEDAL_BADGE_SHAPE, medalBadgeClass } from '@/lib/medal';
 import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useMotionAllowed } from '@/lib/use-motion-allowed';
 import type { Ranking, RankingProblem, RankingRow } from '@/api/types/contests';
 import ScrollRegion from '@/components/ScrollRegion.vue';
-import { deltaToneClass, formatDelta } from '@/lib/rating-delta';
+import { deltaTone, formatDelta } from '@/lib/rating-delta';
 import { isPenaltyFormat, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
 import RankingCell from './RankingCell.vue';
@@ -226,13 +226,11 @@ const scoreHeaderKey = computed(() =>
           >
             <td
               class="h-12 w-14 px-3 py-0 text-right"
-              :class="[
-                RANK_STICKY,
-                stickyBackground(row),
-                row.rank && !row.isDisqualified ? medalClass(row.rank) : '',
-              ]"
+              :class="[RANK_STICKY, stickyBackground(row)]"
             >
-              {{ row.isDisqualified ? '—' : (row.rank ?? '—') }}
+              <span :class="row.rank && !row.isDisqualified ? [MEDAL_BADGE_SHAPE, medalBadgeClass(row.rank)] : ''">{{
+                row.isDisqualified ? '—' : (row.rank ?? '—')
+              }}</span>
             </td>
             <th
               scope="row"
@@ -269,19 +267,13 @@ const scoreHeaderKey = computed(() =>
             <td v-if="hasTimeColumn" class="overflow-hidden text-meta whitespace-nowrap text-muted">
               {{ row.isDisqualified ? '—' : viewOf(row).time }}
             </td>
-            <td
-              v-if="hasRatingColumn"
-              data-testid="rating-change"
-              class="px-2.5 whitespace-nowrap"
-              :class="deltaToneClass(row.ratingChange?.delta ?? null)"
-            >
+            <td v-if="hasRatingColumn" data-testid="rating-change" class="px-2.5 whitespace-nowrap">
               <template v-if="!row.ratingChange">—</template>
-              <template v-else-if="row.ratingChange.delta === null">{{
-                row.ratingChange.rating
-              }}</template>
-              <template v-else
-                >{{ formatDelta(row.ratingChange.delta) }} → {{ row.ratingChange.rating }}</template
-              >
+              <Chip v-else :tone="deltaTone(row.ratingChange.delta)">{{
+                row.ratingChange.delta === null
+                  ? row.ratingChange.rating
+                  : `${formatDelta(row.ratingChange.delta)} → ${row.ratingChange.rating}`
+              }}</Chip>
             </td>
             <RankingCell
               v-for="cell in viewOf(row).cells"
