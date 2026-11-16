@@ -92,6 +92,8 @@ const openerOf = (button: unknown) => (button as { $el?: HTMLElement } | null)?.
     data-testid="account-placeholder"
     :class="variant === 'row' ? 'h-11 w-full' : 'h-11 w-36'"
   />
+  <!-- The home page's header already offers sign-in and register, so the rail shows them once there. -->
+  <div v-else-if="variant === 'row' && route.name === 'home'" />
   <div v-else-if="variant === 'row'" class="flex flex-col gap-2">
     <IconButton
       class="rail-open:hidden"

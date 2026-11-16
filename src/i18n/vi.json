@@ -1131,14 +1131,11 @@
         "submissions": "bài nộp",
         "contests": "kỳ thi"
       },
-      "allContests": "Tất cả kỳ thi",
       "elapsed": "Đã qua {percent}% thời gian",
       "newPosts": "Bài viết mới",
-      "allPosts": "Tất cả bài viết",
       "score": "{score} điểm",
       "topPp": "Top điểm PP",
       "pp": "{pp} PP",
-      "allUsers": "Tất cả người dùng",
       "leaderboard": "Bảng xếp hạng",
       "noPerformers": "Chưa có ai có điểm PP."
     },
@@ -1932,8 +1929,6 @@
     "empty": "Chưa có bài viết nào",
     "noComments": "Chưa có bình luận nào.",
     "newProblems": "Bài tập mới",
-    "problemLine": "{code} · {date}",
-    "problemPoints": "{points} điểm",
     "topContributors": "Top đóng góp",
     "toLeaderboard": "Bảng xếp hạng",
     "title": "Blog",

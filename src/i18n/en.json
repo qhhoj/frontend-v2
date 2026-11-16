@@ -1131,14 +1131,11 @@
         "submissions": "submissions",
         "contests": "contests"
       },
-      "allContests": "All contests",
       "elapsed": "{percent}% of the time has passed",
       "newPosts": "New posts",
-      "allPosts": "All posts",
       "score": "{score} points",
       "topPp": "Top performance points",
       "pp": "{pp} PP",
-      "allUsers": "All users",
       "leaderboard": "Leaderboard",
       "noPerformers": "No one has performance points yet."
     },
@@ -1932,8 +1929,6 @@
     "empty": "No posts yet",
     "noComments": "No comments yet.",
     "newProblems": "New problems",
-    "problemLine": "{code} · {date}",
-    "problemPoints": "{points} points",
     "topContributors": "Top contributors",
     "toLeaderboard": "Leaderboard",
     "title": "Blog",
