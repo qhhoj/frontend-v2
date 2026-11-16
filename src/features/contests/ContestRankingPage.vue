@@ -4,7 +4,6 @@ import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import AppButton from '@/components/ui/AppButton.vue';
-import Card from '@/components/ui/Card.vue';
 import Notice from '@/components/ui/Notice.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
@@ -163,6 +162,10 @@ const myRow = computed(() => {
   const virtualRow = run && own.find((row) => row.participationId === run.id);
   return virtualRow || own.find((row) => row.virtual === 0) || own[0] || null;
 });
+/** Kept as the first row of the board while it is among the rows shown: a search that hides it hides the copy too, and a board that shows only the viewer's row needs none. */
+const pinnedRow = computed(() =>
+  myRow.value && !isBoardHidden.value && rows.value.includes(myRow.value) ? myRow.value : null,
+);
 /** The legend's "virtual" line needs a virtual row among those shown. */
 const hasVirtualRows = computed(() => rows.value.some((row) => row.virtual > 0));
 const table = ref<{ focusRow(participationId: string): boolean } | null>(null);
@@ -216,7 +219,7 @@ async function goToMyRow() {
         />
       </template>
       <template v-if="ranking && !isComparing" #right>
-        <AppButton v-if="myRow" tone="primary" data-testid="my-row" @click="goToMyRow">
+        <AppButton v-if="myRow" tone="secondary" data-testid="my-row" @click="goToMyRow">
           <template #icon><LocateFixed class="size-4" aria-hidden="true" /></template>
           {{
             myRow.rank === null || myRow.isDisqualified
@@ -251,11 +254,10 @@ async function goToMyRow() {
         <Notice v-if="rankingRefreshFailed" tone="warning" bit="sweat" role="status">
           {{ $t('ranking.refreshFailed') }}
         </Notice>
-        <Card
+        <div
           id="ranking-board"
-          as="div"
           tabindex="-1"
-          class="scroll-mt-4 overflow-hidden"
+          class="scroll-mt-4"
           :class="{ 'opacity-60': rankingStale }"
         >
           <RankingTable
@@ -268,8 +270,9 @@ async function goToMyRow() {
             :problem-names="problemNames"
             :own-submissions-only="contest ? ownSubmissionsOnly(contest, now) : true"
             :is-stale="rankingStale"
+            :pinned-row="pinnedRow"
           />
-        </Card>
+        </div>
       </div>
     </QueryState>
     <VirtualOverlay v-else-if="virtualRun" :contest="contest" :participation="virtualRun" />

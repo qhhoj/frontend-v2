@@ -78,18 +78,6 @@ export const timeColumnRem = (times: Iterable<string>) => {
   return roundUp(widest);
 };
 
-/** The phone list's mini cell: the problem's label and the cell's text ("A 100"), 2 px padding each side. */
-const MINI_PADDING_REM = 0.25;
-export const miniCellRem = (cells: Iterable<{ label: string; text: string }>) => {
-  let widest = 0;
-  for (const { label, text } of cells)
-    widest = Math.max(
-      widest,
-      MINI_PADDING_REM + textRem(text ? `${label} ${text}` : label, TINY_PX) + SPARE_REM,
-    );
-  return roundUp(widest);
-};
-
 /** The widths right of the name column; null where the board has no such column. */
 export interface StatsColumns {
   scoreRem: number;

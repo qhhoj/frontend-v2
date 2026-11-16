@@ -7,8 +7,8 @@ import type { RankingCellView } from '@/lib/ranking-cells';
 import ScoreTick from './ScoreTick.vue';
 import { TABLE_CELL_CLASSES } from './ranking-cell-classes';
 
-/** The board row is 48 px (`h-12`), the cell box 40 px inside it: the score and, under it, the time. */
-const CELL_BOX_CLASS = 'h-10';
+/** The board row is 40 px (`--qh-row-dense`), the cell box 36 px inside it: the score and, under it, the time. */
+const CELL_BOX_CLASS = 'h-9';
 
 const props = defineProps<{ view: RankingCellView; to?: RouteLocationRaw; tick?: boolean }>();
 
@@ -17,7 +17,7 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
 </script>
 
 <template>
-  <td class="h-12 px-0.5 py-0">
+  <td class="h-(--qh-row-dense) px-0.5 py-0">
     <!-- An empty cell keeps the filled cell's box height so a row without attempts is as tall as the rest. -->
     <span v-if="view.kind === 'empty'" class="block" :class="CELL_BOX_CLASS"
       ><span class="sr-only">{{ $t(view.labelKey) }}</span></span

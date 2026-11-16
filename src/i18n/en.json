@@ -1457,6 +1457,9 @@
       "button": "Publish results",
       "confirmTitle": "Publish the final results?",
       "confirmBody": "The board unfreezes for everyone and is rescored; contestants see the real results at once."
+    },
+    "pinned": {
+      "label": "Your row"
     }
   },
   "formats": {

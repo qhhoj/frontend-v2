@@ -59,14 +59,14 @@ const context = computed<RankingContext | null>(() => {
             />
           </template>
         </Toolbar>
-        <Card v-if="data.ranking.rows.length" as="div" class="overflow-hidden">
+        <div v-if="data.ranking.rows.length">
           <RankingTable
             :ranking="data.ranking"
             :rows="data.ranking.rows"
             :context="context"
             :viewer-id="null"
           />
-        </Card>
+        </div>
       </template>
     </QueryState>
   </div>
