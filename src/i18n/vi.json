@@ -1183,7 +1183,6 @@
         "io": "Nhập/xuất",
         "input": "Nhập",
         "output": "Xuất",
-        "stdio": "Bàn phím / màn hình",
         "status": "Trạng thái",
         "untried": "Chưa thử",
         "contestPoints": "Điểm kỳ thi"
@@ -1203,11 +1202,12 @@
         "report": "Báo lỗi bài này"
       }
     },
-    "pdfRender": "Tải đề dạng PDF",
+    "pdfRender": "Tải PDF",
     "externalJudge": "Chấm trên {oj}",
     "strip": {
       "partial": "từng phần",
-      "solves": "AC {rate}% · {count} người giải"
+      "acRate": "Tỉ lệ AC",
+      "solvers": "Người giải"
     }
   },
   "problems": {

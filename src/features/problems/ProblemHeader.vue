@@ -6,7 +6,7 @@ import type { ProblemSection } from '@/features/admin/edit-link/admin-edit-targe
 import type { ProblemDetail } from '@/api/types/problems';
 import Chip from '@/components/ui/Chip.vue';
 import { useSessionStore } from '@/stores/session.store';
-import { problemTypeLabel } from './problem-type-label';
+import { UNCATEGORIZED_TYPE_NAME, problemTypeLabel } from './problem-type-label';
 
 /**
  * The top of the problem page, on the page background (not in the statement card): the section crumb, the title, a meta
@@ -25,9 +25,11 @@ const session = useSessionStore();
     <PageHeader :title="problem.name">
       <template #meta>
         <span class="font-mono [overflow-wrap:anywhere]">{{ problem.code }}</span>
-        <Chip v-if="problem.group" data-testid="problem-group-chip">{{
-          problemTypeLabel(problem.group)
-        }}</Chip>
+        <Chip
+          v-if="problem.group && problem.group.name !== UNCATEGORIZED_TYPE_NAME"
+          data-testid="problem-group-chip"
+          >{{ problemTypeLabel(problem.group) }}</Chip
+        >
         <Chip v-if="problem.externalJudge" data-testid="external-judge-badge">{{
           $t('problem.externalJudge', { oj: problem.externalJudge.oj })
         }}</Chip>

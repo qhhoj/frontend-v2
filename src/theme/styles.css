@@ -701,7 +701,7 @@
   & h4 {
     font-family: var(--qh-font-display);
     font-weight: 700;
-    color: var(--qh-accent-text);
+    color: var(--qh-text);
     margin-block: 1.25em 0.4em;
   }
   /* Legacy statements use h2-h4 inconsistently for the same sections, so all of them look alike. */
@@ -710,7 +710,7 @@
   & h3,
   & h4 {
     padding-bottom: 0.25em;
-    font-size: 17px;
+    font-size: var(--text-section);
     border-bottom: 1px solid var(--qh-line);
   }
   & h5,

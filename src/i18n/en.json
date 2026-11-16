@@ -1183,7 +1183,6 @@
         "io": "Input/Output",
         "input": "Input",
         "output": "Output",
-        "stdio": "Standard I/O",
         "status": "Status",
         "untried": "Not tried",
         "contestPoints": "Contest points"
@@ -1203,11 +1202,12 @@
         "report": "Report a problem with this task"
       }
     },
-    "pdfRender": "Download statement as PDF",
+    "pdfRender": "Download PDF",
     "externalJudge": "Judged on {oj}",
     "strip": {
       "partial": "partial",
-      "solves": "AC {rate}% · {count} solvers"
+      "acRate": "AC rate",
+      "solvers": "Solvers"
     }
   },
   "problems": {
