@@ -15,7 +15,7 @@ Source of truth for values is the code: `src/theme/tokens.css` (sizes, radii, ty
 - **Mode** `html[data-theme]`: `light` (default when the device says nothing) or `dark`; the preference may be `auto`. Saved as the account's `siteTheme`. Retired ids (`clay-*`, `glass-*`) are read as their successor by the pre-paint script, the stores and the backend.
 - **Contrast** `html[data-contrast="high"]`: text, control borders, the accent and the verdict lanes at WCAG AAA-like floors (`palette/contrast-high.css`). Without a saved look it follows `prefers-contrast: more`.
 - **Accent** `html[data-accent]`: ultramarine (default), teal, plum, terracotta, graphite (`palette/accents.css`, one rule per mode × contrast × accent, also on any `[data-accent]` element for swatches). The eight Clay accents map to the nearest new one. Verdicts, first-solve, tiers, coins, tags and syntax never follow the accent.
-- **Page background** `html[data-background]`: None or one of eight styles, Blueprint by default (`theme/backgrounds.css`).
+- **Page background** `html[data-background]`: None (default) or one of seven styles (`theme/backgrounds.css`). The surface is a plain colour with no grid.
 - A user whose stored Clay or Glass choice was moved sees one toast pointing to Settings › Appearance.
 
 ## Colour roles (light / dark, standard contrast, ultramarine)

@@ -96,40 +96,6 @@ html[data-background]::after,
   mask: var(--background-tile-grain) 0 0 / 160px repeat;
 }
 
-:is(html, .background-sample)[data-background='blueprint'] {
-  background-image: linear-gradient(
-    color-mix(in srgb, var(--qh-accent) calc(var(--qh-background-level) * 4%), transparent),
-    color-mix(in srgb, var(--qh-accent) calc(var(--qh-background-level) * 4%), transparent)
-  );
-}
-:is(html, .background-sample)[data-background='blueprint']::before {
-  background-image:
-    linear-gradient(
-      color-mix(in srgb, var(--qh-accent) calc(var(--qh-background-level) * 34%), transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--qh-accent) calc(var(--qh-background-level) * 34%), transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      color-mix(in srgb, var(--qh-accent) calc(var(--qh-background-level) * 14%), transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--qh-accent) calc(var(--qh-background-level) * 14%), transparent) 1px,
-      transparent 1px
-    );
-  background-size:
-    120px 120px,
-    120px 120px,
-    24px 24px,
-    24px 24px;
-  mask: radial-gradient(130% 100% at 50% 0, currentcolor 25%, transparent 95%);
-}
-
 :is(html, .background-sample)[data-background='contour'] {
   background-image: linear-gradient(
     color-mix(in srgb, var(--qh-accent) calc(var(--qh-background-level) * 4%), transparent),
