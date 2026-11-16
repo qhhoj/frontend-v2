@@ -395,6 +395,13 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.appearance' },
   },
   ...adminRoutes,
+  /** The kit gallery (DESIGN.md): admin-only like `/admin`; viewers who may enter no admin screen get the not-found page. */
+  {
+    path: '/dev/kit',
+    name: 'dev-kit',
+    component: () => import('@/features/dev/KitGalleryPage.vue'),
+    meta: { titleKey: 'pages.devKit', adminArea: true },
+  },
   /** Links the backend writes into mails, Discord and feeds (backend CONTRIBUTING, SPA contract); the hash is kept. */
   {
     path: '/post/:id',

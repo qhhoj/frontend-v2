@@ -14,7 +14,8 @@
     "AdminNotice": 1,
     "button": 4,
     "controls": 7,
-    "input": 1
+    "input": 1,
+    "status-colour": 1
   },
   "features/admin/rejudge/RejudgeSummary.vue": {
     "controls": 1
@@ -113,7 +114,8 @@
     "controls": 1
   },
   "features/admin/ui/ChipPicker.vue": {
-    "button": 1
+    "button": 1,
+    "status-colour": 1
   },
   "features/admin/ui/RevealKeyDialog.vue": {
     "button": 1,
@@ -121,11 +123,16 @@
     "controls": 2
   },
   "features/admin/ui/controls.ts": {
-    "disabled-opacity": 1
+    "disabled-opacity": 1,
+    "status-colour": 2
+  },
+  "features/admin/ui/form/AdminFormSection.vue": {
+    "status-colour": 2
   },
   "features/admin/ui/form/AdminSectionNav.vue": {
     "controls": 1,
     "select": 1,
+    "status-colour": 1,
     "uppercase": 1
   },
   "features/admin/ui/table/standard-row-menu.ts": {

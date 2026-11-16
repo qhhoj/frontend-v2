@@ -3,7 +3,8 @@
     "textarea": 1
   },
   "components/CopyButton.vue": {
-    "button": 1
+    "button": 1,
+    "status-colour": 1
   },
   "components/CryingBit.vue": {
     "fixed-size": 1
@@ -17,6 +18,19 @@
     "select": 1
   },
   "components/VoteControl.vue": {
-    "button": 2
+    "button": 2,
+    "status-colour": 1
+  },
+  "features/shares/PastePage.vue": {
+    "status-colour": 1
+  },
+  "features/shares/ReportShareDialog.vue": {
+    "status-colour": 1
+  },
+  "features/shares/ShareDialog.vue": {
+    "status-colour": 2
+  },
+  "lib/rating-delta.ts": {
+    "status-colour": 2
   }
 }

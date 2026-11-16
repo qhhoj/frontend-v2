@@ -25,7 +25,8 @@
     "AdminNotice": 1,
     "AdminPageHeader": 1,
     "button": 1,
-    "controls": 1
+    "controls": 1,
+    "status-colour": 1
   },
   "features/admin/activity/UserSummaryPanel.vue": {
     "button": 2,
@@ -36,7 +37,8 @@
   },
   "features/admin/audit/AuditFeed.vue": {
     "button": 1,
-    "controls": 2
+    "controls": 2,
+    "status-colour": 1
   },
   "features/admin/audit/AuditFilters.vue": {
     "AdminDateTimeField": 2,
@@ -110,6 +112,7 @@
     "checkbox": 1,
     "controls": 8,
     "input": 2,
+    "status-colour": 1,
     "textarea": 1
   },
   "features/admin/integrations/IntegrationClientsPage.vue": {
@@ -145,7 +148,8 @@
     "AdminField": 2,
     "button": 1,
     "controls": 7,
-    "input": 2
+    "input": 2,
+    "status-colour": 1
   },
   "features/admin/short-links/ShortLinksPage.vue": {
     "AdminPageHeader": 1
@@ -173,7 +177,8 @@
   "features/admin/tickets/TicketQueueDetail.vue": {
     "button": 2,
     "checkbox": 1,
-    "controls": 2
+    "controls": 2,
+    "status-colour": 1
   },
   "features/admin/tickets/TicketQueueFilters.vue": {
     "AdminField": 1,

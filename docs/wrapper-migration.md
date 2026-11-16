@@ -101,10 +101,12 @@ Not restricted, because they add behaviour the kit part lacks:
 | ------------------ | ---- | ----- | ---------------------------------------------------------------------------- |
 | `verdict-tone`     | 77   | 31    | the status tones (`positive-bg`, `negative-bg`, success/danger/warning)      |
 | `fixed-size`       | 75   | 38    | the size steps (icons `size-3.5/4/5`, controls `min-h-(--qh-control)`); a skeleton copies the real markup |
+| `status-colour`    | 186  | 126   | a Chip or StatusDot tone, or a `cue-*` token (`DESIGN.md`)                   |
 | `uppercase`        | 25   | 19    | sentence case, `text-caption font-semibold`                                  |
 | `disabled-opacity` | 3    | 3     | the kit control's muted disabled pair (`AppButton disabledReason`)           |
 
 - `fixed-size` is `size-`, `h-` or `min-h-` with a `[N px|rem]` value.
+- `status-colour` is a `positive`, `negative`, `warning` or `info` colour utility (`text-`, `bg-`, `border-` …, with or without `-bg`) outside the kit and the verdict parts.
 - `verdict-tone` is any `*-verdict-*` colour outside the verdict parts. Those parts are listed in `VERDICT_PARTS` and
   draw a submission's result or the viewer's solved state.
 

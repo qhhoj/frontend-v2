@@ -4,12 +4,14 @@ import { X } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
+import { CUE_CHIP } from './cue-tones';
+import type { CueTone } from './cue-tones';
 
 type TagTone = `tag-${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8}`;
 /** `solid` is the attention count ("something waits for you"): the one filled chip. */
 type StatusTone = 'neutral' | 'accent' | 'solid' | 'success' | 'danger' | 'warning' | 'info';
-/** A status or a tag colour. A verdict is a `VerdictChip`, which adds its glyph. */
-export type ChipTone = StatusTone | TagTone;
+/** A status, a cue (live, upcoming, ended, full, partial, zero, attention; cue-tones.ts) or a tag colour. A verdict is a `VerdictChip`, which adds its glyph. */
+export type ChipTone = StatusTone | CueTone | TagTone;
 export type ChipSize = 'sm' | 'md';
 
 /**
@@ -51,6 +53,7 @@ const emit = defineEmits<{ remove: [] }>();
 defineOptions({ name: 'UiChip' });
 
 const TONES: Record<ChipTone, string> = {
+  ...CUE_CHIP,
   neutral: 'border-line bg-surface-strong text-muted',
   accent: 'border-transparent bg-accent-soft text-accent-soft-text',
   solid: 'border-transparent bg-accent text-on-accent',
