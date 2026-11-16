@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Ellipsis, Lock, Printer, Snowflake, Timer } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import type { ContestDetail, ContestPhase } from '@/api/types/contests';
 import CountdownTimer from '@/components/CountdownTimer.vue';
@@ -21,10 +21,13 @@ import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useI18n } from 'vue-i18n';
 import { useNow } from '@/lib/use-now';
+import AnnouncementsPausedNotice from '../AnnouncementsPausedNotice.vue';
 import ContestActions from '../ContestActions.vue';
 import ContestTabs from '../ContestTabs.vue';
 import { boardFreezeOf } from './board-freeze';
 import { useShownClock } from './header-clock';
+import { usePublishedHeight } from '@/features/problems/use-dock-height';
+import { useSessionStore } from '@/stores/session.store';
 import { useCurrentContest } from './use-current-contest';
 import { useLengthText } from '../use-span-text';
 
@@ -88,11 +91,6 @@ interface Fact {
 const facts = computed<(Fact & { text: string })[]>(() => {
   const contest = props.contest;
   if (!contest) return [];
-  const privacy = contest.isPrivate
-    ? t('contests.private')
-    : contest.isOrganizationPrivate
-      ? t('contests.organizationPrivate')
-      : null;
   /** Under `md` only the format stays: the rest moves to the rules fold-out and the ranking tab. */
   const all: Fact[] = [
     {
@@ -103,8 +101,7 @@ const facts = computed<(Fact & { text: string })[]>(() => {
       wideOnly: true,
     },
     { text: formatLabel(contest.formatName), wideOnly: false },
-    { text: contest.isRated ? t('contests.rated') : null, wideOnly: true },
-    { text: privacy, wideOnly: true },
+    { text: contest.isRated ? t('contests.rated') : null, wideOnly: false },
   ];
   return all.filter((fact): fact is Fact & { text: string } => fact.text !== null);
 });
@@ -127,13 +124,47 @@ const overflow = computed<MenuEntry[]>(() =>
       ]
     : [],
 );
+/**
+ * While time runs the tabs sit in a sticky strip that outlives the header: the contest's tabs stay one tap away and,
+ * once the header's own clock has scrolled off the top, the strip carries the name and the clock, so the clock shows once.
+ * The strip is a sibling of the `PageHeader` (the header root is `display: contents`), so it sticks across the page column.
+ * Under impersonation the banner is the one sticky strip above; the strip then scrolls with the page.
+ */
+const isPinned = computed(() => clockUntil.value !== null);
+const session = useSessionStore();
+const isSticky = computed(() => isPinned.value && !session.impersonatorId);
+const root = ref<HTMLElement | null>(null);
+const strip = ref<HTMLElement | null>(null);
+const isHeaderClockAbove = ref(false);
+watch(
+  [root, clockUntil],
+  ([container], _previous, onCleanup) => {
+    const clock = container?.querySelector('[data-testid="contest-clock"]');
+    isHeaderClockAbove.value = false;
+    if (!clock) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry)
+        isHeaderClockAbove.value = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+    });
+    observer.observe(clock);
+    onCleanup(() => observer.disconnect());
+  },
+  { flush: 'post' },
+);
+const showsStripClock = computed(() => isSticky.value && isHeaderClockAbove.value);
+/** Sticky things below the strip (the ranking's table head) clear it through `--contest-bar-height`; it publishes only while it sticks. */
+usePublishedHeight(
+  computed(() => (isSticky.value ? strip.value : null)),
+  '--contest-bar-height',
+  () => true,
+);
 const freeze = computed(() =>
   props.contest ? boardFreezeOf(props.contest, now.value, props.isBoardFrozen) : null,
 );
 </script>
 
 <template>
-  <div data-testid="contest-page-header">
+  <div ref="root" data-testid="contest-page-header" class="contents">
     <PageHeader v-if="contest" :title="contest.name" beside-from="xl">
       <template v-if="contest.logoOverrideImage" #start>
         <img
@@ -226,11 +257,45 @@ const freeze = computed(() =>
           class="max-xl:flex-row max-xl:flex-wrap max-xl:items-center xl:max-w-80 xl:items-end xl:text-right"
         />
       </template>
-      <template #tabs>
+      <template v-if="!isPinned" #tabs>
         <ContestTabs :contest-key="contestKey" :phase="contest.phase" :current="current" />
       </template>
     </PageHeader>
-    <template v-else>
+    <div
+      v-if="contest && isPinned"
+      ref="strip"
+      role="group"
+      :aria-label="$t('contestBar.sticky.label')"
+      data-testid="contest-sticky-bar"
+      :class="[
+        'z-header -mt-3 flex items-center gap-3 bg-surface py-1 md:-mt-2 print:static',
+        isSticky && 'sticky top-0',
+      ]"
+    >
+      <div class="min-w-0 flex-1">
+        <ContestTabs
+          is-pinned
+          :contest-key="contestKey"
+          :phase="contest.phase"
+          :current="current"
+        />
+      </div>
+      <div
+        v-if="showsStripClock && clockUntil"
+        data-testid="contest-sticky-status"
+        class="flex min-w-0 shrink-0 items-center gap-2 text-meta font-semibold"
+      >
+        <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-cue-live" />
+        <span class="max-w-xs truncate text-cue-live max-md:hidden">{{ contest.name }}</span>
+        <span class="flex items-center gap-1.5 tabular-nums">
+          <Timer class="size-4 text-muted" aria-hidden="true" />
+          <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
+          <CountdownTimer :key="clockUntil" :until="clockUntil" />
+        </span>
+      </div>
+    </div>
+    <AnnouncementsPausedNotice v-if="contest && isPinned" :contest-key="contestKey" />
+    <template v-if="!contest">
       <div data-skeleton-region="title" class="page-title">
         <SkeletonBlock text class="w-80 max-w-full" />
       </div>

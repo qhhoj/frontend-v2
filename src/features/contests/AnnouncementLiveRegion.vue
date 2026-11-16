@@ -3,8 +3,14 @@ import { toRef } from 'vue';
 import AnnouncementsPausedNotice from './AnnouncementsPausedNotice.vue';
 import { useAnnouncementFeed } from './use-announcement-feed';
 
-/** A contest page's own stream; `isStreaming` is false while the app shell streams this contest, whose paused state still shows here. */
-const props = defineProps<{ contestKey: string; isStreaming: boolean }>();
+/**
+ * A contest page's own stream; `isStreaming` is false while the app shell streams this contest, whose paused state still shows here.
+ * `isNoticeHidden`: the caller draws the paused notice itself (the sticky strip must not grow when the stream drops).
+ */
+const props = withDefaults(
+  defineProps<{ contestKey: string; isStreaming: boolean; isNoticeHidden?: boolean }>(),
+  { isNoticeHidden: false },
+);
 const { message } = useAnnouncementFeed(toRef(props, 'contestKey'), toRef(props, 'isStreaming'));
 </script>
 
@@ -12,5 +18,5 @@ const { message } = useAnnouncementFeed(toRef(props, 'contestKey'), toRef(props,
   <p data-testid="announcement-live" role="status" aria-live="polite" class="sr-only">
     {{ message }}
   </p>
-  <AnnouncementsPausedNotice :contest-key="contestKey" />
+  <AnnouncementsPausedNotice v-if="!isNoticeHidden" :contest-key="contestKey" />
 </template>

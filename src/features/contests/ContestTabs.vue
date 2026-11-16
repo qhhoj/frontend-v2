@@ -18,7 +18,13 @@ import { useStreamedContest } from './live/use-streamed-contest';
 
 /** `current` names the tab to light up on a page that is not a tab's own route (a problem's best submissions lights `contest`). */
 const { t } = useI18n();
-const props = defineProps<{ contestKey: string; phase?: ContestPhase; current?: string }>();
+const props = defineProps<{
+  contestKey: string;
+  phase?: ContestPhase;
+  current?: string;
+  /** In the sticky strip: the paused-stream notice is drawn by the header below the strip, not inside it. */
+  isPinned?: boolean;
+}>();
 interface ContestTab {
   name: string;
   labelKey: string;
@@ -43,6 +49,8 @@ const { data: contest } = useContestQuery(() => props.contestKey);
 const canViewBalloons = computed(() => contest.value?.viewer.canViewBalloons ?? false);
 const route = useRoute();
 const session = useSessionStore();
+/** The tab to light: the page's own `current`, else the route's name (the layout passes none, so a tab page lights its own tab). */
+const currentName = computed(() => props.current ?? String(route.name));
 /** The editor tab that matches a public contest page: the problem list opens Problems, the board opens Ranking; others General. */
 const EDIT_SCREEN_OF_PAGE: Record<string, ContestEditScreen> = {
   contest: 'contestProblems',
@@ -52,11 +60,7 @@ const EDIT_SCREEN_OF_PAGE: Record<string, ContestEditScreen> = {
 /** Editors' "Quản lý": the admin editor's tab that matches the page they are on. */
 const manageTarget = computed(() =>
   contest.value
-    ? contestEditTarget(
-        session.user,
-        contest.value,
-        EDIT_SCREEN_OF_PAGE[props.current ?? String(route.name)],
-      )
+    ? contestEditTarget(session.user, contest.value, EDIT_SCREEN_OF_PAGE[currentName.value])
     : null,
 );
 /** This page streams announcements while the contest can still get them, unless the app shell streams it (the viewer is in it). */
@@ -75,7 +79,7 @@ const tabs = computed<TabItem[]>(() => {
       key: tab.name,
       label: t(tab.labelKey),
       to: { name: tab.name, params: { key: props.contestKey } },
-      isCurrent: tab.name === props.current,
+      isCurrent: tab.name === currentName.value,
       count: hasUnread ? String(unread.value) : undefined,
       countLabel: hasUnread
         ? t('contests.announcements.unread', { count: unread.value }, unread.value)
@@ -102,5 +106,9 @@ const tabs = computed<TabItem[]>(() => {
 
 <template>
   <Tabs :items="tabs" :label="t('contests.tabs.label')" variant="underline" overflow="scroll" />
-  <AnnouncementLiveRegion :contest-key="contestKey" :is-streaming="isStreaming" />
+  <AnnouncementLiveRegion
+    :contest-key="contestKey"
+    :is-streaming="isStreaming"
+    :is-notice-hidden="isPinned"
+  />
 </template>
