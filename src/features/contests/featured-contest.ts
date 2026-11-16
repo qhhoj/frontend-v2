@@ -15,7 +15,7 @@ export function featuredFirst(
   isRunning: boolean,
 ): ContestListItem[] {
   const startOf = (contest: ContestListItem) => Date.parse(contest.startTime);
-  const startOrder = (a: ContestListItem, b: ContestListItem) =>
-    isRunning ? startOf(b) - startOf(a) : startOf(a) - startOf(b);
-  return [...contests].sort((a, b) => rank(b) - rank(a) || startOrder(a, b));
+  const startOrder = (left: ContestListItem, right: ContestListItem) =>
+    isRunning ? startOf(right) - startOf(left) : startOf(left) - startOf(right);
+  return [...contests].sort((left, right) => rank(right) - rank(left) || startOrder(left, right));
 }
