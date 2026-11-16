@@ -10,7 +10,7 @@ Values live in code: `src/theme/tokens.css`, `@theme` in `src/theme/styles.css`,
 
 ### Type roles
 
-Kit 2 scale (spec `.batch/kit2/spec.md` §1b): IBM Plex Sans and Plex Mono, line height 1.5 (`--qh-leading`) for running text. Nothing is smaller than 13 px except the `kbd` hint (12 px).
+Kit 2 scale (spec `.batch/kit2/spec.md` §1b): Be Vietnam Pro (text) and JetBrains Mono (code and numbers), line height 1.5 (`--qh-leading`) for running text. Nothing is smaller than 13 px except the `kbd` hint (12 px).
 
 | Class               | px / line | Role                                                                          |
 | ------------------- | --------- | ----------------------------------------------------------------------------- |

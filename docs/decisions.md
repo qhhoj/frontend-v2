@@ -680,3 +680,4 @@ What the code does and why. Conventions are in [CONTRIBUTING.md](../CONTRIBUTING
 ## Tokens
 
 - No hard-coded values: the `hardcoded-value` lint rule (per-area baseline, a file never gains one) refuses literal sizes, spacing, motion and palette colours outside `src/theme/` — a theme swap must change one place (owner rule 2026-11-16).
+- Fonts Be Vietnam Pro + JetBrains Mono (2026-11-16, owner): `@fontsource/be-vietnam-pro` 400/500/600/700 and `@fontsource/jetbrains-mono` 400/500/600 replace IBM Plex; same weight-file imports and font tokens. Why: owner choice; Be Vietnam Pro is drawn for Vietnamese diacritics. Both OFL; cold-page font payload about the same (~210 KB).
