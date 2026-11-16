@@ -14,11 +14,4 @@
   }
 }
 
-/*
- * Admin scope for the shared control tokens (docs/design-language.md): 12 px control corners and the small control height.
- * AdminShell puts the class on <html> while it is mounted, so teleported dialogs are inside the scope.
- */
-.qh-admin {
-  --qh-radius-control: var(--qh-radius-cell);
-  --qh-control: var(--qh-control-sm);
-}
+/* The admin scope no longer changes control tokens: admin pages use the public control height and shape (Kit 2). AdminShell still sets `.qh-admin` on <html> for admin-only rules. */

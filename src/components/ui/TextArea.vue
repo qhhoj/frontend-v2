@@ -12,6 +12,6 @@ const field = useFieldControl();
     v-model="model"
     :aria-describedby="field?.describedBy"
     :aria-invalid="field?.invalid"
-    :class="`${CONTROL_FRAME} min-h-(--qh-control) py-2`"
+    :class="`${CONTROL_FRAME} min-h-(--qh-control) rounded-card py-2`"
   />
 </template>

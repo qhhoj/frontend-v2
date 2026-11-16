@@ -4,7 +4,7 @@ import type { CueTone } from './cue-tones';
 
 /**
  * A small dot in a cue's colour, before a word that says the same thing ("Đang diễn ra"). Colour only repeats the word, so the
- * dot is decorative unless `label` is given (then it is read out and shown on hover). One size: 8 px.
+ * dot is decorative unless `label` is given (then it is read out and shown on hover). One size: 8 px (`size-2`, the spacing step).
  */
 defineOptions({ name: 'UiStatusDot' });
 defineProps<{ tone: CueTone; label?: string }>();

@@ -158,11 +158,11 @@ const setSolved = (solved: SolvedFilter) => emit('update', { solved });
       <RandomProblemButton :filters="filters" labelled />
     </template>
     <template v-if="isCompact || $slots.default" #chips>
-      <div v-if="isCompact" class="flex items-center justify-between gap-3">
+      <div v-if="isCompact" class="flex flex-wrap items-center justify-between gap-3">
         <ProblemListCount :text="countText" class="text-caption" />
         <SegmentedControl
           v-if="signedIn"
-          class="min-w-0 flex-1 basis-0 sm:max-w-72"
+          class="min-w-0 flex-auto sm:max-w-72"
           :label="$t('problems.solvedFilter.label')"
           :options="SOLVED_CHOICES"
           :model-value="filters.solved"

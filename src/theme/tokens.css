@@ -5,6 +5,8 @@
   --qh-font-body: 'IBM Plex Sans', system-ui, sans-serif;
   --qh-font-display: var(--qh-font-body);
   --qh-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  /* Line height of all running text. */
+  --qh-leading: 1.5;
   /* Page background strength (theme/backgrounds.css): one fixed subtle level, no control. */
   --qh-background-level: 0.45;
   /* Limit chips by meaning: time blue, memory violet, points gold. They reuse the tag colours, so the palette proves their contrast. */
@@ -76,27 +78,49 @@
   --space-section-title: 0.5rem;
   --space-stack: 0.75rem;
   --qh-sidebar-width: 20rem;
-  /* Workbench sizes (build plan §1.2), for the shell and table steps: rows 32, board rows 36, the rail 224. */
-  --qh-row: 2rem;
-  --qh-row-dense: 2.25rem;
+  /* Kit 2 geometry (.batch/kit2/spec.md). Every size below is a variable; components never write a number. */
+  /* Heights: a control is 36 (32 only inside a table, 40 for a page's primary action), a chip 24, a list row 44 (ranking and menus 40).
+     Under the touch media below every control is 44 or more and a row is at least 44. */
+  --qh-control-sm: 2rem;
+  --qh-control: 2.25rem;
+  --qh-control-lg: 2.5rem;
+  --qh-chip: 1.5rem;
+  --qh-row: 2.75rem;
+  --qh-row-dense: 2.5rem;
+  --qh-touch: 2.75rem;
   --qh-rail: 14rem;
-  /* Workbench shape: 4 controls and cells, 6 rows, panels and cards (8 on phones), no pills but avatars and dots. */
-  --qh-radius-cell: 4px;
-  --qh-radius-row: 6px;
-  --qh-radius-card: 6px;
+  /* Control padding x: at least half the height, so the text clears the pill's curve. */
+  --qh-control-px-sm: 0.875rem;
+  --qh-control-px: 1rem;
+  --qh-control-px-lg: 1.25rem;
+  --qh-chip-px: 0.625rem;
+  /* Inset between a segmented track's edge and its sliding thumb. */
+  --qh-control-inset: 0.1875rem;
+  --qh-control-icon: 1rem;
+  --qh-control-icon-lg: 1.25rem;
+  /* Padding of a surface (Card, Panel, StatStrip) and of an overlay (Dialog, Sheet). */
+  --qh-pad-surface: 1.25rem;
+  --qh-pad-dialog: 1.5rem;
+  /* Gaps: between controls 10, toolbar to content 16, between surfaces 16. */
+  --qh-gap-control: 0.625rem;
+  --qh-gap-block: 1rem;
+  /* Shape: a control is a pill, a surface is 12, a box nested in a surface is 8 (surface minus the padding between, never below 6), a small square mark is 6. */
+  --qh-radius-control: 999px;
+  --qh-radius-surface: 12px;
+  --qh-radius-nested: 8px;
+  --qh-radius-mark: 6px;
   --qh-radius-pill: 999px;
   --qh-radius-skeleton: 4px;
-  /* Radius by role: controls (buttons, tabs, segmented). The admin scope (.qh-admin) sets the cell radius. */
-  --qh-radius-control: 4px;
-  /* Control heights (Workbench): md 28 is the default, sm 24 for toolbars and row actions, lg 36 for the submit card only.
-     Every one is 44 px or more under the touch media below. */
-  --qh-control: 1.75rem;
-  --qh-control-sm: 1.5rem;
-  --qh-control-lg: 2.25rem;
-  /* Admin density, global so no size depends on whether the admin chunk has loaded: 40 px rows, 28 px controls, 24 px chips (48, 44, 32 on touch). */
+  --qh-radius-card: var(--qh-radius-surface);
+  --qh-radius-row: var(--qh-radius-nested);
+  --qh-radius-cell: var(--qh-radius-mark);
+  /* Surface levels, by tone not by line: L0 ground (--qh-ground), L1 surface (Card, Panel, table), L2 strong (fields, secondary buttons,
+     the segmented track, the current tab, neutral chips), hover (--qh-surface-hover). L3 overlay = L1 + --qh-shadow-float + this ring. */
+  --qh-ring-overlay: inset 0 0 0 1px var(--qh-line);
+  /* Admin density, global so no size depends on whether the admin chunk has loaded: 40 px rows, controls as the public kit, 36 px filter chips (48, 44, 44 on touch). */
   --qa-row: 2.5rem;
   --qa-control: var(--qh-control);
-  --qa-chip: 1.5rem;
+  --qa-chip: var(--qh-control);
   --qa-gap: 0.75rem;
   /* Motion (.batch/motion-ux/motion-notes.md): five durations and four curves. Reduced motion (below) and low power
      (styles.css) zero the durations, so every element shows its end state at once. */
@@ -113,16 +137,16 @@
 
 @media (pointer: coarse), (max-width: 40rem) {
   :root {
-    --qh-control: 2.75rem;
-    --qh-control-sm: 2.75rem;
+    --qh-control: var(--qh-touch);
+    --qh-control-sm: var(--qh-touch);
     --qh-control-lg: 3.5rem;
-    --qh-radius-card: 8px;
+    --qh-control-inset: 0rem;
     --space-page-top: 1rem;
     --space-header: 0.75rem;
     --space-toolbar: 0.5rem;
     --space-section: 2rem;
     --qa-row: 3rem;
-    --qa-chip: 2rem;
+    --qa-chip: var(--qh-touch);
   }
 }
 

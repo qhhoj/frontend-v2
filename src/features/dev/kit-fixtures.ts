@@ -54,12 +54,48 @@ export const CUES = CUE_TONES.map((tone) => ({
 }));
 
 export const TYPE_ROLES = [
-  { token: 'text-page', use: 'Tiêu đề trang (H1 duy nhất)', size: '24' },
-  { token: 'text-section', use: 'Tiêu đề mục', size: '16' },
-  { token: 'text-sm', use: 'Chữ thân, hàng danh sách', size: '14' },
-  { token: 'text-meta', use: 'Dòng phụ, mô tả ngắn', size: '13' },
-  { token: 'text-caption', use: 'Nhãn nhỏ, chip', size: '12' },
-  { token: 'text-tiny', use: 'Chú thích rất nhỏ', size: '11' },
+  { token: 'text-page', use: 'Tiêu đề trang (H1 duy nhất), 28/36', size: '28' },
+  { token: 'text-heading', use: 'Tiêu đề thẻ, hộp thoại, mục, 18/26', size: '18' },
+  { token: 'text-long', use: 'Văn bản dài: đề bài, bài viết, 16/26', size: '16' },
+  { token: 'text-body', use: 'Chữ thân: ô bảng, hàng, nút, ô nhập, 15/22', size: '15' },
+  { token: 'text-meta', use: 'Dòng phụ, nhãn biểu mẫu, đếm, 14/21', size: '14' },
+  { token: 'text-small', use: 'Đầu bảng, mã bài, chip, 13/20', size: '13' },
+] as const;
+
+/** The height scale (spec §1): each token draws as a bar of that height. */
+export const HEIGHTS = [
+  {
+    token: '--qh-control-sm',
+    class: 'h-(--qh-control-sm)',
+    px: '32',
+    use: 'Chỉ trong bảng: nút hàng, phân trang',
+  },
+  {
+    token: '--qh-control',
+    class: 'h-(--qh-control)',
+    px: '36',
+    use: 'Mọi nút, ô nhập, chọn, thanh công cụ, tab',
+  },
+  {
+    token: '--qh-control-lg',
+    class: 'h-(--qh-control-lg)',
+    px: '40',
+    use: 'Hành động chính của trang hoặc biểu mẫu',
+  },
+  { token: '--qh-chip', class: 'h-(--qh-chip)', px: '24', use: 'Chip, trạng thái, kết quả' },
+  { token: '--qh-row', class: 'h-(--qh-row)', px: '44', use: 'Hàng danh sách một dòng, đầu bảng' },
+  {
+    token: '--qh-row-dense',
+    class: 'h-(--qh-row-dense)',
+    px: '40',
+    use: 'Bảng xếp hạng, mục trình đơn',
+  },
+  {
+    token: '--qh-touch',
+    class: 'h-(--qh-touch)',
+    px: '44',
+    use: 'Cảm ứng: mọi điều khiển và hàng',
+  },
 ] as const;
 
 export const SPACES = [
@@ -82,10 +118,10 @@ export const WIDTHS = [
 ] as const;
 
 export const RADII = [
-  { name: 'rounded-cell', class: 'rounded-cell' },
-  { name: 'rounded-row', class: 'rounded-row' },
-  { name: 'rounded-card', class: 'rounded-card' },
-  { name: 'rounded-pill', class: 'rounded-pill' },
+  { name: 'rounded-control', class: 'rounded-control', use: 'Nút, ô nhập, tab, chip: viên thuốc' },
+  { name: 'rounded-card', class: 'rounded-card', use: 'Thẻ, bảng, hộp thoại: 12' },
+  { name: 'rounded-row', class: 'rounded-row', use: 'Hộp nằm trong thẻ: 8' },
+  { name: 'rounded-cell', class: 'rounded-cell', use: 'Dấu vuông nhỏ: 6' },
 ] as const;
 
 /** The base palette roles a page may use besides the cues. */

@@ -50,7 +50,7 @@ export interface TabItem {
 }
 
 /**
- * A row of tabs. `underline` (the default) is the Workbench look; `pill` a row of boxed tabs; `rail` is a vertical side nav
+ * A row of tabs. `underline` (the default, the old name) and `pill` both draw the pill row, the current tab filled; `rail` is a vertical side nav
  * from `lg` and the pill row below it. Link tabs mark the open one `aria-current="page"` (the `v-model` key, else the
  * router's exact match); without links the row is a tablist with a roving tabindex and arrow keys. `overflow="menu"`
  * hides a tab that does not fit whole (never the current one) and lists it behind a "⋯ Thêm" button; `scroll` lets the row
@@ -87,17 +87,12 @@ const { hiddenKeys, measure } = useTabsOverflow(scroller, trigger, hasMenu, [
   () => route.fullPath,
 ]);
 /** The indicator slides to the current tab when the model, the router or the items change. */
-const indicator = useSlidingIndicator(
-  scroller,
-  '[data-tab-key]',
-  [
-    current,
-    () => route.fullPath,
-    () => props.variant,
-    () => props.items.map((item) => `${item.key}:${item.isCurrent}`).join(),
-  ],
-  () => props.variant === 'underline',
-);
+const indicator = useSlidingIndicator(scroller, '[data-tab-key]', [
+  current,
+  () => route.fullPath,
+  () => props.variant,
+  () => props.items.map((item) => `${item.key}:${item.isCurrent}`).join(),
+]);
 /** A tab out of view, hidden whole; the current one is always kept in view. */
 const isHidden = (item: TabItem) =>
   hiddenKeys.value.includes(item.key) && item.key !== current.value && !item.isCurrent;
@@ -260,7 +255,7 @@ const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
             <AppButton
               :ref="(el) => setOpener((el as { $el?: HTMLElement } | null)?.$el ?? null)"
               tone="ghost"
-              :size="variant === 'underline' ? 'sm' : 'md'"
+              size="md"
               :aria-label="triggerName"
               :data-testid="moreTestid"
               aria-haspopup="menu"

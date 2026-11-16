@@ -33,8 +33,8 @@ export interface SegmentDot {
 }
 
 /**
- * One choice out of two to four views (Workbench): boxed segments inside one 28 px frame, the current one raised on the solid
- * surface. `md` fills its width with equal segments (settings);
+ * One choice out of two to four views (Kit 2): segments inside one pill track on the strong surface (L2), 36 px tall, the current one a
+ * thumb on the page surface (L1, no shadow) that slides. `md` fills its width with equal segments (settings);
  * `sm` is the admin chip density (a 44 px segment on a coarse pointer) and wraps on a narrow phone instead of being clipped, the
  * current segment scrolled into view when the row still overflows. Links make it a `nav`; buttons a `group` of `aria-pressed` toggles.
  */
@@ -76,27 +76,24 @@ function stateOf(option: SegmentOption<Value>) {
 }
 
 /**
- * The frame is exactly one control tall (`--qh-control`: 28 px, 44 on touch), like every other toolbar control. Its outline
- * is an inset ring, which takes no height; the segments stretch to fill it. On touch the frame has no padding, so a segment
- * is the full 44 px.
+ * The frame is exactly one control tall (`--qh-control`: 36 px, 44 on touch), like every other toolbar control; the segments
+ * stretch to fill it inside a 3 px inset (`--qh-control-inset`). On touch the inset is 0, so a segment is the full 44 px.
  */
 const FRAME_BASE =
-  'relative flex min-h-(--qh-control) gap-0.5 rounded-control bg-surface-strong p-0.5 inset-ring inset-ring-line touch:gap-0 touch:p-0';
+  'edge-high relative flex min-h-(--qh-control) gap-0.5 rounded-control bg-surface-strong p-(--qh-control-inset) touch:gap-0';
 const FRAME = {
-  md: FRAME_BASE,
+  md: `${FRAME_BASE} max-w-full overflow-x-auto [scrollbar-width:none]`,
   sm: `${FRAME_BASE} max-w-full flex-wrap self-start overflow-x-auto`,
 };
 const SEGMENT = {
-  md: 'relative inline-flex flex-1 items-center justify-center gap-1.5 px-2.5 py-0.5 leading-tight touch:min-h-11',
-  sm: 'relative inline-flex shrink-0 items-center gap-1.5 px-2.5 py-0.5 whitespace-nowrap touch:min-h-11',
+  md: 'relative inline-flex flex-1 items-center justify-center gap-1.5 px-(--qh-control-px-sm) whitespace-nowrap touch:min-h-11',
+  sm: 'relative inline-flex shrink-0 items-center gap-1.5 px-(--qh-control-px-sm) whitespace-nowrap touch:min-h-11',
 };
-/** The current segment: bold, full-contrast text over the sliding indicator (raised on the solid surface). */
-const ACTIVE = 'border-transparent font-semibold text-content';
+/** The current segment: bold, full-contrast text over the sliding thumb. */
+const ACTIVE = 'font-semibold text-content';
 /** The indicator behind the segments; disabled keeps the full-contrast text, no opacity. */
-const INDICATOR =
-  'pointer-events-none absolute top-0 left-0 rounded-cell border border-line-strong bg-surface-solid';
-const IDLE =
-  'border-transparent text-muted hover:text-content disabled:border-line disabled:bg-surface-strong';
+const INDICATOR = 'pointer-events-none absolute top-0 left-0 rounded-control bg-surface';
+const IDLE = 'text-muted hover:text-content';
 
 /** The option's dot: its own, else the red one `alertLabel` names. */
 function dotOf(option: SegmentOption<Value>): SegmentDot | undefined {
@@ -127,7 +124,7 @@ const segments = computed(() => props.options.map((option) => ({ option, dot: do
       v-bind="stateOf(option)"
       :data-testid="option.testid"
       data-segment
-      class="rounded-cell border text-meta font-medium disabled:cursor-not-allowed"
+      class="rounded-control text-body font-medium disabled:cursor-not-allowed"
       :class="[SEGMENT[size], option.value === modelValue ? ACTIVE : IDLE]"
       @click="option.to ? undefined : emit('update:modelValue', option.value)"
     >
