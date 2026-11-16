@@ -2617,7 +2617,10 @@
     "live": "In contest",
     "virtual": "Virtual #{run}",
     "spectate": "Spectating",
-    "rankingShort": "Ranking"
+    "rankingShort": "Ranking",
+    "sticky": {
+      "label": "Live contest bar"
+    }
   },
   "balloons": {
     "tab": "Balloons",

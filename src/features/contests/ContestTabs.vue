@@ -18,7 +18,13 @@ import { useStreamedContest } from './live/use-streamed-contest';
 
 /** `current` names the tab to light up on a page that is not a tab's own route (a problem's best submissions lights `contest`). */
 const { t } = useI18n();
-const props = defineProps<{ contestKey: string; phase?: ContestPhase; current?: string }>();
+const props = defineProps<{
+  contestKey: string;
+  phase?: ContestPhase;
+  current?: string;
+  /** In the sticky strip: the paused-stream notice is drawn by the header below the strip, not inside it. */
+  isPinned?: boolean;
+}>();
 interface ContestTab {
   name: string;
   labelKey: string;
@@ -102,5 +108,9 @@ const tabs = computed<TabItem[]>(() => {
 
 <template>
   <Tabs :items="tabs" :label="t('contests.tabs.label')" variant="underline" overflow="scroll" />
-  <AnnouncementLiveRegion :contest-key="contestKey" :is-streaming="isStreaming" />
+  <AnnouncementLiveRegion
+    :contest-key="contestKey"
+    :is-streaming="isStreaming"
+    :is-notice-hidden="isPinned"
+  />
 </template>

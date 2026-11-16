@@ -2617,7 +2617,10 @@
     "live": "Bạn đang thi",
     "virtual": "Thi ảo #{run}",
     "spectate": "Đang theo dõi",
-    "rankingShort": "Bảng"
+    "rankingShort": "Bảng",
+    "sticky": {
+      "label": "Thanh kỳ thi đang diễn ra"
+    }
   },
   "balloons": {
     "tab": "Bóng bay",
