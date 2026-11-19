@@ -2,16 +2,12 @@ import type { LocationQuery, LocationQueryRaw } from 'vue-router';
 import { BAN_REASON_MAX_LENGTH } from '@/api/types/users';
 import type { UserPage } from '@/api/types/users';
 import type { StaffUser, StaffUserQuery } from '@/api/types/users-admin';
-import { STAFF_USERS_PAGE_SIZE } from '@/api/users-admin.api';
 import { pageFromQuery } from '@/lib/paging';
 import { isBannedPage } from '@/lib/user-ban';
 
 export { BAN_REASON_MAX_LENGTH };
 /** The backend refuses deeper pages (skipping is linear in the page number). */
 export const STAFF_USERS_MAX_PAGE = 500;
-
-export const lastStaffPage = (total: number, pageSize: number = STAFF_USERS_PAGE_SIZE) =>
-  Math.min(STAFF_USERS_MAX_PAGE, Math.max(1, Math.ceil(total / pageSize)));
 
 /**
  * Only a superuser may start an impersonation, and never of another superuser, an inactive (never activated) or a banned account. Unknown staff facts

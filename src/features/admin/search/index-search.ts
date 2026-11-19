@@ -1,5 +1,4 @@
 import type { LocationQuery, LocationQueryRaw } from 'vue-router';
-import type { ContestPhase } from '@/api/types/contests';
 
 export const INDEX_PAGE_SIZE = 20;
 /** The longest search text the address keeps. */
@@ -7,10 +6,6 @@ export const SEARCH_MAX_LENGTH = 100;
 /** The segmented filter of the contests index: `all` is no `phase` at all. */
 export const CONTEST_PHASE_FILTERS = ['all', 'running', 'upcoming', 'ended'] as const;
 export type ContestPhaseFilter = (typeof CONTEST_PHASE_FILTERS)[number];
-const PHASES: readonly string[] = ['running', 'upcoming', 'ended'];
-
-export const phaseFromQuery = (value: unknown): ContestPhase | null =>
-  typeof value === 'string' && PHASES.includes(value) ? (value as ContestPhase) : null;
 
 export interface TextPart {
   text: string;

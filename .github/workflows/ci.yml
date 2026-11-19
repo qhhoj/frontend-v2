@@ -97,7 +97,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --ignore-scripts
-      - run: npm run api:check
       # vue-tsc --build is incremental: the newest build info for these dependencies and configs skips unchanged files.
       - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:

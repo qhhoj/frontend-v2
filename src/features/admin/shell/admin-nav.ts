@@ -25,8 +25,6 @@ import {
   Trophy,
   Users,
 } from 'lucide-vue-next';
-import { hasPermission } from '@/lib/permissions';
-import type { PermissionHolder, PermissionRule } from '@/lib/permissions';
 import { canUseAdmin } from '../admin-access';
 import type { AdminAccess, AdminViewer } from '../admin-access';
 import { ADMIN_SCREENS, adminRouteName } from '../admin-screens';
@@ -193,16 +191,6 @@ export function navCrumbsOf(routePath: string, translate: (key: string) => strin
   if (pathsOf(place.item).includes(routePath)) return [groupCrumb];
   const screenCrumb = { label: translate(place.item.labelKey), to: { name: place.item.routeName } };
   return groupCrumb.label === screenCrumb.label ? [screenCrumb] : [groupCrumb, screenCrumb];
-}
-
-/** The first permission of a rule that this viewer holds: a card names what the viewer can use, never a permission they lack. */
-export function heldPermission(
-  rule: PermissionRule | null,
-  user: PermissionHolder | null,
-): string | null {
-  if (rule === null) return null;
-  const permissions = typeof rule === 'string' ? [rule] : rule;
-  return permissions.find((permission) => hasPermission(user, permission)) ?? null;
 }
 
 /** The greeting card's three actions; each shows only with its screen's permission. */

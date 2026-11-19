@@ -44,9 +44,6 @@ export const ratingRange = (ratings: number[]): RatingRange => ({
   high: Math.ceil((Math.max(...ratings) + STEP) / STEP) * STEP,
 });
 
-export const ratingTicks = ({ low, high }: RatingRange) =>
-  Array.from({ length: (high - low) / STEP + 1 }, (_tick, index) => low + index * STEP);
-
 const LABEL_STEPS = [100, 200, 500, 1000, 2000];
 /** Rating labels and grid lines: multiples of the smallest step that keeps them `minGap` units apart, so 2 200 rating points do not stack into one smear. */
 export function ratingLabelTicks({ low, high }: RatingRange, plotHeight: number, minGap = 18) {

@@ -5,7 +5,6 @@ import type { MaybeRefOrGetter } from 'vue';
 import {
   deleteComment,
   editComment,
-  fetchComment,
   fetchCommentPage,
   fetchCommentVotes,
   fetchRevisions,
@@ -53,16 +52,6 @@ export const useCommentPageQuery = (
     ]),
     queryFn: () => fetchCommentPage(toValue(type), toValue(key), toValue(page)),
     placeholderData: computed(() => keepPreviousForSameViewer(5, viewer.value)),
-  });
-};
-
-/** One comment (a deep link); idle for an empty id. */
-export const useCommentQuery = (id: MaybeRefOrGetter<string>) => {
-  const viewer = useViewerId();
-  return useQuery({
-    queryKey: computed(() => ['comments', 'detail', toValue(id), viewer.value]),
-    queryFn: () => fetchComment(toValue(id)),
-    enabled: computed(() => Boolean(toValue(id))),
   });
 };
 

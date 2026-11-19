@@ -10,19 +10,22 @@ import {
   SCRATCH_ID,
   problemDetail,
   profile,
+  signedOut,
   languageItem,
   submissionDetail,
 } from '@/test/fixtures';
 import { fail, invalid, issue, mockApi, ok } from '@/test/mock-api';
 import type { ApiCall } from '@/test/mock-api';
 import { mountComponent } from '@/test/mount';
-import { anonymousViewer } from '@/test/problem-routes';
 import type { ContestDetail } from '@/api/types/contests';
 import type { Profile } from '@/api/types/profile';
 import type { ProblemDetail } from '@/api/types/problems';
 import { MAX_SOURCE_LENGTH } from '@/lib/source';
 import { useSubmitForm } from './use-submit-form';
 import { LANGUAGE_STORAGE_KEY } from './use-submit-language';
+
+/** What the shell asks of an anonymous visitor. */
+const anonymousViewer = { 'GET /auth/me': signedOut };
 
 const { profileData } = await vi.hoisted(async () => {
   const { ref: createRef } = await import('vue');

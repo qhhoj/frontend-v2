@@ -37,14 +37,6 @@ export const useRatingHistoryQuery = (username: MaybeRefOrGetter<string>) => {
   });
 };
 
-const TOP_USERS = { sort: 'rating', pageSize: 3 } as const;
-export const useTopUsersQuery = () =>
-  useQuery({
-    queryKey: ['users', 'leaderboard', TOP_USERS],
-    queryFn: () => fetchLeaderboard(TOP_USERS),
-    select: (result) => result.items,
-  });
-
 const fetchBoard = (sort: LeaderboardSort, page: number) =>
   fetchLeaderboard({ sort, page, pageSize: LEADERBOARD_PAGE_SIZE });
 export const useLeaderboardQuery = (

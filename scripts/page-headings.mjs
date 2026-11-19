@@ -20,7 +20,6 @@ export const ALLOWED = {
   'features/not-found/NotFoundPage.vue': 'a centred error state under the 404 digits and Bit',
   'features/contests/ContestNotFound.vue': 'a centred error state under Bit',
   'features/admin/shell/AdminForbidden.vue': 'a centred error state under Bit',
-  'features/admin/shell/AdminPlaceholder.vue': 'a centred placeholder state under Bit',
   'features/admin/similarity/SimilarityPairPage.vue': 'a centred not-found state under Bit',
   'features/home/AnonymousHero.vue':
     'the signed-out hero card: title, pitch and calls to action beside Bit',

@@ -302,11 +302,6 @@
     "controls": 3,
     "input": 1
   },
-  "features/admin/search/IndexSearchBox.vue": {
-    "button": 1,
-    "controls": 4,
-    "search": 1
-  },
   "features/admin/search/ProblemBulkVisibilityDialog.vue": {
     "checkbox": 1,
     "controls": 3,
