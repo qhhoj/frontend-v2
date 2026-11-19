@@ -6,9 +6,10 @@ import AdminNotice from '../ui/feedback/AdminNotice.vue';
 import { needsPermissionText } from '../ui/permission-text';
 import UserPasswordForm from './UserPasswordForm.vue';
 import UserResetLink from './UserResetLink.vue';
+import UserSocialLinks from './UserSocialLinks.vue';
 import UserTwoFactorReset from './UserTwoFactorReset.vue';
 
-/** The Bảo mật tab: a new password and the reset link (`auth.change_user`), then the 2FA reset (`judge.ban_user`). */
+/** The Bảo mật tab: a new password, the reset link and the social sign-in links (`auth.change_user`), then the 2FA reset (`judge.ban_user`). */
 defineProps<{ user: UserEdit; hadTwoFactor: boolean }>();
 const { can } = usePermissions();
 const canCredentials = computed(() => can('auth.change_user'));
@@ -20,6 +21,7 @@ const canResetTwoFactor = computed(() => can('judge.ban_user'));
     <template v-if="canCredentials">
       <UserPasswordForm :username="user.username" />
       <UserResetLink :username="user.username" :email="user.email" />
+      <UserSocialLinks :username="user.username" :providers="user.socialProviders" />
     </template>
     <div v-else>
       <AdminNotice tone="info" :title="needsPermissionText('auth.change_user')" />

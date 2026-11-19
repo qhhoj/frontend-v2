@@ -38,6 +38,9 @@ export const renameUser = (username: string, newName: string) =>
 /** backend `UserModerationController` (`judge.ban_user`): removes TOTP and security keys and signs the user out. */
 export const resetUserTwoFactor = (username: string) =>
   apiSend('post', '/users/{username}/reset-two-factor', { path: { username } });
+/** `auth.change_user`: unlinks every social sign-in and ends the user's sessions. */
+export const removeUserSocialLinks = (username: string) =>
+  apiSend('delete', '/admin/users/{username}/social-links', { path: { username } });
 /** `auth.add_user`: up to `USER_CREATE_BATCH` rows; each row is created or refused on its own. */
 export const createUsers = (body: CreateUsersBody) => apiSend('post', '/admin/users', { body });
 export const USER_CREATE_BATCH = 100;
