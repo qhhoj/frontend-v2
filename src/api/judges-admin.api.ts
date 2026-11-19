@@ -11,6 +11,9 @@ export const rotateJudgeKey = (name: string) =>
   apiSend('post', '/judges/{name}/key', { path: { name } });
 export const disconnectJudge = (name: string, force: boolean) =>
   apiSend('post', '/judges/{name}/disconnect', { path: { name }, body: { force } });
+/** Only an offline judge with nothing in flight (409 `judge_online`, `judge_busy`); 409 `name_taken` for a used name. */
+export const renameJudge = (name: string, newName: string) =>
+  apiSend('post', '/judges/{name}/rename', { path: { name }, body: { name: newName } });
 /** Only an offline judge (409 `judge_online` otherwise). */
 export const deleteJudge = (name: string) =>
   apiSend('delete', '/judges/{name}', { path: { name } });

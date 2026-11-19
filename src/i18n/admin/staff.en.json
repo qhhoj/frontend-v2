@@ -50,5 +50,15 @@
     "lock": "Lock submission",
     "unlock": "Unlock",
     "hint": "A locked submission is never rejudged, not even by a bulk rejudge (unless it includes locked ones)."
+  },
+  "override": {
+    "title": "Override verdict and score",
+    "lead": "Sets the verdict and points shown for this submission; the test results stay as judged. User points, problem statistics and contest results are recomputed. A rejudge discards the override unless you also lock the submission.",
+    "result": "Verdict",
+    "points": "Points (0 to {max})",
+    "comment": "Reason (kept in the change log)",
+    "lock": "Also lock the submission so a rejudge keeps the override",
+    "save": "Save override",
+    "done": "Override saved."
   }
 }

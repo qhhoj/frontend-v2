@@ -9,11 +9,12 @@ export interface StaffActions {
 }
 type Can = (permission: string) => boolean;
 
-/** The three permissions that open the staff panel at all. */
+/** The permissions that open the staff panel at all. */
 export const STAFF_PERMISSIONS = [
   'judge.rejudge_submission',
   'judge.reject_submission',
   'judge.abort_any_submission',
+  'judge.change_submission',
 ] as const;
 
 /** Still being judged, or waiting for the contest's final judging (`PD`): rejudge and reject answer 409 until it is over. */

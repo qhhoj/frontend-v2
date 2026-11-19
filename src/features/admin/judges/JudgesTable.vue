@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Ban, KeyRound, PanelRight, Trash2, Unplug } from 'lucide-vue-next';
+import { Ban, KeyRound, PanelRight, PencilLine, Trash2, Unplug } from 'lucide-vue-next';
 import type { Component } from 'vue';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -48,7 +48,7 @@ const pingText = (judge: Judge) => {
   return ms === null ? t('admin.judges.stats.noLoad') : t('admin.judges.row.ping', { ms });
 };
 
-/** Chặn and Xóa are the destructive ones (listed last, in red); Xóa exists only for a judge that is not connected. */
+/** Chặn and Xóa are the destructive ones (listed last, in red); Đổi tên and Xóa exist only for a judge that is not connected. */
 function menuOf(judge: Judge): RowMenuItem[] {
   const item = (action: JudgeAction, label: string, icon: Component, danger = false) => ({
     label,
@@ -63,7 +63,12 @@ function menuOf(judge: Judge): RowMenuItem[] {
     judge.isBlocked
       ? item('unblock', t('admin.judges.row.unblock'), Ban)
       : item('block', t('admin.judges.row.block'), Ban, true),
-    ...(judge.online ? [] : [item('delete', t('common.delete'), Trash2, true)]),
+    ...(judge.online
+      ? []
+      : [
+          item('rename', t('admin.judges.row.rename'), PencilLine),
+          item('delete', t('common.delete'), Trash2, true),
+        ]),
   ];
 }
 </script>

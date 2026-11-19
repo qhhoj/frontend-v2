@@ -50,5 +50,15 @@
     "lock": "Khóa bài nộp",
     "unlock": "Mở khóa",
     "hint": "Bài nộp bị khóa không bị chấm lại, kể cả khi chấm lại hàng loạt (trừ khi chọn cả bài bị khóa)."
+  },
+  "override": {
+    "title": "Sửa kết quả và điểm",
+    "lead": "Đặt kết quả và điểm hiển thị cho bài nộp này; kết quả từng test giữ nguyên như đã chấm. Điểm người dùng, thống kê bài và kết quả kỳ thi được tính lại. Chấm lại sẽ bỏ phần sửa này, trừ khi bạn khóa bài nộp.",
+    "result": "Kết quả",
+    "points": "Điểm (0 đến {max})",
+    "comment": "Lý do (lưu trong nhật ký thay đổi)",
+    "lock": "Khóa luôn bài nộp để chấm lại vẫn giữ phần sửa",
+    "save": "Lưu phần sửa",
+    "done": "Đã lưu phần sửa."
   }
 }

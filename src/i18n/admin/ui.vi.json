@@ -134,7 +134,13 @@
     "problem_renamed": "Bài đã được đổi mã trong lúc tải lên; hãy tải lại tệp.",
     "data_save_unfinished": "Lần lưu dữ liệu test gần nhất chưa xong nên chưa đóng gói được. Hãy lưu lại dữ liệu test rồi thử lại.",
     "chunks_missing": "Còn phần tệp chưa gửi xong.",
-    "upload_sessions_full": "Bạn đang có 2 lượt tải gói test chưa xong; hãy hủy bớt hoặc đợi chúng hết hạn."
+    "upload_sessions_full": "Bạn đang có 2 lượt tải gói test chưa xong; hãy hủy bớt hoặc đợi chúng hết hạn.",
+    "judge_online": "Hãy ngắt kết nối máy chấm trước: máy đang kết nối.",
+    "judge_busy": "Hãy chờ máy chấm xong các bài đang chấm.",
+    "points_above_problem": "Điểm không được vượt quá điểm của bài.",
+    "points_not_partial": "Bài này không có điểm thành phần: chỉ dùng 0 hoặc điểm tối đa.",
+    "accepted_needs_full_points": "Kết quả AC cần điểm tối đa.",
+    "problem_deleted": "Bài đã bị xóa."
   },
   "uploading": "Đang tải lên…",
   "uploadBusy": "Đang tải lên. Hãy chọn lại tệp sau khi xong.",

@@ -37,7 +37,8 @@
     "descriptionLabel": "Mô tả (hiện cho nhân viên)",
     "protocol": "Giao thức",
     "features": "Tính năng",
-    "lastIp": "IP gần nhất"
+    "lastIp": "IP gần nhất",
+    "rename": "Đổi tên"
   },
   "runtimes": {
     "caption": "Ngôn ngữ máy chấm báo về",
@@ -80,6 +81,12 @@
     "descriptionHint": "Tối đa 10 000 ký tự.",
     "submit": "Tạo và lấy khóa",
     "descriptionTooLong": "Tối đa 10 000 ký tự."
+  },
+  "rename": {
+    "title": "Đổi tên {name}",
+    "body": "Máy chấm chỉ kết nối lại khi cấu hình của nó dùng tên mới. Không đổi tên được máy đang kết nối hoặc còn bài đang chấm.",
+    "label": "Tên mới",
+    "confirm": "Đổi tên máy chấm"
   },
   "delete": {
     "title": "Xóa máy chấm {name}?",
@@ -128,6 +135,7 @@
     "unblocked": "Đã bỏ chặn {name}",
     "description": "Đã lưu mô tả của {name}",
     "disconnected": "Đã ngắt kết nối {name}",
-    "deleted": "Đã xóa {name}"
+    "deleted": "Đã xóa {name}",
+    "renamed": "Đã đổi tên {name} thành {newName}"
   }
 }
