@@ -1168,7 +1168,11 @@
     },
     "contestants": "{count} contestants",
     "liveEnter": "Enter contest",
-    "liveScore": "{score} points"
+    "liveScore": "{score} points",
+    "contributors": {
+      "title": "Top contributors",
+      "empty": "No contributions yet."
+    }
   },
   "problem": {
     "copySample": "Copy sample",

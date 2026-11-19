@@ -6,6 +6,7 @@ import { viewerTimeZone } from '@/lib/format-date';
 import type { LeaderboardSort, RankField } from '@/api/types/users';
 import {
   fetchActivity,
+  fetchContributors,
   fetchLeaderboard,
   fetchPpBreakdown,
   fetchRank,
@@ -42,6 +43,14 @@ export const useTopUsersQuery = () =>
   useQuery({
     queryKey: ['users', 'leaderboard', TOP_USERS],
     queryFn: () => fetchLeaderboard(TOP_USERS),
+    select: (result) => result.items,
+  });
+
+const TOP_CONTRIBUTORS = { pageSize: 5 } as const;
+export const useTopContributorsQuery = () =>
+  useQuery({
+    queryKey: ['users', 'contributors', TOP_CONTRIBUTORS],
+    queryFn: () => fetchContributors(TOP_CONTRIBUTORS),
     select: (result) => result.items,
   });
 

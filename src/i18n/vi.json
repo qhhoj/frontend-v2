@@ -1164,7 +1164,11 @@
     },
     "contestants": "{count} thí sinh",
     "liveEnter": "Vào thi",
-    "liveScore": "{score} điểm"
+    "liveScore": "{score} điểm",
+    "contributors": {
+      "title": "Đóng góp nhiều nhất",
+      "empty": "Chưa có đóng góp nào."
+    }
   },
   "problem": {
     "copySample": "Sao chép ví dụ",
