@@ -1,5 +1,5 @@
-import { IN_PROGRESS_STATUSES } from '@/api/types/submissions';
-import type { SubmissionDetail, SubmissionStatus } from '@/api/types/submissions';
+import { UNFINISHED_STATUSES } from '@/api/types/submissions';
+import type { SubmissionDetail } from '@/api/types/submissions';
 
 export type StaffActionState = 'ready' | 'waiting' | 'locked' | 'hidden';
 export interface StaffActions {
@@ -16,10 +16,8 @@ export const STAFF_PERMISSIONS = [
   'judge.abort_any_submission',
 ] as const;
 
-/** Still being judged, or waiting for the contest's final judging (`PD`): rejudge and reject answer 409 until it is over. */
-const UNFINISHED: readonly SubmissionStatus[] = [...IN_PROGRESS_STATUSES, 'PD'];
 export const isUnfinished = (submission: SubmissionDetail) =>
-  UNFINISHED.includes(submission.status);
+  UNFINISHED_STATUSES.includes(submission.status);
 const hasPassed = (iso: string | null, now: number) =>
   iso !== null && new Date(iso).getTime() <= now;
 
