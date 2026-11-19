@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { ChevronRight } from 'lucide-vue-next';
 import { useQueryClient } from '@tanstack/vue-query';
 import { computed, ref, watch } from 'vue';
 import { overrideSubmissionScore } from '@/api/submission-actions.api';
 import type { OverrideResult } from '@/api/submission-actions.api';
 import type { SubmissionDetail } from '@/api/types/submissions';
+import AppButton from '@/components/ui/AppButton.vue';
+import Checkbox from '@/components/ui/Checkbox.vue';
+import Disclosure from '@/components/ui/Disclosure.vue';
+import FormField from '@/components/ui/FormField.vue';
+import SelectField from '@/components/ui/SelectField.vue';
+import TextArea from '@/components/ui/TextArea.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import AdminStatus from '@/features/admin/ui/AdminStatus.vue';
-import { BUTTON, INPUT } from '@/features/admin/ui/controls';
 import { failureTextOf } from '@/features/admin/ui/admin-errors';
 import { useAdminMutation } from '@/features/admin/ui/use-admin-mutation';
 import { useViewerId } from '@/stores/use-viewer-id';
@@ -20,7 +25,8 @@ const COMMENT_MAX = 500;
 
 const props = defineProps<{ submission: SubmissionDetail }>();
 const maxPoints = computed(() => props.submission.problem?.points ?? 0);
-const result = ref<OverrideResult>('AC');
+/** A string, as the select hands it back; it only ever holds one of `RESULTS`. */
+const result = ref<string>('AC');
 const points = ref(0);
 const comment = ref('');
 const lock = ref(false);
@@ -43,7 +49,7 @@ const viewerId = useViewerId();
 const mutation = useAdminMutation<void, void>({
   mutate: () =>
     overrideSubmissionScore(props.submission.id, {
-      result: result.value,
+      result: result.value as OverrideResult,
       points: points.value,
       comment: comment.value.trim(),
       lock: lock.value,
@@ -55,67 +61,49 @@ const mutation = useAdminMutation<void, void>({
     });
   },
 });
-const canSave = computed(
-  () => comment.value.trim() !== '' && Number.isFinite(points.value) && !mutation.isPending.value,
-);
+const canSave = computed(() => comment.value.trim() !== '' && Number.isFinite(points.value));
+/** The points field holds a number; `TextInput` hands back what was typed. */
+const pointsText = computed({
+  get: () => String(points.value),
+  set: (typed: string | number) => (points.value = Number(typed)),
+});
 </script>
 
 <template>
-  <details class="group border-t border-line pt-2" data-testid="score-override">
-    <summary class="flex min-h-11 cursor-pointer items-center gap-2 font-semibold">
-      <ChevronRight
-        aria-hidden="true"
-        class="size-4 text-muted transition-transform group-open:rotate-90"
-        :stroke-width="1.75"
-      />
-      {{ $t('admin.staff.override.title') }}
-    </summary>
-    <form class="flex flex-col gap-3 pt-2" @submit.prevent="canSave && mutation.run()">
+  <Disclosure :label="$t('admin.staff.override.title')" data-testid="score-override">
+    <form class="flex flex-col gap-3" @submit.prevent="canSave && mutation.run()">
       <p class="text-sm text-muted">{{ $t('admin.staff.override.lead') }}</p>
       <div class="flex flex-wrap gap-3">
-        <label class="flex flex-col gap-1" for="override-result">
-          {{ $t('admin.staff.override.result') }}
-          <select id="override-result" v-model="result" :class="INPUT">
+        <FormField :label="$t('admin.staff.override.result')">
+          <SelectField v-model="result">
             <option v-for="code in RESULTS" :key="code" :value="code">{{ code }}</option>
-          </select>
-        </label>
-        <label class="flex flex-col gap-1" for="override-points">
-          {{ $t('admin.staff.override.points', { max: maxPoints }) }}
-          <input
-            id="override-points"
-            v-model.number="points"
+          </SelectField>
+        </FormField>
+        <FormField :label="$t('admin.staff.override.points', { max: maxPoints })">
+          <TextInput
+            v-model="pointsText"
             type="number"
             min="0"
             :max="maxPoints"
             step="0.001"
             inputmode="decimal"
-            :class="INPUT"
           />
-        </label>
+        </FormField>
       </div>
-      <label class="flex flex-col gap-1" for="override-comment">
-        {{ $t('admin.staff.override.comment') }}
-        <textarea
-          id="override-comment"
-          v-model="comment"
-          required
-          :maxlength="COMMENT_MAX"
-          :class="[INPUT, 'min-h-24 resize-y py-2']"
-        />
-      </label>
-      <label class="flex items-center gap-2">
-        <input id="override-lock" v-model="lock" type="checkbox" class="size-5" />
-        {{ $t('admin.staff.override.lock') }}
-      </label>
+      <FormField :label="$t('admin.staff.override.comment')" required>
+        <TextArea v-model="comment" :maxlength="COMMENT_MAX" />
+      </FormField>
+      <Checkbox v-model="lock" :label="$t('admin.staff.override.lock')" />
       <div>
-        <button
+        <AppButton
           type="submit"
-          :class="BUTTON.primary"
-          :aria-disabled="!canSave || undefined"
-          :aria-busy="mutation.isPending.value || undefined"
+          tone="primary"
+          :loading="mutation.isPending.value"
+          :disabled="!canSave"
+          :disabled-reason="canSave ? undefined : $t('admin.staff.override.needsReason')"
         >
           {{ $t('admin.staff.override.save') }}
-        </button>
+        </AppButton>
       </div>
       <AdminStatus
         v-if="mutation.failure.value"
@@ -128,5 +116,5 @@ const canSave = computed(
         :text="$t('admin.staff.override.done')"
       />
     </form>
-  </details>
+  </Disclosure>
 </template>

@@ -59,6 +59,7 @@
     "comment": "Reason (kept in the change log)",
     "lock": "Also lock the submission so a rejudge keeps the override",
     "save": "Save override",
-    "done": "Override saved."
+    "done": "Override saved.",
+    "needsReason": "Write a reason first."
   }
 }

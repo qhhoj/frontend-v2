@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import FormField from '@/components/ui/FormField.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import AdminStatus from '../ui/AdminStatus.vue';
-import { INPUT } from '../ui/controls';
 
 /** Asks for the new name of an offline judge; the judge reconnects only once its config uses that name. */
 const props = defineProps<{ judgeName: string; isBusy: boolean; failureText: string | null }>();
@@ -29,19 +30,9 @@ const canConfirm = computed(() => {
     :can-confirm="canConfirm"
     @confirm="emit('confirm', newName.trim())"
   >
-    <label class="flex flex-col gap-1" for="judge-rename">
-      {{ $t('admin.judges.rename.label') }}
-      <input
-        id="judge-rename"
-        v-model="newName"
-        type="text"
-        autocomplete="off"
-        spellcheck="false"
-        :class="INPUT"
-        aria-describedby="judge-rename-hint"
-      />
-      <span id="judge-rename-hint" class="text-sm text-muted">{{ $t('admin.judges.add.nameHint') }}</span>
-    </label>
+    <FormField :label="$t('admin.judges.rename.label')" :hint="$t('admin.judges.add.nameHint')">
+      <TextInput v-model="newName" autocomplete="off" spellcheck="false" />
+    </FormField>
     <template v-if="failureText" #error>
       <AdminStatus kind="refused" :text="failureText" />
     </template>

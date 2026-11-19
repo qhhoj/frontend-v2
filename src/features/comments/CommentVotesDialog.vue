@@ -48,7 +48,7 @@ const ups = computed(() => votes.value.filter((vote) => vote.score > 0).length);
           <span v-else class="text-muted">{{ $t('comments.votes.gone') }}</span>
           <span
             class="font-mono font-semibold tabular-nums"
-            :class="vote.score > 0 ? 'text-positive' : 'text-negative'"
+            :class="vote.score > 0 ? 'text-cue-full' : 'text-cue-zero'"
           >
             {{ vote.score > 0 ? '+1' : '−1' }}
           </span>

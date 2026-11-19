@@ -4,11 +4,11 @@ import { useI18n } from 'vue-i18n';
 import { useQueryClient } from '@tanstack/vue-query';
 import { removeUserSocialLinks } from '@/api/users-admin.api';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { SOCIAL_PROVIDER_LABELS } from '@/features/auth/social-providers';
 import { failureTextOf } from '../ui/admin-errors';
 import { useAdminMutation } from '../ui/use-admin-mutation';
 import AdminStatus from '../ui/AdminStatus.vue';
-import { BUTTON } from '../ui/controls';
 import { invalidateUserModeration } from './users.queries';
 
 /** Unlinks every Google, GitHub or Facebook sign-in of the account (`auth.change_user`) and ends its sessions, after a confirm. */
@@ -44,15 +44,14 @@ const refusal = computed(() => (remove.failure.value ? failureTextOf(remove.fail
           : $t('admin.users.edit.account.socialNone')
       }}
     </p>
-    <button
+    <AppButton
       v-if="providers.length"
-      type="button"
-      :class="BUTTON.danger"
+      tone="danger"
       class="self-start"
       @click="isConfirmOpen = true"
     >
       {{ $t('admin.users.edit.account.socialRemove') }}
-    </button>
+    </AppButton>
     <AdminStatus v-if="refusal" kind="refused" :text="refusal" />
     <ConfirmDialog
       v-model:visible="isConfirmOpen"

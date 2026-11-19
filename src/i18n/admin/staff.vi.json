@@ -59,6 +59,7 @@
     "comment": "Lý do (lưu trong nhật ký thay đổi)",
     "lock": "Khóa luôn bài nộp để chấm lại vẫn giữ phần sửa",
     "save": "Lưu phần sửa",
-    "done": "Đã lưu phần sửa."
+    "done": "Đã lưu phần sửa.",
+    "needsReason": "Hãy ghi lý do trước."
   }
 }
