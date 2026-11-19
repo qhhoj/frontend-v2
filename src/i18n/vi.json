@@ -2022,7 +2022,8 @@
       "lock": "Khóa bình luận",
       "unlock": "Mở khóa",
       "report": "Báo cáo",
-      "unhide": "Bỏ ẩn"
+      "unhide": "Bỏ ẩn",
+      "votes": "Ai đã bình chọn"
     },
     "composer": {
       "label": "Viết bình luận",
@@ -2145,7 +2146,14 @@
       "lockedOverride": "Người dùng thường chỉ đọc được; bạn vẫn bình luận được nhờ quyền vượt khóa.",
       "lockedBody": "Người dùng thường chỉ đọc được."
     },
-    "unhideFailed": "Không bỏ ẩn được bình luận. Hãy thử lại."
+    "unhideFailed": "Không bỏ ẩn được bình luận. Hãy thử lại.",
+    "votes": {
+      "title": "Ai đã bình chọn",
+      "count": "{up} lên · {down} xuống",
+      "loading": "Đang tải lượt bình chọn…",
+      "none": "Chưa có bình chọn.",
+      "gone": "Tài khoản đã xóa"
+    }
   },
   "tickets": {
     "lead": "Báo lỗi đề bài, test sai hoặc sự cố trên trang. Quản trị viên sẽ trả lời tại đây.",

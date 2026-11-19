@@ -2026,7 +2026,8 @@
       "lock": "Lock comments",
       "unlock": "Unlock",
       "report": "Report",
-      "unhide": "Unhide"
+      "unhide": "Unhide",
+      "votes": "Who voted"
     },
     "composer": {
       "label": "Write a comment",
@@ -2149,7 +2150,14 @@
       "lockedOverride": "Other users can only read; you can still comment with the lock override.",
       "lockedBody": "Other users can only read."
     },
-    "unhideFailed": "Could not unhide the comment. Try again."
+    "unhideFailed": "Could not unhide the comment. Try again.",
+    "votes": {
+      "title": "Who voted",
+      "count": "{up} up · {down} down",
+      "loading": "Loading votes…",
+      "none": "No votes.",
+      "gone": "Deleted account"
+    }
   },
   "tickets": {
     "lead": "Report statement mistakes, wrong tests or site problems. Staff answer here.",
