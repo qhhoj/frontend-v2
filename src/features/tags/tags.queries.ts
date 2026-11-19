@@ -8,6 +8,9 @@ const tagsKey = ['tags'] as const;
 export const TAG_PROBLEMS_PAGE_SIZE = 50;
 /** The judges the index accepts links from (backend `tag-links.ts`). */
 export const TAG_JUDGES = ['Codeforces', 'CodeforcesGym', 'Atcoder', 'Kattis', 'VNOJ'] as const;
+export type TagJudge = (typeof TAG_JUDGES)[number];
+export const isTagJudge = (value: string): value is TagJudge =>
+  (TAG_JUDGES as readonly string[]).includes(value);
 /** The rating that lets a user add problems and tags without `judge.add_tagproblem` (they must also have opted in). */
 export const TAGGING_RATING = 1900;
 

@@ -22,6 +22,7 @@ import { usePermissions } from '@/stores/use-permissions';
 import AddTagProblemDialog from './AddTagProblemDialog.vue';
 import {
   TAG_JUDGES,
+  isTagJudge,
   TAG_PROBLEMS_PAGE_SIZE,
   mayTag,
   useTagCatalogQuery,
@@ -66,7 +67,7 @@ const query = computed<TagProblemQuery>(() => ({
   pageSize: TAG_PROBLEMS_PAGE_SIZE,
   ...(search.value ? { search: search.value } : {}),
   ...(tag.value ? { tag: tag.value } : {}),
-  ...(judge.value ? { judges: [judge.value] } : {}),
+  ...(isTagJudge(judge.value) ? { judges: [judge.value] } : {}),
 }));
 const list = useTagProblemsQuery(query);
 const catalog = useTagCatalogQuery();
@@ -154,7 +155,15 @@ function clearFilters() {
       @retry="list.refetch()"
     >
       <template #empty>
-        <EmptyState inline>{{ $t(isFiltered ? 'tags.emptyFiltered' : 'tags.empty') }}</EmptyState>
+        <EmptyState inline>
+          {{ $t(isFiltered ? 'tags.emptyFiltered' : 'tags.empty') }}
+          <template #action>
+            <AppButton v-if="isFiltered" @click="clearFilters">{{ $t('common.clearFilters') }}</AppButton>
+            <AppButton v-else-if="canTag" tone="primary" @click="isAddOpen = true">
+              {{ $t('tags.add.open') }}
+            </AppButton>
+          </template>
+        </EmptyState>
       </template>
       <template #cell-name="{ row }">
         <span class="flex min-w-0 flex-col">

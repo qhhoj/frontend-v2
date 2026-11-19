@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import PageSection from '@/components/ui/PageSection.vue';
 import UserLink from '@/components/UserLink.vue';
 import { sortLocation } from '@/features/leaderboard/leaderboard-columns';
@@ -31,6 +32,9 @@ const BOARD = { name: 'users', ...sortLocation('contributionPoints') };
       </template>
       <EmptyState v-if="!contributors.length" inline>
         {{ $t('home.contributors.empty') }}
+        <template #action>
+          <AppButton size="sm" to="/blog">{{ $t('home.contributors.toBlog') }}</AppButton>
+        </template>
       </EmptyState>
       <ol v-else class="flex flex-col divide-y divide-line">
         <li

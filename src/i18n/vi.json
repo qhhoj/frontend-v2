@@ -1168,7 +1168,8 @@
     "liveScore": "{score} điểm",
     "contributors": {
       "title": "Đóng góp nhiều nhất",
-      "empty": "Chưa có đóng góp nào."
+      "empty": "Chưa có đóng góp nào.",
+      "toBlog": "Đến blog"
     }
   },
   "problem": {
@@ -3304,7 +3305,7 @@
       "tags": "Thẻ",
       "noTags": "Chưa có thẻ nào.",
       "addedBy": "thêm bởi",
-      "addedByGone": "một người dùng đã xoá"
+      "addedByGone": "một người dùng đã xóa"
     }
   }
 }
