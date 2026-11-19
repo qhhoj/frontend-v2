@@ -42,8 +42,7 @@ const resend = useAdminMutation({
 const remove = useAdminMutation({
   mutate: () => deleteAnnouncement(props.contestKey, props.announcement.id),
   invalidates: () => [listKey(), ['contests', 'announcements']],
-  successText: () =>
-    translate('admin.announcements.deleted', { title: props.announcement.title }),
+  successText: () => translate('admin.announcements.deleted', { title: props.announcement.title }),
   onDone: () => {
     isConfirmOpen.value = false;
   },

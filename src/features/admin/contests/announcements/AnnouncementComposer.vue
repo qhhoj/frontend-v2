@@ -72,11 +72,7 @@ const { title, description, post, errors, submit } = useAnnouncementComposer(
       :markdown="description"
     />
     <p class="m-0 text-sm text-muted">
-      {{
-        isPushedLive
-          ? $t('admin.announcements.pushOn')
-          : $t('admin.announcements.pushOff')
-      }}
+      {{ isPushedLive ? $t('admin.announcements.pushOn') : $t('admin.announcements.pushOff') }}
     </p>
     <div class="flex flex-wrap items-center gap-3">
       <button

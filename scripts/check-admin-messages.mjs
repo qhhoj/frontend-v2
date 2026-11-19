@@ -14,9 +14,15 @@ const STATIC_IMPORT = /^\s*(?:import|export)\s+(?!type\b)(?:[^'";]*?\sfrom\s+)?[
 const DYNAMIC_IMPORT = /import\(\s*['"]([^'"]+)['"]\s*\)/g;
 
 function resolveImport(from, spec) {
-  const base = spec.startsWith('@/') ? join(src, spec.slice(2)) : spec.startsWith('.') ? resolve(dirname(from), spec) : null;
+  const base = spec.startsWith('@/')
+    ? join(src, spec.slice(2))
+    : spec.startsWith('.')
+      ? resolve(dirname(from), spec)
+      : null;
   if (!base) return null;
-  const hit = ['', '.ts', '.vue', '/index.ts'].map((ext) => base + ext).find((path) => existsSync(path) && statSync(path).isFile());
+  const hit = ['', '.ts', '.vue', '/index.ts']
+    .map((ext) => base + ext)
+    .find((path) => existsSync(path) && statSync(path).isFile());
   return hit && /\.(?:ts|vue)$/.test(hit) ? hit : null;
 }
 
@@ -46,13 +52,23 @@ function publicAreas() {
   return areas;
 }
 
-const areaNames = (dir) => new Set(readdirSync(dir).filter((n) => n.endsWith('.json')).map((n) => n.split('.')[0]));
+const areaNames = (dir) =>
+  new Set(
+    readdirSync(dir)
+      .filter((n) => n.endsWith('.json'))
+      .map((n) => n.split('.')[0]),
+  );
 const adminOnly = areaNames(adminTexts);
 const offences = [...publicAreas()]
   .filter(([area]) => adminOnly.has(area))
-  .map(([area, file]) => `admin.${area} (src/i18n/admin/${area}.*.json) named by ${relative(root, file)}`);
+  .map(
+    ([area, file]) =>
+      `admin.${area} (src/i18n/admin/${area}.*.json) named by ${relative(root, file)}`,
+  );
 
 if (offences.length) {
-  console.error(`Public code names admin-only text areas (move the keys to src/i18n/admin/shared/):\n${offences.join('\n')}`);
+  console.error(
+    `Public code names admin-only text areas (move the keys to src/i18n/admin/shared/):\n${offences.join('\n')}`,
+  );
   process.exit(1);
 }
