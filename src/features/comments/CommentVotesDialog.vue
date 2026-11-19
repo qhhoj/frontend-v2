@@ -12,7 +12,9 @@ const { data, isPending, error, refetch } = useCommentVotesQuery(
   () => props.commentId,
   () => visible.value,
 );
-const votes = computed(() => [...(data.value ?? [])].sort((left, right) => right.score - left.score));
+const votes = computed(() =>
+  [...(data.value ?? [])].sort((left, right) => right.score - left.score),
+);
 const ups = computed(() => votes.value.filter((vote) => vote.score > 0).length);
 </script>
 

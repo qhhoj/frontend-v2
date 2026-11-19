@@ -162,6 +162,18 @@ export const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pages.publicRanking' },
   },
   {
+    path: '/tags',
+    name: 'tag-problems',
+    component: () => import('@/features/tags/TagProblemsPage.vue'),
+    meta: { titleKey: 'pages.tagProblems' },
+  },
+  {
+    path: '/tags/:code',
+    name: 'tag-problem',
+    component: () => import('@/features/tags/TagProblemPage.vue'),
+    meta: { titleKey: 'pages.tagProblems' },
+  },
+  {
     path: '/users',
     name: 'users',
     component: () => import('@/features/leaderboard/LeaderboardPage.vue'),

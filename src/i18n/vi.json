@@ -71,7 +71,8 @@
     "contestProblemBest": "Bài nộp tốt nhất của bài",
     "paste": "Dán mã",
     "share": "Liên kết chia sẻ",
-    "settingsShares": "Liên kết của tôi"
+    "settingsShares": "Liên kết của tôi",
+    "tagProblems": "Bài được gắn thẻ"
   },
   "contests": {
     "title": "Kỳ thi",
@@ -1240,6 +1241,7 @@
   },
   "problems": {
     "title": "Bài tập",
+    "otherJudges": "Bài trên trang chấm khác",
     "results": "{n} kết quả",
     "search": "Mã hoặc tên bài",
     "listName": "Danh sách bài",
@@ -3257,5 +3259,52 @@
       "users": "Người dùng"
     },
     "inProblems": "Tìm trong danh sách bài tập"
+  },
+  "tags": {
+    "title": "Bài được gắn thẻ",
+    "lead": "Bài từ các trang chấm khác, được thành viên gắn thẻ theo chủ đề.",
+    "search": "Tìm theo tên hoặc mã",
+    "pager": "Các trang bài được gắn thẻ",
+    "empty": "Chưa có bài nào được gắn thẻ.",
+    "emptyFiltered": "Không có bài nào khớp bộ lọc.",
+    "facts": {
+      "problems": "Bài"
+    },
+    "filters": {
+      "anyTag": "Mọi thẻ",
+      "tag": "Thẻ",
+      "anyJudge": "Mọi trang chấm",
+      "judge": "Trang chấm"
+    },
+    "table": {
+      "name": "Bài",
+      "tags": "Thẻ",
+      "judge": "Trang chấm",
+      "caption": "Bài được gắn thẻ",
+      "more": "+{count}"
+    },
+    "add": {
+      "open": "Thêm bài",
+      "title": "Thêm bài",
+      "body": "Dán đường dẫn tới một bài trên trang chấm khác.",
+      "confirm": "Thêm",
+      "link": "Đường dẫn",
+      "linkHint": "Ví dụ https://codeforces.com/problemset/problem/1/A",
+      "name": "Tên"
+    },
+    "assign": {
+      "label": "Thêm thẻ",
+      "placeholder": "Chọn một thẻ",
+      "submit": "Thêm thẻ",
+      "pickFirst": "Hãy chọn một thẻ trước"
+    },
+    "detail": {
+      "open": "Mở trên {judge}",
+      "theJudge": "trang chấm",
+      "tags": "Thẻ",
+      "noTags": "Chưa có thẻ nào.",
+      "addedBy": "thêm bởi",
+      "addedByGone": "một người dùng đã xoá"
+    }
   }
 }

@@ -71,7 +71,8 @@
     "contestProblemBest": "Best submissions of a problem",
     "paste": "Paste code",
     "share": "Shared link",
-    "settingsShares": "My links"
+    "settingsShares": "My links",
+    "tagProblems": "Tagged problems"
   },
   "contests": {
     "title": "Contests",
@@ -1244,6 +1245,7 @@
   },
   "problems": {
     "title": "Problems",
+    "otherJudges": "Problems on other judges",
     "results": "{n} result | {n} results",
     "search": "Code or name",
     "listName": "Problem list",
@@ -3261,5 +3263,52 @@
       "users": "Users"
     },
     "inProblems": "Search the problem list"
+  },
+  "tags": {
+    "title": "Tagged problems",
+    "lead": "Problems from other judges, tagged by topic by our members.",
+    "search": "Search by name or code",
+    "pager": "Tagged problem pages",
+    "empty": "No tagged problems yet.",
+    "emptyFiltered": "No problem matches these filters.",
+    "facts": {
+      "problems": "Problems"
+    },
+    "filters": {
+      "anyTag": "Any tag",
+      "tag": "Tag",
+      "anyJudge": "Any judge",
+      "judge": "Judge"
+    },
+    "table": {
+      "name": "Problem",
+      "tags": "Tags",
+      "judge": "Judge",
+      "caption": "Tagged problems",
+      "more": "+{count}"
+    },
+    "add": {
+      "open": "Add a problem",
+      "title": "Add a problem",
+      "body": "Paste the link to a problem on another judge.",
+      "confirm": "Add",
+      "link": "Link",
+      "linkHint": "For example https://codeforces.com/problemset/problem/1/A",
+      "name": "Name"
+    },
+    "assign": {
+      "label": "Add a tag",
+      "placeholder": "Pick a tag",
+      "submit": "Add tag",
+      "pickFirst": "Pick a tag first"
+    },
+    "detail": {
+      "open": "Open on {judge}",
+      "theJudge": "the judge",
+      "tags": "Tags",
+      "noTags": "No tags yet.",
+      "addedBy": "added by",
+      "addedByGone": "a deleted user"
+    }
   }
 }
