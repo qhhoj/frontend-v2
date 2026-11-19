@@ -21,7 +21,10 @@
     "summary": "{count} ngôn ngữ · {online} máy chấm trực tuyến",
     "summaryNoJudges": "{count} ngôn ngữ",
     "inProblemChip": "Có trong bài mới",
-    "versions": "Máy chạy"
+    "versions": "Máy chạy",
+    "usage": "Mức dùng",
+    "usageProblems": "{count} bài",
+    "usageSubmissions": "{count} lượt nộp trong 30 ngày"
   },
   "empty": "Chưa có ngôn ngữ nào.",
   "form": {

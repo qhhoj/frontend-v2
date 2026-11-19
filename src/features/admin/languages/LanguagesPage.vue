@@ -11,7 +11,7 @@ import { useJudgesQuery } from '../judges/judges.queries';
 import LanguageCoverageNotice from './LanguageCoverageNotice.vue';
 import LanguagesTable from './LanguagesTable.vue';
 import { singleJudgeLanguages, unservedLanguages, withCoverage } from './languages';
-import { useLanguagesAdminQuery } from './languages.queries';
+import { useLanguageUsageQuery, useLanguagesAdminQuery } from './languages.queries';
 
 const { can } = usePermissions();
 const canSeeJudges = computed(() => can('judge.change_judge'));
@@ -19,11 +19,14 @@ const canAdd = computed(() => can('judge.add_language'));
 const canEdit = computed(() => can('judge.change_language'));
 const { data, isPending, error, refetch } = useLanguagesAdminQuery({ enabled: canEdit });
 const judgesQuery = useJudgesQuery({ enabled: canSeeJudges });
+const usageQuery = useLanguageUsageQuery({ enabled: canEdit });
 /** Coverage is shown only once the judges have loaded for a viewer who may read them. */
 const judges = computed(() => (canSeeJudges.value ? (judgesQuery.data.value ?? null) : null));
 /** A failed judges request is said out loud: the coverage column then vanishes, which would otherwise look like a missing permission. */
 const hasJudgesError = computed(() => judgesQuery.isError.value);
-const rows = computed(() => withCoverage(data.value ?? [], judges.value));
+const rows = computed(() =>
+  withCoverage(data.value ?? [], judges.value, usageQuery.data.value ?? null),
+);
 const singles = computed(() => singleJudgeLanguages(rows.value));
 const unserved = computed(() => unservedLanguages(rows.value));
 const onlineJudgeCount = computed(() => judges.value?.filter((judge) => judge.online).length ?? 0);
@@ -56,7 +59,12 @@ const judgeTotal = computed(() => judges.value?.length ?? null);
         :title="$t('admin.languages.judgesUnavailable')"
       />
       <LanguageCoverageNotice :unserved="unserved" :singles="singles" />
-      <LanguagesTable :rows="rows" :judge-total="judgeTotal" :can-edit="canEdit">
+      <LanguagesTable
+        :rows="rows"
+        :judge-total="judgeTotal"
+        :can-edit="canEdit"
+        :shows-usage="Boolean(usageQuery.data.value)"
+      >
         <template #empty>
           <div class="flex flex-col items-center gap-3 px-4 py-8 text-center">
             <AdminBit placement="empty" />
