@@ -35,13 +35,11 @@ export const WRAPPERS = [
   ),
   wrapper('AdminUserLabel', 'features/admin/ui/AdminUserLabel.vue', 'UserLink'),
   wrapper('SettingsNotice', 'features/account/settings/SettingsNotice.vue', 'Notice'),
-  wrapper('AuthNotice', 'features/auth/AuthNotice.vue', 'Notice'),
   wrapper(
     'use-admin-toast',
     'features/admin/ui/feedback/use-admin-toast.ts',
     'useToast (components/ui/use-toast)',
   ),
-  wrapper('admin-toasts', 'features/admin/ui/feedback/admin-toasts.ts', 'components/ui/toasts'),
   wrapper('PillTabs', 'components/PillTabs.vue', 'Tabs'),
   wrapper('SubmissionPager', 'features/submissions/SubmissionPager.vue', 'NumberedPager'),
   wrapper('AuthField', 'features/auth/AuthField.vue', 'FormField with TextInput or PasswordInput'),

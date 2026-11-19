@@ -5,8 +5,6 @@
 // (an unlisted file has none). A file with fewer uses (or a deleted file) is good news, not a failure: lint:tokens
 // prints a notice, and `npm run raw-elements:shrink` (run by `npm run prepush`) rewrites the baselines down to the real
 // counts; it never raises or adds one.
-// scripts/raw-elements.first.json keeps the first baselines; scripts/raw-elements.spec.ts fails when a baseline holds
-// a file or a count the first one does not, so the lists only shrink.
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';

@@ -9,7 +9,3 @@ export const toolbarControlClass = (active: boolean) =>
       ? 'border-accent bg-accent-soft font-medium text-accent-soft-text'
       : 'border-line-strong bg-surface text-content hover:bg-surface-hover'
   }`;
-
-/** A bare text input given the same box as a toolbar control (for forms that lay their own label out): 44 px tall, 16 px text. */
-export const TOOLBAR_INPUT_CLASS =
-  'h-(--qh-control) rounded-row border border-line-control bg-surface px-3.5 text-base text-content placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';

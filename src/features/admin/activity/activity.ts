@@ -3,9 +3,6 @@ import type { LocationQuery } from 'vue-router';
 export const ACTIVITY_DAY_CHOICES = [7, 30, 90] as const;
 export type ActivityDays = (typeof ACTIVITY_DAY_CHOICES)[number];
 
-/** Rows per page of the log and of the live list (the backend's page size). */
-export const ACTIVITY_PAGE_SIZE = 50;
-
 export interface ActivityFilter {
   user: string;
   ip: string;

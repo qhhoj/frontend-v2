@@ -19,8 +19,7 @@ No file may gain a use, and every fix lowers its count.
     wrong area's file.
   - ESLint (`no-restricted-imports`, built from the same baselines) flags a new wrapper import as you type. A file
     listed for one wrapper is still refused the others.
-- **Only shrink:** `scripts/raw-elements.first.json` keeps the first baselines (its hash is pinned: a deliberate edit, such as a rule that now sees more uses, needs the new `sha256sum scripts/raw-elements.first.json` in the spec; the failure message says so).
-  `scripts/raw-elements.spec.ts` fails when a baseline holds a file or a count that the first one does not.
+- **Only shrink:** `npm run raw-elements:shrink` never raises or adds a count; review a baseline diff that grows one.
 - **Not checked:** specs, and the kit for raw elements and PrimeVue (its job); a kit file importing a wrapper (a barrel) counts like any file. Opacity beside a `disabled`/`busy`/`pending` word in the same line counts as `disabled-opacity`; `{ uppercase: x }` counts as `uppercase`.
 - **Bypasses closed:**
   - tags in any letter case (`<BUTTON>` renders a button);
@@ -82,8 +81,6 @@ Uses, then files. The last M lane updates this table; the M lanes before it only
 | `AdminChoiceCards`   | `features/admin/ui/form/ChoiceCards.vue`          | 4 | 4 | `ChoiceCards` (`components/ui`)                          |
 | `PillTabs`           | `components/PillTabs.vue`                         | 9 | 3 | `Tabs`                                                   |
 | `SubmissionPager`    | `features/submissions/SubmissionPager.vue`        | 3 | 3 | `NumberedPager`                                          |
-| `AuthNotice`         | `features/auth/AuthNotice.vue`                    | 3 | 2 | `Notice`                                                 |
-| `admin-toasts`       | `features/admin/ui/feedback/admin-toasts.ts`      | 0 | 0 | `components/ui/toasts`                                   |
 
 A use is each reference to a name the import binds: a tag in either case (`<Badge>`, `<badge>`), a class constant, a
 type. An import whose names are unused counts once, as does each dynamic import or re-export. When the last importer of a
@@ -141,4 +138,4 @@ Whichever lane edits one of those files lowers its count.
 A moved or split file starts with no counts: move its uses to the kit in the same change. Shrink never adds an entry,
 and the spec refuses one the first baselines lack.
 
-Never add a file or raise a count, whether in a baseline or in `raw-elements.first.json`: a new file uses the kit.
+Never add a file or raise a count in a baseline: a new file uses the kit.
