@@ -37,7 +37,8 @@
     "descriptionLabel": "Description (shown to staff)",
     "protocol": "Protocol",
     "features": "Features",
-    "lastIp": "Last IP"
+    "lastIp": "Last IP",
+    "rename": "Rename"
   },
   "runtimes": {
     "caption": "Languages the judge reports",
@@ -80,6 +81,12 @@
     "descriptionHint": "Up to 10,000 characters.",
     "submit": "Create and get key",
     "descriptionTooLong": "Up to 10,000 characters."
+  },
+  "rename": {
+    "title": "Rename {name}",
+    "body": "The judge reconnects only after its config uses the new name. A connected judge, or one with submissions in flight, cannot be renamed.",
+    "label": "New name",
+    "confirm": "Rename judge"
   },
   "delete": {
     "title": "Delete judge {name}?",
@@ -128,6 +135,7 @@
     "unblocked": "{name} unblocked",
     "description": "Description of {name} saved",
     "disconnected": "{name} disconnected",
-    "deleted": "{name} deleted"
+    "deleted": "{name} deleted",
+    "renamed": "{name} renamed to {newName}"
   }
 }

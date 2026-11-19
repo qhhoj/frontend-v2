@@ -14,6 +14,15 @@ export interface LanguageRow extends LanguageAdmin {
   onlineJudges: string[] | null;
   /** The runtime each judge reports for the language. */
   versions: JudgeVersion[] | null;
+  /** `null` until the usage counts load (or when they fail). */
+  usage: LanguageUsage | null;
+}
+
+export interface LanguageUsage {
+  /** Problems that allow the language (deleted ones left out). */
+  problems: number;
+  /** Submissions in it over the last 30 days. */
+  recentSubmissions: number;
 }
 
 /** A connected judge a blocked or disabled flag keeps from taking work does not count as coverage. */
@@ -39,10 +48,25 @@ const judgeNamesRunning = (judges: Judge[], languageKey: string, onlineOnly: boo
     )
     .map((judge) => judge.name);
 
-export const withCoverage = (languages: LanguageAdmin[], judges: Judge[] | null): LanguageRow[] =>
+/** A language absent from the usage answer is unused: zero problems, zero recent submissions. */
+const usageOf = (
+  usage: readonly (LanguageUsage & { languageId: string })[] | null,
+  languageId: string,
+): LanguageUsage | null => {
+  if (!usage) return null;
+  const found = usage.find((entry) => entry.languageId === languageId);
+  return { problems: found?.problems ?? 0, recentSubmissions: found?.recentSubmissions ?? 0 };
+};
+
+export const withCoverage = (
+  languages: LanguageAdmin[],
+  judges: Judge[] | null,
+  usage: readonly (LanguageUsage & { languageId: string })[] | null = null,
+): LanguageRow[] =>
   languages
     .map((language) => ({
       ...language,
+      usage: usageOf(usage, language.id),
       judges: judges && judgeNamesRunning(judges, language.key, false),
       onlineJudges: judges && judgeNamesRunning(judges, language.key, true),
       versions: judges && versionsOf(judges, language.key),

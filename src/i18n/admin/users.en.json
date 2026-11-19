@@ -170,7 +170,16 @@
       "twoFactorDone": "Two-factor sign-in reset.",
       "renamed": "Renamed to {username}.",
       "activated": "Activated {username}.",
-      "deactivated": "Deactivated {username}."
+      "deactivated": "Deactivated {username}.",
+      "social": "Social sign-in",
+      "socialLinked": "Signs in with: {providers}.",
+      "socialNone": "No social sign-in is linked.",
+      "socialRemove": "Remove social sign-in links",
+      "socialDialog": {
+        "title": "Remove the social sign-in links of {username}?",
+        "body": "Google, GitHub and Facebook no longer sign in to this account, and the user is signed out everywhere. A provider can link again only through a verified e-mail that matches the account."
+      },
+      "socialDone": "Social sign-in links removed."
     },
     "sections": {
       "profile": "Profile",

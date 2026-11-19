@@ -21,7 +21,10 @@
     "summary": "{count} languages · {online} judges online",
     "summaryNoJudges": "{count} languages",
     "inProblemChip": "In new problems",
-    "versions": "Run by"
+    "versions": "Run by",
+    "usage": "Usage",
+    "usageProblems": "{count} problems",
+    "usageSubmissions": "{count} submissions in 30 days"
   },
   "empty": "No languages yet.",
   "form": {

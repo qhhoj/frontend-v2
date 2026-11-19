@@ -23,6 +23,7 @@ import CommentGate from './CommentGate.vue';
 import CommentItem from './CommentItem.vue';
 import CommentReportDialog from './CommentReportDialog.vue';
 import CommentRevisionsDialog from './CommentRevisionsDialog.vue';
+import CommentVotesDialog from './CommentVotesDialog.vue';
 import { commentFailureOf } from './comment-failure';
 import type { CommentFailure } from './comment-failure';
 import { flattenInTimeOrder } from './comment-order';
@@ -239,6 +240,13 @@ function showHistory(entry: NumberedComment) {
   isHistoryOpen.value = true;
 }
 
+const votesId = ref<string | null>(null);
+const isVotesOpen = ref(false);
+function showVotes(entry: NumberedComment) {
+  votesId.value = entry.comment.id;
+  isVotesOpen.value = true;
+}
+
 // Another page (or another problem or post) starts clean.
 watch(
   () => [props.type, props.pageKey],
@@ -350,6 +358,7 @@ useCommentJump({
                 @reply="startReply(entry)"
                 @edit="startEdit(entry)"
                 @history="showHistory(entry)"
+                @votes="showVotes(entry)"
                 @hide="askHide(entry)"
                 @unhide="unhide(entry)"
                 @delete="askDelete(entry)"
@@ -446,5 +455,6 @@ useCommentJump({
       v-model:visible="isHistoryOpen"
       :comment-id="historyId"
     />
+    <CommentVotesDialog v-if="votesId" v-model:visible="isVotesOpen" :comment-id="votesId" />
   </section>
 </template>

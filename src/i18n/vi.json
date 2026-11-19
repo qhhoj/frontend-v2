@@ -71,7 +71,8 @@
     "contestProblemBest": "Bài nộp tốt nhất của bài",
     "paste": "Dán mã",
     "share": "Liên kết chia sẻ",
-    "settingsShares": "Liên kết của tôi"
+    "settingsShares": "Liên kết của tôi",
+    "tagProblems": "Bài được gắn thẻ"
   },
   "contests": {
     "title": "Kỳ thi",
@@ -1164,7 +1165,12 @@
     },
     "contestants": "{count} thí sinh",
     "liveEnter": "Vào thi",
-    "liveScore": "{score} điểm"
+    "liveScore": "{score} điểm",
+    "contributors": {
+      "title": "Đóng góp nhiều nhất",
+      "empty": "Chưa có đóng góp nào.",
+      "toBlog": "Đến blog"
+    }
   },
   "problem": {
     "copySample": "Sao chép ví dụ",
@@ -1236,6 +1242,7 @@
   },
   "problems": {
     "title": "Bài tập",
+    "otherJudges": "Bài trên trang chấm khác",
     "results": "{n} kết quả",
     "search": "Mã hoặc tên bài",
     "listName": "Danh sách bài",
@@ -2022,7 +2029,8 @@
       "lock": "Khóa bình luận",
       "unlock": "Mở khóa",
       "report": "Báo cáo",
-      "unhide": "Bỏ ẩn"
+      "unhide": "Bỏ ẩn",
+      "votes": "Ai đã bình chọn"
     },
     "composer": {
       "label": "Viết bình luận",
@@ -2145,7 +2153,14 @@
       "lockedOverride": "Người dùng thường chỉ đọc được; bạn vẫn bình luận được nhờ quyền vượt khóa.",
       "lockedBody": "Người dùng thường chỉ đọc được."
     },
-    "unhideFailed": "Không bỏ ẩn được bình luận. Hãy thử lại."
+    "unhideFailed": "Không bỏ ẩn được bình luận. Hãy thử lại.",
+    "votes": {
+      "title": "Ai đã bình chọn",
+      "count": "{up} lên · {down} xuống",
+      "loading": "Đang tải lượt bình chọn…",
+      "none": "Chưa có bình chọn.",
+      "gone": "Tài khoản đã xóa"
+    }
   },
   "tickets": {
     "lead": "Báo lỗi đề bài, test sai hoặc sự cố trên trang. Quản trị viên sẽ trả lời tại đây.",
@@ -3245,5 +3260,52 @@
       "users": "Người dùng"
     },
     "inProblems": "Tìm trong danh sách bài tập"
+  },
+  "tags": {
+    "title": "Bài được gắn thẻ",
+    "lead": "Bài từ các trang chấm khác, được thành viên gắn thẻ theo chủ đề.",
+    "search": "Tìm theo tên hoặc mã",
+    "pager": "Các trang bài được gắn thẻ",
+    "empty": "Chưa có bài nào được gắn thẻ.",
+    "emptyFiltered": "Không có bài nào khớp bộ lọc.",
+    "facts": {
+      "problems": "Bài"
+    },
+    "filters": {
+      "anyTag": "Mọi thẻ",
+      "tag": "Thẻ",
+      "anyJudge": "Mọi trang chấm",
+      "judge": "Trang chấm"
+    },
+    "table": {
+      "name": "Bài",
+      "tags": "Thẻ",
+      "judge": "Trang chấm",
+      "caption": "Bài được gắn thẻ",
+      "more": "+{count}"
+    },
+    "add": {
+      "open": "Thêm bài",
+      "title": "Thêm bài",
+      "body": "Dán đường dẫn tới một bài trên trang chấm khác.",
+      "confirm": "Thêm",
+      "link": "Đường dẫn",
+      "linkHint": "Ví dụ https://codeforces.com/problemset/problem/1/A",
+      "name": "Tên"
+    },
+    "assign": {
+      "label": "Thêm thẻ",
+      "placeholder": "Chọn một thẻ",
+      "submit": "Thêm thẻ",
+      "pickFirst": "Hãy chọn một thẻ trước"
+    },
+    "detail": {
+      "open": "Mở trên {judge}",
+      "theJudge": "trang chấm",
+      "tags": "Thẻ",
+      "noTags": "Chưa có thẻ nào.",
+      "addedBy": "thêm bởi",
+      "addedByGone": "một người dùng đã xóa"
+    }
   }
 }

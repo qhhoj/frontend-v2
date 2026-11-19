@@ -10,9 +10,15 @@ import type { LanguageRow } from './languages';
 
 /**
  * The languages list. With the judges loaded (`judgeTotal` not null) it adds the coverage column: "5 / 5" judges, a meter that
- * repeats that text, the online count, and the judges behind it. Below 768 px each language is a card.
+ * repeats that text, the online count, and the judges behind it. With the usage counts loaded it adds how many problems allow
+ * each language and its submissions over 30 days. Below 768 px each language is a card.
  */
-const props = defineProps<{ rows: LanguageRow[]; judgeTotal: number | null; canEdit: boolean }>();
+const props = defineProps<{
+  rows: LanguageRow[];
+  judgeTotal: number | null;
+  canEdit: boolean;
+  showsUsage: boolean;
+}>();
 const { t } = useI18n();
 
 const columns = computed<AdminColumn[]>(() => [
@@ -20,6 +26,11 @@ const columns = computed<AdminColumn[]>(() => [
   { key: 'inProblem', label: t('admin.languages.table.inProblem'), priority: 'badge' },
   { key: 'name', label: t('admin.languages.table.name') },
   { key: 'extension', label: t('admin.languages.table.extension') },
+  ...(props.showsUsage
+    ? ([
+        { key: 'usage', label: t('admin.languages.table.usage'), priority: 'meta' },
+      ] satisfies AdminColumn[])
+    : []),
   ...(props.judgeTotal === null
     ? []
     : ([
@@ -64,6 +75,14 @@ const percentOf = (count: number) =>
     </template>
     <template #cell-extension="{ row }">
       <span class="font-mono">.{{ row.extension }}</span>
+    </template>
+    <template #cell-usage="{ row }">
+      <span v-if="row.usage" class="inline-flex flex-col tabular-nums">
+        <span>{{ $t('admin.languages.table.usageProblems', { count: row.usage.problems }) }}</span>
+        <span class="text-muted">{{
+          $t('admin.languages.table.usageSubmissions', { count: row.usage.recentSubmissions })
+        }}</span>
+      </span>
     </template>
     <template #cell-coverage="{ row }">
       <span class="inline-flex flex-wrap items-center gap-x-2 gap-y-1">

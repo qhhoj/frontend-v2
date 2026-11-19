@@ -5,6 +5,7 @@ import type { Judge } from '@/api/types/judges-admin';
 import AdminStatus from '../ui/AdminStatus.vue';
 import { failureTextOf } from '../ui/admin-errors';
 import DisconnectDialog from './DisconnectDialog.vue';
+import RenameJudgeDialog from './RenameJudgeDialog.vue';
 import type { JudgeDialog } from './judge-actions';
 import { useJudgeWrites } from './judges.mutations';
 import { JUDGE_SEARCH_ID, useJudgesCache } from './judges.queries';
@@ -30,6 +31,7 @@ const isOpen = (dialog: JudgeDialog) =>
 const isBlockOpen = isOpen('block');
 const isRotateOpen = isOpen('rotate');
 const isDisconnectOpen = isOpen('disconnect');
+const isRenameOpen = isOpen('rename');
 const isDeleteOpen = isOpen('delete');
 
 /** A dialog opens on a clean slate: a refusal from an earlier attempt must not repeat inside it. */
@@ -37,6 +39,7 @@ watch(open, (dialog) => {
   if (dialog === 'block') writes.patch.reset();
   if (dialog === 'rotate') writes.rotate.reset();
   if (dialog === 'disconnect') writes.disconnect.reset();
+  if (dialog === 'rename') writes.rename.reset();
   if (dialog === 'delete') writes.remove.reset();
 });
 
@@ -54,6 +57,10 @@ async function disconnect(force: boolean) {
   await writes.disconnect.run({ name: name.value, force });
   if (writes.disconnect.isDone.value) open.value = null;
 }
+async function rename(newName: string) {
+  await writes.rename.run({ name: name.value, newName });
+  if (writes.rename.isDone.value) open.value = null;
+}
 /** The dialog closes first, then the row leaves the list; focus goes to the search box. */
 async function remove() {
   const judgeName = name.value;
@@ -66,6 +73,9 @@ async function remove() {
 const searchBox = () => document.getElementById(JUDGE_SEARCH_ID);
 const disconnectFailure = computed(() =>
   writes.disconnect.failure.value ? failureTextOf(writes.disconnect.failure.value) : null,
+);
+const renameFailure = computed(() =>
+  writes.rename.failure.value ? failureTextOf(writes.rename.failure.value) : null,
 );
 </script>
 
@@ -101,6 +111,13 @@ const disconnectFailure = computed(() =>
     :is-busy="writes.disconnect.isPending.value"
     :failure-text="disconnectFailure"
     @confirm="disconnect"
+  />
+  <RenameJudgeDialog
+    v-model:visible="isRenameOpen"
+    :judge-name="name"
+    :is-busy="writes.rename.isPending.value"
+    :failure-text="renameFailure"
+    @confirm="rename"
   />
   <ConfirmDialog
     v-model:visible="isDeleteOpen"

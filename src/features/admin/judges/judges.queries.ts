@@ -38,6 +38,9 @@ export function useJudgesCache() {
     replace: (judge: Judge) =>
       writeList((list) => list.map((item) => (item.name === judge.name ? judge : item))),
     add: (judge: Judge) => writeList((list) => [...list, judge]),
+    /** The renamed judge takes its old row's place. */
+    rename: (oldName: string, judge: Judge) =>
+      writeList((list) => list.map((item) => (item.name === oldName ? judge : item))),
     remove: (name: string) => writeList((list) => list.filter((item) => item.name !== name)),
   };
 }

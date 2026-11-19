@@ -170,7 +170,16 @@
       "twoFactorDone": "Đã đặt lại xác thực hai bước.",
       "renamed": "Đã đổi tên thành {username}.",
       "activated": "Đã kích hoạt {username}.",
-      "deactivated": "Đã vô hiệu hóa {username}."
+      "deactivated": "Đã vô hiệu hóa {username}.",
+      "social": "Đăng nhập mạng xã hội",
+      "socialLinked": "Đăng nhập bằng: {providers}.",
+      "socialNone": "Chưa liên kết đăng nhập mạng xã hội nào.",
+      "socialRemove": "Gỡ liên kết đăng nhập mạng xã hội",
+      "socialDialog": {
+        "title": "Gỡ liên kết đăng nhập mạng xã hội của {username}?",
+        "body": "Google, GitHub và Facebook không còn đăng nhập được vào tài khoản này, và người dùng bị đăng xuất khỏi mọi phiên. Nhà cung cấp chỉ liên kết lại được qua e-mail đã xác minh khớp với tài khoản."
+      },
+      "socialDone": "Đã gỡ liên kết đăng nhập mạng xã hội."
     },
     "sections": {
       "profile": "Hồ sơ",

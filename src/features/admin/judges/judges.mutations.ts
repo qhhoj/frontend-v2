@@ -1,4 +1,10 @@
-import { deleteJudge, disconnectJudge, rotateJudgeKey, updateJudge } from '@/api/judges-admin.api';
+import {
+  deleteJudge,
+  disconnectJudge,
+  renameJudge,
+  rotateJudgeKey,
+  updateJudge,
+} from '@/api/judges-admin.api';
 import type { Judge, JudgePatch } from '@/api/types/judges-admin';
 import { translate } from '@/i18n';
 import { useAdminMutation } from '../ui/use-admin-mutation';
@@ -29,10 +35,16 @@ export function useJudgeWrites() {
     mutate: ({ name, force }) => disconnectJudge(name, force),
     successText: (_result, { name }) => translate('admin.judges.toast.disconnected', { name }),
   });
+  const rename = useAdminMutation<{ name: string; newName: string }, Judge>({
+    mutate: ({ name, newName }) => renameJudge(name, newName),
+    onDone: (judge, { name }) => cache.rename(name, judge),
+    successText: (judge, { name }) =>
+      translate('admin.judges.toast.renamed', { name, newName: judge.name }),
+  });
   /** The page drops the judge from the cache once its dialog has closed. */
   const remove = useAdminMutation<string, void>({
     mutate: (name) => deleteJudge(name),
     successText: (_result, name) => translate('admin.judges.toast.deleted', { name }),
   });
-  return { patch, rotate, disconnect, remove };
+  return { patch, rotate, disconnect, rename, remove };
 }

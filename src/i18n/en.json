@@ -71,7 +71,8 @@
     "contestProblemBest": "Best submissions of a problem",
     "paste": "Paste code",
     "share": "Shared link",
-    "settingsShares": "My links"
+    "settingsShares": "My links",
+    "tagProblems": "Tagged problems"
   },
   "contests": {
     "title": "Contests",
@@ -1168,7 +1169,12 @@
     },
     "contestants": "{count} contestants",
     "liveEnter": "Enter contest",
-    "liveScore": "{score} points"
+    "liveScore": "{score} points",
+    "contributors": {
+      "title": "Top contributors",
+      "empty": "No contributions yet.",
+      "toBlog": "Go to the blog"
+    }
   },
   "problem": {
     "copySample": "Copy sample",
@@ -1240,6 +1246,7 @@
   },
   "problems": {
     "title": "Problems",
+    "otherJudges": "Problems on other judges",
     "results": "{n} result | {n} results",
     "search": "Code or name",
     "listName": "Problem list",
@@ -2026,7 +2033,8 @@
       "lock": "Lock comments",
       "unlock": "Unlock",
       "report": "Report",
-      "unhide": "Unhide"
+      "unhide": "Unhide",
+      "votes": "Who voted"
     },
     "composer": {
       "label": "Write a comment",
@@ -2149,7 +2157,14 @@
       "lockedOverride": "Other users can only read; you can still comment with the lock override.",
       "lockedBody": "Other users can only read."
     },
-    "unhideFailed": "Could not unhide the comment. Try again."
+    "unhideFailed": "Could not unhide the comment. Try again.",
+    "votes": {
+      "title": "Who voted",
+      "count": "{up} up · {down} down",
+      "loading": "Loading votes…",
+      "none": "No votes.",
+      "gone": "Deleted account"
+    }
   },
   "tickets": {
     "lead": "Report statement mistakes, wrong tests or site problems. Staff answer here.",
@@ -3249,5 +3264,52 @@
       "users": "Users"
     },
     "inProblems": "Search the problem list"
+  },
+  "tags": {
+    "title": "Tagged problems",
+    "lead": "Problems from other judges, tagged by topic by our members.",
+    "search": "Search by name or code",
+    "pager": "Tagged problem pages",
+    "empty": "No tagged problems yet.",
+    "emptyFiltered": "No problem matches these filters.",
+    "facts": {
+      "problems": "Problems"
+    },
+    "filters": {
+      "anyTag": "Any tag",
+      "tag": "Tag",
+      "anyJudge": "Any judge",
+      "judge": "Judge"
+    },
+    "table": {
+      "name": "Problem",
+      "tags": "Tags",
+      "judge": "Judge",
+      "caption": "Tagged problems",
+      "more": "+{count}"
+    },
+    "add": {
+      "open": "Add a problem",
+      "title": "Add a problem",
+      "body": "Paste the link to a problem on another judge.",
+      "confirm": "Add",
+      "link": "Link",
+      "linkHint": "For example https://codeforces.com/problemset/problem/1/A",
+      "name": "Name"
+    },
+    "assign": {
+      "label": "Add a tag",
+      "placeholder": "Pick a tag",
+      "submit": "Add tag",
+      "pickFirst": "Pick a tag first"
+    },
+    "detail": {
+      "open": "Open on {judge}",
+      "theJudge": "the judge",
+      "tags": "Tags",
+      "noTags": "No tags yet.",
+      "addedBy": "added by",
+      "addedByGone": "a deleted user"
+    }
   }
 }

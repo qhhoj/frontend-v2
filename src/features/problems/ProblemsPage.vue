@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import type { PageFact } from '@/components/ui/PageHeader.vue';
 import PageLayout from '@/components/ui/PageLayout.vue';
@@ -115,7 +116,10 @@ function prefetchRow(event: Event) {
   <PageLayout>
     <template #header>
       <PageHeader :title="$t('problems.title')" :facts="facts">
-        <template #actions><CreateShortcut kind="problem" /></template>
+        <template #actions>
+          <AppButton to="/tags">{{ $t('problems.otherJudges') }}</AppButton>
+          <CreateShortcut kind="problem" />
+        </template>
       </PageHeader>
     </template>
     <template #toolbar>

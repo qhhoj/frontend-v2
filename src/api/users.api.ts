@@ -21,6 +21,9 @@ export const fetchRatingHistory = (username: string): Promise<RatingHistoryEntry
   apiGet('/users/{username}/ratings', { path: { username } });
 export const fetchLeaderboard = (query: LeaderboardQuery): Promise<Page<LeaderboardEntry>> =>
   apiGetPage('/users', { query });
+/** Users ranked by contribution points (the board's entry shape). */
+export const fetchContributors = (query: { page?: number; pageSize?: number }) =>
+  apiGetPage('/contributors', { query });
 export const fetchRank = (username: string, field: RankField): Promise<RankResponse> =>
   apiGet('/users/{username}/rank', { path: { username }, query: { sort: field } });
 export const fetchSolved = (username: string): Promise<SolvedResponse> =>

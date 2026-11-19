@@ -12,11 +12,12 @@ import LiveContestCard from './LiveContestCard.vue';
 import MyProblemsCard from './MyProblemsCard.vue';
 import NewPostsCard from './NewPostsCard.vue';
 import RecentSubmissionsList from './RecentSubmissionsList.vue';
+import TopContributorsCard from './TopContributorsCard.vue';
 
 /**
  * The home is a dashboard of two columns: the wide one holds what the viewer reads (recent submissions, then posts), the narrow one
  * what they act on (staff: "Bài của tôi" and its create link; then the contests, and for a student "Làm tiếp"). A visitor sees posts
- * beside contests. On a phone the columns dissolve into one list in the order mine, submissions, contests / continue, posts.
+ * beside contests. Both see the top contributors under the contests. On a phone the columns dissolve into one list in the order mine, submissions, contests / continue, posts.
  */
 const session = useSessionStore();
 const { canAny } = usePermissions();
@@ -45,6 +46,7 @@ const SIDE = 'max-lg:contents lg:flex lg:flex-col lg:gap-(--space-section)';
         <div class="flex flex-col gap-(--space-section) max-lg:order-3">
           <ContestsCard :exclude-key="current?.contest.key" />
           <ContinueCard v-if="!canEditProblems()" :username="session.user.username" />
+          <TopContributorsCard />
         </div>
       </div>
     </div>
@@ -53,7 +55,10 @@ const SIDE = 'max-lg:contents lg:flex lg:flex-col lg:gap-(--space-section)';
     <template #header><AnonymousHeader /></template>
     <div :class="COLUMNS">
       <div :class="MAIN"><NewPostsCard /></div>
-      <div :class="SIDE"><ContestsCard /></div>
+      <div :class="SIDE">
+        <ContestsCard />
+        <TopContributorsCard />
+      </div>
     </div>
   </PageLayout>
 </template>

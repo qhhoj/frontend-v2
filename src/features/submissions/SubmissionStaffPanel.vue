@@ -7,6 +7,7 @@ import { abortSubmission, rejectSubmission, rejudgeSubmission } from '@/api/subm
 import type { SubmissionDetail } from '@/api/types/submissions';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import SubmissionLockControl from './SubmissionLockControl.vue';
+import SubmissionScoreOverride from './SubmissionScoreOverride.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Notice from '@/components/ui/Notice.vue';
 import { failureTextOf, hasIssueCode } from '@/features/admin/ui/admin-errors';
@@ -50,7 +51,9 @@ const actions = computed(() => staffActionsFor(props.submission, can, now.value)
 const isVisible = computed(
   () =>
     holdsAnyStaffPermission(can) &&
-    (hasAnyStaffAction(actions.value) || props.submission.viewer.canLock),
+    (hasAnyStaffAction(actions.value) ||
+      props.submission.viewer.canLock ||
+      props.submission.viewer.canOverrideScore),
 );
 /** The board's order: a judging submission offers abort first, a finished one rejudge first. */
 const order = computed<StaffAction[]>(() =>
@@ -200,6 +203,7 @@ async function confirmAction() {
     </ul>
 
     <SubmissionLockControl v-if="submission.viewer.canLock" :submission="submission" />
+    <SubmissionScoreOverride v-if="submission.viewer.canOverrideScore" :submission="submission" />
 
     <Notice v-if="outcome" :tone="outcome.kind === 'done' ? 'success' : 'danger'">{{
       outcome.text

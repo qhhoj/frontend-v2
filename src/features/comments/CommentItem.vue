@@ -48,6 +48,7 @@ const emit = defineEmits<{
   reply: [];
   edit: [];
   history: [];
+  votes: [];
   hide: [];
   unhide: [];
   delete: [];
@@ -85,7 +86,7 @@ const hiderName = computed(() => comment.value.hiddenBy?.username ?? null);
 const authorName = computed(() => comment.value.author?.username ?? t('comments.deletedAccount'));
 const send = (score: VoteScore) => voteComment(comment.value.id, score);
 
-/** Edit, history (a deleted comment's only for moderators: its history holds the deleted text), report and the moderators' hide or unhide, then delete last. */
+/** Edit, history (a deleted comment's only for moderators: its history holds the deleted text), the moderators' list of voters, report and the moderators' hide or unhide, then delete last. */
 const menuItems = computed<RowMenuItem[]>(() => {
   const shown = comment.value;
   const items: RowMenuItem[] = [];
@@ -97,6 +98,8 @@ const menuItems = computed<RowMenuItem[]>(() => {
       label: t('comments.action.history', { count: shown.revisions }),
       run: () => emit('history'),
     });
+  if (props.moderates && shown.score !== 0)
+    items.push({ label: t('comments.action.votes'), run: () => emit('votes') });
   if (props.canReport && !shown.deleted && !shown.hidden)
     items.push({ label: t('comments.action.report'), run: () => emit('report') });
   if (props.moderates)
