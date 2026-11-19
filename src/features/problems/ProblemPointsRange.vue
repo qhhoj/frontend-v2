@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue';
-import { PROBLEM_LIMITS } from '@/features/admin/problems/general/problem-form';
+import { PROBLEM_LIMITS } from './problem-limits';
 import { translate } from '@/i18n';
 import TextInput from '@/components/ui/TextInput.vue';
 

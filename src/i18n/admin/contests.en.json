@@ -334,26 +334,6 @@
     "rejudgeLine": "Rejudge or rescore one problem:",
     "rejudgeLink": "Actions tab."
   },
-  "announcements": {
-    "composeTitle": "Post an announcement",
-    "titleLabel": "Title",
-    "titleHint": "At most 100 characters.",
-    "bodyLabel": "Body (Markdown)",
-    "pushOn": "Also pushed over the live channel.",
-    "pushOff": "Not pushed over the live channel. Turn it on in the General tab.",
-    "post": "Post announcement",
-    "posted": "Posted.",
-    "justPosted": "Just posted",
-    "resend": "Resend to those not reached",
-    "resent": "Resent to those not reached.",
-    "deleteTitle": "Delete announcement “{title}”?",
-    "deleteBody": "Participants will no longer see this announcement.",
-    "empty": "No announcements yet.",
-    "pager": "{total} announcements · page {page} of {pages}",
-    "pagerLabel": "Announcement pages",
-    "listLabel": "Posted announcements",
-    "titleError": "The title must be 1 to 100 characters."
-  },
   "ranking": {
     "official": {
       "title": "Official ranking",

@@ -334,26 +334,6 @@
     "rejudgeLine": "Chấm lại hoặc tính lại điểm một bài:",
     "rejudgeLink": "tab Thao tác."
   },
-  "announcements": {
-    "composeTitle": "Đăng thông báo",
-    "titleLabel": "Tiêu đề",
-    "titleHint": "Tối đa 100 ký tự.",
-    "bodyLabel": "Nội dung (Markdown)",
-    "pushOn": "Đã bật gửi qua kênh trực tiếp.",
-    "pushOff": "Chưa bật gửi qua kênh trực tiếp. Bật ở tab Thông tin chung.",
-    "post": "Đăng thông báo",
-    "posted": "Đã đăng.",
-    "justPosted": "Vừa đăng",
-    "resend": "Gửi lại cho những người chưa nhận được",
-    "resent": "Đã gửi lại cho những người chưa nhận được.",
-    "deleteTitle": "Xóa thông báo “{title}”?",
-    "deleteBody": "Thí sinh không còn thấy thông báo này.",
-    "empty": "Chưa có thông báo nào.",
-    "pager": "{total} thông báo · trang {page} của {pages}",
-    "pagerLabel": "Trang thông báo",
-    "listLabel": "Các thông báo đã đăng",
-    "titleError": "Tiêu đề từ 1 đến 100 ký tự."
-  },
   "ranking": {
     "official": {
       "title": "Bảng xếp hạng chính thức",

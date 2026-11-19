@@ -192,13 +192,6 @@
       "kept": "Kept: code, points, group, types, authors, curators, allowed languages (except the fields you fill in QHHOJ settings).",
       "lost": "Edits to the items above made on QHHOJ will be lost.",
       "confirm": "Overwrite {code} and import"
-    },
-    "refusal": {
-      "statement_language_required": "Pick the main statement among: {languages}.",
-      "statement_language_unmapped": "Pick a QHHOJ language or Skip for the {language} statement.",
-      "statement_language_repeated": "Two statements are {language}: pick another language or Skip.",
-      "tutorial_language_required": "Pick the editorial among: {languages}.",
-      "too_many_testcases": "The problem has {count} tests, over your limit of {limit}."
     }
   },
   "progress": {

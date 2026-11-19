@@ -124,13 +124,5 @@
       "user": "Chỉ {value}"
     },
     "tiebreakerOf": "Phân định hòa: {value}"
-  },
-  "announcements": {
-    "editNote": "Bản sửa giữ nguyên thời gian đăng và không được gửi lại. Dùng gửi lại để thông báo.",
-    "previewLabel": "Xem trước",
-    "previewEmpty": "Chưa có gì để xem trước.",
-    "more": "Thao tác khác với thông báo “{title}”",
-    "deleted": "Đã xóa thông báo “{title}”.",
-    "saved": "Đã lưu thông báo."
   }
 }

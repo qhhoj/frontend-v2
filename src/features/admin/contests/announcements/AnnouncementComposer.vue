@@ -16,7 +16,7 @@ const emit = defineEmits<{ posted: [announcement: Announcement] }>();
 const { title, description, post, errors, submit } = useAnnouncementComposer(
   toRef(props, 'contestKey'),
   {
-    successText: () => translate('admin.contests.announcements.posted'),
+    successText: () => translate('admin.announcements.posted'),
     onPosted: (created) => emit('posted', created),
   },
 );
@@ -31,13 +31,13 @@ const { title, description, post, errors, submit } = useAnnouncementComposer(
     <header class="flex items-center gap-3">
       <AdminBit placement="composing" />
       <h2 :id="COMPOSE_HEADING_ID" tabindex="-1" class="m-0 text-base font-semibold">
-        {{ $t('admin.contests.announcements.composeTitle') }}
+        {{ $t('admin.announcements.composeTitle') }}
       </h2>
     </header>
     <AdminField
       input-id="announcement-title"
-      :label="$t('admin.contests.announcements.titleLabel')"
-      :hint="$t('admin.contests.announcements.titleHint')"
+      :label="$t('admin.announcements.titleLabel')"
+      :hint="$t('admin.announcements.titleHint')"
       :error="errors.title"
     >
       <template #default="{ id, describedBy, invalid }">
@@ -52,7 +52,7 @@ const { title, description, post, errors, submit } = useAnnouncementComposer(
     </AdminField>
     <AdminField
       input-id="announcement-body"
-      :label="$t('admin.contests.announcements.bodyLabel')"
+      :label="$t('admin.announcements.bodyLabel')"
       :error="errors.description"
     >
       <template #default="{ id, describedBy, invalid }">
@@ -74,8 +74,8 @@ const { title, description, post, errors, submit } = useAnnouncementComposer(
     <p class="m-0 text-sm text-muted">
       {{
         isPushedLive
-          ? $t('admin.contests.announcements.pushOn')
-          : $t('admin.contests.announcements.pushOff')
+          ? $t('admin.announcements.pushOn')
+          : $t('admin.announcements.pushOff')
       }}
     </p>
     <div class="flex flex-wrap items-center gap-3">
@@ -84,7 +84,7 @@ const { title, description, post, errors, submit } = useAnnouncementComposer(
         :class="buttonClass('primary')"
         :aria-busy="post.isPending.value || undefined"
       >
-        {{ $t('admin.contests.announcements.post') }}
+        {{ $t('admin.announcements.post') }}
       </button>
       <AdminStatus
         v-if="post.failure.value"

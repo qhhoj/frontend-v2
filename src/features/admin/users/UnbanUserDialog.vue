@@ -19,7 +19,7 @@ const queryClient = useQueryClient();
 
 const unban = useAdminMutation({
   mutate: (username: string) => unbanUser(username),
-  successText: (_result, username) => t('admin.users.moderation.unbanned', { username }),
+  successText: (_result, username) => t('admin.moderation.unbanned', { username }),
   onDone: (_result, username) => {
     visible.value = false;
     void invalidateUserModeration(queryClient, username);
@@ -31,16 +31,16 @@ watch(visible, (shown) => {
 const refusal = computed(() => {
   const error = unban.failure.value;
   if (error === null) return null;
-  return isConflict(error) ? t('admin.users.moderation.notBanned') : failureTextOf(error);
+  return isConflict(error) ? t('admin.moderation.notBanned') : failureTextOf(error);
 });
 </script>
 
 <template>
   <ConfirmDialog
     v-model:visible="visible"
-    :title="$t('admin.users.moderation.unbanDialog.title', { username })"
-    :body="$t('admin.users.moderation.unbanDialog.body')"
-    :confirm-label="$t('admin.users.moderation.banned.unban')"
+    :title="$t('admin.moderation.unbanDialog.title', { username })"
+    :body="$t('admin.moderation.unbanDialog.body')"
+    :confirm-label="$t('admin.moderation.banned.unban')"
     :busy="unban.isPending.value"
     @confirm="unban.run(props.username)"
   >

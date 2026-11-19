@@ -1,7 +1,6 @@
 {
   "title": "Import a .zip file",
   "lead": "Upload a Polygon package as a .zip and follow the import.",
-  "rateLimited": "At most 10 imports per hour.",
   "form": {
     "board": "Import a Polygon package",
     "drop": "Drop the .zip package here",

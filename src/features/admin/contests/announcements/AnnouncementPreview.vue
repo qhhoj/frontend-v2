@@ -14,15 +14,15 @@ const preview = useDebouncedPreview(
 
 <template>
   <section
-    :aria-label="$t('admin.contestOps.announcements.previewLabel')"
+    :aria-label="$t('admin.announcements.previewLabel')"
     class="flex flex-col gap-1.5"
     :aria-busy="preview.isUpdating.value || undefined"
   >
-    <p class="text-sm font-semibold">{{ $t('admin.contestOps.announcements.previewLabel') }}</p>
+    <p class="text-sm font-semibold">{{ $t('admin.announcements.previewLabel') }}</p>
     <div class="min-h-24 rounded-cell border border-line bg-surface-strong p-4">
       <UserContent v-if="preview.html.value" :html="preview.html.value" />
       <p v-else class="text-sm text-muted">
-        {{ $t('admin.contestOps.announcements.previewEmpty') }}
+        {{ $t('admin.announcements.previewEmpty') }}
       </p>
     </div>
     <p v-if="preview.isRateLimited.value" class="text-caption leading-4 text-negative">

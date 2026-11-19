@@ -27,7 +27,7 @@ const isBanned = computed(() => isBannedPage(props.user));
 
 const ban = useAdminMutation({
   mutate: (vars: { username: string; reason: string }) => banUser(vars.username, vars.reason),
-  successText: (_result, vars) => t('admin.users.moderation.done', { username: vars.username }),
+  successText: (_result, vars) => t('admin.moderation.done', { username: vars.username }),
   onDone: (_result, vars) => {
     void invalidateUserModeration(queryClient, vars.username);
   },
@@ -40,13 +40,13 @@ const reasonError = computed(
 const banRefusal = computed(() => {
   const error = ban.failure.value;
   if (error === null || Object.keys(ban.fieldErrors.value).length > 0) return null;
-  return isConflict(error) ? t('admin.users.moderation.alreadyBanned') : failureTextOf(error);
+  return isConflict(error) ? t('admin.moderation.alreadyBanned') : failureTextOf(error);
 });
 
 const banReasonText = (problem: 'required' | 'tooLong') =>
   problem === 'required'
-    ? t('admin.users.moderation.reasonRequired')
-    : t('admin.users.moderation.reasonTooLong');
+    ? t('admin.moderation.reasonRequired')
+    : t('admin.moderation.reasonTooLong');
 
 /** An empty reason marks the box and opens nothing; a valid one asks for the confirm. */
 function requestBan() {
@@ -65,14 +65,14 @@ async function confirmBan() {
 <template>
   <UserDangerRow
     v-if="!isBanned"
-    :title="$t('admin.users.moderation.title')"
-    :text="$t('admin.users.moderation.banDialog.body')"
+    :title="$t('admin.moderation.title')"
+    :text="$t('admin.moderation.banDialog.body')"
   >
     <template #body>
       <AdminField
         v-slot="{ id, describedBy, invalid }"
-        :label="$t('admin.users.moderation.reasonLabel')"
-        :hint="$t('admin.users.moderation.reasonHint')"
+        :label="$t('admin.moderation.reasonLabel')"
+        :hint="$t('admin.moderation.reasonHint')"
         :error="reasonError"
         input-id="ban-reason"
       >
@@ -86,7 +86,7 @@ async function confirmBan() {
         />
       </AdminField>
       <button type="button" :class="BUTTON.danger" class="self-start" @click="requestBan">
-        {{ $t('admin.users.moderation.ban') }}
+        {{ $t('admin.moderation.ban') }}
       </button>
     </template>
     <template #status>
@@ -95,11 +95,11 @@ async function confirmBan() {
   </UserDangerRow>
   <UserDangerRow
     v-else
-    :title="$t('admin.users.moderation.banned.title')"
+    :title="$t('admin.moderation.banned.title')"
     :text="
       user.staff?.banReason
-        ? $t('admin.users.moderation.banned.reason', { reason: user.staff.banReason })
-        : $t('admin.users.moderation.banned.noReason')
+        ? $t('admin.moderation.banned.reason', { reason: user.staff.banReason })
+        : $t('admin.moderation.banned.noReason')
     "
   >
     <button
@@ -108,19 +108,19 @@ async function confirmBan() {
       :class="BUTTON.secondary"
       @click="isUnbanOpen = true"
     >
-      {{ $t('admin.users.moderation.banned.unban') }}
+      {{ $t('admin.moderation.banned.unban') }}
     </button>
     <template #status>
       <p class="text-caption leading-4 text-muted">
-        {{ $t('admin.users.moderation.banned.unbanHint') }}
+        {{ $t('admin.moderation.banned.unbanHint') }}
       </p>
     </template>
   </UserDangerRow>
   <ConfirmDialog
     v-model:visible="isConfirmOpen"
-    :title="$t('admin.users.moderation.banDialog.title', { username: user.username })"
-    :body="$t('admin.users.moderation.banDialog.body')"
-    :confirm-label="$t('admin.users.moderation.banDialog.confirm')"
+    :title="$t('admin.moderation.banDialog.title', { username: user.username })"
+    :body="$t('admin.moderation.banDialog.body')"
+    :confirm-label="$t('admin.moderation.banDialog.confirm')"
     tone="danger"
     :busy="ban.isPending.value"
     @confirm="confirmBan"

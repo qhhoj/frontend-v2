@@ -33,7 +33,7 @@ const save = useAdminMutation({
     ['admin', 'contest-announcements', props.contestKey],
     ['contests', 'announcements'],
   ],
-  successText: () => translate('admin.contestOps.announcements.saved'),
+  successText: () => translate('admin.announcements.saved'),
   onDone: () => emit('close'),
 });
 </script>
@@ -42,7 +42,7 @@ const save = useAdminMutation({
   <form class="flex flex-col gap-4" @submit.prevent="save.run(undefined)">
     <AdminField
       :input-id="`announcement-edit-title-${announcement.id}`"
-      :label="$t('admin.contests.announcements.titleLabel')"
+      :label="$t('admin.announcements.titleLabel')"
       :error="save.fieldErrors.value.title"
     >
       <template #default="{ id, describedBy, invalid }">
@@ -57,7 +57,7 @@ const save = useAdminMutation({
     </AdminField>
     <AdminField
       :input-id="`announcement-edit-body-${announcement.id}`"
-      :label="$t('admin.contests.announcements.bodyLabel')"
+      :label="$t('admin.announcements.bodyLabel')"
       :error="save.fieldErrors.value.description"
     >
       <template #default="{ id, describedBy, invalid }">
@@ -72,7 +72,7 @@ const save = useAdminMutation({
       </template>
     </AdminField>
     <AnnouncementPreview :contest-key="contestKey" :markdown="description" />
-    <p class="m-0 text-sm text-muted">{{ $t('admin.contestOps.announcements.editNote') }}</p>
+    <p class="m-0 text-sm text-muted">{{ $t('admin.announcements.editNote') }}</p>
     <div class="flex flex-wrap items-center gap-3">
       <button
         type="submit"

@@ -54,7 +54,7 @@ watch(data, (answer) => {
     />
     <section
       class="flex min-w-0 flex-col gap-3"
-      :aria-label="$t('admin.contests.announcements.listLabel')"
+      :aria-label="$t('admin.announcements.listLabel')"
     >
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
@@ -65,7 +65,7 @@ watch(data, (answer) => {
           </div>
         </template>
         <EmptyState v-if="items.length === 0">{{
-          $t('admin.contests.announcements.empty')
+          $t('admin.announcements.empty')
         }}</EmptyState>
         <template v-else>
           <AnnouncementItem
@@ -78,12 +78,12 @@ watch(data, (answer) => {
           />
           <footer class="flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
             <span>{{
-              $t('admin.contests.announcements.pager', { total, page, pages: pageCount })
+              $t('admin.announcements.pager', { total, page, pages: pageCount })
             }}</span>
             <NumberedPager
               v-if="data && pageCount > 1"
               :meta="data.meta"
-              :label="$t('admin.contests.announcements.pagerLabel')"
+              :label="$t('admin.announcements.pagerLabel')"
               compact
             />
           </footer>

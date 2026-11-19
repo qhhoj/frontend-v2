@@ -1,0 +1,28 @@
+{
+  "title": "Ban account",
+  "reasonLabel": "Reason (required, shown to the banned user)",
+  "reasonHint": "At most 4,096 characters. A ban revokes every sign-in session. Timed bans are not supported yet: a ban lasts until it is lifted.",
+  "reasonRequired": "Enter a reason.",
+  "reasonTooLong": "The reason is longer than 4,096 characters.",
+  "ban": "Ban user",
+  "done": "Banned {username}.",
+  "unbanned": "Unbanned {username}.",
+  "alreadyBanned": "This account was already banned.",
+  "notBanned": "This account is not banned.",
+  "banDialog": {
+    "title": "Ban {username}?",
+    "body": "The account is locked, every sign-in session is revoked and the account is hidden from the leaderboard.",
+    "confirm": "Ban"
+  },
+  "banned": {
+    "title": "This account is banned",
+    "reason": "Ban reason: {reason}",
+    "noReason": "No reason was recorded.",
+    "unban": "Unban",
+    "unbanHint": "Unbanning restores the rank \"user\", shows the account again and activates it."
+  },
+  "unbanDialog": {
+    "title": "Unban {username}?",
+    "body": "The account gets the rank \"user\" back, shows on the leaderboard again and can sign in again."
+  }
+}
