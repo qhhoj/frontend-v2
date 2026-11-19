@@ -98,7 +98,7 @@ export const GATED_CONTEST_FIELDS: Record<string, readonly (keyof ContestForm)[]
     'isOrganizationPrivate',
     'organizations',
   ],
-  'judge.contest_access_code': ['accessCode'],
+  'judge.contest_access_code': ['accessCode', 'rankingAccessCode'],
   'judge.change_contest_visibility': ['isVisible'],
 };
 const DATE_FIELDS = [
@@ -532,7 +532,10 @@ export function toContestBody(
     ...specialFields(emptyContestForm(), form),
     ...filledFields(form, can, inOrganization),
   };
-  if (!can('judge.contest_access_code')) delete optional.accessCode;
+  if (!can('judge.contest_access_code')) {
+    delete optional.accessCode;
+    delete optional.rankingAccessCode;
+  }
   return { ...optional, ...requiredContestFields(form) };
 }
 

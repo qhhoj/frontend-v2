@@ -108,9 +108,12 @@ const ACCESS_CODE = 'judge.contest_access_code';
         input-id="contest-rankingAccessCode"
         :label="$t('admin.contests.general.fields.rankingAccessCode')"
         :hint="
-          hasCodes.ranking
-            ? $t('admin.contests.general.hints.rankingCodeSet')
-            : $t('admin.contests.general.hints.accessCodeNone')
+          hintOf(
+            ACCESS_CODE,
+            hasCodes.ranking
+              ? $t('admin.contests.general.hints.rankingCodeSet')
+              : $t('admin.contests.general.hints.accessCodeNone'),
+          )
         "
       >
         <template #default="{ id, describedBy }">
@@ -119,14 +122,14 @@ const ACCESS_CODE = 'judge.contest_access_code';
             v-model="form.rankingAccessCode"
             type="password"
             autocomplete="new-password"
-            :disabled="form.removeRankingAccessCode"
+            :disabled="Boolean(lockedBy(ACCESS_CODE)) || form.removeRankingAccessCode"
             :class="INPUT"
             :aria-describedby="describedBy"
           />
         </template>
       </AdminField>
       <AdminCheckbox
-        v-if="hasCodes.ranking"
+        v-if="hasCodes.ranking && !lockedBy(ACCESS_CODE)"
         v-model="form.removeRankingAccessCode"
         input-id="contest-removeRankingAccessCode"
         :label="$t('admin.contests.general.fields.removeRankingAccessCode')"

@@ -46,7 +46,7 @@ const CODE_BY_MESSAGE: Readonly<Record<string, string>> = {
 const MESSAGE_PATTERNS: ReadonlyArray<{ pattern: RegExp; code: string }> = [
   { pattern: /^Missing the (?<column>.+) column$/u, code: 'ranking_column_missing' },
   {
-    pattern: /^Line (?<line>\d+) has (?<found>\d+) columns; the header has (?<expected>\d+)\.?$/u,
+    pattern: /^Row (?<line>\d+) has (?<found>\d+) fields, the header (?<expected>\d+)$/u,
     code: 'ranking_row_columns',
   },
 ];

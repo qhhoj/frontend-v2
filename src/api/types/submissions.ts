@@ -3,10 +3,28 @@ import type { JsonBodyOf, QueryOf, StreamData } from '../typed';
 
 export type SubmissionStatus = Schemas['SubmissionStatus'];
 export type SubmissionResult = Schemas['SubmissionResult'];
-/** Statuses of a row that is still being judged. `PD` (final-only contest) emits no events, so it is not here. */
-export const IN_PROGRESS_STATUSES: readonly SubmissionStatus[] = ['QU', 'P', 'G'];
-/** Statuses after which a submission never changes again on its own. */
-export const FINISHED_STATUSES: readonly SubmissionStatus[] = ['D', 'IE', 'CE', 'AB'];
+/**
+ * The phase of every status, so a status the backend adds is a type error until it is placed: `judging` is still being
+ * judged; `waiting` (`PD`, a final-only contest) waits for the final judging and emits no events; `finished` never
+ * changes again on its own.
+ */
+const STATUS_PHASE: Record<SubmissionStatus, 'judging' | 'waiting' | 'finished'> = {
+  QU: 'judging',
+  P: 'judging',
+  G: 'judging',
+  PD: 'waiting',
+  D: 'finished',
+  IE: 'finished',
+  CE: 'finished',
+  AB: 'finished',
+};
+type StatusPhase = (typeof STATUS_PHASE)[SubmissionStatus];
+const statusesWhere = (test: (phase: StatusPhase) => boolean): readonly SubmissionStatus[] =>
+  (Object.keys(STATUS_PHASE) as SubmissionStatus[]).filter((status) => test(STATUS_PHASE[status]));
+export const IN_PROGRESS_STATUSES = statusesWhere((phase) => phase === 'judging');
+export const FINISHED_STATUSES = statusesWhere((phase) => phase === 'finished');
+/** Being judged or waiting for the final judging: rejudge and reject answer 409 until it is over. */
+export const UNFINISHED_STATUSES = statusesWhere((phase) => phase !== 'finished');
 
 export type SubmissionListItem = Schemas['SubmissionListItemResponse'];
 export type SubmissionDetail = Schemas['SubmissionDetailResponse'];
@@ -34,18 +52,20 @@ export type SubmissionBatch = Schemas['SubmissionBatchResponse'];
 export type SubmissionSource = Schemas['SubmissionSourceResponse'];
 export type SubmissionStats = Schemas['SubmissionStatsResponse'];
 
+/** Every result in display order, so a result the backend adds is a type error until it is listed. */
+const LISTED_RESULTS: Record<SubmissionResult, true> = {
+  AC: true,
+  WA: true,
+  TLE: true,
+  MLE: true,
+  OLE: true,
+  IR: true,
+  RTE: true,
+  CE: true,
+  IE: true,
+  SC: true,
+  AB: true,
+  RJ: true,
+};
 /** The result values the list filter accepts; anything else is a 400. */
-export const SUBMISSION_RESULT_CODES = [
-  'AC',
-  'WA',
-  'TLE',
-  'MLE',
-  'OLE',
-  'IR',
-  'RTE',
-  'CE',
-  'IE',
-  'SC',
-  'AB',
-  'RJ',
-] as const satisfies readonly Schemas['SubmissionResult'][];
+export const SUBMISSION_RESULT_CODES = Object.keys(LISTED_RESULTS) as readonly SubmissionResult[];
