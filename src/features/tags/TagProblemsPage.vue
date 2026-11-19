@@ -119,11 +119,7 @@ function clearFilters() {
             :placeholder="$t('tags.filters.anyTag')"
             :aria-label="$t('tags.filters.tag')"
           >
-            <optgroup
-              v-for="group in catalog.data.value ?? []"
-              :key="group.id"
-              :label="group.name"
-            >
+            <optgroup v-for="group in catalog.data.value ?? []" :key="group.id" :label="group.name">
               <option v-for="entry in group.tags" :key="entry.id" :value="entry.code">
                 {{ entry.name }}
               </option>
@@ -158,7 +154,9 @@ function clearFilters() {
         <EmptyState inline>
           {{ $t(isFiltered ? 'tags.emptyFiltered' : 'tags.empty') }}
           <template #action>
-            <AppButton v-if="isFiltered" @click="clearFilters">{{ $t('common.clearFilters') }}</AppButton>
+            <AppButton v-if="isFiltered" @click="clearFilters">{{
+              $t('common.clearFilters')
+            }}</AppButton>
             <AppButton v-else-if="canTag" tone="primary" @click="isAddOpen = true">
               {{ $t('tags.add.open') }}
             </AppButton>
