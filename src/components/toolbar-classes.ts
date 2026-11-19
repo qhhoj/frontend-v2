@@ -9,4 +9,3 @@ export const toolbarControlClass = (active: boolean) =>
       ? 'border-accent bg-accent-soft font-medium text-accent-soft-text'
       : 'border-line-strong bg-surface text-content hover:bg-surface-hover'
   }`;
-
