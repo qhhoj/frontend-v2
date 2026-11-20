@@ -17,7 +17,7 @@ import { useRowOpen } from './row-open';
 
 /**
  * The submissions list on a phone: 52 px rows. The verdict with the score under it, then the problem (its own part of
- * the name) over one muted line (who and the time; where the list leaves the name out: time, memory and language;
+ * the name, a link to the problem) over one muted line (who and the time; where the list leaves the name out: time, memory and language;
  * each only if its column is shown and the row has it), and when at the end. The
  * whole row opens the submission; the viewer's own rows carry the bar. Keep `SubmissionTableSkeleton.vue` in step.
  */
@@ -91,7 +91,7 @@ const costOf = (row: SubmissionListItem) =>
       <div class="flex min-w-0 flex-1 flex-col">
         <SubmissionProblemName
           v-if="isShown('problem')"
-          class="min-w-0 text-body"
+          class="text-body"
           short
           :problem="row.problem"
           :label="row.problem ? problemLabels[row.problem.code] : undefined"

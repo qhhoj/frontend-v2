@@ -15,7 +15,8 @@ import { useLocaleStore } from '@/stores/locale.store';
 
 /**
  * The contests under the plate (both homes): the other running ones, then the coming ones, one row each, a link as a
- * whole: name, start and length, and for a signed-in viewer "Đăng ký" (a link: the contest page asks for the rules and
+ * whole: name, then the time left of a running one (a neutral tag: green is a result's colour) or the start and length
+ * of a coming one, and for a signed-in viewer "Đăng ký" (a link: the contest page asks for the rules and
  * the access code) or the "Đã đăng ký" tag. The page reads the lists once and leaves out the plate's contest. With no
  * row the section is not drawn: the plate, or its one line, already says so.
  */
@@ -73,9 +74,7 @@ const META = 'shrink-0 font-mono text-small text-muted tabular-nums';
         <span :class="TEXT">
           <StretchedLink :to="linkOf(contest)" :class="NAME">{{ contest.name }}</StretchedLink>
         </span>
-        <Chip tone="live" dot>{{
-          $t('contests.list.timeLeft', { span: timeLeftOf(contest) })
-        }}</Chip>
+        <Chip>{{ $t('contests.list.timeLeft', { span: timeLeftOf(contest) }) }}</Chip>
       </li>
       <li
         v-for="contest in upcoming"

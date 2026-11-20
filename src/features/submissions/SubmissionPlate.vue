@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { FINISHED_STATUSES, IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import type { SubmissionDetail } from '@/api/types/submissions';
 import type { ProblemDetail } from '@/api/types/problems';
@@ -134,6 +135,21 @@ const passed = computed(() => passedCount(props.submission));
 const hasTestsCell = computed(() => tests.value !== null || passed.value !== null);
 /** Many squares leave the row of readings and wrap on a line of their own under it. */
 const isWideTests = computed(() => (tests.value?.squares.length ?? 0) > INLINE_SQUARES_MAX);
+/**
+ * A square that has a row in the tests table opens that row (`#case-<n>`, which `CasesTable.vue` follows). The kit's
+ * `TestSquares` draws plain items, so the click is read here from its list: the item's place is the square's.
+ */
+const router = useRouter();
+const hasTestRows = computed(() => tests.value?.unit === 'test' && props.submission.cases !== null);
+function openTestRow(event: MouseEvent) {
+  const item = (event.target as Element).closest('li');
+  const square = item?.parentElement
+    ? tests.value?.squares[[...item.parentElement.children].indexOf(item)]
+    : undefined;
+  if (!hasTestRows.value || !square || square.tone === 'waiting' || square.number === undefined)
+    return;
+  void router.replace({ hash: `#case-${square.number}` });
+}
 
 const peak = computed(() => (isFinished.value ? peakOf(props.submission.cases) : null));
 const limits = computed(() => limitsFor(props.problem, props.submission.language?.key ?? null));
@@ -172,7 +188,8 @@ const gauges = computed(() =>
 
 const isCompileError = computed(() => props.submission.status === 'CE');
 const isInternalError = computed(() => props.submission.status === 'IE');
-const isCompileLogOpen = ref(false);
+/** The compiler's output is the answer to a compile error: it starts open. */
+const isCompileLogOpen = ref(true);
 const isStaffMessageOpen = ref(false);
 </script>
 
@@ -210,16 +227,22 @@ const isStaffMessageOpen = ref(false);
         <template v-if="passed">{{ passed.passed }}</template>
         <template v-if="passed" #unit>/{{ passed.total }}</template>
         <template v-if="tests" #below>
-          <TestSquares
-            :tests="tests.squares"
-            :label="
-              $t(
-                tests.unit === 'group'
-                  ? 'submission.plate.groupSquares'
-                  : 'submission.plate.squares',
-              )
-            "
-          />
+          <div
+            data-testid="plate-squares"
+            :class="hasTestRows && '[&_li]:cursor-pointer'"
+            @click="openTestRow"
+          >
+            <TestSquares
+              :tests="tests.squares"
+              :label="
+                $t(
+                  tests.unit === 'group'
+                    ? 'submission.plate.groupSquares'
+                    : 'submission.plate.squares',
+                )
+              "
+            />
+          </div>
         </template>
       </ReadoutCell>
       <!-- The two readings against a limit stay side by side: when the row is full they wrap as a pair. -->

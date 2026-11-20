@@ -25,9 +25,9 @@ export const CELLS_OF: Record<ColumnKey, readonly CellKind[]> = {
 export const cellsOf = (keys: readonly ColumnKey[]) => keys.flatMap((key) => CELLS_OF[key]);
 
 /**
- * The full table is one 44 px line per submission. Every cell but the problem keeps its text on one line at its own
- * width, so a name or a time is never cut; the problem cell takes the width that is left and is the only one that
- * truncates. Cells give way by the width of the table's own frame (a container query): verdict, score, problem and
+ * The full table is one 44 px line per submission. Every cell but the problem keeps its text on one line and is as
+ * narrow as its content (`w-px`: the table then gives it its content's width and no spare), so a name or a time is
+ * never cut; the problem cell takes all the width that is left and is the only one that truncates. Cells give way by the width of the table's own frame (a container query): verdict, score, problem and
  * user always; "when" from @2xl (42rem), time from @3xl (48rem), memory from @4xl (56rem), language from @5xl (64rem).
  * A frame narrower than `COMPACT_BELOW_PX` (a phone) shows the rows of `SubmissionCompactList.vue` instead, so the
  * list never scrolls sideways.
@@ -41,20 +41,23 @@ export const COMPACT_BELOW_PX = 584;
 export const TABLE_CARD_CLASS = '@container overflow-hidden';
 
 /** How a cell holds its content; the problem cell takes the rest and truncates. Shared with the skeleton. */
-export const CELL_WIDTH_CLASS: Record<CellKind | 'pick', string> = {
+const FIT_CONTENT = 'w-px whitespace-nowrap';
+export const CELL_WIDTH_CLASS: Record<CellKind | 'pick' | 'source', string> = {
   pick: 'w-14',
-  verdict: 'whitespace-nowrap',
-  score: 'whitespace-nowrap',
+  verdict: FIT_CONTENT,
+  score: FIT_CONTENT,
   problem: 'w-full max-w-0',
-  user: 'whitespace-nowrap',
-  time: 'whitespace-nowrap',
-  memory: 'whitespace-nowrap',
-  language: 'whitespace-nowrap',
-  when: 'whitespace-nowrap',
+  user: FIT_CONTENT,
+  time: FIT_CONTENT,
+  memory: FIT_CONTENT,
+  language: FIT_CONTENT,
+  when: FIT_CONTENT,
+  source: FIT_CONTENT,
 };
 
 /** The cells that give way as the frame narrows (see `FULL_TABLE_CLASS`). */
-export const CELL_TIER_CLASS: Partial<Record<CellKind, string>> = {
+export const CELL_TIER_CLASS: Partial<Record<CellKind | 'source', string>> = {
+  source: 'hidden @3xl:table-cell',
   when: 'hidden @2xl:table-cell',
   time: 'hidden @3xl:table-cell',
   memory: 'hidden @4xl:table-cell',
@@ -62,7 +65,7 @@ export const CELL_TIER_CLASS: Partial<Record<CellKind, string>> = {
 };
 
 /** Width and tier of a cell of the full table. */
-export const fullCellClass = (kind: CellKind | 'pick') =>
+export const fullCellClass = (kind: CellKind | 'pick' | 'source') =>
   `${CELL_WIDTH_CLASS[kind]} ${CELL_TIER_CLASS[kind as CellKind] ?? ''}`;
 
 /** Numbers line up on the right, and the time of submitting ends the row. */

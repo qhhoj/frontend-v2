@@ -7,14 +7,14 @@ import { isFinished, scoreCellText, scoreParts, scoreToneOf } from './submission
 
 /**
  * A list row's score: the earned points in the result's colour, the maximum muted after it ("560/800"). No tint and
- * no box: with the lamp and the verdict code this is the only colour of a row. A row still being judged shows where
- * it is instead ("30%", "Trong hàng đợi"), muted.
+ * no box: with the lamp and the verdict code this is the only colour of a row. A row being graded shows how far the
+ * judging got instead ("3/10"), muted; a queued one nothing (its verdict mark says so).
  */
 const props = defineProps<{
   row: SubmissionListItem;
   /** The contest problem's points: the score reads as contest points over it. */
   contestMax?: number;
-  /** The short queue word, for a narrow row. */
+  /** No spaces around the slash, for a narrow row. */
   tight?: boolean;
 }>();
 const locale = useLocaleStore();
@@ -34,5 +34,10 @@ const progress = computed(() =>
     }}</span
     ><span v-if="parts.max" class="text-muted">/{{ parts.max }}</span>
   </span>
-  <span v-else-if="progress" class="text-small whitespace-nowrap text-muted">{{ progress }}</span>
+  <span
+    v-else-if="progress"
+    data-testid="grading-progress"
+    class="font-mono text-small whitespace-nowrap text-muted tabular-nums"
+    >{{ progress }}</span
+  >
 </template>

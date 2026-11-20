@@ -7,7 +7,6 @@ import {
   formatNumber,
   scoreBelowFull,
 } from '@/lib/format';
-import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
 import { ringFraction } from '@/lib/grading';
 import { submissionVerdictOf } from '@/lib/verdicts';
@@ -97,9 +96,17 @@ export function scoreToneOf(
   return isPart ? 'pc' : submissionVerdictOf(row).tone;
 }
 
-/** The share of the points judged so far, `45%`; only a grading row with a known case count has one. */
-export const gradingPercent = (row: SubmissionListItem) =>
-  row.status === 'G' && row.caseTotal > 0 ? `${Math.round(ringFraction(row) * PERCENT)}%` : '';
+/**
+ * How far the judging of a grading row got: the tests judged of the total ("3/10") when the row lists its tests, else
+ * the share of the points judged so far ("45%"), else nothing.
+ */
+export function gradingProgress(row: SubmissionListItem): string {
+  if (row.status !== 'G') return '';
+  const tests = row.testSummary;
+  if (tests?.unit === 'case' && tests.total)
+    return `${tests.statuses.length + tests.more}/${tests.total}`;
+  return row.caseTotal > 0 ? `${Math.round(ringFraction(row) * PERCENT)}%` : '';
+}
 
 /** "0.12s · 3.2 MB": only a finished row has numbers worth showing. */
 export const costText = (row: SubmissionListItem) =>
@@ -107,16 +114,12 @@ export const costText = (row: SubmissionListItem) =>
     ? `${formatCaseTime(row.time)} · ${formatCaseMemory(row.memory)}`
     : NO_VALUE;
 
-/** The score cell of a list row: the score once judged; while grading the share judged; "Trong hàng đợi" when queued; empty otherwise. */
+/** The score cell of a list row: the score once judged; while grading how far it got; empty otherwise (the verdict mark names the state). */
 export function scoreCellText(
   row: SubmissionListItem,
   locale: Locale,
   contestMax: number | undefined,
   tight = false,
 ): string {
-  if (isFinished(row)) return listScoreText(row, locale, contestMax, tight);
-  const { code, labelKey } = submissionVerdictOf(row);
-  if (code === 'G') return gradingPercent(row);
-  if (code === 'QU') return translate(tight ? 'submissions.queuedShort' : 'submissions.queued');
-  return code === 'P' ? translate(labelKey) : '';
+  return isFinished(row) ? listScoreText(row, locale, contestMax, tight) : gradingProgress(row);
 }
