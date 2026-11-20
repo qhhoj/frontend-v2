@@ -54,8 +54,10 @@ function checkAccent({ expect, expectOn }, id, accent, neutrals, minimums) {
 function checkLanes({ expect, expectOn }, set, minimums) {
   const { neutrals } = set;
   const grounds = [neutrals.ground, neutrals.surface, neutrals.strong, neutrals.hover];
-  for (const lane of LANES) {
-    const { text, tint, solid, on } = set.lanes[lane];
+  for (const [lane, { text, tint, solid, on }] of [
+    ...LANES.map((name) => [name, set.lanes[name]]),
+    ['part', set.part],
+  ]) {
     expectOn(
       `${lane} text`,
       text,
@@ -102,6 +104,11 @@ function checkFixed({ expect, expectOn }, set) {
     for (const [name, hex] of Object.entries(set[family]))
       expectOn(`${family} ${name}`, hex, grounds, 4.5);
   set.difficulty.forEach((hex, index) => expectOn(`diff-${index + 1}`, hex, grounds.slice(1), 3));
+  const { bg, fg, muted, track, marks } = set.plate;
+  for (const [name, hex] of Object.entries({ fg, muted, ...marks }))
+    expect(`plate ${name}`, contrast(hex, bg), 4.5);
+  expect('plate brand label', contrast(set.plate.brandFg, marks.brand), 4.5);
+  expect('plate gauge and waiting numeral on the track', contrast(fg, track), 4.5);
   set.coins.forEach((stops, index) =>
     stops.forEach((stop) => expect(`coin-${index + 1} ${stop}`, contrast(set.ink, stop), 4.5)),
   );

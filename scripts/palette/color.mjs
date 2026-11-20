@@ -126,3 +126,14 @@ export function solveLightness(start, chroma, hue, accepts, step) {
   }
   throw new Error(`no lightness for chroma ${chroma}, hue ${hue}`);
 }
+
+const rounded = (value, digits) => Number(value.toFixed(digits));
+/** A hex colour as a palette input: [hue, chroma, lightness] (OKLCH). A walk that starts at this lightness keeps the hex where it passes. */
+export function hueChromaLightness(hex) {
+  const [lightness, greenRed, blueYellow] = hexToOklab(hex);
+  return [
+    rounded(((Math.atan2(blueYellow, greenRed) * 180) / Math.PI + 360) % 360, 4),
+    rounded(Math.hypot(greenRed, blueYellow), 5),
+    rounded(lightness, 5),
+  ];
+}

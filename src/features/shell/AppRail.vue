@@ -11,7 +11,7 @@ import type { CurrentParticipation } from '@/api/types/contests';
 import OfficialModePill from '@/features/official-mode/OfficialModePill.vue';
 import type { BitLook } from '@/mascot/bit-sprite';
 import LocaleToggle from './LocaleToggle.vue';
-import { NAV_ITEMS, useIsNavCurrent, useNavLinkEvents } from './nav-items';
+import { MENU_ITEMS, useIsNavCurrent, useNavLinkEvents } from './nav-items';
 import RailLiveContest from './RailLiveContest.vue';
 import RailNextContest from './RailNextContest.vue';
 import { useNextContest } from './use-next-contest';
@@ -21,7 +21,7 @@ import { useRailCollapse } from './use-rail-collapse';
 import UserMenu from './UserMenu.vue';
 
 /**
- * The desktop rail, from `md` up: the brand, the search button (Ctrl K), the seven sections (Kỳ thi with its count of
+ * The desktop rail, from `md` up: the brand, the search button (Ctrl K), the menu's sections (Kỳ thi with its count of
  * running contests), the contest the viewer is taking part in (or else the next one to look at), and at the foot one row of icons (bell, language, look,
  * collapse; stacked in the narrow column) over the account. 224 px from 1100 px
  * (`rail-open`); below that, or when the viewer collapses it (button at the foot, `[`; AppShell sets `data-rail`), a 56 px
@@ -38,11 +38,11 @@ const { isCollapsed, toggle } = useRailCollapse();
 const isPhone = useMediaQuery(PHONE_QUERY);
 const BIT: BitLook = { headgear: 'none', palette: 'terracotta' };
 
-/** One row: a control tall (36 px) for a mouse, 44 on touch; the current section is a panel with an accent edge. */
+/** One row: a control tall (36 px) for a mouse, 44 on touch; the current section is a soft brand ground, brand text and a 3 px brand bar on the left. */
 const ROW =
   'relative flex min-h-(--qh-control) items-center gap-3 rounded-control px-(--qh-control-px-sm) text-body font-semibold text-secondary transition-colors hover:bg-surface-hover hover:text-content touch:min-h-11 rail-slim:justify-center rail-slim:px-0';
 const CURRENT_ROW =
-  "bg-surface text-content before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-pill before:bg-accent before:content-['']";
+  "overflow-hidden bg-accent-soft! font-bold text-accent-text! before:absolute before:inset-y-0 before:left-0 before:w-0.75 before:bg-accent before:content-['']";
 </script>
 
 <template>
@@ -82,7 +82,7 @@ const CURRENT_ROW =
     </AppButton>
     <nav :aria-label="$t('nav.main')" class="flex flex-col gap-0.5">
       <RouterLink
-        v-for="item in NAV_ITEMS"
+        v-for="item in MENU_ITEMS"
         :key="item.path"
         :to="item.path"
         :title="

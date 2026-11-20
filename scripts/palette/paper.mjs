@@ -64,7 +64,32 @@ export const PAPER = {
     master: [55, 0.17],
     grandmaster: [25, 0.2],
   },
+  /** Partial score (lime): its own colour, apart from accepted green and time-limit amber. */
+  part: [125, 0.15],
   medals: { gold: [88, 0.14], silver: [240, 0.04], bronze: [50, 0.12] },
+  /**
+   * The plate (kit `Readout`): the one dark surface, the same in every palette and both modes; dark mode deepens the
+   * ground and frames it gold-brown. Its verdict colours replace the page's inside a plate.
+   */
+  plate: {
+    light: { bg: '#191211', line: '#4B3B2C' },
+    dark: { bg: '#0B0808', line: '#6E5830' },
+    fg: '#F1E9D8',
+    muted: '#9C8F7D',
+    track: '#3A2E2A',
+    marks: {
+      ac: '#5CC79A',
+      wa: '#F0655A',
+      tle: '#F2A23C',
+      pd: '#6FA8E8',
+      part: '#B4D455',
+      ce: '#A69D90',
+      merit: '#DDB65C',
+      brand: '#C3A6F5',
+    },
+    /** The label on a brand fill (the plate's primary button). */
+    brandFg: '#1C1026',
+  },
   syntax: {
     keyword: [25, 0.17],
     type: [300, 0.16],

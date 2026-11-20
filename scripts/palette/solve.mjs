@@ -23,6 +23,8 @@ export const MIN_TEXT_STEP = 1.1;
 /** Contrast floors (WCAG ratios), standard and high contrast; a pair is [light mode, dark mode]. */
 const FLOORS = {
   standard: {
+    /** An official colour of an `exact` palette keeps its hex down to this floor (the proof's minimum plus a margin). */
+    official: 4.6,
     text: [13, 11],
     secondary: [8, 7.5],
     muted: 5.2,
@@ -79,16 +81,22 @@ function neutrals(palette, mode, floors, accents) {
   const pick = (light, dark) => (isLight(mode) ? light : dark);
   const readable = (floor) => (hex) =>
     worstContrast(hex, grounds) >= floor && worstContrast(hex, tinted) >= floors.onTint;
-  const solve = (start, floor) => solveLightness(start, chroma, hue, readable(floor), stepOf(mode));
+  // An exact palette's level starts at its official colour and keeps it down to the official floor.
+  const officialOf = (level) => (palette.exact ? palette.neutralText?.[level] : undefined);
+  const solve = (start, floor, level) => {
+    const [ownHue, ownChroma, lightness] = officialOf(level) ?? [hue, chroma, start];
+    const kept = officialOf(level) ? (floors.official ?? floor) : floor;
+    return solveLightness(lightness, ownChroma, ownHue, readable(kept), stepOf(mode));
+  };
   const { ground, surface } = palette[mode];
   const bordered = (hex) => worstContrast(hex, [ground, surface]) >= floors.control;
-  const text = solve(pick(0.4, 0.8), pick(...floors.text));
-  const textMuted = solve(pick(0.65, 0.62), floors.muted);
+  const text = solve(pick(0.4, 0.8), pick(...floors.text), 'text');
+  const textMuted = solve(pick(0.65, 0.62), floors.muted, 'textMuted');
   // Secondary sits between text and muted: where its own floor lands on muted's (the tint floor rules both), it moves
   // toward text until it is a step from each.
   const between = (hex) =>
     contrast(hex, textMuted) >= MIN_TEXT_STEP && contrast(hex, text) >= MIN_TEXT_STEP;
-  const ownSecondary = solve(pick(0.55, 0.72), pick(...floors.secondary));
+  const ownSecondary = solve(pick(0.55, 0.72), pick(...floors.secondary), 'textSecondary');
   const textSecondary = between(ownSecondary)
     ? ownSecondary
     : solveLightness(lightnessOf(textMuted), chroma, hue, between, stepOf(mode) / 4);
@@ -140,7 +148,7 @@ function accentFill(palette, mode, id, floors) {
   } catch {
     fill = null;
   }
-  if (fill && (isNeutral || lightnessOf(fill) >= 0.42)) return fill;
+  if (fill && (isNeutral || lightnessOf(fill) >= 0.42 || (palette.exact && official))) return fill;
   return solveLightness(0.7, chroma, hue, carries(inkOf(palette)), -0.005);
 }
 
@@ -161,9 +169,12 @@ function accentTokens(palette, mode, id, floors) {
       (hex) => worstContrast(hex, backgrounds) >= floor,
       stepOf(mode),
     );
+  // An exact palette's default accent starts at its official colour in both modes (its links and focus ring are the brand colour).
+  const exact = palette.exact && id === palette.defaultAccent && official !== undefined;
   const pick = (light, dark) => (isLight(mode) ? light : dark);
+  const startAt = (light, dark) => (exact ? official : pick(light, dark));
   const strongOf = () => {
-    if (inked) return oklch(lightnessOf(fill) + pick(0.12, -0.1), 0, 0);
+    if (inked) return oklch(lightnessOf(fill) + (isLight(mode) ? 0.12 : -0.1), 0, 0);
     const inkLabelled =
       palette.inkLabel && id === palette.defaultAccent && contrast(WHITE, fill) < floors.onFill;
     return oklch(
@@ -176,10 +187,10 @@ function accentTokens(palette, mode, id, floors) {
     fill,
     strong: strongOf(),
     on: labelOn(palette, fill),
-    text: solve(pick(0.75, official ?? 0.5), floors.link, tinted),
+    text: solve(startAt(0.75, official ?? 0.5), floors.link, tinted),
     soft,
-    softText: solve(pick(0.7, official ?? 0.55), floors.softText, tinted),
-    ring: solve(pick(0.75, official ?? 0.5), floors.ring, grounds),
+    softText: solve(startAt(0.7, official ?? 0.55), floors.softText, tinted),
+    ring: solve(startAt(0.75, official ?? 0.5), floors.ring, grounds),
   };
 }
 
@@ -217,8 +228,28 @@ function closestPair(pick, accentFills) {
   return closest;
 }
 
-/** Lane solids: coordinate ascent over each lane's valid lightnesses, maximising the closest pair. */
+/** A solid fill at the official lightness, moved only until it carries its label and stands out from the page and the cards. */
+function officialSolid(palette, mode, floors, [hue, chroma, lightness]) {
+  const { ground, surface } = palette[mode];
+  const passes = (hex) =>
+    contrast(labelOn(palette, hex), hex) >= floors.onFill &&
+    contrast(hex, ground) >= floors.fill &&
+    contrast(hex, surface) >= floors.fill;
+  return solveLightness(
+    lightness ?? (isLight(mode) ? 0.55 : 0.75),
+    chroma,
+    hue,
+    passes,
+    stepOf(mode),
+  );
+}
+
+/** Lane solids: coordinate ascent over each lane's valid lightnesses, maximising the closest pair. An exact palette keeps its official colours. */
 function laneSolids(palette, mode, floors, highContrast, accentFills) {
+  if (palette.exact)
+    return Object.fromEntries(
+      LANES.map((lane) => [lane, officialSolid(palette, mode, floors, palette.lanes[lane])]),
+    );
   const candidates = laneCandidates(palette, mode, floors, highContrast);
   const pick = Object.fromEntries(
     LANES.map((lane) => [lane, candidates[lane][Math.floor(candidates[lane].length / 2)]]),
@@ -281,13 +312,29 @@ function lanes(palette, mode, floors, highContrast, accentFills) {
         alpha,
         floors.laneText,
         partials,
-        0.7,
+        (palette.exact && palette.lanes[lane][2]) || 0.7,
       );
       return [lane, { text, tint, solid: solids[lane], on: labelOn(palette, solids[lane]) }];
     }),
   );
   const texts = Object.fromEntries(LANES.map((lane) => [lane, solved[lane].text]));
-  return { ...solved, ac: { ...solved.ac, text: separateAccepted(palette, mode, texts) } };
+  const separated = {
+    ...solved,
+    ac: { ...solved.ac, text: separateAccepted(palette, mode, texts) },
+  };
+  // An aliased lane shows its target's colours: one colour, one meaning.
+  for (const [lane, target] of Object.entries(palette.laneAlias ?? {}))
+    separated[lane] = separated[target];
+  return separated;
+}
+
+/** Partial score, beside the lanes: text on its own tint, and a solid with its label. */
+function partial(palette, mode, floors) {
+  const alpha = tintOf(palette, mode, 'lane');
+  const start = (palette.exact && palette.part[2]) || 0.7;
+  const { text, tint } = tintedText(palette, mode, palette.part, alpha, floors.laneText, [], start);
+  const solid = officialSolid(palette, mode, floors, palette.part);
+  return { text, tint, solid, on: labelOn(palette, solid) };
 }
 
 /** The first-solve cell: a stronger green than the AC tint (3:1 against it) that carries its label. */
@@ -381,6 +428,8 @@ export function solvePalette(palette, mode, level) {
     neutrals: neutrals(palette, mode, floors, accents),
     accents,
     lanes: laneSet,
+    part: partial(palette, mode, floors),
+    plate: { ...palette.plate, ...palette.plate[mode] },
     firstSolve: firstSolve(palette, mode, laneSet.ac),
     tags: tags(palette, mode),
     tiers: textFamily(palette, mode, palette.tiers),

@@ -15,10 +15,10 @@ import { useIsFirstNavigationPending } from '@/router/first-navigation';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { useAccountLinks } from './account-links';
-import { NAV_ITEMS, useIsNavCurrent, useNavLinkEvents } from './nav-items';
+import { MENU_ITEMS, useIsNavCurrent, useNavLinkEvents } from './nav-items';
 
 /**
- * The sheet behind the tab bar's "Tôi" (`TabBar`, which owns the button). It rises from the bottom: the seven sections (the current one marked), then what the
+ * The sheet behind the tab bar's "Tôi" (`TabBar`, which owns the button). It rises from the bottom: the menu's sections (the current one marked), then what the
  * desktop row shows beside the navigation: the official-mode pill, the account (who is signed in, its pages in the
  * desktop menu's order and sign-out, or register for a visitor; sign-in and the bell stay in the header), the language
  * and the light/dark mode (the rest of the look is one link away). The drawer traps focus and closes on Esc; any
@@ -52,11 +52,11 @@ watch(
   <Drawer v-model:visible="isOpen" side="bottom" :title="$t('nav.menu')">
     <nav :aria-label="$t('nav.main')">
       <RouterLink
-        v-for="item in NAV_ITEMS"
+        v-for="item in MENU_ITEMS"
         :key="item.path"
         :to="item.path"
         :aria-current="isCurrent(item.path) ? 'page' : undefined"
-        :class="[ROW, isCurrent(item.path) ? 'bg-accent-soft text-accent-soft-text' : '']"
+        :class="[ROW, isCurrent(item.path) ? 'bg-accent-soft font-bold text-accent-text' : '']"
         v-on="linkEvents(item.path)"
       >
         <component :is="item.icon" aria-hidden="true" class="size-5 shrink-0" />

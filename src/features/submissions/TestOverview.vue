@@ -66,7 +66,7 @@ function squareStyle(testCase: SubmissionCase) {
   if (caseVerdictOf(testCase).code !== PARTIAL_CODE) return undefined;
   const filled = (testCase.points / testCase.total) * PERCENT;
   return {
-    background: `linear-gradient(to top, var(--qh-verdict-partial) ${filled}%, var(--qh-partial-bg-3) 0)`,
+    background: `linear-gradient(to top, var(--qh-verdict-partial) ${filled}%, var(--qh-verdict-part-bg) 0)`,
   };
 }
 const squareTitle = (testCase: SubmissionCase) => caseTitle(testCase, locale.locale);

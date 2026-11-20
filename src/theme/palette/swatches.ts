@@ -10,6 +10,26 @@ export interface PaletteSwatch {
 
 export const PALETTE_SWATCHES = [
   {
+    id: 'sonmai',
+    defaultAccent: 'plum',
+    light: {
+      ground: '#f5f2ea',
+      surface: '#fffdf8',
+      accent: '#5b2a8f',
+      accepted: '#12754f',
+      wrong: '#bf3029',
+      upcoming: '#2955d3',
+    },
+    dark: {
+      ground: '#141010',
+      surface: '#1b1514',
+      accent: '#b797f0',
+      accepted: '#5cc79a',
+      wrong: '#f0655a',
+      upcoming: '#9ebdff',
+    },
+  },
+  {
     id: 'catppuccin-mocha',
     defaultAccent: 'plum',
     light: {

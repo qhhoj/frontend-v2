@@ -36,12 +36,42 @@ export const VERDICT_TONES: Record<VerdictCode, VerdictTone> = {
 /** Tone classes of `VerdictChip`: tokens only (lint:tokens). */
 export const VERDICT_TONE_CLASSES: Record<VerdictTone, string> = {
   ac: 'bg-verdict-ac-bg text-verdict-ac',
-  pc: 'bg-partial-bg-2 text-verdict-partial',
+  pc: 'bg-verdict-part-bg text-verdict-partial',
   wa: 'bg-verdict-wa-bg text-verdict-wa',
   tle: 'bg-verdict-tle-bg text-verdict-tle',
   rte: 'bg-verdict-rte-bg text-verdict-rte',
   ce: 'bg-verdict-ce-bg text-verdict-ce',
   pending: 'bg-verdict-pending-bg text-verdict-pending',
+};
+/** The text colour alone: the verdict code beside its lamp, a score, a verdict word on the plate (kit `Lamp`, `VerdictChip`, `ReadoutCell`). */
+export const VERDICT_TEXT_CLASSES: Record<VerdictTone, string> = {
+  ac: 'text-verdict-ac',
+  pc: 'text-verdict-partial',
+  wa: 'text-verdict-wa',
+  tle: 'text-verdict-tle',
+  rte: 'text-verdict-rte',
+  ce: 'text-verdict-ce',
+  pending: 'text-verdict-pending',
+};
+/** The lamp's colour (kit `Lamp`): the verdict's solid, a little brighter than its text. */
+export const VERDICT_LAMP_CLASSES: Record<VerdictTone, string> = {
+  ac: 'text-verdict-ac-solid',
+  pc: 'text-verdict-part-solid',
+  wa: 'text-verdict-wa-solid',
+  tle: 'text-verdict-tle-solid',
+  rte: 'text-verdict-rte-solid',
+  ce: 'text-verdict-ce-solid',
+  pending: 'text-verdict-pending-solid',
+};
+/** A solid mark in the verdict's colour with its label colour (kit `TestSquares`). */
+export const VERDICT_MARK_CLASSES: Record<VerdictTone, string> = {
+  ac: 'bg-verdict-ac-solid text-verdict-ac-on',
+  pc: 'bg-verdict-part-solid text-verdict-part-on',
+  wa: 'bg-verdict-wa-solid text-verdict-wa-on',
+  tle: 'bg-verdict-tle-solid text-verdict-tle-on',
+  rte: 'bg-verdict-rte-solid text-verdict-rte-on',
+  ce: 'bg-verdict-ce-solid text-verdict-ce-on',
+  pending: 'bg-verdict-pending-solid text-verdict-pending-on',
 };
 /** Custom properties of the verdict tones (tokens), for drawings that need a colour value (rings, strips). */
 export const VERDICT_TONE_VARS: Record<VerdictTone, string> = {

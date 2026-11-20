@@ -687,6 +687,7 @@
     "paletteTitle": "Bảng màu",
     "paletteHelp": "Nền, chữ và màu kết quả của cả trang. Mỗi bảng đều được kiểm tra để chữ đủ rõ ở chế độ sáng, tối và tương phản cao. Lựa chọn lưu trong trình duyệt này.",
     "palette": {
+      "sonmai": "Sơn mài",
       "catppuccin-mocha": "Catppuccin Mocha",
       "catppuccin-frappe": "Catppuccin Frappé",
       "palletism": "Palletism",

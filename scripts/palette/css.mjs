@@ -37,15 +37,29 @@ const accentTokens = (accent) => [
   token('focus-ring', accent.ring),
 ];
 
-const laneTokens = ({ lanes, firstSolve }) => [
-  ...LANES.flatMap((lane) => [
-    token(`verdict-${lane}`, lanes[lane].text),
-    token(`verdict-${lane}-bg`, lanes[lane].tint),
-    token(`verdict-${lane}-solid`, lanes[lane].solid),
-    token(`verdict-${lane}-on`, lanes[lane].on),
+const laneTokens = ({ lanes, part, firstSolve }) => [
+  ...Object.entries({
+    ...Object.fromEntries(LANES.map((lane) => [lane, lanes[lane]])),
+    part,
+  }).flatMap(([lane, { text, tint, solid, on }]) => [
+    token(`verdict-${lane}`, text),
+    token(`verdict-${lane}-bg`, tint),
+    token(`verdict-${lane}-solid`, solid),
+    token(`verdict-${lane}-on`, on),
   ]),
   token('first-solve-bg', firstSolve.fill),
   token('first-solve-text', firstSolve.on),
+];
+
+/** The plate (kit `Readout`): its ground and frame, its text and gauge track, and its verdict and merit marks. */
+const plateTokens = ({ bg, line, fg, muted, track, marks, brandFg }) => [
+  token('ro-bg', bg),
+  token('ro-line', line),
+  token('ro-fg', fg),
+  token('ro-muted', muted),
+  token('ro-track', track),
+  ...Object.entries(marks).map(([name, hex]) => token(`ro-${name}`, hex)),
+  token('ro-brand-fg', brandFg),
 ];
 
 /** Tokens that do not change with the accent or the contrast level. */
@@ -68,6 +82,7 @@ const fixedTokens = (set, mode) => [
   ...Object.entries(set.tiers).map(([name, hex]) => token(`tier-${name}`, hex)),
   ...Object.entries(set.medals).map(([name, hex]) => token(`medal-${name}`, hex)),
   ...Object.entries(set.syntax).map(([name, hex]) => token(`syntax-${name}`, hex)),
+  ...plateTokens(set.plate),
   [
     '--qh-shadow-float',
     `0 8px 24px ${value({ hex: mode === 'light' ? set.neutrals.text : '#000000', alpha: mode === 'light' ? 0.12 : 0.55 })}`,

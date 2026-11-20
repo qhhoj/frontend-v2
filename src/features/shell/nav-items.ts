@@ -33,6 +33,9 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/organizations', labelKey: 'nav.organizations', icon: Building2 },
 ];
 
+/** What the rail and the phone menu list: the global ranking (`/users`) stays a section and a search result, but left the menu (owner, 2026-11-20). */
+export const MENU_ITEMS: readonly NavItem[] = NAV_ITEMS.filter((item) => item.path !== '/users');
+
 /** The section the viewer just asked for; it is lit at once while the page behind it loads. Null when none is pending. */
 const pendingPath = ref<string | null>(null);
 

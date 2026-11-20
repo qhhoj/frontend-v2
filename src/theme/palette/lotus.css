@@ -49,6 +49,20 @@
   --qh-syntax-string: #02632b;
   --qh-syntax-comment: #5a554d;
   --qh-syntax-function: #035d76;
+  --qh-ro-bg: #191211;
+  --qh-ro-line: #4b3b2c;
+  --qh-ro-fg: #f1e9d8;
+  --qh-ro-muted: #9c8f7d;
+  --qh-ro-track: #3a2e2a;
+  --qh-ro-ac: #5cc79a;
+  --qh-ro-wa: #f0655a;
+  --qh-ro-tle: #f2a23c;
+  --qh-ro-pd: #6fa8e8;
+  --qh-ro-part: #b4d455;
+  --qh-ro-ce: #a69d90;
+  --qh-ro-merit: #ddb65c;
+  --qh-ro-brand: #c3a6f5;
+  --qh-ro-brand-fg: #1c1026;
   --qh-shadow-float: 0 8px 24px rgba(38, 34, 36, 0.12);
   --qh-qr-ink: #141413;
   --qh-qr-paper: #ffffff;
@@ -95,6 +109,10 @@
   --qh-verdict-pending-bg: rgba(137, 134, 127, 0.2);
   --qh-verdict-pending-solid: #5b5852;
   --qh-verdict-pending-on: #ffffff;
+  --qh-verdict-part: #4a6400;
+  --qh-verdict-part-bg: rgba(114, 149, 19, 0.2);
+  --qh-verdict-part-solid: #5f7e00;
+  --qh-verdict-part-on: #ffffff;
   --qh-first-solve-bg: #016940;
   --qh-first-solve-text: #ffffff;
   --qh-coin-1: linear-gradient(135deg, #bcd1fe, #8caffd);
@@ -157,6 +175,20 @@
   --qh-syntax-string: #5cbe75;
   --qh-syntax-comment: #afaaa0;
   --qh-syntax-function: #3eb8e1;
+  --qh-ro-bg: #0b0808;
+  --qh-ro-line: #6e5830;
+  --qh-ro-fg: #f1e9d8;
+  --qh-ro-muted: #9c8f7d;
+  --qh-ro-track: #3a2e2a;
+  --qh-ro-ac: #5cc79a;
+  --qh-ro-wa: #f0655a;
+  --qh-ro-tle: #f2a23c;
+  --qh-ro-pd: #6fa8e8;
+  --qh-ro-part: #b4d455;
+  --qh-ro-ce: #a69d90;
+  --qh-ro-merit: #ddb65c;
+  --qh-ro-brand: #c3a6f5;
+  --qh-ro-brand-fg: #1c1026;
   --qh-shadow-float: 0 8px 24px rgba(0, 0, 0, 0.55);
   --qh-qr-ink: #141413;
   --qh-qr-paper: #ffffff;
@@ -203,6 +235,10 @@
   --qh-verdict-pending-bg: rgba(161, 158, 152, 0.2);
   --qh-verdict-pending-solid: #aeaaa4;
   --qh-verdict-pending-on: #1a0e15;
+  --qh-verdict-part: #95bb46;
+  --qh-verdict-part-bg: rgba(137, 174, 55, 0.2);
+  --qh-verdict-part-solid: #98be49;
+  --qh-verdict-part-on: #1a0e15;
   --qh-first-solve-bg: #0ab16f;
   --qh-first-solve-text: #1a0e15;
   --qh-coin-1: linear-gradient(135deg, #bcd1fe, #8caffd);
@@ -259,6 +295,10 @@
   --qh-verdict-pending-bg: rgba(137, 134, 127, 0.2);
   --qh-verdict-pending-solid: #3a3832;
   --qh-verdict-pending-on: #ffffff;
+  --qh-verdict-part: #314200;
+  --qh-verdict-part-bg: rgba(114, 149, 19, 0.2);
+  --qh-verdict-part-solid: #486003;
+  --qh-verdict-part-on: #ffffff;
   --qh-first-solve-bg: #013e24;
   --qh-first-solve-text: #ffffff;
 }
@@ -307,6 +347,10 @@
   --qh-verdict-pending-bg: rgba(161, 158, 152, 0.2);
   --qh-verdict-pending-solid: #cdcac3;
   --qh-verdict-pending-on: #1a0e15;
+  --qh-verdict-part: #c2ea76;
+  --qh-verdict-part-bg: rgba(137, 174, 55, 0.2);
+  --qh-verdict-part-solid: #98be49;
+  --qh-verdict-part-on: #1a0e15;
   --qh-first-solve-bg: #1dd588;
   --qh-first-solve-text: #1a0e15;
 }
