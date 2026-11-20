@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
-import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { translate } from '@/i18n';
 import { NO_VALUE } from '@/lib/format';
 import { submissionVerdictOf } from '@/lib/verdicts';
+import SubmissionVerdictMark from './SubmissionVerdictMark.vue';
 
 /**
- * A list row's verdict: the one verdict mark (lamp and code; the lamp pulses while the row is judged) as the link to
- * the submission; its label names the whole row for a screen reader.
+ * A list row's verdict (`SubmissionVerdictMark`: lamp and code, or words while the row is judged) as the link to the
+ * submission; its label names the whole row for a screen reader.
  */
 const props = defineProps<{ row: SubmissionListItem }>();
 const verdict = computed(() => submissionVerdictOf(props.row));
@@ -28,6 +28,6 @@ const rowLabel = computed(() =>
     :aria-label="rowLabel"
     class="relative inline-flex touch:after:absolute touch:after:-inset-3 touch:after:content-['']"
   >
-    <VerdictChip :verdict="verdict" />
+    <SubmissionVerdictMark :row="row" />
   </RouterLink>
 </template>

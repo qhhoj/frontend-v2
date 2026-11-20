@@ -11,6 +11,7 @@ import HomeContestPlate from './HomeContestPlate.vue';
 import HomeHeader from './HomeHeader.vue';
 import { useRecentSubmissionsQuery } from './home.queries';
 import MyProblemsCard from './MyProblemsCard.vue';
+import NewProblemsCard from './NewProblemsCard.vue';
 import NewPostsCard from './NewPostsCard.vue';
 import RecentSubmissionsList from './RecentSubmissionsList.vue';
 import { useHomeContests } from './use-home-contests';
@@ -20,7 +21,8 @@ import { useHomeContests } from './use-home-contests';
  * contests, the news; staff then get "Bài của tôi". From `lg` the first row is the plate (3 of 5 columns) beside "Làm
  * tiếp", and under it the wide column holds the lists and the narrow one the news. With no contest at all the plate is
  * one line over the page, "Làm tiếp" is the narrow column and the news join the wide one. A phone shows one column in the order above. A visitor
- * gets the header with the sign-up, the plate without buttons, the contests and the news.
+ * gets the header with the sign-up, then in the wide column the plate without buttons, the contests and the newest
+ * problems, and the news in the narrow one: with no contest the page still offers the problems.
  */
 const session = useSessionStore();
 const { canAny } = usePermissions();
@@ -79,8 +81,8 @@ const SIDE = 'max-lg:contents lg:col-span-2 lg:flex lg:flex-col lg:gap-(--space-
   </PageLayout>
   <PageLayout v-else>
     <template #header><AnonymousHeader /></template>
-    <div :class="hasPlate ? COLUMNS : 'contents'">
-      <div :class="hasPlate ? MAIN : 'contents'">
+    <div :class="COLUMNS">
+      <div :class="MAIN">
         <HomeContestPlate
           :plate="contests.plate.value"
           :loading="contests.isPending.value"
@@ -94,8 +96,9 @@ const SIDE = 'max-lg:contents lg:col-span-2 lg:flex lg:flex-col lg:gap-(--space-
           :upcoming="contests.otherUpcoming.value"
           :loading="contests.isPending.value"
         />
+        <NewProblemsCard />
       </div>
-      <div :class="hasPlate ? SIDE : 'contents'"><NewPostsCard /></div>
+      <div :class="SIDE"><NewPostsCard /></div>
     </div>
   </PageLayout>
 </template>

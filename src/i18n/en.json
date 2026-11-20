@@ -1132,6 +1132,7 @@
       "evening": "Good evening, {username}"
     },
     "posts": "News",
+    "newProblems": "New problems",
     "mine": {
       "title": "My problems",
       "empty": "You have no problems yet.",
@@ -1377,8 +1378,7 @@
       "judges": "judges",
       "noJudge": "no judge online"
     },
-    "queued": "In queue",
-    "queuedShort": "Wait",
+    "viewSource": "View source",
     "rowLabel": "Submission #{id} by {user} on {problem}: {verdict}",
     "liveAdded": "{count} new submission | {count} new submissions",
     "liveNew": "{count} new submission on the first page | {count} new submissions on the first page",

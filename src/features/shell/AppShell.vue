@@ -47,7 +47,12 @@ const isOnCurrentContest = computed(
     (route.params.key === currentContest.value.contest.key ||
       navSectionOverride.value === '/contests'),
 );
-const chipContest = computed(() => (isOnCurrentContest.value ? null : currentContest.value));
+/** The home's plate already shows the viewer's contest: there the rail's card and the phone's chip would repeat it. */
+const isOnHome = computed(() => route.name === 'home');
+const railContest = computed(() => (isOnHome.value ? null : currentContest.value));
+const chipContest = computed(() =>
+  isOnCurrentContest.value || isOnHome.value ? null : currentContest.value,
+);
 </script>
 
 <template>
@@ -76,7 +81,7 @@ const chipContest = computed(() => (isOnCurrentContest.value ? null : currentCon
     </main>
     <!-- Workbench: the rail (from md) beside the page column; on a phone the top bar and the tab bar; a desktop has no top bar. The rail and the bars are opaque, so the page background shows behind the page column only. -->
     <div v-else class="flex flex-1" :data-rail="isRailCollapsed ? 'collapsed' : 'open'">
-      <AppRail :current="currentContest" @search="isSearchOpen = true" />
+      <AppRail :current="railContest" @search="isSearchOpen = true" />
       <div class="flex min-w-0 flex-1 flex-col">
         <NotificationAnnouncer />
         <TopBar :live-contest="chipContest" @search="isSearchOpen = true" />

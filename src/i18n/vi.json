@@ -1132,6 +1132,7 @@
       "evening": "Chào buổi tối, {username}"
     },
     "posts": "Tin mới",
+    "newProblems": "Bài tập mới",
     "mine": {
       "title": "Bài của tôi",
       "empty": "Bạn chưa có bài nào.",
@@ -1377,8 +1378,7 @@
       "judges": "máy chấm",
       "noJudge": "không có máy chấm"
     },
-    "queued": "Trong hàng đợi",
-    "queuedShort": "Chờ",
+    "viewSource": "Xem mã nguồn",
     "rowLabel": "Bài nộp #{id} của {user} cho bài {problem}: {verdict}",
     "liveAdded": "Có {count} bài nộp mới | Có {count} bài nộp mới",
     "liveNew": "Có {count} bài nộp mới ở trang đầu | Có {count} bài nộp mới ở trang đầu",

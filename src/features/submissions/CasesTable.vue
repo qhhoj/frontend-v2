@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { ChevronRight } from 'lucide-vue-next';
 import { useRoute } from 'vue-router';
 import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
@@ -17,7 +17,9 @@ import { formatCasePoints, isFullCase } from './test-overview';
 
 /**
  * The tests of a submission ("Từng test"): the tests that lost points one per row, the full ones folded into one line
- * until "Hiện tất cả", then the `footer` slot (the subtasks and the total, `TestOverview.vue`). A test's feedback and
+ * until "Hiện tất cả", then the `footer` slot (the subtasks and the total, `TestOverview.vue`). When every test is
+ * correct there is nothing to list: the section is that one line with "Hiện tất cả" beside it, without the table's
+ * header and without the footer (the plate already says the score). A test's feedback and
  * output stay closed until its row is opened. Keep `CasesTableSkeleton.vue` in step: same card, header cells and row classes. Below `sm` the same rows lay out as cards
  * (test, verdict and points, then time and memory), so each test keeps one `#case-<n>` anchor. Cells pad 24 px on the left, the same edge as the card title.
  */
@@ -70,19 +72,28 @@ const isOpen = (key: string) => opened.value.has(key);
 const toggle = (key: string) => {
   if (!opened.value.delete(key)) opened.value.add(key);
 };
+/** The ledger lists the tests that lost points; "Hiện tất cả" adds the full ones. A link to one test (`#case-<n>`) shows all. */
+const isShowingAll = ref(false);
 const route = useRoute();
-/** A link to one test (`#case-<n>`, from the test squares) opens that test. */
-onMounted(() => {
-  if (!route.hash.startsWith('#case-')) return;
-  opened.value.add(route.hash.slice(1));
-  isShowingAll.value = true;
-});
+/**
+ * A link to one test (`#case-<n>`, from the plate's test squares or a shared URL) shows every row, opens that test and
+ * brings it into view: its row may not be drawn before (a full test is folded), so the browser alone finds no target.
+ */
+watch(
+  () => route.hash,
+  async (hash) => {
+    if (!hash.startsWith('#case-')) return;
+    opened.value.add(hash.slice(1));
+    isShowingAll.value = true;
+    await nextTick();
+    document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'center' });
+  },
+  { immediate: true },
+);
 
 const allRows = computed(() =>
   props.cases ? props.cases.map(caseRow) : (props.batches ?? []).map(batchRow),
 );
-/** The ledger lists the tests that lost points; "Hiện tất cả" adds the full ones. A link to one test (`#case-<n>`) shows all. */
-const isShowingAll = ref(false);
 const fullCount = computed(() => allRows.value.filter((row) => row.isFull).length);
 const gradedRows = computed(() =>
   isShowingAll.value ? allRows.value : allRows.value.filter((row) => !row.isFull),
@@ -112,15 +123,29 @@ const hasRows = computed(() => allRows.value.length > 0);
 const isHidden = computed(() => props.cases === null && props.batches === null);
 /** The full tests are folded into one line while only the tests that lost points are listed. */
 const isFolded = computed(() => !isShowingAll.value && fullCount.value > 0);
+/** Every test is correct and the judging is over: one line stands for the table until "Hiện tất cả". */
+const isAllFull = computed(
+  () => !props.running && hasRows.value && fullCount.value === allRows.value.length,
+);
+const isOneLine = computed(() => isAllFull.value && !isShowingAll.value);
 const foldedText = computed(() =>
-  fullCount.value === allRows.value.length && !props.running
+  isAllFull.value
     ? translate('submission.strip.allFull', { count: allRows.value.length })
     : translate('submission.strip.folded', { count: fullCount.value }),
 );
 </script>
 
 <template>
-  <section id="cases" data-testid="cases-card" class="scroll-mt-20">
+  <section v-if="isOneLine" id="cases" data-testid="cases-card" class="scroll-mt-20">
+    <h2 class="sr-only">{{ $t('submission.cases.title') }}</h2>
+    <p data-testid="cases-all-full" class="flex flex-wrap items-center gap-x-4 gap-y-2 text-muted">
+      {{ foldedText }}
+      <AppButton size="sm" data-testid="cases-show-all" @click="isShowingAll = true">
+        {{ $t('submission.strip.showAll', { count: allRows.length }) }}
+      </AppButton>
+    </p>
+  </section>
+  <section v-else id="cases" data-testid="cases-card" class="scroll-mt-20">
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 pb-3">
       <h2 class="section-title">{{ $t('submission.cases.title') }}</h2>
       <span v-if="running" class="text-meta text-muted">{{ $t('submission.liveUpdates') }}</span>

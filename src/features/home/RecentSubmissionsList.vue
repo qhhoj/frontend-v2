@@ -9,19 +9,18 @@ import { CUE_TEXT } from '@/components/ui/cue-tones';
 import PageSection from '@/components/ui/PageSection.vue';
 import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import StretchedLink from '@/components/ui/StretchedLink.vue';
-import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { useInFlightPoll } from '@/features/submissions/list/use-in-flight-poll';
 import { scoreCellText, scoreCue } from '@/features/submissions/submission-row';
+import SubmissionVerdictMark from '@/features/submissions/SubmissionVerdictMark.vue';
 import { NO_VALUE } from '@/lib/format';
 import { formatRelative } from '@/lib/format-date';
 import { useNow } from '@/lib/use-now';
-import { submissionVerdictOf } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useRecentSubmissionsQuery } from './home.queries';
 
 /**
  * "Bài nộp gần đây của bạn": the newest submissions of the viewer, one row each, a link as a whole: verdict, score in
- * its cue, problem, language, time. On a phone the score sits under the verdict and the language is left out. The
+ * its cue (a row being judged: its state in words and how far it got), problem, language, time. On a phone the score sits under the verdict and the language is left out. The
  * query is shared with "Làm tiếp", so it is one request. A queued or grading row is read again by the same in-flight
  * poll the submission list uses, so its verdict and score settle without a reload.
  */
@@ -78,7 +77,7 @@ const ROW = 'flex min-h-(--qh-row) items-center gap-3 px-2 touch:min-h-13';
       <ul v-else class="flex flex-col divide-y divide-line">
         <li v-for="item in visible" :key="item.id" class="box-link" :class="ROW">
           <span class="flex shrink-0 flex-col max-sm:w-24 sm:flex-row sm:items-center sm:gap-3">
-            <VerdictChip :verdict="submissionVerdictOf(item)" />
+            <SubmissionVerdictMark :row="item" />
             <span
               class="font-mono text-small tabular-nums sm:w-24 sm:text-right"
               :class="scoreClass(item)"
