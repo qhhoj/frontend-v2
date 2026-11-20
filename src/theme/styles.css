@@ -348,6 +348,7 @@
   --qh-on-accent: var(--qh-ro-brand-fg);
   --qh-accent-text: var(--qh-ro-brand);
   --qh-focus-ring: var(--qh-ro-brand);
+  --qh-skeleton: var(--qh-ro-track);
   --qh-merit: var(--qh-ro-merit);
   --qh-medal-gold: var(--qh-ro-merit);
   --qh-positive: var(--qh-ro-ac);

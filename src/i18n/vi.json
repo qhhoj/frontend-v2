@@ -1124,24 +1124,31 @@
       "afternoon": "Chào buổi chiều, {username}",
       "evening": "Chào buổi tối, {username}"
     },
-    "ratingDelta": "{delta} sau kỳ thi gần nhất",
-    "solved": "Đã giải",
-    "unrated": "Chưa có rating",
-    "rating": "Rating",
-    "points": "Điểm",
-    "rank": "Hạng",
-    "posts": "Bài viết",
-    "mine": { "title": "Bài của tôi", "empty": "Bạn chưa có bài nào.", "create": "Tạo bài" },
-    "recentSubmissions": "Bài nộp gần đây",
+    "posts": "Tin mới",
+    "mine": {
+      "title": "Bài của tôi",
+      "empty": "Bạn chưa có bài nào.",
+      "create": "Tạo bài",
+      "unfinished": "Chưa xong",
+      "missing": "Thiếu {gaps}",
+      "gaps": {
+        "statement": "đề bài",
+        "tests": "test",
+        "points": "điểm cho test"
+      }
+    },
+    "recentSubmissions": "Bài nộp gần đây của bạn",
     "continue": {
       "title": "Làm tiếp",
-      "lastSubmission": "Lần nộp cuối {when}",
-      "failedAt": "{verdict} ở test {test}",
-      "failedBatch": "{verdict} ở nhóm {batch}",
-      "empty": "Bạn chưa có bài nào làm dở."
+      "empty": "Bạn chưa có bài nào làm dở.",
+      "all": "Tất cả bài tập",
+      "map": "Bản đồ bài tập",
+      "mapSummary": "Đã giải {solved} trong {total} bài",
+      "solved": "bài đã giải",
+      "unsolved": "bài chưa giải",
+      "attempted": "bài đang dở"
     },
     "noSubmissions": "Bạn chưa nộp bài nào.",
-    "noLiveContest": "Không có kỳ thi đang diễn ra.",
     "browseContests": "Xem các kỳ thi",
     "anon": {
       "title": "Quốc Học Huế Online Judge",
@@ -1164,13 +1171,26 @@
       "leaderboard": "Bảng xếp hạng",
       "noPerformers": "Chưa có ai có điểm PP."
     },
-    "contestants": "{count} thí sinh",
-    "liveEnter": "Vào thi",
-    "liveScore": "{score} điểm",
-    "contributors": {
-      "title": "Đóng góp nhiều nhất",
-      "empty": "Chưa có đóng góp nào.",
-      "toBlog": "Đến blog"
+    "upcomingContests": "Kỳ thi sắp tới",
+    "otherContests": "Kỳ thi khác",
+    "allContests": "Tất cả kỳ thi",
+    "plate": {
+      "label": "Kỳ thi",
+      "mine": "Đang diễn ra · bạn đã vào thi",
+      "running": "Đang diễn ra",
+      "upcoming": "Sắp diễn ra",
+      "timeLeft": "Còn lại",
+      "startsIn": "Bắt đầu sau",
+      "rank": "Hạng của bạn",
+      "score": "Điểm",
+      "contestants": "Thí sinh",
+      "start": "Bắt đầu",
+      "length": "Thời lượng",
+      "enter": "Vào làm bài",
+      "join": "Tham gia",
+      "timeline": "Tiến trình kỳ thi",
+      "now": "Bây giờ: {time}",
+      "none": "Hiện không có kỳ thi nào đang hoặc sắp diễn ra."
     }
   },
   "problem": {

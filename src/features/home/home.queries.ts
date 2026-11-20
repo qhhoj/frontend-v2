@@ -5,11 +5,15 @@ import { fetchProblems } from '@/api/problems.api';
 import { fetchSubmissions } from '@/api/submissions.api';
 import { useViewerId } from '@/stores/use-viewer-id';
 
-/** The newest submissions of the user: the card shows the first three, "Tiếp tục" scans all of them. */
-const RECENT_SUBMISSIONS = 10;
-export const useRecentSubmissionsQuery = (username: MaybeRefOrGetter<string>) => {
+/** The newest submissions of the user: the list shows the first rows, "Làm tiếp" and the plate's timeline scan all of them. */
+const RECENT_SUBMISSIONS = 20;
+export const useRecentSubmissionsQuery = (
+  username: MaybeRefOrGetter<string>,
+  isEnabled: MaybeRefOrGetter<boolean> = true,
+) => {
   const query = computed(() => ({ user: toValue(username), pageSize: RECENT_SUBMISSIONS }));
   return useQuery({
+    enabled: () => toValue(isEnabled),
     queryKey: computed(() => ['submissions', 'list', query.value]),
     queryFn: () => fetchSubmissions(query.value),
     select: (result) => result.items,
@@ -39,5 +43,19 @@ export const useMyProblemsQuery = (enabled: MaybeRefOrGetter<boolean>) => {
         ...recent.items.filter((problem) => !seen.has(problem.code)),
       ].slice(0, MY_PROBLEMS_PAGE);
     },
+  });
+};
+
+/** The largest page of `GET /problems`. */
+const PROBLEM_MAP_PAGE = 100;
+/**
+ * Every public problem with the viewer's status (`viewerStatus`), in one request: the problem map of "Làm tiếp" and
+ * its counts. A catalogue larger than one page has no map (`meta.total` says so); the API has no summary of it.
+ */
+export const useProblemMapQuery = () => {
+  const viewerId = useViewerId();
+  return useQuery({
+    queryKey: computed(() => ['problems', 'map-home', viewerId.value]),
+    queryFn: () => fetchProblems({ sort: 'code', pageSize: PROBLEM_MAP_PAGE }),
   });
 };

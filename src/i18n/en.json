@@ -1124,28 +1124,31 @@
       "afternoon": "Good afternoon, {username}",
       "evening": "Good evening, {username}"
     },
-    "ratingDelta": "{delta} at the last contest",
-    "solved": "Solved",
-    "unrated": "No rating yet",
-    "rating": "Rating",
-    "points": "Points",
-    "rank": "Rank",
-    "posts": "Posts",
+    "posts": "News",
     "mine": {
       "title": "My problems",
       "empty": "You have no problems yet.",
-      "create": "New problem"
+      "create": "New problem",
+      "unfinished": "Unfinished",
+      "missing": "Missing {gaps}",
+      "gaps": {
+        "statement": "statement",
+        "tests": "tests",
+        "points": "test points"
+      }
     },
-    "recentSubmissions": "Recent submissions",
+    "recentSubmissions": "Your recent submissions",
     "continue": {
       "title": "Continue",
-      "lastSubmission": "Last submission {when}",
-      "failedAt": "{verdict} on test {test}",
-      "failedBatch": "{verdict} on group {batch}",
-      "empty": "You have no unfinished problem."
+      "empty": "You have no unfinished problem.",
+      "all": "All problems",
+      "map": "Problem map",
+      "mapSummary": "{solved} of {total} problems solved",
+      "solved": "solved",
+      "unsolved": "not solved",
+      "attempted": "in progress"
     },
     "noSubmissions": "You have not submitted anything yet.",
-    "noLiveContest": "No contest is running.",
     "browseContests": "Browse contests",
     "anon": {
       "title": "Quoc Hoc Hue Online Judge",
@@ -1168,13 +1171,26 @@
       "leaderboard": "Leaderboard",
       "noPerformers": "No one has performance points yet."
     },
-    "contestants": "{count} contestants",
-    "liveEnter": "Enter contest",
-    "liveScore": "{score} points",
-    "contributors": {
-      "title": "Top contributors",
-      "empty": "No contributions yet.",
-      "toBlog": "Go to the blog"
+    "upcomingContests": "Coming contests",
+    "otherContests": "Other contests",
+    "allContests": "All contests",
+    "plate": {
+      "label": "Contest",
+      "mine": "Running · you are in",
+      "running": "Running",
+      "upcoming": "Coming",
+      "timeLeft": "Time left",
+      "startsIn": "Starts in",
+      "rank": "Your rank",
+      "score": "Score",
+      "contestants": "Contestants",
+      "start": "Start",
+      "length": "Length",
+      "enter": "Go to the problems",
+      "join": "Join",
+      "timeline": "Contest timeline",
+      "now": "Now: {time}",
+      "none": "No contest is running or coming."
     }
   },
   "problem": {
