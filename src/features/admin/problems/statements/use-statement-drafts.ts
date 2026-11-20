@@ -23,10 +23,15 @@ import type { StatementDraft, StatementSlot } from './statement-drafts';
 export const FULL_MARKUP_PERMISSION = 'judge.problem_full_markup';
 
 type Drafts = Record<StatementSlot, StatementDraft>;
-/** One slot's save, to the problem the drafts were filled from. */
+/** A slot saved on its own by PUT: every slot but the original, whose description goes with the problem PATCH. */
+type TranslationSlot = Exclude<StatementSlot, 'original'>;
+/** One slot's change, to the problem the drafts were filled from. */
 interface SlotSave {
   code: string;
   target: StatementSlot;
+}
+interface TranslationSave extends SlotSave {
+  target: TranslationSlot;
 }
 
 const seedDrafts = (problem: EditableProblem): Drafts =>
@@ -35,7 +40,7 @@ const seedDrafts = (problem: EditableProblem): Drafts =>
   ) as Drafts;
 
 /** A translation's save. The original description is not saved here: it goes in the page's one problem PATCH. */
-const saveTranslationSlot = (code: string, target: StatementSlot, draft: StatementDraft) =>
+const saveTranslationSlot = (code: string, target: TranslationSlot, draft: StatementDraft) =>
   putTranslation(code, target, { name: draft.name, description: sentDescription(draft) });
 
 /** Sets the slot's trust for the text last saved (the text the holder was shown), never for unsaved edits. */
@@ -140,9 +145,10 @@ export function useStatementDrafts(problem: () => EditableProblem) {
   });
 
   const saveMutation = useAdminMutation({
-    mutate: ({ code, target }: SlotSave) => saveTranslationSlot(code, target, drafts.value[target]),
+    mutate: ({ code, target }: TranslationSave) =>
+      saveTranslationSlot(code, target, drafts.value[target]),
     invalidates: ({ code }: SlotSave) => [['admin', 'problem', code], PUBLIC_PROBLEMS_KEY],
-    onSuccess: (_saved: unknown, { target }: SlotSave) => {
+    onSuccess: (_saved: unknown, { target }: TranslationSave) => {
       recordSaved(drafts, saved, target);
       triedSlots.value.delete(target);
     },
@@ -173,7 +179,7 @@ export function useStatementDrafts(problem: () => EditableProblem) {
   }
 
   /** Sends one translation to the problem `code`: null when saved, else the refusal. */
-  async function saveTranslation(code: string, target: StatementSlot): Promise<ApiError | null> {
+  async function saveTranslation(code: string, target: TranslationSlot): Promise<ApiError | null> {
     await saveMutation.run({ code, target });
     return saveMutation.failure.value;
   }
