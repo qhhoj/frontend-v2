@@ -11,10 +11,10 @@ import type { Ranking, RankingProblem, RankingRow } from '@/api/types/contests';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import { isPenaltyFormat, showsCumtime } from '@/lib/ranking-cells';
 import type { RankingContext } from '@/lib/ranking-cells';
-import RankingList from './RankingList.vue';
 import RankingProblemHeader from './RankingProblemHeader.vue';
 import RankingTableRow from './RankingTableRow.vue';
 import {
+  NAME_COLUMN_PHONE_REM,
   RANK_COLUMN_REM,
   nameColumnRem,
   RATING_COLUMN_REM,
@@ -41,14 +41,9 @@ const props = defineProps<{
   ownSubmissionsOnly?: boolean;
   /** The rows shown are the previous board's while the new one loads: nothing ticks when it arrives. */
   isStale?: boolean;
-  /** The viewer's row, kept as the first row of the board (and of the phone list) while it is among the rows shown. */
+  /** The viewer's row, kept as the first row of the board while it is among the rows shown. */
   pinnedRow?: RankingRow | null;
 }>();
-/** Rank and name stay while the problem columns scroll (the rank column is `RANK_COLUMN_REM` = 3.5 rem = `left-14`). */
-const HEAD_STICKY = 'sticky top-(--contest-bar-height,0) bg-ground';
-const RANK_HEAD = `${HEAD_STICKY} left-0 z-20`;
-const NAME_HEAD = `${HEAD_STICKY} left-14 z-20`;
-const OTHER_HEAD = `${HEAD_STICKY} z-10`;
 const penalty = computed(() => isPenaltyFormat(props.context.formatName));
 const { t } = useI18n();
 const root = ref<HTMLElement | null>(null);
@@ -81,7 +76,7 @@ const submissionsLink = (row: RankingRow, problem?: RankingProblem) => {
     query: { user: row.user.username, problem: problem?.code },
   };
 };
-/** Below `sm` the board is a list in the screen's width; only one of the two is rendered, so 600 rows are not drawn twice. */
+/** Below `sm` the board is the same table in its own scroll box: the name column is narrow and stays while the cells scroll. */
 const isCompact = useMediaQuery(COMPACT_LIST_QUERY);
 /** Points boards print the cumulative time beside the score; penalty boards keep Score and Penalty. */
 const hasCombinedScore = computed(
@@ -126,7 +121,9 @@ const printedName = (row: RankingRow) =>
     row.user.id === props.viewerId ? t('common.you') : '',
     row.isDisqualified ? t('ranking.disqualified') : '',
   ].join(' ');
-const nameRem = computed(() => nameColumnRem(props.ranking.rows.map(printedName)));
+const nameRem = computed(() =>
+  isCompact.value ? NAME_COLUMN_PHONE_REM : nameColumnRem(props.ranking.rows.map(printedName)),
+);
 const tableWidth = computed(
   () => `${tableWidthRem(nameRem.value, props.ranking.problems.length, columns.value)}rem`,
 );
@@ -152,7 +149,17 @@ onMounted(() => {
 });
 onBeforeUnmount(() => observer?.disconnect());
 watch([tableWidth, tableEl, frame], () => void nextTick(measure));
-const HEAD_CELL = 'h-(--qh-row-dense) border-b border-line-strong px-2.5 py-0 font-medium';
+/**
+ * The head sticks under the contest's bar only while the page is the scroller. Inside the sideways scroll frame the frame
+ * is the scroller, so a `top` offset would push the head down over the first row: there it keeps to its place.
+ */
+const headSticky = computed(
+  () => `sticky bg-ground ${isScrolling.value ? '' : 'top-(--contest-bar-height,0)'}`,
+);
+const rankHead = computed(() => `${headSticky.value} z-10 sm:left-0 sm:z-20`);
+const nameHead = computed(() => `${headSticky.value} left-0 z-20 sm:left-14`);
+const otherHead = computed(() => `${headSticky.value} z-10`);
+const HEAD_CELL = 'h-(--qh-row-dense) border-b border-line-strong px-2.5 py-0 font-semibold';
 /** What one board row needs; the pinned copy and the row in place are built the same way. */
 const rowProps = (row: RankingRow) => ({
   row,
@@ -179,19 +186,6 @@ const scoreHeaderKey = computed(() =>
         </AppButton>
       </template>
     </EmptyState>
-    <RankingList
-      v-else-if="isCompact"
-      :ranking="ranking"
-      :rows="rows"
-      :view-of="viewOf"
-      :viewer-id="viewerId"
-      :has-time-column="hasTimeColumn"
-      :has-combined-score="hasCombinedScore"
-      :has-rating-column="hasRatingColumn"
-      :link-of="submissionsLink"
-      :is-ticking="isTicking"
-      :pinned-row="pinnedRow ?? null"
-    />
     <div v-else ref="frame" class="overflow-x-clip">
       <component
         :is="isScrolling ? ScrollRegion : 'div'"
@@ -226,7 +220,7 @@ const scoreHeaderKey = computed(() =>
               <th
                 scope="col"
                 :class="[
-                  RANK_HEAD,
+                  rankHead,
                   'h-(--qh-row-dense) w-14 border-b border-line-strong px-3 py-0 text-right font-medium',
                 ]"
               >
@@ -234,27 +228,24 @@ const scoreHeaderKey = computed(() =>
               </th>
               <th
                 scope="col"
-                :class="[
-                  NAME_HEAD,
-                  'border-b border-line-strong px-2.5 py-0 text-left font-medium',
-                ]"
+                :class="[nameHead, 'border-b border-line-strong px-2.5 py-0 text-left font-medium']"
               >
                 {{ $t('ranking.columns.user') }}
               </th>
-              <th scope="col" :class="[OTHER_HEAD, HEAD_CELL]">
+              <th scope="col" :class="[otherHead, HEAD_CELL]">
                 {{ $t(scoreHeaderKey) }}
               </th>
-              <th v-if="hasTimeColumn" scope="col" :class="[OTHER_HEAD, HEAD_CELL]">
+              <th v-if="hasTimeColumn" scope="col" :class="[otherHead, HEAD_CELL]">
                 {{ $t('ranking.columns.penalty') }}
               </th>
-              <th v-if="hasRatingColumn" scope="col" :class="[OTHER_HEAD, HEAD_CELL]">
+              <th v-if="hasRatingColumn" scope="col" :class="[otherHead, HEAD_CELL]">
                 {{ $t('ranking.columns.ratingChange') }}
               </th>
               <th
                 v-for="problem in ranking.problems"
                 :key="problem.problemId"
                 scope="col"
-                :class="[OTHER_HEAD, HEAD_CELL, 'px-1.5 text-content']"
+                :class="[otherHead, HEAD_CELL, 'px-1.5 text-content']"
               >
                 <RankingProblemHeader
                   :problem="problem"

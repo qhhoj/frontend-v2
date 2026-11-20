@@ -4,12 +4,12 @@ import { computed, ref, watch } from 'vue';
 import type { ContestDetail } from '@/api/types/contests';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AppButton from '@/components/ui/AppButton.vue';
-import StatusDot from '@/components/ui/StatusDot.vue';
 import { formatClock } from '@/lib/format-date';
 import type { ParticipationKind } from './bar/current-contest';
 
 /**
- * The hero's line while the viewer takes part: who they are here and since when, then leaving as a text link.
+ * The header's line while the viewer takes part: who they are here and since when, then leaving as a secondary button
+ * (the plate says the phase; leaving is never the page's primary).
  * The note that used to stand under a red button is in the confirm dialog, worded per participation (live, virtual,
  * spectating). A virtual run also points at its board ("Gồm thi ảo").
  */
@@ -32,8 +32,6 @@ watch(
     if (was && !isNow) isConfirmOpen.value = false;
   },
 );
-const LINK =
-  'inline-flex min-h-8 items-center font-semibold text-accent-text underline underline-offset-2 hover:no-underline touch:min-h-11';
 </script>
 
 <template>
@@ -47,23 +45,21 @@ const LINK =
           <template #icon><Trophy class="size-4" aria-hidden="true" /></template>
           {{ $t('contests.tabs.ranking') }}
         </AppButton>
-        <button type="button" :class="LINK" @click="isConfirmOpen = true">
+        <AppButton tone="secondary" @click="isConfirmOpen = true">
           {{ $t(`${keys}.link`) }}
-        </button>
+        </AppButton>
       </div>
     </template>
-    <p v-else class="flex flex-wrap items-center gap-x-1.5 text-sm">
-      <StatusDot tone="live" />
-      <strong>{{
-        $t(kind === 'spectate' ? 'contests.actions.spectating' : 'contests.actions.inContest')
-      }}</strong>
-      <span v-if="since && kind === 'live'" class="text-muted">
-        {{ $t('contests.actions.since', { time: formatClock(since) }) }}
+    <p v-else class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+      <span class="text-muted">
+        {{ $t(kind === 'spectate' ? 'contests.actions.spectating' : 'contests.actions.inContest') }}
+        <template v-if="since && kind === 'live'">
+          {{ $t('contests.actions.since', { time: formatClock(since) }) }}
+        </template>
       </span>
-      <span aria-hidden="true" class="text-muted">·</span>
-      <button type="button" :class="LINK" @click="isConfirmOpen = true">
+      <AppButton tone="secondary" @click="isConfirmOpen = true">
         {{ $t(`${keys}.link`) }}
-      </button>
+      </AppButton>
     </p>
     <ConfirmDialog
       v-model:visible="isConfirmOpen"

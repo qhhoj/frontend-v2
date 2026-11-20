@@ -227,14 +227,15 @@ async function goToMyRow() {
               : $t('ranking.myRow', { rank: myRow.rank })
           }}
         </AppButton>
-        <RankingLegend
-          :is-penalty="isPenaltyFormat(rankingContext.formatName)"
-          :shows-time="rankingContext.showsTime"
-          :has-virtual-rows="hasVirtualRows"
-          :freeze-note="freezeNote"
-        />
       </template>
     </Toolbar>
+    <RankingLegend
+      v-if="ranking && !isComparing && ranking.rows.length"
+      :is-penalty="isPenaltyFormat(rankingContext.formatName)"
+      :shows-time="rankingContext.showsTime"
+      :has-virtual-rows="hasVirtualRows"
+      :freeze-note="freezeNote"
+    />
     <QueryState
       v-if="!isComparing"
       :loading="rankingPending"

@@ -124,18 +124,12 @@
     "detail": {
       "authors": "Ra đề:",
       "freezeAt": "{time} đóng băng",
-      "freeze": "Đóng băng",
-      "timeLeft": "Còn lại",
-      "notStarted": "Kỳ thi chưa bắt đầu",
       "endedOn": "Kết thúc lúc {time}",
-      "endedAt": "Đã kết thúc lúc {time}",
       "elapsed": "đã qua {span}",
       "notFoundTitle": "Không tìm thấy kỳ thi",
       "notFoundBody": "Kỳ thi không tồn tại hoặc bạn không được xem.",
       "backToList": "Về danh sách kỳ thi",
-      "aside": "Thông tin kỳ thi",
-      "ratingChange": "Rating của bạn {change}",
-      "firstRating": "Rating đầu tiên: {rating}"
+      "aside": "Thông tin kỳ thi"
     },
     "problems": {
       "caption": "Các bài của kỳ thi",
@@ -143,7 +137,7 @@
         "label": "Bài",
         "name": "Đề bài",
         "points": "Điểm",
-        "own": "Của bạn",
+        "own": "Của tôi",
         "open": "Mở đề"
       },
       "open": "Mở đề",
@@ -156,7 +150,6 @@
       "afterStart": "Đề bài sẽ hiện khi kỳ thi bắt đầu và bạn vào thi.",
       "afterJoin": "Đề bài sẽ hiện ngay khi bạn vào thi.",
       "hidden": "Đề bài chưa được công khai.",
-      "heading": "Danh sách bài",
       "printAll": "In tất cả đề"
     },
     "announcements": {
@@ -384,6 +377,20 @@
       "title": "Bắt đầu ngay?",
       "body": "Đồng hồ {span} chạy từ lúc bạn bấm và không dừng lại được.",
       "wait": "Chưa bắt đầu"
+    },
+    "plate": {
+      "label": "Đồng hồ và kết quả của kỳ thi",
+      "left": "còn lại",
+      "startsIn": "bắt đầu sau",
+      "freezeIn": "Đóng băng sau",
+      "start": "Bắt đầu",
+      "length": "Thời lượng",
+      "rating": "Rating",
+      "timeline": "Tiến trình kỳ thi",
+      "now": "Bây giờ: {elapsed}",
+      "event": "{elapsed} · Bài {problem}: {verdict}",
+      "eventsNote": "Chấm tròn trên thước là các lần nộp của bạn.",
+      "freezeNote": "Vùng gạch chéo: bảng xếp hạng đóng băng từ {time}."
     }
   },
   "placeholder": {
@@ -1434,8 +1441,6 @@
       "pendingLabel": "Chờ công bố"
     },
     "timeLeft": "Thời gian còn lại",
-    "showProblems": "Mở các bài của thí sinh",
-    "hideProblems": "Thu gọn các bài của thí sinh",
     "scrollRegion": "Vùng cuộn bảng xếp hạng",
     "columns": {
       "rank": "Hạng",
@@ -1447,16 +1452,15 @@
       "scorePenalty": "Điểm · Phạt"
     },
     "legend": {
-      "firstSolve": "giải đầu tiên",
-      "solved": "+n: giải sau n lần sai, thời điểm giải ở dòng dưới",
-      "failed": "−n đỏ: n lần sai",
-      "pending": "?n: chờ công bố",
-      "firstPoints": "đủ điểm và giải đầu tiên",
-      "fullPoints": "nền xanh: đủ điểm của bài",
-      "partialPoints": "số điểm không nền: một phần điểm của bài",
-      "zeroPoints": "0 đỏ: đã nộp nhưng chưa được điểm",
-      "notAttempted": "trống: chưa nộp",
-      "button": "Chú giải"
+      "label": "Chú giải",
+      "fullPoints": "đủ điểm",
+      "partialPoints": "một phần",
+      "zeroPoints": "chưa được điểm",
+      "notAttempted": "chưa nộp",
+      "solved": "giải sau n lần sai",
+      "failed": "n lần sai",
+      "pending": "chờ công bố",
+      "firstSolve": "giải đầu tiên"
     },
     "cell": {
       "firstSolve": "Giải đầu tiên, sau {tries} lần sai, lúc {time}",
@@ -2685,6 +2689,16 @@
     "rankingShort": "Bảng",
     "sticky": {
       "label": "Thanh kỳ thi đang diễn ra"
+    },
+    "rank": "Hạng {rank}",
+    "score": "{score} điểm",
+    "problems": "Các bài của kỳ thi",
+    "letter": {
+      "solved": "đã giải",
+      "partial": "được một phần điểm",
+      "failed": "đã nộp, chưa được điểm",
+      "pending": "đang chấm",
+      "none": "chưa nộp"
     }
   },
   "balloons": {

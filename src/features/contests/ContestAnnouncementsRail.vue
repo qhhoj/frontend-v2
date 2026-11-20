@@ -27,9 +27,9 @@ const isLive = computed(
 </script>
 
 <template>
-  <Card v-if="latest.length" class="p-5">
-    <div class="mb-1 flex items-center justify-between gap-3">
-      <h2 class="section-title">{{ $t('contests.tabs.announcements') }}</h2>
+  <Card v-if="latest.length" as="aside" padding="md" data-testid="contest-announcements-rail">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="eyebrow">{{ $t('contests.tabs.announcements') }}</h2>
       <Chip v-if="isLive" tone="success">{{ $t('contests.announcements.live') }}</Chip>
     </div>
     <AnnouncementItem
@@ -41,7 +41,7 @@ const isLive = computed(
     />
     <RouterLink
       :to="{ name: 'contest-announcements', params: { key: contest.key } }"
-      class="inline-flex min-h-11 items-center text-accent-text underline"
+      class="inline-flex items-center font-semibold text-accent-text hover:underline touch:min-h-11"
       >{{ $t('common.viewAll') }}</RouterLink
     >
   </Card>

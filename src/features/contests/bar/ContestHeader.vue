@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { Ellipsis, Lock, Printer, Snowflake, Timer } from 'lucide-vue-next';
+import { Ellipsis, Lock, Printer, Timer } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import type { ContestDetail, ContestPhase } from '@/api/types/contests';
+import type { ContestDetail } from '@/api/types/contests';
 import CountdownTimer from '@/components/CountdownTimer.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import Chip from '@/components/ui/Chip.vue';
-import type { CueTone } from '@/components/ui/cue-tones';
 import IconButton from '@/components/ui/IconButton.vue';
 import Menu from '@/components/ui/Menu.vue';
 import type { MenuEntry } from '@/components/ui/Menu.vue';
@@ -17,26 +16,27 @@ import UserLink from '@/components/UserLink.vue';
 import { formatLabel } from '@/lib/contest-format';
 import { ownEndTime, phaseAt } from '@/lib/contest-time';
 import { formatNumber } from '@/lib/format';
-import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useI18n } from 'vue-i18n';
 import { useNow } from '@/lib/use-now';
 import AnnouncementsPausedNotice from '../AnnouncementsPausedNotice.vue';
 import ContestActions from '../ContestActions.vue';
+import ContestChips from '../ContestChips.vue';
+import { useContestTagsQuery } from '../contest-extras.queries';
 import ContestTabs from '../ContestTabs.vue';
-import { boardFreezeOf } from './board-freeze';
+import ContestPlate from './ContestPlate.vue';
 import { useShownClock } from './header-clock';
 import { usePublishedHeight } from '@/features/problems/use-dock-height';
 import { useSessionStore } from '@/stores/session.store';
 import { useCurrentContest } from './use-current-contest';
-import { useLengthText } from '../use-span-text';
 
 /**
- * The contest bar on the contest's own pages: the one H1 (the name), the phase and format chips, the clock while time runs, the
- * freeze chip beside the clock, and the contest's tabs. `ContestLayout` renders it once for every tab, so the state sits in one place and
- * the layout does not jump between tabs. The shell's `ContestBar` steps aside while this header shows the clock
- * (`header-clock.ts`), so the clock shows once and never zero times. The clock counts what the viewer's own time is: a virtual run's end, else the end of their live
- * window, else the contest's end; it shows only while that time runs.
+ * The head of the contest's own pages: the eyebrow (format, rated), the one H1 (the name), the facts that are not
+ * measurements (tags, access code, participants, authors), the viewer's actions, the plate (`ContestPlate`: clock, rank,
+ * score, freeze, time scale) and the contest's tabs. `ContestLayout` renders it once for every tab, so the state sits in
+ * one place and the layout does not jump between tabs. The shell's `ContestBar` steps aside while the plate shows the
+ * clock (`header-clock.ts`), so the clock shows once and never zero times. The clock counts what the viewer's own time
+ * is: a virtual run's end, else the end of their live window, else the contest's end.
  * `isBoardFrozen` is the board's own answer where the page has it (the ranking); elsewhere `viewer.boardFrozenAt` decides.
  */
 const props = withDefaults(
@@ -75,43 +75,22 @@ useShownClock(
   () => props.contestKey,
   () => clockUntil.value !== null,
 );
-/** The status is a filled chip with its dot: running green, upcoming blue, ended grey. The rest of the line is plain muted text. */
-const PHASE_TONE: Record<ContestPhase, CueTone> = {
-  running: 'live',
-  upcoming: 'upcoming',
-  ended: 'ended',
-};
 const { t } = useI18n();
 const locale = useLocaleStore();
-const lengthText = useLengthText();
-interface Fact {
-  text: string | null;
-  wideOnly: boolean;
-}
-const facts = computed<(Fact & { text: string })[]>(() => {
+/** The eyebrow over the name: the viewer's virtual run when one goes on, the format, and "rated" when it is. */
+const eyebrow = computed(() => {
   const contest = props.contest;
-  if (!contest) return [];
-  /** Under `md` only the format stays: the rest moves to the rules fold-out and the ranking tab. */
-  const all: Fact[] = [
-    {
-      text:
-        run.value && run.value.virtual > 0
-          ? t('contestBar.virtual', { run: run.value.virtual })
-          : null,
-      wideOnly: true,
-    },
-    { text: formatLabel(contest.formatName), wideOnly: false },
-    { text: contest.isRated ? t('contests.rated') : null, wideOnly: false },
-  ];
-  return all.filter((fact): fact is Fact & { text: string } => fact.text !== null);
+  if (!contest) return '';
+  return [
+    run.value && run.value.virtual > 0 ? t('contestBar.virtual', { run: run.value.virtual }) : null,
+    formatLabel(contest.formatName),
+    contest.isRated ? t('contests.rated') : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 });
-/** The contest's start and length, the one time fact the header carries (the clock and the bar say the rest). Phones show the length only. */
-const timeFact = computed(() => {
-  const contest = props.contest;
-  if (!contest) return null;
-  const length = lengthText((Date.parse(contest.endTime) - Date.parse(contest.startTime)) / 1000);
-  return { start: formatDate(contest.startTime, 'datetime', locale.locale), length };
-});
+/** The tag chips read their colours from the catalogue: asked only when the contest has tags. */
+useContestTagsQuery(() => (props.contest?.tags.length ?? 0) > 0);
 /** "In tất cả đề" sits in the header's "⋯" menu while the statements are listed. */
 const overflow = computed<MenuEntry[]>(() =>
   props.contest?.problems
@@ -158,14 +137,16 @@ usePublishedHeight(
   '--contest-bar-height',
   () => true,
 );
-const freeze = computed(() =>
-  props.contest ? boardFreezeOf(props.contest, now.value, props.isBoardFrozen) : null,
-);
 </script>
 
 <template>
   <div ref="root" data-testid="contest-page-header" class="contents">
-    <PageHeader v-if="contest" :title="contest.name" beside-from="xl">
+    <PageHeader
+      v-if="contest"
+      :title="contest.name"
+      :lead="contest.summary || undefined"
+      beside-from="xl"
+    >
       <template v-if="contest.logoOverrideImage" #start>
         <img
           :src="contest.logoOverrideImage"
@@ -173,26 +154,19 @@ const freeze = computed(() =>
           class="size-8 shrink-0 rounded-cell object-contain"
         />
       </template>
+      <template #above>
+        <p class="eyebrow" data-testid="contest-eyebrow">{{ eyebrow }}</p>
+      </template>
       <template #meta>
-        <Chip v-if="phase" :tone="PHASE_TONE[phase]" dot>{{ $t(`contests.phase.${phase}`) }}</Chip>
-        <template v-for="fact in facts" :key="fact.text">
-          <span aria-hidden="true" :class="fact.wideOnly && 'max-md:hidden'">·</span>
-          <span :class="fact.wideOnly && 'max-md:hidden'">{{ fact.text }}</span>
-        </template>
-        <span aria-hidden="true">·</span>
-        <template v-if="timeFact">
-          <span class="max-md:hidden">{{ timeFact.start }} ({{ timeFact.length }})</span>
-          <span class="md:hidden">{{ timeFact.length }}</span>
-        </template>
-        <Chip
-          v-if="contest.requiresAccessCode"
-          tone="attention"
-          :icon="Lock"
-          class="max-md:hidden"
-          >{{ $t('contests.list.codeNeeded') }}</Chip
-        >
-        <span aria-hidden="true" class="max-md:hidden">·</span>
-        <span class="max-md:hidden">{{
+        <ContestChips
+          v-if="contest.tags.length || contest.organizations.length"
+          :contest="contest"
+          only-tags
+        />
+        <Chip v-if="contest.requiresAccessCode" tone="attention" :icon="Lock">{{
+          $t('contests.list.codeNeeded')
+        }}</Chip>
+        <span>{{
           $t(
             'contests.participants',
             { count: formatNumber(contest.userCount, locale.locale) },
@@ -200,8 +174,8 @@ const freeze = computed(() =>
           )
         }}</span>
         <template v-if="contest.authors.length">
-          <span aria-hidden="true" class="hidden md:inline">·</span>
-          <span class="hidden md:inline">
+          <span aria-hidden="true" class="max-md:hidden">·</span>
+          <span class="max-md:hidden">
             {{ $t('contests.detail.authors') }}
             <template v-for="(author, index) in contest.authors" :key="author.id"
               >{{ index ? ', ' : '' }}<UserLink :username="author.username" :rating="author.rating"
@@ -227,54 +201,37 @@ const freeze = computed(() =>
         </Menu>
         <ShortLinkButton compact :path="shortLinkPath({ kind: 'contest', key: contest.key })" />
       </template>
-      <template v-if="freeze || clockUntil || showsActions" #actions>
-        <span
-          v-if="freeze"
-          data-testid="freeze-chip"
-          :title="
-            $t(freeze.bodyKey, { minutes: contest.frozenLastMinutes }, contest.frozenLastMinutes)
-          "
-        >
-          <Chip tone="attention" :icon="Snowflake">{{ $t(freeze.labelKey) }}</Chip>
-          <span class="sr-only">{{
-            $t(freeze.bodyKey, { minutes: contest.frozenLastMinutes }, contest.frozenLastMinutes)
-          }}</span>
-        </span>
-        <p
-          v-if="clockUntil"
-          data-testid="contest-clock"
-          class="flex items-center gap-1.5 text-subtitle leading-none font-semibold tabular-nums"
-        >
-          <Timer class="size-4 text-muted" aria-hidden="true" />
-          <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
-          <CountdownTimer :key="clockUntil" :until="clockUntil" @elapsed="emit('elapsed')" />
-        </p>
+      <template v-if="showsActions" #actions>
         <!-- Under `xl` the actions are one row under the title; from `xl` a column beside it, capped so a note wraps instead of widening it over the title. -->
         <ContestActions
-          v-if="showsActions"
           :contest="contest"
           :current="participation"
           class="max-xl:flex-row max-xl:flex-wrap max-xl:items-center xl:max-w-80 xl:items-end xl:text-right"
         />
       </template>
-      <template v-if="!isPinned" #tabs>
-        <ContestTabs :contest-key="contestKey" :phase="contest.phase" :current="current" />
-      </template>
     </PageHeader>
+    <ContestPlate
+      v-if="contest"
+      :contest="contest"
+      :run="run"
+      :standing="run ? (participation?.standing ?? null) : null"
+      :is-board-frozen="isBoardFrozen"
+      @elapsed="emit('elapsed')"
+    />
     <div
-      v-if="contest && isPinned"
+      v-if="contest"
       ref="strip"
       role="group"
       :aria-label="$t('contestBar.sticky.label')"
       data-testid="contest-sticky-bar"
       :class="[
-        'z-header -mt-3 flex items-center gap-3 bg-surface py-1 md:-mt-2 print:static',
-        isSticky && 'sticky top-0',
+        'z-header flex items-center gap-3 print:static',
+        isSticky && 'sticky top-0 bg-ground',
       ]"
     >
       <div class="min-w-0 flex-1">
         <ContestTabs
-          is-pinned
+          :is-pinned="isPinned"
           :contest-key="contestKey"
           :phase="contest.phase"
           :current="current"
@@ -285,8 +242,7 @@ const freeze = computed(() =>
         data-testid="contest-sticky-status"
         class="flex min-w-0 shrink-0 items-center gap-2 text-meta font-semibold"
       >
-        <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-cue-live" />
-        <span class="max-w-xs truncate text-cue-live max-md:hidden">{{ contest.name }}</span>
+        <span class="max-w-xs truncate max-md:hidden">{{ contest.name }}</span>
         <span class="flex items-center gap-1.5 tabular-nums">
           <Timer class="size-4 text-muted" aria-hidden="true" />
           <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
@@ -299,7 +255,7 @@ const freeze = computed(() =>
       <div data-skeleton-region="title" class="page-title">
         <SkeletonBlock text class="w-80 max-w-full" />
       </div>
-      <div class="mt-3"><ContestTabs :contest-key="contestKey" :current="current" /></div>
+      <ContestTabs :contest-key="contestKey" :current="current" />
     </template>
   </div>
 </template>
