@@ -1,23 +1,4 @@
 {
-  "view": "View problem",
-  "tabsLabel": "Problem sections",
-  "stepTodo": "Not done",
-  "tabs": {
-    "general": "General",
-    "statements": "Statements",
-    "editorial": "Editorial",
-    "data": "Test data",
-    "files": "Files",
-    "external": "External judge"
-  },
-  "leads": {
-    "general": "Code, limits, classification, people and status.",
-    "statements": "Statements per language, with a live preview.",
-    "editorial": "The editorial, its visibility and its authors.",
-    "data": "The data package, checker settings and the test list.",
-    "files": "Images in the statement, the PDF statement and attached material.",
-    "external": "Judge this problem on a remote online judge instead of here."
-  },
   "notFound": "Problem {code} not found.",
   "cannotEdit": "This account cannot edit problem {code}.",
   "indexLead": "Open by code or search the list.",
@@ -128,7 +109,6 @@
       "people": "Who edits, tests and sees the problem.",
       "status": "Saved with the sections above."
     },
-    "savedToast": "Saved {code}.",
     "basic": {
       "sections": {
         "info": "Code, name and limits"
@@ -179,35 +159,18 @@
     },
     "missing": "missing",
     "unsaved": "unsaved",
-    "otherUnsaved": "{slot}: {count} unsaved change | {slot}: {count} unsaved changes",
     "nameLabel": "Name ({language})",
     "nameHint": "Up to 100 characters.",
     "contentLabel": "Content (Markdown)",
     "imageButton": "Insert image",
     "imageHint": "An uploaded image is inserted at the cursor.",
     "fullMarkupNote": "This problem uses full markup: the preview uses the plain style because you lack the “Use unsanitised problem markup” permission.",
-    "save": {
-      "vi": "Save Vietnamese translation",
-      "en": "Save English translation",
-      "original": "Save original description"
-    },
     "errors": {
       "nameLength": "Name is 1 to {max} characters.",
       "descriptionLength": "Content is at most {max} characters.",
       "character": "Do not use the character {character}; use a plain one instead."
     },
-    "savedToast": "Saved {slot}.",
     "nameDefaultHint": "Defaults to the problem's name; type to change it for {language}.",
-    "written": {
-      "label": "Statements written",
-      "short": {
-        "vi": "VI",
-        "en": "EN",
-        "original": "Base"
-      },
-      "yes": "{slot}: written",
-      "no": "{slot}: missing"
-    },
     "trust": {
       "trustedTitle": "This text is trusted",
       "trustedSummary": "The problem uses full markup: HTML in this text renders unsanitised on the problem page.",
@@ -232,8 +195,7 @@
     "publishOn": "Publish from",
     "publishOnHint": "The editorial opens to everyone at this time (when publishing is on).",
     "authors": "Editorial authors",
-    "content": "Content (Markdown)",
-    "savedToast": "Editorial saved."
+    "content": "Content (Markdown)"
   },
   "data": {
     "badJson": "Invalid JSON.",
@@ -326,7 +288,6 @@
       "count": "Must be a whole number, zero or more.",
       "argsTotal": "All test arguments together are over 1 MiB; shorten them."
     },
-    "savedToast": "Saved the judging setup of {code}.",
     "autofill": {
       "title": "Create tests from the zip",
       "found": "Found {count} input/output pairs",
@@ -567,17 +528,6 @@
     "suggested": "Suggested"
   },
   "visibility": {
-    "title": {
-      "everyone": "Shown to contestants",
-      "members": "Shown to members"
-    },
-    "lead": {
-      "private": "Off: only the problem's staff see it. Publish once it is ready.",
-      "public": "On: contestants see the problem in the list and can submit.",
-      "members": "On: only organization members see the problem in the list and can submit."
-    },
-    "missing": "Missing:",
-    "ready": "All steps done:",
     "checks": {
       "statement": {
         "done": "Statement written",
@@ -618,5 +568,102 @@
     },
     "publishedToast": "Published {code}.",
     "hiddenToast": "{code} is private now."
+  },
+  "workbench": {
+    "back": "My problems",
+    "viewAsStudent": "View as a student",
+    "plate": {
+      "label": "Problem status",
+      "state": "Status",
+      "sentence": {
+        "draft": "Draft · students cannot see this problem yet",
+        "suggested": "Suggested problem · awaiting review, students cannot see it",
+        "public": "Public · students can see it and submit",
+        "members": "Shown to organization members"
+      },
+      "note": {
+        "public": "You can make it private at any time; past submissions are kept.",
+        "loading": "Reading the test data…",
+        "ready": "Every step is done. Publish when you are ready.",
+        "trial": "One step left: submit a model solution to check the tests and the judging.",
+        "todo": "{count} steps left. First: {missing}."
+      },
+      "steps": {
+        "info": "Info",
+        "statement": "Statement",
+        "tests": "Tests and judging",
+        "trial": "Trial run"
+      },
+      "stepDone": "Done",
+      "next": {
+        "statement": "Write the statement",
+        "tests": "Add tests and points",
+        "trial": "Submit a model solution"
+      },
+      "publishBlocked": "Cannot publish yet: {missing}",
+      "saveFirst": "Save first"
+    },
+    "sections": {
+      "info": "Info",
+      "statement": "Statement",
+      "tests": "Tests and judging",
+      "trial": "Trial run",
+      "other": "Other",
+      "edit": "Edit",
+      "collapse": "Collapse"
+    },
+    "summary": {
+      "code": "Code {code}",
+      "points": "{points} points",
+      "partial": "partial scoring",
+      "allOrNothing": "all tests or nothing",
+      "noStatement": "no statement yet",
+      "hasPdf": "has a PDF statement",
+      "noPdf": "no PDF statement",
+      "hasEditorial": "has an editorial",
+      "noEditorial": "no editorial"
+    },
+    "info": {
+      "more": "Rarely used settings",
+      "memory": "Memory (MB)",
+      "memoryHint": "At most 1024."
+    },
+    "statement": {
+      "files": "Images, PDF statement and material",
+      "editorial": "Editorial"
+    },
+    "tests": {
+      "judging": "Judging",
+      "ioTitle": "Students read and write with",
+      "advanced": "Advanced options",
+      "total": "{tests} tests · {groups} groups · total {sum} / {points} points",
+      "totalOff": "The tests' total differs from the problem's points."
+    },
+    "trial": {
+      "todo": "No trial submission yet",
+      "done": "Trial submission made",
+      "later": "running it on this page comes in a later version",
+      "open": "Submit on the problem page"
+    },
+    "other": {
+      "summary": "External judging, Polygon, package, source files, delete"
+    },
+    "save": {
+      "partial": "Not everything was saved. The unsaved parts are still on this page: fix them and save again.",
+      "complaint": "Saved, but the judge reports a problem with the test setup.",
+      "parts": {
+        "problem": "Info and original description",
+        "translationVi": "Vietnamese translation",
+        "translationEn": "English translation",
+        "editorial": "Editorial",
+        "data": "Tests and judging"
+      },
+      "status": {
+        "saved": "saved",
+        "savedWithNote": "saved, the judge reports",
+        "failed": "not saved",
+        "skipped": "not sent because an earlier part failed"
+      }
+    }
   }
 }

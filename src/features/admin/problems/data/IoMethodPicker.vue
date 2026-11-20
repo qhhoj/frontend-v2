@@ -44,7 +44,11 @@ const fileName = (name: 'io_input_file' | 'io_output_file') =>
 </script>
 
 <template>
-  <AdminFormSection id="data-io-section" :title="t(`${key}.graderTitle`)" :columns="1">
+  <AdminFormSection
+    id="data-io-section"
+    :title="t('admin.problems.workbench.tests.ioTitle')"
+    :columns="1"
+  >
     <template v-if="form.grader === 'standard'">
       <ChoiceCards
         v-model="ioMethod"

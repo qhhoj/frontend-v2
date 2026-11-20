@@ -18,13 +18,13 @@ const sourceOf = (suffix: string) => {
  */
 const PROVIDER: Record<string, string> = {
   'admin/short-links/ShortLinkCreateForm.vue': 'self',
-  'admin/problems/editorial/ProblemEditorialTab.vue': 'self',
   'admin/integrations/IntegrationClientForm.vue': 'self',
   'admin/contests/participants/AddParticipationDialog.vue': 'self',
   'admin/contests/participants/ParticipationDialogs.vue': 'self',
   'admin/contests/lifecycle/ContestCloneDialog.vue': 'self',
   'admin/contests/ranking/RankingLinkCard.vue': 'self',
-  'admin/problems/general/ProblemBasicsSection.vue': 'admin/problems/general/use-problem-form.ts',
+  'admin/problems/editorial/EditorialFields.vue': 'admin/problems/workbench/use-workbench.ts',
+  'admin/problems/general/ProblemBasicsSection.vue': 'admin/problems/workbench/use-workbench.ts',
   'admin/contests/general/ContestTimeSection.vue': 'admin/contests/general/use-contest-form.ts',
   'admin/contests/general/ContestBasicTime.vue': 'admin/contests/general/use-contest-form.ts',
   'admin/rejudge/RejudgeFilterForm.vue': 'admin/rejudge/BulkRejudgePage.vue',

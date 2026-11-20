@@ -5,7 +5,6 @@ import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { INPUT } from '../../ui/controls';
-import type { EditorView } from '../../ui/form/editor-view';
 import CheckerPicker from './CheckerPicker.vue';
 import CheckerRuleOptions from './CheckerRuleOptions.vue';
 import GraderPicker from './GraderPicker.vue';
@@ -14,11 +13,17 @@ import { numberBoxValue } from '../../ui/form/number-box';
 import type { DataForm } from './test-cases';
 
 /**
- * The judging settings above the test list. Basic: the checker type and the input/output method. Advanced: the checker's
- * rule and options, how the program runs, then the rarely used output options.
+ * The judging settings of the workbench. `main`: how the answer is compared (with the checker file), how the program runs
+ * (interactor, header and grader files) and the input/output method. `advanced`: the checker's rule options and the rarely
+ * used output options.
  */
 const form = defineModel<DataForm>({ required: true });
-defineProps<{ code: string; data: ProblemData; errors: FieldErrors; view: EditorView }>();
+defineProps<{
+  code: string;
+  data: ProblemData;
+  errors: FieldErrors;
+  part: 'main' | 'advanced';
+}>();
 const key = 'admin.problems.data.config';
 
 function setOutputNumber(field: 'outputLimit' | 'outputPrefix', event: Event) {
@@ -27,13 +32,13 @@ function setOutputNumber(field: 'outputLimit' | 'outputPrefix', event: Event) {
 </script>
 
 <template>
-  <template v-if="view === 'basic'">
+  <template v-if="part === 'main'">
     <CheckerPicker v-model="form" :code="code" :data="data" />
+    <GraderPicker v-model="form" :code="code" :data="data" />
     <IoMethodPicker v-model="form" :errors="errors" />
   </template>
   <template v-else>
     <CheckerRuleOptions v-model="form" :errors="errors" />
-    <GraderPicker v-model="form" :code="code" :data="data" />
     <AdminFormSection
       :title="$t(`${key}.advancedTitle`)"
       :description="$t(`${key}.advancedDescription`)"

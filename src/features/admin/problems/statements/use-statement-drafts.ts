@@ -3,6 +3,7 @@ import type { Ref } from 'vue';
 import { putTranslation, updateProblem } from '@/api/problem-editing.api';
 import type { EditableProblem } from '@/api/types/problem-editing';
 import { translate } from '@/i18n';
+import type { ApiError } from '@/api/client';
 import { usePermissions } from '@/stores/use-permissions';
 import { useSeededDraft } from '../../ui/form/seeded-draft';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
@@ -33,12 +34,9 @@ const seedDrafts = (problem: EditableProblem): Drafts =>
     STATEMENT_SLOTS.map((slot) => [slot, statementDraftOf(problem, slot)]),
   ) as Drafts;
 
-/** The text a slot is saved with: a translation goes to PUT, the original description to PATCH on the problem. */
-function saveSlot(code: string, target: StatementSlot, draft: StatementDraft): Promise<unknown> {
-  const description = sentDescription(draft);
-  if (target === 'original') return updateProblem(code, { description });
-  return putTranslation(code, target, { name: draft.name, description });
-}
+/** A translation's save. The original description is not saved here: it goes in the page's one problem PATCH. */
+const saveTranslationSlot = (code: string, target: StatementSlot, draft: StatementDraft) =>
+  putTranslation(code, target, { name: draft.name, description: sentDescription(draft) });
 
 /** Sets the slot's trust for the text last saved (the text the holder was shown), never for unsaved edits. */
 function saveSlotTrust(
@@ -60,10 +58,7 @@ function saveSlotTrust(
 const changedFields = (draft: StatementDraft, saved: StatementDraft) =>
   Number(draft.name !== saved.name) + Number(draft.description !== saved.description);
 
-/**
- * The one count of unsaved changes, per slot. The save bar counts the slot on screen (one slot saves at a time) and names the
- * other slots' changes (`otherUnsaved`); the leave guard counts them all, so it never reports a change the bar hid.
- */
+/** The one count of unsaved changes, per slot and in total; the page's save bar and leave guard read the total. */
 function useSlotChanges(drafts: Ref<Drafts>, saved: Ref<Drafts>, slot: Ref<StatementSlot>) {
   const changesBySlot = computed(
     () =>
@@ -75,12 +70,10 @@ function useSlotChanges(drafts: Ref<Drafts>, saved: Ref<Drafts>, slot: Ref<State
   const totalDirtyCount = computed(() =>
     STATEMENT_SLOTS.reduce((total, item) => total + changesBySlot.value[item], 0),
   );
-  const otherUnsaved = computed(() =>
-    STATEMENT_SLOTS.filter((item) => item !== slot.value && changesBySlot.value[item] > 0).map(
-      (item) => ({ slot: item, count: changesBySlot.value[item] }),
-    ),
+  const dirtySlots = computed(() =>
+    STATEMENT_SLOTS.filter((item) => changesBySlot.value[item] > 0),
   );
-  return { changesBySlot, dirtyCount, totalDirtyCount, otherUnsaved };
+  return { changesBySlot, dirtyCount, totalDirtyCount, dirtySlots };
 }
 
 /**
@@ -99,7 +92,11 @@ function recordSaved(drafts: Ref<Drafts>, saved: Ref<Drafts>, target: StatementS
   saved.value[target] = { ...drafts.value[target] };
 }
 
-/** The statements tab: one draft per slot for the page's life, saved one slot at a time, with the last saved text as the baseline. */
+/**
+ * The statement section: one draft per slot for the page's life, with the last saved text as the baseline. The page's one save
+ * checks every edited slot (`validate`), sends the original description with the problem PATCH (`originalPatch`, then
+ * `markOriginalSaved`) and each edited translation on its own (`saveTranslation`).
+ */
 export function useStatementDrafts(problem: () => EditableProblem) {
   const { can } = usePermissions();
   const slot = ref<StatementSlot>(initialSlotOf(problem()));
@@ -126,14 +123,13 @@ export function useStatementDrafts(problem: () => EditableProblem) {
       triedSlots.value.has(slot.value),
     ),
   );
-  const { changesBySlot, dirtyCount, totalDirtyCount, otherUnsaved } = useSlotChanges(
+  const { changesBySlot, dirtyCount, totalDirtyCount, dirtySlots } = useSlotChanges(
     drafts,
     saved,
     slot,
   );
-  const savedAt = ref<Date | null>(null);
   /** Every slot follows the problem on screen; a newer copy of it only while no slot is edited. */
-  const { target: seededCode } = useSeededDraft(problem, {
+  const { target: seededCode, retarget } = useSeededDraft(problem, {
     idOf: (stored) => stored.code,
     routeParam: 'code',
     isDirty: () => totalDirtyCount.value > 0,
@@ -144,26 +140,42 @@ export function useStatementDrafts(problem: () => EditableProblem) {
   });
 
   const saveMutation = useAdminMutation({
-    mutate: ({ code, target }: SlotSave) => saveSlot(code, target, drafts.value[target]),
+    mutate: ({ code, target }: SlotSave) => saveTranslationSlot(code, target, drafts.value[target]),
     invalidates: ({ code }: SlotSave) => [['admin', 'problem', code], PUBLIC_PROBLEMS_KEY],
-    successText: (_saved: unknown, { target }: SlotSave) =>
-      translate('admin.problems.statements.savedToast', {
-        slot: translate(`admin.problems.statements.slots.${target}`),
-      }),
-    onSuccess: () => (savedAt.value = new Date()),
-    onDone: (_saved: unknown, { target }: SlotSave) => {
+    onSuccess: (_saved: unknown, { target }: SlotSave) => {
       recordSaved(drafts, saved, target);
       triedSlots.value.delete(target);
     },
   });
 
-  async function save() {
-    triedSlots.value.add(slot.value);
-    if (isLocked.value || Object.keys(errors.value).length > 0) return;
-    // The slot goes to the problem it was filled from, and nowhere while the page shows another one.
-    const code = seededCode();
-    if (dirtyCount.value === 0 || !code) return;
-    await saveMutation.run({ code, target: slot.value });
+  /** Whether an edited slot cannot be sent: a text the backend would refuse, or a description this viewer may not write. */
+  const isSlotInvalid = (item: StatementSlot) =>
+    Object.keys(checkStatementDraft(drafts.value[item], item)).length > 0 ||
+    (isOriginalLocked(problem(), canFullMarkup.value) &&
+      isDescriptionWrite(item, drafts.value, saved.value));
+
+  /** Checks every edited slot; the first one that cannot be sent comes on screen with its errors. True when all may be sent. */
+  function validate(): boolean {
+    dirtySlots.value.forEach((item) => triedSlots.value.add(item));
+    const invalid = dirtySlots.value.filter(isSlotInvalid);
+    if (invalid.length > 0 && !invalid.includes(slot.value)) slot.value = invalid[0]!;
+    return invalid.length === 0;
+  }
+
+  /** The original description as the problem PATCH sends it, or null while it is unchanged. */
+  const originalPatch = () =>
+    changesBySlot.value.original > 0
+      ? { description: sentDescription(drafts.value.original) }
+      : null;
+  function markOriginalSaved() {
+    recordSaved(drafts, saved, 'original');
+    triedSlots.value.delete('original');
+  }
+
+  /** Sends one translation to the problem `code`: null when saved, else the refusal. */
+  async function saveTranslation(code: string, target: StatementSlot): Promise<ApiError | null> {
+    await saveMutation.run({ code, target });
+    return saveMutation.failure.value;
   }
 
   const trustMutation = useAdminMutation({
@@ -193,10 +205,10 @@ export function useStatementDrafts(problem: () => EditableProblem) {
     await trustMutation.run({ code, target: slot.value, isTrusted });
   }
 
-  /** Puts the slot on screen back to its last saved text. */
+  /** Puts every slot back to its last saved text. */
   function discard() {
-    drafts.value[slot.value] = { ...saved.value[slot.value] };
-    triedSlots.value.delete(slot.value);
+    STATEMENT_SLOTS.forEach((item) => (drafts.value[item] = { ...saved.value[item] }));
+    triedSlots.value.clear();
   }
 
   return {
@@ -207,14 +219,16 @@ export function useStatementDrafts(problem: () => EditableProblem) {
     changesBySlot,
     dirtyCount,
     totalDirtyCount,
-    otherUnsaved,
-    savedAt,
+    dirtySlots,
     previewStyle,
     canFullMarkup,
     errors: visibleErrors,
-    save,
+    validate,
+    originalPatch,
+    markOriginalSaved,
+    saveTranslation,
+    retarget,
     discard,
-    saveMutation,
     canSetTrust,
     setTrust,
     trustMutation,
