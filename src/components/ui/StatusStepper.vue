@@ -29,7 +29,7 @@ const label = computed(() => {
 });
 /** Lamp index of each step shown: all four, or only the current one in a list row. */
 const lamps = computed(() =>
-  props.compact ? [current.value] : Array.from({ length: STEP_COUNT }, (_, index) => index),
+  props.compact ? [current.value] : Array.from({ length: STEP_COUNT }, (unused, index) => index),
 );
 </script>
 
