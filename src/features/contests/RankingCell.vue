@@ -7,8 +7,8 @@ import type { RankingCellView } from '@/lib/ranking-cells';
 import ScoreTick from './ScoreTick.vue';
 import { TABLE_CELL_CLASSES } from './ranking-cell-classes';
 
-/** The board row is 40 px (`--qh-row-dense`), the cell box 36 px inside it: the score and, under it, the time. */
-const CELL_BOX_CLASS = 'h-9';
+/** The board row is 40 px (`--qh-row-dense`), the cell box 36 px inside it: the score and, under it, the time. On a coarse pointer the box is the touch height, so a cell that links is a 44 px target. */
+const CELL_BOX_CLASS = 'h-9 touch:h-(--qh-touch)';
 
 const props = defineProps<{ view: RankingCellView; to?: RouteLocationRaw; tick?: boolean }>();
 

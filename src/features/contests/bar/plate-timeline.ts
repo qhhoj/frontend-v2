@@ -5,7 +5,7 @@ import { formatElapsed } from '@/lib/format';
 import { formatClock } from '@/lib/format-date';
 import { submissionVerdictOf } from '@/lib/verdicts';
 
-const MINUTE_MS = 60_000;
+const MS_PER_MINUTE = 60_000;
 /** The steps a scale may count in, in minutes; the first that leaves at most `MAX_STEPS` parts is used. */
 const STEP_MINUTES = [15, 30, 60, 120, 180, 360, 720];
 const MAX_STEPS = 4;
@@ -27,10 +27,14 @@ export function timelineTicks(
     { at: start, label: ends.start },
     { at: end, label: ends.end },
   ];
-  const step = STEP_MINUTES.find((minutes) => length / (minutes * MINUTE_MS) <= MAX_STEPS);
+  const step = STEP_MINUTES.find((minutes) => length / (minutes * MS_PER_MINUTE) <= MAX_STEPS);
   if (!isOneDay || length <= 0 || step === undefined) return edges;
   const inner: TimelineTick[] = [];
-  for (let at = start + step * MINUTE_MS; at < end - length * END_CLEARANCE; at += step * MINUTE_MS)
+  for (
+    let at = start + step * MS_PER_MINUTE;
+    at < end - length * END_CLEARANCE;
+    at += step * MS_PER_MINUTE
+  )
     inner.push({ at, label: formatClock(new Date(at).toISOString()) });
   return [edges[0]!, ...inner, edges[1]!];
 }

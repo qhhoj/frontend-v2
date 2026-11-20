@@ -12,8 +12,8 @@ import { useContestQuery } from './contests.queries';
  * The header, the plate and the tab strip live here, so they stay mounted while the tab changes and the tab indicator
  * can slide. Each tab page draws only its own content, under the tabs.
  */
-/** The countdown can fire up to a second before the server's clock agrees with it: one later refetch closes that gap. */
-const SERVER_CATCH_UP_MS = 1500;
+/** The countdown can fire up to a second before the server's clock agrees with it: one refetch this many milliseconds later closes that gap (a wait on the server, not a design duration). */
+const SERVER_CATCH_UP_WAIT = 1500;
 
 const route = useRoute();
 const key = computed(() => String(route.params.key));
@@ -32,7 +32,7 @@ function onCountdownElapsed() {
   clearTimeout(catchUpTimer);
   catchUpTimer = setTimeout(() => {
     if (serverLagsClock()) void refetch();
-  }, SERVER_CATCH_UP_MS);
+  }, SERVER_CATCH_UP_WAIT);
 }
 onBeforeUnmount(() => clearTimeout(catchUpTimer));
 </script>

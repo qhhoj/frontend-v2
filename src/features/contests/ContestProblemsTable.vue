@@ -135,6 +135,9 @@ const HEAD = 'px-3 font-semibold';
                 {{ capLineOf(problem) }}
               </span>
             </span>
+            <span v-if="capLineOf(problem)" class="block pb-2 text-small text-muted md:hidden">
+              {{ capLineOf(problem) }}
+            </span>
           </td>
           <td v-if="hasOwnResults" class="px-3">
             <OwnResultChip :problem="problem" :context="context" />
