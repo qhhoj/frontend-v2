@@ -15,8 +15,8 @@ export function areasOf(files: AreaFiles): AdminMessages {
 /**
  * `./admin/shared/`: the admin areas that pages outside the admin area also show (through admin parts they import).
  * They load with the app. Every other area in `./admin/` loads when an admin page is first opened
- * (`loadAdminMessages`); `admin-messages.guard.spec.ts` fails when a public page reaches one of those.
+ * (`loadAdminMessages`); `npm run lint:admin-messages` fails when a public page reaches one of those.
  */
 export const SHARED_ADMIN_MESSAGES = areasOf(
-  import.meta.glob<{ default: Messages }>('./admin/shared/*.json', { eager: true }) as AreaFiles,
+  import.meta.glob<{ default: Messages }>('./admin/shared/*.json', { eager: true }),
 );

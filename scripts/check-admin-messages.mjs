@@ -28,9 +28,9 @@ function resolveImport(from, spec) {
 
 function importsOf(file, text) {
   const isEntry = ADMIN_ENTRIES.includes(relative(root, file));
-  const targets = [...text.matchAll(STATIC_IMPORT)].map((m) => resolveImport(file, m[1]));
-  for (const m of text.matchAll(DYNAMIC_IMPORT)) {
-    const target = resolveImport(file, m[1]);
+  const targets = [...text.matchAll(STATIC_IMPORT)].map((match) => resolveImport(file, match[1]));
+  for (const match of text.matchAll(DYNAMIC_IMPORT)) {
+    const target = resolveImport(file, match[1]);
     if (!(isEntry && target?.includes('/features/admin/'))) targets.push(target);
   }
   return targets.filter(Boolean);
@@ -46,7 +46,8 @@ function publicAreas() {
     if (seen.has(file)) continue;
     seen.add(file);
     const text = readFileSync(file, 'utf8');
-    for (const m of text.matchAll(/\badmin\.(\w+)/g)) if (!areas.has(m[1])) areas.set(m[1], file);
+    for (const match of text.matchAll(/\badmin\.(\w+)/g))
+      if (!areas.has(match[1])) areas.set(match[1], file);
     queue.push(...importsOf(file, text));
   }
   return areas;
@@ -55,8 +56,8 @@ function publicAreas() {
 const areaNames = (dir) =>
   new Set(
     readdirSync(dir)
-      .filter((n) => n.endsWith('.json'))
-      .map((n) => n.split('.')[0]),
+      .filter((name) => name.endsWith('.json'))
+      .map((name) => name.split('.')[0]),
   );
 const adminOnly = areaNames(adminTexts);
 const offences = [...publicAreas()]
