@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { spanMessage } from '@/lib/contest-time';
 import { buttonClass } from '../../ui/controls';
 import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
-import { useDateReset, useHasUnreadableDate } from '@/components/ui/date-validity';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import type { ContestForm } from '../contest-form';
+import { QUICK_MINUTES, useContestLength } from './contest-length';
 import { timeModel } from './input-values';
 
 /** The Basic view's time: start and end, and quick lengths that set the end from the start. */
@@ -15,30 +13,10 @@ const form = defineModel<ContestForm>({ required: true });
 defineProps<{ errors: FieldErrors }>();
 const { t } = useI18n();
 const KEY = 'admin.contests.general';
-const QUICK_MINUTES = [15, 45, 90, 120] as const;
 
 const start = timeModel(form, 'startTime');
 const end = timeModel(form, 'endTime');
-
-const resetDates = useDateReset();
-const hasUnreadableDate = useHasUnreadableDate();
-/** Does nothing while a box holds text that does not read: it stays as typed, with its error, and the save stays refused. */
-function lastFor(minutes: number) {
-  if (hasUnreadableDate.value) return;
-  const startMs = Date.parse(form.value.startTime);
-  if (Number.isFinite(startMs))
-    form.value.endTime = new Date(startMs + minutes * 60_000).toISOString();
-  resetDates();
-}
-/** "Kéo dài 45 phút." under the end, once the window reads. */
-const lengthHint = computed(() => {
-  const seconds = (Date.parse(form.value.endTime) - Date.parse(form.value.startTime)) / 1000;
-  if (!(seconds > 0)) return undefined;
-  const span = spanMessage(seconds);
-  const text =
-    span.count === undefined ? t(span.key, span.params) : t(span.key, span.params, span.count);
-  return t(`${KEY}.hints.length`, { span: text });
-});
+const { lastFor, lengthHint } = useContestLength(form);
 </script>
 
 <template>

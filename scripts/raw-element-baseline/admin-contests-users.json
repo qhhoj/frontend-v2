@@ -1,12 +1,4 @@
 {
-  "features/admin/contests/ContestEditorPage.vue": {
-    "AdminChip": 1,
-    "AdminPageHeader": 1,
-    "button": 2,
-    "controls": 6,
-    "fixed-size": 2,
-    "status-colour": 1
-  },
   "features/admin/contests/ContestsIndexPage.vue": {
     "AdminPageHeader": 1,
     "controls": 1
@@ -132,9 +124,6 @@
   "features/admin/contests/general/ContestGeneralForm.vue": {
     "controls": 1
   },
-  "features/admin/contests/general/ContestGeneralTab.vue": {
-    "AdminNotice": 1
-  },
   "features/admin/contests/general/ContestInfoSection.vue": {
     "AdminField": 3,
     "controls": 4,
@@ -151,19 +140,11 @@
     "controls": 2,
     "input": 1
   },
-  "features/admin/contests/general/ContestSummaryRail.vue": {
-    "button": 1,
-    "controls": 2,
-    "uppercase": 1
-  },
   "features/admin/contests/general/ContestTimeSection.vue": {
     "AdminDateTimeField": 3,
     "AdminField": 2,
     "controls": 4,
     "input": 2
-  },
-  "features/admin/contests/general/ContestVisibilitySwitch.vue": {
-    "status-colour": 1
   },
   "features/admin/contests/general/SectionJumpSelect.vue": {
     "controls": 1,
@@ -259,21 +240,6 @@
   },
   "features/admin/contests/participants/use-participation-actions.ts": {
     "AdminRowMenu": 1
-  },
-  "features/admin/contests/problems/ContestProblemRow.vue": {
-    "button": 3,
-    "checkbox": 3,
-    "controls": 12,
-    "input": 4,
-    "status-colour": 1
-  },
-  "features/admin/contests/problems/ContestProblemsTab.vue": {
-    "button": 3,
-    "checkbox": 1,
-    "controls": 7,
-    "hardcoded-value": 1,
-    "input": 1,
-    "table": 1
   },
   "features/admin/contests/problems/ProblemAddPicker.vue": {
     "button": 1,

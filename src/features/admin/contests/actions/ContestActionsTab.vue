@@ -18,9 +18,6 @@ import { useLocaleStore } from '@/stores/locale.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { contestActionsKey } from '../contest-ops.queries';
 import ContestActionCard from './ContestActionCard.vue';
-import ContestCloneCard from './ContestCloneCard.vue';
-import ContestDataCard from './ContestDataCard.vue';
-import ContestDeleteCard from './ContestDeleteCard.vue';
 import ContestFreezeLockCard from './ContestFreezeLockCard.vue';
 import ContestProblemOpsCard from './ContestProblemOpsCard.vue';
 import ContestPublishCard from './ContestPublishCard.vue';
@@ -212,21 +209,6 @@ const runReplayRebuild = () => runAction(rebuildReplay);
         <ContestFreezeLockCard :contest="contest" />
         <ContestPublishCard :contest="contest" :actions="actions" />
       </div>
-    </section>
-    <section class="flex flex-col gap-3" aria-labelledby="contest-actions-copy">
-      <h2 id="contest-actions-copy" :class="GROUP">
-        {{ $t('admin.contests.actions.groups.copy') }}
-      </h2>
-      <div class="grid items-start gap-4 xl:grid-cols-2">
-        <ContestDataCard :contest-key="contest.key" :is-ended="hasEnded" />
-        <ContestCloneCard :contest="contest" />
-      </div>
-    </section>
-    <section class="flex flex-col gap-3" aria-labelledby="contest-actions-danger">
-      <h2 id="contest-actions-danger" :class="GROUP">
-        {{ $t('admin.contests.actions.groups.danger') }}
-      </h2>
-      <ContestDeleteCard :contest="contest" />
     </section>
   </div>
 </template>

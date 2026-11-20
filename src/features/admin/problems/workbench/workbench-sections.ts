@@ -17,5 +17,4 @@ const SECTION_OF_ROUTE: Readonly<Record<string, WorkbenchSectionId | null>> = {
 export const sectionOfRoute = (routeName: unknown): WorkbenchSectionId | null =>
   SECTION_OF_ROUTE[String(routeName)] ?? null;
 
-/** The section's element id: what a step on the plate scrolls to. */
-export const sectionDomId = (id: WorkbenchSectionId) => `workbench-${id}`;
+export { sectionDomId } from '../../ui/workbench/section-dom-id';

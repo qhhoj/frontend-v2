@@ -54,7 +54,10 @@ function rowIssueOf(
   )?.[1];
 }
 
-/** The contest's ordered problem list as an editor works on it: add, copy, reorder, set points, remove, then one PATCH of the whole list. */
+/**
+ * The contest's ordered problem list as an editor works on it: add, copy, reorder, set points, remove, then one PATCH of
+ * the whole list. The page's one save calls `validate()` and then `saveTo()`.
+ */
 export function useContestProblemRows(contest: () => EditableContest) {
   const viewer = useViewerId();
   const queryClient = useQueryClient();
@@ -65,7 +68,6 @@ export function useContestProblemRows(contest: () => EditableContest) {
   const dirtyCount = computed(() =>
     isDirty.value ? Math.max(1, changedProblemCount(seedRows.value, rows.value)) : 0,
   );
-  const savedAt = ref<Date | null>(null);
   const adding = useAddProblem(rows);
 
   const { target, reseed } = useSeededDraft(contest, {
@@ -82,11 +84,9 @@ export function useContestProblemRows(contest: () => EditableContest) {
     mutate: ({ key, listed }: { key: string; listed: ProblemRow[] }) =>
       updateContest(key, { problems: toProblemsBody(listed) }),
     invalidates: () => [PUBLIC_CONTESTS_KEY],
-    successText: () => translate('admin.contests.problems.saved'),
     onDone: (saved: EditableContest) => {
       queryClient.setQueryData(editableContestKey(saved.key, viewer.value), saved);
       reseed(saved);
-      savedAt.value = new Date();
     },
   });
 
@@ -96,10 +96,15 @@ export function useContestProblemRows(contest: () => EditableContest) {
   const hasInvalidPoints = computed(() =>
     rows.value.some((row) => !isPointsValid(row.points) || hasUnreadableLimit(row)),
   );
-  /** The list goes to the contest it was filled from, and nowhere while the page shows another one. */
-  function save() {
+  /**
+   * Sends the list to the contest it was filled from: the saved contest, or the refusal. Nothing is sent (and `null` is
+   * answered) while the page shows another contest.
+   */
+  async function saveTo() {
     const key = target();
-    return !key || hasInvalidPoints.value ? undefined : mutation.run({ key, listed: rows.value });
+    if (!key) return null;
+    const saved = await mutation.run({ key, listed: rows.value });
+    return saved ?? mutation.failure.value;
   }
 
   return {
@@ -107,8 +112,7 @@ export function useContestProblemRows(contest: () => EditableContest) {
     ...adding,
     isDirty,
     dirtyCount,
-    savedAt,
-    mutation,
+    validate: () => !hasInvalidPoints.value,
     discard: () => {
       rows.value = seedRows.value.map((row) => ({ ...row }));
       mutation.reset();
@@ -125,6 +129,6 @@ export function useContestProblemRows(contest: () => EditableContest) {
     },
     remove: (index: number) =>
       (rows.value = rows.value.filter((_row, position) => position !== index)),
-    save,
+    saveTo,
   };
 }

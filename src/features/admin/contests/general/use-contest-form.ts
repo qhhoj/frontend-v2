@@ -2,7 +2,6 @@ import { computed, ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { updateContest } from '@/api/contest-editing.api';
 import type { ContestPatch, EditableContest } from '@/api/types/contest-editing';
-import { translate } from '@/i18n';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { provideDateValidity } from '@/components/ui/date-validity';
 import { cloneValue } from '../../ui/form/dirty-form';
@@ -21,8 +20,9 @@ import {
 const hasKeys = (object: object) => Object.keys(object).length > 0;
 
 /**
- * The general tab's form over one contest: a PATCH carries only the changed members, the answer re-seeds the form, and an
- * unsaved form is never overwritten by a background refetch.
+ * The workbench's settings form over one contest: a PATCH carries only the changed members, the answer re-seeds the form,
+ * and an unsaved form is never overwritten by a background refetch. The page's one save calls `validate()` and then
+ * `saveTo()`. "Hiện/Ẩn" is not a field here: the status plate changes it at once.
  */
 export function useContestForm(contest: () => EditableContest) {
   const viewer = useViewerId();
@@ -31,11 +31,14 @@ export function useContestForm(contest: () => EditableContest) {
   const form = ref<ContestForm>(toContestForm(contest()));
   /** Local checks gate the save; the server's field errors are shown beside their fields and cleared by the next save. */
   const localErrors = computed(() => checkContestForm(form.value));
-  const pendingPatch = computed(() => changedContestFields(seed.value, form.value));
+  const pendingPatch = computed(() => {
+    const patch = changedContestFields(seed.value, form.value);
+    delete patch.isVisible;
+    return patch;
+  });
   /** The save bar's "3 thay đổi chưa lưu": one per member the PATCH would carry. */
   const dirtyCount = computed(() => Object.keys(pendingPatch.value).length);
   const isDirty = computed(() => dirtyCount.value > 0);
-  const savedAt = ref<Date | null>(null);
   /** True while a time box holds text that is not a date: the save is refused, never sent without it. */
   const { hasUnreadableDate, resetDates } = provideDateValidity();
 
@@ -52,21 +55,24 @@ export function useContestForm(contest: () => EditableContest) {
   const mutation = useAdminMutation({
     mutate: ({ key, patch }: { key: string; patch: ContestPatch }) => updateContest(key, patch),
     invalidates: () => [PUBLIC_CONTESTS_KEY, CONTEST_INDEX_KEY],
-    successText: (saved: EditableContest) =>
-      translate('admin.contests.general.saved', { key: saved.key }),
     onDone: (saved: EditableContest) => {
       queryClient.setQueryData(editableContestKey(saved.key, viewer.value), saved);
       reseed(saved);
-      savedAt.value = new Date();
     },
   });
 
-  /** The PATCH goes to the contest the form was filled from, and nowhere while the page shows another one. */
-  async function save() {
+  /** True when the form may be sent: no local error and no date box holding text that is not a date. */
+  const validate = () => !hasKeys(localErrors.value) && !hasUnreadableDate.value;
+
+  /**
+   * Sends the changed fields to the contest the form was filled from: the saved contest, or the refusal. Nothing is sent
+   * (and `null` is answered) while the page shows another contest.
+   */
+  async function saveTo() {
     const key = target();
-    if (!key || hasKeys(localErrors.value) || hasUnreadableDate.value) return;
-    const patch = changedContestFields(seed.value, form.value);
-    if (hasKeys(patch)) await mutation.run({ key, patch });
+    if (!key) return null;
+    const saved = await mutation.run({ key, patch: pendingPatch.value });
+    return saved ?? mutation.failure.value;
   }
 
   /** Puts the form back to the last saved contest. */
@@ -84,10 +90,10 @@ export function useContestForm(contest: () => EditableContest) {
     errors,
     dirtyCount,
     isDirty,
-    savedAt,
     pendingPatch,
-    save,
+    hasUnreadableDate,
+    validate,
+    saveTo,
     discard,
-    mutation,
   };
 }
