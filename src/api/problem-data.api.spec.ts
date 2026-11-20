@@ -14,7 +14,7 @@ describe('uploadDataSource', () => {
     const saved = await uploadDataSource('sum', 'customChecker', file);
     expect(saved.customChecker).toBe('checker.cpp');
     expect(calls).toHaveLength(1);
-    const sent = (calls[0].body as FormData).get('file') as File;
+    const sent = (calls[0]?.body as FormData).get('file') as File;
     expect(sent.name).toBe('checker.cpp');
   });
 });
