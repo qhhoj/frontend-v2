@@ -3,7 +3,7 @@ import type { RouteLocationRaw } from 'vue-router';
 import type { RankingRow } from '@/api/types/contests';
 import Chip from '@/components/ui/Chip.vue';
 import UserLink from '@/components/UserLink.vue';
-import { deltaTone, formatDelta } from '@/lib/rating-delta';
+import { deltaTextClass, formatDelta } from '@/lib/rating-delta';
 import RankingCell from './RankingCell.vue';
 import ScoreTick from './ScoreTick.vue';
 import { rankMedalClass } from '@/lib/medal';
@@ -86,11 +86,15 @@ const EDGE = 'border-l-3';
     </td>
     <td v-if="hasRatingColumn" data-testid="rating-change" class="px-2.5 whitespace-nowrap">
       <template v-if="!row.ratingChange">—</template>
-      <Chip v-else :tone="deltaTone(row.ratingChange.delta)">{{
-        row.ratingChange.delta === null
-          ? row.ratingChange.rating
-          : `${formatDelta(row.ratingChange.delta)} → ${row.ratingChange.rating}`
-      }}</Chip>
+      <template v-else>
+        {{ row.ratingChange.rating }}
+        <span
+          v-if="row.ratingChange.delta !== null"
+          class="text-small font-semibold"
+          :class="deltaTextClass(row.ratingChange.delta)"
+          >{{ formatDelta(row.ratingChange.delta) }}</span
+        >
+      </template>
     </td>
     <RankingCell
       v-for="cell in view.cells"

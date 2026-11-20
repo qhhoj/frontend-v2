@@ -21,8 +21,7 @@ import {
 } from '@/lib/contest-time';
 import { formatElapsed, formatNumber, formatPoints } from '@/lib/format';
 import { formatClock, formatDate } from '@/lib/format-date';
-import { formatDelta } from '@/lib/rating-delta';
-import { VERDICT_TEXT_CLASSES } from '@/lib/verdicts';
+import { deltaTextClass, formatDelta } from '@/lib/rating-delta';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
@@ -152,11 +151,10 @@ const span = computed(() =>
 const ratingChange = computed(() => {
   const change = props.contest.viewer.ratingChange;
   if (!change) return null;
-  const delta = change.delta ?? 0;
   return {
     rating: formatNumber(change.rating, locale.locale),
     delta: change.delta === null ? null : formatDelta(change.delta),
-    deltaClass: delta === 0 ? '' : VERDICT_TEXT_CLASSES[delta > 0 ? 'ac' : 'wa'],
+    deltaClass: deltaTextClass(change.delta),
   };
 });
 /** No value wraps inside its cell; on a phone a cell that holds words or a date takes the whole line instead. */
