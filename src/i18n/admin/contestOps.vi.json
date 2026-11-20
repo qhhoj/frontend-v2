@@ -12,18 +12,13 @@
     "pending": "Còn {count} bài nộp đang chờ chấm."
   },
   "problemOps": {
-    "title": "Chấm lại hoặc tính lại điểm một bài",
-    "description": "Chấm lại sẽ đặt lại các bài nộp của bài này trong kỳ thi và chấm lại từ đầu. Tính lại điểm chỉ tính lại điểm của các bài nộp và các lượt tham gia liên quan, không chấm lại, nhanh hơn tính lại cả kỳ thi.",
+    "title": "Tính lại điểm một bài",
+    "description": "Tính lại điểm các bài nộp của bài này trong kỳ thi và các lượt tham gia liên quan, không chấm lại; nhanh hơn tính lại cả kỳ thi.",
     "noProblems": "Hãy lưu ít nhất một bài trước.",
     "problemLabel": "Bài",
     "rescore": "Tính lại điểm bài",
-    "rejudge": "Chấm lại bài…",
     "rescoreQueued": "Đã xếp hàng tính lại điểm bài {code}.",
-    "rejudged": "Đã xếp hàng chấm lại {count} bài nộp của {code}.",
-    "rejudgeTitle": "Chấm lại bài {label}?",
-    "counting": "Đang đếm bài nộp…",
-    "willRejudge": "{count} bài nộp của {code} trong kỳ thi sẽ được chấm lại. Kết quả thay đổi dần khi chấm xong.",
-    "includeLocked": "Chấm lại cả bài nộp đã khóa"
+    "toRejudge": "Chấm lại bài: mục “Khi kỳ thi diễn ra”"
   },
   "freezeLock": {
     "title": "Đóng băng bảng xếp hạng và khóa bài nộp",

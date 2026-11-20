@@ -7,30 +7,36 @@ import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminStatus from '../ui/AdminStatus.vue';
 import AdminSubmissionTable from '../submissions/AdminSubmissionTable.vue';
-import { queuedLinkQuery } from '../submissions/admin-submission-filters';
 import RejudgeCountPanel from './RejudgeCountPanel.vue';
 import { toRescoreBody } from './rejudge-filter';
-import { useBulkRejudge } from './use-bulk-rejudge';
 import type { RejudgeOutcome } from './use-bulk-rejudge';
 import { canConfirmRescore, useBulkRescore } from './use-bulk-rescore';
-import { canConfirmRejudge, useRejudgeCount } from './use-rejudge-count';
+import { useRejudgeConfirm } from './use-rejudge-confirm';
+import { canConfirmRejudge } from './use-rejudge-count';
 
 /**
  * The two batch confirms (rejudge, rescore) over one filter body: each opens by counting with a dry run and confirms only a
- * counted, permitted, non-empty batch. Used by the rejudge screen and by the admin submission list's bulk bar.
+ * counted, permitted, non-empty batch. The one rejudge dialog: the rejudge screen, the admin submission list's bulk bar and
+ * the contest workbench all open it. The body is copied when the dialog opens, so the request sent is the one counted.
  */
 const props = defineProps<{
   body: RejudgeBody;
   /** The filter in words, under the count. */
   line: string;
+  /** What a rescore of this body reaches beyond the matched rows (a contest scope recomputes the whole contest). */
+  rescoreNote?: string;
 }>();
 const emit = defineEmits<{ outcome: [outcome: RejudgeOutcome] }>();
 const locale = useLocaleStore();
 const isRejudgeOpen = ref(false);
 const isRescoreOpen = ref(false);
-const bulk = useBulkRejudge();
+const rejudger = useRejudgeConfirm();
 const rescorer = useBulkRescore();
-const { state: countState, count: countMatching, reset: resetCount } = useRejudgeCount();
+const countState = rejudger.state;
+/** The rescore body as it was when its dialog opened. */
+const rescoreAsked = ref<RejudgeBody>({});
+/** Whether the open rejudge also takes locked submissions: the skipped-rows line says which rule applies. */
+const isForced = ref(false);
 
 const sample = computed(() => (countState.value.kind === 'ready' ? countState.value.sample : []));
 /** The button names what it will do: the counted number once known, "counting" while the server counts. */
@@ -52,24 +58,26 @@ const rescoreLine = computed(() => {
 
 function open(action: 'rejudge' | 'rescore') {
   if (action === 'rejudge') {
+    isForced.value = props.body.force === true;
     isRejudgeOpen.value = true;
-    void countMatching(props.body);
+    void rejudger.ask(props.body);
   } else {
+    rescoreAsked.value = JSON.parse(JSON.stringify(toRescoreBody(props.body))) as RejudgeBody;
     isRescoreOpen.value = true;
-    void rescorer.count(toRescoreBody(props.body));
+    void rescorer.count(rescoreAsked.value);
   }
 }
 defineExpose({ open });
-watch(isRejudgeOpen, (isOpen) => !isOpen && resetCount());
+watch(isRejudgeOpen, (isOpen) => !isOpen && rejudger.close());
 watch(isRescoreOpen, (isOpen) => !isOpen && rescorer.reset());
 
 async function confirmRejudge() {
-  await bulk.rejudge(props.body, queuedLinkQuery(props.body));
+  const outcome = await rejudger.confirm();
   isRejudgeOpen.value = false;
-  if (bulk.outcome.value) emit('outcome', bulk.outcome.value);
+  if (outcome) emit('outcome', outcome);
 }
 async function confirmRescore() {
-  await rescorer.rescore(toRescoreBody(props.body));
+  await rescorer.rescore(rescoreAsked.value);
   isRescoreOpen.value = false;
   if (rescorer.outcome.value) emit('outcome', rescorer.outcome.value);
 }
@@ -81,7 +89,7 @@ async function confirmRescore() {
     tone="danger"
     :title="$t('admin.rejudge.confirm.title')"
     :confirm-label="rejudgeLabel"
-    :busy="bulk.isPending.value"
+    :busy="rejudger.isPending.value"
     :can-confirm="canConfirmRejudge(countState)"
     size="lg"
     @confirm="confirmRejudge"
@@ -92,6 +100,9 @@ async function confirmRescore() {
       <p class="text-sm font-semibold">{{ $t('admin.rejudge.confirm.sample') }}</p>
       <AdminSubmissionTable :items="sample" :label="$t('admin.rejudge.confirm.sample')" />
     </div>
+    <p class="text-sm" data-testid="rejudge-skipped">
+      {{ $t(`admin.rejudge.confirm.skipped.${isForced ? 'forced' : 'locked'}`) }}
+    </p>
     <p class="text-sm text-muted">{{ $t('admin.rejudge.confirm.body') }}</p>
   </ConfirmDialog>
   <ConfirmDialog
@@ -109,6 +120,7 @@ async function confirmRescore() {
     />
     <p v-else role="status" class="text-sm font-semibold">{{ rescoreLine }}</p>
     <p class="text-sm">{{ line }}</p>
+    <p v-if="rescoreNote" class="text-sm font-semibold">{{ rescoreNote }}</p>
     <p class="text-sm text-muted">{{ $t('admin.rejudge.rescore.body') }}</p>
   </ConfirmDialog>
 </template>

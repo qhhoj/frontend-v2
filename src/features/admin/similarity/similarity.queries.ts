@@ -55,9 +55,11 @@ export const similarityPairKey = (pairId: string) => ['admin', 'similarity-pair'
 export const useSimilarityPairsQuery = (
   runId: MaybeRefOrGetter<string>,
   filter: MaybeRefOrGetter<PairFilter>,
+  options: { enabled?: () => boolean } = {},
 ) => {
   const viewer = useViewerId();
   return useQuery({
+    enabled: options.enabled,
     queryKey: computed(() => [
       ...similarityPairsKey(toValue(runId)),
       toPairsRequest(toValue(filter)),

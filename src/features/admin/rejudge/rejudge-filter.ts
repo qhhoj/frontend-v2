@@ -70,6 +70,37 @@ export function toRejudgeBody(filter: RejudgeFilter): RejudgeBody {
   return body;
 }
 
+/** What a rejudge run from a contest's own page reaches: one of its problems, one contestant, or all of it. */
+export const CONTEST_REJUDGE_SCOPES = ['problem', 'user', 'contest'] as const;
+export type ContestRejudgeScope = (typeof CONTEST_REJUDGE_SCOPES)[number];
+
+/**
+ * The filter a contest's own rejudge sends: always that contest, the field of the chosen scope alone (a problem picked
+ * before switching to "one contestant" never rides along), and none of the site form's other narrowing. The verdicts
+ * and the locked choice are kept.
+ */
+export const contestScopedFilter = (
+  filter: RejudgeFilter,
+  contest: string,
+  scope: ContestRejudgeScope,
+): RejudgeFilter => ({
+  ...emptyRejudgeFilter(),
+  contest,
+  problem: scope === 'problem' ? filter.problem : '',
+  user: scope === 'user' ? filter.user : '',
+  results: filter.results,
+  force: filter.force,
+});
+
+/** "One problem" and "one contestant" must name it: left blank, the request would reach the whole contest. */
+export function checkContestScope(filter: RejudgeFilter, scope: ContestRejudgeScope): FieldErrors {
+  if (scope === 'problem' && !filter.problem.trim())
+    return { problem: translate('admin.rejudge.errors.problemRequired') };
+  if (scope === 'user' && !filter.user.trim())
+    return { user: translate('admin.rejudge.errors.userRequired') };
+  return {};
+}
+
 /** A rescore takes the same filter; locks do not matter to it. */
 export function toRescoreBody(body: RejudgeBody): RescoreBody {
   const rescore: RejudgeBody = { ...body };

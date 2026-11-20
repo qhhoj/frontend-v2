@@ -16,7 +16,8 @@ const open = defineModel<boolean>('open', { default: false });
 defineProps<{
   /** The section's id among the page's own sections. */
   id: string;
-  index: number;
+  /** The step number of a setup section; a section that is not a step (a contest's running tools) has none. */
+  index?: number;
   title: string;
   summary: string;
   /** Unsaved changes inside, shown as a mark while the section is closed. */
@@ -38,7 +39,9 @@ const panelId = useId();
       :aria-controls="to ? undefined : panelId"
       @click="open = !open"
     >
-      <span class="shrink-0 text-body font-semibold">{{ index }} · {{ title }}</span>
+      <span class="shrink-0 text-body font-semibold">{{
+        index === undefined ? title : `${index} · ${title}`
+      }}</span>
       <span class="min-w-0 flex-1 truncate text-meta text-muted">{{ open ? '' : summary }}</span>
       <StatusMark
         v-if="changeCount"

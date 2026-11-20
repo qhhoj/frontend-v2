@@ -1419,7 +1419,8 @@
       "label": "Score {percent}%",
       "grading": "{percent}% of the points judged"
     },
-    "mineSummary": "Your submissions · {count}"
+    "mineSummary": "Your submissions · {count}",
+    "selectRow": "Select submission {id}"
   },
   "ranking": {
     "public": {

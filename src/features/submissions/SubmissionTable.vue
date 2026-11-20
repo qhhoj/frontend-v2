@@ -60,6 +60,8 @@ const props = withDefaults(
     contestPoints?: Record<string, number>;
     /** Rows picked for the diff, in pick order; given only to signed-in viewers of the list page (shows the "Chọn" column). */
     pickedIds?: readonly string[];
+    /** The picks are a selection for a bulk action (staff tools): any number of rows, no diff order. */
+    unlimitedPicks?: boolean;
     /** Rank of the first row; given, a leading "#" column numbers the rows (the best-submissions ranking). */
     rankStart?: number;
     /** The viewer's username: their rows carry the bar. Left out where every row is theirs. */
@@ -138,6 +140,7 @@ const memoryText = (row: SubmissionListItem) =>
       :problem-labels="problemLabels"
       :contest-points="contestPoints"
       :picked-ids="pickedIds"
+      :unlimited-picks="unlimitedPicks"
       :rank-start="rankStart"
       :own-username="ownUsername"
       :variant="variant"
@@ -191,6 +194,7 @@ const memoryText = (row: SubmissionListItem) =>
                 :id="row.id"
                 :order="pickOrder(row.id)"
                 :picked-count="pickedIds?.length ?? 0"
+                :unlimited="unlimitedPicks"
                 @toggle="emit('togglePick', $event)"
               />
             </td>

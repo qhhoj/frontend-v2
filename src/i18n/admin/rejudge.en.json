@@ -64,11 +64,17 @@
       "noneChip": "No match",
       "none": "No submission matches the filter."
     },
-    "sample": "Newest matching submissions"
+    "sample": "Newest matching submissions",
+    "skipped": {
+      "locked": "Skipped: submissions past the lock time, submissions a judge holds, and submissions waiting for the contest’s final judging.",
+      "forced": "Locked submissions are rejudged too. Still skipped: submissions a judge holds and submissions waiting for the contest’s final judging."
+    }
   },
   "errors": {
     "languages": "At most 50 languages.",
-    "dateOrder": "The end must be after the start."
+    "dateOrder": "The end must be after the start.",
+    "problemRequired": "Pick a problem.",
+    "userRequired": "Enter the contestant's username."
   },
   "presets": {
     "internalErrors": "All IE",
@@ -97,5 +103,21 @@
       "filter": "Filter",
       "createdAt": "When"
     }
+  },
+  "contestScope": {
+    "label": "Rejudge scope",
+    "scopes": {
+      "problem": "One problem",
+      "user": "One contestant",
+      "contest": "Whole contest"
+    },
+    "problem": "Problem",
+    "problemPlaceholder": "Pick a problem",
+    "user": "Contestant",
+    "userHint": "Username, for example bitcoder.",
+    "contestHint": "Every submission in this contest.",
+    "narrow": "Narrow: current verdicts, locked submissions",
+    "submit": "Rejudge…",
+    "twoSteps": "Always counted first: the dialog shows how many submissions match and a sample; nothing is reset yet."
   }
 }

@@ -662,11 +662,34 @@
       }
     },
     "tools": {
-      "label": "Công cụ khi kỳ thi diễn ra",
-      "submissions": "Bài nộp của kỳ thi",
-      "rejudge": "Chấm lại nhiều bài nộp",
-      "problemTools": "Chấm lại theo bài, đóng băng",
-      "similarity": "Kiểm tra tương đồng"
+      "label": "Khi kỳ thi diễn ra",
+      "summary": "Bài nộp của kỳ thi · Chấm lại · Tương đồng",
+      "open": "Mở",
+      "submissions": {
+        "title": "Bài nộp của kỳ thi",
+        "problem": "Bài",
+        "allProblems": "Tất cả",
+        "user": "Lọc theo thí sinh",
+        "userPlaceholder": "Thí sinh: tên đăng nhập, Enter để lọc",
+        "shown": "{shown} mới nhất / {total}",
+        "seeAll": "Xem tất cả",
+        "empty": "Chưa có bài nộp nào trong kỳ thi này.",
+        "emptyFiltered": "Không có bài nộp nào khớp bộ lọc.",
+        "pickAll": "Chọn cả {count} bài nộp đang hiện",
+        "bulkLine": "{count} bài nộp đã chọn trong kỳ thi này.",
+        "rescoreNote": "Trong một kỳ thi, tính lại điểm luôn tính lại kết quả của cả kỳ thi, không riêng các bài nộp đã chọn."
+      },
+      "rejudge": {
+        "title": "Chấm lại",
+        "line": "Phạm vi: {scope} · {user} · {results} · bài bị khóa: {locked}"
+      },
+      "similarity": {
+        "title": "Tương đồng",
+        "running": "Kỳ thi này đang có một lượt chưa xong.",
+        "pairsTitle": "Các cặp giống nhau nhất",
+        "pairsShown": "{shown} cặp giống nhau nhất / {total}",
+        "allPairs": "Xem tất cả cặp, có bộ lọc"
+      }
     },
     "results": {
       "ranking": "Bảng chính thức và liên kết xếp hạng"
