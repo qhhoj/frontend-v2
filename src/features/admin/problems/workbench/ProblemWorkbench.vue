@@ -53,7 +53,10 @@ const steps = computed(() => {
 const tests = computed(() =>
   data.form.value ? testsSummary(data.form.value.cases, info.form.value.points) : null,
 );
-const isTrialDone = computed(() => props.problem.viewerStatus !== null);
+/** The trial's state comes from the same rule as the plate's fourth step. */
+const isTrialDone = computed(() =>
+  setupSteps(props.problem, null).some((step) => step.id === 'trial' && step.isDone),
+);
 const summaries = computed(() => ({
   info: infoSummary(info.form.value),
   statement: statementSummary(props.problem),
@@ -88,20 +91,23 @@ async function openSection(id: WorkbenchSectionId) {
 const openStep = (id: WorkbenchStepId) => openSection(id);
 
 /** An old tab address opens its section; else the page opens at the next step, once, and never folds a section itself. */
-const named = sectionOfRoute(route.name);
-onMounted(() => {
-  if (!named) return;
+function openRouteSection() {
+  const section = sectionOfRoute(route.name);
+  if (!section) return;
   if (route.name === 'admin-problemEditorial') folds.editorial = true;
   if (route.name === 'admin-problemFiles') folds.files = true;
-  void openSection(named);
-});
-const stopOpeningNext = watch(
+  void openSection(section);
+}
+onMounted(openRouteSection);
+watch(() => route.name, openRouteSection);
+let isNextStepOpened = sectionOfRoute(route.name) !== null;
+watch(
   steps,
   (known) => {
-    if (named || !known) return;
+    if (isNextStepOpened || !known) return;
+    isNextStepOpened = true;
     const next = workbenchSteps(known).find((step) => !step.isDone);
     if (next && next.id !== 'trial') open[next.id] = true;
-    void nextTick(() => stopOpeningNext());
   },
   { immediate: true },
 );
@@ -152,38 +158,29 @@ const PART_LABEL: Record<SavePartId, string> = {
 };
 /** The last save, part by part: what was saved, what was not and why. Shown while a part is unsaved or has a complaint. */
 const reportLines = computed(() =>
-  (report.value ?? []).map((part) => ({
-    id: part.id,
-    status: part.status,
-    text: [
-      t(`${KEY}.save.parts.${PART_LABEL[part.id]}`),
-      t(
-        `${KEY}.save.status.${part.status === 'saved' && part.note ? 'savedWithNote' : part.status}`,
-      ),
-      part.note,
-    ]
-      .filter(Boolean)
-      .join(': ')
-      .replace(': ', ' — '),
-  })),
+  (report.value ?? []).map((part) => {
+    const status = part.status === 'saved' && part.note ? 'savedWithNote' : part.status;
+    const said = `${t(`${KEY}.save.parts.${PART_LABEL[part.id]}`)} — ${t(`${KEY}.save.status.${status}`)}`;
+    return { id: part.id, status: part.status, text: part.note ? `${said}: ${part.note}` : said };
+  }),
 );
 const isReportFailed = computed(() => (report.value ?? []).some((part) => part.status !== 'saved'));
 /** A save the server refused in part: the report comes into view and the sections it names open below it. */
 const reportBox = ref<HTMLElement>();
 watch(report, async (parts) => {
-  const named = (parts ?? []).filter((part) => part.status === 'failed' || part.note);
-  if (named.length === 0) return;
-  openInvalid(named.map((part) => SECTION_OF_PART[part.id]));
+  const toFix = (parts ?? []).filter((part) => part.status === 'failed' || part.note);
+  if (toFix.length === 0) return;
+  openInvalid(toFix.map((part) => SECTION_OF_PART[part.id]));
   await nextTick();
   reportBox.value?.scrollIntoView({ block: 'start' });
 });
 
 /** What the bar says changed: "Thông tin 2 · Đề bài 1". */
 const changedText = computed(() => {
-  const named = (['info', 'statement', 'tests'] as const)
+  const changed = (['info', 'statement', 'tests'] as const)
     .filter((id) => changes.value[id] > 0)
     .map((id) => `${t(`${KEY}.sections.${id}`)} ${changes.value[id]}`);
-  return named.length ? named.join(' · ') : undefined;
+  return changed.length ? changed.join(' · ') : undefined;
 });
 /** Only the page form's own submit saves: a dialog's form inside a section must not. */
 function submit(event: Event) {
@@ -218,6 +215,7 @@ const listLink = computed(() => ({ to: { name: 'admin-problems' }, label: t(`${K
       :problem="problem"
       :steps="steps"
       :has-unsaved="dirtyCount > 0"
+      :is-data-unread="data.query.isError.value"
       @open="openStep"
     />
     <div v-if="reportLines.length" ref="reportBox" class="scroll-mt-4">

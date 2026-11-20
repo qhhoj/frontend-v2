@@ -159,7 +159,7 @@ const isAdvancedOpen = defineModel<boolean>('advancedOpen', { default: false });
           class="m-0 flex items-center gap-2 border-t border-line px-4 py-3 text-meta text-secondary"
         >
           <Lamp :tone="summary.isAddingUp ? 'ac' : 'none'" still />
-          {{ $t(`${KEY}.total`, summary) }}
+          {{ $t(`${KEY}.total`, { ...summary }) }}
           <span v-if="!summary.isAddingUp" class="text-muted">{{ $t(`${KEY}.totalOff`) }}</span>
         </p>
       </Card>

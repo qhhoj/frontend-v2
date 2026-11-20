@@ -22,6 +22,8 @@ const props = defineProps<{
   problem: EditableProblem;
   steps: readonly SetupStep[] | null;
   hasUnsaved: boolean;
+  /** The test data could not be read: the steps stay unknown and the plate says so (section 3 offers the retry). */
+  isDataUnread?: boolean;
 }>();
 const emit = defineEmits<{ open: [step: WorkbenchStepId] }>();
 const { t } = useI18n();
@@ -45,13 +47,14 @@ const missingText = (ids: readonly string[]) =>
     .map((id) => t(`${CHECKS}.${id}.missing`))
     .join(' · ');
 
+const unknownText = computed(() => t(`${KEY}.note.${props.isDataUnread ? 'unread' : 'loading'}`));
 const sentenceKey = computed(() => {
   if (isPublic.value) return audience.value === 'members' ? 'members' : 'public';
   return props.problem.editor?.suggester ? 'suggested' : 'draft';
 });
 const note = computed(() => {
   if (isPublic.value) return t(`${KEY}.note.public`);
-  if (!plateSteps.value) return t(`${KEY}.note.loading`);
+  if (!plateSteps.value) return unknownText.value;
   if (!next.value) return t(`${KEY}.note.ready`);
   if (next.value.id === 'trial') return t(`${KEY}.note.trial`);
   const openCount = plateSteps.value.filter((step) => !step.isDone).length;
@@ -62,7 +65,7 @@ const note = computed(() => {
 const publishBlockedReason = computed(() => {
   if (props.hasUnsaved) return t(`${KEY}.saveFirst`);
   if (isPublic.value) return undefined;
-  if (!props.steps) return t(`${KEY}.note.loading`);
+  if (!props.steps) return unknownText.value;
   return blockers.value.length
     ? t(`${KEY}.publishBlocked`, { missing: missingText(blockers.value.map((step) => step.id)) })
     : undefined;

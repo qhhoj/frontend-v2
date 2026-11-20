@@ -16,6 +16,7 @@ import { isAllSaved, runSaveParts } from './save-parts';
 import type { SavePart, SavePartAnswer, SavePartOutcome } from './save-parts';
 import type { WorkbenchSectionId } from './workbench-sections';
 
+/** A part's answer from its refusal; no refusal means it was saved. */
 const failed = (error: ApiError | null): SavePartAnswer =>
   error ? { failure: failureReasonOf(error) } : {};
 
@@ -72,7 +73,8 @@ export function useWorkbench(problem: () => EditableProblem, meta: () => Problem
   async function saveProblem(code: string): Promise<SavePartAnswer> {
     const original = statements.originalPatch();
     const answer = await info.saveTo(code, original ?? {});
-    if (!answer || answer instanceof ApiError) return failed(answer);
+    // No saved problem came back: a refusal, or (never expected) no answer at all. Either way the part is not saved.
+    if (!answer || answer instanceof ApiError) return { failure: failureReasonOf(answer) };
     if (original) statements.markOriginalSaved();
     return { code: answer.code };
   }

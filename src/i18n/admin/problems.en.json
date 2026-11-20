@@ -586,7 +586,8 @@
         "loading": "Reading the test data…",
         "ready": "Every step is done. Publish when you are ready.",
         "trial": "One step left: submit a model solution to check the tests and the judging.",
-        "todo": "{count} steps left. First: {missing}."
+        "todo": "{count} steps left. First: {missing}.",
+        "unread": "The test data could not be read. Open section 3 to retry."
       },
       "steps": {
         "info": "Info",

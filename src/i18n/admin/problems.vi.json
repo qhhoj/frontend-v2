@@ -586,7 +586,8 @@
         "loading": "Đang đọc dữ liệu test…",
         "ready": "Đã đủ các bước. Công khai khi bạn sẵn sàng.",
         "trial": "Còn một bước: nộp thử lời giải mẫu để chắc test và cách chấm đúng.",
-        "todo": "Còn {count} bước. Trước hết: {missing}."
+        "todo": "Còn {count} bước. Trước hết: {missing}.",
+        "unread": "Không đọc được dữ liệu test. Mở mục 3 để thử lại."
       },
       "steps": {
         "info": "Thông tin",
