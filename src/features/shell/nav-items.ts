@@ -1,6 +1,7 @@
 import {
   Building2,
   ChartColumn,
+  FileText,
   House,
   ListChecks,
   Newspaper,
@@ -11,6 +12,9 @@ import type { Component } from 'vue';
 import { computed, provide, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { CURRENT_SECTION_KEY } from '@/components/ui/page-section';
+import { canUseAdmin } from '@/features/admin/admin-access';
+import { ADMIN_SCREENS } from '@/features/admin/admin-screens';
+import { useSessionStore } from '@/stores/session.store';
 import type { RouteLocationNormalized } from 'vue-router';
 import { preloadRoute } from '@/router/preload';
 import { useIsFirstNavigationPending } from '@/router/first-navigation';
@@ -35,6 +39,19 @@ export const NAV_ITEMS: readonly NavItem[] = [
 
 /** What the rail and the phone menu list: the global ranking (`/users`) stays a section and a search result, but left the menu (owner, 2026-11-20). */
 export const MENU_ITEMS: readonly NavItem[] = NAV_ITEMS.filter((item) => item.path !== '/users');
+
+/**
+ * The menu's "Quản lý" group: the viewer's own work as a setter. "Bài tập của tôi" is listed for whoever may open the
+ * problem list of the admin area (create or edit problems); nobody else gets the group.
+ */
+export function useManageItems() {
+  const session = useSessionStore();
+  return computed<NavItem[]>(() =>
+    canUseAdmin(session.user, ADMIN_SCREENS.problems)
+      ? [{ path: ADMIN_SCREENS.problems.path, labelKey: 'nav.myProblems', icon: FileText }]
+      : [],
+  );
+}
 
 /** The section the viewer just asked for; it is lit at once while the page behind it loads. Null when none is pending. */
 const pendingPath = ref<string | null>(null);

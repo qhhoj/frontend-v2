@@ -26,12 +26,7 @@
     }
   },
   "problem": {
-    "timeHint": "Seconds, e.g. 1.",
-    "memoryHint": "KiB, e.g. 262144 (256 MiB).",
-    "pointsHint": "From 800 to 3500.",
-    "type": "Type",
-    "pickType": "Pick a type",
-    "nextNote": "After creating: write the statement, upload tests, pick the checker and points, try a submission.",
+    "nextNote": "Limits, points and type start from the defaults; change them in the editor, which opens next.",
     "prefixHint": "Organization problem codes start with {prefix}, e.g. {example}. Type only the rest."
   },
   "steps": {
@@ -79,5 +74,9 @@
   "contest": {
     "ownerAccess": "Only members of {name} see this contest (fixed when created in an organization)."
   },
-  "publishToMembers": "An organization-private problem: turned on, only the organization's members see it."
+  "publishToMembers": "An organization-private problem: turned on, only the organization's members see it.",
+  "credits": {
+    "label": "Credits of {owner} this month",
+    "line": "{owner}: {used} / {limit} credits used this month"
+  }
 }

@@ -15,10 +15,10 @@ import { useIsFirstNavigationPending } from '@/router/first-navigation';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import { useAccountLinks } from './account-links';
-import { MENU_ITEMS, useIsNavCurrent, useNavLinkEvents } from './nav-items';
+import { MENU_ITEMS, useIsNavCurrent, useManageItems, useNavLinkEvents } from './nav-items';
 
 /**
- * The sheet behind the tab bar's "Tôi" (`TabBar`, which owns the button). It rises from the bottom: the menu's sections (the current one marked), then what the
+ * The sheet behind the tab bar's "Tôi" (`TabBar`, which owns the button). It rises from the bottom: the menu's sections (the current one marked), the "Quản lý" group for a viewer who sets problems, then what the
  * desktop row shows beside the navigation: the official-mode pill, the account (who is signed in, its pages in the
  * desktop menu's order and sign-out, or register for a visitor; sign-in and the bell stay in the header), the language
  * and the light/dark mode (the rest of the look is one link away). The drawer traps focus and closes on Esc; any
@@ -42,6 +42,7 @@ const isSessionPending = useIsFirstNavigationPending();
 const isOpen = defineModel<boolean>('open', { required: true });
 const isCurrent = useIsNavCurrent();
 const linkEvents = useNavLinkEvents();
+const manageItems = useManageItems();
 watch(
   () => route.fullPath,
   () => (isOpen.value = false),
@@ -57,6 +58,23 @@ watch(
         :to="item.path"
         :aria-current="isCurrent(item.path) ? 'page' : undefined"
         :class="[ROW, isCurrent(item.path) ? 'bg-accent-soft font-bold text-accent-text' : '']"
+        v-on="linkEvents(item.path)"
+      >
+        <component :is="item.icon" aria-hidden="true" class="size-5 shrink-0" />
+        {{ $t(item.labelKey) }}
+      </RouterLink>
+    </nav>
+    <nav
+      v-if="manageItems.length > 0"
+      data-testid="phone-menu-manage"
+      :aria-label="$t('nav.manage')"
+    >
+      <p aria-hidden="true" :class="HEADING">{{ $t('nav.manage') }}</p>
+      <RouterLink
+        v-for="item in manageItems"
+        :key="item.path"
+        :to="item.path"
+        :class="ROW"
         v-on="linkEvents(item.path)"
       >
         <component :is="item.icon" aria-hidden="true" class="size-5 shrink-0" />

@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="Row extends ProblemTableRow">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import type { RouteLocationRaw } from 'vue-router';
 import { UNCATEGORIZED_TYPE_NAME, problemTypeLabel } from './problem-type-label';
 import { isProblemSort } from '@/api/types/problems';
 import type { NumberedPageMeta } from '@/api/client';
@@ -32,7 +33,9 @@ import { viewerLampOf } from './viewer-status';
  * It is the one table for every list of problems. `managed` is another list's problems (an organization's): the same name
  * cell and whole-row link, then the page's own columns (`extraColumns` with a `cell-<key>` slot each), marks after the
  * name (`name-end`), row selection (`selectable`, `v-model:selected` by code, the `bulk` slot) and row actions (`actions`);
- * no status, statistics or sorting, and on a phone the kit's own card, which carries the tick box and the actions.
+ * no status, statistics or sorting, and on a phone the kit's own card, which carries the tick box and the actions, unless
+ * the page draws its own (`card`). `rowTarget` is where a row leads when that is not the public problem page (a list of
+ * problems to edit opens the editor).
  */
 const props = withDefaults(
   defineProps<{
@@ -41,6 +44,8 @@ const props = withDefaults(
     /** `managed`: the columns after the name. */
     extraColumns?: DataTableColumn[];
     selectable?: boolean;
+    /** Where a row leads; the public problem page by default. */
+    rowTarget?: (code: string) => RouteLocationRaw;
     /** The table's caption; the catalogue's own by default. */
     label?: string;
     sort?: ProblemSort | null;
@@ -56,6 +61,7 @@ const props = withDefaults(
     managed: false,
     extraColumns: () => [],
     selectable: false,
+    rowTarget: undefined,
     label: undefined,
     sort: null,
     signedIn: false,
@@ -72,13 +78,16 @@ defineSlots<
     'name-end'?: (scope: { row: Row }) => unknown;
     actions?: (scope: { row: Row }) => unknown;
     bulk?: (scope: { count: number }) => unknown;
+    /** `managed`: the page's own phone row, an `li`. */
+    card?: (scope: { row: Row }) => unknown;
   } & Record<`cell-${string}`, (scope: { row: Row }) => unknown>
 >();
 /** The catalogue's cells read their own fields from a row; they are drawn only when the list is not `managed`. */
 const rows = computed(() => props.problems as CatalogueRow<Row>[]);
 const { t } = useI18n();
 const locale = useLocaleStore();
-const target = (code: string) => ({ name: 'problem', params: { code } });
+const target = (code: string): RouteLocationRaw =>
+  props.rowTarget?.(code) ?? { name: 'problem', params: { code } };
 
 /** Numbers: highest first, then lowest first; the name: A to Z, then Z to A; then the default order. */
 const sortOf = (field: string, first: 'asc' | 'desc') => ({
@@ -242,7 +251,10 @@ const acRateText = (problem: ProblemListItem) =>
     <template #bulk="{ count }"><slot name="bulk" :count="count" /></template>
 
     <!-- A phone: two lines per row. The part of the name the contest shares is left out; the code under it says it. -->
-    <template v-if="!managed" #card="{ row }">
+    <template v-if="managed && $slots.card" #card="{ row }"
+      ><slot name="card" :row="row"
+    /></template>
+    <template v-else-if="!managed" #card="{ row }">
       <li class="box-link flex min-h-(--qh-row) items-center gap-3 border-b border-line px-2 py-1">
         <Lamp
           v-if="signedIn"

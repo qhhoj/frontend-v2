@@ -11,6 +11,9 @@ export interface SetupStep {
   routeName: string;
 }
 
+/** The trial step: the viewer has submitted to the problem. The one rule for the checklist and the problem list's mark. */
+export const isTrialDone = (viewerStatus: EditableProblem['viewerStatus']) => viewerStatus !== null;
+
 const isWritten = (text: string | undefined) => (text ?? '').trim() !== '';
 
 /**
@@ -42,7 +45,7 @@ export function setupSteps(
       isDone: isExternal || (hasCases && scoredCasePoints(cases ?? []) > 0),
       routeName: 'admin-problemData',
     },
-    { id: 'trial', isDone: problem.viewerStatus !== null, routeName: 'problem' },
+    { id: 'trial', isDone: isTrialDone(problem.viewerStatus), routeName: 'problem' },
     { id: 'publish', isDone: problem.isPublic, routeName: 'admin-problemGeneral' },
   ];
 }

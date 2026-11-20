@@ -11,7 +11,7 @@ import type { CurrentParticipation } from '@/api/types/contests';
 import OfficialModePill from '@/features/official-mode/OfficialModePill.vue';
 import type { BitLook } from '@/mascot/bit-sprite';
 import LocaleToggle from './LocaleToggle.vue';
-import { MENU_ITEMS, useIsNavCurrent, useNavLinkEvents } from './nav-items';
+import { MENU_ITEMS, useIsNavCurrent, useManageItems, useNavLinkEvents } from './nav-items';
 import RailLiveContest from './RailLiveContest.vue';
 import RailNextContest from './RailNextContest.vue';
 import { useNextContest } from './use-next-contest';
@@ -22,7 +22,7 @@ import UserMenu from './UserMenu.vue';
 
 /**
  * The desktop rail, from `md` up: the brand, the search button (Ctrl K), the menu's sections (Kỳ thi with its count of
- * running contests), the contest the viewer is taking part in (or else the next one to look at), and at the foot one row of icons (bell, language, look,
+ * running contests), the "Quản lý" group for a viewer who sets problems, the contest the viewer is taking part in (or else the next one to look at), and at the foot one row of icons (bell, language, look,
  * collapse; stacked in the narrow column) over the account. 224 px from 1100 px
  * (`rail-open`); below that, or when the viewer collapses it (button at the foot, `[`; AppShell sets `data-rail`), a 56 px
  * column of icons (44 px targets) whose labels stay their accessible names and tooltips. Opaque: the page background is
@@ -32,6 +32,7 @@ defineProps<{ current: CurrentParticipation | null }>();
 const emit = defineEmits<{ search: [] }>();
 const isCurrent = useIsNavCurrent();
 const linkEvents = useNavLinkEvents();
+const manageItems = useManageItems();
 const { runningCount, next } = useNextContest();
 const { isCollapsed, toggle } = useRailCollapse();
 /** Below `md` the rail is hidden by CSS: its bell, language and look controls are not mounted then, so the phone's top bar owns the only bell. */
@@ -120,6 +121,28 @@ const CURRENT_ROW =
           tone="live"
           class="absolute top-1.5 right-2 rail-open:hidden"
         />
+      </RouterLink>
+    </nav>
+    <nav
+      v-if="manageItems.length > 0"
+      data-testid="rail-manage"
+      :aria-label="$t('nav.manage')"
+      class="flex flex-col gap-0.5"
+    >
+      <span aria-hidden="true" class="eyebrow px-(--qh-control-px-sm) pb-1 rail-slim:hidden">{{
+        $t('nav.manage')
+      }}</span>
+      <RouterLink
+        v-for="item in manageItems"
+        :key="item.path"
+        :to="item.path"
+        :title="$t(item.labelKey)"
+        :aria-current="isCurrent(item.path) ? 'page' : undefined"
+        :class="[ROW, isCurrent(item.path) && CURRENT_ROW]"
+        v-on="linkEvents(item.path)"
+      >
+        <component :is="item.icon" aria-hidden="true" class="size-4 shrink-0" />
+        <span class="min-w-0 flex-1 truncate rail-slim:sr-only">{{ $t(item.labelKey) }}</span>
       </RouterLink>
     </nav>
     <RailNextContest v-if="!current && next" :next="next" />

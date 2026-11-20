@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import type { BulkVisibilityResult } from '@/api/types/problems';
 import EmptyState from '@/components/EmptyState.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
@@ -12,7 +13,6 @@ import DeleteProblemDialog from '../problems/lifecycle/DeleteProblemDialog.vue';
 import { PROBLEM_CODE_PATTERN } from '../problems/problem-code';
 import { useProblemEditingMetaQuery } from '../problems/problem-editing.queries';
 import { isNotFound } from '../ui/admin-errors';
-import { buttonClass } from '../ui/controls';
 import { useAdminToast } from '../ui/feedback/use-admin-toast';
 import ProblemBulkResult from './ProblemBulkResult.vue';
 import ProblemBulkVisibilityDialog from './ProblemBulkVisibilityDialog.vue';
@@ -26,6 +26,9 @@ import {
 import { filterQueryOf, filtersFromQuery, listQueryOf } from './problem-list-filters';
 import type { FilterPatch } from './problem-list-filters';
 
+/** `canCreate`: the empty list offers "Tạo bài tập" (the page owns the form, so the click is passed up). */
+defineProps<{ canCreate: boolean }>();
+const emit = defineEmits<{ create: [] }>();
 const route = useRoute();
 const router = useRouter();
 const locale = useLocaleStore();
@@ -45,10 +48,6 @@ const { data, isPending, error, refetch } = useAdminProblemSearchQuery(listQuery
 const retry = () => void (lookupError.value ? authorLookup.refetch() : refetch());
 const change = (patch: FilterPatch) =>
   void router.replace({ query: filterQueryOf(route.query, patch) });
-const sort = computed({
-  get: () => filters.value.sort,
-  set: (value: string) => change({ sort: value as typeof filters.value.sort }),
-});
 const isFiltered = computed(() => {
   const { q, status, groupId, typeId, author: name } = filters.value;
   return Boolean(q || groupId || typeId || name) || status !== 'all';
@@ -119,6 +118,10 @@ function askDelete(code: string) {
 const countKey = computed(() =>
   can('judge.edit_all_problem') ? 'admin.problemList.count' : 'admin.problemList.countOwn',
 );
+/** Nothing to edit yet and nothing narrows the list: the page says so and offers the first step. */
+const isBare = computed(
+  () => !isFiltered.value && !isAuthorUnknown.value && data.value?.meta.total === 0,
+);
 const resultText = computed(() =>
   data.value
     ? t(countKey.value, { total: formatNumber(data.value.meta.total, locale.locale) })
@@ -128,13 +131,27 @@ const resultText = computed(() =>
 
 <template>
   <section class="flex min-w-0 flex-col gap-3" :aria-label="$t('admin.problemList.tableCaption')">
+    <ProblemListFilters
+      :filters="filters"
+      :meta="meta"
+      :author-error="isAuthorUnknown ? $t('admin.ui.noSuchUser', { name: author }) : ''"
+      :result-text="resultText"
+      :exact="exact"
+      @change="change"
+    />
     <ProblemBulkResult v-if="lastResult" :result="lastResult" />
+    <EmptyState v-if="isBare">
+      {{ $t('admin.problemList.emptyOwn') }}
+      <template v-if="canCreate" #action>
+        <!-- Secondary: the page's one primary is the same action in the header. -->
+        <AppButton @click="emit('create')">{{ $t('create.problem') }}</AppButton>
+      </template>
+    </EmptyState>
     <ProblemListTable
-      v-model:sort="sort"
+      v-else
       v-model:selected="selected"
       :items="isAuthorUnknown ? [] : (data?.items ?? [])"
       :meta="isAuthorUnknown ? undefined : data?.meta"
-      :search="filters.q"
       :selectable="canBulk"
       :loading="!isAuthorUnknown && isPending && !lookupError"
       :error="isAuthorUnknown ? null : (error ?? lookupError)"
@@ -144,30 +161,15 @@ const resultText = computed(() =>
       @clear-filters="clearFilters"
       @delete="askDelete"
     >
-      <template #toolbar>
-        <ProblemListFilters
-          :filters="filters"
-          :meta="meta"
-          :author-error="isAuthorUnknown ? $t('admin.ui.noSuchUser', { name: author }) : ''"
-          :result-text="resultText"
-          :exact="exact"
-          @change="change"
-        />
-      </template>
       <template #bulk>
-        <button type="button" :class="buttonClass('secondary', 'sm')" @click="openBulk(true)">
-          <Globe aria-hidden="true" class="size-4" :stroke-width="1.75" />
+        <AppButton size="sm" @click="openBulk(true)">
+          <template #icon><Globe aria-hidden="true" /></template>
           {{ $t('admin.problemList.bulk.publish') }}
-        </button>
-        <button type="button" :class="buttonClass('secondary', 'sm')" @click="openBulk(false)">
-          <Lock aria-hidden="true" class="size-4" :stroke-width="1.75" />
+        </AppButton>
+        <AppButton size="sm" @click="openBulk(false)">
+          <template #icon><Lock aria-hidden="true" /></template>
           {{ $t('admin.problemList.bulk.unpublish') }}
-        </button>
-      </template>
-      <template v-if="isAuthorUnknown" #empty>
-        <EmptyState compact>
-          <strong>{{ $t('admin.ui.noSuchUser', { name: author }) }}</strong>
-        </EmptyState>
+        </AppButton>
       </template>
     </ProblemListTable>
     <ProblemBulkVisibilityDialog

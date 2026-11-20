@@ -5,18 +5,21 @@ import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
 import { useRoute } from 'vue-router';
 import type { ProblemEditingMeta } from '@/api/types/problem-editing';
+import FormField from '@/components/ui/FormField.vue';
+import SelectField from '@/components/ui/SelectField.vue';
 import AdminField from '../ui/AdminField.vue';
 import AdminFilterTabs from '../ui/AdminFilterTabs.vue';
 import type { AdminFilterTab } from '../ui/AdminFilterTabs.vue';
 import { INPUT } from '../ui/controls';
 import AdminFilterBar from '../ui/table/AdminFilterBar.vue';
 import type { ActiveFilter } from '../ui/table/AdminFilterBar.vue';
-import { filterQueryOf, PROBLEM_STATUS_FILTERS } from './problem-list-filters';
+import { filterQueryOf, STAFF_STATUS_FILTERS, STATUS_TOGGLES } from './problem-list-filters';
 import type { FilterPatch, ProblemListFilters } from './problem-list-filters';
 
 /**
- * The staff problem list's filter row: search (with the exact-code "Mở" row), the status segments, and the "Bộ lọc" panel
- * with group, type and author. Every change lands in the address; active panel filters show as removable chips.
+ * The problem list's filter row: search (with the exact-code "Mở" row), the three toggles (all, not finished, published),
+ * and the "Bộ lọc" panel with the two review views (private, suggested), group, type and author. Every change lands in the
+ * address; active panel filters show as removable chips.
  */
 const props = defineProps<{
   filters: ProblemListFilters;
@@ -34,7 +37,7 @@ const search = computed({
   set: (text: string) => emit('change', { q: text.trim() }),
 });
 const statusTabs = computed<AdminFilterTab[]>(() =>
-  PROBLEM_STATUS_FILTERS.map((status) => ({
+  STATUS_TOGGLES.map((status) => ({
     key: status,
     label: t(`admin.problemList.status.${status}`),
     to: { query: filterQueryOf(route.query, { status }) },
@@ -58,9 +61,22 @@ const typeNameOf = (id: string) => {
   const type = props.meta?.types.find((item) => item.id === id);
   return type ? problemTypeLabel(type) : id;
 };
+const isStaffStatus = computed(() =>
+  (STAFF_STATUS_FILTERS as readonly string[]).includes(props.filters.status),
+);
+const viewOptions = computed(() =>
+  (['all', ...STAFF_STATUS_FILTERS] as const).map((status) => ({
+    value: status,
+    label: t(`admin.problemList.${status === 'all' ? 'anyStatus' : `status.${status}`}`),
+  })),
+);
 const chips = computed<ActiveFilter[]>(() => {
-  const { groupId, typeId, author } = props.filters;
+  const { groupId, typeId, author, status } = props.filters;
   return [
+    isStaffStatus.value && {
+      key: 'status',
+      label: t(`admin.problemList.status.${status}`),
+    },
     groupId && {
       key: 'groupId',
       label: t('admin.problemList.chips.group', { name: nameOf(props.meta?.groups, groupId) }),
@@ -72,8 +88,14 @@ const chips = computed<ActiveFilter[]>(() => {
     author && { key: 'author', label: t('admin.problemList.chips.author', { name: author }) },
   ].filter((chip): chip is ActiveFilter => Boolean(chip));
 });
-const remove = (key: string) => emit('change', { [key]: '' });
-const clearAll = () => emit('change', { groupId: '', typeId: '', author: '' });
+const remove = (key: string) => emit('change', { [key]: key === 'status' ? 'all' : '' });
+const clearAll = () =>
+  emit('change', {
+    groupId: '',
+    typeId: '',
+    author: '',
+    ...(isStaffStatus.value ? { status: 'all' as const } : {}),
+  });
 </script>
 
 <template>
@@ -96,6 +118,13 @@ const clearAll = () => emit('change', { groupId: '', typeId: '', author: '' });
       />
     </template>
     <template #filters>
+      <FormField :label="$t('admin.problemList.statusLabel')">
+        <SelectField
+          :model-value="isStaffStatus ? filters.status : 'all'"
+          :options="viewOptions"
+          @update:model-value="(status) => emit('change', { status })"
+        />
+      </FormField>
       <AdminField
         v-slot="{ id }"
         input-id="problem-filter-group"

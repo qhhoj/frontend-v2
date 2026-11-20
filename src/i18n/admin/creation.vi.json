@@ -26,12 +26,7 @@
     }
   },
   "problem": {
-    "timeHint": "Giây, ví dụ 1.",
-    "memoryHint": "KiB, ví dụ 262144 (256 MiB).",
-    "pointsHint": "Từ 800 đến 3500.",
-    "type": "Dạng bài",
-    "pickType": "Chọn dạng bài",
-    "nextNote": "Sau khi tạo: viết đề bài, tải test lên, chọn trình chấm và điểm, nộp thử.",
+    "nextNote": "Giới hạn, điểm và dạng bài lấy giá trị mặc định; sửa ở trang soạn bài, mở ngay sau khi tạo.",
     "prefixHint": "Mã bài của tổ chức bắt đầu bằng {prefix}, ví dụ {example}. Chỉ gõ phần sau."
   },
   "steps": {
@@ -79,5 +74,9 @@
   "contest": {
     "ownerAccess": "Chỉ thành viên {name} thấy kỳ thi này (cố định khi tạo trong tổ chức)."
   },
-  "publishToMembers": "Bài riêng của tổ chức: bật lên thì chỉ thành viên tổ chức thấy."
+  "publishToMembers": "Bài riêng của tổ chức: bật lên thì chỉ thành viên tổ chức thấy.",
+  "credits": {
+    "label": "Tín dụng tháng này của {owner}",
+    "line": "{owner}: đã dùng {used} / {limit} tín dụng tháng này"
+  }
 }

@@ -164,6 +164,18 @@ export function emptyProblemForm(meta: ProblemEditingMeta): ProblemForm {
   };
 }
 
+/** The catch-all type a new problem starts with (a problem needs at least one type). */
+const DEFAULT_TYPE_NAME = 'uncategorized';
+
+/**
+ * What the short create form posts besides its own fields: the defaults of `emptyProblemForm` (limits, points, group,
+ * languages) and the catch-all type. The create endpoints fill nothing in, so every create path starts from this.
+ */
+export function newProblemForm(meta: ProblemEditingMeta): ProblemForm {
+  const type = meta.types.find((item) => item.name === DEFAULT_TYPE_NAME);
+  return { ...emptyProblemForm(meta), typeIds: type ? [type.id] : [] };
+}
+
 /** A plain copy of the form: `structuredClone` cannot copy the reactive proxy a ref holds. The form is JSON data. */
 export const cloneForm = (form: ProblemForm): ProblemForm =>
   JSON.parse(JSON.stringify(form)) as ProblemForm;

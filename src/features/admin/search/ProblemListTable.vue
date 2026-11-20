@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import AppButton from '@/components/ui/AppButton.vue';
-import { Building2, Check, CircleAlert, Database, Globe, Lightbulb, Lock } from 'lucide-vue-next';
+import { Database } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import type { RouteLocationRaw } from 'vue-router';
 import type { NumberedPageMeta } from '@/api/client';
 import type { ProblemListItem } from '@/api/types/problems';
+import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
+import type { DataTableColumn } from '@/components/ui/DataTableColumns';
+import RowMenu from '@/components/ui/RowMenu.vue';
+import StretchedLink from '@/components/ui/StretchedLink.vue';
+import ProblemTable from '@/features/problems/ProblemTable.vue';
 import { formatNumber } from '@/lib/format';
-import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
 import { usePermissions } from '@/stores/use-permissions';
-import Chip from '@/components/ui/Chip.vue';
-import AdminUserLabel from '../ui/AdminUserLabel.vue';
-import AdminDataTable from '../ui/table/AdminDataTable.vue';
-import AdminRowMenu from '../ui/table/AdminRowMenu.vue';
-import { standardRowMenu } from '../ui/table/standard-row-menu';
 import ProblemCloneDialog from '../problems/general/ProblemCloneDialog.vue';
-import type { AdminColumn } from '../ui/table/table-columns';
-import { GAP_ROUTE, setupGapsOf } from './problem-setup-marks';
-import HighlightedText from './HighlightedText.vue';
+import { standardRowMenu } from '../ui/table/standard-row-menu';
+import ProblemSetupMark from './ProblemSetupMark.vue';
+import { listStepsOf, nextListStep } from './problem-setup-marks';
 
 /**
- * One page of the staff problem list (`tr[data-code]`, a card per problem on phones): sortable Bài / Điểm / Ngày đăng
- * headers bound to `?sort=`; the title opens the editor and "⋯" holds Xem · Nhân bản… · Xóa… (the admin row contract).
- * Points read as a plain number; the "từng phần" chip sits with the status chips. `toolbar` and `bulk` pass through.
+ * One page of the problems the account may edit, on the one problem table (`ProblemTable managed`): the name and code
+ * open the editor (the whole row does), then the four-segment setup mark, the next step as a link to where it is done,
+ * who can see the problem as a tag, and the acceptance rate. "⋯" holds Xem · Nhân bản… · Dữ liệu chấm · Xóa…. On a phone
+ * a row is one `--qh-row` line: name over code, the mark, the next step; the other columns are left to the editor.
  */
-defineProps<{
+const props = defineProps<{
   items: ProblemListItem[];
   meta: NumberedPageMeta | undefined;
-  search: string;
   selectable: boolean;
   loading: boolean;
   error: unknown;
@@ -35,55 +35,48 @@ defineProps<{
   /** The list is the review queue: every private row is a suggestion (the list rows do not say so themselves). */
   isSuggestedQueue: boolean;
 }>();
-const sort = defineModel<string>('sort', { required: true });
 const selected = defineModel<Set<string>>('selected', { required: true });
 const emit = defineEmits<{ retry: []; 'clear-filters': []; delete: [code: string] }>();
 const locale = useLocaleStore();
 const { t } = useI18n();
 const { can } = usePermissions();
 
-const columns = computed<AdminColumn[]>(() => [
+const columns = computed<DataTableColumn[]>(() => [
+  { key: 'setup', label: t('admin.problemList.columns.setup'), cellClass: 'w-28' },
+  { key: 'next', label: t('admin.problemList.columns.next'), cellClass: 'whitespace-nowrap' },
   {
-    key: 'problem',
-    label: t('admin.problemList.columns.problem'),
-    priority: 'primary',
-    sort: { asc: 'name', desc: '-name' },
+    key: 'visibility',
+    label: t('admin.problemList.columns.visibility'),
+    cellClass: 'whitespace-nowrap',
+    hideBelow: 'lg',
   },
-  {
-    key: 'status',
-    label: t('admin.problemList.columns.status'),
-    priority: 'badge',
-    cellClass: 'max-w-80',
-  },
-  { key: 'setup', label: t('admin.problemList.columns.setup'), priority: 'badge' },
-  { key: 'group', label: t('admin.problemList.columns.group'), cellClass: 'max-w-48 truncate' },
-  { key: 'authors', label: t('admin.problemList.columns.authors') },
-  {
-    key: 'points',
-    label: t('admin.problemList.columns.points'),
-    align: 'end',
-    sort: { asc: 'points', desc: '-points', first: 'desc' },
-  },
-  {
-    key: 'date',
-    label: t('admin.problemList.columns.date'),
-    cellClass: 'whitespace-nowrap text-muted',
-    sort: { asc: 'date', desc: '-date', first: 'desc' },
-  },
+  { key: 'acRate', label: t('problem.strip.acRate'), align: 'end', hideBelow: 'lg' },
 ]);
-const editorOf = (code: string) => ({ name: 'admin-problemGeneral', params: { code } });
-/** Names the gaps for the hover text, and sends the click to the tab that fixes the first one. */
-const gapsOf = (problem: ProblemListItem) => setupGapsOf(problem.setup) ?? [];
-const gapText = (problem: ProblemListItem) =>
-  t('admin.problemList.setup.missing', {
-    gaps: gapsOf(problem)
-      .map((gap) => t(`admin.problemList.setup.gaps.${gap}`))
-      .join(', '),
-  });
-const gapLink = (problem: ProblemListItem) => ({
-  name: GAP_ROUTE[gapsOf(problem)[0]!],
-  params: { code: problem.code },
+const editorOf = (code: string): RouteLocationRaw => ({
+  name: 'admin-problemGeneral',
+  params: { code },
 });
+
+/** The row's next step: its words and where it is done; null when the problem is ready or has no readiness. */
+function nextOf(problem: ProblemListItem) {
+  const step = nextListStep(listStepsOf(problem) ?? []);
+  if (!step) return null;
+  return {
+    label: t(`admin.problemList.next.${step.action}`),
+    to: { name: step.routeName, params: { code: problem.code } },
+  };
+}
+type Visibility = 'public' | 'organization' | 'suggested' | 'draft';
+function visibilityOf(problem: ProblemListItem): Visibility {
+  if (!problem.isPublic) return props.isSuggestedQueue ? 'suggested' : 'draft';
+  return problem.isOrganizationPrivate ? 'organization' : 'public';
+}
+/** No solver and a rate of zero says nothing yet: a dash, not "0 %". */
+const acRateText = (problem: ProblemListItem) =>
+  problem.acRate === 0 && problem.userCount === 0
+    ? '—'
+    : `${formatNumber(problem.acRate, locale.locale, 1)}%`;
+
 const cloning = ref('');
 const isCloneOpen = ref(false);
 function askClone(code: string) {
@@ -106,96 +99,71 @@ const menuItems = (code: string) =>
 </script>
 
 <template>
-  <AdminDataTable
-    v-model:sort="sort"
+  <ProblemTable
     v-model:selected="selected"
-    :pager="meta ? { meta, label: $t('admin.search.pager') } : undefined"
-    :columns="columns"
-    :rows="items"
-    :row-key="(problem) => problem.code"
-    :row-label="(problem) => problem.code"
-    :row-attrs="(problem) => ({ 'data-code': problem.code })"
-    :label="$t('admin.problemList.tableCaption')"
+    managed
+    :problems="items"
+    :extra-columns="columns"
+    :row-target="editorOf"
     :selectable="selectable"
+    :label="$t('admin.problemList.tableCaption')"
+    :meta="meta"
     :loading="loading"
     :error="error"
     :filtered="filtered"
-    :empty-text="$t('admin.search.problems.empty')"
     @retry="emit('retry')"
     @clear-filters="emit('clear-filters')"
   >
-    <template #toolbar><slot name="toolbar" /></template>
-    <template #bulk><slot name="bulk" /></template>
-    <template v-if="$slots.empty" #empty><slot name="empty" /></template>
-    <template #cell-problem="{ row }">
-      <RouterLink
-        :to="editorOf(row.code)"
-        class="block min-w-0 font-semibold text-accent-text hover:underline"
-      >
-        <HighlightedText :text="row.name" :query="search" />
-      </RouterLink>
-      <span class="block font-mono text-caption leading-4 text-muted">
-        <HighlightedText :text="row.code" :query="search" />
-      </span>
-    </template>
-    <template #cell-status="{ row }">
-      <span class="inline-flex gap-1">
-        <Chip v-if="row.isPublic" tone="success" :icon="Globe">
-          {{ $t('admin.problemList.status.public') }}
-        </Chip>
-        <Chip v-else-if="isSuggestedQueue" tone="warning" :icon="Lightbulb">{{
-          $t('admin.problemList.status.suggested')
-        }}</Chip>
-        <Chip v-else :icon="Lock">{{ $t('admin.problemList.status.private') }}</Chip>
-        <Chip v-if="row.isOrganizationPrivate" tone="info" :icon="Building2">
-          {{ $t('admin.problemList.orgPrivate') }}
-        </Chip>
-        <Chip v-if="row.partial" :title="$t('admin.problemList.partialHint')">
-          {{ $t('admin.problemList.partial') }}
-        </Chip>
-      </span>
-    </template>
     <template #cell-setup="{ row }">
-      <template v-if="row.setup">
-        <Chip v-if="gapsOf(row).length === 0" tone="success" size="sm" :icon="Check">
-          {{ $t('admin.problemList.setup.ready') }}
-        </Chip>
-        <AppButton
-          v-else
-          size="sm"
-          :to="gapLink(row)"
-          :title="gapText(row)"
-          :aria-label="`${$t('admin.problemList.setup.unfinished')}. ${gapText(row)}`"
-        >
-          <template #icon><CircleAlert aria-hidden="true" class="text-cue-attention" /></template>
-          {{ $t('admin.problemList.setup.unfinished') }}
-        </AppButton>
-      </template>
+      <ProblemSetupMark v-if="listStepsOf(row)" :steps="listStepsOf(row)!" />
     </template>
-    <template #cell-group="{ row }">{{ row.group?.fullName ?? '—' }}</template>
-    <template #cell-authors="{ row }">
-      <span v-if="row.authors.length === 0" class="text-muted">—</span>
-      <span v-else class="inline-flex items-center gap-1.5">
-        <AdminUserLabel
-          :username="row.authors[0]!.username"
-          :rating="row.authors[0]!.rating"
-          :link="false"
-        />
-        <span v-if="row.authors.length > 1" class="text-caption leading-4 text-muted">
-          {{ $t('admin.problemList.moreAuthors', { count: row.authors.length - 1 }) }}
-        </span>
-      </span>
+    <template #cell-next="{ row }">
+      <AppButton v-if="nextOf(row)" tone="link" :to="nextOf(row)!.to">{{
+        nextOf(row)!.label
+      }}</AppButton>
+      <span v-else-if="row.setup" class="text-meta text-muted">{{
+        $t('admin.problemList.setup.ready')
+      }}</span>
     </template>
-    <template #cell-points="{ row }">{{ formatNumber(row.points, locale.locale) }}</template>
-    <template #cell-date="{ row }">
-      {{ row.date ? formatDate(row.date, 'date', locale.locale) : '—' }}
+    <template #cell-visibility="{ row }">
+      <Chip :strong="row.isPublic">{{
+        $t(`admin.problemList.visibility.${visibilityOf(row)}`)
+      }}</Chip>
     </template>
+    <template #cell-acRate="{ row }">{{ acRateText(row) }}</template>
     <template #actions="{ row }">
-      <AdminRowMenu
+      <RowMenu
         :label="$t('admin.problemList.menu.label', { code: row.code })"
         :items="menuItems(row.code)"
       />
     </template>
-  </AdminDataTable>
+    <template #bulk><slot name="bulk" /></template>
+    <template #card="{ row }">
+      <li
+        class="box-link flex min-h-(--qh-row) items-center gap-3 border-b border-line px-2 py-1"
+        :data-code="row.code"
+      >
+        <span class="flex min-w-0 flex-1 flex-col">
+          <StretchedLink
+            :to="editorOf(row.code)"
+            :title="row.name"
+            class="line-clamp-2 text-body font-semibold text-content"
+            >{{ row.name }}</StretchedLink
+          >
+          <span class="truncate font-mono text-small text-muted">{{ row.code }}</span>
+        </span>
+        <ProblemSetupMark v-if="listStepsOf(row)" :steps="listStepsOf(row)!" class="shrink-0" />
+        <!-- A fixed width, so the marks of all rows stand in one column. -->
+        <span class="flex w-28 shrink-0 items-center">
+          <AppButton v-if="nextOf(row)" tone="link" :to="nextOf(row)!.to" class="min-h-11">{{
+            nextOf(row)!.label
+          }}</AppButton>
+          <span v-else-if="row.setup" class="text-meta text-muted">{{
+            $t('admin.problemList.setup.ready')
+          }}</span>
+        </span>
+      </li>
+    </template>
+  </ProblemTable>
   <ProblemCloneDialog v-model:visible="isCloneOpen" :code="cloning" />
 </template>

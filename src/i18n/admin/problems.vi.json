@@ -27,14 +27,10 @@
   "general": {
     "create": {
       "title": "Tạo bài tập",
-      "lead": "Chọn nơi đặt bài, nhập mã, tên và giới hạn. Phần còn lại chỉnh sau ở các tab của bài.",
+      "lead": "Chọn nơi đặt bài, nhập mã và tên. Phần còn lại soạn ở trang của bài.",
       "leadSuggest": "Không có quyền tạo bài thì bài được gửi dưới dạng đề xuất để nhân viên duyệt.",
-      "createButton": "Tạo bài",
       "suggestButton": "Gửi đề xuất bài",
-      "suggested": "Đã gửi đề xuất {code}.",
-      "required": "Các mục có * là bắt buộc.",
-      "createdToast": "Đã tạo bài {code}.",
-      "cancel": "Hủy"
+      "suggested": "Đã gửi đề xuất {code}."
     },
     "sections": {
       "basics": "Thông tin thêm",
