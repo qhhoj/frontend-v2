@@ -15,7 +15,6 @@ export const ALLOWED = {
   'features/appearance/AppearancePreview.vue': ['text-[22px]'],
   'components/CryingBit.vue': ['rounded-[50%]'],
   'features/runtimes/JudgeCard.vue': ['rounded-[2px]'],
-  'features/submissions/list/TestStrip.vue': ['rounded-[2px]', 'rounded-[3px]'],
 };
 
 /** The arbitrary size, radius and z-index classes in the string literals of one source line, as written; comment lines are ignored. */

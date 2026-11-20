@@ -7,10 +7,10 @@ import Toolbar from '@/components/ui/Toolbar.vue';
 import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import { formatNumber } from '@/lib/format';
+import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
 import DiffSelectionBar from '../DiffSelectionBar.vue';
-import LiveToggle from '../LiveToggle.vue';
 import SubmissionQuickFilters from '../SubmissionQuickFilters.vue';
 import SubmissionTable from '../SubmissionTable.vue';
 import SubmissionTableSkeleton from '../SubmissionTableSkeleton.vue';
@@ -19,6 +19,7 @@ import { ALL_COLUMN_KEYS } from '../submission-table-cells';
 import type { ColumnKey } from '../submission-table-cells';
 import { useSubmissionStatsQuery } from '../submissions.queries';
 import { useDiffPicks } from '../use-diff-picks';
+import ListTools from './ListTools.vue';
 import LiveListNotices from './LiveListNotices.vue';
 import SubmissionFilterPanel from './SubmissionFilterPanel.vue';
 import type { ProblemPickerSource } from './problem-picker-options';
@@ -27,8 +28,8 @@ import type { SubmissionScope } from './submission-scope';
 import { useSubmissionList } from './use-submission-list';
 
 /**
- * The one submission list: a warning when no judge is online, one `Toolbar` (quick filters left, "Trực tiếp" right),
- * "Bộ lọc nâng cao", live notices, the list, its one pager at the foot, and its loading,
+ * The one submission list: a warning when no judge is online, one `Toolbar` (filter toggles left; the tools "So sánh" and
+ * "Trực tiếp" right), "Bộ lọc nâng cao", live notices, the list, its one pager at the foot, and its loading,
  * empty and error states. A page passes only its scope and what differs there: the problem box's choices, the
  * judging-state boxes, the columns and the unfiltered empty text. A contest's problem box also gives the rows their
  * letters and contest scores. The contest tab drops the site-wide stats (`showStats`: the queue count on "Đang chấm" and the no-judge warning).
@@ -88,6 +89,12 @@ const shownColumns = computed(() => {
   if (hasFixedProblem.value) hidden.push('problem');
   return (props.columnKeys ?? ALL_COLUMN_KEYS).filter((key) => !hidden.includes(key));
 });
+/** Whose rows carry the "mine" bar: the viewer's, unless every row of the list is theirs anyway. */
+const ownRowUsername = computed(() =>
+  isSignedIn.value && !isOwnList.value ? session.user?.username : undefined,
+);
+/** A phone's toolbar is one row that scrolls sideways: the tools end it there. */
+const isPhone = useMediaQuery(COMPACT_LIST_QUERY);
 const picks = useDiffPicks();
 /** The rows' compare boxes wait behind "So sánh"; turning it off drops the picks. */
 const isComparing = ref(false);
@@ -146,14 +153,26 @@ watch(
             :advanced-open="isAdvancedOpen"
             :advanced-count="advancedCount"
             :panel-id="ADVANCED_PANEL_ID"
-            :comparing="isSignedIn ? isComparing : null"
             @update="update"
             @toggle-advanced="toggleAdvanced"
-            @toggle-compare="toggleCompare"
-          />
+          >
+            <template v-if="isPhone" #tools>
+              <ListTools
+                :comparing="isSignedIn ? isComparing : null"
+                :live="filters.live"
+                @toggle-compare="toggleCompare"
+                @update:live="update({ live: $event })"
+              />
+            </template>
+          </SubmissionQuickFilters>
         </template>
-        <template #right>
-          <LiveToggle :live="filters.live" @update:live="update({ live: $event })" />
+        <template v-if="!isPhone" #right>
+          <ListTools
+            :comparing="isSignedIn ? isComparing : null"
+            :live="filters.live"
+            @toggle-compare="toggleCompare"
+            @update:live="update({ live: $event })"
+          />
         </template>
       </Toolbar>
       <SubmissionFilterPanel
@@ -205,6 +224,7 @@ watch(
           :highlight-ids="live.addedIds.value"
           :problem-labels="contestLabels"
           :contest-points="contestPoints"
+          :own-username="ownRowUsername"
           :picked-ids="isSignedIn && isComparing ? picks.picked.value : undefined"
           @toggle-pick="picks.toggle"
         />

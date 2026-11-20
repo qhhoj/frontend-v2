@@ -12,12 +12,14 @@ import SubmissionTableSkeleton from '@/features/submissions/SubmissionTableSkele
 import { SUBMISSION_PAGE_SIZE } from '@/features/submissions/list/submission-scope';
 import { useBestSubmissionsQuery } from '@/features/submissions/submissions.queries';
 import { pageFromQuery } from '@/lib/paging';
+import { useSessionStore } from '@/stores/session.store';
 
 /**
  * The problem page's "Tốt nhất" tab (`/problems/:code/best`): each user's best submission, ranked (points, time, memory,
  * earliest), `?page=` paged. The problem page draws the header and the tabs; a problem that does not exist never gets here.
  */
 const route = useRoute();
+const session = useSessionStore();
 const code = computed(() => String(route.params.code));
 const page = computed(() => pageFromQuery(route.query.page));
 const { data: list, isPending, error, refetch } = useBestSubmissionsQuery(code, page);
@@ -45,7 +47,12 @@ const rankStart = computed(() => ((list.value?.meta.page ?? 1) - 1) * SUBMISSION
         </EmptyState>
       </Card>
       <template v-else>
-        <SubmissionTable :submissions="list.items" :show-problem="false" :rank-start="rankStart" />
+        <SubmissionTable
+          :submissions="list.items"
+          :show-problem="false"
+          :rank-start="rankStart"
+          :own-username="session.user?.username"
+        />
         <NumberedPager :meta="list.meta" :label="$t('submissions.best.pager')" />
       </template>
     </QueryState>

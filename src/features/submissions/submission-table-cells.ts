@@ -1,5 +1,5 @@
 import { TABLE_HEAD_CELL, TABLE_ROW_HEIGHT, TABLE_VARIANT } from '@/components/ui/table-classes';
-/** Columns a submission table can show, in table order. The verdict column holds the score; `cost` is "time · memory". */
+/** Columns a submission table can show, in table order. The verdict column holds the score; `cost` is time and memory. */
 export type ColumnKey = 'verdict' | 'problem' | 'user' | 'cost' | 'language' | 'when';
 /** Every column, in table order. */
 export const ALL_COLUMN_KEYS: readonly ColumnKey[] = [
@@ -10,9 +10,6 @@ export const ALL_COLUMN_KEYS: readonly ColumnKey[] = [
   'language',
   'when',
 ];
-
-/** A column plus the two that have no heading text: the pick box and the source link. */
-export type ColumnSlot = ColumnKey | 'pick' | 'source';
 
 /** What one `ColumnKey` draws: the verdict column also holds the score, the cost column time and memory. */
 export type CellKind =
@@ -28,36 +25,35 @@ export const CELLS_OF: Record<ColumnKey, readonly CellKind[]> = {
 export const cellsOf = (keys: readonly ColumnKey[]) => keys.flatMap((key) => CELLS_OF[key]);
 
 /**
- * The full table is one 36 px line per submission, `table-fixed`, and shows cells by the width of its card (a container
- * query, so the filter rail beside it does not matter): verdict chip, score, problem, user and source always; "when" from
- * @2xl (42rem), time from @3xl (48rem), memory from @4xl (56rem), language from @5xl (64rem). A card narrower than the base
- * minimum (`COMPACT_BELOW_PX`: a phone, a tablet beside the filter rail) shows the two-line rows of
- * `SubmissionCompactList.vue` instead, so the list never scrolls sideways.
+ * The full table is one 44 px line per submission. Every cell but the problem keeps its text on one line at its own
+ * width, so a name or a time is never cut; the problem cell takes the width that is left and is the only one that
+ * truncates. Cells give way by the width of the table's own frame (a container query): verdict, score, problem and
+ * user always; "when" from @2xl (42rem), time from @3xl (48rem), memory from @4xl (56rem), language from @5xl (64rem).
+ * A frame narrower than `COMPACT_BELOW_PX` (a phone) shows the rows of `SubmissionCompactList.vue` instead, so the
+ * list never scrolls sideways.
  */
-export const FULL_TABLE_CLASS =
-  'table-fixed min-w-[36rem] @2xl:min-w-[40rem] @3xl:min-w-[45rem] @4xl:min-w-[51rem] @5xl:min-w-[58rem] [&_td]:truncate';
+export const FULL_TABLE_CLASS = 'w-full border-collapse';
 
-/** The base minimum width of the full table (`min-w-[36rem]` above) in px. */
+/** Below this frame width (px) the compact rows replace the table. */
 export const COMPACT_BELOW_PX = 584;
 
-/** The width of the card that holds the full table: the container the cell tiers above are measured against. */
+/** The frame that holds the full table: the container the cell tiers above are measured against. */
 export const TABLE_CARD_CLASS = '@container overflow-hidden';
 
-/** Cell widths of the full table; the problem cell takes the rest. Shared with the skeleton. */
-export const CELL_WIDTH_CLASS: Record<CellKind | 'pick' | 'source', string> = {
+/** How a cell holds its content; the problem cell takes the rest and truncates. Shared with the skeleton. */
+export const CELL_WIDTH_CLASS: Record<CellKind | 'pick', string> = {
   pick: 'w-14',
-  verdict: 'w-36',
-  score: 'w-32',
-  problem: '',
-  user: 'w-32',
-  time: 'w-20',
-  memory: 'w-24',
-  language: 'w-28',
-  when: 'w-16',
-  source: 'w-14',
+  verdict: 'whitespace-nowrap',
+  score: 'whitespace-nowrap',
+  problem: 'w-full max-w-0',
+  user: 'whitespace-nowrap',
+  time: 'whitespace-nowrap',
+  memory: 'whitespace-nowrap',
+  language: 'whitespace-nowrap',
+  when: 'whitespace-nowrap',
 };
 
-/** The cells that give way as the card narrows (see `FULL_TABLE_CLASS`). */
+/** The cells that give way as the frame narrows (see `FULL_TABLE_CLASS`). */
 export const CELL_TIER_CLASS: Partial<Record<CellKind, string>> = {
   when: 'hidden @2xl:table-cell',
   time: 'hidden @3xl:table-cell',
@@ -66,27 +62,26 @@ export const CELL_TIER_CLASS: Partial<Record<CellKind, string>> = {
 };
 
 /** Width and tier of a cell of the full table. */
-export const fullCellClass = (kind: CellKind | 'pick' | 'source') =>
+export const fullCellClass = (kind: CellKind | 'pick') =>
   `${CELL_WIDTH_CLASS[kind]} ${CELL_TIER_CLASS[kind as CellKind] ?? ''}`;
 
-/** Numbers line up on the right. */
-export const NUMBER_CELLS: ReadonlySet<CellKind> = new Set(['score', 'time', 'memory']);
+/** Numbers line up on the right, and the time of submitting ends the row. */
+export const NUMBER_CELLS: ReadonlySet<CellKind> = new Set(['score', 'time', 'memory', 'when']);
 
 /**
- * `ledger` (the default): no frame, a hairline under every row, a stronger rule under the head, a small inset at the ends (the list
- * sits on the page). `surface`: the list is inside a card of its own (the contest's best-submissions page), rows are told apart by a
- * hairline above. The classes are shared by `SubmissionTable.vue` and its skeleton, so the two cannot drift apart in height or width.
+ * `ledger` (the default): no frame, a hairline under every row, a stronger rule under the head (the list sits on the
+ * page). `surface`: the list is inside a card of its own (the contest's best-submissions page), rows are told apart by
+ * a hairline above. The classes are shared by `SubmissionTable.vue` and its skeleton, so the two cannot drift apart.
  */
 export type TableVariant = keyof typeof TABLE_VARIANT;
-/** The ends of a row keep a small inset in a ledger too: a row tinted by its verdict must not touch its first and last cell. */
 const CELL_EDGE: Record<TableVariant, string> = {
-  ledger: 'first:pl-2 last:pr-2',
+  ledger: 'first:pl-3 last:pr-3',
   surface: TABLE_VARIANT.surface.edge,
 };
 export const headerCellClasses = (variant: TableVariant) =>
-  `${TABLE_HEAD_CELL} px-2 ${CELL_EDGE[variant]}`;
+  `${TABLE_HEAD_CELL} px-3 ${CELL_EDGE[variant]}`;
 export const bodyCellClasses = (variant: TableVariant) =>
-  `${TABLE_ROW_HEIGHT} px-2 align-middle text-body ${CELL_EDGE[variant]}`;
+  `${TABLE_ROW_HEIGHT} px-3 align-middle text-body ${CELL_EDGE[variant]}`;
 /** The header row: the same tone as the rows, like every table; the ledger rules it off. */
 export const headerRowClasses = (variant: TableVariant) =>
   variant === 'ledger'
@@ -97,3 +92,16 @@ export const ROW_RULE: Record<TableVariant, string> = {
   ledger: 'border-b border-line',
   surface: 'border-t border-line',
 };
+
+/**
+ * "You are here" on a row: a 3 px bar in the action colour on the left of the viewer's own rows. Every row keeps the
+ * bar's width (clear on the others), so the lamps of all rows stay on one line. `table` puts it on the row's first
+ * cell (a table row has no border of its own), `list` on the row itself.
+ */
+export const OWN_BAR = {
+  table: {
+    own: '[&>:first-child]:border-l-3 [&>:first-child]:border-l-accent',
+    other: '[&>:first-child]:border-l-3 [&>:first-child]:border-l-transparent',
+  },
+  list: { own: 'border-l-3 border-l-accent', other: 'border-l-3 border-l-transparent' },
+} as const;

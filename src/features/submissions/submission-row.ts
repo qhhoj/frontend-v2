@@ -11,6 +11,7 @@ import { translate } from '@/i18n';
 import type { Locale } from '@/i18n';
 import { ringFraction } from '@/lib/grading';
 import { submissionVerdictOf } from '@/lib/verdicts';
+import type { VerdictTone } from '@/lib/verdicts';
 import type { CueTone } from '@/components/ui/cue-tones';
 
 const PERCENT = 100;
@@ -60,6 +61,40 @@ export function scoreCue(row: SubmissionListItem, contestMax: number | undefined
   return contestMax !== undefined && contestPoints !== null
     ? scoreTone(contestPoints, contestMax)
     : scoreTone(row.points, row.problem?.points);
+}
+
+/** The points a list row counts: contest points over the contest problem's in a contest list, else the problem's own. */
+function countedScore(row: SubmissionListItem, contestMax: number | undefined) {
+  const contestPoints = row.contest?.points ?? null;
+  return contestMax !== undefined && contestPoints !== null
+    ? { points: contestPoints, max: contestMax as number | undefined }
+    : { points: row.points, max: row.problem?.points };
+}
+
+/** A judged row's score in two parts, "560" and "800" (no maximum where it is unknown); null when the row has no score. */
+export function scoreParts(
+  row: SubmissionListItem,
+  locale: Locale,
+  contestMax: number | undefined,
+): { earned: string; max: string } | null {
+  const { points, max } = countedScore(row, contestMax);
+  if (points === null) return null;
+  const shown = scoreBelowFull(points, max, POINT_FRACTION_DIGITS);
+  return {
+    earned: formatNumber(shown, locale, POINT_FRACTION_DIGITS, false),
+    max: max === undefined ? '' : formatNumber(max, locale, POINT_FRACTION_DIGITS, false),
+  };
+}
+
+/** The colour of a judged row's score: part of the points is the partial tone whatever the verdict, else the verdict's own. */
+export function scoreToneOf(
+  row: SubmissionListItem,
+  contestMax: number | undefined,
+): VerdictTone | null {
+  if (!isFinished(row)) return null;
+  const { points, max } = countedScore(row, contestMax);
+  const isPart = points !== null && max !== undefined && points > 0 && points < max;
+  return isPart ? 'pc' : submissionVerdictOf(row).tone;
 }
 
 /** The share of the points judged so far, `45%`; only a grading row with a known case count has one. */

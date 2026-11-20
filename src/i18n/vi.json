@@ -1330,7 +1330,6 @@
       "language": "ngôn ngữ"
     },
     "listName": "Danh sách bài nộp",
-    "viewSource": "Xem mã nguồn",
     "scrollRegion": "Bảng bài nộp, cuộn ngang",
     "columns": {
       "verdict": "Kết quả",
@@ -1341,7 +1340,6 @@
       "memory": "Bộ nhớ",
       "language": "Ngôn ngữ",
       "when": "Lúc",
-      "source": "Mã nguồn",
       "rank": "Hạng"
     },
     "rail": {
@@ -1387,6 +1385,7 @@
     },
     "live": "Trực tiếp",
     "quick": {
+      "all": "Tất cả",
       "mine": "Của tôi",
       "accepted": "AC",
       "errors": "Lỗi",
@@ -1567,7 +1566,6 @@
     },
     "ringLabel": "Đã chấm {graded} trên {total} test",
     "ringLabelPoints": "Đã được {percent}% điểm",
-    "provisional": "điểm tạm tính",
     "liveUpdates": "Cập nhật trực tiếp",
     "staleReload": "Kết nối đã dừng; tải lại để xem trạng thái mới nhất",
     "reload": "Tải lại",
@@ -1604,15 +1602,14 @@
       "moreLosses": "+{count} test mất điểm khác · Bảng {total} test"
     },
     "cases": {
-      "title": "Kết quả chấm",
-      "scrollRegion": "Kết quả chấm, cuộn ngang",
+      "title": "Từng test",
+      "scrollRegion": "Từng test, cuộn ngang",
       "none": "Chưa có kết quả từng test",
       "test": "Test",
       "result": "Kết quả",
       "time": "Thời gian",
       "memory": "Bộ nhớ",
       "points": "Điểm",
-      "pending": "Chờ chấm",
       "batch": "Nhóm {number}",
       "compileLog": "Thông báo biên dịch",
       "feedback": "Phản hồi",
@@ -1674,7 +1671,28 @@
     "strip": {
       "showAll": "Hiện tất cả ({count})",
       "onlyLost": "Chỉ test chưa đúng",
-      "allFull": "Cả {count} test đều đúng."
+      "allFull": "Cả {count} test đều đúng.",
+      "folded": "{count} test đúng đã gộp lại. Bấm để hiện."
+    },
+    "plate": {
+      "label": "Kết quả chấm",
+      "verdict": "Kết quả",
+      "score": "Điểm",
+      "provisional": "Điểm tạm tính",
+      "contestScore": "Điểm kỳ thi",
+      "failedAt": "{verdict} ở test {number}",
+      "judging": "Đang chấm test {current}/{total}",
+      "passed": "Test đúng",
+      "tests": "Các test",
+      "squares": "Kết quả từng test",
+      "groupSquares": "Kết quả từng subtask",
+      "testTitle": "Test {number}: {verdict}",
+      "groupTitle": "Subtask {number}: {verdict}",
+      "waitingTest": "Test {number}: chờ chấm",
+      "slowest": "Test chậm nhất",
+      "largest": "Bộ nhớ đỉnh",
+      "limit": "giới hạn {limit}",
+      "ofLimit": "{value} trên {limit}"
     }
   },
   "states": {

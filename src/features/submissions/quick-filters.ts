@@ -2,7 +2,7 @@ import type { SubmissionResult } from '@/api/types/submissions';
 import type { SubmissionFilters } from './use-submission-filters';
 
 /** The one-click filters above the list; each is a shortcut for filters the advanced panel can also set. */
-export type QuickFilter = 'mine' | 'accepted' | 'errors' | 'grading';
+export type QuickFilter = 'all' | 'mine' | 'accepted' | 'errors' | 'grading';
 
 /** "Lỗi": every result that is the contestant's fault (system outcomes such as IE stay out). */
 export const ERROR_RESULTS: readonly SubmissionResult[] = [
@@ -18,6 +18,14 @@ export const ERROR_RESULTS: readonly SubmissionResult[] = [
 const sameSet = (left: readonly string[], right: readonly string[]) =>
   left.length === right.length && right.every((value) => left.includes(value));
 
+/** No filter narrows the list: what "Tất cả" shows as on, and what a click on it brings back. */
+const isUnfiltered = (filters: SubmissionFilters) =>
+  filters.problem === '' &&
+  filters.user === '' &&
+  filters.results.length === 0 &&
+  filters.languageIds.length === 0 &&
+  filters.statusGroups.length === 0;
+
 /** Whether the URL's filters are what this chip sets: a deep link lights the right chip. */
 export function isQuickFilterOn(
   filters: SubmissionFilters,
@@ -25,6 +33,8 @@ export function isQuickFilterOn(
   username: string | null,
 ): boolean {
   switch (chip) {
+    case 'all':
+      return isUnfiltered(filters);
     case 'mine':
       return username !== null && filters.user === username;
     case 'accepted':
@@ -36,7 +46,7 @@ export function isQuickFilterOn(
   }
 }
 
-/** The filter change of a click on the chip: on sets its filter (AC and Lỗi replace each other), off clears it. */
+/** The filter change of a click on the chip: on sets its filter (AC and Lỗi replace each other), off clears it; "Tất cả" clears every filter. */
 export function quickFilterPatch(
   filters: SubmissionFilters,
   chip: QuickFilter,
@@ -44,6 +54,8 @@ export function quickFilterPatch(
 ): Partial<SubmissionFilters> {
   const isOn = isQuickFilterOn(filters, chip, username);
   switch (chip) {
+    case 'all':
+      return { problem: '', user: '', results: [], languageIds: [], statusGroups: [] };
     case 'mine':
       return { user: isOn ? '' : (username ?? '') };
     case 'accepted':

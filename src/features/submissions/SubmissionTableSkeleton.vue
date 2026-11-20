@@ -53,7 +53,7 @@ const isCompact = useIsNarrow(() => frame.value, COMPACT_BELOW_PX);
 const variant = 'ledger';
 const bodyCell = bodyCellClasses(variant);
 const headerCell = headerCellClasses(variant);
-const classOf = (kind: CellKind | 'pick' | 'source') => fullCellClass(kind);
+const classOf = (kind: CellKind | 'pick') => fullCellClass(kind);
 </script>
 
 <template>
@@ -63,22 +63,23 @@ const classOf = (kind: CellKind | 'pick' | 'source') => fullCellClass(kind);
         v-for="row in ROW_COUNT"
         :key="row"
         data-skeleton-region="row"
-        class="flex min-h-(--qh-row) items-center gap-2 py-2"
+        class="flex min-h-13 items-center gap-3 px-2 py-1.5"
         :class="ROW_RULE[variant]"
       >
         <SkeletonBlock v-if="hasPickColumn" round class="size-11 shrink-0" />
-        <div class="flex min-w-0 flex-1 flex-col gap-1">
-          <div class="flex items-center gap-2 text-sm">
-            <SkeletonBlock class="h-5 w-12 shrink-0" />
-            <SkeletonBlock v-if="shownKeys.includes('problem')" text class="w-32" />
-          </div>
-          <div class="text-caption leading-4"><SkeletonBlock text class="w-40" /></div>
+        <div class="flex w-24 shrink-0 flex-col gap-1">
+          <SkeletonBlock class="h-5 w-12" />
+          <SkeletonBlock text class="w-16" />
         </div>
-        <SkeletonBlock class="size-7 shrink-0" />
+        <div class="flex min-w-0 flex-1 flex-col gap-1">
+          <SkeletonBlock v-if="shownKeys.includes('problem')" text class="w-32" />
+          <div class="text-small leading-4"><SkeletonBlock text class="w-40" /></div>
+        </div>
+        <SkeletonBlock text class="w-10 shrink-0" />
       </li>
     </ul>
     <ScrollRegion v-else placeholder label="">
-      <table aria-hidden="true" class="w-full border-collapse" :class="FULL_TABLE_CLASS">
+      <table aria-hidden="true" :class="FULL_TABLE_CLASS">
         <thead>
           <tr :class="headerRowClasses(variant)">
             <th v-if="hasPickColumn" scope="col" :class="[headerCell, classOf('pick')]">
@@ -92,7 +93,6 @@ const classOf = (kind: CellKind | 'pick' | 'source') => fullCellClass(kind);
             >
               <SkeletonBlock text :class="BAR[kind]" />
             </th>
-            <th scope="col" :class="[headerCell, classOf('source')]" />
           </tr>
         </thead>
         <tbody>
@@ -113,7 +113,6 @@ const classOf = (kind: CellKind | 'pick' | 'source') => fullCellClass(kind);
               <SkeletonBlock v-if="kind === 'verdict'" class="h-5 w-12" />
               <SkeletonBlock v-else text :class="BAR[kind]" />
             </td>
-            <td :class="bodyCell"><SkeletonBlock class="size-7" /></td>
           </tr>
         </tbody>
       </table>

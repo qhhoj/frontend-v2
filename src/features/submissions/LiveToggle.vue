@@ -9,6 +9,7 @@ const emit = defineEmits<{ 'update:live': [live: boolean] }>();
 <template>
   <AppButton
     tone="ghost"
+    size="sm"
     data-testid="live-toggle"
     class="shrink-0 aria-pressed:!border-transparent aria-pressed:!bg-transparent aria-pressed:!text-cue-live"
     :pressed="live"
