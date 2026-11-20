@@ -14,12 +14,9 @@ import AdminSaveBar from '../../ui/form/AdminSaveBar.vue';
 import { provideDateValidity } from '@/components/ui/date-validity';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { CONTEST_INDEX_KEY, PUBLIC_CONTESTS_KEY } from '../contest-editing.queries';
-import {
-  checkContestForm,
-  checkContestIdentity,
-  emptyContestForm,
-  toContestBody,
-} from '../contest-form';
+import { emptyContestForm } from '../contest-form';
+import { checkContestForm, checkContestIdentity } from '../contest-form-checks';
+import { toContestBody } from '../contest-patch';
 import { usePermissions } from '@/stores/use-permissions';
 import ContestBasicForm from './ContestBasicForm.vue';
 

@@ -5,7 +5,7 @@ import { INPUT } from '../../ui/controls';
 import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
 import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
-import { RULES_MAX_LENGTH } from '../contest-form';
+import { RULES_MAX_LENGTH } from '../contest-form-checks';
 import type { ContestForm } from '../contest-form';
 
 /** Contest rules and the balloon queue settings. */

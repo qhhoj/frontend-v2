@@ -8,7 +8,9 @@ import { provideDateValidity } from '@/components/ui/date-validity';
 import { cloneValue } from '../../ui/form/dirty-form';
 import { useSeededDraft } from '../../ui/form/seeded-draft';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
-import { changedContestFields, checkContestForm, toContestForm } from '../contest-form';
+import { toContestForm } from '../contest-form';
+import { checkContestForm } from '../contest-form-checks';
+import { changedContestFields } from '../contest-patch';
 import type { ContestForm } from '../contest-form';
 import {
   CONTEST_INDEX_KEY,
