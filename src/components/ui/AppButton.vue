@@ -10,7 +10,7 @@ import type { ButtonSize, ButtonTone } from './button-classes';
 /**
  * The site button (docs/design-language.md). `to` renders a RouterLink, `href` a plain link, otherwise a `<button>`. Disabled and
  * loading keep focus (`aria-disabled`, never the native attribute) and swallow the click; loading shows a spinner in place of the
- * icon and keeps the label. `iconOnly` is IconButton's square shape. `pressed` makes it a toggle (`aria-pressed`, the accent-soft
+ * icon and keeps the label. `iconOnly` is IconButton's square shape: neutral ink, and it needs an `aria-label`, which is also its tooltip. `pressed` makes it a toggle (`aria-pressed`, the accent-soft
  * pair while on). `tone="link"` is an inline text action with a 44 px hit area. `disabledReason` shows, beside a disabled button,
  * why it cannot be used (and names it for assistive tech): a disabled button never has to guess.
  */
@@ -54,6 +54,10 @@ const described = computed(
   () =>
     [attrs['aria-describedby'], reason.value ? reasonId : undefined].filter(Boolean).join(' ') ||
     undefined,
+);
+/** An icon-only button always has a tooltip: its `aria-label`, unless the caller passes a `title` of its own. */
+const iconTitle = computed(() =>
+  props.iconOnly && typeof attrs['aria-label'] === 'string' ? attrs['aria-label'] : undefined,
 );
 const classes = computed(() =>
   buttonClasses({
@@ -100,6 +104,7 @@ const WithReason = (_props: object, { slots }: { slots: { default?: () => VNode[
       <a
         ref="control"
         :aria-pressed="pressed"
+        :title="iconTitle"
         v-bind="$attrs"
         :class="classes"
         :aria-disabled="inactive || undefined"
@@ -115,6 +120,7 @@ const WithReason = (_props: object, { slots }: { slots: { default?: () => VNode[
       v-else-if="href !== undefined"
       ref="control"
       :aria-pressed="pressed"
+      :title="iconTitle"
       v-bind="$attrs"
       :class="classes"
       :aria-disabled="inactive || undefined"
@@ -129,6 +135,7 @@ const WithReason = (_props: object, { slots }: { slots: { default?: () => VNode[
       v-else
       ref="control"
       :aria-pressed="pressed"
+      :title="iconTitle"
       v-bind="$attrs"
       :class="classes"
       :aria-disabled="inactive || undefined"

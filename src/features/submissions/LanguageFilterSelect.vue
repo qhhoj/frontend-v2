@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { Language } from '@/api/types/problems';
 import LanguageIcon from '@/components/language/LanguageIcon.vue';
 import { languageById } from '@/components/language/language-by-id';
-import ToolbarSelect from '@/components/ToolbarSelect.vue';
+import SelectField from '@/components/ui/SelectField.vue';
 import { translate } from '@/i18n';
 import type { SubmissionFilters } from './use-submission-filters';
 
@@ -24,13 +24,13 @@ const pick = (languageId: string) =>
 </script>
 
 <template>
-  <ToolbarSelect
-    :label="$t('submissions.rail.language')"
+  <SelectField
+    :prefix="$t('submissions.rail.language')"
     :model-value="filters.languageIds[0] ?? ANY_LANGUAGE"
     :options="options"
     :active="filters.languageIds.length > 0"
     @update:model-value="pick"
   >
     <template #chosen-icon><LanguageIcon v-if="chosen" :language-key="chosen.key" /></template>
-  </ToolbarSelect>
+  </SelectField>
 </template>

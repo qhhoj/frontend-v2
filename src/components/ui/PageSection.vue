@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { RouteLocationRaw } from 'vue-router';
-import SeeAllLink from './SeeAllLink.vue';
+import AppButton from './AppButton.vue';
 
 /**
  * The one section header ("Sơn mài" placement): the title at the left with an optional count after it (mono, 13 px); at the right a
@@ -25,8 +25,8 @@ defineProps<{
         class="ml-auto flex items-center gap-3 text-meta text-muted"
       >
         <slot name="actions" />
-        <SeeAllLink v-if="seeAll" :to="seeAll.to"
-          >{{ seeAll.label }}<span class="sr-only"> {{ title }}</span></SeeAllLink
+        <AppButton v-if="seeAll" tone="link" class="text-meta" :to="seeAll.to"
+          >{{ seeAll.label }}<span class="sr-only"> {{ title }}</span></AppButton
         >
       </div>
     </div>

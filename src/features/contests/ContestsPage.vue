@@ -3,7 +3,7 @@ import PageHeader from '@/components/ui/PageHeader.vue';
 import PageLayout from '@/components/ui/PageLayout.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
 import Toolbar from '@/components/ui/Toolbar.vue';
-import ToolbarSelect from '@/components/ToolbarSelect.vue';
+import SelectField from '@/components/ui/SelectField.vue';
 import CreateShortcut from '@/features/admin/creation/CreateShortcut.vue';
 import { computed, reactive } from 'vue';
 import type { ContestPhase } from '@/api/types/contests';
@@ -71,9 +71,9 @@ const tagName = computed(() => {
             :maxlength="100"
             class="w-full sm:w-64"
           />
-          <ToolbarSelect
+          <SelectField
             v-model="ratedChoice"
-            :label="$t('contests.list.ratedLabel')"
+            :prefix="$t('contests.list.ratedLabel')"
             :options="ratedOptions"
             :active="ratedChoice !== 'any'"
             class="w-full sm:w-auto"

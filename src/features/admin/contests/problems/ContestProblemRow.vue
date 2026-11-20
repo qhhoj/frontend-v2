@@ -141,6 +141,7 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
           type="button"
           :class="ICON_BUTTON"
           :aria-label="$t('admin.contests.problems.moveUp', { code: row.code })"
+          :title="$t('admin.contests.problems.moveUp', { code: row.code })"
           :disabled="position === 1"
           @click="emit('move', -1)"
         >
@@ -150,6 +151,7 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
           type="button"
           :class="ICON_BUTTON"
           :aria-label="$t('admin.contests.problems.moveDown', { code: row.code })"
+          :title="$t('admin.contests.problems.moveDown', { code: row.code })"
           :disabled="position === count"
           @click="emit('move', 1)"
         >
@@ -159,6 +161,7 @@ const ICON_BUTTON = iconButtonClass('ghost', 'sm');
           type="button"
           :class="ICON_BUTTON"
           :aria-label="$t('admin.contests.problems.remove', { code: row.code })"
+          :title="$t('admin.contests.problems.remove', { code: row.code })"
           @click="emit('remove')"
         >
           <X aria-hidden="true" class="size-4" />

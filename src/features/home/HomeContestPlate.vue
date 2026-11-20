@@ -12,7 +12,6 @@ import type { TimelineEvent } from '@/components/ui/ContestTimeline.vue';
 import Lamp from '@/components/ui/Lamp.vue';
 import Readout from '@/components/ui/Readout.vue';
 import ReadoutCell from '@/components/ui/ReadoutCell.vue';
-import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import StretchedLink from '@/components/ui/StretchedLink.vue';
 import { participationKind } from '@/features/contests/bar/current-contest';
 import { listActionKind } from '@/features/contests/contest-action';
@@ -180,7 +179,9 @@ const events = computed<TimelineEvent[]>(() => {
       <EmptyState v-if="!times" inline data-testid="home-no-contest">
         {{ $t('home.plate.none') }}
         <template #action>
-          <SeeAllLink :to="CONTESTS">{{ $t('home.browseContests') }}</SeeAllLink>
+          <AppButton tone="link" class="text-meta" :to="CONTESTS">{{
+            $t('home.browseContests')
+          }}</AppButton>
         </template>
       </EmptyState>
       <Readout

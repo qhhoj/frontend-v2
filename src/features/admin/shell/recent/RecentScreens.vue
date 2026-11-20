@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { History } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { recordOf } from './continue-records';
@@ -28,18 +29,19 @@ const openable = computed(() =>
     <h2 id="admin-recent-title" class="mr-1 text-sm font-semibold">
       {{ $t('admin.shell.recent.title') }}
     </h2>
-    <RouterLink
+    <AppButton
       v-for="entry in openable"
       :key="entry.path"
+      size="sm"
       :to="entry.path"
       :title="entry.detail ?? undefined"
-      class="inline-flex min-h-(--qa-control) max-w-full min-w-0 items-center gap-1.5 rounded-pill border border-line bg-surface-solid px-3 text-sm hover:bg-surface-hover"
+      class="max-w-full min-w-0"
     >
-      <History aria-hidden="true" class="size-3.5 shrink-0 text-muted" :stroke-width="1.75" />
-      <span class="truncate font-semibold">{{ $t(entry.titleKey) }}</span>
-      <span v-if="entry.detail" class="truncate font-mono text-caption leading-4 text-muted">{{
+      <template #icon><History aria-hidden="true" class="text-muted" /></template>
+      <span class="truncate">{{ $t(entry.titleKey) }}</span>
+      <span v-if="entry.detail" class="truncate font-mono text-small font-normal text-muted">{{
         entry.detail
       }}</span>
-    </RouterLink>
+    </AppButton>
   </nav>
 </template>

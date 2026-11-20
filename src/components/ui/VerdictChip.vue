@@ -8,9 +8,9 @@ import Lamp from './Lamp.vue';
  * verdict's name in muted text. No tint and no box: colour sits on the lamp and the code only, and the code carries the meaning, so
  * colour is never the only signal. Without `named` the name is the tooltip and what a screen reader reads, and the
  * mark has one fixed minimum width (fits the longest code, 3 characters), so the titles beside a column of marks line
- * up. A judging verdict's lamp pulses. Inside a `Readout` it takes the plate's colours.
+ * up. A judging verdict's lamp pulses; `still` keeps it steady (a long list, a row that is not live). Inside a `Readout` it takes the plate's colours.
  */
-defineProps<{ verdict: Verdict; named?: boolean }>();
+defineProps<{ verdict: Verdict; named?: boolean; still?: boolean }>();
 </script>
 
 <template>
@@ -19,7 +19,7 @@ defineProps<{ verdict: Verdict; named?: boolean }>();
     :class="[VERDICT_TEXT_CLASSES[verdict.tone], named ? '' : 'min-w-15']"
     :title="named ? undefined : $t(verdict.labelKey)"
   >
-    <Lamp :tone="verdict.tone" />
+    <Lamp :tone="verdict.tone" :still="still" />
     <span :aria-hidden="named ? undefined : 'true'">{{ verdict.code }}</span>
     <span v-if="named" class="font-body font-medium tracking-normal text-muted">{{
       $t(verdict.labelKey)

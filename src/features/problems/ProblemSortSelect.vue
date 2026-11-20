@@ -2,7 +2,7 @@
 import { ArrowDownUp } from 'lucide-vue-next';
 import { isProblemSort } from '@/api/types/problems';
 import type { ProblemSort } from '@/api/types/problems';
-import ToolbarSelect from '@/components/ToolbarSelect.vue';
+import SelectField from '@/components/ui/SelectField.vue';
 import IconButton from '@/components/ui/IconButton.vue';
 import Menu from '@/components/ui/Menu.vue';
 import { DEFAULT_SORT, sortOptions } from './problem-sort-options';
@@ -36,9 +36,9 @@ const pick = (value: string) =>
       </IconButton>
     </template>
   </Menu>
-  <ToolbarSelect
+  <SelectField
     v-else
-    :label="$t('problems.sort')"
+    :prefix="$t('problems.sort')"
     :model-value="props.sort ?? DEFAULT_SORT"
     :options="sortOptions()"
     :active="props.sort !== null"

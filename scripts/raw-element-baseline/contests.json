@@ -10,18 +10,8 @@
   "features/contests/ContestAnnouncementsPage.vue": {
     "SubmissionPager": 1
   },
-  "features/contests/ContestCountdown.vue": {
-    "uppercase": 2
-  },
-  "features/contests/ContestDetailSkeleton.vue": {
-    "fixed-size": 1,
-    "hardcoded-value": 1
-  },
   "features/contests/ContestGroup.vue": {
     "SubmissionPager": 1
-  },
-  "features/contests/ContestPage.vue": {
-    "hardcoded-script-value": 1
   },
   "features/contests/ContestProblemsTable.vue": {
     "table": 1
@@ -32,12 +22,6 @@
     "verdict-tone": 1
   },
   "features/contests/ContestTagFilter.vue": {
-    "button": 2
-  },
-  "features/contests/ContestTimeBar.vue": {
-    "hardcoded-script-value": 1
-  },
-  "features/contests/InContestStatus.vue": {
     "button": 2
   },
   "features/contests/LanguageStatsTable.vue": {

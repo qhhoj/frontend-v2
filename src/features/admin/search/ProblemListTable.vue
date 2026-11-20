@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppButton from '@/components/ui/AppButton.vue';
 import { Building2, Check, CircleAlert, Database, Globe, Lightbulb, Lock } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -159,17 +160,16 @@ const menuItems = (code: string) =>
         <Chip v-if="gapsOf(row).length === 0" tone="success" size="sm" :icon="Check">
           {{ $t('admin.problemList.setup.ready') }}
         </Chip>
-        <RouterLink
+        <AppButton
           v-else
+          size="sm"
           :to="gapLink(row)"
           :title="gapText(row)"
           :aria-label="`${$t('admin.problemList.setup.unfinished')}. ${gapText(row)}`"
-          class="inline-flex rounded-pill"
         >
-          <Chip tone="warning" size="sm" :icon="CircleAlert">
-            {{ $t('admin.problemList.setup.unfinished') }}
-          </Chip>
-        </RouterLink>
+          <template #icon><CircleAlert aria-hidden="true" class="text-cue-attention" /></template>
+          {{ $t('admin.problemList.setup.unfinished') }}
+        </AppButton>
       </template>
     </template>
     <template #cell-group="{ row }">{{ row.group?.fullName ?? '—' }}</template>

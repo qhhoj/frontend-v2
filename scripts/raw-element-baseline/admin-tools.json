@@ -128,7 +128,6 @@
     "controls": 1
   },
   "features/admin/ui/ChipPicker.vue": {
-    "button": 1,
     "status-colour": 1
   },
   "features/admin/ui/RevealKeyDialog.vue": {
@@ -137,8 +136,7 @@
     "controls": 2
   },
   "features/admin/ui/controls.ts": {
-    "disabled-opacity": 1,
-    "status-colour": 2
+    "disabled-opacity": 1
   },
   "features/admin/ui/form/AdminFormSection.vue": {
     "status-colour": 2

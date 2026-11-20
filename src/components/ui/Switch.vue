@@ -38,22 +38,18 @@ const describedBy = computed(
 );
 
 const SIZES: Record<SwitchSize, { track: string; thumb: string; on: string }> = {
-  md: {
-    track: 'h-6 w-10 before:-inset-2.5',
-    thumb: 'ml-0.5 size-4.5',
-    on: 'translate-x-4',
-  },
-  lg: { track: 'h-11 w-14', thumb: 'ml-1 size-8', on: 'translate-x-3.5' },
+  md: { track: 'h-6 w-12 before:-inset-3', thumb: 'size-4', on: 'translate-x-6' },
+  lg: { track: 'h-(--qh-touch) w-16', thumb: 'size-8', on: 'translate-x-6' },
 };
 /** One colour pair per state, so a locked switch never depends on which variant Tailwind sorts last. */
 const colours = computed(() => {
   if (props.disabled)
     return model.value
-      ? { track: 'border-line bg-accent-soft', thumb: 'bg-line-strong' }
-      : { track: 'border-line bg-surface', thumb: 'bg-line-strong' };
+      ? { track: 'inset-ring-line bg-accent-soft', thumb: 'bg-line-strong' }
+      : { track: 'inset-ring-line bg-surface', thumb: 'bg-line-strong' };
   return model.value
-    ? { track: 'border-accent bg-accent', thumb: 'bg-on-accent' }
-    : { track: 'border-line-strong bg-surface-strong', thumb: 'bg-muted' };
+    ? { track: 'inset-ring-accent bg-accent', thumb: 'bg-on-accent' }
+    : { track: 'inset-ring-line-strong bg-surface-strong', thumb: 'bg-muted' };
 });
 const toggle = () => {
   if (!props.disabled) model.value = !model.value;
@@ -69,7 +65,7 @@ const toggle = () => {
       :aria-disabled="disabled ? 'true' : undefined"
       :aria-labelledby="labelledby ?? labelId"
       :aria-describedby="describedBy"
-      class="relative inline-flex shrink-0 items-center rounded-pill border transition-colors before:absolute aria-disabled:cursor-not-allowed"
+      class="relative inline-flex shrink-0 items-center rounded-pill px-1 inset-ring transition-colors before:absolute aria-disabled:cursor-not-allowed"
       :class="[SIZES[size].track, colours.track, hasText && size === 'md' && 'mt-0.5']"
       @click="toggle"
     >

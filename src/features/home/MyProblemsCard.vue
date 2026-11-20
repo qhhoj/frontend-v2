@@ -8,7 +8,7 @@ import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import Chip from '@/components/ui/Chip.vue';
 import PageSection from '@/components/ui/PageSection.vue';
-import SeeAllLink from '@/components/ui/SeeAllLink.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import StretchedLink from '@/components/ui/StretchedLink.vue';
 import { translate } from '@/i18n';
 import { GAP_ROUTE, setupGapsOf } from '@/features/admin/search/problem-setup-marks';
@@ -60,7 +60,9 @@ const CREATE = { name: 'admin-problemNew' };
       <EmptyState v-if="!mine.length" inline>
         {{ $t('home.mine.empty') }}
         <template #action>
-          <SeeAllLink :to="CREATE">{{ $t('home.mine.create') }}</SeeAllLink>
+          <AppButton tone="link" class="text-meta" :to="CREATE">{{
+            $t('home.mine.create')
+          }}</AppButton>
         </template>
       </EmptyState>
       <template v-else>
@@ -86,8 +88,8 @@ const CREATE = { name: 'admin-problemNew' };
             </template>
           </li>
         </ul>
-        <SeeAllLink :to="CREATE" class="mt-1 gap-1"
-          ><Plus aria-hidden="true" class="size-4" />{{ $t('home.mine.create') }}</SeeAllLink
+        <AppButton tone="link" :to="CREATE" class="text-meta mt-1 gap-1"
+          ><Plus aria-hidden="true" class="size-4" />{{ $t('home.mine.create') }}</AppButton
         >
       </template>
     </QueryState>

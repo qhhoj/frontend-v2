@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { CatalogItem } from '@/api/types/problems';
-import ToolbarSelect from '@/components/ToolbarSelect.vue';
+import SelectField from '@/components/ui/SelectField.vue';
 import Switch from '@/components/ui/Switch.vue';
 import { translate } from '@/i18n';
 import ProblemPointsRange from './ProblemPointsRange.vue';
@@ -34,9 +34,9 @@ const groupOptions = computed(() => [
   <div
     class="-m-3 flex max-h-[calc(100dvh-9rem)] w-86 max-w-full flex-col gap-4 overflow-y-auto p-3"
   >
-    <ToolbarSelect
+    <SelectField
       v-if="groups.length"
-      :label="$t('problems.group')"
+      :prefix="$t('problems.group')"
       :model-value="filters.groupId ?? ''"
       :options="groupOptions"
       :active="filters.groupId !== null"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import IconButton from '@/components/ui/IconButton.vue';
 import { ChevronDown, ChevronRight } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -48,19 +49,15 @@ const lines = computed(() => changeLinesOf(props.revision.changes));
       </td>
       <td class="px-3 py-2">
         <div class="flex flex-wrap justify-end gap-2">
-          <button
-            type="button"
-            class="min-h-11 rounded-pill border border-line px-3 text-sm font-semibold hover:bg-surface-hover"
+          <IconButton
+            tone="secondary"
+            size="sm"
+            :label="t('admin.pages.history.showChanges')"
             :aria-expanded="isOpen"
-            :aria-label="t('admin.pages.history.showChanges')"
             @click="emit('toggle')"
           >
-            <component
-              :is="isOpen ? ChevronDown : ChevronRight"
-              aria-hidden="true"
-              class="size-4"
-            />
-          </button>
+            <component :is="isOpen ? ChevronDown : ChevronRight" aria-hidden="true" />
+          </IconButton>
           <button
             v-if="!readonly && canLoadOldValues(revision)"
             type="button"

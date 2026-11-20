@@ -40,7 +40,7 @@ const isHelpOpen = ref(false);
         <button
           v-if="help"
           type="button"
-          class="relative ml-1 inline-flex size-5 items-center justify-center rounded-pill border border-line-control align-middle font-mono text-caption text-content after:absolute after:-inset-3 after:content-[''] hover:bg-surface-hover"
+          class="relative ml-1 inline-flex size-5 items-center justify-center rounded-control border border-line-control align-middle font-mono text-caption text-content after:absolute after:-inset-3 after:content-[''] hover:bg-surface-hover"
           :aria-label="helpLabel"
           :aria-expanded="isHelpOpen"
           :aria-controls="`${id}-help`"

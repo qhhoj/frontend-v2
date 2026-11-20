@@ -20,6 +20,7 @@ const isShown = ref(false);
         class="-mr-3 flex size-(--qh-control) items-center justify-center rounded-control text-muted hover:text-content"
         :aria-pressed="isShown ? 'true' : 'false'"
         :aria-label="$t('auth.showPassword')"
+        :title="$t('auth.showPassword')"
         @click="isShown = !isShown"
       >
         <EyeOff v-if="isShown" aria-hidden="true" class="size-4" />

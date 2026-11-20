@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref } from 'vue';
 import { Check, Copy } from 'lucide-vue-next';
+import AppButton from '@/components/ui/AppButton.vue';
 import { COPIED_FEEDBACK_MS, clipboardAvailable, copyText } from '@/lib/clipboard';
 
 /** `iconOnlyOnPhone` drops the visible word below `sm`; the label stays for assistive tech. */
@@ -20,20 +21,17 @@ onBeforeUnmount(() => clearTimeout(resetTimer));
 
 <template>
   <span v-if="clipboardAvailable()" class="inline-flex items-center gap-2">
-    <button
-      type="button"
-      class="inline-flex min-h-11 items-center gap-2 rounded-pill border border-line-strong bg-surface-solid px-4 text-sm font-semibold text-content"
-      :aria-label="label"
-      @click="copy"
-    >
-      <component
-        :is="copied ? Check : Copy"
-        aria-hidden="true"
-        class="size-4 transition-colors"
-        :class="{ 'text-positive': copied }"
-      />
+    <AppButton :aria-label="label" @click="copy">
+      <template #icon>
+        <component
+          :is="copied ? Check : Copy"
+          aria-hidden="true"
+          class="size-4 transition-colors"
+          :class="{ 'text-positive': copied }"
+        />
+      </template>
       <span :class="{ 'max-sm:sr-only': iconOnlyOnPhone }">{{ $t('common.copy') }}</span>
-    </button>
+    </AppButton>
     <span class="text-sm text-muted" aria-live="polite">{{
       copied ? $t('common.copied') : ''
     }}</span>

@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { UserPage } from '@/api/types/users';
 import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
-import { MEDAL_BADGE_SHAPE, medalBadgeClass } from '@/lib/medal';
+import { medalClass } from '@/lib/medal';
 import { useLocaleStore } from '@/stores/locale.store';
 
 interface StatRow {
@@ -23,8 +23,7 @@ const count = (value: number, fractionDigits = 0) =>
   formatNumber(value, locale.locale, fractionDigits);
 /** A banned account is out of the ranking, whatever rank the API still carries. */
 const isBanned = computed(() => props.user.displayRank === 'banned');
-const medalOf = (rank: number | null) =>
-  rank === null || isBanned.value ? '' : `${MEDAL_BADGE_SHAPE} ${medalBadgeClass(rank)}`;
+const medalOf = (rank: number | null) => (rank === null || isBanned.value ? '' : medalClass(rank));
 const rankOf = (rank: number | null) => (rank === null || isBanned.value ? '—' : `#${count(rank)}`);
 
 const rows = computed<StatRow[]>(() => [

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { TOGGLE_CHECKABLE } from '@/components/ui/button-classes';
 import { TriangleAlert } from 'lucide-vue-next';
 import Modal from '@/components/ui/Modal.vue';
 import { computed, ref, useId, watch } from 'vue';
@@ -88,7 +89,7 @@ const CELL = 'border-b border-line px-2 py-1.5';
         <label
           v-for="option in ['append', 'replace'] as const"
           :key="option"
-          class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-pill border border-line-control px-4 text-sm font-semibold has-[:checked]:bg-accent-soft has-[:checked]:text-accent-soft-text has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus"
+          :class="TOGGLE_CHECKABLE"
         >
           <input v-model="mode" type="radio" :value="option" class="sr-only" />
           {{ $t(`admin.problems.data.autofill.modes.${option}`, { count: cases.length }) }}

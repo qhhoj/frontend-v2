@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import type { ContestDetail, ContestPhase, ContestProblem } from '@/api/types/contests';
 import { TABLE_HEAD_CELL, TABLE_ROW_HEIGHT } from '@/components/ui/table-classes';
 import Card from '@/components/ui/Card.vue';
+import ProgressBar from '@/components/ui/ProgressBar.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import { formatNumber, formatPoints } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -153,15 +154,14 @@ const HEAD = 'px-3 font-semibold';
               v-if="problem.solverCount !== null"
               class="flex items-center justify-end gap-3 font-mono whitespace-nowrap tabular-nums"
             >
-              <span
+              <ProgressBar
+                :value="solverPercent(problem)"
+                :label="$t('contests.stats.columns.solvers')"
+                tone="neutral"
+                size="sm"
                 aria-hidden="true"
-                class="block h-1 w-14 overflow-hidden rounded-pill bg-surface-strong"
-              >
-                <span
-                  class="block h-full rounded-pill bg-muted"
-                  :style="{ width: `${solverPercent(problem)}%` }"
-                />
-              </span>
+                class="w-14"
+              />
               {{ formatNumber(problem.solverCount, locale.locale) }}
             </span>
           </td>

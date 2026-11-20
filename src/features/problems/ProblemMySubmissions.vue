@@ -5,7 +5,7 @@ import type { SubmissionListItem } from '@/api/types/submissions';
 import { IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import InlineBit from '@/components/InlineBit.vue';
 import Card from '@/components/ui/Card.vue';
-import SeeAllLink from '@/components/ui/SeeAllLink.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import StretchedLink from '@/components/ui/StretchedLink.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -84,9 +84,11 @@ const rows = computed(() =>
 <template>
   <Card padding="md" :title="$t('problem.rail.mine.title')" data-testid="rail-my-submissions">
     <template #actions>
-      <SeeAllLink
+      <AppButton
+        tone="link"
+        class="text-meta"
         :to="{ name: 'submissions', query: { problem: code, user: session.user?.username } }"
-        >{{ $t('common.viewAll') }}</SeeAllLink
+        >{{ $t('common.viewAll') }}</AppButton
       >
     </template>
     <QueryState :loading="isPending" :error="error" @retry="refetch()">

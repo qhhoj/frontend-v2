@@ -285,23 +285,23 @@
   margin-inline: auto;
   width: 100%;
   max-width: var(--page-width, var(--qh-page-max));
-  padding-inline: 1rem;
+  padding-inline: var(--qh-gutter);
   @media (min-width: 40rem) {
-    padding-inline: 2rem;
+    padding-inline: var(--qh-gutter-wide);
   }
 }
 /* The standard page: a gutter and one vertical rhythm (24 px between blocks, 24 px above and below). */
 @utility page-column {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding-block: 1.5rem;
+  gap: var(--qh-page-gap);
+  padding-block: var(--qh-page-gap);
   margin-inline: auto;
   width: 100%;
   max-width: var(--page-width, var(--qh-page-max));
-  padding-inline: 1rem;
+  padding-inline: var(--qh-gutter);
   @media (min-width: 40rem) {
-    padding-inline: 2rem;
+    padding-inline: var(--qh-gutter-wide);
   }
 }
 /* Page title, 28 px on a 32 px line: one rule for every h1 (pages put it on the h1 instead of size classes). */
@@ -423,12 +423,12 @@
 }
 @utility lamp-off {
   --lamp-fill: transparent;
-  --lamp-ring: inset 0 0 0 1.5px var(--qh-line-strong);
+  --lamp-ring: inset 0 0 0 var(--qh-line-width-strong) var(--qh-line-strong);
 }
 /* An event on a timeline: larger, ringed by the ground so it stays apart from the track and its neighbours. */
 @utility lamp-event {
   --lamp-size: var(--qh-lamp-lg);
-  --lamp-ring: 0 0 0 2px var(--qh-ground);
+  --lamp-ring: 0 0 0 var(--qh-line-width-strong) var(--qh-ground);
 }
 @utility lamp-pulse {
   @media (prefers-reduced-motion: no-preference) {
@@ -444,8 +444,9 @@
 @utility timeline-freeze {
   background: repeating-linear-gradient(
     135deg,
-    transparent 0 4px,
-    color-mix(in srgb, var(--qh-verdict-tle) 55%, transparent) 4px 6px
+    transparent 0 var(--qh-hatch-gap),
+    color-mix(in srgb, var(--qh-verdict-tle) 55%, transparent) var(--qh-hatch-gap)
+      calc(var(--qh-hatch-gap) + var(--qh-line-width-strong))
   );
 }
 /* A card: the opaque surface and its hairline (the Glass blur and the background blobs were retired with palette A). */
@@ -468,8 +469,8 @@
     background-color: var(--qh-surface-hover);
   }
   &:has(.stretched-link:focus-visible) {
-    outline: 2px solid var(--qh-focus-ring);
-    outline-offset: 2px;
+    outline: var(--qh-line-width-strong) solid var(--qh-focus-ring);
+    outline-offset: var(--qh-line-width-strong);
   }
   & :is(a:not(.stretched-link), button, input, select, textarea, label, summary) {
     position: relative;
@@ -478,7 +479,7 @@
 }
 /* The one card look ("Sơn mài" controls): the surface with a 1 px line. `glass` keeps its name for its many users; the radius is `rounded-card`. */
 @utility glass {
-  border: 1px solid var(--qh-line-strong);
+  border: var(--qh-line-width) solid var(--qh-line-strong);
   background-color: var(--qh-surface);
   :root[data-contrast='high'] & {
     border-color: var(--qh-line-control);
@@ -492,7 +493,7 @@
 /* Contrast-high mode gives every control back a 1 px edge (WCAG 1.4.11); the default mode draws no line. An invalid field keeps its own red ring. */
 @utility edge-high {
   :root[data-contrast='high'] &:not([aria-invalid='true']) {
-    box-shadow: inset 0 0 0 1px var(--qh-line-control);
+    box-shadow: inset 0 0 0 var(--qh-line-width) var(--qh-line-control);
   }
 }
 /* Loading indicators keep their own durations (--qh-duration is 0 under reduced motion) and switch themselves off there. */

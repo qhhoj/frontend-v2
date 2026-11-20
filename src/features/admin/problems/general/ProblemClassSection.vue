@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import { problemTypeLabel } from '@/features/problems/problem-type-label';
 import { computed, ref, useId } from 'vue';
-import { Plus, X } from 'lucide-vue-next';
+import { Plus } from 'lucide-vue-next';
 import type { ProblemEditingMeta } from '@/api/types/problem-editing';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import { usePermissions } from '@/stores/use-permissions';
@@ -106,20 +107,13 @@ function setLanguageAllowed(languageId: string, isAllowed: boolean) {
         }}<span aria-hidden="true" class="ml-0.5 text-negative">*</span>
       </h3>
       <ul v-if="form.typeIds.length > 0" class="flex flex-wrap gap-2">
-        <li
-          v-for="typeId in form.typeIds"
-          :key="typeId"
-          class="flex items-center gap-1 rounded-pill border border-line-strong py-0.5 pr-0.5 pl-3 text-sm"
-        >
-          {{ typeNameOf(typeId) }}
-          <button
-            type="button"
-            class="inline-flex size-8 items-center justify-center rounded-pill text-muted hover:bg-surface-hover hover:text-content touch:size-11"
-            :aria-label="$t('admin.ui.removeChip', { name: typeNameOf(typeId) })"
-            @click="removeType(typeId)"
+        <li v-for="typeId in form.typeIds" :key="typeId">
+          <Chip
+            removable
+            :remove-label="$t('admin.ui.removeChip', { name: typeNameOf(typeId) })"
+            @remove="removeType(typeId)"
+            >{{ typeNameOf(typeId) }}</Chip
           >
-            <X aria-hidden="true" class="size-4" :stroke-width="1.75" />
-          </button>
         </li>
       </ul>
       <p v-if="errors.typeIds" class="text-sm text-negative">{{ errors.typeIds }}</p>

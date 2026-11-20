@@ -5,6 +5,10 @@
  * - `primary`: the brand fill. The one main action of a page.
  * - `secondary`: the surface with the control border. Every other action.
  * - `quiet`: brand text, no border. A small action in a row or a panel header.
+ * - `danger`: the secondary shape with red text and a red icon (`negative`, the wrong-answer red). Red is one family: wrong, error,
+ *   destructive. It marks the button that removes or blocks something; its hover is the secondary's.
+ * - Icon-only (`iconOnly`, `IconButton`): a quiet square in neutral ink (`secondary` text), never brand: an icon alone is a small tool,
+ *   not the page's action. It must carry an `aria-label` and a `title` (the tooltip); `IconButton` sets both from its `label`.
  * - `md` 40 px (`--qh-control`) and `sm` 32 px (`--qh-control-sm`, inside a table or a panel header); both are 44 px on touch.
  *
  * Inside a `Readout` the same primary and secondary take the plate's colours by themselves (the `readout` utility re-points the tokens).
@@ -12,14 +16,13 @@
  * 45 % opacity (`aria-disabled`, with a reason beside it), pending a spinner in place of the icon. A button with `aria-pressed` is a
  * toggle and takes the filter-toggle "on" look while pressed.
  *
- * Old names keep working and render one of the three: `ghost` is `quiet`, `danger` is `secondary` (the confirm dialog carries the
- * warning), `lg` is `md`. `link` is a text link (brand text, underline on hover, a 44 px hit area), `row` a full-width secondary whose
+ * Old names keep working: `ghost` is `quiet`, `lg` is `md`. `link` is a text link (brand text, underline on hover, a 44 px hit area), `row` a full-width secondary whose
  * text is left aligned and may wrap, `plain` a control its container draws.
  */
 export type ButtonTone =
   'primary' | 'secondary' | 'quiet' | 'ghost' | 'danger' | 'link' | 'row' | 'plain';
 export type ButtonSize = 'sm' | 'md' | 'lg';
-type ButtonKind = 'primary' | 'secondary' | 'quiet';
+type ButtonKind = 'primary' | 'secondary' | 'quiet' | 'danger' | 'icon';
 type BoxedTone = Exclude<ButtonTone, 'link' | 'row' | 'plain'>;
 
 const KIND_OF_TONE: Record<BoxedTone, ButtonKind> = {
@@ -27,7 +30,7 @@ const KIND_OF_TONE: Record<BoxedTone, ButtonKind> = {
   secondary: 'secondary',
   quiet: 'quiet',
   ghost: 'quiet',
-  danger: 'secondary',
+  danger: 'danger',
 };
 
 /** The states every kind shares: the colour step, the disabled look, and an icon drawn at the control icon size. */
@@ -39,6 +42,8 @@ const KINDS: Record<ButtonKind, string> = {
   primary: `border border-accent bg-accent font-semibold text-on-accent not-aria-disabled:not-disabled:hover:border-accent-strong not-aria-disabled:not-disabled:hover:bg-accent-strong`,
   secondary: `border border-line-control bg-surface font-semibold text-content not-aria-disabled:not-disabled:hover:bg-surface-strong`,
   quiet: `border border-transparent bg-transparent font-semibold text-accent-text not-aria-disabled:not-disabled:hover:bg-accent-soft`,
+  danger: `border border-line-control bg-surface font-semibold text-negative not-aria-disabled:not-disabled:hover:bg-surface-strong`,
+  icon: `border border-transparent bg-transparent text-secondary not-aria-disabled:not-disabled:hover:bg-surface-strong not-aria-disabled:not-disabled:hover:text-content`,
 };
 
 /**
@@ -58,6 +63,12 @@ export const TOGGLE_BASE =
 export const TOGGLE_OFF =
   'border-line-control bg-surface text-secondary hover:bg-surface-strong hover:text-content';
 
+/**
+ * A filter toggle drawn by a `<label>` around a hidden checkbox or radio (a set of choices in a form): on while its input is
+ * checked, a focus ring while its input has keyboard focus. The class names are written out so Tailwind finds them.
+ */
+export const TOGGLE_CHECKABLE = `${TOGGLE_BASE} cursor-pointer border-line-control bg-surface text-secondary not-has-checked:hover:bg-surface-strong not-has-checked:hover:text-content has-checked:border-accent has-checked:bg-accent-soft has-checked:text-accent-soft-text has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus has-disabled:cursor-not-allowed has-disabled:opacity-(--qh-opacity-disabled)`;
+
 /** `row`: a button that is a whole line of a list or form (a closed composer, a folded comment, a version in a history). */
 const ROW_CLASSES = `flex min-h-(--qh-control) w-full items-center justify-start gap-2 rounded-control border border-line-control bg-surface px-(--qh-control-px-sm) py-2 text-left text-body font-normal text-secondary not-aria-disabled:not-disabled:hover:bg-surface-strong`;
 
@@ -73,18 +84,18 @@ const HEIGHTS: Record<ButtonSize, string> = {
 };
 
 /** Side padding: 16 in a 40 px button, 12 in a 32 px one; a quiet button has 8, so its text lines up with the row it sits in. */
+const BOXED_PADDING: Record<ButtonSize, string> = {
+  sm: 'px-(--qh-control-px-sm)',
+  md: 'px-(--qh-control-px)',
+  lg: 'px-(--qh-control-px)',
+};
+const QUIET_PADDING: Record<ButtonSize, string> = { sm: 'px-2', md: 'px-2', lg: 'px-2' };
 const PADDING: Record<ButtonKind, Record<ButtonSize, string>> = {
-  primary: {
-    sm: 'px-(--qh-control-px-sm)',
-    md: 'px-(--qh-control-px)',
-    lg: 'px-(--qh-control-px)',
-  },
-  secondary: {
-    sm: 'px-(--qh-control-px-sm)',
-    md: 'px-(--qh-control-px)',
-    lg: 'px-(--qh-control-px)',
-  },
-  quiet: { sm: 'px-2', md: 'px-2', lg: 'px-2' },
+  primary: BOXED_PADDING,
+  secondary: BOXED_PADDING,
+  danger: BOXED_PADDING,
+  quiet: QUIET_PADDING,
+  icon: QUIET_PADDING,
 };
 
 /** Icon-only buttons are square: as wide as they are tall, no side padding. */
@@ -104,7 +115,9 @@ export interface ButtonClassOptions {
 }
 
 function boxedClasses(tone: BoxedTone, size: ButtonSize, iconOnly: boolean) {
-  const kind = KIND_OF_TONE[tone];
+  const toneKind = KIND_OF_TONE[tone];
+  // An icon alone is neutral ink: the quiet kind's brand text is for a worded action.
+  const kind = iconOnly && toneKind === 'quiet' ? 'icon' : toneKind;
   const width = iconOnly ? ICON_WIDTHS[size] : PADDING[kind][size];
   return `inline-flex ${HEIGHTS[size]} ${width} items-center justify-center whitespace-nowrap rounded-control ${STATES} ${KINDS[kind]} ${PRESSED}`;
 }

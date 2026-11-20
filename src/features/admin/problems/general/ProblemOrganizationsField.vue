@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import { computed, ref, useId } from 'vue';
-import { Lock, X } from 'lucide-vue-next';
+import { Lock } from 'lucide-vue-next';
 import Notice from '@/components/ui/Notice.vue';
 import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
@@ -72,31 +73,18 @@ function add() {
       >{{ $t('admin.problems.people.organizations') }}</component
     >
     <ul class="flex flex-wrap gap-2">
-      <li
-        v-for="organizationId in ids"
-        :key="organizationId"
-        data-testid="organization-chip"
-        class="inline-flex min-h-11 items-center gap-1 rounded-pill border border-line py-0.5 pl-3 text-sm"
-        :class="lockReason(organizationId) && 'pr-3'"
-      >
-        <span>{{ nameOf(organizationId) }}</span>
-        <button
+      <li v-for="organizationId in ids" :key="organizationId" data-testid="organization-chip">
+        <Chip
           v-if="!lockReason(organizationId)"
-          type="button"
-          class="inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-hover"
-          :aria-label="$t('admin.ui.removeChip', { name: nameOf(organizationId) })"
-          @click="remove(organizationId)"
+          removable
+          :remove-label="$t('admin.ui.removeChip', { name: nameOf(organizationId) })"
+          @remove="remove(organizationId)"
+          >{{ nameOf(organizationId) }}</Chip
         >
-          <X aria-hidden="true" class="size-4" />
-        </button>
-        <span
-          v-else
-          class="inline-flex items-center text-muted"
-          :title="lockReason(organizationId)!"
+        <Chip v-else :icon="Lock" :title="lockReason(organizationId)!"
+          >{{ nameOf(organizationId)
+          }}<span class="sr-only"> {{ lockReason(organizationId) }}</span></Chip
         >
-          <Lock aria-hidden="true" class="size-3.5" />
-          <span class="sr-only">{{ lockReason(organizationId) }}</span>
-        </span>
       </li>
       <li v-if="ids.length === 0" class="text-sm text-muted">
         {{ $t('admin.problems.people.orgSite') }}

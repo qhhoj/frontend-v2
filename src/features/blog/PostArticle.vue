@@ -43,13 +43,11 @@ const refreshPosts = () => queryClient.invalidateQueries({ queryKey: ['posts'] }
     >
       <template v-if="post.organization || post.sticky" #above>
         <div class="flex flex-wrap items-center gap-2">
-          <RouterLink
+          <Chip
             v-if="post.organization"
             :to="{ name: 'organization', params: { slug: post.organization.slug } }"
-            class="rounded-pill hover:underline"
+            >{{ post.organization.shortName }}</Chip
           >
-            <Chip>{{ post.organization.shortName }}</Chip>
-          </RouterLink>
           <Chip v-if="post.sticky" tone="accent">{{ $t('blogPost.pinned') }}</Chip>
         </div>
       </template>

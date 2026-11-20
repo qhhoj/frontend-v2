@@ -44,11 +44,14 @@ export interface PageCrumb {
  * `facts` are the page's own numbers in the meta line ("Giới hạn 1 giây · Bộ nhớ 256 MB"): the label muted, the value in mono
  * unless `mono` is false, a `tone` colours the value, "·" between facts. On a phone they wrap onto their own line under `meta`. They replace
  * a hand-built `#meta` slot of boxes; `meta` and `#meta` stay.
+ * `titleTo` makes the title a link (a submission's header names its problem and leads to it): ink text, brand text and an underline on hover.
  * `#above` is a kicker line over the title (a code, chips, a summary) and `#lead` a lead that holds more than a string.
  */
 const props = withDefaults(
   defineProps<{
     title: string;
+    /** Where the title leads, when the page is about one thing that has its own page. */
+    titleTo?: RouteLocationRaw;
     lead?: string;
     crumbs?: PageCrumb[];
     back?: { to: RouteLocationRaw; label: string; ariaLabel?: string } | null;
@@ -61,6 +64,7 @@ const props = withDefaults(
     titleClass?: string;
   }>(),
   {
+    titleTo: undefined,
     lead: undefined,
     titleClass: undefined,
     crumbs: () => [],
@@ -154,7 +158,14 @@ const GRID = {
         class="col-start-2 row-start-3 min-w-0 page-title [overflow-wrap:anywhere]"
         :class="[titleClass, slots.titleTools && 'flex-1']"
       >
-        {{ title }}
+        <RouterLink
+          v-if="titleTo"
+          :to="titleTo"
+          data-testid="page-title-link"
+          class="underline-offset-2 hover:text-accent-text hover:underline"
+          >{{ title }}</RouterLink
+        >
+        <template v-else>{{ title }}</template>
       </h1>
       <div v-if="slots.titleTools" class="-my-1 flex shrink-0 items-center gap-1">
         <slot name="titleTools" />

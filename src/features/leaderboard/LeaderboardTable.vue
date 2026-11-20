@@ -6,7 +6,7 @@ import type { NumberedPageMeta } from '@/api/client';
 import type { LeaderboardEntry, LeaderboardSort, RankField } from '@/api/types/users';
 import StatePanel from '@/components/StatePanel.vue';
 import StateBit from '@/components/StateBit.vue';
-import ToolbarSelect from '@/components/ToolbarSelect.vue';
+import SelectField from '@/components/ui/SelectField.vue';
 import UserName from '@/components/UserName.vue';
 import Chip from '@/components/ui/Chip.vue';
 import DataTable from '@/components/ui/DataTable.vue';
@@ -113,8 +113,8 @@ watch(() => [props.entries, route.hash], scrollToTarget, { immediate: true });
     @retry="$emit('retry')"
   >
     <template v-if="!isWide" #toolbar>
-      <ToolbarSelect
-        :label="$t('leaderboard.sortBy')"
+      <SelectField
+        :prefix="$t('leaderboard.sortBy')"
         :model-value="sort"
         :options="sortOptions"
         :active="false"

@@ -147,7 +147,12 @@ const nextTo = computed(() =>
   <NotFoundPage v-if="isNotFound" />
   <PageLayout v-else>
     <template #header>
-      <PageHeader :title="heading.title" :crumbs="heading.crumbs" :back="heading.back">
+      <PageHeader
+        :title="heading.title"
+        :title-to="problemRoute ?? undefined"
+        :crumbs="heading.crumbs"
+        :back="heading.back"
+      >
         <template v-if="row" #meta
           ><SubmissionMeta :submission="row" :in-contest="inContest"
         /></template>

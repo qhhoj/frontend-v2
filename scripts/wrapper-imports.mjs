@@ -41,7 +41,6 @@ export const WRAPPERS = [
     'useToast (components/ui/use-toast)',
   ),
   wrapper('admin-toasts', 'features/admin/ui/feedback/admin-toasts.ts', 'components/ui/toasts'),
-  wrapper('PillTabs', 'components/PillTabs.vue', 'Tabs'),
   wrapper('SubmissionPager', 'features/submissions/SubmissionPager.vue', 'NumberedPager'),
   wrapper('AuthField', 'features/auth/AuthField.vue', 'FormField with TextInput or PasswordInput'),
   wrapper('SettingsCard', 'features/account/settings/SettingsCard.vue', 'Card'),

@@ -1,38 +1,27 @@
 <script setup lang="ts">
-import { Download, Plus, Trash2 } from 'lucide-vue-next';
 import { ref } from 'vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
-import Checkbox from '@/components/ui/Checkbox.vue';
 import ContestTimeline from '@/components/ui/ContestTimeline.vue';
 import Chip from '@/components/ui/Chip.vue';
 import { CUE_TONES } from '@/components/ui/cue-tones';
 import DataTable from '@/components/ui/DataTable.vue';
 import Disclosure from '@/components/ui/Disclosure.vue';
-import FormField from '@/components/ui/FormField.vue';
 import Gauge from '@/components/ui/Gauge.vue';
-import IconButton from '@/components/ui/IconButton.vue';
 import Lamp from '@/components/ui/Lamp.vue';
 import Menu from '@/components/ui/Menu.vue';
 import Notice from '@/components/ui/Notice.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import PageSection from '@/components/ui/PageSection.vue';
 import ProgressBar from '@/components/ui/ProgressBar.vue';
-import RadioGroup from '@/components/ui/RadioGroup.vue';
 import Readout from '@/components/ui/Readout.vue';
 import ReadoutCell from '@/components/ui/ReadoutCell.vue';
 import RowMenu from '@/components/ui/RowMenu.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
-import SegmentedControl from '@/components/ui/SegmentedControl.vue';
-import SelectField from '@/components/ui/SelectField.vue';
 import StatGrid from '@/components/ui/StatGrid.vue';
 import StatusDot from '@/components/ui/StatusDot.vue';
 import StatusMark from '@/components/ui/StatusMark.vue';
-import Switch from '@/components/ui/Switch.vue';
-import Tabs from '@/components/ui/Tabs.vue';
 import TestSquares from '@/components/ui/TestSquares.vue';
-import TextArea from '@/components/ui/TextArea.vue';
-import TextInput from '@/components/ui/TextInput.vue';
 import Toolbar from '@/components/ui/Toolbar.vue';
 import ToastItem from '@/components/ui/ToastItem.vue';
 import VerdictChip from '@/components/ui/VerdictChip.vue';
@@ -53,24 +42,8 @@ import type { FixtureRow } from './kit-fixtures';
 /** Components of the kit gallery: each kit part in its variants, with fixtures inline (no backend). */
 defineOptions({ name: 'KitComponents' });
 
-const tab = ref('a');
-const segment = ref('x');
-const text = ref('Nội dung mẫu');
 const search = ref('');
-const radio = ref('a');
-const isOn = ref(true);
-const isChecked = ref(true);
 const sort = ref<string | undefined>();
-const tabItems = [
-  { key: 'a', label: 'Đề bài' },
-  { key: 'b', label: 'Bài nộp', count: 12 },
-  { key: 'c', label: 'Xếp hạng' },
-];
-const segmentOptions = [
-  { value: 'x', label: 'Tất cả' },
-  { value: 'y', label: 'Đang mở', count: 4 },
-  { value: 'z', label: 'Đã xong' },
-];
 const menuItems = [
   { label: 'Sửa', run: () => undefined },
   { label: 'Sao chép', run: () => undefined },
@@ -85,31 +58,10 @@ const columns = [
 ];
 const ledgerColumns = columns.map((column) => ({ ...column, grow: column.key === 'name' }));
 const rowKey = (row: FixtureRow) => row.code;
-const BUTTON_TONES = ['primary', 'secondary', 'ghost', 'danger', 'link'] as const;
 </script>
 
 <template>
   <div class="flex flex-col gap-(--space-section)">
-    <PageSection title="Nút">
-      <Card padding="sm" class="flex flex-col gap-3">
-        <div class="flex flex-wrap items-center gap-2">
-          <AppButton v-for="tone in BUTTON_TONES" :key="tone" :tone="tone">{{ tone }}</AppButton>
-          <AppButton tone="primary" loading>Đang lưu</AppButton>
-          <AppButton disabled disabled-reason="Chưa đủ quyền">Bị khóa</AppButton>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <AppButton size="sm">sm</AppButton>
-          <AppButton size="md">md</AppButton>
-          <AppButton size="lg">lg</AppButton>
-          <AppButton tone="primary"
-            ><template #icon><Plus class="size-4" aria-hidden="true" /></template>Thêm</AppButton
-          >
-          <IconButton label="Tải xuống"><Download aria-hidden="true" /></IconButton>
-          <IconButton label="Xóa" tone="danger"><Trash2 aria-hidden="true" /></IconButton>
-        </div>
-      </Card>
-    </PageSection>
-
     <PageSection title="Chip và chấm trạng thái">
       <Card padding="sm" class="flex flex-col gap-3">
         <div class="flex flex-wrap items-center gap-2">
@@ -267,49 +219,6 @@ const BUTTON_TONES = ['primary', 'secondary', 'ghost', 'danger', 'link'] as cons
           </div>
         </Readout>
       </div>
-    </PageSection>
-
-    <PageSection title="Ô nhập">
-      <Card padding="sm" class="grid gap-4 md:grid-cols-2">
-        <FormField label="Tên bài" hint="Gợi ý ngắn dưới ô nhập"
-          ><TextInput v-model="text"
-        /></FormField>
-        <FormField label="Có lỗi" error="Không được để trống"
-          ><TextInput model-value=""
-        /></FormField>
-        <FormField label="Ngôn ngữ"
-          ><SelectField model-value="py"
-            ><option value="py">Python</option>
-            <option value="cpp">C++</option></SelectField
-          ></FormField
-        >
-        <FormField label="Tìm kiếm"
-          ><SearchInput v-model="search" label="Tìm bài" placeholder="Tìm bài"
-        /></FormField>
-        <FormField label="Ghi chú"><TextArea v-model="text" rows="2" /></FormField>
-        <div class="flex flex-col gap-2">
-          <Checkbox v-model="isChecked" label="Hộp chọn" description="Mô tả ngắn" />
-          <Switch v-model="isOn" label="Công tắc" />
-          <RadioGroup
-            v-model="radio"
-            legend="Chọn một"
-            name="gallery-radio"
-            inline
-            :options="[
-              { value: 'a', label: 'A' },
-              { value: 'b', label: 'B' },
-            ]"
-          />
-        </div>
-      </Card>
-    </PageSection>
-
-    <PageSection title="Thẻ tab và nút chọn">
-      <Card padding="sm" class="flex flex-col gap-4">
-        <Tabs v-model="tab" :items="tabItems" label="Tab mẫu" />
-        <Tabs v-model="tab" :items="tabItems" label="Tab dạng viên" variant="pill" />
-        <SegmentedControl v-model="segment" :options="segmentOptions" label="Bộ lọc mẫu" />
-      </Card>
     </PageSection>
 
     <PageSection title="Gập mở và thông báo">
