@@ -1,6 +1,7 @@
 import type { RequiredPart } from '@/api/typed';
 import type { UserChip } from '@/api/types/admin-common';
 import type { ContestBody, ContestPatch } from '@/api/types/contest-editing';
+import { emptyContestForm } from './contest-form';
 import type { ContestForm } from './contest-form';
 
 // What a save sends: the changed fields of an edit (PATCH), or the filled fields of a create (POST).
