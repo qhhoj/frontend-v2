@@ -1128,14 +1128,7 @@
     "mine": {
       "title": "Bài của tôi",
       "empty": "Bạn chưa có bài nào.",
-      "create": "Tạo bài",
-      "unfinished": "Chưa xong",
-      "missing": "Thiếu {gaps}",
-      "gaps": {
-        "statement": "đề bài",
-        "tests": "test",
-        "points": "điểm cho test"
-      }
+      "create": "Tạo bài"
     },
     "recentSubmissions": "Bài nộp gần đây của bạn",
     "continue": {

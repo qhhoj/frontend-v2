@@ -1128,14 +1128,7 @@
     "mine": {
       "title": "My problems",
       "empty": "You have no problems yet.",
-      "create": "New problem",
-      "unfinished": "Unfinished",
-      "missing": "Missing {gaps}",
-      "gaps": {
-        "statement": "statement",
-        "tests": "tests",
-        "points": "test points"
-      }
+      "create": "New problem"
     },
     "recentSubmissions": "Your recent submissions",
     "continue": {

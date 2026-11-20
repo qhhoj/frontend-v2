@@ -16,8 +16,7 @@ import { useMyProblemsQuery } from './home.queries';
 
 /**
  * "Bài của tôi" (staff only): the problems the viewer may edit, unfinished first, one row each, a link as a whole, with its setup state
- * ("Chưa xong" and what it still lacks; a click goes to the tab that fixes the first gap). The texts are the home's own:
- * the `admin.problemList` messages load only on admin pages.
+ * ("Chưa xong" and what it still lacks, the admin problem list's own texts; a click goes to the tab that fixes the first gap).
  * The header links to the list filtered to the viewer's own problems; the foot has "+ Tạo bài".
  */
 const props = defineProps<{ username: string }>();
@@ -30,9 +29,9 @@ const listLink = computed<RouteLocationRaw>(() => ({
 const gapsOf = (problem: ProblemListItem) => setupGapsOf(problem.setup) ?? [];
 const isUnfinished = (problem: ProblemListItem) => gapsOf(problem).length > 0;
 const gapText = (problem: ProblemListItem) =>
-  translate('home.mine.missing', {
+  translate('admin.problemList.setup.missing', {
     gaps: gapsOf(problem)
-      .map((gap) => translate(`home.mine.gaps.${gap}`))
+      .map((gap) => translate(`admin.problemList.setup.gaps.${gap}`))
       .join(', '),
   });
 /** An unfinished row opens the tab that fixes its first gap; a finished one opens the editor. */
@@ -82,7 +81,7 @@ const CREATE = { name: 'admin-problemNew' };
                 gapText(problem)
               }}</span>
               <Chip tone="attention" size="sm" :title="gapText(problem)">{{
-                $t('home.mine.unfinished')
+                $t('admin.problemList.setup.unfinished')
               }}</Chip>
             </template>
           </li>
