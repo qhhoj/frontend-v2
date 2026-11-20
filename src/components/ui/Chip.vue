@@ -152,6 +152,7 @@ const markClass = computed(() => (isToggle.value ? undefined : MARK[props.tone])
       v-if="removable"
       type="button"
       :aria-label="removeLabel"
+      :title="removeLabel"
       :class="REMOVE"
       @click.stop="emit('remove')"
     >

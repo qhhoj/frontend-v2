@@ -61,8 +61,8 @@ const tickLabelShift = (at: number) => {
 </script>
 
 <template>
-  <div role="group" :aria-label="label" class="relative h-14">
-    <div class="absolute inset-x-0 top-5 h-2 overflow-hidden rounded-pill bg-surface-strong">
+  <div role="group" :aria-label="label" class="relative h-12">
+    <div class="absolute inset-x-0 top-4 h-2 overflow-hidden rounded-pill bg-surface-strong">
       <div
         class="absolute inset-y-0 left-0 bg-content opacity-90"
         :style="{ width: `${nowPercent}%` }"
@@ -79,7 +79,7 @@ const tickLabelShift = (at: number) => {
     <span
       v-for="tick in ticks"
       :key="tick.at"
-      class="absolute top-7.5 h-1.5 w-px bg-muted"
+      class="absolute top-6 h-1 w-px bg-muted"
       :style="{ left: `${percentOf(tick.at)}%` }"
     >
       <span
@@ -93,7 +93,7 @@ const tickLabelShift = (at: number) => {
       :role="nowLabel ? 'img' : undefined"
       :aria-label="nowLabel"
       :aria-hidden="nowLabel ? undefined : 'true'"
-      class="absolute top-3 h-6 w-0.5 -translate-x-1/2 rounded-pill bg-content"
+      class="absolute top-2 h-6 w-0.5 -translate-x-1/2 rounded-pill bg-content"
       :style="{ left: `${nowPercent}%` }"
     />
     <Lamp

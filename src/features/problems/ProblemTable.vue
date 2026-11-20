@@ -25,7 +25,7 @@ import { viewerLampOf } from './viewer-status';
  * dimmed, the part after the last " - " is bold), its code in grey mono and its type tag; at the right points, the acceptance
  * rate as one neutral bar and a number, and solvers. No row tint and no colour scale: colour is the viewer's result only.
  * Sorting is by the column headers (only the sorted one shows its arrow, the others on hover); a third click returns to the
- * default order. On a phone a row is two lines (`--qh-row-phone`): the name over its code, the points at the right. Each
+ * default order. On a phone a row is two lines (`--qh-row`, 52 px on touch): the name over its code, the points at the right. Each
  * table row carries `data-code` (the page loads that problem ahead on hover and focus).
  */
 const props = defineProps<{
@@ -186,9 +186,7 @@ const acRateText = (problem: ProblemListItem) =>
 
     <!-- A phone: two lines per row. The part of the name the contest shares is left out; the code under it says it. -->
     <template #card="{ row }">
-      <li
-        class="box-link flex min-h-(--qh-row-phone) items-center gap-3 border-b border-line px-2 py-1"
-      >
+      <li class="box-link flex min-h-(--qh-row) items-center gap-3 border-b border-line px-2 py-1">
         <Lamp
           v-if="signedIn"
           :tone="viewerLampOf(row.viewerStatus).tone"

@@ -6,7 +6,7 @@ import UserLink from '@/components/UserLink.vue';
 import { deltaTone, formatDelta } from '@/lib/rating-delta';
 import RankingCell from './RankingCell.vue';
 import ScoreTick from './ScoreTick.vue';
-import { rankMedalClass } from './rank-medal';
+import { rankMedalClass } from '@/lib/medal';
 import type { RowView } from './ranking-row-view';
 
 /**

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { TOGGLE_CHECKABLE } from '@/components/ui/button-classes';
 import Modal from '@/components/ui/Modal.vue';
 import { computed, ref, useId } from 'vue';
 import type { OrganizationChip } from '@/api/types/admin-common';
@@ -79,11 +80,7 @@ const titleId = useId();
     <form class="flex flex-col gap-5" @submit.prevent="canSubmit && create.run(rows)">
       <fieldset class="flex flex-wrap gap-2">
         <legend class="sr-only">{{ $t('admin.users.create.mode') }}</legend>
-        <label
-          v-for="option in ['single', 'csv'] as const"
-          :key="option"
-          class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-pill border border-line-control px-4 text-sm font-semibold has-[:checked]:bg-accent-soft has-[:checked]:text-accent-soft-text has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus"
-        >
+        <label v-for="option in ['single', 'csv'] as const" :key="option" :class="TOGGLE_CHECKABLE">
           <input v-model="mode" type="radio" :value="option" class="sr-only" />
           {{ $t(`admin.users.create.modes.${option}`) }}
         </label>

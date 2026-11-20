@@ -19,14 +19,9 @@ const emit = defineEmits<{ reconnect: []; showNew: [] }>();
       {{ $t('submissions.liveReload') }}
     </AppButton>
   </p>
-  <div v-if="newCount > 0" class="sticky top-20 z-10 w-fit rounded-pill bg-surface-solid">
-    <button
-      type="button"
-      data-testid="new-pill"
-      class="min-h-11 rounded-pill border border-line-accent bg-accent-soft px-4 font-semibold text-accent-soft-text hover:opacity-90"
-      @click="emit('showNew')"
-    >
+  <div v-if="newCount > 0" class="sticky top-20 z-10 w-fit rounded-control bg-surface-solid">
+    <AppButton data-testid="new-pill" @click="emit('showNew')">
       {{ $t('submissions.newPill', { count: newCount }, newCount) }}
-    </button>
+    </AppButton>
   </div>
 </template>

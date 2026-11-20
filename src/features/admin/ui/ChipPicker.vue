@@ -1,9 +1,9 @@
 <script setup lang="ts" generic="Chip extends { id: string }">
+import Chip from '@/components/ui/Chip.vue';
 import { computed, ref, useId } from 'vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import { failureTextOf, isNotFound } from './admin-errors';
 import { needsPermissionText } from './permission-text';
-import { X } from 'lucide-vue-next';
 import TextInput from '@/components/ui/TextInput.vue';
 import { useChipSuggestions } from './use-chip-suggestions';
 import type { Suggest } from './use-chip-suggestions';
@@ -114,22 +114,17 @@ const remove = (chipId: string) => (chips.value = chips.value.filter((chip) => c
   <div class="flex flex-col gap-1.5">
     <label :for="id" class="text-sm font-semibold">{{ label }}</label>
     <ul class="flex flex-wrap gap-2">
-      <li
-        v-for="chip in chips"
-        :key="chip.id"
-        :data-testid="chipTestId"
-        class="inline-flex items-center gap-1 rounded-pill border border-line py-0.5 pl-3 text-sm"
-      >
-        <span :class="!isNamed(chip) && 'font-mono'">{{ nameOf(chip) }}</span>
-        <button
+      <li v-for="chip in chips" :key="chip.id" :data-testid="chipTestId">
+        <Chip
           v-if="!lockedBy"
-          type="button"
-          class="inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-hover"
-          :aria-label="$t('admin.ui.removeChip', { name: nameOf(chip) })"
-          @click="remove(chip.id)"
+          removable
+          :remove-label="$t('admin.ui.removeChip', { name: nameOf(chip) })"
+          @remove="remove(chip.id)"
+          ><span :class="!isNamed(chip) && 'font-mono'">{{ nameOf(chip) }}</span></Chip
         >
-          <X aria-hidden="true" class="size-4" />
-        </button>
+        <Chip v-else
+          ><span :class="!isNamed(chip) && 'font-mono'">{{ nameOf(chip) }}</span></Chip
+        >
       </li>
       <li v-if="chips.length === 0" class="text-sm text-muted">{{ $t('admin.ui.nobody') }}</li>
     </ul>

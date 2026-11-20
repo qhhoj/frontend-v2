@@ -24,7 +24,11 @@ const tickets = computed(() => data.value?.items ?? []);
   >
     <div class="flex items-center justify-between gap-2 border-b border-line px-4 py-2">
       <h2 class="text-meta font-semibold">{{ $t('tickets.title') }}</h2>
-      <AppButton tone="link" class="text-meta" :to="{ name: 'tickets', query: routeQueryFromFilters(filters) }">
+      <AppButton
+        tone="link"
+        class="text-meta"
+        :to="{ name: 'tickets', query: routeQueryFromFilters(filters) }"
+      >
         {{ $t('common.viewAll') }}
       </AppButton>
     </div>

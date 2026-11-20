@@ -33,7 +33,7 @@ const COLUMNS = {
   3: 'grid-cols-2 sm:grid-cols-3',
   4: 'grid-cols-2 sm:grid-cols-4',
 } as const;
-const AUTO_COLUMNS = 'grid-cols-[repeat(auto-fit,minmax(6.5rem,1fr))]';
+const AUTO_COLUMNS = 'grid-cols-(--qh-stat-columns)';
 
 const TONES: Record<StatTone, string> = {
   accent: 'text-accent-text',
@@ -49,7 +49,7 @@ const TONES: Record<StatTone, string> = {
 const MODES = {
   fact: {
     item: 'min-w-0',
-    value: 'mt-1 text-title leading-5.5 font-semibold',
+    value: 'mt-1 text-title leading-6 font-semibold',
   },
   stat: {
     item: 'min-w-0 rounded-row bg-surface-strong p-4',

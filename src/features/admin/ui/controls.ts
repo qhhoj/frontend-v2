@@ -1,15 +1,13 @@
-import { buttonClasses } from '@/components/ui/button-classes';
+import { TOGGLE_CHECKABLE, buttonClasses } from '@/components/ui/button-classes';
 import type { ButtonTone } from '@/components/ui/button-classes';
 import { CARD_VARIANTS } from '@/components/ui/Card.variants';
+import { CONTROL_FRAME } from '@/components/ui/FormField.control';
 
 /**
- * Admin control classes (design-system/qhhoj/pages/admin.md). Heights follow `--qh-control`: 44 px on public pages, and inside `.qh-admin` the small step
- * (36 px on a fine pointer, 44 px on a coarse one). Controls are `rounded-cell`; pills
- * are only for chips, segmented filters and status. A disabled control keeps focus (`aria-disabled`) and wears muted token
- * pairs, never opacity.
+ * Admin control classes: thin aliases of the kit's recipes ("Sơn mài" controls, DESIGN.md), kept for a classed element that cannot
+ * be the kit component. There is one look for the whole site: a control is a 4 px rounded rectangle, 40 px tall (32 px for a
+ * toggle; 44 px on touch), with the control border. Nothing here draws a pill: a pill is a status tag and cannot be clicked.
  */
-const CONTROL_HEIGHT = 'min-h-(--qh-control)';
-
 export type { ButtonTone };
 export type ControlSize = 'sm' | 'md';
 
@@ -32,14 +30,14 @@ export const BUTTON = {
   danger: buttonClass('danger'),
 } as const;
 
-/** Text inputs, selects and textareas. Text stays at the inherited 16 px, so iOS does not zoom. Disabled: muted pair, no opacity. */
-export const INPUT = `${CONTROL_HEIGHT} w-full rounded-cell border border-line-control bg-surface-solid px-3 text-content aria-invalid:border-negative aria-invalid:inset-ring aria-invalid:inset-ring-negative disabled:cursor-not-allowed disabled:border-line disabled:bg-surface-strong disabled:text-muted`;
+/** Text inputs, selects and textareas: the kit's field frame (`CONTROL_FRAME`), at least one control tall. Prefer `TextInput`, `SelectField`, `TextArea`. */
+export const INPUT = `${CONTROL_FRAME} min-h-(--qh-control)`;
 
-/** A checkbox styled as a pill: language and verdict pickers. */
-export const CHECK_CHIP = `inline-flex ${CONTROL_HEIGHT} items-center gap-2 rounded-pill border border-line-control px-3 text-sm has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:checked]:text-accent-soft-text`;
+/** A label around a checkbox or radio, drawn as a filter toggle that is on while checked: language and verdict pickers. */
+export const CHECK_CHIP = TOGGLE_CHECKABLE;
 
-/** A button that stays on (`aria-pressed`): the pressed one wears the accent-soft pair. */
-export const TOGGLE = `${buttonClass('secondary')} aria-pressed:border-accent aria-pressed:bg-accent-soft aria-pressed:text-accent-soft-text`;
+/** A button that stays on (`aria-pressed`): the kit's secondary button, which takes the toggle's "on" look while pressed. */
+export const TOGGLE = buttonClass('secondary');
 
 /** A form or table card: sections inside are split by hairlines, not by more cards. */
 export const CARD = CARD_VARIANTS.flat;

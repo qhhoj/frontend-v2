@@ -98,8 +98,6 @@
   --qh-chip: 1.5rem;
   --qh-row: 2.75rem;
   --qh-row-dense: var(--qh-row);
-  /* A two-line list row on a phone (name over its code): 52. */
-  --qh-row-phone: 3.25rem;
   --qh-touch: 2.75rem;
   --qh-rail: 14rem;
   /* Control padding x: 16 in a 40 px control, 12 in a 32 px one and in a field; 8 in a status tag. */
@@ -120,6 +118,17 @@
   --qh-pad-dialog: 1.5rem;
   /* Gaps: between controls 8, toolbar to content 16, between surfaces 16. */
   --qh-gap-control: 0.5rem;
+  /* The page gutter: 16, and 32 from 640 px. The page's blocks are 24 apart, with 24 above and below. */
+  --qh-gutter: 1rem;
+  --qh-gutter-wide: 2rem;
+  --qh-page-gap: 1.5rem;
+  /* Lines: a hairline, and the 2 px of a focus ring, an unlit lamp's ring and a hatch stripe (4 px apart). */
+  --qh-line-width: 1px;
+  --qh-line-width-strong: 2px;
+  --qh-hatch-gap: 4px;
+  /* StatGrid's automatic columns: as many as fit, none narrower than 96 (two 48 steps). */
+  --qh-stat-col-min: 6rem;
+  --qh-stat-columns: repeat(auto-fit, minmax(var(--qh-stat-col-min), 1fr));
   --qh-gap-block: 1rem;
   /* Shape (redesign "Sơn mài"): a control is 4, a surface (card, panel, plate) is 6, a box nested in a surface is 4, a small square mark is 2. Status tags and lamps are round; nothing you can click is. */
   --qh-radius-control: 4px;

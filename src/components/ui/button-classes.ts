@@ -63,6 +63,12 @@ export const TOGGLE_BASE =
 export const TOGGLE_OFF =
   'border-line-control bg-surface text-secondary hover:bg-surface-strong hover:text-content';
 
+/**
+ * A filter toggle drawn by a `<label>` around a hidden checkbox or radio (a set of choices in a form): on while its input is
+ * checked, a focus ring while its input has keyboard focus. The class names are written out so Tailwind finds them.
+ */
+export const TOGGLE_CHECKABLE = `${TOGGLE_BASE} cursor-pointer border-line-control bg-surface text-secondary not-has-checked:hover:bg-surface-strong not-has-checked:hover:text-content has-checked:border-accent has-checked:bg-accent-soft has-checked:text-accent-soft-text has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus has-disabled:cursor-not-allowed has-disabled:opacity-(--qh-opacity-disabled)`;
+
 /** `row`: a button that is a whole line of a list or form (a closed composer, a folded comment, a version in a history). */
 const ROW_CLASSES = `flex min-h-(--qh-control) w-full items-center justify-start gap-2 rounded-control border border-line-control bg-surface px-(--qh-control-px-sm) py-2 text-left text-body font-normal text-secondary not-aria-disabled:not-disabled:hover:bg-surface-strong`;
 

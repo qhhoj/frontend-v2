@@ -170,7 +170,6 @@
     "select": 1
   },
   "features/admin/contests/general/TagChips.vue": {
-    "button": 1,
     "controls": 2,
     "input": 1,
     "status-colour": 1
@@ -339,9 +338,6 @@
   },
   "features/admin/users/UnbanUserDialog.vue": {
     "status-colour": 1
-  },
-  "features/admin/users/UserAccessSection.vue": {
-    "button": 1
   },
   "features/admin/users/UserAccountPanel.vue": {
     "button": 1,

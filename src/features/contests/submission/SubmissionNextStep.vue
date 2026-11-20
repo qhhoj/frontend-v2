@@ -1,18 +1,22 @@
 <script setup lang="ts">
 import { ChevronRight } from 'lucide-vue-next';
 import type { ContestProblem } from '@/api/types/contests';
+import AppButton from '@/components/ui/AppButton.vue';
 
 /** Under the result in the viewer's running contest: the next problem one click away. */
 defineProps<{ next: ContestProblem }>();
 </script>
 
 <template>
-  <RouterLink
+  <AppButton
+    size="sm"
     data-testid="submission-next"
     :to="{ name: 'problem', params: { code: next.code } }"
-    class="inline-flex min-h-9 items-center gap-1 self-start rounded-pill border border-line-strong bg-surface px-3.5 text-sm font-semibold hover:bg-surface-hover touch:min-h-11"
+    class="max-w-full self-start"
   >
-    {{ $t('submission.contest.next', { label: next.label, name: next.name }) }}
-    <ChevronRight class="size-4" aria-hidden="true" />
-  </RouterLink>
+    <span class="truncate">{{
+      $t('submission.contest.next', { label: next.label, name: next.name })
+    }}</span>
+    <ChevronRight aria-hidden="true" />
+  </AppButton>
 </template>

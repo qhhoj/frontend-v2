@@ -244,8 +244,8 @@
   "features/admin/pages/FlatpageRevisionRow.vue": {
     "AdminChip": 2,
     "AdminUserLabel": 1,
-    "button": 2,
-    "controls": 3
+    "button": 1,
+    "controls": 2
   },
   "features/admin/pages/FlatpagesPage.vue": {
     "AdminChip": 1,

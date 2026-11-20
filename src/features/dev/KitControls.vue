@@ -38,6 +38,8 @@ const search = ref('');
 const name = ref('Dãy con đối xứng');
 const note = ref('Ghi chú của giáo viên');
 const isPartial = ref(true);
+const language = ref('cpp17');
+const order = ref('new');
 const isLive = ref(true);
 const scoring = ref('best');
 const isLocked = ref(true);
@@ -172,10 +174,19 @@ const dirtyCount = ref(2);
         <h3 class="eyebrow">Ô nhập</h3>
         <div class="flex flex-wrap items-center gap-3">
           <SearchInput v-model="search" label="Tên hoặc mã bài" class="min-w-48 flex-1" />
-          <SelectField model-value="cpp17" aria-label="Ngôn ngữ"
+          <SelectField v-model="language" aria-label="Ngôn ngữ"
             ><option value="cpp17">C++17</option>
             <option value="py">Python 3</option></SelectField
           >
+          <SelectField
+            v-model="order"
+            prefix="Sắp xếp"
+            :options="[
+              { value: 'new', label: 'Mới nhất' },
+              { value: 'points', label: 'Điểm cao nhất' },
+            ]"
+            :active="order !== 'new'"
+          />
         </div>
         <div class="grid gap-3 sm:grid-cols-2">
           <FormField label="Tên bài"><TextInput v-model="name" /></FormField>
@@ -241,7 +252,9 @@ const dirtyCount = ref(2);
           <AppButton tone="quiet" size="sm">Sửa</AppButton>
         </template>
         <PageSection title="Đầu mục" :count="12">
-          <template #actions><AppButton tone="link" class="text-meta" to="/dev/kit">Xem tất cả</AppButton></template>
+          <template #actions
+            ><AppButton tone="link" class="text-meta" to="/dev/kit">Xem tất cả</AppButton></template
+          >
           <p class="text-meta text-secondary">
             Bên trái là tên mục; bên phải là ghi chú, liên kết hoặc một nút nhẹ.
           </p>

@@ -55,7 +55,9 @@ const scoreClass = (item: SubmissionListItem) => {
 <template>
   <Card data-testid="continue-card" :title="$t('home.continue.title')" padding="md">
     <template v-if="isPending || rows.length" #actions>
-      <AppButton tone="link" class="text-meta" :to="PROBLEMS">{{ $t('home.continue.all') }}</AppButton>
+      <AppButton tone="link" class="text-meta" :to="PROBLEMS">{{
+        $t('home.continue.all')
+      }}</AppButton>
     </template>
     <ul v-if="isPending" aria-hidden="true" class="flex flex-col divide-y divide-line">
       <li v-for="row in ROWS" :key="row" class="flex min-h-(--qh-row) items-center gap-3 px-2">
@@ -86,7 +88,9 @@ const scoreClass = (item: SubmissionListItem) => {
     <EmptyState v-else inline>
       {{ $t('home.continue.empty') }}
       <template #action>
-        <AppButton tone="link" class="text-meta" :to="PROBLEMS">{{ $t('home.anon.problems') }}</AppButton>
+        <AppButton tone="link" class="text-meta" :to="PROBLEMS">{{
+          $t('home.anon.problems')
+        }}</AppButton>
       </template>
     </EmptyState>
     <ProblemProgress

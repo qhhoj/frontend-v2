@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useQueryClient } from '@tanstack/vue-query';
@@ -146,23 +147,16 @@ const retry = () =>
           </p>
           <div class="flex flex-wrap gap-2">
             <template v-for="role in roles" :key="role.id">
-              <button
+              <Chip
                 v-if="canEdit"
-                type="button"
-                :aria-pressed="form.groups.includes(role.id)"
-                class="inline-flex min-h-11 items-center rounded-pill border border-line-strong px-4 text-sm font-semibold aria-pressed:bg-accent-soft aria-pressed:text-accent-soft-text"
+                :pressed="form.groups.includes(role.id)"
                 data-testid="role-chip"
                 @click="toggleRole(role.id)"
+                >{{ role.name }}</Chip
               >
-                {{ role.name }}
-              </button>
-              <span
-                v-else-if="form.groups.includes(role.id)"
-                class="inline-flex min-h-8 items-center rounded-pill bg-accent-soft px-3 text-sm text-accent-soft-text"
-                data-testid="role-chip"
-              >
-                {{ role.name }}
-              </span>
+              <Chip v-else-if="form.groups.includes(role.id)" strong data-testid="role-chip">{{
+                role.name
+              }}</Chip>
             </template>
             <span v-if="!canEdit && form.groups.length === 0" class="text-sm text-muted">
               {{ $t('admin.users.access.noRolesHeld') }}

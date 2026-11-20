@@ -84,7 +84,9 @@ const rows = computed(() =>
 <template>
   <Card padding="md" :title="$t('problem.rail.mine.title')" data-testid="rail-my-submissions">
     <template #actions>
-      <AppButton tone="link" class="text-meta"
+      <AppButton
+        tone="link"
+        class="text-meta"
         :to="{ name: 'submissions', query: { problem: code, user: session.user?.username } }"
         >{{ $t('common.viewAll') }}</AppButton
       >

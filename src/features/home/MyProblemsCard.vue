@@ -60,7 +60,9 @@ const CREATE = { name: 'admin-problemNew' };
       <EmptyState v-if="!mine.length" inline>
         {{ $t('home.mine.empty') }}
         <template #action>
-          <AppButton tone="link" class="text-meta" :to="CREATE">{{ $t('home.mine.create') }}</AppButton>
+          <AppButton tone="link" class="text-meta" :to="CREATE">{{
+            $t('home.mine.create')
+          }}</AppButton>
         </template>
       </EmptyState>
       <template v-else>

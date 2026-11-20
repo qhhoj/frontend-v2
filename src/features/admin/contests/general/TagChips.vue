@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import Chip from '@/components/ui/Chip.vue';
 import { computed, ref, useId } from 'vue';
-import { X } from 'lucide-vue-next';
 import { INPUT } from '../../ui/controls';
 import { needsPermissionText } from '../../ui/permission-text';
 
@@ -31,21 +31,15 @@ const remove = (tag: string) => (tags.value = tags.value.filter((item) => item !
   <div class="flex flex-col gap-1.5">
     <label :for="id" class="text-sm font-semibold">{{ label }}</label>
     <ul v-if="tags.length" class="m-0 flex list-none flex-wrap gap-1.5 p-0">
-      <li
-        v-for="tag in tags"
-        :key="tag"
-        class="inline-flex min-h-(--qa-chip) items-center gap-0.5 rounded-pill border border-line-strong bg-surface-solid pl-2.5 text-caption leading-4 font-semibold"
-      >
-        <span>{{ tag }}</span>
-        <button
+      <li v-for="tag in tags" :key="tag">
+        <Chip
           v-if="!lockedBy"
-          type="button"
-          class="inline-flex size-6 items-center justify-center rounded-full text-muted hover:bg-surface-hover hover:text-content touch:size-9"
-          :aria-label="$t('admin.ui.removeChip', { name: tag })"
-          @click="remove(tag)"
+          removable
+          :remove-label="$t('admin.ui.removeChip', { name: tag })"
+          @remove="remove(tag)"
+          >{{ tag }}</Chip
         >
-          <X aria-hidden="true" class="size-3.5" :stroke-width="1.75" />
-        </button>
+        <Chip v-else strong>{{ tag }}</Chip>
       </li>
     </ul>
     <input

@@ -179,7 +179,9 @@ const events = computed<TimelineEvent[]>(() => {
       <EmptyState v-if="!times" inline data-testid="home-no-contest">
         {{ $t('home.plate.none') }}
         <template #action>
-          <AppButton tone="link" class="text-meta" :to="CONTESTS">{{ $t('home.browseContests') }}</AppButton>
+          <AppButton tone="link" class="text-meta" :to="CONTESTS">{{
+            $t('home.browseContests')
+          }}</AppButton>
         </template>
       </EmptyState>
       <Readout

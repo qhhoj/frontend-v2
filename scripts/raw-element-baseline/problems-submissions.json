@@ -87,9 +87,6 @@
     "hardcoded-value": 1,
     "table": 1
   },
-  "features/submissions/list/LiveListNotices.vue": {
-    "button": 1
-  },
   "features/submissions/list/SubmissionFilterPanel.vue": {
     "hardcoded-value": 1
   },
