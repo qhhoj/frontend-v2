@@ -2,12 +2,15 @@ import { computed, ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
+import { fetchEditableProblem } from '@/api/problem-editing.api';
 import type { EditableProblem, ProblemEditingMeta } from '@/api/types/problem-editing';
 import { provideDateValidity } from '@/components/ui/date-validity';
+import { useViewerId } from '@/stores/use-viewer-id';
 import { useDataForm } from '../data/use-data-form';
 import { useEditorialForm } from '../editorial/use-editorial-form';
 import { failureReasonOf } from '../failure-reason';
 import { useProblemForm } from '../general/use-problem-form';
+import { editableProblemKey } from '../problem-editing.queries';
 import { useStatementDrafts } from '../statements/use-statement-drafts';
 import { isAllSaved, runSaveParts } from './save-parts';
 import type { SavePart, SavePartAnswer, SavePartOutcome } from './save-parts';
@@ -25,6 +28,7 @@ export function useWorkbench(problem: () => EditableProblem, meta: () => Problem
   const route = useRoute();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const viewer = useViewerId();
   const dates = provideDateValidity();
   const info = useProblemForm(problem, meta, dates);
   const statements = useStatementDrafts(problem);
@@ -102,7 +106,12 @@ export function useWorkbench(problem: () => EditableProblem, meta: () => Problem
     statements.retarget(code);
     editorial.retarget(code);
     data.retarget(code);
-    await queryClient.refetchQueries({ queryKey: ['admin', 'problem', code] });
+    // The page must open on the problem as it is after every part: the PATCH's answer predates the translations.
+    const key = editableProblemKey(code, viewer.value);
+    const answered = queryClient.getQueryData(key);
+    await queryClient
+      .fetchQuery({ queryKey: key, queryFn: () => fetchEditableProblem(code) })
+      .catch(() => queryClient.setQueryData(key, answered));
     isFollowingRename.value = true;
     try {
       await router.replace({ name: route.name!, params: { code }, query: route.query });

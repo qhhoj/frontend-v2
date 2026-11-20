@@ -69,6 +69,15 @@ const open = reactive<Record<WorkbenchSectionId, boolean>>({
   trial: false,
   other: false,
 });
+/** The last section asks for its own data (external judge, Polygon link) only once it is opened. */
+const isOtherShown = ref(false);
+watch(
+  () => open.other,
+  (isOpen) => {
+    if (isOpen) isOtherShown.value = true;
+  },
+  { immediate: true },
+);
 const folds = reactive({ infoMore: false, editorial: false, files: false, testsAdvanced: false });
 async function openSection(id: WorkbenchSectionId) {
   open[id] = true;
@@ -274,7 +283,7 @@ const listLink = computed(() => ({ to: { name: 'admin-problems' }, label: t(`${K
         :title="$t(`${KEY}.sections.other`)"
         :summary="summaries.other"
       >
-        <WorkbenchOther :problem="problem" :meta="meta" />
+        <WorkbenchOther v-if="isOtherShown" :problem="problem" :meta="meta" />
       </WorkbenchSection>
     </div>
     <Notice
