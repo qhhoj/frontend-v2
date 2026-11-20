@@ -11,8 +11,8 @@ import { useHomeQuery } from '@/features/community/community.queries';
 
 /**
  * The visitor's page header: Bit, the H1, the lead, the sign-up actions and one meta line with the four totals. The
- * counts come from `GET /home`; the header never waits for them and leaves them out when the request fails. One primary ("Đăng ký") and a ghost "Đăng nhập";
- * on phones the counts and the ghost are left out (the top bar has the sign-in).
+ * counts come from `GET /home`; the header never waits for them and leaves them out when the request fails. One primary ("Đăng ký", last) and a secondary "Đăng nhập" before it;
+ * on phones the counts and the secondary are left out (the top bar has the sign-in).
  */
 const locale = useLocaleStore();
 const { data: home, isPending, isError } = useHomeQuery();
@@ -53,10 +53,8 @@ const counts = computed(() =>
       </template>
     </template>
     <template #actions>
+      <AppButton to="/login" class="max-sm:hidden">{{ $t('home.anon.signIn') }}</AppButton>
       <AppButton tone="primary" to="/register">{{ $t('home.anon.register') }}</AppButton>
-      <AppButton tone="ghost" to="/login" class="max-sm:hidden">{{
-        $t('home.anon.signIn')
-      }}</AppButton>
     </template>
   </PageHeader>
 </template>

@@ -148,13 +148,9 @@ const LIST_BADGES: Partial<Record<ContestActionKind, string>> = {
   finished: 'contests.list.badges.finished',
 };
 
-/**
- * A list row's button: the detail's action for the same facts, as a link to the detail (a row never joins by itself).
- * A visitor gets the signed-in label: the detail asks them to sign in where the action needs it.
- * `canSpectate` is false because the list does not carry the editor or tester role.
- */
-export function listCallToAction(item: ContestListItem, now: number): ListCallToAction {
-  const { kind } = contestAction({
+/** The detail's action for a list row's facts. `canSpectate` is false because the list does not carry the editor or tester role. */
+export function listActionKind(item: ContestListItem, now: number): ContestActionKind {
+  return contestAction({
     isSignedIn: true,
     phase: phaseAt(item, now),
     liveStatus: item.viewer?.liveStatus ?? null,
@@ -164,7 +160,15 @@ export function listCallToAction(item: ContestListItem, now: number): ListCallTo
     registration: registrationState(item, now),
     requiresAccessCode: item.requiresAccessCode,
     disallowVirtual: item.disallowVirtual,
-  });
+  }).kind;
+}
+
+/**
+ * A list row's button: the detail's action for the same facts, as a link to the detail (a row never joins by itself).
+ * A visitor gets the signed-in label: the detail asks them to sign in where the action needs it.
+ */
+export function listCallToAction(item: ContestListItem, now: number): ListCallToAction {
+  const kind = listActionKind(item, now);
   return {
     labelKey: LIST_LABELS[kind],
     // One primary per view (M-14): only the viewer's current contest; joining or re-entering another stays outline.
