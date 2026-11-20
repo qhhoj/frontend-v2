@@ -239,12 +239,12 @@ function useParticipantsChoice(
     changes: computed(() => accessChangesOf(seed.value, form.value, hasStoredCode())),
     save: computed(() => accessSaveOf(seed.value, form.value, choice.value, hasStoredCode())),
     /** Switches the picked mode's restriction on and the others off in the form; the lists stay. */
-    pick(mode: ParticipantMode) {
+    pick: (mode: ParticipantMode) => {
       chooseParticipantMode(form.value, mode, hasStoredCode());
       choice.value = mode;
     },
     /** Back to the stored contest's restrictions. */
-    undo() {
+    undo: () => {
       restoreAccess(form.value, seed.value);
       reset();
     },
