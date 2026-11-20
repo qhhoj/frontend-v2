@@ -16,7 +16,9 @@ const props = defineProps<{ contest: EditableContest }>();
 const route = useRoute();
 const router = useRouter();
 const viewer = useViewerId();
-const page = computed(() => Math.max(1, Number(route.query.page) || 1));
+/** Its own page key: the participants list on the same page pages by `?page=`. */
+const PAGE_KEY = 'announcementsPage';
+const page = computed(() => Math.max(1, Number(route.query[PAGE_KEY]) || 1));
 const justPostedId = ref<string | null>(null);
 const isPushedLive = computed(() => props.contest.settings?.pushAnnouncements ?? false);
 
@@ -35,7 +37,7 @@ const pageCount = computed(() => Math.max(1, Math.ceil(total.value / ANNOUNCEMEN
 const items = computed<Announcement[]>(() => data.value?.items ?? []);
 
 const goToPage = (target: number) =>
-  router.push({ query: { ...route.query, page: String(target) } });
+  router.push({ query: { ...route.query, [PAGE_KEY]: String(target) } });
 
 /** A delete that empties a later page sends the list back one page: an empty page never shows without its pager. */
 watch(data, (answer) => {
@@ -77,6 +79,7 @@ watch(data, (answer) => {
               v-if="data && pageCount > 1"
               :meta="data.meta"
               :label="$t('admin.announcements.pagerLabel')"
+              :query-key="PAGE_KEY"
               compact
             />
           </footer>

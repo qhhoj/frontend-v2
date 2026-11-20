@@ -17,7 +17,7 @@ import type { SavePartId } from './save-parts';
 import WorkbenchInfo from './WorkbenchInfo.vue';
 import WorkbenchOther from './WorkbenchOther.vue';
 import WorkbenchPlate from './WorkbenchPlate.vue';
-import WorkbenchSection from './WorkbenchSection.vue';
+import WorkbenchSection from '../../ui/workbench/WorkbenchSection.vue';
 import WorkbenchStatement from './WorkbenchStatement.vue';
 import WorkbenchTests from './WorkbenchTests.vue';
 import { useWorkbench } from './use-workbench';

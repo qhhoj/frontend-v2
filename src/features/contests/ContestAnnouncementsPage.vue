@@ -5,6 +5,7 @@ import { ApiError } from '@/api/client';
 import { ANNOUNCEMENT_FIRST_PAGE, ANNOUNCEMENT_PAGE_SIZE } from '@/api/contests.api';
 import EmptyState from '@/components/EmptyState.vue';
 import Card from '@/components/ui/Card.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import Chip from '@/components/ui/Chip.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
@@ -18,7 +19,6 @@ import {
   markAnnouncementsSeen,
   seenAnnouncementId,
 } from './announcement-seen';
-import ContestAnnouncementComposer from './ContestAnnouncementComposer.vue';
 import ContestNotFound from './ContestNotFound.vue';
 import { useContestAnnouncementsQuery, useContestQuery } from './contests.queries';
 import { isAnnouncementStreamPaused } from './use-announcement-feed';
@@ -72,7 +72,15 @@ const goTo = (next: number) =>
 <template>
   <ContestNotFound v-if="isMissing" />
   <template v-else>
-    <ContestAnnouncementComposer v-if="contest?.viewer.canEdit" :contest="contest" />
+    <!-- Editors post from the contest workbench: the one composer. -->
+    <AppButton
+      v-if="contest?.viewer.canEdit"
+      class="self-start"
+      data-testid="contest-announcement-compose"
+      :to="{ name: 'admin-contestAnnouncements', params: { key } }"
+    >
+      {{ $t('contests.announcements.compose.post') }}
+    </AppButton>
     <div v-if="isLive" class="flex justify-end">
       <Chip tone="success">{{ $t('contests.announcements.live') }}</Chip>
     </div>

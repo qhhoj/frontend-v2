@@ -359,16 +359,16 @@
       "empty": "Chưa có bảng chính thức."
     },
     "link": {
-      "title": "Liên kết xếp hạng công khai",
+      "title": "Liên kết xếp hạng",
       "none": "Chưa có liên kết? Nhấn Tạo liên kết để sinh đường dẫn mới; trạng thái ban đầu theo cấu hình kỳ thi.",
       "create": "Tạo liên kết",
       "activeLine": "Liên kết đang hoạt động. Người có đường dẫn xem được bảng xếp hạng không cần đăng nhập.",
-      "inactiveLine": "Liên kết đã hết hạn hoặc đang riêng tư.",
+      "inactiveLine": "Liên kết đã hết hạn hoặc đang đóng.",
       "copy": "Sao chép đường dẫn",
       "regeneratedAt": "Tạo lại lúc {time}. Tạo lại làm mất hiệu lực đường dẫn cũ.",
       "statusLegend": "Trạng thái",
-      "statusPublic": "Công khai",
-      "statusPrivate": "Riêng tư",
+      "statusPublic": "Mở cho người có liên kết",
+      "statusPrivate": "Đóng",
       "expiryLegend": "Hết hạn",
       "expiryNone": "Không",
       "expiryMinutes": "Sau một số phút",
@@ -510,5 +510,171 @@
     "selectRow": "Chọn {name}"
   },
   "backToList": "Danh sách kỳ thi",
-  "participantCount": "{count} thí sinh"
+  "participantCount": "{count} thí sinh",
+  "workbench": {
+    "back": "Kỳ thi của tôi",
+    "viewAsStudent": "Xem như học sinh",
+    "tabs": {
+      "setup": "Thiết lập và điều hành",
+      "results": "Kết quả",
+      "other": "Khác"
+    },
+    "sections": {
+      "time": "Thời gian và thể thức",
+      "problems": "Bài",
+      "participants": "Thí sinh",
+      "announcements": "Thông báo",
+      "info": "Giới thiệu và người phụ trách"
+    },
+    "plate": {
+      "label": "Trạng thái kỳ thi",
+      "state": "Trạng thái",
+      "timeline": "Kỳ thi trên trục thời gian",
+      "sentence": {
+        "hidden": "Đang ẩn · học sinh chưa thấy kỳ thi",
+        "upcoming": "Đang hiện · học sinh thấy kỳ thi, chưa bắt đầu",
+        "running": "Đang diễn ra · học sinh đang làm bài",
+        "ended": "Đã kết thúc · học sinh vẫn thấy kỳ thi"
+      },
+      "clock": {
+        "upcoming": "Bắt đầu lúc {time}.",
+        "running": "Kết thúc lúc {time}.",
+        "ended": "Đã kết thúc lúc {time}."
+      },
+      "gaps": {
+        "loading": "Đang kiểm tra các bài…",
+        "none": "Đã có bài và quy định thí sinh.",
+        "noProblems": "Chưa có bài",
+        "problemSetup": "Bài {label} chưa xong thiết lập",
+        "open": "Chưa giới hạn thí sinh: ai thấy kỳ thi cũng vào được"
+      },
+      "freeze": "Đóng băng bảng xếp hạng {minutes} phút cuối, từ {time}.",
+      "saveFirst": "Lưu trước",
+      "show": {
+        "button": "Hiện cho học sinh",
+        "title": "Hiện kỳ thi {key} cho học sinh?",
+        "body": "Người được phép tham gia sẽ thấy kỳ thi trong danh sách và vào được khi đến giờ.",
+        "confirm": "Hiện kỳ thi",
+        "warning": "Kỳ thi còn thiếu"
+      },
+      "hide": {
+        "button": "Ẩn",
+        "title": "Ẩn kỳ thi {key}?",
+        "body": "Học sinh không còn thấy kỳ thi. Bài nộp và kết quả vẫn giữ; hiện lại bất cứ lúc nào.",
+        "confirm": "Ẩn kỳ thi"
+      }
+    },
+    "time": {
+      "more": "Thêm: đăng ký, khóa chấm, nhãn bài, rating, bộ nhớ đệm",
+      "freeze": "đóng băng {minutes} phút cuối",
+      "startFirst": "Chọn giờ bắt đầu trước",
+      "scoreboardLabel": "Bảng xếp hạng",
+      "scoreboard": {
+        "V": "Học sinh thấy",
+        "H": "Ẩn với học sinh",
+        "C": "Ẩn trong lúc thi",
+        "P": "Ẩn trong lượt tham gia"
+      },
+      "noFreeze": "Thể thức {format} không đóng băng bảng xếp hạng; số này chỉ có tác dụng với ICPC và VNOJ."
+    },
+    "problems": {
+      "setup": "Thiết lập",
+      "total": "{count} bài · tổng {points} điểm",
+      "none": "Chưa có bài",
+      "rescore": "Lưu danh sách bài sẽ tính lại điểm của kỳ thi.",
+      "showLimits": "Thêm cột: cắt output, số lần nộp tối đa",
+      "hideLimits": "Ẩn cột cắt output và số lần nộp"
+    },
+    "participants": {
+      "label": "Ai được tham gia",
+      "list": "Người đã vào kỳ thi",
+      "more": "Thêm: cấm tài khoản, cấm máy chấm",
+      "modes": {
+        "organization": "Cả tổ chức",
+        "code": "Ai có mã vào",
+        "list": "Danh sách chọn",
+        "open": "Không giới hạn"
+      },
+      "notes": {
+        "organization": "Chỉ thành viên các tổ chức đã chọn thấy và vào được kỳ thi.",
+        "code": "Ai cũng thấy kỳ thi; phải nhập đúng mã mới vào thi được.",
+        "list": "Chỉ các tài khoản trong danh sách thấy và vào được kỳ thi.",
+        "open": "Ai cũng thấy kỳ thi; tài khoản nào cũng vào thi được."
+      },
+      "joined": "Đã vào: {count} thí sinh.",
+      "mixed": "Kỳ thi đang giới hạn bằng nhiều cách cùng lúc ({modes}); thí sinh phải qua tất cả. Chọn một cách nếu muốn bỏ các cách còn lại.",
+      "code": {
+        "set": "Đặt mã vào",
+        "replace": "Đặt mã mới"
+      },
+      "gaps": {
+        "organization": "Chưa chọn tổ chức",
+        "list": "Danh sách thí sinh còn trống",
+        "code": "Chưa nhập mã vào"
+      },
+      "changes": {
+        "title": "Khi lưu",
+        "removed": {
+          "organizationNamed": "Bỏ giới hạn tổ chức {names}",
+          "organization": "Bỏ giới hạn theo tổ chức ({count} tổ chức)",
+          "list": "Bỏ danh sách {count} thí sinh",
+          "code": "Bỏ mã vào"
+        },
+        "added": {
+          "organization": "Thêm giới hạn theo tổ chức",
+          "list": "Thêm giới hạn theo danh sách",
+          "code": "Thêm mã vào"
+        }
+      },
+      "refused": "Máy chủ từ chối thay đổi người tham gia",
+      "widen": {
+        "title": "Bỏ giới hạn người tham gia của {key}?",
+        "intro": "Lần lưu này:",
+        "see": {
+          "everyone": "Thấy kỳ thi: mọi người, kể cả khách chưa đăng nhập.",
+          "organization": "Thấy kỳ thi: chỉ thành viên các tổ chức đã chọn.",
+          "list": "Thấy kỳ thi: chỉ các tài khoản trong danh sách.",
+          "both": "Thấy kỳ thi: chỉ thành viên các tổ chức đã chọn có tên trong danh sách."
+        },
+        "join": {
+          "everyone": "Vào thi: mọi tài khoản đã đăng nhập.",
+          "organization": "Vào thi: thành viên các tổ chức đã chọn.",
+          "list": "Vào thi: các tài khoản trong danh sách.",
+          "both": "Vào thi: thành viên các tổ chức đã chọn có tên trong danh sách."
+        },
+        "withCode": "Phải nhập đúng mã vào.",
+        "withoutCode": "Không cần mã vào.",
+        "shown": "Kỳ thi đang hiện: thay đổi có hiệu lực ngay khi lưu.",
+        "hidden": "Kỳ thi đang ẩn: thay đổi có hiệu lực khi bạn hiện kỳ thi.",
+        "confirm": "Bỏ giới hạn và lưu"
+      }
+    },
+    "announcements": {
+      "summary": "Một ô soạn; học sinh thấy ngay trong kỳ thi"
+    },
+    "info": {
+      "summary": "Tên, mô tả, thẻ, người phụ trách, quy định"
+    },
+    "save": {
+      "parts": {
+        "settings": "Thiết lập kỳ thi",
+        "problems": "Danh sách bài"
+      }
+    },
+    "tools": {
+      "label": "Công cụ khi kỳ thi diễn ra",
+      "submissions": "Bài nộp của kỳ thi",
+      "rejudge": "Chấm lại nhiều bài nộp",
+      "problemTools": "Chấm lại theo bài, đóng băng",
+      "similarity": "Kiểm tra tương đồng"
+    },
+    "results": {
+      "ranking": "Bảng chính thức và liên kết xếp hạng"
+    },
+    "other": {
+      "data": "Dữ liệu",
+      "copy": "Nhân bản",
+      "danger": "Vùng nguy hiểm"
+    }
+  }
 }

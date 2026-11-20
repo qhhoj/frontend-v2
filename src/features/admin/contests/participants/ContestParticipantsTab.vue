@@ -167,7 +167,7 @@ const showUser = (username: string) => change({ user: username, search: '', kind
       <p class="m-0 max-w-prose text-sm text-muted">
         {{ $t('admin.contests.participants.footnote') }}
       </p>
-      <button type="button" :class="buttonClass('primary')" @click="isAddOpen = true">
+      <button type="button" :class="buttonClass('secondary')" @click="isAddOpen = true">
         <UserPlus aria-hidden="true" class="size-4" :stroke-width="1.75" />
         {{ $t('admin.contestOps.participants.add') }}
       </button>

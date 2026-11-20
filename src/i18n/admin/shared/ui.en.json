@@ -140,7 +140,8 @@
     "points_above_problem": "Points cannot be above the problem's points.",
     "points_not_partial": "This problem has no partial points: use 0 or full points.",
     "accepted_needs_full_points": "An accepted verdict needs full points.",
-    "problem_deleted": "The problem is deleted."
+    "problem_deleted": "The problem is deleted.",
+    "site_contest_rights": "Moving a contest out of every organization onto the site needs the “Create contests” permission."
   },
   "uploading": "Uploading…",
   "uploadBusy": "Still uploading. Choose the file again when it finishes.",

@@ -50,7 +50,7 @@
     "refreeze": {
       "button": "Đóng băng",
       "title": "Đóng băng bảng xếp hạng?",
-      "body": "Bảng xếp hạng công khai ngừng cập nhật trong những phút cuối kỳ thi. Kỳ thi được tính lại điểm.",
+      "body": "Bảng xếp hạng học sinh thấy ngừng cập nhật trong những phút cuối kỳ thi. Kỳ thi được tính lại điểm.",
       "confirm": "Đóng băng"
     },
     "lock": {
