@@ -5,6 +5,7 @@
 const KIB = 1024;
 const MIB = 1024 * KIB;
 
+export const SOURCE_MAX_BYTES = MIB;
 export const IMAGE_MAX_BYTES = 5 * MIB;
 export const MAX_CASE_ARGS_BYTES = MIB;
 export const IMAGE_ACCEPT = 'image/png,image/jpeg,image/gif,image/svg+xml';
@@ -30,3 +31,13 @@ export const DISALLOWED_STATEMENT_CHARACTERS: readonly string[] = [
   'ﬃ',
   'ﬄ',
 ];
+
+/** The extensions the backend takes per uploaded source kind (`SOURCE_EXTENSIONS`); a generator is never uploaded. */
+export const SOURCE_EXTENSIONS: Record<
+  'customChecker' | 'customGrader' | 'customHeader',
+  readonly string[]
+> = {
+  customChecker: ['cpp', 'pas', 'java'],
+  customGrader: ['cpp'],
+  customHeader: ['h'],
+};
