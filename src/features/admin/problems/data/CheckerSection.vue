@@ -1,96 +1,66 @@
 <script setup lang="ts">
 import type { ProblemData } from '@/api/types/problem-data';
-import AdminField from '../../ui/AdminField.vue';
-import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
-import AdminFormSection from '../../ui/form/AdminFormSection.vue';
+import Checkbox from '@/components/ui/Checkbox.vue';
+import FormField from '@/components/ui/FormField.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
-import { INPUT } from '../../ui/controls';
+import { numberBoxValue } from '../../ui/form/number-box';
 import CheckerPicker from './CheckerPicker.vue';
 import CheckerRuleOptions from './CheckerRuleOptions.vue';
 import GraderPicker from './GraderPicker.vue';
 import IoMethodPicker from './IoMethodPicker.vue';
-import { numberBoxValue } from '../../ui/form/number-box';
 import type { DataForm } from './test-cases';
 
 /**
- * The judging settings of the workbench. `main`: how the answer is compared (with the checker file), how the program runs
- * (interactor, header and grader files) and the input/output method. `advanced`: the checker's rule options and the rarely
- * used output options.
+ * The judging settings of the workbench, without headings of their own (the panel names them). `main`: how a result is
+ * compared, with the checker or interactor file, and the input/output method. `more`: what the student hands in, the
+ * built-in rule's options and the rarely used output options.
  */
 const form = defineModel<DataForm>({ required: true });
 defineProps<{
   code: string;
   data: ProblemData;
   errors: FieldErrors;
-  part: 'main' | 'advanced';
+  part: 'main' | 'more';
 }>();
 const key = 'admin.problems.data.config';
-
-function setOutputNumber(field: 'outputLimit' | 'outputPrefix', event: Event) {
-  form.value[field] = numberBoxValue(event);
-}
 </script>
 
 <template>
   <template v-if="part === 'main'">
     <CheckerPicker v-model="form" :code="code" :data="data" />
-    <GraderPicker v-model="form" :code="code" :data="data" />
     <IoMethodPicker v-model="form" :errors="errors" />
   </template>
-  <template v-else>
+  <div v-else class="flex flex-col gap-4 pb-3">
+    <GraderPicker v-model="form" :code="code" :data="data" />
     <CheckerRuleOptions v-model="form" :errors="errors" />
-    <AdminFormSection
-      :title="$t(`${key}.advancedTitle`)"
-      :description="$t(`${key}.advancedDescription`)"
+    <FormField
+      v-for="field in ['outputLimit', 'outputPrefix'] as const"
+      :key="field"
+      :input-id="`data-${field}`"
+      :label="$t(`admin.problems.data.checker.${field}`)"
+      :hint="$t(`${key}.${field}Hint`)"
+      :error="errors[field]"
     >
-      <AdminField
-        v-slot="{ id, describedBy }"
-        input-id="data-outputLimit"
-        :label="$t('admin.problems.data.checker.outputLimit')"
-        :hint="$t(`${key}.outputLimitHint`)"
-        :error="errors.outputLimit"
-      >
-        <input
-          :id="id"
-          :value="form.outputLimit ?? ''"
-          type="number"
-          inputmode="numeric"
-          min="0"
-          :class="INPUT"
-          :aria-describedby="describedBy"
-          @input="setOutputNumber('outputLimit', $event)"
-        />
-      </AdminField>
-      <AdminField
-        v-slot="{ id, describedBy }"
-        input-id="data-outputPrefix"
-        :label="$t('admin.problems.data.checker.outputPrefix')"
-        :hint="$t(`${key}.outputPrefixHint`)"
-        :error="errors.outputPrefix"
-      >
-        <input
-          :id="id"
-          :value="form.outputPrefix ?? ''"
-          type="number"
-          inputmode="numeric"
-          min="0"
-          :class="INPUT"
-          :aria-describedby="describedBy"
-          @input="setOutputNumber('outputPrefix', $event)"
-        />
-      </AdminField>
-      <AdminCheckbox
-        v-model="form.unicode"
-        input-id="data-unicode"
-        :label="$t('admin.problems.data.checker.unicode')"
-        :description="$t(`${key}.unicodeHint`)"
+      <TextInput
+        :model-value="form[field] ?? ''"
+        type="number"
+        inputmode="numeric"
+        min="0"
+        @input="form[field] = numberBoxValue($event)"
       />
-      <AdminCheckbox
-        v-model="form.nobigmath"
-        input-id="data-nobigmath"
-        :label="$t('admin.problems.data.checker.nobigmath')"
-        :description="$t(`${key}.nobigmathHint`)"
-      />
-    </AdminFormSection>
-  </template>
+    </FormField>
+    <Checkbox
+      v-model="form.unicode"
+      input-id="data-unicode"
+      :label="$t('admin.problems.data.checker.unicode')"
+      :description="$t(`${key}.unicodeHint`)"
+    />
+    <Checkbox
+      v-model="form.nobigmath"
+      input-id="data-nobigmath"
+      :label="$t('admin.problems.data.checker.nobigmath')"
+      :description="$t(`${key}.nobigmathHint`)"
+    />
+  </div>
 </template>

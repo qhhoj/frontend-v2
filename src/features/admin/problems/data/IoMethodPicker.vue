@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import AdminField from '../../ui/AdminField.vue';
-import AdminFormSection from '../../ui/form/AdminFormSection.vue';
-import ChoiceCards from '../../ui/form/ChoiceCards.vue';
+import FormField from '@/components/ui/FormField.vue';
+import SegmentedControl from '@/components/ui/SegmentedControl.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
-import { INPUT } from '../../ui/controls';
 import { argsOf, usesFileIo, withArg } from './checker-config';
 import type { DataForm } from './test-cases';
 
 /**
- * The Basic view's input/output: keyboard and screen (stdin/stdout) or named files (BAI.INP / BAI.OUT). Only a plain
- * problem reads input this way; another kind of problem says so and points to the Advanced view.
+ * How the student's program reads and writes: keyboard and screen (stdin/stdout) or named files (BAI.INP / BAI.OUT).
+ * Only a plain problem reads input this way; another kind of problem says so.
  */
 const form = defineModel<DataForm>({ required: true });
 defineProps<{ errors: FieldErrors }>();
@@ -23,20 +22,20 @@ const setArg = (name: string, value: unknown) => {
 };
 
 type IoMethod = 'standard' | 'file';
-const ioMethod = computed<IoMethod>({
-  get: () => (usesFileIo(form.value) ? 'file' : 'standard'),
-  set: (next) => {
-    if (next === 'file') return setArg('io_method', 'file');
-    let text = withArg(form.value.graderArgsText, 'io_method', undefined);
-    text = withArg(text, 'io_input_file', undefined);
-    form.value.graderArgsText = withArg(text, 'io_output_file', undefined);
-  },
-});
+const ioMethod = computed<IoMethod>(() => (usesFileIo(form.value) ? 'file' : 'standard'));
+/** The method already shown changes nothing. Leaving files drops the two names with the method. */
+function setIoMethod(next: IoMethod) {
+  if (next === ioMethod.value) return;
+  if (next === 'file') return setArg('io_method', 'file');
+  let text = withArg(form.value.graderArgsText, 'io_method', undefined);
+  text = withArg(text, 'io_input_file', undefined);
+  form.value.graderArgsText = withArg(text, 'io_output_file', undefined);
+}
 const ioOptions = computed(() =>
-  (['standard', 'file'] as IoMethod[]).map((value) => ({
+  (['standard', 'file'] as const).map((value) => ({
     value,
     label: t(`${key}.io.${value}.label`),
-    description: t(`${key}.io.${value}.description`),
+    testid: `data-io-method-${value}`,
   })),
 );
 const fileName = (name: 'io_input_file' | 'io_output_file') =>
@@ -44,45 +43,38 @@ const fileName = (name: 'io_input_file' | 'io_output_file') =>
 </script>
 
 <template>
-  <AdminFormSection
-    id="data-io-section"
-    :title="t('admin.problems.workbench.tests.ioTitle')"
-    :columns="1"
-  >
+  <div id="data-io-section" class="flex flex-col gap-3">
+    <p class="m-0 text-meta text-muted">{{ t('admin.problems.workbench.tests.ioTitle') }}</p>
     <template v-if="form.grader === 'standard'">
-      <ChoiceCards
-        v-model="ioMethod"
-        :legend="t(`${key}.ioLegend`)"
-        name="data-io-method"
+      <SegmentedControl
+        size="sm"
+        :label="t('admin.problems.workbench.tests.ioTitle')"
         :options="ioOptions"
+        :model-value="ioMethod"
+        @update:model-value="setIoMethod"
       />
-      <div v-if="ioMethod === 'file'" class="grid gap-4 md:grid-cols-2">
-        <AdminField
+      <div v-if="ioMethod === 'file'" class="grid grid-cols-2 gap-3">
+        <FormField
           v-for="name in ['io_input_file', 'io_output_file'] as const"
           :key="name"
-          v-slot="{ id, describedBy, invalid }"
           :input-id="`data-${name}`"
           :label="t(`${key}.${name}`)"
           :hint="t(`${key}.${name}Hint`)"
           :error="errors[`graderArgs.${name}`]"
           required
         >
-          <input
-            :id="id"
-            :value="fileName(name)"
-            :class="[INPUT, 'font-mono']"
+          <TextInput
+            :model-value="fileName(name)"
+            class="font-mono"
             autocomplete="off"
             spellcheck="false"
-            :aria-describedby="describedBy"
-            :aria-invalid="invalid ? 'true' : undefined"
             @input="setArg(name, ($event.target as HTMLInputElement).value.trim())"
           />
-        </AdminField>
+        </FormField>
       </div>
     </template>
-
-    <p v-else class="text-sm text-muted" data-testid="data-io-other-grader">
+    <p v-else class="m-0 text-meta text-muted" data-testid="data-io-other-grader">
       {{ t(`${key}.ioOtherGrader`, { grader: t(`${key}.grader.${form.grader}.label`) }) }}
     </p>
-  </AdminFormSection>
+  </div>
 </template>

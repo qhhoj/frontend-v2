@@ -37,7 +37,7 @@ export function useDataForm(code: () => string) {
   const errors = computed<FieldErrors>(() =>
     form.value ? { ...checkDataForm(form.value), ...configErrors(form.value) } : {},
   );
-  const { badRowNumbers, markInvalid } = useInvalidArgs(form);
+  const { badRows, badRowNumbers, markInvalid } = useInvalidArgs(form);
 
   /** Nothing typed: no change, and no args box holding text that does not parse. */
   const isClean = () => dirtyCount.value === 0 && badRowNumbers.value.length === 0;
@@ -68,10 +68,14 @@ export function useDataForm(code: () => string) {
   /** Whether the server's configuration differs from the one the form was seeded from (row keys and non-form fields aside). */
   const isNewConfig = (data: ProblemData) =>
     !saved.value || countDataChanges(toDataForm(data), toDataForm(saved.value)) > 0;
+  /** A clean form takes the server's configuration when it differs; a form with edits keeps them. */
+  function adopt(data: ProblemData) {
+    if (isClean() && isNewConfig(data)) seed(data);
+  }
   watch(
     () => query.data.value,
     (data) => {
-      if (data && isClean() && isNewConfig(data)) seed(data);
+      if (data) adopt(data);
     },
     { immediate: true },
   );
@@ -109,11 +113,13 @@ export function useDataForm(code: () => string) {
     saved,
     errors,
     dirtyCount,
+    badRows,
     badRowNumbers,
     markInvalid,
     validate,
     saveTo,
     retarget,
+    adopt,
     discard,
   };
 }

@@ -1,77 +1,162 @@
 <script setup lang="ts">
-import { computed, shallowRef, toRaw } from 'vue';
-import { FileArchive } from 'lucide-vue-next';
-import { translate } from '@/i18n';
-import AdminStatus from '../../ui/AdminStatus.vue';
-import { buttonClass } from '../../ui/controls';
+import { computed, ref, shallowRef, toRaw, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import AppButton from '@/components/ui/AppButton.vue';
+import SegmentedControl from '@/components/ui/SegmentedControl.vue';
+import TextInput from '@/components/ui/TextInput.vue';
+import { numberBoxValue } from '../../ui/form/number-box';
+import { caseBody, caseCount, casesFromPairs } from './test-cases';
 import type { KeyedCase } from './test-cases';
-import ZipAutofillDialog from './ZipAutofillDialog.vue';
-import type { AutofillMode } from './ZipAutofillDialog.vue';
+import { newPairsOnly, pairArchiveFiles, splitPoints, totalPointsOf } from './zip-autofill';
+
+type AutofillMode = 'replace' | 'append';
+/** What `start` put in the table: the rows it started from (for the other mode and for undo) and the list it made. */
+interface Applied {
+  base: KeyedCase[];
+  list: KeyedCase[];
+  snapshot: string;
+  added: number;
+  skipped: number;
+}
 
 /**
- * "Tạo test từ gói zip": the button, its dialog, and the "added N tests, now save" line. Laid out as part of the parent's
- * button row (`display: contents`): the line takes a full row above the buttons.
+ * Tests from the archive's input/output pairs, made in the table at once (`start`, called after an upload or from "Tạo
+ * test từ gói"): after the existing tests when there are some (pairs already listed are skipped), else as the whole
+ * list, the problem's points split across them. The bar then offers the same choices the old dialog had (add or replace,
+ * the total to split) and "Hoàn tác"; a choice re-makes the rows from the list as it was before `start`. The bar is
+ * there only while the list is exactly the one it made: an edit in the table, a save or a discard retires it, so a
+ * choice never overwrites the teacher's own edits. Nothing is saved here.
  */
 const cases = defineModel<KeyedCase[]>({ required: true });
-const props = defineProps<{
-  archiveFiles: string[];
-  /** The problem's points: the default total the autofill splits across its tests. */
-  problemPoints: number | null;
-}>();
+const props = defineProps<{ archiveFiles: string[]; problemPoints: number | null }>();
 const emit = defineEmits<{ invalid: [key: number, isInvalid: boolean] }>();
-/** The dialog; the data tab opens it itself right after a zip upload, where its dismiss reads "Bỏ qua, tự thêm test". */
-const isShown = defineModel<boolean>('open', { default: false });
-const isAfterUpload = defineModel<boolean>('afterUpload', { default: false });
-/**
- * Shown inline (a toast would sit over the save bar it points to) while the list is still the one the autofill made; any
- * later change, a save or a discard replaces the list and hides it.
- */
-const applied = shallowRef<{ list: KeyedCase[]; count: number; mode: AutofillMode } | null>(null);
-const appliedText = computed(() =>
-  applied.value && applied.value.list === toRaw(cases.value)
-    ? translate(
-        `admin.problems.data.autofill.${applied.value.mode === 'replace' ? 'appliedReplace' : 'applied'}`,
-        { count: applied.value.count },
-      )
-    : '',
+const { t } = useI18n();
+const KEY = 'admin.problems.data.autofill';
+
+/** The files `start` was given (an upload's own answer, which is ahead of the prop), else the archive's as the page has them. */
+const startedFrom = shallowRef<string[] | null>(null);
+watch(
+  () => props.archiveFiles,
+  () => (startedFrom.value = null),
 );
+const pairing = computed(() => pairArchiveFiles(startedFrom.value ?? props.archiveFiles));
+const applied = shallowRef<Applied | null>(null);
+const mode = ref<AutofillMode>('replace');
+const total = ref<number | null>(null);
+const snapshotOf = (list: readonly KeyedCase[]) => JSON.stringify(list.map(caseBody));
+const live = computed(() => {
+  const made = applied.value;
+  const isSame =
+    made && made.list === toRaw(cases.value) && made.snapshot === snapshotOf(cases.value);
+  return isSame ? made : null;
+});
+const isTotalOk = computed(
+  () => total.value !== null && Number.isSafeInteger(total.value) && total.value >= 0,
+);
+
 /** Replaced rows take their args-box flags with them, as a removed row does. */
-function apply(rows: KeyedCase[], mode: AutofillMode) {
-  if (mode === 'replace') cases.value.forEach((row) => emit('invalid', row.key, false));
-  const list = mode === 'replace' ? rows : [...cases.value, ...rows];
+function make(base: KeyedCase[]) {
+  const isReplace = mode.value === 'replace';
+  const pairs = isReplace ? pairing.value.pairs : newPairsOnly(pairing.value.pairs, base);
+  const rows = casesFromPairs(pairs, splitPoints(total.value ?? 0, pairs.length));
+  if (isReplace) base.forEach((row) => emit('invalid', row.key, false));
+  const list = isReplace ? rows : [...base, ...rows];
   cases.value = list;
-  applied.value = { list: toRaw(list), count: rows.length, mode };
+  applied.value = {
+    base,
+    list,
+    snapshot: snapshotOf(list),
+    added: rows.length,
+    skipped: pairing.value.pairs.length - pairs.length,
+  };
 }
+
+/**
+ * `files` and `rows` are for the caller that is ahead of this component's props: after an upload, the answer's file list
+ * and the form's rows as they are now (the form may just have taken the server's list; the model prop still holds the old one).
+ */
+function start(files?: string[], rows?: readonly KeyedCase[]) {
+  startedFrom.value = files ?? null;
+  if (pairing.value.pairs.length === 0) return;
+  const base = [...toRaw(rows ?? cases.value)];
+  mode.value = base.length > 0 ? 'append' : 'replace';
+  total.value = totalPointsOf(props.problemPoints);
+  make(base);
+}
+/** A choice in the bar: the rows are made again from the list as it was, unless the total cannot be split. */
+function remake() {
+  if (live.value && isTotalOk.value) make(live.value.base);
+}
+function setMode(next: AutofillMode) {
+  if (next === mode.value) return;
+  mode.value = next;
+  remake();
+}
+function setTotal(event: Event) {
+  total.value = numberBoxValue(event);
+  remake();
+}
+function undo() {
+  if (!live.value) return;
+  cases.value = live.value.base;
+  applied.value = null;
+}
+/** The archive's pairs the table does not list yet: what "Tạo test từ gói" would add. */
+const newPairCount = computed(() => newPairsOnly(pairing.value.pairs, cases.value).length);
+defineExpose({ start, newPairCount, live });
+
+const modeOptions = computed(() =>
+  (['append', 'replace'] as const).map((value) => ({
+    value,
+    label: t(`${KEY}.modes.${value}`, { count: caseCount(live.value?.base ?? []) }),
+    testid: `autofill-mode-${value}`,
+  })),
+);
+const statusText = computed(() => {
+  const made = live.value;
+  if (!made) return '';
+  if (made.added === 0) return t(`${KEY}.nothingNew`, { count: made.skipped });
+  const isReplacing = mode.value === 'replace' && made.base.length > 0;
+  const said = t(`${KEY}.${isReplacing ? 'appliedReplace' : 'applied'}`, {
+    count: made.added,
+  });
+  return made.skipped > 0 ? `${said} ${t(`${KEY}.skipped`, { count: made.skipped })}` : said;
+});
 </script>
 
 <template>
-  <div v-if="props.archiveFiles.length > 0" class="contents">
-    <AdminStatus
-      v-if="appliedText"
-      kind="done"
-      class="order-first basis-full"
-      data-testid="autofill-applied"
-      :text="appliedText"
+  <div
+    v-if="live"
+    data-testid="autofill-applied"
+    class="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-card border border-line bg-surface-strong px-4 py-2"
+  >
+    <p role="status" class="m-0 min-w-0 flex-1 basis-64 text-meta">{{ statusText }}</p>
+    <SegmentedControl
+      v-if="live.base.length > 0"
+      size="sm"
+      :label="t(`${KEY}.modeLegend`)"
+      :options="modeOptions"
+      :model-value="mode"
+      @update:model-value="setMode"
     />
-    <button
-      type="button"
-      data-testid="zip-autofill-open"
-      :class="buttonClass(cases.length === 0 ? 'primary' : 'secondary')"
-      @click="
-        isAfterUpload = false;
-        isShown = true;
-      "
-    >
-      <FileArchive aria-hidden="true" class="size-4" :stroke-width="1.75" />
-      {{ $t('admin.problems.data.cases.autofill') }}
-    </button>
-    <ZipAutofillDialog
-      v-model:visible="isShown"
-      :archive-files="archiveFiles"
-      :cases="cases"
-      :problem-points="problemPoints"
-      :dismiss-label="isAfterUpload ? $t('admin.problems.data.autofill.skip') : undefined"
-      @apply="apply"
-    />
+    <label class="flex items-center gap-2 text-meta" :title="t(`${KEY}.totalHint`)">
+      {{ t(`${KEY}.total`) }}
+      <span class="block w-24">
+        <TextInput
+          :model-value="total ?? ''"
+          type="number"
+          min="0"
+          step="1"
+          inputmode="numeric"
+          class="text-right font-mono tabular-nums"
+          data-testid="autofill-total"
+          :aria-invalid="isTotalOk ? undefined : 'true'"
+          @input="setTotal"
+        />
+      </span>
+    </label>
+    <AppButton size="sm" tone="quiet" data-testid="autofill-undo" @click="undo">
+      {{ t('common.undo') }}
+    </AppButton>
   </div>
 </template>
