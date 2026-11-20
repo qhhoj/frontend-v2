@@ -34,11 +34,9 @@
     "status-colour": 1
   },
   "features/admin/contests/actions/ContestProblemOpsCard.vue": {
-    "button": 2,
-    "checkbox": 1,
-    "controls": 5,
-    "select": 1,
-    "status-colour": 2
+    "button": 1,
+    "controls": 3,
+    "select": 1
   },
   "features/admin/contests/actions/ContestPublishCard.vue": {
     "button": 2,

@@ -11,7 +11,6 @@ import { freezesInFormat } from '@/lib/board-freeze';
 import { formatLabel } from '@/lib/contest-format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
-import { usePermissions } from '@/stores/use-permissions';
 import AdminLeaveGuard from '../../ui/form/AdminLeaveGuard.vue';
 import SaveReport from '../../ui/workbench/SaveReport.vue';
 import WorkbenchSection from '../../ui/workbench/WorkbenchSection.vue';
@@ -19,6 +18,7 @@ import { sectionDomId } from '../../ui/workbench/section-dom-id';
 import ContestAnnouncementsTab from '../announcements/ContestAnnouncementsTab.vue';
 import { useContestLength } from '../general/contest-length';
 import { isPointsValid } from '../problems/contest-problems';
+import ContestTools from '../tools/ContestTools.vue';
 import ContestOtherTab from './ContestOtherTab.vue';
 import ContestPlate from './ContestPlate.vue';
 import ContestResultsTab from './ContestResultsTab.vue';
@@ -29,7 +29,13 @@ import SetupProblems from './SetupProblems.vue';
 import SetupTime from './SetupTime.vue';
 import { useContestProblemMarks } from './contest-problem-marks';
 import { contestGapsOf } from './contest-status';
-import { CONTEST_WORKBENCH_TABS, sectionOfRoute, tabOfRoute } from './contest-workbench-tabs';
+import {
+  CONTEST_TOOLS_ANCHORS,
+  CONTEST_TOOLS_SECTION,
+  CONTEST_WORKBENCH_TABS,
+  sectionOfRoute,
+  tabOfRoute,
+} from './contest-workbench-tabs';
 import type { ContestSectionId } from './contest-workbench-tabs';
 import { sectionOfField, useContestWorkbench } from './use-contest-workbench';
 import type { ContestSavePartId } from './use-contest-workbench';
@@ -37,14 +43,14 @@ import type { ContestSavePartId } from './use-contest-workbench';
 /**
  * The teacher's contest workbench: one page to set a contest up and run it. Header, the status plate (the one place
  * that says whether students see the contest, and the show/hide action), three tabs. The setup tab holds the sections,
- * each a one-line row until opened: time and format, problems, participants, announcements, and the presentation. One
+ * each a one-line row until opened: time and format, problems, participants, announcements, and the presentation; under
+ * them the running tools (submissions, rejudge, similarity), open while the contest runs. One
  * save bar saves the settings and the problem list together (`useContestWorkbench`); it holds the page's primary while
  * it shows. One leave guard covers the page; the tab lives in `?tab=`, so switching tabs never asks.
  */
 const props = defineProps<{ contest: EditableContest }>();
 const route = useRoute();
 const { t } = useI18n();
-const { can } = usePermissions();
 const locale = useLocaleStore();
 const KEY = 'admin.contests.workbench';
 const FORM_ID = 'contest-workbench-form';
@@ -92,6 +98,12 @@ watch(
   { immediate: true },
 );
 const folds = reactive({ timeMore: false, participantsMore: false });
+/** The running tools: open while the contest runs, one closed row before it starts and after it ends; read once opened. */
+const isToolsOpen = ref(props.contest.phase === 'running');
+const wasToolsOpened = ref(isToolsOpen.value);
+watch(isToolsOpen, (isOpen) => {
+  if (isOpen) wasToolsOpened.value = true;
+});
 async function openSection(id: ContestSectionId) {
   open[id] = true;
   await nextTick();
@@ -103,6 +115,8 @@ async function openRoutePlace() {
   const section = sectionOfRoute(route.name);
   if (section && tab.value === 'setup') void openSection(section);
   if (!route.hash) return;
+  if (Object.values<string>(CONTEST_TOOLS_ANCHORS).includes(route.hash.slice(1)))
+    isToolsOpen.value = true;
   await nextTick();
   document.getElementById(route.hash.slice(1))?.scrollIntoView({ block: 'start' });
 }
@@ -208,42 +222,14 @@ const summaries = computed(() => {
   };
 });
 /** What the bar says changed: "Thời gian và thể thức 2 · Bài 1". */
-const changedText = computed(() => {
-  const changed = (['time', 'problems', 'participants', 'info'] as const)
-    .filter((id) => changes.value[id] > 0)
-    .map((id) => `${t(`${KEY}.sections.${id}`)} ${changes.value[id]}`);
-  return changed.length ? changed.join(' · ') : undefined;
-});
+const changedParts = computed(() =>
+  (['time', 'problems', 'participants', 'info'] as const).map((id) => ({
+    label: t(`${KEY}.sections.${id}`),
+    count: changes.value[id],
+  })),
+);
 
 const listLink = computed(() => ({ to: { name: 'admin-contests' }, label: t(`${KEY}.back`) }));
-/** The tools that stay on their own pages for now; each shows only to an account that may open it. */
-const tools = computed(() => {
-  const key = props.contest.key;
-  const all = [
-    { id: 'submissions', to: { name: 'contest-submissions', params: { key } }, isOpen: true },
-    {
-      id: 'rejudge',
-      to: { name: 'admin-rejudge', query: { contest: key } },
-      isOpen: can('judge.rejudge_submission'),
-    },
-    {
-      id: 'problemTools',
-      to: {
-        name: 'admin-contestActions',
-        params: { key },
-        query: { tab: 'results' },
-        hash: '#contest-actions-problem',
-      },
-      isOpen: true,
-    },
-    {
-      id: 'similarity',
-      to: { name: 'admin-similarity', query: { contest: key } },
-      isOpen: can('judge.moss_contest'),
-    },
-  ];
-  return all.filter((tool) => tool.isOpen);
-});
 </script>
 
 <template>
@@ -340,16 +326,19 @@ const tools = computed(() => {
           <SetupInfo v-model="settings.form.value" :errors="settings.errors.value" />
         </WorkbenchSection>
       </fieldset>
-      <nav
-        class="flex flex-wrap items-center gap-x-4 gap-y-2 text-meta"
-        :aria-label="$t(`${KEY}.tools.label`)"
-        data-testid="contest-tools"
-      >
-        <span class="text-muted">{{ $t(`${KEY}.tools.label`) }}</span>
-        <AppButton v-for="tool in tools" :key="tool.id" tone="link" :to="tool.to">
-          {{ $t(`${KEY}.tools.${tool.id}`) }}
-        </AppButton>
-      </nav>
+      <div class="border-b border-line">
+        <WorkbenchSection
+          :id="CONTEST_TOOLS_SECTION"
+          v-model:open="isToolsOpen"
+          :title="$t(`${KEY}.tools.label`)"
+          :summary="$t(`${KEY}.tools.summary`)"
+          :action-label="
+            $t(isToolsOpen ? 'admin.problems.workbench.sections.collapse' : `${KEY}.tools.open`)
+          "
+        >
+          <ContestTools v-if="wasToolsOpened" :contest="contest" />
+        </WorkbenchSection>
+      </div>
     </div>
     <ContestResultsTab v-if="tab === 'results'" :contest="contest" />
     <ContestOtherTab v-if="tab === 'other'" :contest="contest" />
@@ -359,7 +348,7 @@ const tools = computed(() => {
       :dirty-count="dirtyCount"
       :pending="isSaving"
       :saved-at="savedAt"
-      :note="changedText"
+      :changed-parts="changedParts"
       @discard="discard"
     />
     <ParticipantsWidenDialog :contest="contest" :workbench="workbench" />

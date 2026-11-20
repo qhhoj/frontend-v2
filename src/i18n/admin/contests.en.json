@@ -662,11 +662,34 @@
       }
     },
     "tools": {
-      "label": "Tools while the contest runs",
-      "submissions": "Submissions of this contest",
-      "rejudge": "Rejudge many submissions",
-      "problemTools": "Rejudge by problem, freeze",
-      "similarity": "Similarity check"
+      "label": "While the contest runs",
+      "summary": "Contest submissions · Rejudge · Similarity",
+      "open": "Open",
+      "submissions": {
+        "title": "Contest submissions",
+        "problem": "Problem",
+        "allProblems": "All",
+        "user": "Filter by contestant",
+        "userPlaceholder": "Contestant: username, Enter to filter",
+        "shown": "{shown} / {total}",
+        "seeAll": "See all",
+        "empty": "No submissions in this contest yet.",
+        "emptyFiltered": "No submissions match the filter.",
+        "pickAll": "Select all {count} shown",
+        "bulkLine": "{count} selected submissions of this contest.",
+        "rescoreNote": "Inside a contest a rescore always recomputes the whole contest’s results, not only the selected submissions."
+      },
+      "rejudge": {
+        "title": "Rejudge",
+        "line": "Scope: {scope} · {user} · {results} · locked submissions: {locked}"
+      },
+      "similarity": {
+        "title": "Similarity",
+        "running": "A run of this contest has not finished yet.",
+        "pairsTitle": "Most similar pairs",
+        "pairsShown": "Top {shown} of {total} pairs",
+        "allPairs": "All pairs, with filters"
+      }
     },
     "results": {
       "ranking": "Official ranking and ranking link"

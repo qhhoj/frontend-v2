@@ -47,3 +47,7 @@ export const sectionOfRoute = (routeName: unknown): ContestSectionId | null =>
 
 /** The element ids old links point at with a hash (`#contest-actions-problem`), and the blocks of the results tab. */
 export const RESULTS_ANCHORS = { ghosts: 'contest-results-ghosts' } as const;
+
+/** The running tools' fold on the setup tab, and the blocks inside it that another tab links to with a hash. */
+export const CONTEST_TOOLS_SECTION = 'running-tools';
+export const CONTEST_TOOLS_ANCHORS = { rejudge: 'contest-tool-rejudge' } as const;

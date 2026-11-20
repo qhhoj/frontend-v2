@@ -126,7 +126,7 @@ const summaryText = computed(() =>
         </button>
         <button
           type="button"
-          :class="buttonClass('primary')"
+          :class="buttonClass('secondary')"
           :aria-disabled="!mayPublish || undefined"
           @click="openConfirm"
         >

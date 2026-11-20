@@ -28,6 +28,7 @@ const props = defineProps<{
   problemLabels: Record<string, string>;
   contestPoints: Record<string, number>;
   pickedIds?: readonly string[];
+  unlimitedPicks?: boolean;
   rankStart?: number;
   ownUsername?: string;
   /** `ledger`: the rows sit on the page (a rule under each); `surface`: inside a card. */
@@ -82,6 +83,7 @@ const costOf = (row: SubmissionListItem) =>
         :id="row.id"
         :order="pickOrder(row.id)"
         :picked-count="pickedIds.length"
+        :unlimited="unlimitedPicks"
         @toggle="emit('togglePick', $event)"
       />
       <div v-if="isShown('verdict')" class="flex w-24 shrink-0 flex-col items-start">

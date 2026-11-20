@@ -118,7 +118,7 @@ function startReplace() {
       </button>
       <button
         type="button"
-        :class="buttonClass('primary')"
+        :class="buttonClass('secondary')"
         :disabled="isBusy"
         :aria-disabled="!preview"
         :aria-describedby="preview ? undefined : needsPreviewId"

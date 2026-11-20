@@ -12,18 +12,13 @@
     "pending": "{count} pending submissions left to judge."
   },
   "problemOps": {
-    "title": "Rejudge or rescore one problem",
-    "description": "Rejudge resets this problem's submissions in this contest and judges them again. Rescore recomputes their points and the affected participations without judging, which is faster than rescoring the whole contest.",
+    "title": "Rescore one problem",
+    "description": "Recomputes the points of this problem’s contest submissions and of the participations that sent one, without judging again; faster than rescoring the whole contest.",
     "noProblems": "Save at least one problem first.",
     "problemLabel": "Problem",
     "rescore": "Rescore problem",
-    "rejudge": "Rejudge problem…",
     "rescoreQueued": "Rescore of {code} queued.",
-    "rejudged": "{count} submissions of {code} queued for judging.",
-    "rejudgeTitle": "Rejudge problem {label}?",
-    "counting": "Counting submissions…",
-    "willRejudge": "{count} submissions of {code} in this contest will be judged again. Results change as they finish.",
-    "includeLocked": "Also rejudge locked submissions"
+    "toRejudge": "Rejudge a problem: section “While the contest runs”"
   },
   "freezeLock": {
     "title": "Ranking freeze and submission lock",

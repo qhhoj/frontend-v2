@@ -45,7 +45,9 @@
     "notStarted": "chưa bắt đầu",
     "detail": "Chi tiết",
     "label": "Các lượt chạy",
-    "seconds": "{seconds} giây"
+    "seconds": "{seconds} giây",
+    "showPairs": "Xem cặp",
+    "hidePairs": "Ẩn cặp"
   },
   "status": {
     "queued": "Đang chờ",

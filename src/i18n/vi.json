@@ -1419,7 +1419,8 @@
       "label": "Điểm {percent}%",
       "grading": "Đã chấm {percent}% số điểm"
     },
-    "mineSummary": "Bài nộp của bạn · {count} bài"
+    "mineSummary": "Bài nộp của bạn · {count} bài",
+    "selectRow": "Chọn bài nộp {id}"
   },
   "ranking": {
     "public": {

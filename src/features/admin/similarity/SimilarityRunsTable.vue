@@ -5,6 +5,7 @@ import type { RunStatus, SimilarityRun, SimilarityScope } from '@/api/types/simi
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
+import AppButton from '@/components/ui/AppButton.vue';
 import Chip from '@/components/ui/Chip.vue';
 import type { ChipTone } from '@/components/ui/Chip.vue';
 import { buttonClass } from '../ui/controls';
@@ -14,8 +15,18 @@ import type { AdminColumn } from '../ui/table/table-columns';
 import { runDurationText, runStatusText } from './run-text';
 import { scopeQuery, totalPairs } from './similarity-runs';
 
-/** The scope's runs, newest first, each linking to its summary. Cards below 768 px. */
-const props = defineProps<{ runs: SimilarityRun[]; scope: SimilarityScope }>();
+/**
+ * The scope's runs, newest first, each linking to its summary. Cards below 768 px. With `inPlace` the table sits inside
+ * another page (the contest workbench): no heading of its own, and a finished run's action asks the host to show its
+ * pairs there (`open`; `openId` is the run whose pairs are shown) instead of leaving for the summary page.
+ */
+const props = defineProps<{
+  runs: SimilarityRun[];
+  scope: SimilarityScope;
+  inPlace?: boolean;
+  openId?: string | null;
+}>();
+defineEmits<{ open: [runId: string] }>();
 const { t } = useI18n();
 const locale = useLocaleStore();
 
@@ -45,7 +56,7 @@ const detailTo = (run: SimilarityRun) => ({
 
 <template>
   <section class="flex flex-col gap-3">
-    <h2 class="font-display text-base font-semibold">
+    <h2 v-if="!inPlace" class="font-display text-base font-semibold">
       {{
         'problem' in scope
           ? $t('admin.similarity.runs.ofProblem', { code: scope.problem })
@@ -76,7 +87,16 @@ const detailTo = (run: SimilarityRun) => ({
       <template #cell-groups="{ row }">{{ row.groups.length }}</template>
       <template #cell-pairs="{ row }">{{ pairsText(row) }}</template>
       <template #actions="{ row }">
-        <RouterLink :to="detailTo(row)" :class="buttonClass('secondary', 'sm')">
+        <AppButton
+          v-if="inPlace && row.status === 'done'"
+          size="sm"
+          data-testid="run-pairs"
+          :aria-expanded="openId === row.id"
+          @click="$emit('open', row.id)"
+        >
+          {{ $t(`admin.similarity.runs.${openId === row.id ? 'hidePairs' : 'showPairs'}`) }}
+        </AppButton>
+        <RouterLink v-else :to="detailTo(row)" :class="buttonClass('secondary', 'sm')">
           {{ $t('admin.similarity.runs.detail') }}
         </RouterLink>
       </template>

@@ -76,7 +76,7 @@ const save = useAdminMutation({
     <div class="flex flex-wrap items-center gap-3">
       <button
         type="submit"
-        :class="buttonClass('primary')"
+        :class="buttonClass('secondary')"
         :aria-busy="save.isPending.value || undefined"
       >
         {{ $t('common.save') }}

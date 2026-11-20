@@ -64,11 +64,17 @@
       "noneChip": "Không khớp",
       "none": "Không có bài nộp nào khớp bộ lọc."
     },
-    "sample": "Vài bài nộp khớp mới nhất"
+    "sample": "Vài bài nộp khớp mới nhất",
+    "skipped": {
+      "locked": "Bỏ qua: bài nộp đã qua thời điểm khóa chấm, bài nộp đang được máy chấm giữ và bài nộp chờ chấm lần cuối của kỳ thi.",
+      "forced": "Chấm lại cả bài nộp đã bị khóa. Vẫn bỏ qua bài nộp đang được máy chấm giữ và bài nộp chờ chấm lần cuối của kỳ thi."
+    }
   },
   "errors": {
     "languages": "Tối đa 50 ngôn ngữ.",
-    "dateOrder": "Thời điểm kết thúc phải sau thời điểm bắt đầu."
+    "dateOrder": "Thời điểm kết thúc phải sau thời điểm bắt đầu.",
+    "problemRequired": "Chọn một bài.",
+    "userRequired": "Nhập tên đăng nhập của thí sinh."
   },
   "presets": {
     "internalErrors": "Mọi IE",
@@ -97,5 +103,21 @@
       "filter": "Bộ lọc",
       "createdAt": "Lúc chạy"
     }
+  },
+  "contestScope": {
+    "label": "Phạm vi chấm lại",
+    "scopes": {
+      "problem": "Một bài",
+      "user": "Một thí sinh",
+      "contest": "Cả kỳ thi"
+    },
+    "problem": "Bài",
+    "problemPlaceholder": "Chọn bài",
+    "user": "Thí sinh",
+    "userHint": "Tên đăng nhập, ví dụ bitcoder.",
+    "contestHint": "Mọi bài nộp trong kỳ thi này.",
+    "narrow": "Thu hẹp: kết quả hiện tại, bài bị khóa",
+    "submit": "Chấm lại…",
+    "twoSteps": "Luôn đếm trước: hộp xác nhận hiện số bài nộp khớp và vài bài mẫu, chưa đặt lại gì."
   }
 }

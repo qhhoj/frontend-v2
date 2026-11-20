@@ -16,7 +16,13 @@ import type { PairFilter } from './similarity-pairs';
  * A run's pairs, most similar first: the similarity as a right-aligned number with a meter that repeats it, the two
  * authors, problem, language and the overlap figures. Cards below 768 px.
  */
-const props = defineProps<{ pairs: SimilarityPair[]; total: number; filter: PairFilter }>();
+const props = defineProps<{
+  pairs: SimilarityPair[];
+  total: number;
+  filter: PairFilter;
+  /** The first pairs only, shown inside another page: no pager (the host links to the full list). */
+  preview?: boolean;
+}>();
 defineEmits<{ reset: [] }>();
 const { t } = useI18n();
 const locale = useLocaleStore();
@@ -25,7 +31,11 @@ const count = (value: number) => formatNumber(value, locale.locale);
 const columns = computed<AdminColumn[]>(() => [
   { key: 'similarity', label: t('admin.similarity.pairs.columns.similarity'), align: 'end' },
   { key: 'authors', label: t('admin.similarity.pairs.columns.authors'), priority: 'primary' },
-  { key: 'problemCode', label: t('admin.similarity.pairs.columns.problem') },
+  {
+    key: 'problemCode',
+    label: t('admin.similarity.pairs.columns.problem'),
+    cellClass: 'whitespace-nowrap',
+  },
   { key: 'language', label: t('admin.similarity.pairs.columns.language') },
   { key: 'longest', label: t('admin.similarity.pairs.columns.longest'), align: 'end' },
   {
@@ -55,7 +65,7 @@ const emptyTitle = computed(() =>
 
 <template>
   <AdminDataTable
-    :pager="meta ? { meta, label: $t('admin.similarity.pairs.pager') } : undefined"
+    :pager="preview ? undefined : { meta, label: $t('admin.similarity.pairs.pager') }"
     :columns="columns"
     :rows="pairs"
     :row-key="(pair) => pair.id"
