@@ -13,6 +13,7 @@ import { useSessionStore } from '@/stores/session.store';
 import { useViewerId } from '@/stores/use-viewer-id';
 import { editableProblemKey, PROBLEM_INDEX_KEY } from '../../problem-editing.queries';
 import type { Workbench } from '../use-workbench';
+import { countDataChanges, toDataForm } from '../../data/test-cases';
 import { trialResultsOf } from '../../data/trial-results';
 
 const KEY = 'admin.problems.workbench.trial';
@@ -87,9 +88,11 @@ export function useTrialRun(
   const markTestsChanged = () => {
     outdatedRunId.value = shownId.value;
   };
-  // The stored configuration changes on a save and when the server's differs (a sync); its first read is no change.
+  // The stored configuration changes on a save and when the server's differs (a sync). Its first read is no change, and
+  // neither is the same configuration read again (discarded edits put the server's copy back).
   watch(data.saved, (now, before) => {
-    if (now && before) markTestsChanged();
+    if (now && before && countDataChanges(toDataForm(now), toDataForm(before)) > 0)
+      markTestsChanged();
   });
   /** Unsaved edits to the tests count too: the rows no longer line up with the run's. */
   const isStale = computed(
