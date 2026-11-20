@@ -14,9 +14,11 @@ const props = defineProps<{
   isPending?: boolean;
   /** A fixed id, so another element (an avatar tile) can be a `<label for>` of the same file input. */
   inputId?: string;
+  /** Several files in one pick: they come as one `pickedFiles`; their total size is the consumer's to check. */
+  multiple?: boolean;
 }>();
 /** `attempt`: any pick, before the checks, so a consumer can retire the answer to the previous one. */
-const emit = defineEmits<{ picked: [file: File]; attempt: [] }>();
+const emit = defineEmits<{ picked: [file: File]; pickedFiles: [files: File[]]; attempt: [] }>();
 const generatedId = useId();
 const id = props.inputId ?? generatedId;
 const refusal = ref('');
@@ -24,7 +26,8 @@ const isBusyNoticeShown = ref(false);
 
 function onChange(event: Event) {
   const input = event.target as HTMLInputElement;
-  const [file] = input.files ?? [];
+  const files = [...(input.files ?? [])];
+  const [file] = files;
   input.value = '';
   refusal.value = '';
   isBusyNoticeShown.value = false;
@@ -34,6 +37,10 @@ function onChange(event: Event) {
     return;
   }
   emit('attempt');
+  if (props.multiple) {
+    emit('pickedFiles', files);
+    return;
+  }
   if (props.maxBytes !== undefined && file.size > props.maxBytes) {
     refusal.value = formatFileSize(props.maxBytes);
     return;

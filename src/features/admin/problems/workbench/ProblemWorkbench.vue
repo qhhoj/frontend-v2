@@ -176,12 +176,12 @@ watch(report, async (parts) => {
 });
 
 /** What the bar says changed: "Thông tin 2 · Đề bài 1". */
-const changedText = computed(() => {
-  const changed = (['info', 'statement', 'tests'] as const)
-    .filter((id) => changes.value[id] > 0)
-    .map((id) => `${t(`${KEY}.sections.${id}`)} ${changes.value[id]}`);
-  return changed.length ? changed.join(' · ') : undefined;
-});
+const changedParts = computed(() =>
+  (['info', 'statement', 'tests'] as const).map((id) => ({
+    label: t(`${KEY}.sections.${id}`),
+    count: changes.value[id],
+  })),
+);
 /** Only the page form's own submit saves: a dialog's form inside a section must not. */
 function submit(event: Event) {
   if (event.target === event.currentTarget) void save();
@@ -314,7 +314,7 @@ const listLink = computed(() => ({ to: { name: 'admin-problems' }, label: t(`${K
       :dirty-count="dirtyCount"
       :pending="isSaving"
       :saved-at="savedAt"
-      :note="changedText"
+      :changed-parts="changedParts"
       @discard="discard"
     />
     <AdminLeaveGuard :dirty-count="guardedCount" />

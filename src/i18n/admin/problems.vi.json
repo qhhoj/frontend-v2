@@ -46,7 +46,7 @@
       "languageTitle": "Giới hạn riêng theo ngôn ngữ",
       "languageColumn": "Ngôn ngữ",
       "timeColumn": "Thời gian (giây)",
-      "memoryColumn": "Bộ nhớ (KiB)",
+      "memoryColumn": "Bộ nhớ (MB)",
       "pickLanguage": "Chọn ngôn ngữ",
       "addLimit": "Thêm giới hạn",
       "removeLimit": "Bỏ giới hạn {language}",
@@ -200,14 +200,13 @@
   "data": {
     "badJson": "JSON chưa hợp lệ.",
     "archive": {
-      "title": "Gói dữ liệu",
-      "lead": "Gói zip, init.yml và các tệp trong gói.",
-      "none": "Chưa có gói dữ liệu",
+      "none": "Chưa có gói test",
       "initMade": "init.yml đã tạo",
       "initMissing": "Chưa có init.yml",
       "more": "còn {count} tệp",
       "viewInit": "Xem init.yml",
-      "note": "Tệp trong gói chỉ để chọn tên test; tải về qua liên kết riêng, không bao giờ hiển thị trực tiếp."
+      "current": "Gói hiện tại:",
+      "fileCount": "{count} tệp"
     },
     "init": {
       "title": "init.yml"
@@ -244,24 +243,16 @@
     },
     "cases": {
       "title": "Danh sách test",
-      "count": "{count} test",
       "countOver": "{count} test, vượt ngưỡng khuyến nghị {soft}.",
       "hardLimit": "Cần quyền “{permission}” để có tới {max} test; tài khoản này theo giới hạn thường.",
-      "legend": "C: test lẻ · S: mở nhóm có điểm · E: đóng nhóm. Điểm của nhóm là điểm cả nhóm.",
       "addCase": "Thêm test",
       "addBatch": "Thêm nhóm",
       "columns": {
-        "type": "Loại",
         "input": "Tệp input",
         "output": "Tệp output",
         "points": "Điểm",
-        "options": "Tùy chọn",
-        "order": "Thứ tự"
-      },
-      "types": {
-        "C": "C · test lẻ",
-        "S": "S · mở nhóm",
-        "E": "E · đóng nhóm"
+        "test": "Test",
+        "actions": "Thao tác"
       },
       "batchLabel": "Nhóm {n}",
       "pretest": "Pretest",
@@ -269,18 +260,43 @@
       "caseChecker": "Checker riêng",
       "caseCheckerInherit": "Theo bài",
       "caseArgs": "Tham số checker của test (JSON)",
-      "moveUp": "Chuyển test {row} lên",
-      "moveDown": "Chuyển test {row} xuống",
-      "remove": "Bỏ test {row}",
-      "rowLabel": "Test {row}",
       "warnings": {
         "missingFile": "thiếu tệp {file}",
         "unclosedBatch": "nhóm chưa đóng",
-        "strayEnd": "E không có S"
+        "strayEnd": "dấu đóng nhóm không có nhóm mở"
       },
-      "badJsonRows": "Sửa JSON chưa hợp lệ ở test {rows} trước khi lưu.",
+      "badJsonRows": "Sửa JSON chưa hợp lệ ở {rows} trước khi lưu.",
       "overMax": "Quá giới hạn {max} dòng; lưu sẽ bị từ chối. Bớt test hoặc nhóm.",
-      "autofill": "Tạo test từ gói zip"
+      "autofill": "Tạo test từ gói",
+      "groupRule": "phải đúng cả nhóm mới có điểm",
+      "groupPoints": "Điểm của nhóm {n}",
+      "inputOf": "Tệp input của test {row}",
+      "outputOf": "Tệp output của test {row}",
+      "pointsOf": "Điểm của test {row}",
+      "scoredByGroup": "Tính theo điểm của nhóm",
+      "hasOptions": "Tùy chọn riêng",
+      "pretestHint": "Test chạy trước trong kỳ thi có pretest.",
+      "strayEnd": "Dấu đóng nhóm thừa (không có nhóm nào đang mở)",
+      "removeStrayEnd": "Gỡ dấu đóng nhóm thừa",
+      "empty": "Chưa có test nào. Kéo tệp vào ô phía trên, hoặc thêm test bằng tay.",
+      "menu": {
+        "test": "Thao tác với test {row}",
+        "group": "Thao tác với nhóm {n}",
+        "testOptions": "Tùy chọn của test",
+        "groupOptions": "Tùy chọn của nhóm",
+        "hideOptions": "Ẩn tùy chọn",
+        "testUp": "Chuyển test {row} lên",
+        "testDown": "Chuyển test {row} xuống",
+        "testRemove": "Gỡ test {row}",
+        "groupUp": "Chuyển nhóm {n} lên",
+        "groupDown": "Chuyển nhóm {n} xuống",
+        "groupRemove": "Gỡ nhóm {n}, giữ các test",
+        "groupAdd": "Thêm test vào nhóm {n}"
+      },
+      "rowName": {
+        "test": "test {n}",
+        "group": "nhóm {n}"
+      }
     },
     "errors": {
       "fileName": "Tên tệp tối đa 100 ký tự và không chứa ký tự NUL.",
@@ -289,37 +305,26 @@
       "argsTotal": "Tổng tham số của các test quá 1 MiB; hãy rút ngắn."
     },
     "autofill": {
-      "title": "Tạo test từ gói zip",
-      "found": "Tìm thấy {count} cặp input/output",
       "rules": "Đặt tên tệp theo một trong các dạng: 1.in + 1.out, test01/bai.inp + test01/bai.out, input1.txt + output1.txt. Input có đuôi .in, .inp hoặc bắt đầu bằng input; output có đuôi .out, .ans, .ok hoặc bắt đầu bằng output.",
-      "modeLegend": "Danh sách đang có test",
+      "modeLegend": "Cách đưa test vào bảng",
       "modes": {
-        "append": "Thêm vào sau {count} test hiện có",
-        "replace": "Thay {count} test hiện có"
+        "append": "Thêm sau {count} test đã có",
+        "replace": "Thay {count} test đã có"
       },
       "skipped": "Bỏ qua {count} cặp đã có trong danh sách.",
       "total": "Tổng điểm",
       "totalHint": "Chia đều cho các test, phần dư cộng vào các test cuối. Sửa điểm từng test sau khi tạo.",
-      "previewLabel": "Các test sẽ tạo",
       "unpaired": "{count} tệp chưa ghép được",
       "unpairedHint": "Các tệp này sẽ không thành test. Kiểm tra tên: input và output của một test phải cùng thư mục và cùng tên gốc.",
       "others": "{count} tệp khác (không phải input/output)",
-      "apply": "Thêm {count} test",
-      "applyReplace": "Thay bằng {count} test",
-      "applied": "Đã thêm {count} test. Bấm “Lưu cấu hình” để lưu.",
-      "appliedReplace": "Đã thay bằng {count} test. Bấm “Lưu cấu hình” để lưu.",
-      "skip": "Bỏ qua, tự thêm test"
+      "applied": "Đã thêm {count} test từ gói, chưa lưu.",
+      "appliedReplace": "Đã thay bằng {count} test từ gói, chưa lưu.",
+      "nothingNew": "Cả {count} cặp tệp của gói đã có trong bảng; không thêm test nào.",
+      "noPairs": "Gói chưa có cặp input/output nào ghép được."
     },
     "config": {
-      "checkerTitle": "Trình chấm",
-      "checkerDescription": "Cách so output của bài nộp với đáp án của từng test.",
-      "familyLegend": "Loại trình chấm",
+      "familyLegend": "Loại checker",
       "family": {
-        "stock": {
-          "label": "Có sẵn",
-          "description": "Đúng với hầu hết bài; không cần tải tệp.",
-          "otherRule": "Quy tắc có sẵn. Đổi quy tắc ở tab Nâng cao."
-        },
         "testlib": {
           "label": "Testlib",
           "description": "Checker C++ viết bằng testlib.h (registerTestlibCmd)."
@@ -397,9 +402,7 @@
       "percentage": "Điểm checker là phần trăm",
       "percentageHint": "Bật: “points 50” là 50% điểm test. Tắt: “points N” là N điểm của test.",
       "themisHint": "Checker tìm file theo tên trong mã nguồn của nó và theo tên file vào/ra bên dưới. Nếu checker dùng tên file của bài, chọn “Qua file”.",
-      "graderTitle": "Cách chạy bài",
-      "graderDescription": "Bài nộp đọc dữ liệu và trả kết quả như thế nào.",
-      "graderLegend": "Kiểu bài",
+      "graderLegend": "Kiểu bài nộp",
       "grader": {
         "standard": {
           "label": "Chuẩn",
@@ -418,20 +421,17 @@
           "description": "Thí sinh nộp file kết quả, không nộp mã nguồn."
         }
       },
-      "ioLegend": "Nhập/xuất",
       "io": {
         "standard": {
-          "label": "stdin / stdout",
-          "description": "Đọc từ bàn phím, in ra màn hình."
+          "label": "Bàn phím và màn hình"
         },
         "file": {
-          "label": "Qua file",
-          "description": "Đọc và ghi các file có tên cố định."
+          "label": "Tệp"
         }
       },
-      "io_input_file": "Tên file input",
+      "io_input_file": "Tệp vào",
       "io_input_fileHint": "Ví dụ: SUM.INP",
-      "io_output_file": "Tên file output",
+      "io_output_file": "Tệp ra",
       "io_output_fileHint": "Ví dụ: SUM.OUT",
       "interactorFile": "Interactor (.cpp, testlib)",
       "interactorMissing": "Chưa có interactor. Bài sẽ không chấm được cho tới khi tải lên.",
@@ -439,8 +439,6 @@
       "headerFile": "Header (.h)",
       "allowMain": "Cho phép thí sinh tự viết main",
       "allowMainHint": "Tắt: bài nộp có hàm main sẽ bị từ chối.",
-      "advancedTitle": "Tùy chọn nâng cao",
-      "advancedDescription": "Hiếm khi cần đổi.",
       "outputLimitHint": "Số byte output tối đa. Để trống: mặc định của máy chấm.",
       "outputPrefixHint": "Số byte đầu của output được lưu để xem lại.",
       "unicodeHint": "Coi khoảng trắng Unicode là khoảng trắng khi so sánh.",
@@ -459,10 +457,14 @@
         "log": "Nhật ký biên dịch",
         "reason": "Lý do"
       },
-      "checkerOptionsTitle": "Trình chấm chi tiết",
-      "checkerOptionsDescription": "Quy tắc so sánh và các tùy chọn của nó; loại trình chấm chọn ở tab Cơ bản.",
-      "checkerNoOptions": "Loại trình chấm này không có tùy chọn thêm.",
-      "ioOtherGrader": "Bài kiểu “{grader}” không đọc input theo cách này. Đổi kiểu bài ở tab Nâng cao."
+      "ioOtherGrader": "Bài kiểu “{grader}” không đọc input theo cách này.",
+      "compare": {
+        "label": "So sánh kết quả",
+        "stock": "So khớp đáp án",
+        "custom": "Checker riêng",
+        "interactive": "Tương tác",
+        "otherRule": "Quy tắc đang dùng: {rule}. Đổi ở “Tùy chọn khác”."
+      }
     },
     "basic": {
       "summary": "{count} test · tổng {points} điểm",
@@ -478,12 +480,29 @@
       "resume": "Tiếp tục tải lên",
       "chunk": "phần {number}/{count}",
       "finishing": "Đang hoàn tất trên máy chủ, không thể hủy nữa."
+    },
+    "drop": {
+      "title": "Kéo thả tệp .zip hoặc các tệp input, output vào đây",
+      "hint": "Tên cặp tệp được ghép tự động (1.inp và 1.out, test01/…). Tệp lớn được tải theo từng phần và tiếp tục được khi mất mạng.",
+      "pick": "Chọn tệp",
+      "packing": "Đang gói các tệp thành một tệp zip…",
+      "refused": {
+        "empty": "Chưa có tệp nào được chọn.",
+        "mixed": "Chọn một tệp .zip, hoặc các tệp input, output lẻ; không trộn cả hai.",
+        "duplicate": "Hai tệp trùng tên “{name}”. Mỗi tệp trong gói cần một tên riêng.",
+        "tooMany": "Quá nhiều tệp lẻ cho một gói. Hãy nén thành tệp .zip rồi tải lên.",
+        "tooLarge": "Quá giới hạn {max} của một gói test.",
+        "folder": "Chưa nhận được thư mục. Hãy chọn các tệp bên trong, hoặc nén thư mục thành tệp .zip.",
+        "unreadable": "Không đọc được một tệp đã chọn. Hãy chọn lại."
+      },
+      "replaceTitle": "Bài đã có gói test “{archive}”",
+      "replaceBody": "Máy chủ chỉ giữ một gói và không gộp thêm tệp lẻ vào gói đã có. Nếu tiếp tục, {count} tệp vừa chọn thay toàn bộ {stored} tệp của gói hiện tại.",
+      "replaceConfirm": "Thay gói test bằng {count} tệp này",
+      "replaceZipBody": "Máy chủ chỉ giữ một gói. Nếu tiếp tục, tệp “{name}” thay toàn bộ {stored} tệp của gói hiện tại.",
+      "replaceZipConfirm": "Thay gói test hiện tại bằng {name}"
     }
   },
   "uploads": {
-    "archive": {
-      "upload": "Tải gói test (.zip)"
-    },
     "sources": {
       "title": "Tệp nguồn kèm theo",
       "generator": "Bộ sinh test (generator)",
@@ -636,7 +655,7 @@
     "tests": {
       "judging": "Cách chấm",
       "ioTitle": "Học sinh đọc và ghi bằng",
-      "advanced": "Tùy chọn nâng cao",
+      "advanced": "Tùy chọn khác",
       "total": "{tests} test · {groups} nhóm · tổng {sum} / {points} điểm",
       "totalOff": "Tổng điểm của test khác điểm của bài."
     },

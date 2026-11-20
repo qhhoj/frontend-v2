@@ -1,16 +1,16 @@
 import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
 import type { DataForm } from './test-cases';
+import { shownRowsOf } from './test-table';
 
-/** Keys of the test rows whose args box holds text that is not a JSON object, and the row numbers they show as. */
+/** Keys of the table rows (tests and groups) whose args box holds text that is not a JSON object, and those rows as the table shows them. */
 export function useInvalidArgs(form: Ref<DataForm | null>) {
   const invalidKeys = ref<number[]>([]);
-  const badRowNumbers = computed(
-    () =>
-      form.value?.cases.flatMap((row, index) =>
-        invalidKeys.value.includes(row.key) ? [index + 1] : [],
-      ) ?? [],
+  const badRows = computed(() =>
+    form.value ? shownRowsOf(form.value.cases, invalidKeys.value) : [],
   );
+  /** One number per row to fix: tests and groups each count on their own, so use `badRows` to name them. */
+  const badRowNumbers = computed(() => badRows.value.map((shown) => shown.number));
 
   function markInvalid(key: number, isInvalid: boolean) {
     invalidKeys.value = isInvalid
@@ -18,5 +18,5 @@ export function useInvalidArgs(form: Ref<DataForm | null>) {
       : invalidKeys.value.filter((existing) => existing !== key);
   }
 
-  return { badRowNumbers, markInvalid };
+  return { badRows, badRowNumbers, markInvalid };
 }

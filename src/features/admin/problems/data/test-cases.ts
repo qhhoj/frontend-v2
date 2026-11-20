@@ -202,6 +202,9 @@ export function moveCase(cases: KeyedCase[], index: number, offset: -1 | 1): Key
 export const removeCase = (cases: KeyedCase[], index: number): KeyedCase[] =>
   cases.filter((_row, position) => position !== index);
 
+/** A blank single test with its own key, for a list operation that places it itself. */
+export const newCase = (): KeyedCase => keyed(blankCase('C'));
+
 export const caseCount = (cases: TestCase[]) =>
   cases.filter((testCase) => testCase.type === 'C').length;
 

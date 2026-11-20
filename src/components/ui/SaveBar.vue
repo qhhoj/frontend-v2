@@ -12,7 +12,8 @@ import type { SaveBarProps } from './SaveBar.props';
 /**
  * The one save bar of a form: sticky to the bottom of the content column (z-savebar).
  * Left: "3 thay đổi chưa lưu", "Đã lưu lúc 14:02" for 3 s after a save, or why saving is not possible, in a polite live region
- * (the `status` slot replaces it), then `note` (changes elsewhere on the page that the leave guard also counts) and `immediateNote`
+ * (the `status` slot replaces it), then `note` (changes elsewhere on the page that the leave guard also counts), `changedParts`
+ * (the parts of a page with several sections that hold the changes: "Thông tin 2 · Đề bài 1") and `immediateNote`
  * (what applies at once, without Save). "Hủy thay đổi" asks first when more than one change is pending. A page bar with nothing to say (no change, no save running,
  * no error, no note) is not rendered at any width: it slides in on the first change and keeps the focused field above itself.
  * `allowClean` forms always show it.
@@ -30,6 +31,7 @@ const props = withDefaults(defineProps<SaveBarProps>(), {
   allowClean: false,
   blockedReason: undefined,
   note: undefined,
+  changedParts: undefined,
   immediateNote: undefined,
   saveLabel: undefined,
   form: undefined,
@@ -68,6 +70,14 @@ const statusText = computed(() => {
   if (savedTime.value) return t('form.saveBar.savedAt', { time: savedTime.value });
   return props.allowClean || props.note ? '' : t('form.saveBar.clean');
 });
+
+/** "Thông tin 2 · Đề bài 1": only the parts that hold a change. */
+const changedPartsText = computed(() =>
+  (props.changedParts ?? [])
+    .filter((part) => part.count > 0)
+    .map((part) => `${part.label} ${part.count}`)
+    .join(' · '),
+);
 
 const isShown = computed(() => props.variant === 'footer' || props.allowClean || !isIdle.value);
 
@@ -183,8 +193,17 @@ function keepFocusAbove() {
           <span v-if="statusText || slots.status" aria-hidden="true" class="text-muted">·</span>
           <span class="font-semibold">{{ note }}</span>
         </template>
-        <template v-if="immediateNote">
+        <template v-if="changedPartsText">
           <span v-if="statusText || slots.status || note" aria-hidden="true" class="text-muted"
+            >·</span
+          >
+          <span data-save-changed-parts class="font-semibold">{{ changedPartsText }}</span>
+        </template>
+        <template v-if="immediateNote">
+          <span
+            v-if="statusText || slots.status || note || changedPartsText"
+            aria-hidden="true"
+            class="text-muted"
             >·</span
           >
           <span class="text-muted">{{ immediateNote }}</span>
