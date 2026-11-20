@@ -31,6 +31,7 @@ import type { NumberedComment } from './comment-order';
 import { quoteOf } from './comment-quote';
 import { canReplyTo, composerStateOf } from './composer-state';
 import { useCommentPageQuery, useCommentWrites } from './comments.queries';
+import { useCommentModeration } from './use-comment-moderation';
 import { useCommentJump } from './use-comment-jump';
 
 /**
@@ -165,63 +166,23 @@ async function reloadAfterConflict() {
   editFailure.value = null;
 }
 
-// Moderation: hide one comment (with its replies), lock or unlock the page.
-const hideTarget = ref<NumberedComment | null>(null);
-const isHideOpen = ref(false);
-const hideFailed = ref(false);
-function askHide(entry: NumberedComment) {
-  hideTarget.value = entry;
-  hideFailed.value = false;
-  isHideOpen.value = true;
-}
-async function confirmHide() {
-  if (!hideTarget.value) return;
-  try {
-    await writes.hide.mutateAsync(hideTarget.value.comment.id);
-    isHideOpen.value = false;
-  } catch {
-    hideFailed.value = true;
-  }
-}
-const lockFailed = ref(false);
-async function toggleLock() {
-  if (!data.value) return;
-  lockFailed.value = false;
-  try {
-    await writes.setLocked.mutateAsync(!data.value.pageLocked);
-  } catch {
-    lockFailed.value = true;
-  }
-}
-
-const unhideFailedId = ref<string | null>(null);
-async function unhide(entry: NumberedComment) {
-  unhideFailedId.value = null;
-  try {
-    await writes.unhide.mutateAsync(entry.comment.id);
-  } catch {
-    unhideFailedId.value = entry.comment.id;
-  }
-}
-
-// Delete (the author, or a moderator): a confirm, then the placeholder.
-const deleteTarget = ref<NumberedComment | null>(null);
-const isDeleteOpen = ref(false);
-const deleteFailed = ref(false);
-function askDelete(entry: NumberedComment) {
-  deleteTarget.value = entry;
-  deleteFailed.value = false;
-  isDeleteOpen.value = true;
-}
-async function confirmDelete() {
-  if (!deleteTarget.value) return;
-  try {
-    await writes.remove.mutateAsync(deleteTarget.value.comment.id);
-    isDeleteOpen.value = false;
-  } catch {
-    deleteFailed.value = true;
-  }
-}
+// Moderation and delete: hide or unhide a comment, lock the page, delete behind a confirm.
+const {
+  hideTarget,
+  isHideOpen,
+  hideFailed,
+  askHide,
+  confirmHide,
+  lockFailed,
+  toggleLock,
+  unhideFailedId,
+  unhide,
+  deleteTarget,
+  isDeleteOpen,
+  deleteFailed,
+  askDelete,
+  confirmDelete,
+} = useCommentModeration(writes, () => data.value?.pageLocked ?? null);
 
 // Report: a dialog, then a thank-you line.
 const reportTarget = ref<NumberedComment | null>(null);
