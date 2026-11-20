@@ -52,7 +52,7 @@ const isNotFound = computed(
 
 usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : problem.value?.name));
 
-/** The in-place editor is open: the contest's problem list folds to give it room. */
+/** The side panel stands beside the statement: the contest's problem list starts folded, so the statement keeps its width. */
 const panelOpen = ref(false);
 const { isCollapsed: railCollapsed, toggle: toggleRail } = useProblemRailCollapse(panelOpen);
 const layout = computed(

@@ -55,9 +55,6 @@ const isSignedIn = computed(() => session.status === 'authenticated');
 const usesSheet = useMediaQuery(() => props.layout.stacked);
 /** The editor and the sheet start closed, so the statement is what the viewer sees first; the panel's button opens them. */
 const submitOpen = ref(false);
-/** The in-place editor is open (the contest's problem list folds to give it room). */
-const paneIsOpen = computed(() => isSignedIn.value && !usesSheet.value && submitOpen.value);
-watch(paneIsOpen, (isOpen) => emit('panel', isOpen), { immediate: true });
 /** The side panel sticks under whatever bar stays at the top: the impersonation banner, else the contest bar. */
 const IMPERSONATION_BANNER_HEIGHT = '3.5rem';
 const stickyTop = computed(() => ({
@@ -101,6 +98,9 @@ const tabItems = computed(() =>
 );
 /** The statement and the editorial are the frame's own panels; the submission tabs hand the space to the child route. */
 const isFramePanel = computed(() => props.tab === DEFAULT_TAB || props.tab === 'editorial');
+/** The side panel stands beside the statement: the contest's problem list folds to leave the statement its width. */
+const hasPanelBeside = computed(() => isFramePanel.value && !usesSheet.value);
+watch(hasPanelBeside, (isBeside) => emit('panel', isBeside), { immediate: true });
 </script>
 
 <template>

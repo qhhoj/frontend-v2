@@ -32,6 +32,17 @@ const crumbs = computed<PageCrumb[]>(() => {
 <template>
   <div data-testid="problem-header" class="contents">
     <PageHeader :title="problem.name" :crumbs="crumbs">
+      <!-- A phone has no crumb trail: the contest and the label stay over the title there. -->
+      <template v-if="contest && contestProblem" #above>
+        <p class="text-small text-muted md:hidden">
+          <RouterLink
+            :to="{ name: 'contest', params: { key: contest.key } }"
+            class="hover:text-content hover:underline"
+            >{{ contest.name }}</RouterLink
+          >
+          / {{ $t('problem.contestLabel', { label: contestProblem.label }) }}
+        </p>
+      </template>
       <template v-if="$slots.actions" #actions><slot name="actions" /></template>
       <template v-if="$slots.default" #tabs><slot /></template>
     </PageHeader>
