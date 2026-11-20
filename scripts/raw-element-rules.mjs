@@ -53,7 +53,6 @@ export const VERDICT_PARTS = [
   'features/contests/ranking-cell-classes.ts',
   'features/contests/ContestProblemSwitcher.vue',
   'features/problems/viewer-status.ts',
-  'features/problems/ProblemStatusMark.vue',
   'features/profile/ProfileSolvedTab.vue',
   'features/appearance/AppearancePreview.vue',
   'components/ui/StatusStepper.vue',

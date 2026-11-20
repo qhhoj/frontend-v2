@@ -1198,8 +1198,8 @@
     "tabs": {
       "statement": "Statement",
       "editorial": "Editorial",
-      "submissions": "Submissions",
-      "mine": "Mine",
+      "submissions": "All submissions",
+      "mine": "My submissions",
       "best": "Best"
     },
     "menu": {
@@ -1212,7 +1212,14 @@
     "limits": {
       "time": "Time",
       "memory": "Memory",
-      "points": "Points"
+      "points": "Points",
+      "title": "Limits",
+      "inputFile": "Input file",
+      "outputFile": "Output file",
+      "fileWarning": "This problem reads and writes files, not the keyboard and the screen.",
+      "solvers": "{count} solver | {count} solvers",
+      "perLanguage": "Limits per language",
+      "judgedOn": "Judged on"
     },
     "noStatement": {
       "title": "No statement yet",
@@ -1236,11 +1243,7 @@
     "rail": {
       "railLabel": "Problem info",
       "facts": {
-        "io": "Input/Output",
-        "input": "Input",
-        "output": "Output",
         "status": "Status",
-        "untried": "Not tried",
         "contestPoints": "Contest points"
       },
       "mine": {
@@ -1254,12 +1257,11 @@
       }
     },
     "pdfRender": "Download PDF",
-    "externalJudge": "Judged on {oj}",
     "strip": {
       "partial": "partial",
-      "acRate": "AC rate",
-      "solvers": "Solvers"
-    }
+      "acRate": "AC rate"
+    },
+    "contestLabel": "Problem {label}"
   },
   "problems": {
     "title": "Problems",
@@ -1319,7 +1321,6 @@
       "solvedOnly": "{solved} problems"
     },
     "solvedFilter": {
-      "prefix": "Status",
       "label": "Filter by solved",
       "any": "All",
       "unsolved": "Unsolved",

@@ -4,14 +4,14 @@ import VerdictRing from '@/features/submissions/VerdictRing.vue';
 import type { ProblemDetail } from '@/api/types/problems';
 import SubmitForm from './SubmitForm.vue';
 import SubmitSheetHeader from './SubmitSheetHeader.vue';
-import SubmitSignInLink from './SubmitSignInLink.vue';
+import SubmitSignInButton from './SubmitSignInButton.vue';
 import { useDockHeight } from './use-dock-height';
 import type { useSubmitForm } from './use-submit-form';
 
 const SHEET_ID = 'submit-sheet';
 /** The bar and the open sheet are one surface in two sizes, on the page column: beside the rail, above the phone's tab bar. */
 const SHEET_SURFACE =
-  'fixed right-0 bottom-[var(--tab-bar-height,0px)] left-[var(--shell-rail,0px)] z-30 rounded-t-card border-t border-line-accent bg-surface-solid pb-(--shell-inset-bottom)';
+  'fixed right-0 bottom-[var(--tab-bar-height,0px)] left-[var(--shell-rail,0px)] z-30 rounded-t-card border-t border-line bg-surface-solid pb-(--shell-inset-bottom)';
 const props = defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;
@@ -43,7 +43,7 @@ watch(isExpanded, async (expanded) => {
     :aria-label="$t('submit.title')"
     :class="SHEET_SURFACE"
   >
-    <SubmitSignInLink v-if="!isSignedIn" class="px-4 py-1" />
+    <div v-if="!isSignedIn" class="px-4 py-2"><SubmitSignInButton /></div>
     <template v-else>
       <SubmitSheetHeader
         ref="header"

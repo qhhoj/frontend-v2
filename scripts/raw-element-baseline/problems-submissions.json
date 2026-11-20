@@ -2,10 +2,6 @@
   "features/problems/FileDropzone.vue": {
     "file": 1
   },
-  "features/problems/FilterToggle.vue": {
-    "button": 1,
-    "disabled-opacity": 1
-  },
   "features/problems/PdfButton.vue": {
     "hardcoded-script-value": 1
   },
@@ -27,9 +23,6 @@
   "features/problems/SourceUploadButton.vue": {
     "file": 1
   },
-  "features/problems/StatementSkeleton.vue": {
-    "hardcoded-value": 1
-  },
   "features/problems/SubmitForm.vue": {
     "status-colour": 3
   },
@@ -38,9 +31,6 @@
   },
   "features/problems/SubmitSheet.vue": {
     "hardcoded-value": 1
-  },
-  "features/problems/problem-layout.ts": {
-    "hardcoded-value": 2
   },
   "features/problems/use-pdf-statement.ts": {
     "hardcoded-script-value": 1

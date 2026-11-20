@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import { IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import InlineBit from '@/components/InlineBit.vue';
-import Disclosure from '@/components/ui/Disclosure.vue';
+import Card from '@/components/ui/Card.vue';
 import SeeAllLink from '@/components/ui/SeeAllLink.vue';
+import StretchedLink from '@/components/ui/StretchedLink.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import StateBit from '@/components/StateBit.vue';
 import StatusStepper from '@/components/ui/StatusStepper.vue';
 import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { GLOBAL_SCOPE } from '@/features/submissions/list/submission-scope';
@@ -29,9 +29,10 @@ const SHOWN = 3;
 const CLOCK_TICK_MS = 60_000;
 const NO_SCORE = '–';
 /**
- * The signed-in viewer's last three submissions to this problem. Each scores on its own submission's scale: the
- * contest's points, labelled like the submission page, when it was made in a contest, else the problem's, labelled too.
- * `scale` is the viewer's contest, which alone says what a contest row is out of.
+ * The signed-in viewer's last three submissions to this problem, a card of the side panel: per row the verdict (lamp and
+ * code), the score and when; the whole row opens the submission. Each scores on its own submission's scale: the contest's
+ * points, labelled like the submission page, when it was made in a contest, else the problem's, labelled too. `scale` is
+ * the viewer's contest, which alone says what a contest row is out of.
  */
 const props = defineProps<{ code: string; scale: ScoreScale }>();
 const { t } = useI18n();
@@ -54,10 +55,6 @@ const {
   refetch,
 } = useScopedSubmissionListQuery(GLOBAL_SCOPE, filters);
 const latest = computed(() => list.value?.items.slice(0, SHOWN) ?? []);
-const isJudging = computed(() => {
-  const first = latest.value[0];
-  return first !== undefined && IN_PROGRESS_STATUSES.includes(first.status);
-});
 /** The cue of a judged score: full at the maximum, zero at nothing, partial between; none while unjudged or when the maximum is unknown. */
 function scoreTone(points: number | null, max: number | null): CueTone | null {
   if (points === null) return null;
@@ -79,69 +76,51 @@ function scoreParts(submission: SubmissionListItem) {
   const value = points === null ? NO_SCORE : format(scoreBelowFull(points, max, digits));
   return { value, outOf, scale, tone: scoreTone(points, max) };
 }
-/** The folded row's summary is the newest submission: its verdict and score, so the closed row already answers "how did I do". */
 const rows = computed(() =>
   latest.value.map((submission) => ({ submission, score: scoreParts(submission) })),
 );
-const newest = computed(() => rows.value[0] ?? null);
-const isOpen = ref(false);
 </script>
 
 <template>
-  <div class="border-t border-line" data-testid="rail-my-submissions">
-    <Disclosure v-model:open="isOpen" :label="$t('problem.rail.mine.title')">
-      <template #summary>
-        <StateBit v-if="isJudging" variant="judging" size="tiny" />
-        <template v-else-if="newest">
-          <VerdictChip :verdict="submissionVerdictOf(newest.submission)" />
-          <span
-            :class="[
-              'font-mono text-meta font-bold tabular-nums',
-              newest.score.tone && CUE_TEXT[newest.score.tone],
-            ]"
-            >{{ newest.score.value }}</span
-          >
-        </template>
+  <Card padding="md" :title="$t('problem.rail.mine.title')" data-testid="rail-my-submissions">
+    <template #actions>
+      <SeeAllLink
+        :to="{ name: 'submissions', query: { problem: code, user: session.user?.username } }"
+        >{{ $t('common.viewAll') }}</SeeAllLink
+      >
+    </template>
+    <QueryState :loading="isPending" :error="error" @retry="refetch()">
+      <template #skeleton>
+        <SkeletonBlock v-for="row in SHOWN" :key="row" class="h-(--qh-row)" />
       </template>
-      <QueryState :loading="isPending" :error="error" @retry="refetch()">
-        <template #skeleton>
-          <SkeletonBlock v-for="row in SHOWN" :key="row" class="h-11" />
-        </template>
-        <p v-if="!latest.length" class="flex items-center gap-2 text-sm text-muted">
-          <InlineBit kind="asleep" />{{ $t('problem.noSubmissions') }}
-        </p>
-        <ol v-else class="flex flex-col">
-          <li
-            v-for="{ submission, score } in rows"
-            :key="submission.id"
-            class="flex min-h-11 items-center gap-2.5 border-t border-line"
-          >
-            <RouterLink :to="{ name: 'submission', params: { id: submission.id } }">
-              <StatusStepper
-                v-if="IN_PROGRESS_STATUSES.includes(submission.status)"
-                :status="submission.status"
-                compact
-              />
-              <VerdictChip v-else :verdict="submissionVerdictOf(submission)" />
-            </RouterLink>
-            <p :data-scale="score.scale" :title="submission.contest?.name" class="min-w-0">
-              <span
-                :class="['font-mono font-bold tabular-nums', score.tone && CUE_TEXT[score.tone]]"
-                >{{ score.value }}</span
-              >{{ ' '
-              }}<span class="text-meta whitespace-nowrap text-muted">{{ score.outOf }}</span>
-            </p>
-            <time :datetime="submission.date" class="ml-auto text-meta text-muted">{{
-              formatAgoCompact(submission.date, now, locale.locale)
-            }}</time>
-          </li>
-        </ol>
-        <SeeAllLink
-          :to="{ name: 'submissions', query: { problem: code, user: session.user?.username } }"
-          class="mt-2"
-          >{{ $t('common.viewAll') }}</SeeAllLink
+      <p v-if="!latest.length" class="flex items-center gap-2 text-meta text-muted">
+        <InlineBit kind="asleep" />{{ $t('problem.noSubmissions') }}
+      </p>
+      <ol v-else class="-mx-(--qh-pad-surface) -mb-(--qh-pad-surface) flex flex-col">
+        <li
+          v-for="{ submission, score } in rows"
+          :key="submission.id"
+          class="box-link flex min-h-(--qh-row) items-center gap-2 border-t border-line px-(--qh-pad-surface) last:rounded-b-card"
         >
-      </QueryState>
-    </Disclosure>
-  </div>
+          <StretchedLink :to="{ name: 'submission', params: { id: submission.id } }">
+            <StatusStepper
+              v-if="IN_PROGRESS_STATUSES.includes(submission.status)"
+              :status="submission.status"
+              compact
+            />
+            <VerdictChip v-else :verdict="submissionVerdictOf(submission)" />
+          </StretchedLink>
+          <p :data-scale="score.scale" :title="submission.contest?.name" class="min-w-0 truncate">
+            <span
+              :class="['font-mono font-bold tabular-nums', score.tone && CUE_TEXT[score.tone]]"
+              >{{ score.value }}</span
+            >{{ ' ' }}<span class="text-small whitespace-nowrap text-muted">{{ score.outOf }}</span>
+          </p>
+          <time :datetime="submission.date" class="ml-auto shrink-0 text-small text-muted">{{
+            formatAgoCompact(submission.date, now, locale.locale)
+          }}</time>
+        </li>
+      </ol>
+    </QueryState>
+  </Card>
 </template>
