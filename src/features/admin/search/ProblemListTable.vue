@@ -167,7 +167,7 @@ const menuItems = (code: string) =>
           :title="gapText(row)"
           :aria-label="`${$t('admin.problemList.setup.unfinished')}. ${gapText(row)}`"
         >
-          <template #icon><CircleAlert aria-hidden="true" class="text-warning" /></template>
+          <template #icon><CircleAlert aria-hidden="true" class="text-cue-attention" /></template>
           {{ $t('admin.problemList.setup.unfinished') }}
         </AppButton>
       </template>

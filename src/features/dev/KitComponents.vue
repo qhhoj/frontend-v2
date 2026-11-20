@@ -42,7 +42,6 @@ import type { FixtureRow } from './kit-fixtures';
 /** Components of the kit gallery: each kit part in its variants, with fixtures inline (no backend). */
 defineOptions({ name: 'KitComponents' });
 
-const text = ref('Nội dung mẫu');
 const search = ref('');
 const sort = ref<string | undefined>();
 const menuItems = [
