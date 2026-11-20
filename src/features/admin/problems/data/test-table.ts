@@ -36,11 +36,9 @@ export function tableRows(cases: readonly KeyedCase[]): TableRow[] {
   return rows;
 }
 
-/** The numbers the table shows for the tests with these keys, in list order. */
-export const testNumbersOf = (cases: readonly KeyedCase[], keys: readonly number[]) =>
-  tableRows(cases)
-    .filter((shown) => shown.kind === 'test' && keys.includes(shown.row.key))
-    .map((shown) => shown.number);
+/** The table's rows (tests and groups) with these keys, in list order. */
+export const shownRowsOf = (cases: readonly KeyedCase[], keys: readonly number[]) =>
+  tableRows(cases).filter((shown) => keys.includes(shown.row.key));
 
 /** The last row of the group that starts at `start`: its closing `E`, or `start` itself when nothing closes it. */
 export function groupEnd(cases: readonly KeyedCase[], start: number): number {

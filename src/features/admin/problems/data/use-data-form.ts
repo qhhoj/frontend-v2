@@ -37,7 +37,7 @@ export function useDataForm(code: () => string) {
   const errors = computed<FieldErrors>(() =>
     form.value ? { ...checkDataForm(form.value), ...configErrors(form.value) } : {},
   );
-  const { badRowNumbers, markInvalid } = useInvalidArgs(form);
+  const { badRows, badRowNumbers, markInvalid } = useInvalidArgs(form);
 
   /** Nothing typed: no change, and no args box holding text that does not parse. */
   const isClean = () => dirtyCount.value === 0 && badRowNumbers.value.length === 0;
@@ -113,6 +113,7 @@ export function useDataForm(code: () => string) {
     saved,
     errors,
     dirtyCount,
+    badRows,
     badRowNumbers,
     markInvalid,
     validate,

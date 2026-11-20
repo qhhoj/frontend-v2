@@ -265,7 +265,7 @@
         "unclosedBatch": "nhóm chưa đóng",
         "strayEnd": "dấu đóng nhóm không có nhóm mở"
       },
-      "badJsonRows": "Sửa JSON chưa hợp lệ ở test {rows} trước khi lưu.",
+      "badJsonRows": "Sửa JSON chưa hợp lệ ở {rows} trước khi lưu.",
       "overMax": "Quá giới hạn {max} dòng; lưu sẽ bị từ chối. Bớt test hoặc nhóm.",
       "autofill": "Tạo test từ gói",
       "groupRule": "phải đúng cả nhóm mới có điểm",
@@ -292,6 +292,10 @@
         "groupDown": "Chuyển nhóm {n} xuống",
         "groupRemove": "Gỡ nhóm {n}, giữ các test",
         "groupAdd": "Thêm test vào nhóm {n}"
+      },
+      "rowName": {
+        "test": "test {n}",
+        "group": "nhóm {n}"
       }
     },
     "errors": {

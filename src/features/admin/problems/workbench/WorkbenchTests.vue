@@ -42,7 +42,7 @@ const props = defineProps<{
   info: Workbench['info'];
   summary: TestsSummary | null;
 }>();
-const { query, form, errors, badRowNumbers, markInvalid, adopt } = props.data;
+const { query, form, errors, badRows, markInvalid, adopt } = props.data;
 const { form: infoForm } = props.info;
 const KEY = 'admin.problems.workbench.tests';
 const DROP = 'admin.problems.data.drop';
@@ -55,7 +55,7 @@ const autofill = useTemplateRef<InstanceType<typeof CasesAutofill>>('autofill');
  */
 function onStored(saved: ProblemData) {
   adopt(saved);
-  autofill.value?.start(saved.archiveFiles);
+  autofill.value?.start(saved.archiveFiles, form.value?.cases);
 }
 const upload = useTestUpload(
   () => props.problem.code,
@@ -72,13 +72,17 @@ const refusalText = computed(() => {
   });
 });
 
-/** A row whose args box does not parse blocks the save: the table names the tests. */
+/** A row whose args box does not parse blocks the save: the table names the tests and groups. */
 const tableErrors = computed(() =>
-  badRowNumbers.value.length > 0
+  badRows.value.length > 0
     ? {
         ...errors.value,
         cases: translate('admin.problems.data.cases.badJsonRows', {
-          rows: badRowNumbers.value.join(', '),
+          rows: badRows.value
+            .map((shown) =>
+              translate(`admin.problems.data.cases.rowName.${shown.kind}`, { n: shown.number }),
+            )
+            .join(', '),
         }),
       }
     : errors.value,

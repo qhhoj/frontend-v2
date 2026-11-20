@@ -71,10 +71,14 @@ function make(base: KeyedCase[]) {
   };
 }
 
-function start(files?: string[]) {
+/**
+ * `files` and `rows` are for the caller that is ahead of this component's props: after an upload, the answer's file list
+ * and the form's rows as they are now (the form may just have taken the server's list; the model prop still holds the old one).
+ */
+function start(files?: string[], rows?: readonly KeyedCase[]) {
   startedFrom.value = files ?? null;
   if (pairing.value.pairs.length === 0) return;
-  const base = [...toRaw(cases.value)];
+  const base = [...toRaw(rows ?? cases.value)];
   mode.value = base.length > 0 ? 'append' : 'replace';
   total.value = totalPointsOf(props.problemPoints);
   make(base);

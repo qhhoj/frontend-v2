@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { CaseType } from '@/api/types/problem-data';
 import { addBatch, addCase } from './test-cases';
 import type { KeyedCase } from './test-cases';
-import { addCaseToGroup, moveGroup, removeGroup, tableRows, testNumbersOf } from './test-table';
+import { addCaseToGroup, moveGroup, removeGroup, shownRowsOf, tableRows } from './test-table';
 
 /** A list from its letters, each test named after its position: `list('SCE C')`. */
 function list(letters: string): KeyedCase[] {
@@ -42,9 +42,10 @@ describe('tableRows', () => {
     ]);
   });
 
-  it('names tests by the number the table shows', () => {
+  it('finds tests and groups by key, with the number the table shows', () => {
     const rows = list('SCE SCE');
-    expect(testNumbersOf(rows, [rows[4]!.key])).toEqual([2]);
+    const found = shownRowsOf(rows, [rows[4]!.key, rows[3]!.key]);
+    expect(found.map((row) => `${row.kind}${row.number}`)).toEqual(['group2', 'test2']);
   });
 });
 

@@ -265,7 +265,7 @@
         "unclosedBatch": "group not closed",
         "strayEnd": "group end with no open group"
       },
-      "badJsonRows": "Fix the invalid JSON in test {rows} before saving.",
+      "badJsonRows": "Fix the invalid JSON in {rows} before saving.",
       "overMax": "Over the limit of {max} rows; saving will be refused. Remove tests or groups.",
       "autofill": "Create tests from the archive",
       "groupRule": "every test must pass for the group to score",
@@ -292,6 +292,10 @@
         "groupDown": "Move group {n} down",
         "groupRemove": "Remove group {n}, keep its tests",
         "groupAdd": "Add a test to group {n}"
+      },
+      "rowName": {
+        "test": "test {n}",
+        "group": "group {n}"
       }
     },
     "errors": {
