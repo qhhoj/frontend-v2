@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Copy, FileUp, X } from 'lucide-vue-next';
+import { Copy, FileUp, Trash2, X } from 'lucide-vue-next';
 import { ref } from 'vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
@@ -10,13 +10,14 @@ import IconButton from '@/components/ui/IconButton.vue';
 import PageSection from '@/components/ui/PageSection.vue';
 import Readout from '@/components/ui/Readout.vue';
 import SaveBar from '@/components/ui/SaveBar.vue';
+import RadioGroup from '@/components/ui/RadioGroup.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
-import SeeAllLink from '@/components/ui/SeeAllLink.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import SelectField from '@/components/ui/SelectField.vue';
 import StatusStepper from '@/components/ui/StatusStepper.vue';
 import Tabs from '@/components/ui/Tabs.vue';
 import TextArea from '@/components/ui/TextArea.vue';
+import Switch from '@/components/ui/Switch.vue';
 import TextInput from '@/components/ui/TextInput.vue';
 import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { verdictOfCode } from '@/lib/verdicts';
@@ -37,6 +38,8 @@ const search = ref('');
 const name = ref('Dãy con đối xứng');
 const note = ref('Ghi chú của giáo viên');
 const isPartial = ref(true);
+const isLive = ref(true);
+const scoring = ref('best');
 const isLocked = ref(true);
 const dirtyCount = ref(2);
 </script>
@@ -67,10 +70,17 @@ const dirtyCount = ref(2);
           <span class="text-small text-muted">Liên kết: sang trang khác, gạch chân khi rê.</span>
         </div>
         <div class="flex flex-wrap items-center gap-3">
+          <AppButton tone="danger"
+            ><template #icon><Trash2 aria-hidden="true" /></template>Xóa bài</AppButton
+          >
+          <span class="text-small text-muted"
+            >Nguy hiểm: hình nút phụ, chữ và biểu tượng đỏ. Đỏ là một họ: sai, lỗi, xóa.</span
+          >
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
           <AppButton tone="ghost">ghost</AppButton>
-          <AppButton tone="danger">danger</AppButton>
           <AppButton size="lg">lg</AppButton>
-          <span class="text-small text-muted">Tên cũ: vẽ thành nhẹ, phụ, 40 px.</span>
+          <span class="text-small text-muted">Tên cũ: vẽ thành nhẹ, 40 px.</span>
         </div>
       </Card>
 
@@ -101,9 +111,11 @@ const dirtyCount = ref(2);
           >
           <IconButton label="Đóng"><X aria-hidden="true" /></IconButton>
           <IconButton label="Đóng" tone="secondary" size="sm"><X aria-hidden="true" /></IconButton>
+          <IconButton label="Xóa" tone="danger"><Trash2 aria-hidden="true" /></IconButton>
         </div>
         <p class="text-small text-muted">
-          Biểu tượng đứng trước chữ. Nút chỉ có biểu tượng dành cho thanh hẹp và luôn có tên.
+          Biểu tượng đứng trước chữ. Nút chỉ có biểu tượng: mực trung tính, không viền, không tím;
+          luôn có tên và chú thích khi rê.
         </p>
       </Card>
 
@@ -178,6 +190,17 @@ const dirtyCount = ref(2);
           <FormField label="Ghi chú"><TextArea v-model="note" rows="1" /></FormField>
         </div>
         <Checkbox v-model="isPartial" label="Chấm điểm từng phần" />
+        <Switch v-model="isLive" label="Hiện cho học sinh" />
+        <RadioGroup
+          v-model="scoring"
+          legend="Cách tính điểm"
+          name="kit-scoring"
+          inline
+          :options="[
+            { value: 'best', label: 'Lần cao nhất' },
+            { value: 'last', label: 'Lần cuối' },
+          ]"
+        />
         <p class="text-small text-muted">
           Tất cả cao 40 px, cùng viền và bo góc với nút. Đang nhập = viền tím.
         </p>
@@ -218,7 +241,7 @@ const dirtyCount = ref(2);
           <AppButton tone="quiet" size="sm">Sửa</AppButton>
         </template>
         <PageSection title="Đầu mục" :count="12">
-          <template #actions><SeeAllLink to="/dev/kit">Xem tất cả</SeeAllLink></template>
+          <template #actions><AppButton tone="link" class="text-meta" to="/dev/kit">Xem tất cả</AppButton></template>
           <p class="text-meta text-secondary">
             Bên trái là tên mục; bên phải là ghi chú, liên kết hoặc một nút nhẹ.
           </p>

@@ -4,7 +4,7 @@ import EmptyState from '@/components/EmptyState.vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import PageSection from '@/components/ui/PageSection.vue';
-import SeeAllLink from '@/components/ui/SeeAllLink.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import StretchedLink from '@/components/ui/StretchedLink.vue';
 import { usePostsQuery } from '@/features/blog/blog.queries';
 import { formatNumber } from '@/lib/format';
@@ -46,7 +46,7 @@ const ROW = 'flex min-h-(--qh-row) flex-col justify-center gap-0.5 px-2 py-2 tou
       <EmptyState v-if="!posts.length" inline>
         <template #default>{{ $t('blog.empty') }}</template>
         <template #action>
-          <SeeAllLink :to="BLOG">{{ $t('common.viewAll') }}</SeeAllLink>
+          <AppButton tone="link" class="text-meta" :to="BLOG">{{ $t('common.viewAll') }}</AppButton>
         </template>
       </EmptyState>
       <ul v-else class="flex flex-col divide-y divide-line">

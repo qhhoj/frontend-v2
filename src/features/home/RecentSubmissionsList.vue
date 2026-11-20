@@ -7,7 +7,7 @@ import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { CUE_TEXT } from '@/components/ui/cue-tones';
 import PageSection from '@/components/ui/PageSection.vue';
-import SeeAllLink from '@/components/ui/SeeAllLink.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import StretchedLink from '@/components/ui/StretchedLink.vue';
 import { useInFlightPoll } from '@/features/submissions/list/use-in-flight-poll';
 import { scoreCellText, scoreCue } from '@/features/submissions/submission-row';
@@ -71,7 +71,7 @@ const ROW = 'flex min-h-(--qh-row) items-center gap-3 px-2 touch:min-h-13';
       <EmptyState v-if="!visible.length" inline>
         <template #default>{{ $t('home.noSubmissions') }}</template>
         <template #action>
-          <SeeAllLink :to="PROBLEMS">{{ $t('home.anon.problems') }}</SeeAllLink>
+          <AppButton tone="link" class="text-meta" :to="PROBLEMS">{{ $t('home.anon.problems') }}</AppButton>
         </template>
       </EmptyState>
       <ul v-else class="flex flex-col divide-y divide-line">

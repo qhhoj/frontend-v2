@@ -11,12 +11,12 @@ import Chip from '@/components/ui/Chip.vue';
 import DataTable from '@/components/ui/DataTable.vue';
 import type { DataTableColumn } from '@/components/ui/DataTableColumns';
 import Lamp from '@/components/ui/Lamp.vue';
+import ProgressBar from '@/components/ui/ProgressBar.vue';
 import StretchedLink from '@/components/ui/StretchedLink.vue';
 import { formatNumber, formatPoints } from '@/lib/format';
+import { SERIES_SEPARATOR, titleParts } from '@/lib/title-parts';
 import { COMPACT_LIST_BELOW_PX } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
-import RateBar from './RateBar.vue';
-import { splitProblemName } from './problem-name';
 import { viewerLampOf } from './viewer-status';
 
 /**
@@ -143,10 +143,9 @@ const acRateText = (problem: ProblemListItem) =>
           :to="target(row.code)"
           :title="row.name"
           class="min-w-0 truncate text-content hover:text-accent-text"
-          ><span v-if="splitProblemName(row.name).shared" class="text-muted">{{
-            splitProblemName(row.name).shared
-          }}</span
-          ><span class="font-semibold">{{ splitProblemName(row.name).own }}</span></RouterLink
+          ><span v-if="titleParts(row.name).series" class="text-muted"
+            >{{ titleParts(row.name).series }}{{ SERIES_SEPARATOR }}</span
+          ><span class="font-semibold">{{ titleParts(row.name).name }}</span></RouterLink
         >
         <span class="shrink-0 font-mono text-small text-muted">{{ row.code }}</span>
         <span
@@ -172,7 +171,14 @@ const acRateText = (problem: ProblemListItem) =>
     </template>
     <template #cell-acRate="{ row }">
       <span class="inline-flex items-center gap-2">
-        <RateBar :percent="row.acRate" />
+        <ProgressBar
+          :value="row.acRate"
+          :label="$t('problem.strip.acRate')"
+          tone="neutral"
+          size="sm"
+          aria-hidden="true"
+          class="w-14"
+        />
         <span class="inline-block w-14">{{ acRateText(row) }}</span>
       </span>
     </template>
@@ -194,7 +200,7 @@ const acRateText = (problem: ProblemListItem) =>
             :to="target(row.code)"
             :title="row.name"
             class="line-clamp-2 text-body font-semibold text-content"
-            >{{ splitProblemName(row.name).own }}</StretchedLink
+            >{{ titleParts(row.name).name }}</StretchedLink
           >
           <span class="truncate font-mono text-small text-muted">{{ row.code }}</span>
         </span>

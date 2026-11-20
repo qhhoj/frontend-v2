@@ -4,8 +4,9 @@ import AppButton from './AppButton.vue';
 import type { ButtonSize, ButtonTone } from './button-classes';
 
 /**
- * A square, icon-only AppButton. `label` names it for assistive tech and as the hover tooltip; the icon goes in the slot.
- * `compact`: a 32 px circle with a 40 px hit area (`::after`) for a dense bar such as the shell's top bar; on a coarse pointer it is the
+ * A square, icon-only AppButton. `label` (required) names it for assistive tech and is the hover tooltip; the icon goes in the slot.
+ * By default it is a quiet square in neutral ink (never brand); `secondary` adds the control border, `danger` makes the icon red.
+ * `compact`: a 32 px square with a 40 px hit area (`::after`) for a dense bar such as the shell's top bar; on a coarse pointer it is the
  * `sm` height (44 px).
  * An icon without its own `size-*` class is drawn at the icon scale (docs/design-language.md): 16 px, 20 px in `lg`.
  */

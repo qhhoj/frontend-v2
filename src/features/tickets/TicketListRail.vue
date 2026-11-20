@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import Card from '@/components/ui/Card.vue';
-import SeeAllLink from '@/components/ui/SeeAllLink.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import TicketListPane from './TicketListPane.vue';
 import TicketListSkeleton from './TicketListSkeleton.vue';
 import { routeQueryFromFilters, ticketQueryFromRoute } from './ticket-filters';
@@ -24,9 +24,9 @@ const tickets = computed(() => data.value?.items ?? []);
   >
     <div class="flex items-center justify-between gap-2 border-b border-line px-4 py-2">
       <h2 class="text-meta font-semibold">{{ $t('tickets.title') }}</h2>
-      <SeeAllLink :to="{ name: 'tickets', query: routeQueryFromFilters(filters) }">
+      <AppButton tone="link" class="text-meta" :to="{ name: 'tickets', query: routeQueryFromFilters(filters) }">
         {{ $t('common.viewAll') }}
-      </SeeAllLink>
+      </AppButton>
     </div>
     <QueryState :loading="isPending" :error="null">
       <template #skeleton><TicketListSkeleton /></template>
