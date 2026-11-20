@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n';
 import type { Checker } from '@/api/types/problem-data';
 import AdminField from '../../ui/AdminField.vue';
 import AdminCheckbox from '../../ui/form/AdminCheckbox.vue';
-import AdminFormSection from '../../ui/form/AdminFormSection.vue';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { INPUT } from '../../ui/controls';
 import { numberBoxValue } from '../../ui/form/number-box';
@@ -86,13 +85,8 @@ const weightsError = computed(() =>
 </script>
 
 <template>
-  <AdminFormSection
-    id="data-checker-options-section"
-    :title="t(`${key}.checkerOptionsTitle`)"
-    :description="t(`${key}.checkerOptionsDescription`)"
-    :columns="1"
-  >
-    <div v-if="family === 'stock'" class="grid gap-4 md:grid-cols-2">
+  <div id="data-checker-options-section" class="flex flex-col gap-4">
+    <div v-if="family === 'stock'" class="flex flex-col gap-4">
       <AdminField
         v-slot="{ id, describedBy }"
         input-id="data-checker"
@@ -203,6 +197,5 @@ const weightsError = computed(() =>
       :label="t(`${key}.percentage`)"
       :description="t(`${key}.percentageHint`)"
     />
-    <p v-else class="text-sm text-muted">{{ t(`${key}.checkerNoOptions`) }}</p>
-  </AdminFormSection>
+  </div>
 </template>

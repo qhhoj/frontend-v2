@@ -46,7 +46,7 @@
       "languageTitle": "Limits per language",
       "languageColumn": "Language",
       "timeColumn": "Time (seconds)",
-      "memoryColumn": "Memory (KiB)",
+      "memoryColumn": "Memory (MB)",
       "pickLanguage": "Pick a language",
       "addLimit": "Add limit",
       "removeLimit": "Remove the limit for {language}",
@@ -200,14 +200,13 @@
   "data": {
     "badJson": "Invalid JSON.",
     "archive": {
-      "title": "Data archive",
-      "lead": "The zip, init.yml and the files inside it.",
-      "none": "No data archive yet",
+      "none": "No test archive yet",
       "initMade": "init.yml generated",
       "initMissing": "No init.yml yet",
       "more": "{count} more files",
       "viewInit": "View init.yml",
-      "note": "Archive files only name the tests; download through their own link, never shown inline."
+      "current": "Current archive:",
+      "fileCount": "{count} files"
     },
     "init": {
       "title": "init.yml"
@@ -244,24 +243,16 @@
     },
     "cases": {
       "title": "Test list",
-      "count": "{count} tests",
       "countOver": "{count} tests, over the advised {soft}.",
       "hardLimit": "The “{permission}” permission allows up to {max} tests; this account has the usual limit.",
-      "legend": "C: single test · S: open a scored group · E: close the group. A group's points are the whole group's.",
       "addCase": "Add test",
       "addBatch": "Add group",
       "columns": {
-        "type": "Type",
         "input": "Input file",
         "output": "Output file",
         "points": "Points",
-        "options": "Options",
-        "order": "Order"
-      },
-      "types": {
-        "C": "C · single test",
-        "S": "S · open group",
-        "E": "E · close group"
+        "test": "Test",
+        "actions": "Actions"
       },
       "batchLabel": "Group {n}",
       "pretest": "Pretest",
@@ -269,18 +260,39 @@
       "caseChecker": "Own checker",
       "caseCheckerInherit": "Problem's",
       "caseArgs": "Test checker arguments (JSON)",
-      "moveUp": "Move test {row} up",
-      "moveDown": "Move test {row} down",
-      "remove": "Remove test {row}",
-      "rowLabel": "Test {row}",
       "warnings": {
         "missingFile": "missing file {file}",
         "unclosedBatch": "group not closed",
-        "strayEnd": "E without an S"
+        "strayEnd": "group end with no open group"
       },
       "badJsonRows": "Fix the invalid JSON in test {rows} before saving.",
       "overMax": "Over the limit of {max} rows; saving will be refused. Remove tests or groups.",
-      "autofill": "Create tests from the zip"
+      "autofill": "Create tests from the archive",
+      "groupRule": "every test must pass for the group to score",
+      "groupPoints": "Points of group {n}",
+      "inputOf": "Input file of test {row}",
+      "outputOf": "Output file of test {row}",
+      "pointsOf": "Points of test {row}",
+      "scoredByGroup": "Scored by its group",
+      "hasOptions": "Own options",
+      "pretestHint": "Runs first in a contest with pretests.",
+      "strayEnd": "A group end with no open group",
+      "removeStrayEnd": "Remove the stray group end",
+      "empty": "No tests yet. Drop files on the box above, or add a test by hand.",
+      "menu": {
+        "test": "Actions for test {row}",
+        "group": "Actions for group {n}",
+        "testOptions": "Test options",
+        "groupOptions": "Group options",
+        "hideOptions": "Hide options",
+        "testUp": "Move test {row} up",
+        "testDown": "Move test {row} down",
+        "testRemove": "Remove test {row}",
+        "groupUp": "Move group {n} up",
+        "groupDown": "Move group {n} down",
+        "groupRemove": "Remove group {n}, keep its tests",
+        "groupAdd": "Add a test to group {n}"
+      }
     },
     "errors": {
       "fileName": "A file name is at most 100 characters and holds no NUL character.",
@@ -289,10 +301,8 @@
       "argsTotal": "All test arguments together are over 1 MiB; shorten them."
     },
     "autofill": {
-      "title": "Create tests from the zip",
-      "found": "Found {count} input/output pairs",
       "rules": "Name files in one of these layouts: 1.in + 1.out, test01/task.inp + test01/task.out, input1.txt + output1.txt. Inputs end in .in or .inp or start with input; outputs end in .out, .ans or .ok or start with output.",
-      "modeLegend": "The list already has tests",
+      "modeLegend": "How the tests enter the table",
       "modes": {
         "append": "Add after the {count} existing tests",
         "replace": "Replace the {count} existing tests"
@@ -300,26 +310,17 @@
       "skipped": "Skipping {count} pairs already in the list.",
       "total": "Total points",
       "totalHint": "Split evenly across the tests; the remainder goes to the last tests. Edit each test's points afterwards.",
-      "previewLabel": "Tests to create",
       "unpaired": "{count} files left unpaired",
       "unpairedHint": "These files will not become tests. Check their names: a test's input and output must share a folder and a base name.",
       "others": "{count} other files (not input/output)",
-      "apply": "Add {count} tests",
-      "applyReplace": "Replace with {count} tests",
-      "applied": "Added {count} tests. Press “Save configuration” to save.",
-      "appliedReplace": "Replaced with {count} tests. Press “Save configuration” to save.",
-      "skip": "Skip, add tests by hand"
+      "applied": "Added {count} tests from the archive, not saved yet.",
+      "appliedReplace": "Replaced with {count} tests from the archive, not saved yet.",
+      "nothingNew": "All {count} file pairs of the archive are already in the table; no test was added.",
+      "noPairs": "The archive has no input/output pair that can be matched."
     },
     "config": {
-      "checkerTitle": "Checker",
-      "checkerDescription": "How a submission's output is compared with each test's answer.",
       "familyLegend": "Checker type",
       "family": {
-        "stock": {
-          "label": "Built-in",
-          "description": "Right for most problems; no file to upload.",
-          "otherRule": "A built-in rule. Change the rule on the Advanced tab."
-        },
         "testlib": {
           "label": "Testlib",
           "description": "A C++ checker written with testlib.h (registerTestlibCmd)."
@@ -397,9 +398,7 @@
       "percentage": "Checker points are a percentage",
       "percentageHint": "On: \"points 50\" is 50% of the test. Off: \"points N\" is N points of the test.",
       "themisHint": "The checker finds files by the names in its source and by the file I/O names below. If it uses the problem's file names, choose \"Files\".",
-      "graderTitle": "How the program runs",
-      "graderDescription": "How a submission reads input and returns its result.",
-      "graderLegend": "Problem type",
+      "graderLegend": "Submission kind",
       "grader": {
         "standard": {
           "label": "Standard",
@@ -418,20 +417,17 @@
           "description": "Contestants submit output files, not source code."
         }
       },
-      "ioLegend": "Input/output",
       "io": {
         "standard": {
-          "label": "stdin / stdout",
-          "description": "Read from standard input, print to standard output."
+          "label": "Keyboard and screen"
         },
         "file": {
-          "label": "Files",
-          "description": "Read and write files with fixed names."
+          "label": "Files"
         }
       },
-      "io_input_file": "Input file name",
+      "io_input_file": "Input file",
       "io_input_fileHint": "e.g. SUM.INP",
-      "io_output_file": "Output file name",
+      "io_output_file": "Output file",
       "io_output_fileHint": "e.g. SUM.OUT",
       "interactorFile": "Interactor (.cpp, testlib)",
       "interactorMissing": "No interactor yet. The problem cannot be judged until one is uploaded.",
@@ -439,8 +435,6 @@
       "headerFile": "Header (.h)",
       "allowMain": "Allow contestants to write main",
       "allowMainHint": "Off: a submission with main is refused.",
-      "advancedTitle": "Advanced options",
-      "advancedDescription": "Rarely changed.",
       "outputLimitHint": "Largest output in bytes. Empty: the judge default.",
       "outputPrefixHint": "Leading output bytes kept for review.",
       "unicodeHint": "Treat Unicode whitespace as whitespace when comparing.",
@@ -459,10 +453,14 @@
         "log": "Compile log",
         "reason": "Reason"
       },
-      "checkerOptionsTitle": "Checker details",
-      "checkerOptionsDescription": "The comparison rule and its options; the checker type is picked on the Basic tab.",
-      "checkerNoOptions": "This checker type has no further options.",
-      "ioOtherGrader": "A “{grader}” problem does not read input this way. Change the problem kind on the Advanced tab."
+      "ioOtherGrader": "A “{grader}” problem does not read input this way.",
+      "compare": {
+        "label": "Compare results",
+        "stock": "Match the answer",
+        "custom": "Own checker",
+        "interactive": "Interactive",
+        "otherRule": "Rule in use: {rule}. Change it under “More options”."
+      }
     },
     "basic": {
       "summary": "{count} tests · {points} points in total",
@@ -478,12 +476,28 @@
       "resume": "Resume upload",
       "chunk": "part {number}/{count}",
       "finishing": "Finishing on the server; it can no longer be cancelled."
+    },
+    "drop": {
+      "title": "Drop a .zip or loose input and output files here",
+      "hint": "File pairs are matched by name (1.inp and 1.out, test01/…). A large upload goes in parts and resumes after a lost connection.",
+      "replaces": " A new .zip replaces the current archive.",
+      "pick": "Choose files",
+      "packing": "Packing the files into one zip…",
+      "refused": {
+        "empty": "No file was chosen.",
+        "mixed": "Choose one .zip, or loose input and output files; not both.",
+        "duplicate": "Two files are named “{name}”. Each file in the archive needs its own name.",
+        "tooMany": "Too many loose files for one archive. Zip them and upload the .zip.",
+        "tooLarge": "Over the {max} limit of a test archive.",
+        "folder": "A folder cannot be read. Choose the files inside it, or zip the folder.",
+        "unreadable": "One of the chosen files could not be read. Choose them again."
+      },
+      "replaceTitle": "This problem already has the test archive “{archive}”",
+      "replaceBody": "The server keeps one archive and cannot add loose files to it. If you go on, the {count} chosen files replace all {stored} files of the current archive.",
+      "replaceConfirm": "Replace the archive with these {count} files"
     }
   },
   "uploads": {
-    "archive": {
-      "upload": "Upload tests (.zip)"
-    },
     "sources": {
       "title": "Attached source files",
       "generator": "Test generator",
@@ -636,7 +650,7 @@
     "tests": {
       "judging": "Judging",
       "ioTitle": "Students read and write with",
-      "advanced": "Advanced options",
+      "advanced": "More options",
       "total": "{tests} tests · {groups} groups · total {sum} / {points} points",
       "totalOff": "The tests' total differs from the problem's points."
     },

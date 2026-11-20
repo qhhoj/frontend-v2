@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { translate } from '@/i18n';
-import type { ProblemData } from '@/api/types/problem-data';
 import { Plus } from 'lucide-vue-next';
+import type { ProblemData } from '@/api/types/problem-data';
+import EmptyState from '@/components/EmptyState.vue';
 import ScrollRegion from '@/components/ScrollRegion.vue';
-import { buttonClass } from '../../ui/controls';
-import AdminFormSection from '../../ui/form/AdminFormSection.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import Notice from '@/components/ui/Notice.vue';
+import { TABLE_HEAD_CELL } from '@/components/ui/table-classes';
+import { translate } from '@/i18n';
+import type { FieldErrors } from '../../ui/admin-errors';
 import CaseRow from './CaseRow.vue';
-import CasesAutofill from './CasesAutofill.vue';
 import {
   addBatch,
   addCase,
@@ -18,136 +20,148 @@ import {
   removeCase,
 } from './test-cases';
 import type { KeyedCase, ListWarning } from './test-cases';
-import type { FieldErrors } from '../../ui/admin-errors';
+import { addCaseToGroup, groupEnd, moveGroup, removeGroup, tableRows } from './test-table';
+import type { TableRow } from './test-table';
 
+/**
+ * The test table: one compact row per group and per test, visible at once. Below it the `total` slot (the page's line
+ * that says whether the points add up) and "Thêm nhóm", "Thêm test". Everything waits for the page's save.
+ */
 const cases = defineModel<KeyedCase[]>({ required: true });
-const props = defineProps<{
-  data: ProblemData;
-  errors: FieldErrors;
-  /** The problem's points: the default total the zip autofill splits across its tests. */
-  problemPoints?: number | null;
-}>();
+const props = defineProps<{ data: ProblemData; errors: FieldErrors }>();
 const emit = defineEmits<{ invalid: [key: number, isInvalid: boolean] }>();
+const KEY = 'admin.problems.data.cases';
+const HEAD = 'border-b border-line px-2';
 
+const rows = computed(() => tableRows(cases.value));
 const warnings = computed(() => listWarnings({ cases: cases.value }, props.data));
 const isOverSoft = computed(() => warnings.value.some((warning) => warning.kind === 'over-soft'));
 const isOverMax = computed(() => warnings.value.some((warning) => warning.kind === 'over-max'));
-const countLine = computed(() => {
-  const count = caseCount(cases.value);
-  return isOverSoft.value
-    ? translate('admin.problems.data.cases.countOver', { count, soft: props.data.limits.softCases })
-    : translate('admin.problems.data.cases.count', { count });
-});
 
 function warningTextOf(warning: ListWarning): string {
   if (warning.kind === 'missing-file')
-    return translate('admin.problems.data.cases.warnings.missingFile', {
-      file: warning.file ?? '',
-    });
-  if (warning.kind === 'unclosed-batch')
-    return translate('admin.problems.data.cases.warnings.unclosedBatch');
-  return translate('admin.problems.data.cases.warnings.strayEnd');
+    return translate(`${KEY}.warnings.missingFile`, { file: warning.file ?? '' });
+  if (warning.kind === 'unclosed-batch') return translate(`${KEY}.warnings.unclosedBatch`);
+  return translate(`${KEY}.warnings.strayEnd`);
 }
-/** A row's messages: its list warnings, then the refusals its fields would get from the backend. */
-const messagesAt = (index: number) => {
-  const prefix = `cases.${index}.`;
-  const rowErrors = Object.entries(props.errors)
-    .filter(([key]) => key.startsWith(prefix))
+const warningsAt = (index: number) =>
+  warnings.value.filter((warning) => warning.index === index).map(warningTextOf);
+/** The refusals a row's fields would get from the backend. */
+const errorsAt = (index: number) =>
+  Object.entries(props.errors)
+    .filter(([key]) => key.startsWith(`cases.${index}.`))
     .map(([, text]) => text);
-  return [
-    ...warnings.value.filter((warning) => warning.index === index).map(warningTextOf),
-    ...rowErrors,
-  ];
-};
 
-const HEAD = 'border-b border-line px-2 py-2 whitespace-nowrap';
+const canMoveDown = (shown: TableRow) =>
+  (shown.kind === 'group' ? groupEnd(cases.value, shown.index) : shown.index) <
+  cases.value.length - 1;
 
-function move(index: number, offset: -1 | 1) {
-  cases.value = moveCase(cases.value, index, offset);
+/** A group moves whole, past the test or the group next to it; a test moves one place, into or out of a group on the way. */
+function move(shown: TableRow, offset: -1 | 1) {
+  cases.value =
+    shown.kind === 'group'
+      ? moveGroup(cases.value, shown.index, offset)
+      : moveCase(cases.value, shown.index, offset);
 }
 
-/** A removed row's args box goes with it: it must not keep the list from saving. */
-function remove(index: number) {
-  emit('invalid', cases.value[index]!.key, false);
-  cases.value = removeCase(cases.value, index);
+/** Removing a group keeps its tests. A removed test's args box goes with it: it must not keep the list from saving. */
+function remove(shown: TableRow) {
+  if (shown.kind === 'group') {
+    cases.value = removeGroup(cases.value, shown.index);
+    return;
+  }
+  emit('invalid', shown.row.key, false);
+  cases.value = removeCase(cases.value, shown.index);
 }
 </script>
 
 <template>
-  <AdminFormSection
-    :title="$t('admin.problems.data.cases.title')"
-    :description="countLine"
-    :columns="1"
-  >
-    <p v-if="isOverMax" role="alert" class="text-sm text-negative">
-      {{ $t('admin.problems.data.cases.overMax', { max: data.limits.maxCases }) }}
-    </p>
-    <p v-if="errors.cases" role="alert" class="text-sm text-negative">{{ errors.cases }}</p>
-    <p v-if="data.limits.maxCases < MASS_TESTCASE_LIMIT" class="text-caption leading-4 text-muted">
-      {{
-        $t('admin.problems.data.cases.hardLimit', {
-          max: MASS_TESTCASE_LIMIT,
-          permission: $t('admin.permissions.judge.create_mass_testcases'),
-        })
-      }}
-    </p>
+  <div class="flex min-w-0 flex-col gap-3" data-testid="tests-table">
+    <Notice v-if="isOverMax" tone="danger" inline>
+      {{ $t(`${KEY}.overMax`, { max: data.limits.maxCases }) }}
+    </Notice>
+    <Notice v-else-if="isOverSoft" tone="warning" inline>
+      {{ $t(`${KEY}.countOver`, { count: caseCount(cases), soft: data.limits.softCases }) }}
+      <template v-if="data.limits.maxCases < MASS_TESTCASE_LIMIT">
+        {{
+          $t(`${KEY}.hardLimit`, {
+            max: MASS_TESTCASE_LIMIT,
+            permission: $t('admin.permissions.judge.create_mass_testcases'),
+          })
+        }}
+      </template>
+    </Notice>
+    <Notice v-if="errors.cases" tone="danger" inline>{{ errors.cases }}</Notice>
     <datalist id="archive-files">
       <option v-for="file in data.archiveFiles" :key="file" :value="file" />
     </datalist>
-    <ScrollRegion class="min-w-0" :label="$t('admin.problems.data.cases.title')" no-hint>
-      <table class="w-full min-w-[52rem] border-separate border-spacing-0 text-sm">
+    <ScrollRegion v-if="rows.length > 0" class="min-w-0" :label="$t(`${KEY}.title`)" no-hint>
+      <table class="w-full min-w-md border-separate border-spacing-0 text-body">
         <caption class="sr-only">
           {{
-            $t('admin.problems.data.cases.title')
+            $t(`${KEY}.title`)
           }}
         </caption>
         <thead>
-          <tr class="text-left text-caption leading-4 font-semibold text-muted">
-            <th scope="col" :class="[HEAD, 'sticky left-0 z-10 bg-surface']">
-              {{ $t('admin.problems.data.cases.columns.order') }}
+          <tr class="text-left">
+            <th scope="col" :class="[TABLE_HEAD_CELL, HEAD, 'w-16']">
+              {{ $t(`${KEY}.columns.test`) }}
             </th>
-            <th scope="col" :class="HEAD">{{ $t('admin.problems.data.cases.columns.type') }}</th>
-            <th scope="col" :class="HEAD">
-              {{ $t('admin.problems.data.cases.columns.input') }} /
-              {{ $t('admin.problems.data.cases.columns.output') }}
+            <th scope="col" :class="[TABLE_HEAD_CELL, HEAD]">{{ $t(`${KEY}.columns.input`) }}</th>
+            <th scope="col" :class="[TABLE_HEAD_CELL, HEAD]">{{ $t(`${KEY}.columns.output`) }}</th>
+            <th scope="col" :class="[TABLE_HEAD_CELL, HEAD, 'w-24 text-right']">
+              {{ $t(`${KEY}.columns.points`) }}
             </th>
-            <th scope="col" :class="HEAD">{{ $t('admin.problems.data.cases.columns.points') }}</th>
-            <th scope="col" :class="HEAD">{{ $t('admin.problems.data.cases.columns.options') }}</th>
-            <th scope="col" :class="HEAD"><span class="sr-only">!</span></th>
+            <th scope="col" :class="[TABLE_HEAD_CELL, HEAD, 'w-12']">
+              <span class="sr-only">{{ $t(`${KEY}.columns.actions`) }}</span>
+            </th>
           </tr>
         </thead>
         <tbody>
           <CaseRow
-            v-for="(row, index) in cases"
-            :key="row.key"
-            :model-value="row"
-            :index="index"
-            :is-first="index === 0"
-            :is-last="index === cases.length - 1"
-            :messages="messagesAt(index)"
-            @move="move(index, $event)"
-            @remove="remove(index)"
-            @invalid="emit('invalid', row.key, $event)"
+            v-for="shown in rows"
+            :key="shown.row.key"
+            :model-value="shown.row"
+            :view="shown"
+            :can-move-up="shown.index > 0"
+            :can-move-down="canMoveDown(shown)"
+            :warnings="warningsAt(shown.index)"
+            :errors="errorsAt(shown.index)"
+            @move="move(shown, $event)"
+            @remove="remove(shown)"
+            @add-test="cases = addCaseToGroup(cases, shown.index)"
+            @invalid="emit('invalid', shown.row.key, $event)"
           />
         </tbody>
       </table>
     </ScrollRegion>
-    <div class="flex flex-wrap gap-2">
-      <CasesAutofill
-        v-model="cases"
-        :archive-files="data.archiveFiles"
-        :problem-points="problemPoints ?? null"
-        @invalid="(key, isInvalid) => emit('invalid', key, isInvalid)"
-      />
-      <button type="button" :class="buttonClass('secondary')" @click="cases = addCase(cases)">
-        <Plus aria-hidden="true" class="size-4" :stroke-width="1.75" />
-        {{ $t('admin.problems.data.cases.addCase') }}
-      </button>
-      <button type="button" :class="buttonClass('secondary')" @click="cases = addBatch(cases)">
-        <Plus aria-hidden="true" class="size-4" :stroke-width="1.75" />
-        {{ $t('admin.problems.data.cases.addBatch') }}
-      </button>
+    <EmptyState v-else compact>
+      {{ $t(`${KEY}.empty`) }}
+      <template #action>
+        <AppButton size="sm" tone="secondary" @click="cases = addCase(cases)">
+          <template #icon><Plus aria-hidden="true" /></template>
+          {{ $t(`${KEY}.addCase`) }}
+        </AppButton>
+      </template>
+    </EmptyState>
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+      <div class="min-w-0"><slot name="total" /></div>
+      <div class="ml-auto flex flex-wrap gap-2">
+        <slot name="actions" />
+        <AppButton size="sm" tone="secondary" @click="cases = addBatch(cases)">
+          <template #icon><Plus aria-hidden="true" /></template>
+          {{ $t(`${KEY}.addBatch`) }}
+        </AppButton>
+        <AppButton
+          v-if="rows.length > 0"
+          size="sm"
+          tone="secondary"
+          @click="cases = addCase(cases)"
+        >
+          <template #icon><Plus aria-hidden="true" /></template>
+          {{ $t(`${KEY}.addCase`) }}
+        </AppButton>
+      </div>
     </div>
-    <p class="text-caption leading-4 text-muted">{{ $t('admin.problems.data.cases.legend') }}</p>
-  </AdminFormSection>
+  </div>
 </template>

@@ -4,6 +4,7 @@ import { Plus, X } from 'lucide-vue-next';
 import type { LanguageOption } from '@/api/types/problem-editing';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import { languageById } from '@/components/language/language-by-id';
+import { KIB_PER_MIB } from '@/lib/measure';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { INPUT, buttonClass, iconButtonClass } from '../../ui/controls';
 import type { LanguageLimitForm } from './problem-form';
@@ -43,6 +44,17 @@ function addLimit() {
 
 function removeLimit(index: number) {
   limits.value.splice(index, 1);
+}
+
+/** The API keeps KiB; the box shows MB, as the problem's own limit does. */
+const memoryMbOf = (limit: LanguageLimitForm) =>
+  Number.isFinite(limit.memoryLimit) ? limit.memoryLimit / KIB_PER_MIB : '';
+/** An emptied or unreadable box holds '' (as `v-model.number` leaves it), so the form's check reports it. */
+function setMemoryMb(limit: LanguageLimitForm, event: Event) {
+  const megabytes = (event.target as HTMLInputElement).valueAsNumber;
+  limit.memoryLimit = (
+    Number.isNaN(megabytes) ? '' : Math.round(megabytes * KIB_PER_MIB)
+  ) as number;
 }
 
 const ROW =
@@ -121,10 +133,11 @@ const ROW =
         <label class="flex flex-col gap-1 text-caption leading-4 font-semibold text-muted">
           <span class="sm:sr-only">{{ $t('admin.problems.general.limits.memoryColumn') }}</span>
           <input
-            v-model.number="limit.memoryLimit"
+            :value="memoryMbOf(limit)"
             type="number"
-            inputmode="numeric"
+            inputmode="decimal"
             step="1"
+            @input="setMemoryMb(limit, $event)"
             :class="[INPUT, 'font-mono font-normal text-content tabular-nums']"
             :aria-label="
               $t('admin.problems.general.limits.memoryFor', { language: nameOf(limit.languageId) })

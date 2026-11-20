@@ -68,10 +68,14 @@ export function useDataForm(code: () => string) {
   /** Whether the server's configuration differs from the one the form was seeded from (row keys and non-form fields aside). */
   const isNewConfig = (data: ProblemData) =>
     !saved.value || countDataChanges(toDataForm(data), toDataForm(saved.value)) > 0;
+  /** A clean form takes the server's configuration when it differs; a form with edits keeps them. */
+  function adopt(data: ProblemData) {
+    if (isClean() && isNewConfig(data)) seed(data);
+  }
   watch(
     () => query.data.value,
     (data) => {
-      if (data && isClean() && isNewConfig(data)) seed(data);
+      if (data) adopt(data);
     },
     { immediate: true },
   );
@@ -114,6 +118,7 @@ export function useDataForm(code: () => string) {
     validate,
     saveTo,
     retarget,
+    adopt,
     discard,
   };
 }

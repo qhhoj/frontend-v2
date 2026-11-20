@@ -1,38 +1,40 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { uploadDataArchive } from '@/api/problem-data.api';
+import { computed, useTemplateRef, watch } from 'vue';
 import type { ProblemData } from '@/api/types/problem-data';
 import type { EditableProblem } from '@/api/types/problem-editing';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import { translate } from '@/i18n';
+import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import Checkbox from '@/components/ui/Checkbox.vue';
+import Chip from '@/components/ui/Chip.vue';
 import Disclosure from '@/components/ui/Disclosure.vue';
 import Lamp from '@/components/ui/Lamp.vue';
-import UploadButton from '@/components/ui/UploadButton.vue';
+import Notice from '@/components/ui/Notice.vue';
+import { translate } from '@/i18n';
+import { formatFileSize } from '@/lib/format';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { UPLOAD_LIMITS } from '../../ui/upload-limits';
-import { useAdminMutation } from '../../ui/use-admin-mutation';
 import CasesAutofill from '../data/CasesAutofill.vue';
 import CasesEditor from '../data/CasesEditor.vue';
 import CheckerSection from '../data/CheckerSection.vue';
+import ChunkedUploadStatus from '../data/chunked-upload/ChunkedUploadStatus.vue';
 import DataArchiveCard from '../data/DataArchiveCard.vue';
 import DataFeedback from '../data/DataFeedback.vue';
-import { SINGLE_UPLOAD_MAX_BYTES } from '../data/chunked-upload/chunk-plan';
-import ChunkedUploadStatus from '../data/chunked-upload/ChunkedUploadStatus.vue';
-import { UPLOAD_CANCELLED, useChunkedUpload } from '../data/chunked-upload/use-chunked-upload';
-import { useKeepDataAnswer } from '../data/problem-data.queries';
+import TestDropZone from '../data/TestDropZone.vue';
+import { ARCHIVE_PREVIEW_COUNT } from '../data/test-cases';
+import { useTestUpload } from '../data/use-test-upload';
 import { pairArchiveFiles } from '../data/zip-autofill';
 import { failureReasonOf } from '../failure-reason';
-import type { TestsSummary } from './workbench-summary';
 import type { Workbench } from './use-workbench';
+import type { TestsSummary } from './workbench-summary';
 
 /**
- * Section 3: the test archive (uploaded at once, as before), the test table with its groups and points and a total line
- * that says whether the points add up to the problem's, then the judging panel: how answers are compared (with the
- * checker, interactor and header files), the input/output method, partial scoring, and a fold for the rarely used options.
- * The table, the panel and partial scoring wait for the page's save.
+ * Section 3. Left: the drop zone (a zip or loose files, stored at once, as an upload always was), the tests made from
+ * the archive's pairs, the test table with its groups and points, a total line that says whether the points add up to
+ * the problem's, and the archive's files that are no test. Right, from the width where both fit (under the table below
+ * it): the judging panel: how a result is compared (with the checker or interactor file), the input/output method,
+ * partial scoring, and one fold for the rest. The table, the panel and partial scoring wait for the page's save.
  */
 const props = defineProps<{
   problem: EditableProblem;
@@ -40,42 +42,37 @@ const props = defineProps<{
   info: Workbench['info'];
   summary: TestsSummary | null;
 }>();
-const { query, form, errors, badRowNumbers, markInvalid } = props.data;
+const { query, form, errors, badRowNumbers, markInvalid, adopt } = props.data;
 const { form: infoForm } = props.info;
 const KEY = 'admin.problems.workbench.tests';
-const keepAnswer = useKeepDataAnswer(() => props.problem.code);
-const isAutofillOpen = ref(false);
-const isAutofillAfterUpload = ref(false);
-const chunked = useChunkedUpload(() => props.problem.code);
+const DROP = 'admin.problems.data.drop';
+const AUTOFILL = 'admin.problems.data.autofill';
+const autofill = useTemplateRef<InstanceType<typeof CasesAutofill>>('autofill');
+
 /**
- * An upload only stores the zip: the tests are made from it next, so that dialog opens at once when the zip has pairs.
- * A zip larger than one request goes in chunks (resumable in this tab); a smaller one in a single request.
+ * After an upload: the form takes the server's answer first (when it holds no edits), then the archive's pairs become
+ * tests in the table at once, as an unsaved change. The answer's own file list is used, not the query's (it updates later).
  */
-const archive = useAdminMutation({
-  mutate: (file: File) =>
-    file.size > SINGLE_UPLOAD_MAX_BYTES
-      ? chunked.upload(file)
-      : uploadDataArchive(props.problem.code, file),
-  onDone: (saved: ProblemData) => {
-    keepAnswer(saved);
-    if (pairArchiveFiles(saved.archiveFiles).pairs.length === 0) return;
-    isAutofillAfterUpload.value = true;
-    isAutofillOpen.value = true;
-  },
-});
-/** A cancel is the user's own doing: no refusal line for it. */
-const archiveFailure = computed(() =>
-  archive.failure.value?.code === UPLOAD_CANCELLED ? null : archive.failure.value,
-);
-/** Only the upload started on this problem is offered to resume here. */
-const interruptedHere = computed(() =>
-  chunked.interrupted.value?.code === props.problem.code ? chunked.interrupted.value : null,
-);
-function resumeArchive() {
-  const file = interruptedHere.value?.file;
-  if (file) void archive.run(file);
+function onStored(saved: ProblemData) {
+  adopt(saved);
+  autofill.value?.start(saved.archiveFiles);
 }
-/** A row whose args box does not parse blocks the save: the table names the rows. */
+const upload = useTestUpload(
+  () => props.problem.code,
+  () => Boolean(query.data.value?.archive),
+  onStored,
+);
+const { chunked } = upload;
+const refusalText = computed(() => {
+  const refusal = upload.refusal.value;
+  if (!refusal) return '';
+  return translate(`${DROP}.refused.${refusal.reason}`, {
+    name: refusal.name ?? '',
+    max: formatFileSize(UPLOAD_LIMITS.archive),
+  });
+});
+
+/** A row whose args box does not parse blocks the save: the table names the tests. */
 const tableErrors = computed(() =>
   badRowNumbers.value.length > 0
     ? {
@@ -86,7 +83,24 @@ const tableErrors = computed(() =>
       }
     : errors.value,
 );
+
+/** The archive's files that are no test: inputs and outputs without a partner, and files that are neither. */
+const leftovers = computed(() => pairArchiveFiles(query.data.value?.archiveFiles ?? []));
+const preview = (files: string[]) => ({
+  shown: files.slice(0, ARCHIVE_PREVIEW_COUNT),
+  hidden: Math.max(0, files.length - ARCHIVE_PREVIEW_COUNT),
+});
+const FILE_LIST = 'm-0 flex list-none flex-wrap items-center gap-1 p-0';
+
 const isAdvancedOpen = defineModel<boolean>('advancedOpen', { default: false });
+/** A stored setting that lives in the fold opens it, so no part of the judging stays out of sight. */
+watch(
+  () => form.value?.grader,
+  (grader) => {
+    if (grader === 'signature' || grader === 'output_only') isAdvancedOpen.value = true;
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -96,8 +110,8 @@ const isAdvancedOpen = defineModel<boolean>('advancedOpen', { default: false });
     @retry="() => void query.refetch()"
   >
     <template #skeleton>
-      <SkeletonBlock data-skeleton-region="problem-data-card" class="h-40 w-full rounded-row" />
-      <SkeletonBlock data-skeleton-region="problem-data-cases" class="h-96 w-full rounded-row" />
+      <SkeletonBlock data-skeleton-region="problem-data-card" class="h-24 w-full rounded-card" />
+      <SkeletonBlock data-skeleton-region="problem-data-cases" class="h-96 w-full rounded-card" />
     </template>
     <div v-if="query.data.value && form" class="flex flex-col gap-4">
       <AdminStatus
@@ -107,91 +121,190 @@ const isAdvancedOpen = defineModel<boolean>('advancedOpen', { default: false });
         :text="$t('admin.externalJudge.dataNote', { oj: problem.externalJudge.oj })"
       />
       <DataFeedback :feedback="query.data.value.feedback" />
-      <Card as="div">
-        <DataArchiveCard :code="problem.code" :data="query.data.value">
-          <template #upload>
-            <UploadButton
-              data-testid="upload-archive"
-              :label="$t('admin.problems.uploads.archive.upload')"
-              accept=".zip"
-              :max-bytes="UPLOAD_LIMITS.archive"
-              :is-pending="archive.isPending.value"
-              @picked="archive.run"
-            />
-            <CasesAutofill
-              v-model="form.cases"
-              v-model:open="isAutofillOpen"
-              v-model:after-upload="isAutofillAfterUpload"
-              :archive-files="query.data.value.archiveFiles"
-              :problem-points="problem.points"
-              @invalid="markInvalid"
-            />
-          </template>
-        </DataArchiveCard>
-        <div v-if="chunked.phase.value || interruptedHere" class="px-4 pb-4">
+      <div
+        class="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_var(--qh-sidebar-width)] xl:items-start"
+      >
+        <div class="flex min-w-0 flex-col gap-3">
+          <TestDropZone
+            :is-pending="upload.isBusy.value"
+            :has-archive="Boolean(query.data.value.archive)"
+            @files="upload.take"
+            @folder="upload.refuse('folder')"
+          />
+          <Notice v-if="refusalText" tone="danger" inline data-testid="drop-refusal">
+            {{ refusalText }}
+          </Notice>
+          <Notice
+            v-if="upload.waiting.value"
+            tone="warning"
+            role="alert"
+            data-testid="replace-archive"
+            :title="$t(`${DROP}.replaceTitle`, { archive: query.data.value.archive })"
+          >
+            {{
+              $t(`${DROP}.replaceBody`, {
+                count: upload.waiting.value.length,
+                stored: query.data.value.archiveFiles.length,
+              })
+            }}
+            <template #action>
+              <div class="flex flex-wrap gap-2">
+                <AppButton size="sm" tone="secondary" @click="upload.cancelReplace">
+                  {{ $t('common.cancel') }}
+                </AppButton>
+                <AppButton
+                  size="sm"
+                  tone="danger"
+                  data-testid="replace-archive-confirm"
+                  @click="upload.confirmReplace"
+                >
+                  {{ $t(`${DROP}.replaceConfirm`, { count: upload.waiting.value.length }) }}
+                </AppButton>
+              </div>
+            </template>
+          </Notice>
+          <p v-if="upload.isPacking.value" role="status" class="m-0 text-meta text-muted">
+            {{ $t(`${DROP}.packing`) }}
+          </p>
           <ChunkedUploadStatus
+            v-if="chunked.phase.value || upload.interrupted.value"
             :phase="chunked.phase.value"
             :done-bytes="chunked.doneBytes.value"
             :total-bytes="chunked.totalBytes.value"
             :chunk-number="chunked.chunkNumber.value"
             :chunk-count="chunked.chunkCount.value"
             :finishing="chunked.finishing.value"
-            :interrupted-name="interruptedHere?.file.name ?? null"
+            :interrupted-name="upload.interrupted.value?.file.name ?? null"
             @cancel="chunked.cancel"
-            @resume="resumeArchive"
+            @resume="upload.resume"
           />
-        </div>
-        <div v-if="archiveFailure" class="px-4 pb-4">
-          <AdminStatus kind="refused" :text="failureReasonOf(archiveFailure)" />
-        </div>
-      </Card>
-      <Card as="div">
-        <CasesEditor
-          v-model="form.cases"
-          :data="query.data.value"
-          :errors="tableErrors"
-          :problem-points="problem.points"
-          @invalid="markInvalid"
-        />
-        <p
-          v-if="summary"
-          data-testid="tests-total"
-          class="m-0 flex items-center gap-2 border-t border-line px-4 py-3 text-meta text-secondary"
-        >
-          <Lamp :tone="summary.isAddingUp ? 'ac' : 'none'" still />
-          {{ $t(`${KEY}.total`, { ...summary }) }}
-          <span v-if="!summary.isAddingUp" class="text-muted">{{ $t(`${KEY}.totalOff`) }}</span>
-        </p>
-      </Card>
-      <Card panel as="div" :title="$t(`${KEY}.judging`)">
-        <CheckerSection
-          v-model="form"
-          part="main"
-          :code="problem.code"
-          :data="query.data.value"
-          :errors="errors"
-        />
-        <div class="border-t border-line px-4 py-3">
-          <Checkbox
-            v-model="infoForm.partial"
-            input-id="problem-partial"
-            data-testid="problem-partial"
-            :label="$t('admin.problems.general.limits.partial')"
-            :description="$t('admin.problems.general.limits.partialHint')"
+          <Notice v-if="upload.failure.value" tone="danger" inline data-testid="upload-failure">
+            {{ failureReasonOf(upload.failure.value) }}
+          </Notice>
+          <DataArchiveCard :code="problem.code" :data="query.data.value" />
+          <CasesAutofill
+            ref="autofill"
+            v-model="form.cases"
+            :archive-files="query.data.value.archiveFiles"
+            :problem-points="problem.points"
+            @invalid="markInvalid"
           />
+          <CasesEditor
+            v-model="form.cases"
+            :data="query.data.value"
+            :errors="tableErrors"
+            @invalid="markInvalid"
+          >
+            <template #total>
+              <p
+                v-if="summary"
+                data-testid="tests-total"
+                class="m-0 flex flex-wrap items-center gap-2 text-meta text-secondary"
+              >
+                <Lamp :tone="summary.isAddingUp ? 'ac' : 'none'" still />
+                {{ $t(`${KEY}.total`, { ...summary }) }}
+                <span v-if="!summary.isAddingUp" class="text-muted">{{
+                  $t(`${KEY}.totalOff`)
+                }}</span>
+              </p>
+            </template>
+            <template #actions>
+              <AppButton
+                v-if="autofill?.pairCount && !autofill.live"
+                size="sm"
+                tone="secondary"
+                data-testid="zip-autofill-open"
+                @click="autofill.start()"
+              >
+                {{ $t('admin.problems.data.cases.autofill') }}
+              </AppButton>
+            </template>
+          </CasesEditor>
+          <Notice
+            v-if="query.data.value.archiveFiles.length > 0 && leftovers.pairs.length === 0"
+            tone="info"
+            compact
+            data-testid="autofill-no-pairs"
+            :title="$t(`${AUTOFILL}.noPairs`)"
+          >
+            {{ $t(`${AUTOFILL}.rules`) }}
+          </Notice>
+          <Notice
+            v-if="leftovers.unpaired.length > 0"
+            tone="warning"
+            compact
+            role="status"
+            data-testid="autofill-unpaired"
+            :title="$t(`${AUTOFILL}.unpaired`, { count: leftovers.unpaired.length })"
+          >
+            {{ $t(`${AUTOFILL}.unpairedHint`) }}
+            <template #details>
+              <ul :class="FILE_LIST">
+                <li v-for="file in preview(leftovers.unpaired).shown" :key="file">
+                  <Chip
+                    ><span class="font-mono">{{ file }}</span></Chip
+                  >
+                </li>
+                <li v-if="preview(leftovers.unpaired).hidden > 0" class="text-meta text-muted">
+                  {{
+                    $t('admin.problems.data.archive.more', {
+                      count: preview(leftovers.unpaired).hidden,
+                    })
+                  }}
+                </li>
+              </ul>
+            </template>
+          </Notice>
+          <Disclosure
+            v-if="leftovers.others.length > 0"
+            :label="$t(`${AUTOFILL}.others`, { count: leftovers.others.length })"
+          >
+            <ul :class="[FILE_LIST, 'pb-3']">
+              <li v-for="file in preview(leftovers.others).shown" :key="file">
+                <Chip
+                  ><span class="font-mono">{{ file }}</span></Chip
+                >
+              </li>
+              <li v-if="preview(leftovers.others).hidden > 0" class="text-meta text-muted">
+                {{
+                  $t('admin.problems.data.archive.more', {
+                    count: preview(leftovers.others).hidden,
+                  })
+                }}
+              </li>
+            </ul>
+          </Disclosure>
         </div>
-        <div class="border-t border-line px-4">
-          <Disclosure v-model:open="isAdvancedOpen" :label="$t(`${KEY}.advanced`)">
+        <Card panel as="div" :title="$t(`${KEY}.judging`)" data-testid="judging-panel">
+          <div class="flex flex-col gap-4">
             <CheckerSection
               v-model="form"
-              part="advanced"
+              part="main"
               :code="problem.code"
               :data="query.data.value"
               :errors="errors"
             />
-          </Disclosure>
-        </div>
-      </Card>
+            <Checkbox
+              v-model="infoForm.partial"
+              input-id="problem-partial"
+              data-testid="problem-partial"
+              :label="$t('admin.problems.general.limits.partial')"
+              :description="$t('admin.problems.general.limits.partialHint')"
+            />
+            <div class="border-t border-line">
+              <Disclosure v-model:open="isAdvancedOpen" :label="$t(`${KEY}.advanced`)">
+                <CheckerSection
+                  v-model="form"
+                  part="more"
+                  :code="problem.code"
+                  :data="query.data.value"
+                  :errors="errors"
+                />
+              </Disclosure>
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
   </QueryState>
 </template>
