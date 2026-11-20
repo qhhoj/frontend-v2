@@ -83,60 +83,65 @@
   --space-page-top: 1.5rem;
   --space-header: 1rem;
   --space-toolbar: 0.75rem;
-  --space-section: 2.5rem;
+  --space-section: 2rem;
   --space-section-title: 0.5rem;
   --space-stack: 0.75rem;
   --qh-sidebar-width: 20rem;
   /* Kit 2 geometry (.batch/kit2/spec.md). Every size below is a variable; components never write a number. */
-  /* Heights: a control is 36 (32 only inside a table, 40 for a page's primary action), a chip 24, a list row 44 (ranking and menus 40).
-     Under the touch media below every control is 44 or more and a row is at least 44. */
+  /* Heights ("Design is code" scales): a control is 40 (`md`) or 32 (`sm`: inside a table or a panel header) and nothing else; a status tag 24;
+     a table or list row 44 (52 on a phone). `-lg` and `-dense` are old names of the one step. Under the touch media below every control is 44. */
   --qh-control-sm: 2rem;
-  --qh-control: 2.25rem;
-  --qh-control-lg: 2.5rem;
+  --qh-control: 2.5rem;
+  --qh-control-lg: var(--qh-control);
   --qh-chip: 1.5rem;
   --qh-row: 2.75rem;
-  --qh-row-dense: 2.5rem;
+  --qh-row-dense: var(--qh-row);
   --qh-touch: 2.75rem;
   --qh-rail: 14rem;
-  /* Control padding x: at least half the height, so the text clears the pill's curve. */
-  --qh-control-px-sm: 0.875rem;
+  /* Control padding x: 16 in a 40 px control, 12 in a 32 px one and in a field; 8 in a status tag. */
+  --qh-control-px-sm: 0.75rem;
   --qh-control-px: 1rem;
-  --qh-control-px-lg: 1.25rem;
-  --qh-chip-px: 0.625rem;
-  /* Inset between a segmented track's edge and its sliding thumb. */
-  --qh-control-inset: 0.1875rem;
+  --qh-control-px-lg: var(--qh-control-px);
+  --qh-chip-px: 0.5rem;
+  /* The bar that marks "you are here" (current tab underline 2, current side item 3) and a disabled control's opacity. */
+  --qh-bar: 2px;
+  --qh-bar-strong: 3px;
+  --qh-opacity-disabled: 0.45;
+  /* Old name: the segmented track is gone (filter toggles replaced it). */
+  --qh-control-inset: 0.125rem;
   --qh-control-icon: 1rem;
   --qh-control-icon-lg: 1.25rem;
-  /* Padding of a surface (Card, Panel, StatStrip) and of an overlay (Dialog, Sheet). */
-  --qh-pad-surface: 1.25rem;
+  /* Padding of a surface (Card, panel, StatStrip): 16; of an overlay (Dialog, Sheet): 24. */
+  --qh-pad-surface: 1rem;
   --qh-pad-dialog: 1.5rem;
-  /* Gaps: between controls 10, toolbar to content 16, between surfaces 16. */
-  --qh-gap-control: 0.625rem;
+  /* Gaps: between controls 8, toolbar to content 16, between surfaces 16. */
+  --qh-gap-control: 0.5rem;
   --qh-gap-block: 1rem;
-  /* Shape (redesign "Sơn mài"): a control is 4, a surface (card, panel, plate) is 6, a box nested in a surface is 4, a small square mark is 3. Chips and lamps stay round. */
+  /* Shape (redesign "Sơn mài"): a control is 4, a surface (card, panel, plate) is 6, a box nested in a surface is 4, a small square mark is 2. Status tags and lamps are round; nothing you can click is. */
   --qh-radius-control: 4px;
   --qh-radius-surface: 6px;
   --qh-radius-nested: 4px;
-  --qh-radius-mark: 3px;
+  --qh-radius-mark: 2px;
   --qh-radius-pill: 999px;
   --qh-radius-skeleton: 4px;
   --qh-radius-card: var(--qh-radius-surface);
   --qh-radius-row: var(--qh-radius-nested);
-  --qh-radius-cell: var(--qh-radius-mark);
+  --qh-radius-cell: var(--qh-radius-control);
   /* Surface levels, by tone not by line: L0 ground (--qh-ground), L1 surface (Card, Panel, table), L2 strong (fields, secondary buttons,
      the segmented track, the current tab, neutral chips), hover (--qh-surface-hover). L3 overlay = L1 + --qh-shadow-float + this ring. */
   --qh-ring-overlay: inset 0 0 0 1px var(--qh-line);
-  /* Admin density, global so no size depends on whether the admin chunk has loaded: 40 px rows, controls as the public kit, 36 px filter chips (48, 44, 44 on touch). */
-  --qa-row: 2.5rem;
+  /* Admin density, global so no size depends on whether the admin chunk has loaded: rows and controls as the public kit, 32 px filter toggles (44 on touch). */
+  --qa-row: var(--qh-row);
   --qa-control: var(--qh-control);
-  --qa-chip: var(--qh-control);
+  --qa-chip: var(--qh-control-sm);
   --qa-gap: 0.75rem;
-  /* Motion (.batch/motion-ux/motion-notes.md): five durations and four curves. Reduced motion (below) and low power
-     (styles.css) zero the durations, so every element shows its end state at once. */
-  --qh-duration-instant: 80ms;
-  --qh-duration-fast: 150ms;
+  /* Motion: three durations on the scale (0.12 s a colour or press step, 0.2 s a move, 1.2 s the judging pulse) and four curves;
+     `-instant` and `-emphasis` are old names of the first two. Reduced motion (below) and low power (styles.css) zero the durations,
+     so every element shows its end state at once. */
+  --qh-duration-instant: 120ms;
+  --qh-duration-fast: 120ms;
   --qh-duration: 200ms;
-  --qh-duration-emphasis: 320ms;
+  --qh-duration-emphasis: 200ms;
   --qh-highlight-decay: 1200ms;
   --qh-ease: cubic-bezier(0.2, 0, 0, 1);
   --qh-ease-exit: cubic-bezier(0.4, 0, 1, 1);
@@ -155,13 +160,14 @@
   :root {
     --qh-control: var(--qh-touch);
     --qh-control-sm: var(--qh-touch);
-    --qh-control-lg: 3.5rem;
+    --qh-control-lg: var(--qh-touch);
+    --qh-row: 3.25rem;
     --qh-control-inset: 0rem;
     --space-page-top: 1rem;
     --space-header: 0.75rem;
     --space-toolbar: 0.5rem;
     --space-section: 2rem;
-    --qa-row: 3rem;
+    --qa-row: var(--qh-row);
     --qa-chip: var(--qh-touch);
   }
 }

@@ -287,7 +287,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
           <li
             v-for="index in skeletonRows"
             :key="index"
-            class="flex flex-col gap-1.5 border-b border-line py-3 text-sm"
+            class="flex flex-col gap-2 border-b border-line py-3 text-sm"
             :class="VARIANT.stackedRow"
           >
             <span><SkeletonBlock text class="w-48" /></span>
@@ -365,7 +365,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
           v-for="(row, index) in rows"
           :key="rowKey(row)"
           v-bind="rowAttrs?.(row)"
-          class="flex flex-col gap-1.5 border-b border-line py-3"
+          class="flex flex-col gap-2 border-b border-line py-3"
           :class="[
             VARIANT.stackedRow,
             selected.has(rowKey(row)) && 'bg-accent-soft',
@@ -435,7 +435,7 @@ const offset = computed(() => (props.selectable ? 1 : 0));
               v-if="meta.length"
               tone="ghost"
               size="sm"
-              :class="isCompact && '-ml-2.5'"
+              :class="isCompact && '-ml-2'"
               :aria-expanded="openDetails.has(rowKey(row))"
               :aria-controls="`${detailsId}-${index}`"
               @click="toggleDetails(rowKey(row))"
@@ -519,14 +519,14 @@ const offset = computed(() => (props.selectable ? 1 : 0));
                     <ArrowUp
                       v-if="ariaSortOf(column.sort, sort) === 'ascending'"
                       aria-hidden="true"
-                      class="size-3.5"
+                      class="size-4"
                     />
                     <ArrowDown
                       v-else-if="ariaSortOf(column.sort, sort) === 'descending'"
                       aria-hidden="true"
-                      class="size-3.5"
+                      class="size-4"
                     />
-                    <ChevronsUpDown v-else aria-hidden="true" class="size-3.5" />
+                    <ChevronsUpDown v-else aria-hidden="true" class="size-4" />
                   </button>
                   <template v-else>{{ column.label }}</template>
                 </th>

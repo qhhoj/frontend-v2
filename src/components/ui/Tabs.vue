@@ -5,7 +5,6 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
 import { RouterLink, useRoute } from 'vue-router';
-import Chip from './Chip.vue';
 import AppButton from './AppButton.vue';
 import Menu from './Menu.vue';
 import type { MenuEntry } from './Menu.vue';
@@ -14,6 +13,7 @@ import {
   MORE_CLASS,
   TAB_BASE,
   TAB_CLASS,
+  TAB_COUNT,
   TAB_INDICATOR,
   TABS_FRAME,
   tabsList,
@@ -50,8 +50,8 @@ export interface TabItem {
 }
 
 /**
- * A row of tabs. `underline` (the default, the old name) and `pill` both draw the pill row, the current tab filled; `rail` is a vertical side nav
- * from `lg` and the pill row below it. Link tabs mark the open one `aria-current="page"` (the `v-model` key, else the
+ * A row of tabs, underline only: the current tab is ink text over a 2 px brand bar (`underline`, the default; `pill` is an old name
+ * of it); `rail` is a side menu from `lg` and the same row below it. Link tabs mark the open one `aria-current="page"` (the `v-model` key, else the
  * router's exact match); without links the row is a tablist with a roving tabindex and arrow keys. `overflow="menu"`
  * hides a tab that does not fit whole (never the current one) and lists it behind a "⋯ Thêm" button; `scroll` lets the row
  * scroll sideways.
@@ -87,12 +87,17 @@ const { hiddenKeys, measure } = useTabsOverflow(scroller, trigger, hasMenu, [
   () => route.fullPath,
 ]);
 /** The indicator slides to the current tab when the model, the router or the items change. */
-const indicator = useSlidingIndicator(scroller, '[data-tab-key]', [
-  current,
-  () => route.fullPath,
-  () => props.variant,
-  () => props.items.map((item) => `${item.key}:${item.isCurrent}`).join(),
-]);
+const indicator = useSlidingIndicator(
+  scroller,
+  '[data-tab-key]',
+  [
+    current,
+    () => route.fullPath,
+    () => props.variant,
+    () => props.items.map((item) => `${item.key}:${item.isCurrent}`).join(),
+  ],
+  () => true,
+);
 /** A scrolling row (a phone) opens with the current tab in view, and brings the new one in after a route change; no smooth scroll. */
 function revealCurrent() {
   if (props.overflow !== 'scroll') return;
@@ -183,8 +188,6 @@ const triggerWord = computed(() => t('nav.more'));
 const triggerName = computed(() =>
   hiddenMark.value ? `${triggerWord.value}: ${hiddenMark.value.label}` : triggerWord.value,
 );
-/** The count is a small Chip; `accent` (something waits for the viewer) is the filled one. */
-const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
 </script>
 
 <template>
@@ -229,19 +232,14 @@ const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
                 class="size-4 shrink-0"
               />
               {{ item.label }}
-              <Chip
-                v-if="item.count != null"
-                size="sm"
-                class="font-mono tabular-nums"
-                :tone="COUNT_TONE[item.countTone ?? 'neutral']"
-              >
+              <span v-if="item.count != null" :class="TAB_COUNT[item.countTone ?? 'neutral']">
                 <span
                   :data-testid="item.countTestid"
                   :aria-hidden="item.countLabel ? 'true' : undefined"
                   >{{ item.count }}</span
                 >
                 <span v-if="item.countLabel" class="sr-only">{{ item.countLabel }}</span>
-              </Chip>
+              </span>
               <span
                 v-if="item.dirty"
                 data-testid="tab-dirty"
@@ -266,8 +264,8 @@ const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
           <template #trigger="{ toggle, open, setOpener }">
             <AppButton
               :ref="(el) => setOpener((el as { $el?: HTMLElement } | null)?.$el ?? null)"
-              tone="ghost"
-              size="md"
+              tone="quiet"
+              size="sm"
               :aria-label="triggerName"
               :data-testid="moreTestid"
               aria-haspopup="menu"
@@ -281,7 +279,7 @@ const COUNT_TONE = { neutral: 'neutral', accent: 'solid' } as const;
                   v-if="hiddenMark"
                   aria-hidden="true"
                   data-testid="tabs-more-mark"
-                  class="pointer-events-none absolute -top-1 -right-2.5"
+                  class="pointer-events-none absolute -top-1 -right-2"
                   :tone="hiddenMark.tone"
                   :label="hiddenMark.label"
                 />

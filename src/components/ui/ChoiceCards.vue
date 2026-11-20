@@ -19,7 +19,7 @@ defineProps<{
 
 <template>
   <fieldset class="m-0 flex min-w-0 flex-col gap-2 border-0 p-0">
-    <legend class="mb-1.5 text-sm font-semibold" :class="{ 'sr-only': legendHidden }">
+    <legend class="mb-2 text-sm font-semibold" :class="{ 'sr-only': legendHidden }">
       {{ legend }}
     </legend>
     <div class="grid gap-2 sm:grid-cols-2" :class="{ 'md:grid-cols-3': cols === 3 }">
@@ -27,9 +27,9 @@ defineProps<{
         v-for="option in options"
         :key="option.value"
         :data-testid="`${name}-${option.value}`"
-        class="flex min-h-11 cursor-pointer items-start gap-3 rounded-cell border px-3 py-2.5 transition-colors has-[:checked]:border-accent has-[:checked]:bg-surface-hover has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-accent"
+        class="flex min-h-(--qh-control) cursor-pointer items-start gap-2 rounded-control border px-3 py-2 transition-colors has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus"
         :class="
-          model === option.value ? 'border-accent' : 'border-line-control hover:bg-surface-hover'
+          model === option.value ? 'border-accent' : 'border-line-control hover:bg-surface-strong'
         "
       >
         <input
@@ -37,7 +37,7 @@ defineProps<{
           type="radio"
           :name="name"
           :value="option.value"
-          :class="RADIO_INPUT"
+          :class="`${RADIO_INPUT} mt-0.5`"
         />
         <span class="flex min-w-0 flex-col">
           <span class="text-sm font-semibold">{{ option.label }}</span>

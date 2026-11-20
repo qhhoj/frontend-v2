@@ -19,7 +19,7 @@ defineProps<{
 
 <template>
   <fieldset class="m-0 min-w-0 border-0 p-0">
-    <legend class="mb-1.5 text-sm font-semibold" :class="{ 'sr-only': legendHidden }">
+    <legend class="mb-2 text-sm font-semibold" :class="{ 'sr-only': legendHidden }">
       {{ legend }}
     </legend>
     <div class="flex gap-x-6 gap-y-1" :class="inline ? 'flex-row flex-wrap' : 'flex-col'">

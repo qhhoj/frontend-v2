@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { CONTROL_FRAME, useFieldControl } from './FormField.control';
+import { CONTROL_FRAME, FIELD_FRAME, FIELD_INPUT, useFieldControl } from './FormField.control';
 import { useSplitAttrs } from './split-attrs';
 
 /**
- * A text input, a 36 px pill (44 on touch), 15 px text on the strong surface, no line. Inside a `FormField` it takes the field's id and
+ * A text input: 40 px (44 on touch), the control border and radius of a button, 15 px text on the surface (`FormField.control.ts`). Inside a `FormField` it takes the field's id and
  * description. `#prefix` and `#suffix` sit inside the frame (a unit like "MB", a slug start like "qhhoj.com/", an icon); a tap
  * on them focuses the input. Extra attributes (`type`, `min`, `inputmode`) go to the input; `class` too, or to the frame when there is a prefix or suffix.
  */
@@ -17,8 +17,6 @@ function focusInput(event: MouseEvent) {
   if (event.target === frameEl || !(event.target as HTMLElement).closest('button'))
     frameEl.querySelector('input')?.focus();
 }
-const FRAMED =
-  'edge-high flex h-(--qh-control) items-center gap-2 rounded-control bg-surface-strong px-(--qh-control-px-sm) text-body text-content has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus has-aria-invalid:bg-negative-bg has-aria-invalid:inset-ring has-aria-invalid:inset-ring-negative has-disabled:cursor-not-allowed has-disabled:text-muted';
 </script>
 
 <template>
@@ -34,9 +32,9 @@ const FRAMED =
     :aria-invalid="
       field?.invalid ?? ($attrs['aria-invalid' as keyof typeof $attrs] as 'true' | undefined)
     "
-    :class="`${CONTROL_FRAME} h-(--qh-control) rounded-control`"
+    :class="`${CONTROL_FRAME} h-(--qh-control)`"
   />
-  <div v-else v-bind="frame" :class="FRAMED" @click="focusInput">
+  <div v-else v-bind="frame" :class="FIELD_FRAME" @click="focusInput">
     <span v-if="$slots.prefix" class="flex shrink-0 items-center text-muted"
       ><slot name="prefix"
     /></span>
@@ -51,7 +49,7 @@ const FRAMED =
       :aria-invalid="
         field?.invalid ?? ($attrs['aria-invalid' as keyof typeof $attrs] as 'true' | undefined)
       "
-      class="h-full min-w-0 flex-1 bg-transparent text-body outline-none placeholder:text-muted"
+      :class="FIELD_INPUT"
     />
     <span v-if="$slots.suffix" class="flex shrink-0 items-center text-muted"
       ><slot name="suffix"

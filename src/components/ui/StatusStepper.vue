@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { SubmissionStatus } from '@/api/types/submissions';
+import Lamp from './Lamp.vue';
 
 /**
- * The steps of a submission that is not final, as dots on one line with the current step's label: queued, processing
- * (the judge took it, before the first test), running test k of n, verdict. Done dots are filled and the current one
- * pulses (static under reduced motion). It shows only what the live status says, so there is no compile step: the judge
- * does not report one. It stands in for the verdict chip until the verdict arrives; `compact` is the one-line list row.
+ * A submission that is not final, drawn like a verdict (`VerdictChip`): lamps in the judging colour, then the current step's label.
+ * Four lamps on one line (queued, processing: the judge took it, before the first test; running test k of n; verdict): done steps
+ * are lit, the current one pulses (still under reduced motion), the rest are unlit rings. It shows only what the live status says,
+ * so there is no compile step: the judge does not report one. `compact` is the one-line list row: one pulsing lamp and the label.
  */
 const props = defineProps<{
   status: SubmissionStatus;
@@ -26,28 +27,25 @@ const label = computed(() => {
   if (current.value === 1) return 'submission.step.processing';
   return props.test ? 'submission.step.running' : 'submission.step.grading';
 });
-const dotClass = (index: number) => {
-  if (index < current.value) return 'bg-verdict-pending';
-  if (index === current.value) return 'bg-verdict-pending skeleton-pulse';
-  return 'bg-line-strong';
-};
+/** Lamp index of each step shown: all four, or only the current one in a list row. */
+const lamps = computed(() =>
+  props.compact ? [current.value] : Array.from({ length: STEP_COUNT }, (_, index) => index),
+);
 </script>
 
 <template>
-  <span class="inline-flex min-w-0 items-center gap-2" :class="compact ? 'text-tiny' : 'text-sm'">
-    <span
-      aria-hidden="true"
-      class="flex shrink-0 items-center"
-      :class="compact ? 'gap-1' : 'gap-1.5'"
-    >
-      <span
-        v-for="index in STEP_COUNT"
+  <span
+    class="inline-flex min-h-(--qh-chip) min-w-0 items-center gap-2 text-small text-verdict-pending"
+  >
+    <span aria-hidden="true" class="flex shrink-0 items-center gap-2">
+      <Lamp
+        v-for="index in lamps"
         :key="index"
-        class="rounded-pill transition-colors"
-        :class="[compact ? 'size-1.5' : 'size-2', dotClass(index - 1)]"
+        :tone="index > current ? 'none' : 'pending'"
+        :still="index < current"
       />
     </span>
-    <span class="truncate font-medium text-verdict-pending">{{
+    <span class="truncate font-semibold">{{
       $t(label, { test: test ?? 0, total: total ?? '?' })
     }}</span>
   </span>

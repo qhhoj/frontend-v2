@@ -82,7 +82,7 @@ watch(visible, (isOpen, wasOpen) => wasOpen && !isOpen && emit('hide'), { flush:
             {{ title }}
           </h2>
           <p v-if="subtitle" class="m-0 truncate text-meta text-muted">{{ subtitle }}</p>
-          <div v-if="slots.meta" class="mt-2 flex flex-wrap items-center gap-1.5">
+          <div v-if="slots.meta" class="mt-2 flex flex-wrap items-center gap-2">
             <slot name="meta" />
           </div>
         </div>

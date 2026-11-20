@@ -11,12 +11,12 @@ withDefaults(defineProps<{ id: string; message: string; scale?: 'meta' | 'admin'
 </script>
 
 <template>
-  <p v-if="scale === 'admin'" :id="id" class="flex items-start gap-1.5 text-sm text-negative">
-    <CircleAlert class="mt-0.5 size-3.5 shrink-0" aria-hidden="true" :stroke-width="1.75" />
+  <p v-if="scale === 'admin'" :id="id" class="flex items-start gap-2 text-sm text-negative">
+    <CircleAlert class="mt-0.5 size-4 shrink-0" aria-hidden="true" :stroke-width="1.75" />
     <span>{{ message }}</span>
   </p>
-  <p v-else :id="id" class="flex items-center gap-1.5 text-meta text-negative">
-    <CircleAlert aria-hidden="true" class="size-3.5 shrink-0" />
+  <p v-else :id="id" class="flex items-center gap-2 text-meta text-negative">
+    <CircleAlert aria-hidden="true" class="size-4 shrink-0" />
     {{ message }}
   </p>
 </template>

@@ -79,7 +79,7 @@ const toneMap = (box: (tone: NoticeTone) => string, icon: (tone: NoticeTone) => 
   ) as NoticeLook['tones'];
 const LOOKS: Record<NoticeLookName, NoticeLook> = {
   default: {
-    box: 'gap-2.5 rounded-row px-3.5 py-3 text-sm leading-normal',
+    box: 'gap-2 rounded-row px-3 py-3 text-sm leading-normal',
     icon: 'mt-0.5 size-4.5',
     tones: toneMap(
       (tone) => `${TINTS[tone]} ${INKS[tone]}`,
@@ -87,7 +87,7 @@ const LOOKS: Record<NoticeLookName, NoticeLook> = {
     ),
   },
   compact: {
-    box: 'gap-2.5 rounded-cell px-3 py-2.5 text-sm text-content',
+    box: 'gap-2 rounded-cell px-3 py-2 text-sm text-content',
     icon: 'mt-0.5 size-4',
     tones: toneMap(
       (tone) => TINTS[tone],
@@ -95,8 +95,8 @@ const LOOKS: Record<NoticeLookName, NoticeLook> = {
     ),
   },
   inline: {
-    box: 'gap-1.5 text-meta',
-    icon: 'mt-0.5 size-3.5',
+    box: 'gap-2 text-meta',
+    icon: 'mt-0.5 size-4',
     tones: toneMap(
       (tone) => INKS[tone],
       () => '',
@@ -158,7 +158,7 @@ const isActionBelow = computed(() => lookName.value === 'compact');
     <slot v-if="!isActionBelow" name="action" />
     <IconButton
       v-if="dismissible"
-      class="-my-3 -mr-2.5 shrink-0"
+      class="-my-3 -mr-2 shrink-0"
       :label="$t('common.notice.dismiss')"
       @click="$emit('dismiss')"
     >

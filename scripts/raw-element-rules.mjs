@@ -89,8 +89,9 @@ export const CLASS_RULES = {
     breaks: (token) => /^(?:size|h|min-h)-\[[\d.]+(?:px|rem)\]$/.test(utilityOf(token)),
   },
   'disabled-opacity': {
-    use: 'the muted disabled pair of the kit control (AppButton disabledReason), never opacity',
+    use: 'the disabled state of the kit control (AppButton disabledReason): the kit draws it (45 % opacity, --qh-opacity-disabled), a page never does',
     breaks: (token, rel, line) =>
+      !isKit(rel) &&
       /^opacity-/.test(utilityOf(token)) &&
       (token
         .split(':')

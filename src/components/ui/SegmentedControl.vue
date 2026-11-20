@@ -1,10 +1,10 @@
 <script setup lang="ts" generic="Value extends string | number">
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { computed } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import { RouterLink } from 'vue-router';
 import Chip from './Chip.vue';
 import StatusMark from './StatusMark.vue';
-import { SLIDE, useSlidingIndicator } from './useSlidingIndicator';
+import { TOGGLE_BASE, TOGGLE_OFF, TOGGLE_ON } from './button-classes';
 
 export interface SegmentOption<V extends string | number = string> {
   value: V;
@@ -33,10 +33,10 @@ export interface SegmentDot {
 }
 
 /**
- * One choice out of two to four views (Kit 2): segments inside one pill track on the strong surface (L2), 36 px tall, the current one a
- * thumb on the page surface (L1, no shadow) that slides. `md` fills its width with equal segments (settings);
- * `sm` is the admin chip density (a 44 px segment on a coarse pointer) and wraps on a narrow phone instead of being clipped, the
- * current segment scrolled into view when the row still overflows. Links make it a `nav`; buttons a `group` of `aria-pressed` toggles.
+ * One choice out of two to four views or filters ("Sơn mài" controls): a row of filter toggles, 32 px rounded rectangles 8 px apart;
+ * the chosen one takes the "on" look (soft brand ground, brand border, brand text). There is no track and no sliding thumb.
+ * `md` fills its width with equal toggles (settings); `sm` keeps each toggle as wide as its label and wraps on a narrow phone.
+ * Links make it a `nav`; buttons a `group` of `aria-pressed` toggles. A toggle is 44 px tall on touch.
  */
 const props = withDefaults(
   defineProps<{
@@ -50,51 +50,15 @@ const props = withDefaults(
 );
 const emit = defineEmits<{ 'update:modelValue': [value: Value] }>();
 const isNav = computed(() => props.options.some((option) => option.to));
-const frame = ref<HTMLElement | null>(null);
-const indicator = useSlidingIndicator(frame, '[data-segment]', [
-  () => props.modelValue,
-  () => props.options.map((option) => option.value).join(),
-  () => props.size,
-]);
-
-function revealCurrent() {
-  const box = frame.value;
-  const segment = box?.querySelector<HTMLElement>('[aria-current="page"], [aria-pressed="true"]');
-  if (!box || !segment || box.scrollWidth <= box.clientWidth) return;
-  box.scrollLeft = segment.offsetLeft - (box.clientWidth - segment.offsetWidth) / 2;
-}
-onMounted(revealCurrent);
-watch(
-  () => props.modelValue,
-  () => void nextTick(revealCurrent),
-);
-
 function stateOf(option: SegmentOption<Value>) {
   const isCurrent = option.value === props.modelValue;
   if (option.to) return { to: option.to, 'aria-current': isCurrent ? 'page' : undefined };
   return { type: 'button', disabled: props.disabled, 'aria-pressed': isCurrent };
 }
 
-/**
- * The frame is exactly one control tall (`--qh-control`: 36 px, 44 on touch), like every other toolbar control; the segments
- * stretch to fill it inside a 3 px inset (`--qh-control-inset`). On touch the inset is 0, so a segment is the full 44 px.
- */
-const FRAME_BASE =
-  'edge-high relative flex min-h-(--qh-control) gap-0.5 rounded-control bg-surface-strong p-(--qh-control-inset) touch:gap-0';
-const FRAME = {
-  md: `${FRAME_BASE} max-w-full overflow-x-auto [scrollbar-width:none]`,
-  sm: `${FRAME_BASE} max-w-full flex-wrap self-start overflow-x-auto`,
-};
-const SEGMENT = {
-  md: 'relative inline-flex flex-1 items-center justify-center gap-1.5 px-(--qh-control-px-sm) whitespace-nowrap touch:min-h-11',
-  sm: 'relative inline-flex shrink-0 items-center gap-1.5 px-(--qh-control-px-sm) whitespace-nowrap touch:min-h-11',
-};
-/** The current segment: bold, full-contrast text over the sliding thumb. */
-const ACTIVE = 'font-semibold text-content';
-/** The indicator behind the segments; disabled keeps the full-contrast text, no opacity. */
-const INDICATOR = 'pointer-events-none absolute top-0 left-0 rounded-control bg-surface';
-const IDLE = 'text-muted hover:text-content';
-
+const FRAME = { md: 'flex max-w-full gap-2', sm: 'flex max-w-full flex-wrap gap-2 self-start' };
+const SEGMENT = { md: 'flex-1 justify-center', sm: '' };
+const DISABLED = 'disabled:cursor-not-allowed disabled:opacity-(--qh-opacity-disabled)';
 /** The option's dot: its own, else the red one `alertLabel` names. */
 function dotOf(option: SegmentOption<Value>): SegmentDot | undefined {
   if (option.dot) return option.dot;
@@ -106,17 +70,10 @@ const segments = computed(() => props.options.map((option) => ({ option, dot: do
 <template>
   <component
     :is="isNav ? 'nav' : 'div'"
-    ref="frame"
     :role="isNav ? undefined : 'group'"
     :aria-label="label"
     :class="FRAME[size]"
   >
-    <span
-      v-if="indicator.visible.value"
-      aria-hidden="true"
-      :class="[INDICATOR, disabled && 'bg-surface-hover', indicator.animate.value && SLIDE]"
-      :style="indicator.style.value"
-    />
     <component
       :is="option.to ? RouterLink : 'button'"
       v-for="{ option, dot } in segments"
@@ -124,20 +81,25 @@ const segments = computed(() => props.options.map((option) => ({ option, dot: do
       v-bind="stateOf(option)"
       :data-testid="option.testid"
       data-segment
-      class="rounded-control text-body font-medium disabled:cursor-not-allowed"
-      :class="[SEGMENT[size], option.value === modelValue ? ACTIVE : IDLE]"
+      :class="[
+        TOGGLE_BASE,
+        SEGMENT[size],
+        DISABLED,
+        option.value === modelValue ? TOGGLE_ON : TOGGLE_OFF,
+        !disabled && 'cursor-pointer',
+      ]"
       @click="option.to ? undefined : emit('update:modelValue', option.value)"
     >
       {{ option.label }}
-      <Chip v-if="option.count" size="sm" class="font-mono tabular-nums">
+      <span v-if="option.count" class="font-mono text-kbd tabular-nums">
         <span
           :data-testid="option.countTestid"
           :aria-hidden="option.countLabel ? 'true' : undefined"
           >{{ option.count }}</span
         >
         <span v-if="option.countLabel" class="sr-only">{{ option.countLabel }}</span>
-      </Chip>
-      <Chip v-if="option.badge" size="sm">{{ option.badge }}</Chip>
+      </span>
+      <Chip v-if="option.badge">{{ option.badge }}</Chip>
       <StatusMark
         v-if="dot"
         :data-testid="`${option.testid}-${dot.tone === 'danger' ? 'alert' : 'dot'}`"

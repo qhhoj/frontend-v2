@@ -25,17 +25,6 @@ export const CUE_TEXT: Record<CueTone, string> = {
   attention: 'text-cue-attention',
 };
 
-/** Text on a tint, no line: the chip look. */
-export const CUE_CHIP: Record<CueTone, string> = {
-  live: 'bg-cue-live-bg text-cue-live',
-  upcoming: 'bg-cue-upcoming-bg text-cue-upcoming',
-  ended: 'bg-cue-ended-bg text-cue-ended',
-  full: 'bg-cue-full-bg text-cue-full',
-  partial: 'bg-cue-partial-bg text-cue-partial',
-  zero: 'bg-cue-zero-bg text-cue-zero',
-  attention: 'bg-cue-attention-bg text-cue-attention',
-};
-
 export const CUE_DOT: Record<CueTone, string> = {
   live: 'bg-cue-live',
   upcoming: 'bg-cue-upcoming',

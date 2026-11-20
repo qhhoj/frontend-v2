@@ -131,7 +131,7 @@ function onKeydown(event: KeyboardEvent) {
       @keydown="onKeydown"
     >
       <template v-for="(item, index) in entries" :key="index">
-        <li v-if="item.separated" role="separator" class="mx-1.5 my-1 border-t border-line" />
+        <li v-if="item.separated" role="separator" class="mx-2 my-1 border-t border-line" />
         <li
           :id="itemId(index)"
           role="menuitem"
@@ -145,7 +145,7 @@ function onKeydown(event: KeyboardEvent) {
           <a
             :href="hrefOf(item)"
             tabindex="-1"
-            class="flex min-h-(--qh-row-dense) items-center gap-2.5 px-3 text-body no-underline touch:min-h-(--qh-touch)"
+            class="flex min-h-(--qh-row-dense) items-center gap-2 px-3 text-body no-underline touch:min-h-(--qh-touch)"
             :class="
               item.disabled
                 ? 'cursor-not-allowed text-muted'
@@ -161,7 +161,7 @@ function onKeydown(event: KeyboardEvent) {
               :class="item.danger ? 'text-negative' : 'text-muted'"
               :stroke-width="1.75"
             />
-            <span class="flex flex-col" :class="item.hint && 'py-1.5'">
+            <span class="flex flex-col" :class="item.hint && 'py-2'">
               <span>{{ item.label }}</span>
               <span v-if="item.hint" class="text-caption leading-4 text-muted">{{
                 item.hint

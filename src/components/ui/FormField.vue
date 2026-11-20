@@ -47,7 +47,7 @@ provide(FIELD_CONTROL, control);
 </script>
 
 <template>
-  <div class="flex flex-col gap-1.5">
+  <div class="flex flex-col gap-2">
     <div class="flex items-baseline justify-between gap-3">
       <label :for="id" class="text-sm font-semibold text-content">
         {{ label

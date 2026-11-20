@@ -4,6 +4,7 @@ import { onBeforeUnmount, ref, useId, watch } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import { useRouter } from 'vue-router';
 import AppButton from './AppButton.vue';
+import { TOGGLE_BASE, TOGGLE_ON } from './button-classes';
 import SearchInput from './SearchInput.vue';
 
 export interface ActiveFilter {
@@ -141,12 +142,12 @@ const removeChip = (key: string) => emit('remove', key);
       <li v-for="chip in chips" :key="chip.key">
         <button
           type="button"
-          class="inline-flex h-(--qa-chip) items-center gap-1 rounded-pill bg-surface-strong pr-2 pl-(--qh-control-px-sm) text-meta font-semibold hover:bg-surface-hover"
+          :class="[TOGGLE_BASE, TOGGLE_ON, 'cursor-pointer']"
           :aria-label="$t('common.table.removeFilter', { label: chip.label })"
           @click="removeChip(chip.key)"
         >
           {{ chip.label }}
-          <X aria-hidden="true" class="size-3.5 text-muted" :stroke-width="1.75" />
+          <X aria-hidden="true" class="size-4" />
         </button>
       </li>
       <li>

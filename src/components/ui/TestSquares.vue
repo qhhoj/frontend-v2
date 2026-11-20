@@ -29,7 +29,7 @@ defineProps<{
       v-for="(test, index) in tests"
       :key="index"
       :title="test.label"
-      class="inline-flex size-5.5 items-center justify-center rounded-cell font-mono text-kbd leading-none transition-colors"
+      class="inline-flex size-5 items-center justify-center rounded-mark font-mono text-kbd leading-none transition-colors"
       :class="
         test.tone === 'waiting'
           ? 'bg-surface-strong text-content'

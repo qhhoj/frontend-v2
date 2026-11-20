@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="Option extends object">
 import { ChevronDown, LoaderCircle, Search, X } from 'lucide-vue-next';
 import { computed, nextTick, ref, useAttrs, useId, useTemplateRef, watch } from 'vue';
-import { useFieldControl } from './FormField.control';
+import { CONTROL_FRAME, useFieldControl } from './FormField.control';
 import { yieldsToComposition } from './keys';
 import { usePopup } from './popup';
 
@@ -173,8 +173,8 @@ function onBoxKeydown(event: KeyboardEvent) {
     :aria-describedby="describedBy ?? field?.describedBy"
     :aria-invalid="isInvalid || undefined"
     :aria-busy="loading || undefined"
-    class="relative flex h-(--qh-control) w-full min-w-0 cursor-pointer items-center rounded-control bg-surface-strong pl-(--qh-control-px-sm) text-body text-content outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-    :class="isInvalid ? 'bg-negative-bg inset-ring inset-ring-negative' : 'edge-high'"
+    class="relative flex h-(--qh-control) w-full min-w-0 cursor-pointer items-center rounded-control border bg-surface pl-(--qh-control-px-sm) text-body text-content focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-accent-soft"
+    :class="isInvalid ? 'border-negative bg-negative-bg' : 'border-line-control'"
     @click="popup.isOpen.value ? close() : open()"
     @keydown="onBoxKeydown"
   >
@@ -208,7 +208,7 @@ function onBoxKeydown(event: KeyboardEvent) {
     >
       <div v-if="filter" class="relative p-1">
         <Search
-          class="pointer-events-none absolute top-1/2 left-3.5 size-3.5 -translate-y-1/2 text-muted"
+          class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted"
           aria-hidden="true"
         />
         <input
@@ -221,7 +221,7 @@ function onBoxKeydown(event: KeyboardEvent) {
           :aria-controls="listId"
           :aria-activedescendant="activeId"
           :placeholder="filterPlaceholder"
-          class="edge-high h-(--qh-control) w-full rounded-control bg-surface-strong pr-2.5 pl-8 text-body text-content placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          :class="`${CONTROL_FRAME} h-(--qh-control) pl-8`"
           @keydown="onListKeydown"
         />
       </div>
@@ -239,7 +239,7 @@ function onBoxKeydown(event: KeyboardEvent) {
           :key="String(valueOf(option))"
           role="option"
           :aria-selected="valueOf(option) === model"
-          class="flex min-h-(--qh-row) cursor-pointer items-center rounded-cell px-2.5 text-meta hover:bg-surface-hover touch:min-h-11"
+          class="flex min-h-(--qh-row) cursor-pointer items-center rounded-cell px-2 text-meta hover:bg-surface-hover touch:min-h-11"
           :class="[
             index === active && 'bg-surface-hover outline-2 -outline-offset-2 outline-focus',
             valueOf(option) === model && 'font-semibold text-accent-text',

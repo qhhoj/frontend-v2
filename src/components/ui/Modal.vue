@@ -103,7 +103,7 @@ const handlers = useModalDialog(useTemplateRef<HTMLDialogElement>('dialog'), vis
       <footer
         v-if="$slots.footer"
         ref="footer"
-        class="flex shrink-0 justify-end gap-2.5 px-(--qh-pad-dialog) pb-(--qh-pad-dialog)"
+        class="flex shrink-0 justify-end gap-2 px-(--qh-pad-dialog) pb-(--qh-pad-dialog)"
       >
         <slot name="footer" />
       </footer>
