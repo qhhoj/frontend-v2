@@ -11,10 +11,15 @@ const MEDALS: Record<number, string> = {
 
 /**
  * The rank mark of a board cell: first place is a gold disc, second a gold ring, third a plain ring; every other rank
- * (and a disqualified row) is a plain number.
+ * (and a disqualified row) is a plain number. Merit needs a score above zero: on a board where nobody has scored, every
+ * row is "rank 1" and none of them gets a medal.
  */
-export const rankMedalClass = (rank: number | null, isDisqualified = false): string => {
-  const medal = rank !== null && !isDisqualified ? MEDALS[rank] : undefined;
+export const rankMedalClass = (
+  rank: number | null,
+  score: number,
+  isDisqualified = false,
+): string => {
+  const medal = rank !== null && score > 0 && !isDisqualified ? MEDALS[rank] : undefined;
   return medal ? `${MEDAL_SHAPE} ${medal}` : '';
 };
 

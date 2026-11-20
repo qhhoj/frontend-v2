@@ -2665,15 +2665,12 @@
     "changed": "The rules were just updated, please read them again.",
     "cardTitle": "Rules",
     "revision": "revision {revision}",
-    "read": "Read the rules",
-    "hide": "Collapse",
     "cardNote": "You will be asked to accept them when you register or take a virtual run.",
     "accepted": "Accepted revision {revision} at {time}"
   },
   "problemSwitcher": {
     "collapse": "Collapse the problem list",
     "expand": "Expand the problem list",
-    "limitsColumn": "Limits",
     "status": {
       "solved": "Solved",
       "tried": "Tried, not solved",

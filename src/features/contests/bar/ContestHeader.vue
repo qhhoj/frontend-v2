@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Ellipsis, Lock, Printer, Timer } from 'lucide-vue-next';
-import { computed, ref, watch } from 'vue';
+import { computed, provide, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import type { ContestDetail } from '@/api/types/contests';
 import CountdownTimer from '@/components/CountdownTimer.vue';
@@ -10,6 +10,7 @@ import IconButton from '@/components/ui/IconButton.vue';
 import Menu from '@/components/ui/Menu.vue';
 import type { MenuEntry } from '@/components/ui/Menu.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
+import { CURRENT_SECTION_KEY } from '@/components/ui/page-section';
 import ShortLinkButton from '@/features/short-links/ShortLinkButton.vue';
 import { shortLinkPath } from '@/features/short-links/short-link-path';
 import UserLink from '@/components/UserLink.vue';
@@ -77,7 +78,12 @@ useShownClock(
 );
 const { t } = useI18n();
 const locale = useLocaleStore();
-/** The eyebrow over the name: the viewer's virtual run when one goes on, the format, and "rated" when it is. */
+/**
+ * One eyebrow line over the name ("Kỳ thi · ICPC · Tính rating"): the section (the way back to the list), the viewer's
+ * virtual run when one goes on, the format, and "rated" when it is. The header's own section crumb would be a second
+ * line saying "Kỳ thi" again, so the header inside gets no section.
+ */
+provide(CURRENT_SECTION_KEY, ref(null));
 const eyebrow = computed(() => {
   const contest = props.contest;
   if (!contest) return '';
@@ -155,7 +161,13 @@ usePublishedHeight(
         />
       </template>
       <template #above>
-        <p class="eyebrow" data-testid="contest-eyebrow">{{ eyebrow }}</p>
+        <p class="eyebrow" data-testid="contest-eyebrow">
+          <RouterLink :to="{ name: 'contests' }" class="hover:text-content hover:underline max-md:hidden">{{
+            $t('nav.contests')
+          }}</RouterLink>
+          <span class="md:hidden">{{ $t('nav.contests') }}</span>
+          · {{ eyebrow }}
+        </p>
       </template>
       <template #meta>
         <ContestChips

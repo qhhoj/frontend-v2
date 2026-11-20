@@ -22,13 +22,14 @@ import { viewerLampOf } from './viewer-status';
  * a submission), points with "từng phần", the acceptance rate with the solver count, the viewer's own standing, the group
  * and the judge an external problem runs on. Inside the viewer's contest the points are the contest's and the standing is
  * the viewer's own cell; the site-wide rate is left out. Per-language limits fold under the list. `layout` lays the facts
- * two a line where the panel lies above the statement.
+ * two a line where the panel lies above the statement; there a value shows its first part only ("800", "24%"), so the
+ * list is three lines and nothing wraps.
  */
 interface LimitFact {
   key: string;
   label: string;
   value: string;
-  /** A second part of the value ("từng phần", "80 người"): it wraps as a whole, never inside. */
+  /** A second part of the value ("từng phần", "80 người"): shown only where the facts lie one a line. */
   extra?: string;
   /** A file name the solution must use: amber. */
   isFile?: boolean;
@@ -39,7 +40,7 @@ const props = defineProps<{
   problem: ProblemDetail;
   isSignedIn: boolean;
   contest?: ContestDetail | null;
-  layout: Pick<ProblemLayout, 'facts' | 'factFile'>;
+  layout: Pick<ProblemLayout, 'facts' | 'factFile' | 'factExtra'>;
 }>();
 const { t } = useI18n();
 const locale = useLocaleStore();
@@ -153,7 +154,9 @@ const WIDE_FACT = `${FACT} col-span-full`;
           :class="fact.isFile ? 'font-bold text-cue-attention' : 'font-medium'"
         >
           <span>{{ fact.value }}</span>
-          <span v-if="fact.extra" class="whitespace-nowrap">· {{ fact.extra }}</span>
+          <span v-if="fact.extra" class="whitespace-nowrap" :class="layout.factExtra"
+            >· {{ fact.extra }}</span
+          >
         </dd>
       </div>
       <div v-if="ownCell" data-testid="strip-own-result" :class="WIDE_FACT">

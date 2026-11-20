@@ -2665,15 +2665,12 @@
     "changed": "Thể lệ vừa được cập nhật, vui lòng đọc lại",
     "cardTitle": "Quy định",
     "revision": "bản {revision}",
-    "read": "Đọc quy định",
-    "hide": "Thu gọn",
     "cardNote": "Bạn sẽ được hỏi đồng ý khi đăng ký hoặc tham gia ảo.",
     "accepted": "Đã đồng ý bản {revision} lúc {time}"
   },
   "problemSwitcher": {
     "collapse": "Thu gọn danh sách bài",
     "expand": "Mở rộng danh sách bài",
-    "limitsColumn": "Giới hạn",
     "status": {
       "solved": "Đã giải",
       "tried": "Đã nộp, chưa đúng",

@@ -17,8 +17,15 @@ export const RATING_COLUMN_REM = 8;
 /** The name column fits the longest name and stops at 240 px (15 rem); longer names are cut with a tooltip. */
 export const NAME_COLUMN_MIN_REM = 10;
 export const NAME_COLUMN_MAX_REM = 15;
-/** On a phone the name column is fixed and narrow (it stays while the cells scroll), so a problem column shows beside it. */
-export const NAME_COLUMN_PHONE_REM = 8.5;
+/**
+ * On a phone the name column is fixed and narrow (it stays while the cells scroll) and rank, score and penalty shrink to
+ * what they print (their cells carry 4 px of padding there), so at 390 px the first problem column shows whole at rest:
+ * 2.5 + 7 + 3 + 3.5 = 16 rem of 22.4, and a problem column is 4.5.
+ */
+export const NAME_COLUMN_PHONE_REM = 7;
+export const RANK_COLUMN_PHONE_REM = 2.5;
+export const SCORE_COLUMN_PHONE_REM = 3;
+export const TIME_COLUMN_PHONE_REM = 3.5;
 /** Avatar (24 px), its gap and the cell's padding, then about 0.5 rem per character of the name (13 px, medium). */
 const NAME_FIXED_REM = 4.5;
 const NAME_CHAR_REM = 0.5;
@@ -61,8 +68,11 @@ export const problemColumnRem = (views: Iterable<RankingCellView>) => {
 
 /** The score cell's padding (6 px each side); the total (large) and the time under it on points boards are two lines, so the wider one counts. */
 const SCORE_PADDING_REM = 0.75;
-export const scoreColumnRem = (scores: Iterable<{ total: string; time?: string }>) => {
-  let widest = SCORE_COLUMN_REM;
+export const scoreColumnRem = (
+  scores: Iterable<{ total: string; time?: string }>,
+  floorRem = SCORE_COLUMN_REM,
+) => {
+  let widest = floorRem;
   for (const { total, time } of scores)
     widest = Math.max(
       widest,
@@ -74,8 +84,8 @@ export const scoreColumnRem = (scores: Iterable<{ total: string; time?: string }
 };
 
 /** The penalty column: icpc minutes, or a vnoj total that turns into days and hours from 100 hours. */
-export const timeColumnRem = (times: Iterable<string>) => {
-  let widest = TIME_COLUMN_REM;
+export const timeColumnRem = (times: Iterable<string>, floorRem = TIME_COLUMN_REM) => {
+  let widest = floorRem;
   for (const time of times) widest = Math.max(widest, textRem(time, TEXT_PX) + 2 * SPARE_REM);
   return roundUp(widest);
 };
@@ -102,5 +112,9 @@ export const statsWidthRem = (problemCount: number, columns: StatsColumns) =>
   problemCount * columns.problemRem;
 
 /** The table is exactly as wide as its columns: no empty band in the name column. */
-export const tableWidthRem = (nameRem: number, problemCount: number, columns: StatsColumns) =>
-  RANK_COLUMN_REM + nameRem + statsWidthRem(problemCount, columns);
+export const tableWidthRem = (
+  nameRem: number,
+  problemCount: number,
+  columns: StatsColumns,
+  rankRem = RANK_COLUMN_REM,
+) => rankRem + nameRem + statsWidthRem(problemCount, columns);

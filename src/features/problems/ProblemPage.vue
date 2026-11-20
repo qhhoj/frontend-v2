@@ -3,6 +3,7 @@ import { computed, ref, toRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ApiError } from '@/api/client';
 import QueryState from '@/components/QueryState.vue';
+import { useCurrentContest } from '@/features/contests/bar/use-current-contest';
 import ContestProblemSwitcher from '@/features/contests/ContestProblemSwitcher.vue';
 import { useProblemRail } from '@/features/contests/use-problem-rail';
 import { useProblemRailCollapse } from '@/features/contests/use-problem-rail-collapse';
@@ -43,6 +44,17 @@ const contest = computed(() =>
 );
 /** The ended-contest context: the rail is shown for reading, and submitting stays a practice submission. */
 const isReadOnlyContest = computed(() => liveContestKey.value === null);
+/**
+ * One control switches problems. During a run the shell's contest strip carries the problem letters on this page, so the
+ * list beside the statement is drawn only where there is no strip: an ended contest opened from `?contest=`.
+ */
+const { current: currentRun } = useCurrentContest();
+const hasStrip = computed(
+  () => currentRun.value !== null && currentRun.value.contest.key === contestKey.value,
+);
+const showsSwitcher = computed(
+  () => contest.value !== null && railEntries.value !== null && !hasStrip.value,
+);
 /** A problem of a contest (live or opened from an ended one) belongs to "Kỳ thi" in the nav. */
 useNavSection(() => (contest.value && railEntries.value ? '/contests' : null));
 
@@ -55,9 +67,7 @@ usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : problem.val
 /** The side panel stands beside the statement: the contest's problem list starts folded, so the statement keeps its width. */
 const panelOpen = ref(false);
 const { isCollapsed: railCollapsed, toggle: toggleRail } = useProblemRailCollapse(panelOpen);
-const layout = computed(
-  () => PROBLEM_LAYOUT[contest.value && railEntries.value ? 'contest' : 'plain'],
-);
+const layout = computed(() => PROBLEM_LAYOUT[showsSwitcher.value ? 'contest' : 'plain']);
 
 /** Set when the editorial answers 404 for this problem; the tab then disappears until another problem is opened. */
 const editorialGone = ref(false);
@@ -125,7 +135,7 @@ watch(
     v-else
     :class="[
       'page-column',
-      contest && railEntries
+      showsSwitcher
         ? [
             'lg:grid lg:items-start',
             railCollapsed
@@ -136,7 +146,7 @@ watch(
     ]"
   >
     <ContestProblemSwitcher
-      v-if="contestKey && contest && railEntries"
+      v-if="contestKey && contest && railEntries && showsSwitcher"
       :contest-key="contestKey"
       :contest-name="contest.name"
       :entries="railEntries"

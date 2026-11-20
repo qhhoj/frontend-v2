@@ -9,14 +9,13 @@ import InlineBit from '@/components/InlineBit.vue';
 import { formatNumber, formatPoints } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import OwnResultChip from './OwnResultChip.vue';
-import { limitsText } from './contest-limits';
 import { attemptsLeftUnderCap, ownResultContext, solvedSummary } from './own-result';
 
 /**
  * The contest's problems, one row each and the whole row opens the statement: label, name (with its code), my own result
  * ("Của tôi": lamp, score or tries, time), how many solved it (a neutral bar against the contestants, and the number)
- * and the points. No row tint: the colour sits on my result. The solver, limit and own columns show only when some
- * problem has a value for them, so no column is a run of dashes.
+ * and the points. No row tint: the colour sits on my result. The solver and own columns show only when some problem has
+ * a value for them, so no column is a run of dashes. Limits are not a column: the problem page has them.
  */
 const props = defineProps<{ contest: ContestDetail }>();
 const locale = useLocaleStore();
@@ -35,7 +34,6 @@ const HIDDEN_KEYS: Record<ContestPhase, string> = {
   ended: 'contests.problems.hidden',
 };
 
-const hasLimit = (problem: ContestProblem) => limitsText(problem) !== '—';
 const problems = computed(() => props.contest.problems ?? []);
 /** "Của tôi" shows once I take part (every row then says at least "Chưa nộp") or have a result on some problem. */
 const hasOwnResults = computed(
@@ -43,7 +41,6 @@ const hasOwnResults = computed(
     props.contest.viewer.liveParticipation !== null ||
     problems.value.some((problem) => problem.viewerResult !== null),
 );
-const hasLimits = computed(() => problems.value.some(hasLimit));
 const hasSolvers = computed(() => problems.value.some((problem) => problem.solverCount !== null));
 /** The solver bar is read against the contestants; a count over it (virtual runs) fills the bar. */
 const solverPercent = (problem: ContestProblem) =>
@@ -101,9 +98,6 @@ const HEAD = 'px-3 font-semibold';
           <th v-if="hasOwnResults" scope="col" :class="HEAD">
             {{ $t('contests.problems.columns.own') }}
           </th>
-          <th v-if="hasLimits" scope="col" :class="[HEAD, 'max-2xl:hidden']">
-            {{ $t('problemSwitcher.limitsColumn') }}
-          </th>
           <th v-if="hasSolvers" scope="col" :class="[HEAD, 'text-right max-md:hidden']">
             {{ $t('contests.stats.columns.solvers') }}
           </th>
@@ -142,12 +136,6 @@ const HEAD = 'px-3 font-semibold';
           </td>
           <td v-if="hasOwnResults" class="px-3">
             <OwnResultChip :problem="problem" :context="context" />
-          </td>
-          <td
-            v-if="hasLimits"
-            class="px-3 font-mono text-meta whitespace-nowrap text-muted tabular-nums max-2xl:hidden"
-          >
-            {{ hasLimit(problem) ? limitsText(problem) : '' }}
           </td>
           <td v-if="hasSolvers" class="px-3 max-md:hidden">
             <span

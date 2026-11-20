@@ -27,7 +27,8 @@ defineProps<{
 }>();
 /**
  * Rank and name stay while the problem columns scroll (the rank column is `RANK_COLUMN_REM` = 3.5 rem = `left-14`).
- * Under `sm` only the name stays, so a problem column always shows beside it.
+ * Under `sm` only the name stays and the cells carry less padding (`ranking-columns.ts`, the phone widths), so a problem
+ * column shows beside the score at rest.
  */
 const RANK_STICKY = 'z-10 bg-ground sm:sticky sm:left-0';
 const NAME_STICKY = 'sticky left-0 z-10 bg-ground sm:left-14';
@@ -43,17 +44,17 @@ const EDGE = 'border-l-3';
     :class="pinned ? 'border-line-strong' : 'border-line'"
   >
     <td
-      class="h-(--qh-row-dense) w-14 px-3 py-0 text-right touch:h-(--qh-touch)"
+      class="h-(--qh-row-dense) w-14 px-3 py-0 text-right max-sm:w-10 max-sm:px-1 touch:h-(--qh-touch)"
       :class="[RANK_STICKY, EDGE, isViewer ? 'border-accent' : 'border-transparent']"
     >
-      <span :class="rankMedalClass(row.rank, row.isDisqualified)">{{
+      <span :class="rankMedalClass(row.rank, row.score, row.isDisqualified)">{{
         row.isDisqualified ? '—' : (row.rank ?? '—')
       }}</span>
     </td>
     <th
       scope="row"
       tabindex="-1"
-      class="overflow-hidden px-2.5 py-0 text-left font-body"
+      class="overflow-hidden px-2.5 py-0 text-left font-body max-sm:px-1"
       :class="NAME_STICKY"
     >
       <span class="flex items-center gap-2 whitespace-nowrap">
@@ -69,7 +70,7 @@ const EDGE = 'border-l-3';
         <Chip v-if="row.isDisqualified" tone="danger">{{ $t('ranking.disqualified') }}</Chip>
       </span>
     </th>
-    <td class="overflow-hidden px-1.5 leading-none whitespace-nowrap">
+    <td class="overflow-hidden px-1.5 leading-none whitespace-nowrap max-sm:px-1">
       <span class="block text-base font-bold">
         <template v-if="row.isDisqualified">—</template>
         <ScoreTick v-else :text="view.total" :animate="isTicking" />
