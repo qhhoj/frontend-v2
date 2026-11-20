@@ -106,15 +106,15 @@ Deprecated token names, kept as aliases while many files use them: `--qh-radius-
 
 Colour is a cue: one meaning, the same on every page, as text or a light tint, never decoration. The text always says the same thing; colour only repeats it. Each cue has three tokens (`cue-<name>` text, `cue-<name>-bg` tint, `cue-<name>-border`), all aliases of palette tokens (so contrast holds in every mode and contrast level):
 
-| Cue         | Meaning                                   | Palette source      | Where it shows               |
-| ----------- | ----------------------------------------- | ------------------- | ---------------------------- |
-| `live`      | running now (contest open, judging)       | green (verdict AC)  | dot + text, chip             |
-| `upcoming`  | not started                               | blue (tag-1)        | dot + text, chip             |
-| `ended`     | finished or inactive                      | grey (muted)        | dot + text, chip             |
-| `full`      | accepted, full score                      | green               | tint on a problem cell, chip |
-| `partial`   | some points, not all                      | lime (verdict part) | tint                         |
-| `zero`      | wrong after a try (not tried stays empty) | red (verdict WA)    | tint                         |
-| `attention` | needs action or warning (access code)     | amber               | chip                         |
+| Cue         | Meaning                                   | Palette source                                    | Where it shows               |
+| ----------- | ----------------------------------------- | ------------------------------------------------- | ---------------------------- |
+| `live`      | running now (contest open, judging)       | blue (verdict pending: in progress, not a result) | dot + text, chip             |
+| `upcoming`  | not started                               | blue (tag-1)                                      | dot + text, chip             |
+| `ended`     | finished or inactive                      | grey (muted)                                      | dot + text, chip             |
+| `full`      | accepted, full score                      | green                                             | tint on a problem cell, chip |
+| `partial`   | some points, not all                      | lime (verdict part)                               | tint                         |
+| `zero`      | wrong after a try (not tried stays empty) | red (verdict WA)                                  | tint                         |
+| `attention` | needs action or warning (access code)     | amber                                             | chip                         |
 
 Attempted, not solved: icon only, no row tint (owner 2026-11-16).
 

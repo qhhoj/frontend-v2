@@ -55,7 +55,7 @@ const unreadLabel = computed(() =>
     class="relative inline-flex h-(--qh-control) min-w-0 items-center gap-2 rounded-control px-2 text-sm font-semibold text-content hover:bg-surface-hover touch:h-11"
     @click="popover?.toggle($event)"
   >
-    <component :is="stateIcon" aria-hidden="true" class="size-4 shrink-0 text-positive" />
+    <component :is="stateIcon" aria-hidden="true" class="size-4 shrink-0 text-cue-live" />
     <span data-testid="top-bar-live-state" class="shrink-0 text-meta max-md:sr-only">{{
       statusText
     }}</span>

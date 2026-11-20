@@ -63,10 +63,7 @@ const tickLabelShift = (at: number) => {
 <template>
   <div role="group" :aria-label="label" class="relative h-12">
     <div class="absolute inset-x-0 top-4 h-2 overflow-hidden rounded-pill bg-surface-strong">
-      <div
-        class="absolute inset-y-0 left-0 bg-content opacity-90"
-        :style="{ width: `${nowPercent}%` }"
-      />
+      <div class="absolute inset-y-0 left-0 bg-content" :style="{ width: `${nowPercent}%` }" />
       <div
         v-if="freezePercent !== null"
         :title="freezeLabel"

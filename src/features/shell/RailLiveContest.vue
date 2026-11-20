@@ -4,6 +4,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { CurrentParticipation } from '@/api/types/contests';
 import CountdownTimer from '@/components/CountdownTimer.vue';
+import StatusDot from '@/components/ui/StatusDot.vue';
 import { participationKind } from '@/features/contests/bar/current-contest';
 import { useContestQuery } from '@/features/contests/contests.queries';
 import { solvedSummary } from '@/features/contests/own-result';
@@ -62,8 +63,8 @@ const standing = computed(() =>
     :title="current.contest.name"
     class="flex flex-col gap-1 rounded-card border border-line bg-surface-solid p-3 transition-colors hover:border-line-strong rail-slim:items-center rail-slim:p-2"
   >
-    <span class="flex items-center gap-1.5 text-caption leading-4 font-semibold text-positive">
-      <span aria-hidden="true" class="size-2 shrink-0 rounded-full bg-positive" />
+    <span class="flex items-center gap-1.5 text-caption leading-4 font-semibold text-cue-live">
+      <StatusDot tone="live" />
       <span class="rail-slim:sr-only">{{ statusText }}</span>
     </span>
     <span class="truncate text-sm font-semibold text-content rail-slim:sr-only">{{

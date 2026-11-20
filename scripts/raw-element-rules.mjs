@@ -5,7 +5,7 @@
 //   names an import (`<Select>` from the kit) is that component, not the element;
 // - imports that bypass the kit (scripts/wrapper-imports.mjs);
 // - class words the standard retires (PLAN §1.9): `uppercase` labels, fixed `size-/h-/min-h-[N px|rem]`, opacity on a
-//   disabled state, `verdict-*` colours outside the verdict parts, and status colours (positive, negative, warning, info)
+//   disabled state (in the kit too; the token class `opacity-(--qh-opacity-disabled)` is the one that passes), `verdict-*` colours outside the verdict parts, and status colours (positive, negative, warning, info)
 //   outside the kit: a status is a Chip or StatusDot tone, or a cue-* token (DESIGN.md);
 // - hard-coded values (scripts/hardcoded-values.mjs): a literal size, spacing, motion or colour that is not a token.
 import { classTokens, COMMENT_LINE, utilityOf } from './class-tokens.mjs';
@@ -69,6 +69,9 @@ const BOUND_STATE = /[:@\w.-]+\s*=\s*"\s*(?:disabled|busy|pending)\s*"/g;
 const mentionsDisabledState = (line) =>
   STATE_WORD.test(line.replace(BOUND_STATE, '').replace(/(['`])(?:(?!\1).)*\1/g, ''));
 
+/** The one opacity a disabled state may take, in the kit and on a page: the token class. Any other opacity there breaks `disabled-opacity`. */
+const DISABLED_OPACITY_TOKEN = 'opacity-(--qh-opacity-disabled)';
+
 /** The rule of scripts/hardcoded-values.mjs: each of its lines names the token family to use. */
 export { SCRIPT_RULE, SCRIPT_USE };
 export const HARDCODED_RULE = 'hardcoded-value';
@@ -86,10 +89,10 @@ export const CLASS_RULES = {
     breaks: (token) => /^(?:size|h|min-h)-\[[\d.]+(?:px|rem)\]$/.test(utilityOf(token)),
   },
   'disabled-opacity': {
-    use: 'the disabled state of the kit control (AppButton disabledReason): the kit draws it (45 % opacity, --qh-opacity-disabled), a page never does',
+    use: 'the disabled state of the kit control (AppButton disabledReason); the only opacity a disabled state takes is the token class opacity-(--qh-opacity-disabled) (45 %)',
     breaks: (token, rel, line) =>
-      !isKit(rel) &&
       /^opacity-/.test(utilityOf(token)) &&
+      utilityOf(token) !== DISABLED_OPACITY_TOKEN &&
       (token
         .split(':')
         .slice(0, -1)

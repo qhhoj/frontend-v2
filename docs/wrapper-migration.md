@@ -21,7 +21,7 @@ No file may gain a use, and every fix lowers its count.
     listed for one wrapper is still refused the others.
 - **Only shrink:** `scripts/raw-elements.first.json` keeps the first baselines (its hash is pinned: a deliberate edit, such as a rule that now sees more uses, needs the new `sha256sum scripts/raw-elements.first.json` in the spec; the failure message says so).
   `scripts/raw-elements.spec.ts` fails when a baseline holds a file or a count that the first one does not.
-- **Not checked:** specs, and the kit for raw elements (its job); a kit file importing a wrapper (a barrel) counts like any file. Opacity beside a `disabled`/`busy`/`pending` word in the same line counts as `disabled-opacity`; `{ uppercase: x }` counts as `uppercase`.
+- **Not checked:** specs, and the kit for raw elements (its job); a kit file importing a wrapper (a barrel) counts like any file. Opacity beside a `disabled`/`busy`/`pending` word in the same line counts as `disabled-opacity`, in the kit too; only the token class `opacity-(--qh-opacity-disabled)` passes; `{ uppercase: x }` counts as `uppercase`.
 - **Bypasses closed:**
   - tags in any letter case (`<BUTTON>` renders a button);
   - `<component :is="'button'">`;

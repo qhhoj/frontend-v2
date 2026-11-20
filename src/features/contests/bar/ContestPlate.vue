@@ -227,11 +227,10 @@ const nowLabel = computed(() =>
         :class="CELL"
         data-testid="contest-clock"
       >
-        <Lamp
-          :tone="clock.isRunning ? 'pending' : 'none'"
-          still
-          class="mr-2 shrink-0 self-center"
-        />
+        <template #label>
+          <Lamp :tone="clock.isRunning ? 'pending' : 'none'" still class="shrink-0" />
+          {{ clock.label }}
+        </template>
         <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
         <CountdownTimer :key="clock.until" :until="clock.until" @elapsed="emit('elapsed')" />
       </ReadoutCell>
