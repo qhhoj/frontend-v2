@@ -102,7 +102,10 @@ function checkedBody(): ProblemBody | null {
 }
 
 async function create() {
-  if (!canCreate.value) return void (await suggest());
+  if (!canCreate.value) {
+    await suggest();
+    return;
+  }
   const body = checkedBody();
   if (body && isOwnerReady.value) await createMutation.run(body);
 }
