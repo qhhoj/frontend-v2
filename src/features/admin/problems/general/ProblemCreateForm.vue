@@ -55,6 +55,11 @@ const canCreate = computed(() =>
   owner.value ? scope.value.organizations : can('judge.add_problem'),
 );
 const canSuggest = computed(() => !owner.value && can('judge.suggest_new_problem'));
+/** What the primary button does: create, or suggest for a viewer who may only suggest; nothing while there is no owner to create for. */
+const primaryAction = computed(() => {
+  if (canCreate.value) return 'create';
+  return canSuggest.value ? 'suggest' : 'none';
+});
 
 const afterCreate = (created: EditableProblem) => {
   void router.push({ name: 'admin-problemGeneral', params: { code: created.code } });
@@ -102,12 +107,12 @@ function checkedBody(): ProblemBody | null {
 }
 
 async function create() {
-  if (!canCreate.value) {
+  if (primaryAction.value === 'suggest') {
     await suggest();
     return;
   }
   const body = checkedBody();
-  if (body && isOwnerReady.value) await createMutation.run(body);
+  if (body && canCreate.value && isOwnerReady.value) await createMutation.run(body);
 }
 
 async function suggest() {
@@ -168,9 +173,13 @@ watch(
         type="submit"
         tone="primary"
         :loading="createMutation.isPending.value || suggestMutation.isPending.value"
-        :disabled="canCreate && !isOwnerReady"
+        :disabled="primaryAction === 'none' || (primaryAction === 'create' && !isOwnerReady)"
       >
-        {{ canCreate ? $t('create.problem') : $t('admin.problems.general.create.suggestButton') }}
+        {{
+          primaryAction === 'suggest'
+            ? $t('admin.problems.general.create.suggestButton')
+            : $t('create.problem')
+        }}
       </AppButton>
     </div>
   </form>
