@@ -2743,14 +2743,9 @@
     "searchPlaceholder": "Mã hoặc tên bài",
     "tableCaption": "Bài tập của tổ chức",
     "columns": {
-      "code": "Mã",
-      "name": "Tên bài",
       "tags": "Thẻ",
-      "updated": "Cập nhật",
-      "actions": "Thao tác"
+      "updated": "Cập nhật"
     },
-    "selectAll": "Chọn tất cả bài trên trang",
-    "selectRow": "Chọn {code}",
     "archivedChip": "Đã lưu trữ",
     "noTags": "Chưa gắn thẻ",
     "editTags": "Thẻ",
@@ -2805,8 +2800,6 @@
       }
     },
     "bulk": {
-      "label": "Thao tác hàng loạt",
-      "selected": "Đã chọn {count} bài",
       "tag": "Gắn thẻ…",
       "archive": "Lưu trữ",
       "unarchive": "Bỏ lưu trữ",

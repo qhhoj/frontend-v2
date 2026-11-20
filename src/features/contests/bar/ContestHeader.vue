@@ -162,9 +162,11 @@ usePublishedHeight(
       </template>
       <template #above>
         <p class="eyebrow" data-testid="contest-eyebrow">
-          <RouterLink :to="{ name: 'contests' }" class="hover:text-content hover:underline max-md:hidden">{{
-            $t('nav.contests')
-          }}</RouterLink>
+          <RouterLink
+            :to="{ name: 'contests' }"
+            class="hover:text-content hover:underline max-md:hidden"
+            >{{ $t('nav.contests') }}</RouterLink
+          >
           <span class="md:hidden">{{ $t('nav.contests') }}</span>
           · {{ eyebrow }}
         </p>

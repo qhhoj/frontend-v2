@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="Row extends ProblemTableRow">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { UNCATEGORIZED_TYPE_NAME, problemTypeLabel } from './problem-type-label';
@@ -17,6 +17,7 @@ import { formatNumber, formatPoints } from '@/lib/format';
 import { SERIES_SEPARATOR, titleParts } from '@/lib/title-parts';
 import { COMPACT_LIST_BELOW_PX } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
+import type { CatalogueRow, ProblemTableRow } from './problem-table-row';
 import { viewerLampOf } from './viewer-status';
 
 /**
@@ -27,19 +28,54 @@ import { viewerLampOf } from './viewer-status';
  * Sorting is by the column headers (only the sorted one shows its arrow, the others on hover); a third click returns to the
  * default order. On a phone a row is two lines (`--qh-row`, 52 px on touch): the name over its code, the points at the right. Each
  * table row carries `data-code` (the page loads that problem ahead on hover and focus).
+ *
+ * It is the one table for every list of problems. `managed` is another list's problems (an organization's): the same name
+ * cell and whole-row link, then the page's own columns (`extraColumns` with a `cell-<key>` slot each), marks after the
+ * name (`name-end`), row selection (`selectable`, `v-model:selected` by code, the `bulk` slot) and row actions (`actions`);
+ * no status, statistics or sorting, and on a phone the kit's own card, which carries the tick box and the actions.
  */
-const props = defineProps<{
-  problems: ProblemListItem[];
-  sort: ProblemSort | null;
-  /** Without a viewer there is no status to show, not even "not tried". */
-  signedIn: boolean;
-  loading: boolean;
-  error: unknown;
-  meta: NumberedPageMeta | undefined;
-  /** The list is empty because of filters: the empty state offers to clear them. */
-  filtered: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    problems: Row[];
+    managed?: boolean;
+    /** `managed`: the columns after the name. */
+    extraColumns?: DataTableColumn[];
+    selectable?: boolean;
+    /** The table's caption; the catalogue's own by default. */
+    label?: string;
+    sort?: ProblemSort | null;
+    /** Without a viewer there is no status to show, not even "not tried". */
+    signedIn?: boolean;
+    loading?: boolean;
+    error?: unknown;
+    meta?: NumberedPageMeta;
+    /** The list is empty because of filters: the empty state offers to clear them. */
+    filtered?: boolean;
+  }>(),
+  {
+    managed: false,
+    extraColumns: () => [],
+    selectable: false,
+    label: undefined,
+    sort: null,
+    signedIn: false,
+    loading: false,
+    error: undefined,
+    meta: undefined,
+    filtered: false,
+  },
+);
+const selected = defineModel<Set<string>>('selected', { default: () => new Set<string>() });
 const emit = defineEmits<{ sort: [sort: ProblemSort | null]; retry: []; clearFilters: [] }>();
+defineSlots<
+  {
+    'name-end'?: (scope: { row: Row }) => unknown;
+    actions?: (scope: { row: Row }) => unknown;
+    bulk?: (scope: { count: number }) => unknown;
+  } & Record<`cell-${string}`, (scope: { row: Row }) => unknown>
+>();
+/** The catalogue's cells read their own fields from a row; they are drawn only when the list is not `managed`. */
+const rows = computed(() => props.problems as CatalogueRow<Row>[]);
 const { t } = useI18n();
 const locale = useLocaleStore();
 const target = (code: string) => ({ name: 'problem', params: { code } });
@@ -51,7 +87,7 @@ const sortOf = (field: string, first: 'asc' | 'desc') => ({
   first,
   clears: true,
 });
-const columns = computed<DataTableColumn[]>(() => [
+const catalogueColumns = computed<DataTableColumn[]>(() => [
   ...(props.signedIn
     ? [{ key: 'status', label: t('problems.columns.status'), hideLabel: true, cellClass: 'w-8' }]
     : []),
@@ -83,6 +119,14 @@ const columns = computed<DataTableColumn[]>(() => [
     sort: sortOf('userCount', 'desc'),
   },
 ]);
+const columns = computed<DataTableColumn[]>(() =>
+  props.managed
+    ? [
+        { key: 'name', label: t('problems.columns.problem'), priority: 'primary' },
+        ...props.extraColumns,
+      ]
+    : catalogueColumns.value,
+);
 /** Ledger tweaks the kit has no prop for: unsorted headers show their arrow on hover only; the cells at the row ends keep a small inset so the hover ground does not touch its content. */
 const LEDGER_CLASS =
   '[&_thead_th:not([aria-sort])_svg]:invisible [&_thead_th:not([aria-sort])_button:hover_svg]:visible [&_:is(th,td):first-child]:pl-2 [&_:is(th,td):last-child]:pr-2';
@@ -108,12 +152,14 @@ const acRateText = (problem: ProblemListItem) =>
     variant="ledger"
     :class="LEDGER_CLASS"
     :columns="columns"
-    :rows="problems"
-    :row-key="(problem) => problem.id"
-    :label="$t('problems.listName')"
+    v-model:selected="selected"
+    :rows="rows"
+    :row-key="(problem) => problem.code"
+    :label="label ?? $t('problems.listName')"
+    :selectable="selectable"
     :row-to="(problem) => target(problem.code)"
     :row-attrs="rowAttrs"
-    :sort="sort ?? undefined"
+    :sort="managed ? undefined : (sort ?? undefined)"
     :loading="loading"
     :error="error"
     :stack-below="COMPACT_LIST_BELOW_PX"
@@ -148,8 +194,9 @@ const acRateText = (problem: ProblemListItem) =>
           ><span class="font-semibold">{{ titleParts(row.name).name }}</span></RouterLink
         >
         <span class="shrink-0 font-mono text-small text-muted">{{ row.code }}</span>
+        <slot name="name-end" :row="row" />
         <span
-          v-if="namedTypes(row).length > 0"
+          v-if="!managed && namedTypes(row).length > 0"
           class="flex shrink-0 items-center gap-1 self-center max-lg:hidden"
           :title="namedTypes(row).join(', ')"
         >
@@ -184,8 +231,18 @@ const acRateText = (problem: ProblemListItem) =>
     </template>
     <template #cell-userCount="{ row }">{{ formatNumber(row.userCount, locale.locale) }}</template>
 
+    <template
+      v-for="column in managed ? extraColumns : []"
+      :key="column.key"
+      #[`cell-${column.key}`]="{ row }"
+    >
+      <slot :name="`cell-${column.key}`" :row="row" />
+    </template>
+    <template v-if="$slots.actions" #actions="{ row }"><slot name="actions" :row="row" /></template>
+    <template #bulk="{ count }"><slot name="bulk" :count="count" /></template>
+
     <!-- A phone: two lines per row. The part of the name the contest shares is left out; the code under it says it. -->
-    <template #card="{ row }">
+    <template v-if="!managed" #card="{ row }">
       <li class="box-link flex min-h-(--qh-row) items-center gap-3 border-b border-line px-2 py-1">
         <Lamp
           v-if="signedIn"

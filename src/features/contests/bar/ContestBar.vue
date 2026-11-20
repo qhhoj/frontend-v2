@@ -159,7 +159,10 @@ const QUIET_LINK = 'inline-flex items-center rounded-control hover:underline tou
         v-if="unread > 0"
         :to="{ name: 'contest-announcements', params: { key: contestKey } }"
         data-testid="contest-bar-unread"
-        :class="['shrink-0 gap-1.5 text-small font-semibold', QUIET_LINK]"
+        :class="[
+          'shrink-0 justify-center gap-1.5 text-small font-semibold touch:min-w-11',
+          QUIET_LINK,
+        ]"
       >
         <Megaphone class="size-4" aria-hidden="true" />
         <span aria-hidden="true" class="font-mono tabular-nums">{{ unread }}</span>

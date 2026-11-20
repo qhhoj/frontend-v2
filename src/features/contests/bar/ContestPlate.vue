@@ -229,14 +229,25 @@ const nowLabel = computed(() =>
         :class="CELL"
         data-testid="contest-clock"
       >
-        <Lamp :tone="clock.isRunning ? 'pending' : 'none'" still class="mr-2 shrink-0 self-center" />
+        <Lamp
+          :tone="clock.isRunning ? 'pending' : 'none'"
+          still
+          class="mr-2 shrink-0 self-center"
+        />
         <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
         <CountdownTimer :key="clock.until" :until="clock.until" @elapsed="emit('elapsed')" />
       </ReadoutCell>
-      <ReadoutCell v-else :label="$t('contests.phase.ended')" :class="CELL" data-testid="plate-ended">
+      <ReadoutCell
+        v-else
+        :label="$t('contests.phase.ended')"
+        :class="CELL"
+        data-testid="plate-ended"
+      >
         <time :datetime="contest.endTime">{{ dateTime(contest.endTime) }}</time>
       </ReadoutCell>
-      <div class="grid grid-cols-2 gap-x-12 gap-y-4 max-md:w-full max-md:gap-x-4 md:flex md:flex-wrap">
+      <div
+        class="grid grid-cols-2 gap-x-12 gap-y-4 max-md:w-full max-md:gap-x-4 md:flex md:flex-wrap"
+      >
         <template v-if="own">
           <ReadoutCell
             v-if="own.rank !== null"

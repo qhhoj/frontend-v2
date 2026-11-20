@@ -2743,14 +2743,9 @@
     "searchPlaceholder": "Code or name",
     "tableCaption": "Organization problems",
     "columns": {
-      "code": "Code",
-      "name": "Name",
       "tags": "Tags",
-      "updated": "Updated",
-      "actions": "Actions"
+      "updated": "Updated"
     },
-    "selectAll": "Select every problem on this page",
-    "selectRow": "Select {code}",
     "archivedChip": "Archived",
     "noTags": "No tags",
     "editTags": "Tags",
@@ -2805,8 +2800,6 @@
       }
     },
     "bulk": {
-      "label": "Bulk actions",
-      "selected": "{count} problem selected | {count} problems selected",
       "tag": "Tag…",
       "archive": "Archive",
       "unarchive": "Unarchive",
