@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Megaphone } from 'lucide-vue-next';
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import type { ContestProblem, CurrentParticipation } from '@/api/types/contests';
@@ -20,9 +20,11 @@ import { participationKind } from './current-contest';
 /**
  * The contest strip: a thin plate under the top of the page while the viewer is inside a running contest and reads a
  * problem or a submission of it. It answers "how long is left", "where am I" and "what is left to solve" without leaving
- * the statement: the contest's name (the way back), the countdown, my rank and score (the way to the board), unread
- * announcements, and the problem letters with my state (filled = solved, a bar under the letter = tried, an outline =
- * the problem on screen). A phone keeps the countdown and the letters, which scroll sideways.
+ * the statement: the contest's name (the way back), the countdown, my rank and score (the way to the board), my
+ * submissions in this contest, unread announcements, and the problem letters with my state (filled = solved, a bar under
+ * the letter = tried, an outline = the problem on screen). The letters are the one control that switches problems during
+ * a run (the problem page draws no second list then). A phone keeps the countdown, the submissions link and the letters,
+ * which scroll sideways.
  * On the contest's own tabs the plate already has the clock: while a `ContestHeader` shows it the strip steps aside
  * (`header-clock.ts`), so the clock shows once; pages of the contest without that header (print, balloons) keep the strip.
  * Shown by `AppShell` through `useCurrentContest`.
@@ -31,6 +33,8 @@ const props = defineProps<{ current: CurrentParticipation }>();
 const { t } = useI18n();
 const route = useRoute();
 const locale = useLocaleStore();
+/** The impersonation banner is the one sticky strip above: the strip then scrolls away rather than slide under it. */
+const session = useSessionStore();
 const contestKey = computed(() => props.current.contest.key);
 const kind = computed(() => participationKind(props.current.participation.virtual));
 const statusText = computed(() => {
@@ -43,8 +47,6 @@ const isSteppedAside = computed(() => isClockShownFor(contestKey.value));
 const root = ref<HTMLElement | null>(null);
 /** Sticky things below it (the print toolbar) clear it through `--contest-bar-height`; gone, it publishes nothing. */
 usePublishedHeight(root, '--contest-bar-height', () => true);
-/** The impersonation banner is the one sticky strip above: the strip then scrolls away rather than slide under it. */
-const session = useSessionStore();
 
 /** The problems and my result on each come from the contest's own answer, which the contest's pages already cache. */
 const { data: contest } = useContestQuery(contestKey);
@@ -73,6 +75,18 @@ const stateOf = (problem: ContestProblem): LetterState => {
   if (view.kind === 'pending') return 'pending';
   return view.kind === 'attempted' ? 'failed' : 'none';
 };
+/** My submissions in this contest (a frequent check after a submit); a spectator has none. */
+const ownSubmissions = computed(() =>
+  kind.value === 'spectate' || !session.user
+    ? null
+    : {
+        name: 'contest-submissions',
+        params: { key: contestKey.value },
+        query: { user: session.user.username },
+      },
+);
+/** The problem page and its tabs (my submissions, all, best) are all "this problem". */
+const isProblemRoute = computed(() => String(route.name).split('-')[0] === 'problem');
 const letters = computed(() =>
   (contest.value?.problems ?? []).map((problem) => {
     const state = stateOf(problem);
@@ -80,11 +94,24 @@ const letters = computed(() =>
       problem,
       state,
       title: `${problem.label}. ${problem.name}: ${t(STATE_KEYS[state])}`,
-      isCurrent: route.name === 'problem' && route.params.code === problem.code,
+      isCurrent: isProblemRoute.value && route.params.code === problem.code,
     };
   }),
 );
-const QUIET_LINK = 'rounded-control hover:underline touch:flex touch:min-h-11 touch:items-center';
+/** The letter of the problem on screen is always in view, also where the letters scroll sideways (a phone). */
+watch(
+  () => letters.value.find((letter) => letter.isCurrent)?.problem.problemId,
+  async (currentId) => {
+    if (!currentId) return;
+    await nextTick();
+    root.value
+      ?.querySelector('[aria-current="true"]')
+      ?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  },
+  { immediate: true, flush: 'post' },
+);
+/** `inline-flex` is the base display, so `max-md:hidden` on a link still hides it on a touch screen. */
+const QUIET_LINK = 'inline-flex items-center rounded-control hover:underline touch:min-h-11';
 </script>
 
 <template>
@@ -99,11 +126,11 @@ const QUIET_LINK = 'rounded-control hover:underline touch:flex touch:min-h-11 to
       !session.impersonatorId && 'sticky top-0',
     ]"
   >
-    <div class="page-gutter flex min-h-12 items-center gap-4 py-2 max-md:gap-3">
+    <div class="page-gutter flex min-h-12 items-center gap-4 py-2 max-md:gap-2">
       <span class="eyebrow shrink-0 max-md:hidden">{{ statusText }}</span>
       <RouterLink
         :to="{ name: 'contest', params: { key: contestKey } }"
-        :class="['flex min-w-0 items-center gap-4 font-semibold', QUIET_LINK]"
+        :class="['min-w-0 gap-4 font-semibold max-md:shrink-0', QUIET_LINK]"
       >
         <span class="truncate max-md:sr-only">{{ current.contest.name }}</span>
         <span class="shrink-0 text-readout leading-none">
@@ -122,10 +149,20 @@ const QUIET_LINK = 'rounded-control hover:underline touch:flex touch:min-h-11 to
         >{{ standing }}</RouterLink
       >
       <RouterLink
+        v-if="ownSubmissions"
+        :to="ownSubmissions"
+        data-testid="contest-bar-submissions"
+        :class="['eyebrow shrink-0', QUIET_LINK]"
+        >{{ $t('contests.tabs.submissions') }}</RouterLink
+      >
+      <RouterLink
         v-if="unread > 0"
         :to="{ name: 'contest-announcements', params: { key: contestKey } }"
         data-testid="contest-bar-unread"
-        :class="['flex shrink-0 items-center gap-1.5 text-small font-semibold', QUIET_LINK]"
+        :class="[
+          'shrink-0 justify-center gap-1.5 text-small font-semibold touch:min-w-11',
+          QUIET_LINK,
+        ]"
       >
         <Megaphone class="size-4" aria-hidden="true" />
         <span aria-hidden="true" class="font-mono tabular-nums">{{ unread }}</span>

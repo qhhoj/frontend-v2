@@ -15,7 +15,12 @@ import RankingProblemHeader from './RankingProblemHeader.vue';
 import RankingTableRow from './RankingTableRow.vue';
 import {
   NAME_COLUMN_PHONE_REM,
+  RANK_COLUMN_PHONE_REM,
   RANK_COLUMN_REM,
+  SCORE_COLUMN_PHONE_REM,
+  SCORE_COLUMN_REM,
+  TIME_COLUMN_PHONE_REM,
+  TIME_COLUMN_REM,
   nameColumnRem,
   RATING_COLUMN_REM,
   problemColumnRem,
@@ -107,8 +112,14 @@ const columns = computed<StatsColumns>(() => {
         total: view.total,
         time: hasCombinedScore.value ? view.time : undefined,
       })),
+      isCompact.value ? SCORE_COLUMN_PHONE_REM : SCORE_COLUMN_REM,
     ),
-    timeRem: hasTimeColumn.value ? timeColumnRem(views.map((view) => view.time)) : null,
+    timeRem: hasTimeColumn.value
+      ? timeColumnRem(
+          views.map((view) => view.time),
+          isCompact.value ? TIME_COLUMN_PHONE_REM : TIME_COLUMN_REM,
+        )
+      : null,
     ratingRem: hasRatingColumn.value ? RATING_COLUMN_REM : null,
     problemRem: problemColumnRem(views.flatMap((view) => view.cells.map((cell) => cell.view))),
   };
@@ -124,8 +135,10 @@ const printedName = (row: RankingRow) =>
 const nameRem = computed(() =>
   isCompact.value ? NAME_COLUMN_PHONE_REM : nameColumnRem(props.ranking.rows.map(printedName)),
 );
+const rankRem = computed(() => (isCompact.value ? RANK_COLUMN_PHONE_REM : RANK_COLUMN_REM));
 const tableWidth = computed(
-  () => `${tableWidthRem(nameRem.value, props.ranking.problems.length, columns.value)}rem`,
+  () =>
+    `${tableWidthRem(nameRem.value, props.ranking.problems.length, columns.value, rankRem.value)}rem`,
 );
 /**
  * The table head sticks under the contest's bar (`top: var(--contest-bar-height)`), which needs no scroll frame around the
@@ -159,7 +172,8 @@ const headSticky = computed(
 const rankHead = computed(() => `${headSticky.value} z-10 sm:left-0 sm:z-20`);
 const nameHead = computed(() => `${headSticky.value} left-0 z-20 sm:left-14`);
 const otherHead = computed(() => `${headSticky.value} z-10`);
-const HEAD_CELL = 'h-(--qh-row-dense) border-b border-line-strong px-2.5 py-0 font-semibold';
+const HEAD_CELL =
+  'h-(--qh-row-dense) border-b border-line-strong px-2.5 py-0 font-semibold max-sm:px-1';
 /** What one board row needs; the pinned copy and the row in place are built the same way. */
 const rowProps = (row: RankingRow) => ({
   row,
@@ -199,7 +213,7 @@ const scoreHeaderKey = computed(() =>
           :style="{ minWidth: tableWidth }"
         >
           <colgroup>
-            <col :style="{ width: `${RANK_COLUMN_REM}rem` }" />
+            <col :style="{ width: `${rankRem}rem` }" />
             <col :style="{ width: `${nameRem}rem` }" />
             <col :style="{ width: `${columns.scoreRem}rem` }" />
             <col v-if="columns.timeRem" :style="{ width: `${columns.timeRem}rem` }" />
@@ -221,14 +235,17 @@ const scoreHeaderKey = computed(() =>
                 scope="col"
                 :class="[
                   rankHead,
-                  'h-(--qh-row-dense) w-14 border-b border-line-strong px-3 py-0 text-right font-medium',
+                  'h-(--qh-row-dense) w-14 border-b border-line-strong px-3 py-0 text-right font-medium max-sm:w-10 max-sm:px-1',
                 ]"
               >
                 <RankColumnHeader :label="$t('ranking.columns.rank')" />
               </th>
               <th
                 scope="col"
-                :class="[nameHead, 'border-b border-line-strong px-2.5 py-0 text-left font-medium']"
+                :class="[
+                  nameHead,
+                  'border-b border-line-strong px-2.5 py-0 text-left font-medium max-sm:px-1',
+                ]"
               >
                 {{ $t('ranking.columns.user') }}
               </th>

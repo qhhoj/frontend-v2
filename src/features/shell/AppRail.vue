@@ -99,7 +99,7 @@ const CURRENT_ROW =
         <span
           v-if="item.path === '/contests' && runningCount > 0"
           data-testid="rail-running-count"
-          class="shrink-0 text-caption leading-4 font-semibold text-positive rail-slim:sr-only"
+          class="shrink-0 text-caption leading-4 font-semibold text-cue-live rail-slim:sr-only"
           >{{ $t('nav.runningCount', { count: runningCount }) }}</span
         >
         <!-- Nothing runs but a contest is coming: a blue dot, no count. -->
@@ -115,10 +115,10 @@ const CURRENT_ROW =
           class="absolute top-1.5 right-2 rail-open:hidden"
         />
         <!-- The narrow rail has no room for the count: a dot on the icon, the count stays its accessible text. -->
-        <span
+        <StatusDot
           v-if="item.path === '/contests' && runningCount > 0"
-          aria-hidden="true"
-          class="absolute top-1.5 right-2 size-1.5 rounded-full bg-positive rail-open:hidden"
+          tone="live"
+          class="absolute top-1.5 right-2 rail-open:hidden"
         />
       </RouterLink>
     </nav>

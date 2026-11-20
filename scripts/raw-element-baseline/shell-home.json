@@ -22,20 +22,13 @@
     "hardcoded-value": 1
   },
   "features/shell/AppRail.vue": {
-    "hardcoded-value": 1,
-    "status-colour": 2
+    "hardcoded-value": 1
   },
   "features/shell/AppShell.vue": {
     "hardcoded-value": 2
   },
   "features/shell/LoadingBit.vue": {
     "hardcoded-value": 1
-  },
-  "features/shell/RailLiveContest.vue": {
-    "status-colour": 2
-  },
-  "features/shell/TopBarLiveContest.vue": {
-    "status-colour": 1
   },
   "features/shell/search/CommandPalette.vue": {
     "hardcoded-value": 1

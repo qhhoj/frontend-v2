@@ -192,7 +192,7 @@ const events = computed<TimelineEvent[]>(() => {
       >
         <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
           <p class="flex items-center gap-2 eyebrow">
-            <Lamp :tone="isUpcoming ? 'none' : 'ac'" />{{ sentence }}
+            <Lamp :tone="isUpcoming ? 'none' : 'pending'" still />{{ sentence }}
           </p>
           <p v-if="formatLine" class="eyebrow">{{ formatLine }}</p>
         </div>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Plus } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import type { OrganizationProblem } from '@/api/types/organization-problems';
 import EmptyState from '@/components/EmptyState.vue';
@@ -9,6 +10,10 @@ import NumberedPager from '@/components/NumberedPager.vue';
 import QueryState from '@/components/QueryState.vue';
 import StatePanel from '@/components/StatePanel.vue';
 import AppButton from '@/components/ui/AppButton.vue';
+import type { DataTableColumn } from '@/components/ui/DataTableColumns';
+import ProblemTable from '@/features/problems/ProblemTable.vue';
+import { formatDate } from '@/lib/format-date';
+import { useLocaleStore } from '@/stores/locale.store';
 import SettingsNotice from '@/features/account/settings/SettingsNotice.vue';
 import { useFocusFallback } from '@/lib/use-focus-fallback';
 import { ORG_BITS } from '../org-bits';
@@ -18,11 +23,11 @@ import { filtersFromQuery, listStateOf, routeQueryOf, withFilter } from './org-p
 import type { OrgProblemFilters } from './org-problems.queries';
 import { useOrgProblemsQuery, useProblemTagsQuery } from './org-problems.queries';
 import OrgProblemFiltersBar from './OrgProblemFilters.vue';
-import OrgProblemTable from './OrgProblemTable.vue';
-import OrgProblemTableSkeleton from './OrgProblemTableSkeleton.vue';
+import OrgProblemActions from './OrgProblemActions.vue';
+import OrgProblemMarks from './OrgProblemMarks.vue';
+import OrgProblemTags from './OrgProblemTags.vue';
 import OrgProblemTagsDialog from './OrgProblemTagsDialog.vue';
 import InlineBit from '@/components/InlineBit.vue';
-import OrgBulkBar from './OrgBulkBar.vue';
 import OrgBulkResult from './OrgBulkResult.vue';
 import OrgBulkTagDialog from './OrgBulkTagDialog.vue';
 import OrgTagCatalogue from './OrgTagCatalogue.vue';
@@ -57,6 +62,19 @@ const filteredTagName = computed(
 const selected = ref<string[]>([]);
 const actions = useOrgProblemActions(slug);
 const bulk = useOrgBulk(slug, selected);
+/** The table keeps its ticks as a set of codes. */
+const selectedCodes = computed({
+  get: () => new Set(selected.value),
+  set: (codes: Set<string>) => (selected.value = [...codes]),
+});
+const { t } = useI18n();
+const locale = useLocaleStore();
+/** The organization's own columns after the name: its tags and the last edit. An administrator also gets tick boxes and the two row actions. */
+const columns = computed<DataTableColumn[]>(() => [
+  { key: 'tags', label: t('orgProblems.columns.tags'), cellClass: 'whitespace-nowrap' },
+  { key: 'updatedAt', label: t('orgProblems.columns.updated'), align: 'end', hideBelow: 'xl' },
+]);
+const NO_ROWS: OrganizationProblem[] = [];
 /** A selection belongs to the page and organization it was ticked on: neither a pager link nor a move to another organization keeps it. */
 watch([slug, filters], () => (selected.value = []));
 const listCard = ref<{ $el: HTMLElement } | null>(null);
@@ -138,7 +156,16 @@ function saveTags(tagIds: string[]) {
           :error="problems.error.value"
           @retry="problems.refetch()"
         >
-          <template #skeleton><OrgProblemTableSkeleton :is-admin="isAdmin" /></template>
+          <template #skeleton>
+            <ProblemTable
+              managed
+              loading
+              :problems="NO_ROWS"
+              :extra-columns="columns"
+              :selectable="isAdmin"
+              :label="$t('orgProblems.tableCaption')"
+            />
+          </template>
           <StatePanel
             v-if="listState === 'empty'"
             :kind="ORG_BITS.listEmpty"
@@ -181,14 +208,52 @@ function saveTags(tagIds: string[]) {
             </button>
           </EmptyState>
           <template v-else-if="problems.data.value">
-            <OrgProblemTable
-              v-model:selected="selected"
-              :rows="problems.data.value.items"
-              :is-admin="isAdmin"
-              :busy-code="actions.busyCode.value"
-              @edit-tags="openTags"
-              @toggle-archive="actions.toggleArchive"
-            />
+            <ProblemTable
+              v-model:selected="selectedCodes"
+              managed
+              :problems="problems.data.value.items"
+              :extra-columns="columns"
+              :selectable="isAdmin"
+              :label="$t('orgProblems.tableCaption')"
+            >
+              <template #name-end="{ row }"><OrgProblemMarks :row="row" /></template>
+              <template #cell-tags="{ row }">
+                <span v-if="row.tags.length === 0" class="text-muted">{{
+                  $t('orgProblems.noTags')
+                }}</span>
+                <OrgProblemTags v-else :tags="row.tags" one-line />
+              </template>
+              <template #cell-updatedAt="{ row }">{{
+                formatDate(row.updatedAt, 'date', locale.locale)
+              }}</template>
+              <template v-if="isAdmin" #actions="{ row }">
+                <OrgProblemActions
+                  :row="row"
+                  :is-busy="actions.busyCode.value === row.code"
+                  @edit-tags="openTags(row)"
+                  @toggle-archive="actions.toggleArchive(row)"
+                />
+              </template>
+              <template #bulk>
+                <AppButton size="sm" :disabled="bulk.isPending.value" @click="isBulkTagOpen = true">
+                  {{ $t('orgProblems.bulk.tag') }}
+                </AppButton>
+                <AppButton
+                  size="sm"
+                  :disabled="bulk.isPending.value"
+                  @click="bulk.run({ action: 'archive' })"
+                >
+                  {{ $t('orgProblems.bulk.archive') }}
+                </AppButton>
+                <AppButton
+                  size="sm"
+                  :disabled="bulk.isPending.value"
+                  @click="bulk.run({ action: 'unarchive' })"
+                >
+                  {{ $t('orgProblems.bulk.unarchive') }}
+                </AppButton>
+              </template>
+            </ProblemTable>
             <NumberedPager :meta="problems.data.value.meta" :label="$t('orgProblems.pager')" />
           </template>
         </QueryState>
@@ -219,15 +284,6 @@ function saveTags(tagIds: string[]) {
     >
       <InlineBit :kind="ORG_BITS.bulkRefused" />{{ bulk.failureText.value }}
     </p>
-    <OrgBulkBar
-      v-if="isAdmin && selected.length > 0"
-      :count="selected.length"
-      :is-pending="bulk.isPending.value"
-      @archive="bulk.run({ action: 'archive' })"
-      @unarchive="bulk.run({ action: 'unarchive' })"
-      @tag="isBulkTagOpen = true"
-      @clear="selected = []"
-    />
     <OrgBulkTagDialog
       v-model:visible="isBulkTagOpen"
       :tags="tagList"

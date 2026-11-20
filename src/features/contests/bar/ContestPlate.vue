@@ -21,7 +21,7 @@ import {
 } from '@/lib/contest-time';
 import { formatElapsed, formatNumber, formatPoints } from '@/lib/format';
 import { formatClock, formatDate } from '@/lib/format-date';
-import { formatDelta } from '@/lib/rating-delta';
+import { deltaTextClass, formatDelta } from '@/lib/rating-delta';
 import { useNow } from '@/lib/use-now';
 import { useLocaleStore } from '@/stores/locale.store';
 import { useSessionStore } from '@/stores/session.store';
@@ -33,9 +33,13 @@ import { timelineEvents, timelineTicks } from './plate-timeline';
 /**
  * The contest's plate, under its header on every tab: what the clock and the judge measured. The big clock counts to the
  * start, then the time left (the viewer's own window or virtual run when they have one); an ended contest says when it
- * ended. Beside it, only the cells that have a value: my rank and score while I take part, the time to the freeze (then
- * the freeze itself), the start and length before and after the contest, my rating change. While time runs the time
- * scale shows the start, the end, now, the freeze zone and my submissions as lamps.
+ * ended, at the size of the other cells (an ended contest needs less room than a running one). Beside it, only the cells
+ * that have a value: my rank and score while I take part, the time to the freeze, the start and length before the contest
+ * (the length alone after it: the end is already there), my rating after a rated contest with the change as a small signed
+ * number, and the board's state in words ("Đóng băng", "Chờ công bố") last, on a line of its own on a phone. While time
+ * runs the time scale shows the start, the end, now, the freeze zone and my submissions as lamps.
+ * Colour: a state is neutral ink (the lamp of a running contest is the "in progress" blue, never the accepted green);
+ * verdict colours are for results only, here the lamps of my submissions and the sign of my rating change.
  * `run`: the viewer's running participation here; `standing`: their rank and score in it.
  * `isBoardFrozen` is the board's own answer where the page has it (the ranking); elsewhere the contest decides.
  */
@@ -132,27 +136,30 @@ const freezeBody = computed(() =>
     : '',
 );
 
-/** The start and the length stand in for the scale while no time runs (before the start, after the end). */
+/** The start and the length stand in for the scale while no time runs; after the end the big cell already has the end, so only the length follows. */
 const span = computed(() =>
   clock.value?.isRunning
     ? null
     : {
-        start: dateTime(props.contest.startTime),
+        start: clock.value ? dateTime(props.contest.startTime) : null,
         length: lengthText(
           (Date.parse(props.contest.endTime) - Date.parse(props.contest.startTime)) / 1000,
         ),
       },
 );
+/** My rating after the contest; the change is its result (up or down), so the signed number alone carries green or red. */
 const ratingChange = computed(() => {
   const change = props.contest.viewer.ratingChange;
   if (!change) return null;
-  return change.delta === null
-    ? { text: String(change.rating), tone: undefined }
-    : {
-        text: `${formatDelta(change.delta)} → ${change.rating}`,
-        tone: change.delta >= 0 ? ('ac' as const) : ('wa' as const),
-      };
+  return {
+    rating: formatNumber(change.rating, locale.locale),
+    delta: change.delta === null ? null : formatDelta(change.delta),
+    deltaClass: deltaTextClass(change.delta),
+  };
 });
+/** No value wraps inside its cell; on a phone a cell that holds words or a date takes the whole line instead. */
+const CELL = 'whitespace-nowrap';
+const WIDE_CELL = `${CELL} max-md:col-span-full`;
 
 /** The scale runs over the viewer's virtual run when they have one, else over the contest while it runs. */
 const scale = computed(() => {
@@ -217,16 +224,27 @@ const nowLabel = computed(() =>
         v-if="clock"
         :label="clock.label"
         :size="isLongWait ? 'word' : 'big'"
+        :class="CELL"
         data-testid="contest-clock"
       >
-        <Lamp :tone="clock.isRunning ? 'ac' : 'none'" class="mr-2 shrink-0 self-center" />
+        <template #label>
+          <Lamp :tone="clock.isRunning ? 'pending' : 'none'" still class="shrink-0" />
+          {{ clock.label }}
+        </template>
         <span class="sr-only">{{ $t('ranking.timeLeft') }}</span>
         <CountdownTimer :key="clock.until" :until="clock.until" @elapsed="emit('elapsed')" />
       </ReadoutCell>
-      <ReadoutCell v-else :label="$t('contests.phase.ended')" size="word">
+      <ReadoutCell
+        v-else
+        :label="$t('contests.phase.ended')"
+        :class="CELL"
+        data-testid="plate-ended"
+      >
         <time :datetime="contest.endTime">{{ dateTime(contest.endTime) }}</time>
       </ReadoutCell>
-      <div class="grid grid-cols-2 gap-x-12 gap-y-4 max-md:w-full md:flex md:flex-wrap">
+      <div
+        class="grid grid-cols-2 gap-x-12 gap-y-4 max-md:w-full max-md:gap-x-4 md:flex md:flex-wrap"
+      >
         <template v-if="own">
           <ReadoutCell
             v-if="own.rank !== null"
@@ -244,33 +262,38 @@ const nowLabel = computed(() =>
             {{ own.score }}
           </ReadoutCell>
         </template>
-        <ReadoutCell v-if="freezeIn" :label="$t('contests.plate.freezeIn')">
+        <ReadoutCell v-if="freezeIn" :label="$t('contests.plate.freezeIn')" :class="CELL">
           <CountdownTimer :key="freezeIn" :until="freezeIn" />
         </ReadoutCell>
+        <template v-if="span">
+          <ReadoutCell v-if="span.start" :label="$t('contests.plate.start')" :class="WIDE_CELL">
+            <time :datetime="contest.startTime">{{ span.start }}</time>
+          </ReadoutCell>
+          <ReadoutCell :label="$t('contests.plate.length')" :class="CELL">{{
+            span.length
+          }}</ReadoutCell>
+        </template>
         <ReadoutCell
-          v-else-if="freeze"
+          v-if="ratingChange"
+          :label="$t('contests.plate.rating')"
+          :class="CELL"
+          data-testid="viewer-rating-change"
+        >
+          {{ ratingChange.rating }}
+          <template v-if="ratingChange.delta" #unit>
+            <span :class="ratingChange.deltaClass">{{ ratingChange.delta }}</span>
+          </template>
+        </ReadoutCell>
+        <ReadoutCell
+          v-if="!freezeIn && freeze"
           :label="$t('contests.tabs.ranking')"
           size="word"
-          tone="tle"
+          :class="WIDE_CELL"
           :title="freezeBody"
           data-testid="freeze-chip"
         >
           {{ $t(freeze.labelKey) }}
           <span class="sr-only">{{ freezeBody }}</span>
-        </ReadoutCell>
-        <template v-if="span">
-          <ReadoutCell :label="$t('contests.plate.start')">
-            <time :datetime="contest.startTime">{{ span.start }}</time>
-          </ReadoutCell>
-          <ReadoutCell :label="$t('contests.plate.length')">{{ span.length }}</ReadoutCell>
-        </template>
-        <ReadoutCell
-          v-if="ratingChange"
-          :label="$t('contests.plate.rating')"
-          :tone="ratingChange.tone"
-          data-testid="viewer-rating-change"
-        >
-          {{ ratingChange.text }}
         </ReadoutCell>
       </div>
     </div>

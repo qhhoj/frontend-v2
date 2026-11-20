@@ -20,6 +20,8 @@ export const PROBLEM_LAYOUT = {
       'max-rail-wide:grid-cols-2 max-rail-wide:gap-x-2 rail-wide:-mx-(--qh-pad-surface) rail-wide:*:px-(--qh-pad-surface)',
     /** A file-name fact keeps a little amber around its text where it does not reach the card's edges. */
     factFile: 'max-rail-wide:-mx-1 max-rail-wide:px-1',
+    /** The second part of a value ("· từng phần", "· 80 người") has no room two facts a line. */
+    factExtra: 'max-rail-wide:hidden',
   },
   contest: {
     grid: 'flex flex-col gap-6 xl:grid xl:grid-cols-[minmax(0,var(--qh-measure))_var(--qh-sidebar-width)] xl:items-start xl:gap-x-12',
@@ -30,6 +32,7 @@ export const PROBLEM_LAYOUT = {
     panelRest: 'max-xl:order-last',
     facts: 'max-xl:grid-cols-2 max-xl:gap-x-2 xl:-mx-(--qh-pad-surface) xl:*:px-(--qh-pad-surface)',
     factFile: 'max-xl:-mx-1 max-xl:px-1',
+    factExtra: 'max-xl:hidden',
   },
 } as const;
 export type ProblemLayout = (typeof PROBLEM_LAYOUT)[keyof typeof PROBLEM_LAYOUT];

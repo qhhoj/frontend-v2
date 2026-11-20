@@ -23,3 +23,11 @@ export function durationMs(name: MotionDuration): number {
 /** The easing curve token, for `Element.animate({ easing })`. */
 export const easing = (name: 'ease' | 'ease-exit' | 'ease-move' | 'ease-spring'): string =>
   `var(--qh-${name})`;
+
+/**
+ * Waits that are not motion: a script names the wait here and never writes the number. They are plain numbers, not CSS
+ * variables, because reduced motion and low power must not shorten them.
+ * `SERVER_CATCH_UP_MS`: a countdown can fire up to a second before the server's clock agrees with it; one more read of
+ * the record this much later closes that gap.
+ */
+export const SERVER_CATCH_UP_MS = 1500;

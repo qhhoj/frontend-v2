@@ -35,9 +35,9 @@
   --qh-notice-info: var(--qh-accent-soft-text);
   --qh-notice-info-bg: var(--qh-accent-soft);
   /* Cue tokens (DESIGN.md): one meaning each, the same on every page. Text, tint and border per cue, all aliases of palette tokens (the palette proves their contrast in every mode); the border is the text mixed into the page. A verdict's parts stay verdict-*; everything else that says live, upcoming, ended, full, partial, zero or needs-attention uses cue-*. */
-  --qh-cue-live: var(--qh-verdict-ac);
-  --qh-cue-live-bg: var(--qh-verdict-ac-bg);
-  --qh-cue-live-border: color-mix(in srgb, var(--qh-verdict-ac) 40%, transparent);
+  --qh-cue-live: var(--qh-verdict-pending);
+  --qh-cue-live-bg: var(--qh-verdict-pending-bg);
+  --qh-cue-live-border: color-mix(in srgb, var(--qh-verdict-pending) 40%, transparent);
   --qh-cue-upcoming: var(--qh-tag-1);
   --qh-cue-upcoming-bg: var(--qh-tag-1-bg);
   --qh-cue-upcoming-border: color-mix(in srgb, var(--qh-tag-1) 40%, transparent);

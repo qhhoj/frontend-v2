@@ -28,12 +28,6 @@
     "button": 3,
     "hardcoded-value": 1
   },
-  "features/organizations/problems/OrgProblemTable.vue": {
-    "table": 1
-  },
-  "features/organizations/problems/OrgProblemTableSkeleton.vue": {
-    "table": 1
-  },
   "features/organizations/problems/OrgProblemTagsDialog.vue": {
     "checkbox": 1,
     "status-colour": 1
@@ -42,9 +36,6 @@
     "SettingsNotice": 1,
     "button": 1,
     "status-colour": 2
-  },
-  "features/organizations/problems/OrgSelectBox.vue": {
-    "checkbox": 1
   },
   "features/organizations/problems/OrgTagCatalogue.vue": {
     "status-colour": 1

@@ -5,7 +5,7 @@ import { TABLE_CELL_CLASSES } from './ranking-cell-classes';
 /**
  * What the board's cells mean, on one line above the board: a sample of each cell in the cell's own classes, then its
  * word. Penalty boards read tries (`+n`, `−n`, `?n`); points boards read scores. `freezeNote` says why cells show "?"
- * while the board is frozen.
+ * while the board is frozen. The first-solve sample is a solved cell with the gold star, as the board draws it.
  */
 defineProps<{
   isPenalty: boolean;
@@ -26,7 +26,7 @@ const POINTS_LEGEND = [
   { key: 'ranking.legend.notAttempted', ...sample('—', 'empty') },
 ] as const;
 const SAMPLE =
-  'relative inline-flex h-6 min-w-9 shrink-0 items-center justify-center rounded-cell px-1 font-mono font-semibold tabular-nums';
+  'relative inline-flex h-6 min-w-9 shrink-0 items-center justify-center rounded-cell px-2 font-mono font-semibold tabular-nums';
 </script>
 
 <template>
@@ -50,7 +50,8 @@ const SAMPLE =
         aria-hidden="true"
         data-testid="first-solve-swatch"
         :class="[SAMPLE, TABLE_CELL_CLASSES['first-solve']]"
-        ><Star class="absolute top-0.5 right-0.5 size-2.5 fill-current text-merit"
+        >{{ isPenalty ? '+1' : '100'
+        }}<Star class="absolute top-0.5 right-0.5 size-2.5 fill-current text-merit"
       /></span>
       {{ $t('ranking.legend.firstSolve') }}
     </li>
