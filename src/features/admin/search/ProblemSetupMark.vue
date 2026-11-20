@@ -5,7 +5,7 @@ import type { ListStep } from './problem-setup-marks';
 
 /**
  * A problem's setup as four segments in order (information, statement, tests and judging, trial run): a done step is
- * filled in the success colour, an open one is the line colour. The steps are named, with their state, in the tooltip and
+ * filled in the `full` cue colour, an open one is the line colour. The steps are named, with their state, in the tooltip and
  * for screen readers; the row's next-step link says what to do.
  */
 const props = defineProps<{ steps: readonly ListStep[] }>();
@@ -27,7 +27,7 @@ const summary = computed(() =>
       v-for="step in steps"
       :key="step.id"
       class="h-2 w-4 rounded-mark"
-      :class="step.isDone ? 'bg-positive' : 'bg-line-strong'"
+      :class="step.isDone ? 'bg-cue-full' : 'bg-line-strong'"
     />
   </span>
 </template>
