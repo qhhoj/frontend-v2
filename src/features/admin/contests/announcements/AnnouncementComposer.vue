@@ -77,7 +77,7 @@ const { title, description, post, errors, submit } = useAnnouncementComposer(
     <div class="flex flex-wrap items-center gap-3">
       <button
         type="submit"
-        :class="buttonClass('primary')"
+        :class="buttonClass('secondary')"
         :aria-busy="post.isPending.value || undefined"
       >
         {{ $t('admin.announcements.post') }}

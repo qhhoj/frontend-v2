@@ -7,6 +7,7 @@ import AppButton from '@/components/ui/AppButton.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import SaveBar from '@/components/ui/SaveBar.vue';
 import Tabs from '@/components/ui/Tabs.vue';
+import { freezesInFormat } from '@/lib/board-freeze';
 import { formatLabel } from '@/lib/contest-format';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -180,7 +181,9 @@ const summaries = computed(() => {
     form.startTime ? formatDate(form.startTime, 'datetime', locale.locale) : '',
     lengthText.value ?? '',
     formatLabel(form.formatName),
-    form.frozenLastMinutes > 0 ? t(`${KEY}.time.freeze`, { minutes: form.frozenLastMinutes }) : '',
+    freezesInFormat(form.formatName) && form.frozenLastMinutes > 0
+      ? t(`${KEY}.time.freeze`, { minutes: form.frozenLastMinutes })
+      : '',
   ];
   return {
     time: time.filter(Boolean).join(' · '),
@@ -255,7 +258,10 @@ const tools = computed(() => {
     <Tabs :items="tabs" :label="$t('admin.contests.tabsLabel')" />
     <div v-show="tab === 'setup'" :id="SETUP_ID" class="flex flex-col gap-4">
       <form :id="FORM_ID" class="hidden" novalidate @submit.prevent="save" />
-      <div class="flex flex-col border-b border-line">
+      <fieldset
+        :disabled="isSaving"
+        class="m-0 flex min-w-0 flex-col border-0 border-b border-line p-0"
+      >
         <WorkbenchSection
           id="time"
           v-model:open="open.time"
@@ -321,7 +327,7 @@ const tools = computed(() => {
         >
           <SetupInfo v-model="settings.form.value" :errors="settings.errors.value" />
         </WorkbenchSection>
-      </div>
+      </fieldset>
       <nav
         class="flex flex-wrap items-center gap-x-4 gap-y-2 text-meta"
         :aria-label="$t(`${KEY}.tools.label`)"

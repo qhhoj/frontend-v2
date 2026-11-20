@@ -84,16 +84,10 @@ const scale = computed(() => {
   const start = Date.parse(props.contest.startTime);
   const end = Date.parse(props.contest.endTime);
   const isOneDay = localDayOffset(props.contest.startTime, props.contest.endTime) === 0;
-  const startDay = formatDate(props.contest.startTime, 'short', locale.locale);
-  const ends = isOneDay
-    ? {
-        start: `${startDay} · ${formatClock(props.contest.startTime)}`,
-        end: formatClock(props.contest.endTime),
-      }
-    : {
-        start: formatDate(props.contest.startTime, 'datetime', locale.locale),
-        end: formatDate(props.contest.endTime, 'datetime', locale.locale),
-      };
+  // A one-day contest reads in clocks (the sentence above names the day); a longer one in dates.
+  const label = (iso: string) =>
+    isOneDay ? formatClock(iso) : formatDate(iso, 'datetime', locale.locale);
+  const ends = { start: label(props.contest.startTime), end: label(props.contest.endTime) };
   return { start, end, ticks: timelineTicks(start, end, ends, isOneDay) };
 });
 const freeze = computed(() => {

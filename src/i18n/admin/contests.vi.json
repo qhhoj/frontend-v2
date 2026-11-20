@@ -576,13 +576,16 @@
         "H": "Ẩn với học sinh",
         "C": "Ẩn trong lúc thi",
         "P": "Ẩn trong lượt tham gia"
-      }
+      },
+      "noFreeze": "Thể thức {format} không đóng băng bảng xếp hạng; số này chỉ có tác dụng với ICPC và VNOJ."
     },
     "problems": {
       "setup": "Thiết lập",
       "total": "{count} bài · tổng {points} điểm",
       "none": "Chưa có bài",
-      "rescore": "Lưu danh sách bài sẽ tính lại điểm của kỳ thi."
+      "rescore": "Lưu danh sách bài sẽ tính lại điểm của kỳ thi.",
+      "showLimits": "Thêm cột: cắt output, số lần nộp tối đa",
+      "hideLimits": "Ẩn cột cắt output và số lần nộp"
     },
     "participants": {
       "label": "Ai được tham gia",

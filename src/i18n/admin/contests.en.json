@@ -576,13 +576,16 @@
         "H": "Hidden from students",
         "C": "Hidden during the contest",
         "P": "Hidden during a participation"
-      }
+      },
+      "noFreeze": "The {format} format does not freeze the ranking; this number only applies to ICPC and VNOJ."
     },
     "problems": {
       "setup": "Setup",
       "total": "{count} problems · {points} points in total",
       "none": "No problems yet",
-      "rescore": "Saving the problem list rescores the contest."
+      "rescore": "Saving the problem list rescores the contest.",
+      "showLimits": "More columns: output prefix, submission cap",
+      "hideLimits": "Hide the output prefix and submission cap columns"
     },
     "participants": {
       "label": "Who may take part",

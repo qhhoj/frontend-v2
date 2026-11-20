@@ -65,7 +65,7 @@ const columns = computed<DataTableColumn[]>(() => [
   { key: 'label', label: t(`${KEY}.columns.label`), priority: 'badge' },
   { key: 'problem', label: t(`${KEY}.columns.problem`), priority: 'primary' },
   { key: 'setup', label: t(`${BENCH}.setup`), priority: 'secondary' },
-  { key: 'points', label: t(`${KEY}.columns.points`), priority: 'secondary', align: 'end' },
+  { key: 'points', label: t(`${KEY}.columns.points`), priority: 'secondary', cellClass: 'w-28' },
   { key: 'partial', label: t(`${KEY}.columns.partial`), priority: 'secondary' },
   { key: 'pretest', label: t(`${KEY}.columns.pretest`), priority: 'meta', hideBelow: 'lg' },
   ...(showLimits.value
@@ -108,17 +108,19 @@ const total = computed(() =>
       density="compact"
     >
       <template #bulk>
-        <TextInput
-          :model-value="Number.isNaN(bulkPoints) ? '' : bulkPoints"
-          type="number"
-          min="0"
-          class="w-24 font-mono"
-          :aria-label="$t(`${KEY}.bulkPoints`)"
-          :placeholder="$t(`${KEY}.bulkPoints`)"
-          :aria-invalid="!Number.isNaN(bulkPoints) && !isBulkPointsValid ? 'true' : undefined"
-          @input="bulkPoints = requiredNumberValue($event)"
-          @keydown.enter.prevent="applyPoints"
-        />
+        <span class="block w-24">
+          <TextInput
+            :model-value="Number.isNaN(bulkPoints) ? '' : bulkPoints"
+            type="number"
+            min="0"
+            class="font-mono"
+            :aria-label="$t(`${KEY}.bulkPoints`)"
+            :placeholder="$t(`${KEY}.bulkPoints`)"
+            :aria-invalid="!Number.isNaN(bulkPoints) && !isBulkPointsValid ? 'true' : undefined"
+            @input="bulkPoints = requiredNumberValue($event)"
+            @keydown.enter.prevent="applyPoints"
+          />
+        </span>
         <AppButton
           size="sm"
           :disabled="!isBulkPointsValid"
@@ -152,15 +154,17 @@ const total = computed(() =>
         </span>
       </template>
       <template #cell-points="{ row }">
-        <TextInput
-          :model-value="Number.isNaN(row.points) ? '' : row.points"
-          type="number"
-          min="0"
-          class="w-24 font-mono"
-          :aria-label="$t(`${KEY}.pointsFor`, { code: row.code })"
-          :aria-invalid="isPointsValid(row.points) ? undefined : 'true'"
-          @input="row.points = requiredNumberValue($event)"
-        />
+        <span class="block w-24">
+          <TextInput
+            :model-value="Number.isNaN(row.points) ? '' : row.points"
+            type="number"
+            min="0"
+            class="font-mono"
+            :aria-label="$t(`${KEY}.pointsFor`, { code: row.code })"
+            :aria-invalid="isPointsValid(row.points) ? undefined : 'true'"
+            @input="row.points = requiredNumberValue($event)"
+          />
+        </span>
       </template>
       <template #cell-partial="{ row }">
         <Checkbox v-model="row.partial" :aria-label="$t(`${KEY}.partialFor`, { code: row.code })" />
@@ -172,26 +176,30 @@ const total = computed(() =>
         />
       </template>
       <template #cell-prefix="{ row }">
-        <TextInput
-          :model-value="row.outputPrefix ?? ''"
-          type="number"
-          min="0"
-          class="w-24 font-mono"
-          :placeholder="$t(`${KEY}.prefixDefault`)"
-          :aria-label="$t(`${KEY}.prefixFor`, { code: row.code })"
-          @input="row.outputPrefix = numberBoxValue($event)"
-        />
+        <span class="block w-24">
+          <TextInput
+            :model-value="row.outputPrefix ?? ''"
+            type="number"
+            min="0"
+            class="font-mono"
+            :placeholder="$t(`${KEY}.prefixDefault`)"
+            :aria-label="$t(`${KEY}.prefixFor`, { code: row.code })"
+            @input="row.outputPrefix = numberBoxValue($event)"
+          />
+        </span>
       </template>
       <template #cell-max="{ row }">
-        <TextInput
-          :model-value="row.maxSubmissions ?? ''"
-          type="number"
-          min="1"
-          class="w-24 font-mono"
-          :placeholder="$t(`${KEY}.maxNone`)"
-          :aria-label="$t(`${KEY}.maxFor`, { code: row.code })"
-          @input="row.maxSubmissions = numberBoxValue($event)"
-        />
+        <span class="block w-24">
+          <TextInput
+            :model-value="row.maxSubmissions ?? ''"
+            type="number"
+            min="1"
+            class="font-mono"
+            :placeholder="$t(`${KEY}.maxNone`)"
+            :aria-label="$t(`${KEY}.maxFor`, { code: row.code })"
+            @input="row.maxSubmissions = numberBoxValue($event)"
+          />
+        </span>
       </template>
       <template #actions="{ row }">
         <span class="flex items-center justify-end gap-1">
@@ -247,7 +255,7 @@ const total = computed(() =>
         data-testid="contest-limits-toggle"
         @click="showLimits = !showLimits"
       >
-        {{ $t(showLimits ? `${KEY}.hideLimits` : `${KEY}.showLimits`) }}
+        {{ $t(`${BENCH}.${showLimits ? 'hideLimits' : 'showLimits'}`) }}
       </AppButton>
     </div>
     <FoldPanel :open="isCopyOpen">

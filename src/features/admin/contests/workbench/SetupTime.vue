@@ -10,6 +10,7 @@ import FormField from '@/components/ui/FormField.vue';
 import Notice from '@/components/ui/Notice.vue';
 import SelectField from '@/components/ui/SelectField.vue';
 import TextInput from '@/components/ui/TextInput.vue';
+import { freezesInFormat } from '@/lib/board-freeze';
 import { formatLabel } from '@/lib/contest-format';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { requiredNumberValue } from '../../ui/form/number-box';
@@ -143,7 +144,11 @@ const formatFields = computed(() => FORMAT_FIELDS[form.value.formatName]);
       scale="admin"
       input-id="contest-frozenLastMinutes"
       :label="$t(`${KEY}.fields.frozenLastMinutes`)"
-      :hint="$t(`${KEY}.hints.frozenLastMinutes`)"
+      :hint="
+        freezesInFormat(form.formatName)
+          ? $t(`${KEY}.hints.frozenLastMinutes`)
+          : $t(`${BENCH}.noFreeze`, { format: formatLabel(form.formatName) })
+      "
       :error="errors.frozenLastMinutes"
     >
       <TextInput
