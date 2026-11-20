@@ -1,7 +1,12 @@
 import { fetchText } from './admin-common.api';
 import { apiGet, apiSend, apiUrl, fillPath } from './typed';
 import type { DataOf } from './typed';
-import type { DataFileKind, ProblemData, ProblemDataBody } from './types/problem-data';
+import type {
+  DataFileKind,
+  ProblemData,
+  ProblemDataBody,
+  SourceFileKind,
+} from './types/problem-data';
 
 export const fetchProblemData = (code: string): Promise<ProblemData> =>
   apiGet('/problems/{code}/data', { path: { code } });
@@ -26,6 +31,16 @@ export const fileBody = (file: File) => {
 
 export const uploadDataArchive = (code: string, file: File): Promise<ProblemData> =>
   apiSend('post', '/problems/{code}/data/archive', { path: { code }, ...fileBody(file) });
+
+export const uploadDataSource = (
+  code: string,
+  kind: SourceFileKind,
+  file: File,
+): Promise<ProblemData> =>
+  apiSend('post', '/problems/{code}/data/files/{kind}', {
+    path: { code, kind },
+    ...fileBody(file),
+  });
 
 export const deleteDataFile = (code: string, kind: DataFileKind): Promise<ProblemData> =>
   apiSend('delete', '/problems/{code}/data/files/{kind}', { path: { code, kind } });

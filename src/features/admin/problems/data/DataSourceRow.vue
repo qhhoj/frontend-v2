@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { deleteDataFile, problemDataFileUrl } from '@/api/problem-data.api';
+import { computed, ref } from 'vue';
+import { deleteDataFile, problemDataFileUrl, uploadDataSource } from '@/api/problem-data.api';
 import type { ProblemData, SourceFileKind } from '@/api/types/problem-data';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import AdminStatus from '../../ui/AdminStatus.vue';
 import { failureReasonOf } from '../failure-reason';
+import { acceptOfExtensions, SOURCE_EXTENSIONS, SOURCE_MAX_BYTES } from '../limits';
 import { Trash2 } from 'lucide-vue-next';
 import { iconButtonClass } from '../../ui/controls';
+import UploadButton from '@/components/ui/UploadButton.vue';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { useKeepDataAnswer } from './problem-data.queries';
 
-/** A stored source file of the problem, with its delete button: the judge does not grade init.yml generators, so none can be uploaded. */
+/** A source file of the problem (checker, interactor, grader, header): upload or replace it, see its stored name, delete it. A generator can only be deleted: the judge runs none. */
 const props = defineProps<{
   code: string;
   kind: SourceFileKind;
@@ -20,6 +22,13 @@ const props = defineProps<{
 const keepAnswer = useKeepDataAnswer(() => props.code);
 const isConfirmShown = ref(false);
 
+const upload = useAdminMutation({
+  mutate: (file: File) => uploadDataSource(props.code, props.kind, file),
+  onDone: keepAnswer,
+});
+const accept = computed(() =>
+  props.kind === 'generator' ? undefined : acceptOfExtensions(SOURCE_EXTENSIONS[props.kind]),
+);
 const remove = useAdminMutation({
   mutate: (kind: SourceFileKind) => deleteDataFile(props.code, kind),
   onDone: (saved: ProblemData) => {
@@ -47,6 +56,19 @@ const remove = useAdminMutation({
       </p>
     </div>
     <div class="flex items-center gap-1">
+      <UploadButton
+        v-if="kind !== 'generator'"
+        :data-testid="`upload-${kind}`"
+        :label="
+          storedName
+            ? $t('admin.problems.uploads.sources.replace')
+            : $t('admin.problems.uploads.sources.upload')
+        "
+        :accept="accept"
+        :is-pending="upload.isPending.value"
+        :max-bytes="SOURCE_MAX_BYTES"
+        @picked="upload.run"
+      />
       <button
         v-if="storedName"
         type="button"
@@ -58,6 +80,11 @@ const remove = useAdminMutation({
         <Trash2 aria-hidden="true" class="size-4" :stroke-width="1.75" />
       </button>
     </div>
+    <AdminStatus
+      v-if="upload.failure.value"
+      kind="refused"
+      :text="failureReasonOf(upload.failure.value)"
+    />
     <ConfirmDialog
       v-model:visible="isConfirmShown"
       :title="$t('admin.problems.uploads.sources.removeTitle', { name: storedName ?? '' })"
