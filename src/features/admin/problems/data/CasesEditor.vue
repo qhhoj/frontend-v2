@@ -22,13 +22,15 @@ import {
 import type { KeyedCase, ListWarning } from './test-cases';
 import { addCaseToGroup, groupEnd, moveGroup, removeGroup, tableRows } from './test-table';
 import type { TableRow } from './test-table';
+import type { TrialResults } from './trial-results';
 
 /**
  * The test table: one compact row per group and per test, visible at once. Below it the `total` slot (the page's line
- * that says whether the points add up) and "Thêm nhóm", "Thêm test". Everything waits for the page's save.
+ * that says whether the points add up) and "Thêm nhóm", "Thêm test". Everything waits for the page's save. With `trial`
+ * the table has the column "Lời giải mẫu": what the last trial run got on each test and group (under the row on a phone).
  */
 const cases = defineModel<KeyedCase[]>({ required: true });
-const props = defineProps<{ data: ProblemData; errors: FieldErrors }>();
+const props = defineProps<{ data: ProblemData; errors: FieldErrors; trial?: TrialResults }>();
 const emit = defineEmits<{ invalid: [key: number, isInvalid: boolean] }>();
 const KEY = 'admin.problems.data.cases';
 const HEAD = 'border-b border-line px-2';
@@ -92,6 +94,9 @@ function remove(shown: TableRow) {
       </template>
     </Notice>
     <Notice v-if="errors.cases" tone="danger" inline>{{ errors.cases }}</Notice>
+    <p v-if="trial?.isStale" data-testid="trial-stale-note" class="m-0 text-meta text-muted">
+      {{ $t(`${KEY}.trial.staleNote`) }}
+    </p>
     <datalist id="archive-files">
       <option v-for="file in data.archiveFiles" :key="file" :value="file" />
     </datalist>
@@ -112,6 +117,13 @@ function remove(shown: TableRow) {
             <th scope="col" :class="[TABLE_HEAD_CELL, HEAD, 'w-24 text-right']">
               {{ $t(`${KEY}.columns.points`) }}
             </th>
+            <th
+              v-if="trial"
+              scope="col"
+              :class="[TABLE_HEAD_CELL, HEAD, 'w-36 text-right max-sm:hidden']"
+            >
+              {{ $t(`${KEY}.columns.trial`) }}
+            </th>
             <th scope="col" :class="[TABLE_HEAD_CELL, 'w-11 border-b border-line']">
               <span class="sr-only">{{ $t(`${KEY}.columns.actions`) }}</span>
             </th>
@@ -127,6 +139,7 @@ function remove(shown: TableRow) {
             :can-move-down="canMoveDown(shown)"
             :warnings="warningsAt(shown.index)"
             :errors="errorsAt(shown.index)"
+            :trial="trial"
             @move="move(shown, $event)"
             @remove="remove(shown)"
             @add-test="cases = addCaseToGroup(cases, shown.index)"

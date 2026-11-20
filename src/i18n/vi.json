@@ -1011,7 +1011,10 @@
     "already_participating": "Người này đã có lượt tham gia đang diễn ra trong kỳ thi.",
     "participation_has_submissions": "Lượt tham gia đã có bài nộp nên không xóa được.",
     "file_unreadable": "Không đọc được tệp nữa (đã bị chuyển, sửa hoặc xóa); hãy chọn lại.",
-    "upload_still_processing": "Máy chủ vẫn đang xử lý; tải lại trang để xem kết quả."
+    "upload_still_processing": "Máy chủ vẫn đang xử lý; tải lại trang để xem kết quả.",
+    "problem_has_no_tests": "Bài này chưa có test nên chưa chấm được.",
+    "final_pending_limit": "Bạn có quá nhiều bài nộp đang chờ chấm cuối. Hãy đợi kỳ thi chấm xong.",
+    "spectator_cannot_submit": "Bạn đang xem kỳ thi này với tư cách khán giả nên không nộp bài được."
   },
   "common": {
     "clearSearch": "Xóa từ khóa",

@@ -16,13 +16,16 @@ import { TABLE_ROW_HEIGHT } from '@/components/ui/table-classes';
 import { numberBoxValue } from '../../ui/form/number-box';
 import { argsText, parseArgs } from './test-cases';
 import type { KeyedCase } from './test-cases';
+import CaseTrialResult from './CaseTrialResult.vue';
 import type { TableRow } from './test-table';
+import type { TrialResults } from './trial-results';
 
 /**
  * One row of the test table. A group row sits on the raised ground with the group's points and its rule in words; a test
  * row has its number, input file, output file and points (a dash inside a group: the group's points score it). Moving,
  * removing and the rarely used options are behind the row's menu; the options open as a row below. A row that has
- * something to fix says so in a line under it.
+ * something to fix says so in a line under it. With `trial` the row has the cell "Lời giải mẫu" (what the last trial run
+ * got on this test or group); a phone shows it as a second line of the row once there is a run.
  */
 const row = defineModel<KeyedCase>({ required: true });
 const props = defineProps<{
@@ -31,6 +34,7 @@ const props = defineProps<{
   canMoveDown: boolean;
   warnings: string[];
   errors: string[];
+  trial?: TrialResults;
 }>();
 const emit = defineEmits<{
   move: [offset: -1 | 1];
@@ -40,10 +44,24 @@ const emit = defineEmits<{
 }>();
 const { t } = useI18n();
 const KEY = 'admin.problems.data.cases';
-const CELL = 'border-b border-line px-2 py-0.5';
+const BASE_COLUMN_COUNT = 5;
+const columnCount = computed(() => BASE_COLUMN_COUNT + (props.trial ? 1 : 0));
+const trialResult = computed(() => {
+  if (props.view.kind === 'group') return props.trial?.groups.get(props.view.number);
+  return props.view.kind === 'test' ? props.trial?.tests.get(props.view.number) : undefined;
+});
+/** On a phone the trial cell is a line under the row, shown once a run exists; the row's own rule then moves under it. */
+const hasTrialLine = computed(
+  () =>
+    props.trial !== undefined && props.trial.phase !== 'none' && props.view.kind !== 'stray-end',
+);
+const ruleClass = computed(() =>
+  hasTrialLine.value ? 'border-b border-line max-sm:border-b-0' : 'border-b border-line',
+);
+const cellClass = computed(() => `${ruleClass.value} px-2 py-0.5`);
 /** The menu's cell has no side padding: on a phone the button alone is the 44 px target. */
-const MENU_CELL = 'border-b border-line py-0.5 text-right';
-const COLUMN_COUNT = 5;
+const menuCellClass = computed(() => `${ruleClass.value} py-0.5 text-right`);
+const trialCellClass = computed(() => `${cellClass.value} text-right max-sm:hidden`);
 const CASE_CHECKERS: CaseChecker[] = [
   '',
   'floats',
@@ -123,12 +141,12 @@ const menu = computed<MenuEntry[]>(() => {
     data-testid="group-row"
     :class="[TABLE_ROW_HEIGHT, 'bg-surface-strong']"
   >
-    <th scope="row" colspan="3" :class="[CELL, 'text-left font-normal']">
+    <th scope="row" colspan="3" :class="[cellClass, 'text-left font-normal']">
       <span class="font-semibold">{{ t(`${KEY}.batchLabel`, names) }}</span>
       <span class="ml-2 text-meta text-muted">{{ t(`${KEY}.groupRule`) }}</span>
       <Chip v-if="hasOptions" class="ml-2">{{ t(`${KEY}.hasOptions`) }}</Chip>
     </th>
-    <td :class="CELL">
+    <td :class="cellClass">
       <TextInput
         :model-value="row.points ?? ''"
         type="number"
@@ -140,17 +158,20 @@ const menu = computed<MenuEntry[]>(() => {
         @input="row.points = numberBoxValue($event)"
       />
     </td>
-    <td :class="MENU_CELL">
+    <td v-if="trial" :class="trialCellClass">
+      <CaseTrialResult :result="trialResult" :phase="trial.phase" :is-stale="trial.isStale" />
+    </td>
+    <td :class="menuCellClass">
       <RowMenu :items="menu" :label="t(`${KEY}.menu.group`, names)" />
     </td>
   </tr>
   <tr v-else-if="view.kind === 'test'" data-testid="test-row" :class="TABLE_ROW_HEIGHT">
-    <th scope="row" :class="[CELL, 'text-left font-normal whitespace-nowrap']">
+    <th scope="row" :class="[cellClass, 'text-left font-normal whitespace-nowrap']">
       <span class="font-mono tabular-nums">{{ view.number }}</span>
       <Chip v-if="row.isPretest" class="ml-2">{{ t(`${KEY}.pretest`) }}</Chip>
       <Chip v-if="hasOptions" class="ml-2">{{ t(`${KEY}.hasOptions`) }}</Chip>
     </th>
-    <td :class="CELL">
+    <td :class="cellClass">
       <TextInput
         v-model="row.input"
         class="font-mono"
@@ -161,7 +182,7 @@ const menu = computed<MenuEntry[]>(() => {
         :aria-label="t(`${KEY}.inputOf`, names)"
       />
     </td>
-    <td :class="CELL">
+    <td :class="cellClass">
       <TextInput
         v-model="row.output"
         class="font-mono"
@@ -172,7 +193,7 @@ const menu = computed<MenuEntry[]>(() => {
         :aria-label="t(`${KEY}.outputOf`, names)"
       />
     </td>
-    <td :class="[CELL, 'text-right']">
+    <td :class="[cellClass, 'text-right']">
       <template v-if="view.isInGroup">
         <span aria-hidden="true" class="px-2 text-muted">—</span>
         <span class="sr-only">{{ t(`${KEY}.scoredByGroup`) }}</span>
@@ -189,28 +210,39 @@ const menu = computed<MenuEntry[]>(() => {
         @input="row.points = numberBoxValue($event)"
       />
     </td>
-    <td :class="MENU_CELL">
+    <td v-if="trial" :class="trialCellClass">
+      <CaseTrialResult :result="trialResult" :phase="trial.phase" :is-stale="trial.isStale" />
+    </td>
+    <td :class="menuCellClass">
       <RowMenu :items="menu" :label="t(`${KEY}.menu.test`, names)" />
     </td>
   </tr>
   <tr v-else data-testid="stray-end-row" :class="TABLE_ROW_HEIGHT">
-    <td :colspan="COLUMN_COUNT - 1" :class="[CELL, 'text-meta text-muted']">
+    <td :colspan="columnCount - 1" :class="[cellClass, 'text-meta text-muted']">
       {{ t(`${KEY}.strayEnd`) }}
     </td>
-    <td :class="MENU_CELL">
+    <td :class="menuCellClass">
       <IconButton size="sm" :label="t(`${KEY}.removeStrayEnd`)" @click="emit('remove')">
         <X aria-hidden="true" />
       </IconButton>
     </td>
   </tr>
+  <tr v-if="trial && hasTrialLine" data-testid="trial-line" class="sm:hidden">
+    <td :colspan="columnCount" class="border-b border-line px-2 pb-2">
+      <span class="flex items-center gap-2">
+        <span class="text-small text-muted">{{ t(`${KEY}.trial.of`) }}</span>
+        <CaseTrialResult :result="trialResult" :phase="trial.phase" :is-stale="trial.isStale" />
+      </span>
+    </td>
+  </tr>
   <tr v-if="errors.length > 0 || warnings.length > 0" data-testid="row-messages">
-    <td :colspan="COLUMN_COUNT" :class="[CELL, 'pb-2']">
+    <td :colspan="columnCount" class="border-b border-line px-2 py-0.5 pb-2">
       <Notice v-if="errors.length > 0" tone="danger" inline>{{ errors.join(' · ') }}</Notice>
       <Notice v-if="warnings.length > 0" tone="warning" inline>{{ warnings.join(' · ') }}</Notice>
     </td>
   </tr>
   <tr v-if="isOptionsShown && view.kind !== 'stray-end'" data-testid="row-options">
-    <td :colspan="COLUMN_COUNT" class="border-b border-line bg-surface-strong p-3">
+    <td :colspan="columnCount" class="border-b border-line bg-surface-strong p-3">
       <div class="grid gap-3 sm:grid-cols-2">
         <Checkbox
           v-if="!isGroup"

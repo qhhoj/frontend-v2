@@ -32,7 +32,7 @@ export interface ListStep {
   isDone: boolean;
   /** What doing the step means here (the words of the next-step link): the judging step asks for tests first, then points. */
   action: 'info' | SetupGap | 'trial';
-  /** Where the step is done: an editor tab, or the problem page for the trial run. */
+  /** Where the step is done: an old tab address of the workbench (the general one opens the next step, so the trial run). */
   routeName: string;
 }
 
@@ -64,7 +64,7 @@ export function listStepsOf(problem: SetupRow): ListStep[] | null {
       id: 'trial',
       isDone: isTrialDone(problem.viewerStatus),
       action: 'trial',
-      routeName: 'problem',
+      routeName: 'admin-problemGeneral',
     },
   ];
 }

@@ -5,6 +5,7 @@ import CodeEditor from '@/components/CodeEditor.vue';
 import { blockHeldEnter } from '@/components/submit-key';
 import AppButton from '@/components/ui/AppButton.vue';
 import Notice from '@/components/ui/Notice.vue';
+import { translate } from '@/i18n';
 import { formatMemoryLimit, formatNumber, formatTimeLimit } from '@/lib/format';
 import { MAX_SOURCE_LENGTH, acceptedExtension } from '@/lib/source';
 import { useContestQuery } from '@/features/contests/contests.queries';
@@ -24,9 +25,13 @@ const props = defineProps<{
    * `pane` is the editor that opens in place under the statement: a bar (language, upload, submit) over an editor that fills the
    * rest, and the slot `tools` (full screen) at the end of the line under the editor; `full` the same as a full-screen
    * panel, with the problem's name and the slot `actions` in the bar; `sheet` the phone's column that fills the sheet's
-   * height, the submit button under the editor.
+   * height, the submit button under the editor; `compact` a panel on a page that draws the result itself and keeps its
+   * own primary (the problem workbench): language and upload in one row, a short editor, a secondary submit button under
+   * it, no result strip.
    */
-  layout: 'pane' | 'sheet' | 'full';
+  layout: 'pane' | 'sheet' | 'full' | 'compact';
+  /** The submit button's words when the page names the action itself; "Nộp bài" otherwise. */
+  submitLabel?: string;
 }>();
 /** The same refs as `form`, unwrapped for the template. */
 const state = reactive(props.form);
@@ -45,9 +50,9 @@ const errorReference = computed(() => (state.errorText ? errorId : undefined));
 const reasonId = useId();
 const blockedReason = computed(() => (state.errorText ? null : state.blockedReason));
 const submitDescribedBy = computed(() => (blockedReason.value ? reasonId : undefined));
-const submitLabelKey = computed(() => {
-  if (state.submitting) return 'submit.submitting';
-  return state.fileMode ? 'submit.submitFile' : 'submit.submit';
+const submitText = computed(() => {
+  if (state.submitting) return translate('submit.submitting');
+  return props.submitLabel ?? translate(state.fileMode ? 'submit.submitFile' : 'submit.submit');
 });
 
 /**
@@ -82,7 +87,7 @@ const FILLED_EDITOR = {
   editorFill:
     'h-full !max-h-none [&_.code-editor-host]:h-full [&_.cm-editor]:h-full [&_.code-editor-fallback]:min-h-full',
   counterRow: '',
-  submit: { size: 'md', block: false },
+  submit: { tone: 'primary', size: 'md', block: false },
   header: 'flex flex-wrap items-center gap-x-3 gap-y-2',
   strip: 'order-1',
   /** The contest line gets its own row under the bar, so the bar keeps to one row in a narrow pane. */
@@ -100,16 +105,32 @@ const LAYOUTS = {
     editorMinLines: 6,
     editorFill: '',
     counterRow: 'justify-between',
-    submit: { size: 'lg', block: true },
+    submit: { tone: 'primary', size: 'lg', block: true },
     header: 'contents',
     strip: 'order-first',
+    info: REGION_ORDER.info,
+  },
+  compact: {
+    form: 'flex flex-col gap-3',
+    languageRow: 'grid w-full grid-cols-[minmax(0,1fr)_auto] items-center',
+    body: 'flex flex-col',
+    // The panel never grows with the code: a long source scrolls inside the editor's box.
+    editor: 'max-h-64 overflow-auto rounded-cell',
+    editorMinLines: 6,
+    editorFill: '',
+    counterRow: 'justify-between',
+    submit: { tone: 'secondary', size: 'md', block: true },
+    header: 'contents',
+    strip: null,
     info: REGION_ORDER.info,
   },
 } as const;
 const classes = computed(() => LAYOUTS[props.layout]);
 const isSheet = computed(() => props.layout === 'sheet');
-/** Where the actions and submit sit: the bar of the pane and the full-screen panel, or under the sheet's editor. */
-const isTopRow = computed(() => props.layout !== 'sheet');
+/** The sheet and the compact panel stack: the language fills its row, the submit button sits under the editor. */
+const isStacked = computed(() => props.layout === 'sheet' || props.layout === 'compact');
+/** Where the actions and submit sit: the bar of the pane and the full-screen panel, or under a stacked editor. */
+const isTopRow = computed(() => !isStacked.value);
 const shortcutHint = submitShortcutHint();
 const hasSourceUpload = computed(() => !state.fileMode);
 
@@ -131,7 +152,7 @@ function loadDroppedFile(event: DragEvent) {
 <template>
   <form :class="classes.form" @submit.prevent="state.submitNow()">
     <SubmitResultStrip
-      v-if="state.lastSubmissionId || state.submitting"
+      v-if="classes.strip !== null && (state.lastSubmissionId || state.submitting)"
       :result="form.result"
       :submission-id="state.submitting ? null : state.lastSubmissionId"
       class="w-full shrink-0"
@@ -149,12 +170,12 @@ function loadDroppedFile(event: DragEvent) {
           :languages="problem.allowedLanguages"
           :selected-id="state.languageId"
           :selected="state.language"
-          :is-sheet="isSheet"
+          :is-sheet="isStacked"
           @pick="state.setLanguage"
         />
         <SourceUploadButton
-          v-if="isSheet && hasSourceUpload"
-          icon-only
+          v-if="isStacked && hasSourceUpload"
+          :icon-only="isSheet"
           class="ml-2"
           @pick="(file) => state.loadFile(file)"
         />
@@ -177,7 +198,7 @@ function loadDroppedFile(event: DragEvent) {
         </template>
       </p>
       <SourceUploadButton
-        v-if="!isSheet && hasSourceUpload"
+        v-if="!isStacked && hasSourceUpload"
         :icon-only="false"
         :class="REGION_ORDER.upload"
         @pick="(file) => state.loadFile(file)"
@@ -189,7 +210,6 @@ function loadDroppedFile(event: DragEvent) {
       <AppButton
         v-if="isTopRow"
         type="submit"
-        tone="primary"
         v-bind="classes.submit"
         :disabled="!state.canSubmit"
         :loading="state.submitting"
@@ -198,7 +218,7 @@ function loadDroppedFile(event: DragEvent) {
         :class="[REGION_ORDER.submitTopRow, $slots.actions ? 'ml-1' : 'ml-auto']"
         :aria-keyshortcuts="submitAriaShortcut()"
         @keydown="blockHeldEnter"
-        >{{ $t(submitLabelKey) }}<KeyHint :keys="shortcutHint"
+        >{{ submitText }}<KeyHint :keys="shortcutHint"
       /></AppButton>
     </div>
 
@@ -300,7 +320,6 @@ function loadDroppedFile(event: DragEvent) {
     <AppButton
       v-if="!isTopRow"
       type="submit"
-      tone="primary"
       v-bind="classes.submit"
       :disabled="!state.canSubmit"
       :loading="state.submitting"
@@ -308,7 +327,7 @@ function loadDroppedFile(event: DragEvent) {
       class="shrink-0"
       :class="REGION_ORDER.submit"
       @keydown="blockHeldEnter"
-      >{{ $t(submitLabelKey) }}</AppButton
+      >{{ submitText }}</AppButton
     >
   </form>
 </template>

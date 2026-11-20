@@ -18,11 +18,14 @@ import { useSubmitResult } from './use-submit-result';
  * State of the submit form, shared by the desktop dock and the phone sheet. Each concern lives in its own
  * composable (language, template, file, request, resubmit); this one only wires them together and gates submit.
  * `contest` is the viewer's contest holding the problem: the result strip then scores on the contest's points.
+ * `blocker` is the page's own reason why nothing may be sent now, in words (the workbench: unsaved changes); it holds
+ * the request itself, so neither the button nor the editor's shortcut sends.
  */
 export function useSubmitForm(
   problem: Ref<ProblemDetail>,
   resubmitId: Ref<string | null>,
   contest: () => ContestDetail | null | undefined = () => null,
+  blocker: () => string | null = () => null,
 ) {
   const source = ref('');
   const { errorText, report } = useSubmitMessage();
@@ -44,7 +47,11 @@ export function useSubmitForm(
   );
   const isReady = computed(
     () =>
-      languageId.value !== null && !uploadsOff.value && attemptsLeft.value !== 0 && hasInput.value,
+      blocker() === null &&
+      languageId.value !== null &&
+      !uploadsOff.value &&
+      attemptsLeft.value !== 0 &&
+      hasInput.value,
   );
   const { submitting, lastSubmissionId, submitNow } = useSubmitRequest({
     problemCode: computed(() => problem.value.code),
@@ -64,11 +71,13 @@ export function useSubmitForm(
   );
   const canSubmit = computed(() => isReady.value && !submitting.value);
   /**
-   * Why the submit button is off, for the states that print nothing else: no language, nothing typed, no file picked. A file-only
+   * Why the submit button is off, for the states that print nothing else: the page's blocker, no language, nothing typed, no file picked. A file-only
    * language without uploads, no attempts left and an over-long source each have their own visible line already.
    */
   const blockedReason = computed(() => {
     if (submitting.value) return null;
+    const outside = blocker();
+    if (outside !== null) return outside;
     if (languageId.value === null) return translate('submit.blocked.noLanguage');
     if (uploadsOff.value || attemptsLeft.value === 0 || tooLong.value) return null;
     if (hasInput.value) return null;

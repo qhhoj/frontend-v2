@@ -16,8 +16,7 @@ import { useContestScore } from '@/features/contests/submission/use-contest-scor
 import { useSubmissionContest } from '@/features/contests/submission/use-submission-contest';
 import { useNavSection } from '@/features/shell/nav-section';
 import { useProblemQuery } from '@/features/problems/problems.queries';
-import { IN_PROGRESS_STATUSES } from '@/api/types/submissions';
-import { submissionVerdictOf, verdictOf } from '@/lib/verdicts';
+import { followedVerdictOf } from '@/lib/verdicts';
 import { usePageTitle } from '@/router/page-title';
 import { translate } from '@/i18n';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -127,14 +126,7 @@ usePageTitle(() =>
 const forbiddenKey = computed(() => forbiddenMessageKey(query.error.value));
 
 /** The stream's status leads only while the grading goes on; a final status shows the stored row, which carries the result (PC when partial). */
-const verdict = computed(() => {
-  if (!row.value) return null;
-  const streamStatus = live.status;
-  const isStreamLeading = streamStatus !== null && IN_PROGRESS_STATUSES.includes(streamStatus);
-  return isStreamLeading
-    ? verdictOf({ status: streamStatus, result: null })
-    : submissionVerdictOf(row.value);
-});
+const verdict = computed(() => (row.value ? followedVerdictOf(live.status, row.value) : null));
 /** After the author's full-score AC the way on is the problem list without the solved ones; contests have their own next step. */
 const nextTo = computed(() =>
   canResubmit.value && verdict.value?.code === 'AC' && !inContest.value

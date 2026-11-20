@@ -102,17 +102,7 @@ const isDialogOpen = ref(false);
           {{ $t(`admin.problems.visibility.${isPublic ? 'hide' : 'publish'}.${audience}`) }}
         </AppButton>
         <AppButton
-          v-if="!isPublic && next?.id === 'trial'"
-          tone="primary"
-          data-testid="problem-next-step"
-          :to="{ name: 'problem', params: { code: problem.code } }"
-          :disabled="nextBlockedReason !== undefined"
-          :disabled-reason="nextBlockedReason"
-        >
-          {{ $t(`${KEY}.next.trial`) }}
-        </AppButton>
-        <AppButton
-          v-else-if="!isPublic && next"
+          v-if="!isPublic && next"
           tone="primary"
           data-testid="problem-next-step"
           :disabled="nextBlockedReason !== undefined"

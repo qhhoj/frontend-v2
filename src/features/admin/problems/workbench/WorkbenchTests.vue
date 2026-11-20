@@ -24,6 +24,7 @@ import DataFeedback from '../data/DataFeedback.vue';
 import TestDropZone from '../data/TestDropZone.vue';
 import { ARCHIVE_PREVIEW_COUNT } from '../data/test-cases';
 import { useTestUpload } from '../data/use-test-upload';
+import type { TrialResults } from '../data/trial-results';
 import { pairArchiveFiles } from '../data/zip-autofill';
 import { failureReasonOf } from '../failure-reason';
 import type { Workbench } from './use-workbench';
@@ -35,13 +36,17 @@ import type { TestsSummary } from './workbench-summary';
  * the problem's, and the archive's files that are no test. Right, from the width where both fit (under the table below
  * it): the judging panel: how a result is compared (with the checker or interactor file), the input/output method,
  * partial scoring, and one fold for the rest. The table, the panel and partial scoring wait for the page's save.
+ * `trial` is the last trial run of section 4: the table shows what it got on each test. `stored` tells the page that an
+ * upload replaced the test files (a run from before it is then old).
  */
 const props = defineProps<{
   problem: EditableProblem;
   data: Workbench['data'];
   info: Workbench['info'];
   summary: TestsSummary | null;
+  trial: TrialResults;
 }>();
+const emit = defineEmits<{ stored: [] }>();
 const { query, form, errors, badRows, markInvalid, adopt } = props.data;
 const { form: infoForm } = props.info;
 const KEY = 'admin.problems.workbench.tests';
@@ -55,6 +60,7 @@ const autofill = useTemplateRef<InstanceType<typeof CasesAutofill>>('autofill');
  */
 function onStored(saved: ProblemData) {
   adopt(saved);
+  emit('stored');
   autofill.value?.start(saved.archiveFiles, form.value?.cases);
 }
 const upload = useTestUpload(
@@ -209,6 +215,7 @@ watch(
             v-model="form.cases"
             :data="query.data.value"
             :errors="tableErrors"
+            :trial="trial"
             @invalid="markInvalid"
           >
             <template #total>

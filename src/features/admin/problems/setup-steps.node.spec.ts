@@ -72,14 +72,16 @@ describe('setupSteps', () => {
     expect(nextStep(setupSteps(editableProblem(), unscored))?.id).toBe('scoring');
   });
 
-  it('then a trial submission on the problem page, then publishing', () => {
+  it('then an accepted trial run in the workbench, then publishing', () => {
     const scored = [testCase({ type: 'C', points: 100 })];
     expect(nextStep(setupSteps(editableProblem(), scored))).toMatchObject({
       id: 'trial',
-      routeName: 'problem',
+      routeName: 'admin-problemGeneral',
     });
     const tried = editableProblem({ viewerStatus: 'attempted' });
-    expect(nextStep(setupSteps(tried, scored))?.id).toBe('publish');
+    expect(nextStep(setupSteps(tried, scored))?.id).toBe('trial');
+    const accepted = editableProblem({ viewerStatus: 'solved' });
+    expect(nextStep(setupSteps(accepted, scored))?.id).toBe('publish');
     const published = editableProblem({ viewerStatus: 'solved', isPublic: true });
     expect(nextStep(setupSteps(published, scored))).toBeNull();
   });

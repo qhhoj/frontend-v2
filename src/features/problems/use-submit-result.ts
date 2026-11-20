@@ -23,7 +23,7 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
   const locale = useLocaleStore();
   const queryClient = useQueryClient();
   const id = computed(() => submissionId.value ?? '');
-  const { submission, live } = useLiveSubmission(id);
+  const { submission, live, isLive } = useLiveSubmission(id);
   const row = computed(() => (id.value ? submission.data.value : undefined));
 
   const isFinished = computed(() =>
@@ -97,6 +97,9 @@ export function useSubmitResult(submissionId: Ref<string | null>, scale: Ref<Sco
   });
 
   return {
+    /** The followed submission as stored, and whether its stream is open: for a page that draws the full verdict plate. */
+    row,
+    isLive,
     isEmpty: computed(() => !row.value || row.value.status === 'PD'),
     isFinished,
     step,

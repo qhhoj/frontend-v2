@@ -20,6 +20,8 @@ import WorkbenchPlate from './WorkbenchPlate.vue';
 import WorkbenchSection from '../../ui/workbench/WorkbenchSection.vue';
 import WorkbenchStatement from './WorkbenchStatement.vue';
 import WorkbenchTests from './WorkbenchTests.vue';
+import WorkbenchTrial from './WorkbenchTrial.vue';
+import { useTrialRun } from './trial/use-trial-run';
 import { useWorkbench } from './use-workbench';
 import { sectionDomId, sectionOfRoute } from './workbench-sections';
 import type { WorkbenchSectionId } from './workbench-sections';
@@ -29,7 +31,8 @@ import { infoSummary, statementSummary, testsSummary } from './workbench-summary
  * The teacher's problem workbench: one page to set a problem up. Header, the status plate (the one readiness signal and
  * the publish action), then the sections, each a one-line row until opened: info, statement, tests and judging, the trial
  * run, and the rarely used rest. One save bar saves info, statements, editorial and judging together (`useWorkbench`); it
- * holds the page's primary while it shows. One leave guard covers the page.
+ * holds the page's primary while it shows. One leave guard covers the page. The trial run (`useTrialRun`) lives here:
+ * section 4 sends and shows it, section 3 shows its per-test results. Its form is outside the page's form.
  */
 const props = defineProps<{ problem: EditableProblem; meta: ProblemEditingMeta }>();
 const route = useRoute();
@@ -43,6 +46,11 @@ const workbench = useWorkbench(
 );
 const { info, statements, editorial, data, changes, dirtyCount, guardedCount } = workbench;
 const { isSaving, savedAt, report, invalidSections, hasUnreadableDate, save, discard } = workbench;
+const trial = useTrialRun(() => props.problem, workbench);
+/** The tests as saved: what a run is judged on (the idle trial plate shows one waiting square for each). */
+const savedTestCount = computed(
+  () => (data.saved.value?.cases ?? []).filter((testCase) => testCase.type === 'C').length,
+);
 
 /** The saved state of the setup steps; null while the test data is not read yet (unknown, never "missing"). */
 const steps = computed(() => {
@@ -87,7 +95,7 @@ async function openSection(id: WorkbenchSectionId) {
   await nextTick();
   document.getElementById(sectionDomId(id))?.scrollIntoView({ block: 'start' });
 }
-/** A plate step opens its section; the trial is done on the problem page, so its row is only brought into view. */
+/** A plate step opens its section. */
 const openStep = (id: WorkbenchStepId) => openSection(id);
 
 /** An old tab address opens its section; else the page opens at the next step, once, and never folds a section itself. */
@@ -107,7 +115,7 @@ watch(
     if (isNextStepOpened || !known) return;
     isNextStepOpened = true;
     const next = workbenchSteps(known).find((step) => !step.isDone);
-    if (next && next.id !== 'trial') open[next.id] = true;
+    if (next) open[next.id] = true;
   },
   { immediate: true },
 );
@@ -286,18 +294,22 @@ const listLink = computed(() => ({ to: { name: 'admin-problems' }, label: t(`${K
               :data="data"
               :info="info"
               :summary="tests"
+              :trial="trial.results.value"
+              @stored="trial.markTestsChanged"
             />
           </WorkbenchSection>
         </fieldset>
       </form>
       <WorkbenchSection
         id="trial"
+        v-model:open="open.trial"
         :index="4"
         :title="$t(`${KEY}.sections.trial`)"
-        :summary="`${summaries.trial} · ${$t(`${KEY}.trial.later`)}`"
-        :to="{ name: 'problem', params: { code: problem.code } }"
-        :action-label="$t(`${KEY}.trial.open`)"
-      />
+        :summary="summaries.trial"
+        :action-label="open.trial ? undefined : $t(`${KEY}.trial.open`)"
+      >
+        <WorkbenchTrial :problem="problem" :trial="trial" :test-count="savedTestCount" />
+      </WorkbenchSection>
       <WorkbenchSection
         id="other"
         v-model:open="open.other"

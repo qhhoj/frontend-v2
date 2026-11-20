@@ -1011,7 +1011,10 @@
     "already_participating": "This user already has a live participation in the contest.",
     "participation_has_submissions": "The participation has submissions, so it cannot be deleted.",
     "file_unreadable": "The file can no longer be read (moved, changed or deleted); pick it again.",
-    "upload_still_processing": "The server is still processing the upload; reload the page to see the result."
+    "upload_still_processing": "The server is still processing the upload; reload the page to see the result.",
+    "problem_has_no_tests": "This problem has no tests yet, so it cannot be judged.",
+    "final_pending_limit": "Too many of your submissions wait for the final judging. Wait until the contest has judged them.",
+    "spectator_cannot_submit": "You are watching this contest as a spectator, so you cannot submit."
   },
   "common": {
     "clearSearch": "Clear search",
