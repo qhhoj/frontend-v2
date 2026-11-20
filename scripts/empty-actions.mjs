@@ -18,7 +18,6 @@ export const BASELINE = {
   'features/admin/contests/announcements/ContestAnnouncementsTab.vue': 1,
   'features/admin/contests/ghosts/GhostCurrentCard.vue': 1,
   'features/admin/contests/ranking/OfficialRankingCard.vue': 1,
-  'features/admin/search/ProblemSearchList.vue': 1,
   'features/admin/shell/search/AdminCommandPalette.vue': 1,
   'features/admin/users/UsersPage.vue': 1,
   'features/comments/CommentsSection.vue': 1,

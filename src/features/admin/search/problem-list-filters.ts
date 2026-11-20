@@ -13,6 +13,16 @@ export const PROBLEM_STATUS_FILTERS = [
   'unfinished',
 ] as const;
 export type ProblemStatusFilter = (typeof PROBLEM_STATUS_FILTERS)[number];
+/** The toolbar's toggles, in order; the other two views are review tools kept in the filter panel. */
+export const STATUS_TOGGLES = [
+  'all',
+  'unfinished',
+  'public',
+] as const satisfies readonly ProblemStatusFilter[];
+export const STAFF_STATUS_FILTERS = [
+  'private',
+  'suggested',
+] as const satisfies readonly ProblemStatusFilter[];
 
 /** Sorts the staff list's column headers offer (Bài: name, Điểm, Ngày đăng), newest first by default; `code` stays valid in old links. */
 export const ADMIN_PROBLEM_SORTS = [

@@ -2,7 +2,7 @@
   "statusLabel": "Problem status",
   "status": {
     "all": "All",
-    "public": "Public",
+    "public": "Published",
     "private": "Private",
     "suggested": "Suggested",
     "unfinished": "Unfinished"
@@ -15,15 +15,20 @@
   "authorPlaceholder": "Exact username",
   "columns": {
     "problem": "Problem",
-    "status": "Status",
-    "setup": "Ready",
-    "group": "Group",
-    "authors": "Authors",
-    "points": "Points",
-    "date": "Published"
+    "setup": "Setup",
+    "next": "Next step",
+    "visibility": "Visibility"
   },
   "setup": {
     "ready": "Ready",
+    "stepDone": "{step}: done",
+    "stepOpen": "{step}: not yet",
+    "steps": {
+      "info": "Information",
+      "statement": "Statement",
+      "judging": "Tests and judging",
+      "trial": "Trial run"
+    },
     "unfinished": "Unfinished",
     "missing": "Missing: {gaps}",
     "gaps": {
@@ -32,7 +37,6 @@
       "points": "points"
     }
   },
-  "orgPrivate": "Organization",
   "bulk": {
     "publish": "Make public",
     "unpublish": "Make private",
@@ -55,7 +59,6 @@
   },
   "searchLabel": "Search by code or name",
   "tableCaption": "Problems",
-  "moreAuthors": "+{count}",
   "chips": {
     "group": "Group: {name}",
     "type": "Type: {name}",
@@ -65,13 +68,27 @@
     "label": "More actions for {code}",
     "data": "Test data"
   },
-  "partial": "partial",
-  "partialHint": "Partial scoring: each passed test earns part of the points.",
   "deleted": "Deleted {code}. You can restore it under “Deleted”.",
   "import": {
     "button": "Import",
     "label": "Import problems"
   },
   "count": "{total} problems",
-  "countOwn": "{total} problems · only the ones you manage"
+  "countOwn": "{total} problems · only the ones you manage",
+  "titleOwn": "My problems",
+  "anyStatus": "Any problem",
+  "next": {
+    "info": "Edit the information",
+    "statement": "Write the statement",
+    "tests": "Upload tests",
+    "points": "Give the tests points",
+    "trial": "Submit a trial"
+  },
+  "visibility": {
+    "public": "Public",
+    "organization": "Organization only",
+    "draft": "Draft",
+    "suggested": "Suggested"
+  },
+  "emptyOwn": "You have no problem to edit yet."
 }

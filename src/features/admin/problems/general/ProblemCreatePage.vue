@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import Card from '@/components/ui/Card.vue';
 import { usePermissions } from '@/stores/use-permissions';
 import { useCreationScope } from '../../creation/creation-scope';
 import AdminPageHeader from '../../ui/AdminPageHeader.vue';
@@ -25,9 +26,11 @@ const retry = () => void meta.refetch();
     <AdminPageHeader :title="$t('admin.problems.general.create.title')" :lead="$t(leadKey)" />
     <QueryState :loading="meta.isPending.value" :error="meta.error.value" @retry="retry">
       <template #skeleton>
-        <SkeletonBlock data-skeleton-region="problem-create" class="h-96 w-full rounded-row" />
+        <SkeletonBlock data-skeleton-region="problem-create" class="h-64 max-w-xl rounded-row" />
       </template>
-      <ProblemCreateForm v-if="meta.data.value" :meta="meta.data.value" />
+      <Card v-if="meta.data.value" class="max-w-xl">
+        <ProblemCreateForm :meta="meta.data.value" />
+      </Card>
     </QueryState>
   </div>
 </template>

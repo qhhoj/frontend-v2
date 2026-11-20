@@ -27,14 +27,10 @@
   "general": {
     "create": {
       "title": "Create problem",
-      "lead": "Pick where the problem lives, then give its code, name and limits. The rest is set on the problem's tabs.",
+      "lead": "Choose where the problem lives and type its code and name. The rest is set on its page.",
       "leadSuggest": "Without the right to add problems, the problem is sent as a suggestion for staff to review.",
-      "createButton": "Create problem",
       "suggestButton": "Send suggestion",
-      "suggested": "Suggestion for {code} sent.",
-      "required": "Fields marked * are required.",
-      "createdToast": "Created {code}.",
-      "cancel": "Cancel"
+      "suggested": "Suggestion for {code} sent."
     },
     "sections": {
       "basics": "More details",

@@ -2,7 +2,7 @@
   "statusLabel": "Trạng thái bài",
   "status": {
     "all": "Tất cả",
-    "public": "Công khai",
+    "public": "Đã công khai",
     "private": "Riêng tư",
     "suggested": "Đề xuất",
     "unfinished": "Chưa xong"
@@ -15,15 +15,20 @@
   "authorPlaceholder": "Tên đăng nhập chính xác",
   "columns": {
     "problem": "Bài",
-    "status": "Trạng thái",
-    "setup": "Sẵn sàng",
-    "group": "Nhóm",
-    "authors": "Tác giả",
-    "points": "Điểm",
-    "date": "Ngày đăng"
+    "setup": "Thiết lập",
+    "next": "Việc tiếp theo",
+    "visibility": "Hiển thị"
   },
   "setup": {
     "ready": "Sẵn sàng",
+    "stepDone": "{step}: xong",
+    "stepOpen": "{step}: chưa",
+    "steps": {
+      "info": "Thông tin",
+      "statement": "Đề bài",
+      "judging": "Test và cách chấm",
+      "trial": "Chạy thử"
+    },
     "unfinished": "Chưa xong",
     "missing": "Còn thiếu: {gaps}",
     "gaps": {
@@ -32,7 +37,6 @@
       "points": "điểm"
     }
   },
-  "orgPrivate": "Tổ chức",
   "bulk": {
     "publish": "Công khai",
     "unpublish": "Chuyển riêng tư",
@@ -55,7 +59,6 @@
   },
   "searchLabel": "Tìm theo mã hoặc tên bài",
   "tableCaption": "Bài tập",
-  "moreAuthors": "+{count}",
   "chips": {
     "group": "Nhóm: {name}",
     "type": "Loại: {name}",
@@ -65,13 +68,27 @@
     "label": "Thao tác khác cho {code}",
     "data": "Dữ liệu chấm"
   },
-  "partial": "từng phần",
-  "partialHint": "Chấm từng phần: mỗi test đúng được một phần điểm.",
   "deleted": "Đã xóa {code}. Khôi phục được ở mục “Đã xóa”.",
   "import": {
     "button": "Nhập",
     "label": "Nhập bài tập"
   },
   "count": "{total} bài",
-  "countOwn": "{total} bài · chỉ hiện bài bạn phụ trách"
+  "countOwn": "{total} bài · chỉ hiện bài bạn phụ trách",
+  "titleOwn": "Bài tập của tôi",
+  "anyStatus": "Mọi bài",
+  "next": {
+    "info": "Sửa thông tin",
+    "statement": "Viết đề bài",
+    "tests": "Tải test lên",
+    "points": "Đặt điểm cho test",
+    "trial": "Nộp thử"
+  },
+  "visibility": {
+    "public": "Công khai",
+    "organization": "Riêng tổ chức",
+    "draft": "Nháp",
+    "suggested": "Đề xuất"
+  },
+  "emptyOwn": "Bạn chưa có bài tập nào để sửa."
 }
