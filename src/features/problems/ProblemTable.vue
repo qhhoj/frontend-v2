@@ -5,27 +5,28 @@ import { UNCATEGORIZED_TYPE_NAME, problemTypeLabel } from './problem-type-label'
 import { isProblemSort } from '@/api/types/problems';
 import type { NumberedPageMeta } from '@/api/client';
 import type { ProblemListItem, ProblemSort } from '@/api/types/problems';
-import CompactListRow from '@/components/CompactListRow.vue';
 import EmptyState from '@/components/EmptyState.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Chip from '@/components/ui/Chip.vue';
 import DataTable from '@/components/ui/DataTable.vue';
 import type { DataTableColumn } from '@/components/ui/DataTableColumns';
-import { CUE_ROW, CUE_TABLE_ROW } from '@/components/ui/cue-tones';
-import type { CueTone } from '@/components/ui/cue-tones';
-import { acRateTextClass } from '@/lib/ac-rate';
+import Lamp from '@/components/ui/Lamp.vue';
+import StretchedLink from '@/components/ui/StretchedLink.vue';
 import { formatNumber, formatPoints } from '@/lib/format';
 import { COMPACT_LIST_BELOW_PX } from '@/lib/use-media-query';
 import { useLocaleStore } from '@/stores/locale.store';
-import ProblemStatusMark from './ProblemStatusMark.vue';
+import RateBar from './RateBar.vue';
+import { splitProblemName } from './problem-name';
+import { viewerLampOf } from './viewer-status';
 
 /**
- * The problem list: the kit `DataTable` as a frameless ledger (`variant="ledger"`) on a computer, one `--qh-row` line per
- * problem (the touch height on a touch screen), and on a phone compact rows instead of a table that scrolls sideways. One "Bài" column holds the name and, after it, the code in grey mono;
- * points, acceptance and solvers are narrow fixed columns at the right, plain numbers under their headers (no unit in a row).
- * The acceptance number takes its colour from `acRateTextClass` (low = hard), on the table and the phone rows alike. Sorting is by the column headers (only the sorted one shows its arrow, the others show
- * it on hover); a third click on one returns to the default order. An empty list under filters offers to clear them. Each table row carries `data-code` (the page loads
- * that problem ahead on hover and focus).
+ * The problem list (redesign "Sơn mài"): the kit `DataTable` as a frameless ledger, one `--qh-row` line per problem. The first
+ * column is the viewer's own status as a lamp (signed in only); then the name (the prefix problems of one contest share is
+ * dimmed, the part after the last " - " is bold), its code in grey mono and its type tag; at the right points, the acceptance
+ * rate as one neutral bar and a number, and solvers. No row tint and no colour scale: colour is the viewer's result only.
+ * Sorting is by the column headers (only the sorted one shows its arrow, the others on hover); a third click returns to the
+ * default order. On a phone a row is two lines (`--qh-row-phone`): the name over its code, the points at the right. Each
+ * table row carries `data-code` (the page loads that problem ahead on hover and focus).
  */
 const props = defineProps<{
   problems: ProblemListItem[];
@@ -52,7 +53,7 @@ const sortOf = (field: string, first: 'asc' | 'desc') => ({
 });
 const columns = computed<DataTableColumn[]>(() => [
   ...(props.signedIn
-    ? [{ key: 'status', label: t('problems.columns.status'), hideLabel: true }]
+    ? [{ key: 'status', label: t('problems.columns.status'), hideLabel: true, cellClass: 'w-8' }]
     : []),
   {
     key: 'name',
@@ -69,9 +70,9 @@ const columns = computed<DataTableColumn[]>(() => [
   },
   {
     key: 'acRate',
-    label: t('problems.columns.acRate'),
+    label: t('problem.strip.acRate'),
     align: 'end',
-    cellClass: 'w-16',
+    cellClass: 'w-36',
     sort: sortOf('acRate', 'desc'),
   },
   {
@@ -82,9 +83,9 @@ const columns = computed<DataTableColumn[]>(() => [
     sort: sortOf('userCount', 'desc'),
   },
 ]);
-/** Ledger tweaks the kit has no prop for: unsorted headers show their arrow on hover only; phone rows and the cells at the row ends keep a small inset so a tinted row does not touch its content. */
+/** Ledger tweaks the kit has no prop for: unsorted headers show their arrow on hover only; the cells at the row ends keep a small inset so the hover ground does not touch its content. */
 const LEDGER_CLASS =
-  '[&_thead_th:not([aria-sort])_svg]:invisible [&_thead_th:not([aria-sort])_button:hover_svg]:visible [&_li]:px-2 [&_li:last-child]:border-b [&_:is(th,td):first-child]:pl-2 [&_:is(th,td):last-child]:pr-2';
+  '[&_thead_th:not([aria-sort])_svg]:invisible [&_thead_th:not([aria-sort])_button:hover_svg]:visible [&_:is(th,td):first-child]:pl-2 [&_:is(th,td):last-child]:pr-2';
 const changeSort = (value: string | undefined) =>
   emit('sort', value !== undefined && isProblemSort(value) ? value : null);
 
@@ -94,19 +95,9 @@ function namedTypes(problem: ProblemListItem) {
     .filter((type) => type.name !== UNCATEGORIZED_TYPE_NAME)
     .map((type) => problemTypeLabel(type));
 }
-/** One type chip, the rest counted in a "+N" that is never cut; all are named in the tooltip. The name keeps the width. */
+/** One type tag, the rest counted in a "+N" that is never cut; all are named in the tooltip. The name keeps the width. */
 const SHOWN_TYPES = 1;
-/** Only a solved problem tints its row; tried and not tried show no tint (the status icon says it). */
-const rowTone = (problem: ProblemListItem): CueTone | null =>
-  props.signedIn && problem.viewerStatus === 'solved' ? 'full' : null;
-const phoneRowClass = (problem: ProblemListItem) => {
-  const tone = rowTone(problem);
-  return tone ? CUE_ROW[tone] : undefined;
-};
-const rowAttrs = (problem: ProblemListItem) => {
-  const tone = rowTone(problem);
-  return { 'data-code': problem.code, class: tone ? CUE_TABLE_ROW[tone] : undefined };
-};
+const rowAttrs = (problem: ProblemListItem) => ({ 'data-code': problem.code });
 const pointsText = (problem: ProblemListItem) => formatPoints(problem.points, locale.locale);
 const acRateText = (problem: ProblemListItem) =>
   `${formatNumber(problem.acRate, locale.locale, 1)}%`;
@@ -139,20 +130,28 @@ const acRateText = (problem: ProblemListItem) =>
       </EmptyState>
     </template>
 
-    <template #cell-status="{ row }"><ProblemStatusMark :status="row.viewerStatus" /></template>
-    <!-- Name, then the code in grey mono on the same line (under the name when the line is full), then the type chip. -->
+    <template #cell-status="{ row }">
+      <Lamp
+        :tone="viewerLampOf(row.viewerStatus).tone"
+        :label="$t(viewerLampOf(row.viewerStatus).labelKey)"
+      />
+    </template>
+    <!-- The name on one line (cut with an ellipsis, whole in the tooltip), then the code in grey mono and the type tag. -->
     <template #cell-name="{ row }">
-      <span class="flex flex-wrap items-baseline gap-x-2">
+      <span class="flex min-w-0 items-baseline gap-x-2">
         <RouterLink
           :to="target(row.code)"
           :title="row.name"
-          class="min-w-0 font-semibold text-content hover:text-accent-text"
-          >{{ row.name }}</RouterLink
+          class="min-w-0 truncate text-content hover:text-accent-text"
+          ><span v-if="splitProblemName(row.name).shared" class="text-muted">{{
+            splitProblemName(row.name).shared
+          }}</span
+          ><span class="font-semibold">{{ splitProblemName(row.name).own }}</span></RouterLink
         >
-        <span class="font-mono text-caption text-muted">{{ row.code }}</span>
+        <span class="shrink-0 font-mono text-small text-muted">{{ row.code }}</span>
         <span
           v-if="namedTypes(row).length > 0"
-          class="flex shrink-0 items-center gap-1 self-center"
+          class="flex shrink-0 items-center gap-1 self-center max-lg:hidden"
           :title="namedTypes(row).join(', ')"
         >
           <Chip size="sm"
@@ -160,7 +159,7 @@ const acRateText = (problem: ProblemListItem) =>
           >
           <span
             v-if="namedTypes(row).length > SHOWN_TYPES"
-            class="text-caption whitespace-nowrap text-muted"
+            class="text-small whitespace-nowrap text-muted"
             >+{{ namedTypes(row).length - SHOWN_TYPES }}</span
           >
         </span>
@@ -172,26 +171,39 @@ const acRateText = (problem: ProblemListItem) =>
       }}</span>
     </template>
     <template #cell-acRate="{ row }">
-      <span class="font-semibold" :class="acRateTextClass(row.acRate)">{{ acRateText(row) }}</span>
+      <span class="inline-flex items-center gap-2">
+        <RateBar :percent="row.acRate" />
+        <span class="inline-block w-14">{{ acRateText(row) }}</span>
+      </span>
     </template>
     <template #cell-userCount="{ row }">{{ formatNumber(row.userCount, locale.locale) }}</template>
 
-    <!-- Below `sm` a row is a compact list row. -->
+    <!-- A phone: two lines per row. The part of the name the contest shares is left out; the code under it says it. -->
     <template #card="{ row }">
-      <CompactListRow :to="target(row.code)" :title="row.name" :class="phoneRowClass(row)">
-        <template v-if="signedIn" #lead><ProblemStatusMark :status="row.viewerStatus" /></template>
-        <template #meta>
-          <span class="font-mono">{{ row.code }}</span>
-          ·
-          <span class="font-semibold whitespace-nowrap" :class="acRateTextClass(row.acRate)"
-            >AC {{ acRateText(row) }}</span
+      <li
+        class="box-link flex min-h-(--qh-row-phone) items-center gap-3 border-b border-line px-2 py-1"
+      >
+        <Lamp
+          v-if="signedIn"
+          :tone="viewerLampOf(row.viewerStatus).tone"
+          :label="$t(viewerLampOf(row.viewerStatus).labelKey)"
+          class="shrink-0"
+        />
+        <span class="flex min-w-0 flex-1 flex-col">
+          <StretchedLink
+            :to="target(row.code)"
+            :title="row.name"
+            class="line-clamp-2 text-body font-semibold text-content"
+            >{{ splitProblemName(row.name).own }}</StretchedLink
           >
-        </template>
-        <!-- Points: a plain number, no unit (as on the home's new problems). -->
-        <template #trail>
-          <span class="font-mono text-sm font-medium tabular-nums">{{ pointsText(row) }}</span>
-        </template>
-      </CompactListRow>
+          <span class="truncate font-mono text-small text-muted">{{ row.code }}</span>
+        </span>
+        <span
+          class="shrink-0 font-mono text-body tabular-nums"
+          :title="row.partial ? $t('problems.partialHint') : undefined"
+          >{{ pointsText(row) }}</span
+        >
+      </li>
     </template>
   </DataTable>
 </template>

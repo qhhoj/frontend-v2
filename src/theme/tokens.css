@@ -87,6 +87,8 @@
   --space-section-title: 0.5rem;
   --space-stack: 0.75rem;
   --qh-sidebar-width: 20rem;
+  /* The longest line of long reading (a problem statement): about 74 characters. */
+  --qh-measure: 74ch;
   /* Kit 2 geometry (.batch/kit2/spec.md). Every size below is a variable; components never write a number. */
   /* Heights ("Design is code" scales): a control is 40 (`md`) or 32 (`sm`: inside a table or a panel header) and nothing else; a status tag 24;
      a table or list row 44 (52 on a phone). `-lg` and `-dense` are old names of the one step. Under the touch media below every control is 44. */
@@ -96,6 +98,8 @@
   --qh-chip: 1.5rem;
   --qh-row: 2.75rem;
   --qh-row-dense: var(--qh-row);
+  /* A two-line list row on a phone (name over its code): 52. */
+  --qh-row-phone: 3.25rem;
   --qh-touch: 2.75rem;
   --qh-rail: 14rem;
   /* Control padding x: 16 in a 40 px control, 12 in a 32 px one and in a field; 8 in a status tag. */
