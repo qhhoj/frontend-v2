@@ -144,6 +144,7 @@ const removeChip = (key: string) => emit('remove', key);
           type="button"
           :class="[TOGGLE_BASE, TOGGLE_ON, 'cursor-pointer']"
           :aria-label="$t('common.table.removeFilter', { label: chip.label })"
+          :title="$t('common.table.removeFilter', { label: chip.label })"
           @click="removeChip(chip.key)"
         >
           {{ chip.label }}

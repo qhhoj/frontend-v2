@@ -189,6 +189,7 @@ function onBoxKeydown(event: KeyboardEvent) {
       tabindex="-1"
       class="flex size-8 items-center justify-center text-muted"
       :aria-label="$t('common.clearSelection')"
+      :title="$t('common.clearSelection')"
       @click.stop="model = null"
     >
       <X class="size-4" aria-hidden="true" />

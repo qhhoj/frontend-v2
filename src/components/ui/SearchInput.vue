@@ -60,6 +60,7 @@ function clear() {
       type="button"
       class="-mr-2 flex size-(--qh-control-sm) shrink-0 cursor-pointer items-center justify-center rounded-control text-muted hover:text-content"
       :aria-label="$t('common.clearSearch')"
+      :title="$t('common.clearSearch')"
       @click.stop="clear"
     >
       <X aria-hidden="true" class="size-4" />
