@@ -69,7 +69,7 @@ Colour is a cue: one meaning, the same on every page, as text or a light tint, n
 | `upcoming`  | not started                               | blue (tag-1)        | dot + text, chip             |
 | `ended`     | finished or inactive                      | grey (muted)        | dot + text, chip             |
 | `full`      | accepted, full score                      | green               | tint on a problem cell, chip |
-| `partial`   | some points, not all                      | amber (verdict TLE) | tint                         |
+| `partial`   | some points, not all                      | lime (verdict part) | tint                         |
 | `zero`      | wrong after a try (not tried stays empty) | red (verdict WA)    | tint                         |
 | `attention` | needs action or warning (access code)     | amber               | chip                         |
 

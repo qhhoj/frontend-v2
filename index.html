@@ -7,14 +7,14 @@
     <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico?v=2" sizes="16x16 32x32 48x48" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
-    <meta name="theme-color" content="#f6f1e7" />
+    <meta name="theme-color" content="#f5f2ea" />
     <script>
       // Pre-paint: the theme last painted when the account chose it (src/theme/theme.store.ts), else the stored
       // preference, else the OS scheme (`auto` follows today's scheme, not the last visit's). Then the personal
       // look last painted (src/theme/appearance.store.ts): accent, contrast and page background.
       // `grounds` (theme id -> its --qh-ground, for the address bar), `legacy` and the accent lists must match
       // src/theme/registry.ts, src/theme/palette/ and src/theme/appearance.ts; prepaint.spec.ts enforces it.
-      var grounds = { light: '#f6f1e7', dark: '#15120f' };
+      var grounds = { light: '#f5f2ea', dark: '#141010' };
       var legacy = {
         'clay-light': 'light',
         'glass-light': 'light',

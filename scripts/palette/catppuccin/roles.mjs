@@ -3,20 +3,9 @@
 // walk at that lightness, so a colour stays the official hex where it passes its contrast floor and moves darker (Latte)
 // or lighter (dark flavours) along the same hue and chroma only where it fails.
 import { readFileSync } from 'node:fs';
-import { hexToOklab } from '../color.mjs';
+import { hueChromaLightness } from '../color.mjs';
 
 const FLAVOURS = JSON.parse(readFileSync(new URL('./palette.json', import.meta.url), 'utf8'));
-const round = (value, digits) => Number(value.toFixed(digits));
-
-function hueChromaLightness(hex) {
-  const [lightness, greenRed, blueYellow] = hexToOklab(hex);
-  return [
-    round(((Math.atan2(blueYellow, greenRed) * 180) / Math.PI + 360) % 360, 4),
-    round(Math.hypot(greenRed, blueYellow), 5),
-    round(lightness, 5),
-  ];
-}
-
 /**
  * QHHOJ role -> Catppuccin colour name. Catppuccin has 14 colours, so cues, tag 1 and the default accent get one each,
  * and tags, tiers, medals and code share the rest (as the paper palette already does).

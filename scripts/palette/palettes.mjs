@@ -1,9 +1,11 @@
 // The palettes a visitor can choose (Appearance page, "Bảng màu"), each as overrides of PAPER (paper.mjs). The first is
 // the site's default; `paper` is the look before palettes existed. Hues and chromas are OKLCH ([hue, chroma]); grounds
 // are fixed hex. Optional inputs the solver reads: `tints`, `modes` (per-mode inputs, Catppuccin), `inkLabel` (the default
-// accent is a bright fill with a dark label in light mode) and `inkFill` (the default accent's buttons are ink).
+// accent is a bright fill with a dark label in light mode), `inkFill` (the default accent's buttons are ink), `exact`
+// (official colours are kept where they pass, sonmai.mjs) and `laneAlias` (a verdict lane shows another lane's colours).
 import { catppuccin } from './catppuccin/roles.mjs';
 import { PAPER } from './paper.mjs';
+import { SONMAI } from './sonmai.mjs';
 
 /** Round 2 "lively": white pages, vivid verdict hues, stronger tints. */
 const LIVELY = {
@@ -32,6 +34,7 @@ const SKY = {
 };
 
 const OVERRIDES = {
+  sonmai: SONMAI,
   'catppuccin-mocha': catppuccin('mocha'),
   'catppuccin-frappe': catppuccin('frappe'),
   palletism: {

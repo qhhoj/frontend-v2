@@ -16,7 +16,7 @@ export const ACCENTS = [
 
 export type AccentId = (typeof ACCENTS)[number]['id'];
 
-/** The site's accent (Catppuccin's mauve): what everyone without a look of their own sees in the default palette. Another palette names its own (`defaultAccentOf`). */
+/** The site's accent (Sơn mài's brand, the purple of Huế): what everyone without a look of their own sees in the default palette. Another palette names its own (`defaultAccentOf`). */
 export const DEFAULT_ACCENT: AccentId = 'plum';
 
 /**
