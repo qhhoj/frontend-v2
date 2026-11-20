@@ -1330,7 +1330,6 @@
       "language": "language"
     },
     "listName": "Submissions",
-    "viewSource": "View source",
     "scrollRegion": "Submissions table, scrolls horizontally",
     "columns": {
       "verdict": "Verdict",
@@ -1341,7 +1340,6 @@
       "memory": "Memory",
       "language": "Language",
       "when": "When",
-      "source": "Source code",
       "rank": "Rank"
     },
     "rail": {
@@ -1387,6 +1385,7 @@
     },
     "live": "Live",
     "quick": {
+      "all": "All",
       "mine": "Mine",
       "accepted": "AC",
       "errors": "Errors",
@@ -1567,7 +1566,6 @@
     },
     "ringLabel": "Graded {graded} of {total} tests",
     "ringLabelPoints": "{percent}% of the points earned",
-    "provisional": "provisional score",
     "liveUpdates": "Live updates",
     "staleReload": "The connection stopped; reload to see the latest status",
     "reload": "Reload",
@@ -1604,15 +1602,14 @@
       "moreLosses": "+{count} more tests lost points · Table of {total} tests"
     },
     "cases": {
-      "title": "Judging result",
-      "scrollRegion": "Judging result, scroll sideways",
+      "title": "Tests",
+      "scrollRegion": "Tests, scrolls sideways",
       "none": "No test results yet",
       "test": "Test",
       "result": "Result",
       "time": "Time",
       "memory": "Memory",
       "points": "Points",
-      "pending": "Waiting",
       "batch": "Batch {number}",
       "compileLog": "Compiler message",
       "feedback": "Feedback",
@@ -1674,7 +1671,28 @@
     "strip": {
       "showAll": "Show all ({count})",
       "onlyLost": "Only tests that lost points",
-      "allFull": "All {count} tests passed."
+      "allFull": "All {count} tests passed.",
+      "folded": "{count} passing tests are folded. Click to show them."
+    },
+    "plate": {
+      "label": "Judging result",
+      "verdict": "Result",
+      "score": "Score",
+      "provisional": "Provisional score",
+      "contestScore": "Contest score",
+      "failedAt": "{verdict} on test {number}",
+      "judging": "Judging test {current}/{total}",
+      "passed": "Tests passed",
+      "tests": "Tests",
+      "squares": "Result of each test",
+      "groupSquares": "Result of each subtask",
+      "testTitle": "Test {number}: {verdict}",
+      "groupTitle": "Subtask {number}: {verdict}",
+      "waitingTest": "Test {number}: waiting",
+      "slowest": "Slowest test",
+      "largest": "Peak memory",
+      "limit": "limit {limit}",
+      "ofLimit": "{value} of {limit}"
     }
   },
   "states": {

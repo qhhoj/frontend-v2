@@ -2,8 +2,6 @@
 import { computed, ref } from 'vue';
 import type { SubmissionListItem } from '@/api/types/submissions';
 import Card from '@/components/ui/Card.vue';
-import Chip from '@/components/ui/Chip.vue';
-import { CUE_TABLE_ROW } from '@/components/ui/cue-tones';
 import ScrollRegion from '@/components/ScrollRegion.vue';
 import LanguageLabel from '@/components/language/LanguageLabel.vue';
 import UserLink from '@/components/UserLink.vue';
@@ -13,12 +11,13 @@ import { useLocaleStore } from '@/stores/locale.store';
 import SubmissionCompactList from './SubmissionCompactList.vue';
 import SubmissionPickBox from './SubmissionPickBox.vue';
 import SubmissionProblemName from './SubmissionProblemName.vue';
-import SubmissionSourceLink from './SubmissionSourceLink.vue';
+import SubmissionScore from './SubmissionScore.vue';
 import SubmissionVerdictCell from './SubmissionVerdictCell.vue';
 import {
   COMPACT_BELOW_PX,
   FULL_TABLE_CLASS,
   NUMBER_CELLS,
+  OWN_BAR,
   ROW_RULE,
   TABLE_CARD_CLASS,
   bodyCellClasses,
@@ -28,14 +27,16 @@ import {
   headerRowClasses,
 } from './submission-table-cells';
 import type { CellKind, ColumnKey, TableVariant } from './submission-table-cells';
-import { isFinished, scoreCellText, scoreCue } from './submission-row';
+import { isFinished } from './submission-row';
 import { useRowOpen } from './row-open';
 import { useIsNarrow } from './use-card-compact';
 import { NO_VALUE, formatCaseMemory, formatCaseTime } from '@/lib/format';
 
 /**
- * The dense submission table: one line per row, the whole row opens the submission. A frameless ledger by default; `variant="surface"`
- * is for a table inside a card of its own. Keep `SubmissionTableSkeleton.vue` in step: same frame, header cells and row classes.
+ * The one submission table (site list, problem tabs, contest, organization, best submissions): one 44 px line per row,
+ * the whole row opens the submission. Colour sits on the lamp, the verdict code and the score only; the viewer's own
+ * rows carry a bar on the left. A frameless ledger by default; `variant="surface"` is for a table inside a card of its
+ * own. Keep `SubmissionTableSkeleton.vue` in step: same frame, header cells and row classes.
  */
 const props = withDefaults(
   defineProps<{
@@ -53,7 +54,7 @@ const props = withDefaults(
     pickedIds?: readonly string[];
     /** Rank of the first row; given, a leading "#" column numbers the rows (the best-submissions ranking). */
     rankStart?: number;
-    /** The viewer's username: their rows are tinted (the best-submissions ranking). */
+    /** The viewer's username: their rows carry the bar. Left out where every row is theirs. */
     ownUsername?: string;
     variant?: TableVariant;
   }>(),
@@ -96,11 +97,10 @@ const shownKeys = computed(() =>
 const cells = computed(() => cellsOf(shownKeys.value));
 const isOwn = (row: SubmissionListItem) =>
   props.ownUsername !== undefined && row.user?.username === props.ownUsername;
-const classOf = (kind: CellKind | 'pick' | 'source') => fullCellClass(kind);
+const classOf = (kind: CellKind | 'pick') => fullCellClass(kind);
 const contestMaxOf = (row: SubmissionListItem) =>
   row.problem ? props.contestPoints[row.problem.code] : undefined;
-const rowCue = (row: SubmissionListItem) => scoreCue(row, contestMaxOf(row));
-const NUMBER_ALIGN = 'text-right font-mono tabular-nums whitespace-nowrap';
+const NUMBER_ALIGN = 'text-right font-mono text-sm tabular-nums';
 const timeText = (row: SubmissionListItem) =>
   isFinished(row) && row.time !== null ? formatCaseTime(row.time) : NO_VALUE;
 const memoryText = (row: SubmissionListItem) =>
@@ -129,7 +129,7 @@ const memoryText = (row: SubmissionListItem) =>
       @toggle-pick="emit('togglePick', $event)"
     />
     <ScrollRegion v-else :label="$t('submissions.scrollRegion')">
-      <table class="w-full border-collapse" :class="FULL_TABLE_CLASS">
+      <table :class="FULL_TABLE_CLASS">
         <caption class="sr-only">
           {{
             $t('submissions.listName')
@@ -151,9 +151,6 @@ const memoryText = (row: SubmissionListItem) =>
             >
               {{ $t(`submissions.columns.${kind}`) }}
             </th>
-            <th scope="col" :class="[headerCell, classOf('source')]">
-              <span class="sr-only">{{ $t('submissions.columns.source') }}</span>
-            </th>
           </tr>
         </thead>
         <tbody>
@@ -165,10 +162,9 @@ const memoryText = (row: SubmissionListItem) =>
             :class="[
               ROW_RULE[variant],
               { 'row-added': highlightIds.has(row.id) },
-              rowCue(row)
-                ? CUE_TABLE_ROW[rowCue(row)!]
-                : isOwn(row) && 'bg-accent-soft hover:bg-accent-soft',
+              ownUsername !== undefined && OWN_BAR.table[isOwn(row) ? 'own' : 'other'],
             ]"
+            :data-own="isOwn(row) || undefined"
             @click="openRow($event, row.id)"
             @auxclick="openRowInTab($event, row.id)"
           >
@@ -190,22 +186,17 @@ const memoryText = (row: SubmissionListItem) =>
               <td v-if="kind === 'verdict'" :class="[bodyCell, classOf(kind)]">
                 <SubmissionVerdictCell :row="row" />
               </td>
-              <td v-else-if="kind === 'score'" :class="[bodyCell, classOf(kind), NUMBER_ALIGN]">
-                <Chip v-if="rowCue(row)" :tone="rowCue(row)!" class="font-mono tabular-nums">{{
-                  scoreCellText(row, locale.locale, contestMaxOf(row))
-                }}</Chip>
-                <template v-else>{{
-                  scoreCellText(row, locale.locale, contestMaxOf(row))
-                }}</template>
+              <td v-else-if="kind === 'score'" :class="[bodyCell, classOf(kind), 'text-right']">
+                <SubmissionScore :row="row" :contest-max="contestMaxOf(row)" />
               </td>
-              <td v-else-if="kind === 'problem'" :class="[bodyCell, 'w-full max-w-0']">
+              <td v-else-if="kind === 'problem'" :class="[bodyCell, classOf(kind)]">
                 <SubmissionProblemName
                   :problem="row.problem"
                   :label="row.problem ? problemLabels[row.problem.code] : undefined"
                   show-code
                 />
               </td>
-              <td v-else-if="kind === 'user'" :class="[bodyCell, classOf(kind), 'max-w-0']">
+              <td v-else-if="kind === 'user'" :class="[bodyCell, classOf(kind)]">
                 <UserLink v-if="row.user" :username="row.user.username" :rating="row.user.rating" />
                 <template v-else>{{ NO_VALUE }}</template>
               </td>
@@ -223,13 +214,13 @@ const memoryText = (row: SubmissionListItem) =>
               </td>
               <td
                 v-else-if="kind === 'language'"
-                :class="[bodyCell, classOf(kind), 'text-muted']"
+                :class="[bodyCell, classOf(kind), 'text-small text-muted']"
                 :title="row.language?.name"
               >
                 <LanguageLabel v-if="row.language" :language="row.language" />
                 <template v-else>{{ NO_VALUE }}</template>
               </td>
-              <td v-else :class="[bodyCell, classOf(kind), 'whitespace-nowrap text-muted']">
+              <td v-else :class="[bodyCell, classOf(kind), 'text-right text-small text-muted']">
                 <time
                   :datetime="row.date"
                   :title="formatDate(row.date, 'datetime', locale.locale)"
@@ -237,7 +228,6 @@ const memoryText = (row: SubmissionListItem) =>
                 >
               </td>
             </template>
-            <td :class="bodyCell"><SubmissionSourceLink :id="row.id" /></td>
           </tr>
         </tbody>
       </table>

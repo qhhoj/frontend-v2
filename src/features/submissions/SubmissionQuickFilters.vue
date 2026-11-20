@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { GitCompareArrows } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { Language } from '@/api/types/problems';
 import AppButton from '@/components/ui/AppButton.vue';
+import Lamp from '@/components/ui/Lamp.vue';
+import type { VerdictTone } from '@/lib/verdicts';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdvancedFiltersButton from './AdvancedFiltersButton.vue';
@@ -12,9 +13,10 @@ import type { QuickFilter } from './quick-filters';
 import type { SubmissionFilters } from './use-submission-filters';
 
 /**
- * The chips above the list: Của tôi (signed-in viewers), AC, Lỗi, Đang chấm, the language (in the panel on a phone), the
- * button that opens the filters ("Bộ lọc" on a phone), and "So sánh", which shows the rows' pick boxes. Every chip but
- * "So sánh" only edits `filters`, so the URL stays the one source of truth. On a phone the row scrolls sideways.
+ * The filter toggles above the list: Tất cả, Của tôi (signed-in viewers), AC, Lỗi, Đang chấm (each result toggle with
+ * its lamp), then the language (in the panel on a phone) and the button that opens the rarely used filters ("Bộ lọc" on
+ * a phone). Every toggle only edits `filters`, so the URL stays the one source of truth. On a phone the row scrolls
+ * sideways.
  */
 const props = defineProps<{
   filters: SubmissionFilters;
@@ -27,23 +29,26 @@ const props = defineProps<{
   /** Filters set only in the advanced panel, counted on its button. */
   advancedCount: number;
   panelId: string;
-  /** Whether rows show their compare boxes; null hides "So sánh" (a viewer who cannot compare). */
-  comparing: boolean | null;
 }>();
 const emit = defineEmits<{
   update: [patch: Partial<SubmissionFilters>];
   toggleAdvanced: [];
-  toggleCompare: [];
 }>();
 const locale = useLocaleStore();
 /** Below sm the language box lives in the panel too, so the button counts it there. */
 const phoneCount = computed(() => props.advancedCount + (props.filters.languageIds.length ? 1 : 0));
 
 const chips = computed(() =>
-  (['mine', 'accepted', 'errors', 'grading'] as const satisfies readonly QuickFilter[]).filter(
-    (chip) => chip !== 'mine' || props.username !== null,
-  ),
+  (
+    ['all', 'mine', 'accepted', 'errors', 'grading'] as const satisfies readonly QuickFilter[]
+  ).filter((chip) => chip !== 'mine' || props.username !== null),
 );
+/** The lamp of a result toggle: the same mark as the rows it keeps. */
+const LAMPS: Partial<Record<QuickFilter, VerdictTone>> = {
+  accepted: 'ac',
+  errors: 'wa',
+  grading: 'pending',
+};
 const isOn = (chip: QuickFilter) => isQuickFilterOn(props.filters, chip, props.username);
 const toggle = (chip: QuickFilter) =>
   emit('update', quickFilterPatch(props.filters, chip, props.username));
@@ -58,17 +63,17 @@ const toggle = (chip: QuickFilter) =>
     <AppButton
       v-for="chip in chips"
       :key="chip"
-      class="shrink-0 whitespace-nowrap max-sm:px-3.5"
+      size="sm"
+      class="shrink-0 whitespace-nowrap"
       :data-quick-filter="chip"
       :pressed="isOn(chip)"
       @click="toggle(chip)"
     >
+      <template v-if="LAMPS[chip]" #icon><Lamp :tone="LAMPS[chip]!" still /></template>
       {{ $t(`submissions.quick.${chip}`) }}
-      <span
-        v-if="chip === 'grading' && gradingCount"
-        class="font-mono text-caption leading-4 tabular-nums opacity-80"
-        >{{ formatNumber(gradingCount, locale.locale) }}</span
-      >
+      <span v-if="chip === 'grading' && gradingCount" class="font-mono text-small tabular-nums">{{
+        formatNumber(gradingCount, locale.locale)
+      }}</span>
     </AppButton>
     <LanguageFilterSelect
       class="max-sm:hidden"
@@ -83,15 +88,7 @@ const toggle = (chip: QuickFilter) =>
       :panel-id="panelId"
       @toggle="emit('toggleAdvanced')"
     />
-    <AppButton
-      v-if="comparing !== null"
-      data-testid="compare-mode"
-      class="shrink-0 whitespace-nowrap max-sm:px-3.5"
-      :pressed="comparing"
-      @click="emit('toggleCompare')"
-    >
-      <template #icon><GitCompareArrows class="size-4" aria-hidden="true" /></template>
-      {{ $t('submissions.quick.compare') }}
-    </AppButton>
+    <!-- A phone has one row: the list's tools end it and scroll with the toggles. -->
+    <slot name="tools" />
   </div>
 </template>

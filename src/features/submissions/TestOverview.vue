@@ -3,8 +3,9 @@ import { computed } from 'vue';
 import { ArrowDownWideNarrow, Info, Sigma } from 'lucide-vue-next';
 import type { SubmissionBatch, SubmissionCase } from '@/api/types/submissions';
 import ScrollRegion from '@/components/ScrollRegion.vue';
+import VerdictChip from '@/components/ui/VerdictChip.vue';
 import { translate } from '@/i18n';
-import { PARTIAL_CODE, VERDICT_TONE_CLASSES, caseVerdictOf, verdictOfCode } from '@/lib/verdicts';
+import { PARTIAL_CODE, caseVerdictOf, verdictOfCode } from '@/lib/verdicts';
 import { useLocaleStore } from '@/stores/locale.store';
 import {
   PLAIN_ROW_KEY,
@@ -76,7 +77,6 @@ function rowName(row: OverviewRow): string {
     row.key === PLAIN_ROW_KEY ? 'submission.overview.plainTests' : 'submission.overview.allTests',
   );
 }
-const rowChipClass = (row: OverviewRow) => VERDICT_TONE_CLASSES[verdictOfCode(row.verdict).tone];
 
 function rowReason(row: OverviewRow): string {
   return reasonParts(row)
@@ -194,11 +194,7 @@ const explanation = computed(() => {
             </td>
             <td class="px-3 py-3.5 max-sm:col-span-2 max-sm:row-start-2 max-sm:p-0">
               <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-                <span
-                  class="inline-flex h-6 min-w-10 shrink-0 items-center justify-center rounded-pill px-2 font-mono text-caption font-bold"
-                  :class="rowChipClass(row)"
-                  >{{ row.verdict }}</span
-                >
+                <VerdictChip :verdict="verdictOfCode(row.verdict)" />
                 <span data-testid="overview-reason" class="text-meta text-muted">{{
                   rowReason(row)
                 }}</span>

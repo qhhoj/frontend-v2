@@ -103,15 +103,11 @@
   "features/submissions/list/SubmissionFilterPanel.vue": {
     "hardcoded-value": 1
   },
-  "features/submissions/list/TestStrip.vue": {
-    "hardcoded-script-value": 1
-  },
   "features/submissions/list/in-flight-poll.ts": {
     "hardcoded-script-value": 1
   },
   "features/submissions/submission-table-cells.ts": {
-    "hardcoded-script-value": 1,
-    "hardcoded-value": 5
+    "hardcoded-script-value": 1
   },
   "features/submissions/submissions.queries.ts": {
     "hardcoded-script-value": 1

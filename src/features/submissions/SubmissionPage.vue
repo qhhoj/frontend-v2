@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Send } from 'lucide-vue-next';
 import { computed, toRef } from 'vue';
 import { useRoute } from 'vue-router';
 import { ApiError } from '@/api/client';
@@ -8,7 +7,6 @@ import Card from '@/components/ui/Card.vue';
 import PageLayout from '@/components/ui/PageLayout.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import type { PageCrumb } from '@/components/ui/PageHeader.vue';
-import type { MenuEntry } from '@/components/ui/Menu.vue';
 import ShareButton from '@/features/shares/ShareButton.vue';
 import InlineBit from '@/components/InlineBit.vue';
 import QueryState from '@/components/QueryState.vue';
@@ -29,15 +27,14 @@ import CasesTableSkeleton from './CasesTableSkeleton.vue';
 import SourceView from './SourceView.vue';
 import SourceViewSkeleton from './SourceViewSkeleton.vue';
 import TestOverview from './TestOverview.vue';
-import SubmissionHero from './SubmissionHero.vue';
-import SubmissionHeroSkeleton from './SubmissionHeroSkeleton.vue';
+import SubmissionPlate from './SubmissionPlate.vue';
+import SubmissionPlateSkeleton from './SubmissionPlateSkeleton.vue';
 import SubmissionMeta from './SubmissionMeta.vue';
 import SubmissionExternalRun from './SubmissionExternalRun.vue';
 import SubmissionStaffPanel from './SubmissionStaffPanel.vue';
 import { forbiddenMessageKey } from './forbidden-reason';
 import { useLiveSubmission } from './use-live-submission';
 import DeletedProblemNotice from './DeletedProblemNotice.vue';
-import InternalErrorNotice from './InternalErrorNotice.vue';
 import { isProblemDeleted } from './deleted-problem';
 import CompareWithForm from './CompareWithForm.vue';
 import { submissionShortId } from './submission-short-id';
@@ -99,19 +96,24 @@ const problemRoute = computed(() => {
   const query = row.value?.contest ? { contest: row.value.contest.key } : {};
   return { name: 'problem', params: { code: problem.code }, query };
 });
-/** The author's way back to the editor with this code in it: a menu item, so "Về đề bài" stays the one primary. */
-const moreActions = computed<MenuEntry[]>(() => {
+/** The author's way back to the editor with this code in it: the page's one primary. Nobody else gets a primary here. */
+const resubmit = computed(() => {
   const target = problemRoute.value;
-  if (!canResubmit.value || !target || !row.value) return [];
-  const label =
-    verdict.value?.code === 'AC' ? 'submission.actions.resubmit' : 'submission.actions.resubmitFix';
-  return [
-    {
-      label: translate(label),
-      icon: Send,
-      to: { ...target, query: { ...target.query, resubmit: row.value.id } },
-    },
-  ];
+  if (!canResubmit.value || !target || !row.value) return null;
+  return {
+    to: { ...target, query: { ...target.query, resubmit: row.value.id } },
+    labelKey:
+      verdict.value?.code === 'AC'
+        ? 'submission.actions.resubmit'
+        : 'submission.actions.resubmitFix',
+  };
+});
+/** A compile error has no tests to list, and a system error often none: then the plate says it all. */
+const hasNoTests = computed(() => {
+  const submission = row.value;
+  if (!submission) return false;
+  const hasRows = Boolean(submission.cases?.length || submission.batches?.length);
+  return submission.status === 'CE' || (submission.status === 'IE' && !hasRows);
 });
 
 const isNotFound = computed(
@@ -145,20 +147,18 @@ const nextTo = computed(() =>
   <NotFoundPage v-if="isNotFound" />
   <PageLayout v-else>
     <template #header>
-      <PageHeader
-        :title="heading.title"
-        :crumbs="heading.crumbs"
-        :back="heading.back"
-        :overflow="moreActions"
-      >
+      <PageHeader :title="heading.title" :crumbs="heading.crumbs" :back="heading.back">
         <template v-if="row" #meta
           ><SubmissionMeta :submission="row" :in-contest="inContest"
         /></template>
         <template v-if="row && (problemRoute || nextTo || row.viewer.canShare)" #actions>
           <AppButton v-if="nextTo" :to="nextTo">{{ $t('submission.actions.next') }}</AppButton>
           <ShareButton v-if="row.viewer.canShare" :submission-id="row.id" />
-          <AppButton v-if="problemRoute" tone="primary" :to="problemRoute">{{
+          <AppButton v-if="problemRoute" :to="problemRoute">{{
             $t('submission.actions.problem')
+          }}</AppButton>
+          <AppButton v-if="resubmit" tone="primary" data-testid="resubmit" :to="resubmit.to">{{
+            $t(resubmit.labelKey)
           }}</AppButton>
         </template>
       </PageHeader>
@@ -180,22 +180,21 @@ const nextTo = computed(() =>
     >
       <template #skeleton>
         <div class="flex min-w-0 flex-col gap-(--space-section)">
-          <SubmissionHeroSkeleton />
+          <SubmissionPlateSkeleton />
           <CasesTableSkeleton />
           <SourceViewSkeleton />
         </div>
       </template>
       <div v-if="row && verdict" class="flex min-w-0 flex-col gap-(--space-section)">
-        <SubmissionHero
+        <SubmissionPlate
           :submission="row"
           :verdict="verdict"
-          :problem-points="problemQuery.data.value?.points ?? null"
+          :problem="problemQuery.data.value"
           :is-problem-loading="problemQuery.isLoading.value"
           :is-live="isLive"
+          :current-testcase="live.currentTestcase || (row.currentTestcase ?? 0)"
           :contest-score="contestScore"
-        >
-          <SubmissionStaffPanel :key="row.id" :submission="row" />
-        </SubmissionHero>
+        />
         <SubmissionNextStep v-if="inContest?.next" :next="inContest.next" />
         <p
           v-if="live.stale"
@@ -208,17 +207,13 @@ const nextTo = computed(() =>
             {{ $t('submission.reload') }}
           </AppButton>
         </p>
-        <InternalErrorNotice v-if="row.status === 'IE'" :message="row.error" />
         <SubmissionExternalRun v-if="row.externalRun" :run="row.externalRun" />
         <DeletedProblemNotice v-if="isDeletedProblem" :name="row.problem?.name ?? ''" />
         <CasesTable
-          v-if="!isDeletedProblem"
+          v-if="!isDeletedProblem && !hasNoTests"
           :cases="row.cases"
           :batches="row.batches"
-          :total-cases="row.totalCases"
           :running="isLive"
-          :compile-error="row.status === 'CE' ? row.error : null"
-          :compile-log-hidden="row.status === 'CE' && !row.error"
         >
           <template #footer>
             <TestOverview
@@ -241,6 +236,7 @@ const nextTo = computed(() =>
         >
           <CompareWithForm :current-id="row.id" />
         </SourceView>
+        <SubmissionStaffPanel :key="row.id" :submission="row" />
       </div>
     </QueryState>
   </PageLayout>

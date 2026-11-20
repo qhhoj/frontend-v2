@@ -9,6 +9,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import SubmissionLockControl from './SubmissionLockControl.vue';
 import SubmissionScoreOverride from './SubmissionScoreOverride.vue';
 import AppButton from '@/components/ui/AppButton.vue';
+import Card from '@/components/ui/Card.vue';
 import Notice from '@/components/ui/Notice.vue';
 import { failureTextOf, hasIssueCode } from '@/features/admin/ui/admin-errors';
 import { useAdminMutation } from '@/features/admin/ui/use-admin-mutation';
@@ -41,6 +42,10 @@ const CALLS = {
   abort: abortSubmission,
 } as const;
 
+/**
+ * The one quiet panel for staff on a submission page, under the source: rejudge, reject, abort, the lock and the score
+ * override, with the reason next to any action that cannot run now. It never sits above the verdict.
+ */
 const props = defineProps<{ submission: SubmissionDetail }>();
 const session = useSessionStore();
 const locale = useLocaleStore();
@@ -158,13 +163,14 @@ async function confirmAction() {
 </script>
 
 <template>
-  <section
+  <Card
     v-if="isVisible"
     data-testid="staff-panel"
-    class="flex flex-col gap-3 border-t border-line bg-surface-hover p-6 sm:p-8"
+    padding="sm"
+    class="flex flex-col gap-3"
     aria-labelledby="staff-panel-title"
   >
-    <h2 id="staff-panel-title" class="text-meta font-semibold text-muted">
+    <h2 id="staff-panel-title" class="eyebrow">
       {{ $t('admin.staff.title') }}
     </h2>
     <p class="text-sm text-muted">{{ $t(stateLineKey) }}</p>
@@ -185,6 +191,7 @@ async function confirmAction() {
         <AppButton
           v-if="actions[action] !== 'hidden'"
           tone="danger"
+          size="sm"
           :disabled="!isReady(action)"
           :aria-describedby="!isReady(action) ? reasonIdOf(action) : undefined"
           @click="openAction(action)"
@@ -219,5 +226,5 @@ async function confirmAction() {
       :busy="mutation.isPending.value"
       @confirm="confirmAction"
     />
-  </section>
+  </Card>
 </template>
