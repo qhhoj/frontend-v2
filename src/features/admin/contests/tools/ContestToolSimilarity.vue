@@ -4,6 +4,7 @@ import type { EditableContest } from '@/api/types/contest-editing';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import AppButton from '@/components/ui/AppButton.vue';
+import PageSection from '@/components/ui/PageSection.vue';
 import { usePermissions } from '@/stores/use-permissions';
 import PairsTable from '../../similarity/PairsTable.vue';
 import SimilarityRunsTable from '../../similarity/SimilarityRunsTable.vue';
@@ -44,59 +45,61 @@ const pairTotal = computed(() => pairs.data.value?.meta.total ?? 0);
 </script>
 
 <template>
-  <p v-if="!can('judge.moss_contest')" class="m-0 text-meta text-muted">
-    {{ needsPermissionText('judge.moss_contest') }}
-  </p>
-  <div v-else class="flex flex-col gap-3" data-testid="contest-tool-similarity">
-    <div class="flex flex-wrap items-center gap-3">
-      <AppButton
-        data-testid="similarity-start"
-        :loading="isPending"
-        :disabled="hasActiveRun"
-        :disabled-reason="$t(`${KEY}.running`)"
-        @click="startRun"
-      >
-        {{ $t('admin.similarity.scope.start') }}
-      </AppButton>
-      <p class="m-0 text-meta text-muted">{{ $t('admin.similarity.scope.startHint') }}</p>
-    </div>
-    <SimilarityStartResult :is-done="isDone" :failure="failure" :running-to="null" />
-    <QueryState :loading="runs.isPending.value" :error="runs.error.value" @retry="runs.refetch()">
-      <template #skeleton><SkeletonBlock class="h-(--qh-row) w-full" /></template>
-      <SimilarityRunsTable
-        :runs="runList"
-        :scope="scope"
-        in-place
-        :open-id="openRunId"
-        @open="toggleRun"
-      />
-    </QueryState>
-    <section
-      v-if="openRunId"
-      class="flex flex-col gap-2"
-      :aria-label="$t(`${KEY}.pairsTitle`)"
-      data-testid="similarity-pairs"
-    >
-      <QueryState
-        :loading="pairs.isPending.value"
-        :error="pairs.error.value"
-        @retry="pairs.refetch()"
-      >
+  <PageSection :title="$t(`${KEY}.title`)" data-testid="contest-tool-similarity">
+    <p v-if="!can('judge.moss_contest')" class="m-0 text-meta text-muted">
+      {{ needsPermissionText('judge.moss_contest') }}
+    </p>
+    <div v-else class="flex flex-col gap-3">
+      <div class="flex flex-wrap items-center gap-3">
+        <AppButton
+          data-testid="similarity-start"
+          :loading="isPending"
+          :disabled="hasActiveRun"
+          :disabled-reason="$t(`${KEY}.running`)"
+          @click="startRun"
+        >
+          {{ $t('admin.similarity.scope.start') }}
+        </AppButton>
+        <p class="m-0 text-meta text-muted">{{ $t('admin.similarity.scope.startHint') }}</p>
+      </div>
+      <SimilarityStartResult :is-done="isDone" :failure="failure" :running-to="null" />
+      <QueryState :loading="runs.isPending.value" :error="runs.error.value" @retry="runs.refetch()">
         <template #skeleton><SkeletonBlock class="h-(--qh-row) w-full" /></template>
-        <div class="flex flex-wrap items-center justify-between gap-2 text-meta">
-          <p class="m-0 font-semibold" aria-live="polite">
-            {{ $t(`${KEY}.pairsShown`, { shown: topPairs.length, total: pairTotal }) }}
-          </p>
-          <AppButton
-            tone="link"
-            class="text-meta"
-            :to="{ name: 'admin-similarityPairs', params: { runId: openRunId } }"
-          >
-            {{ $t(`${KEY}.allPairs`) }}
-          </AppButton>
-        </div>
-        <PairsTable :pairs="topPairs" :total="pairTotal" :filter="FIRST_PAGE" preview />
+        <SimilarityRunsTable
+          :runs="runList"
+          :scope="scope"
+          in-place
+          :open-id="openRunId"
+          @open="toggleRun"
+        />
       </QueryState>
-    </section>
-  </div>
+      <section
+        v-if="openRunId"
+        class="flex flex-col gap-2"
+        :aria-label="$t(`${KEY}.pairsTitle`)"
+        data-testid="similarity-pairs"
+      >
+        <QueryState
+          :loading="pairs.isPending.value"
+          :error="pairs.error.value"
+          @retry="pairs.refetch()"
+        >
+          <template #skeleton><SkeletonBlock class="h-(--qh-row) w-full" /></template>
+          <div class="flex flex-wrap items-center justify-between gap-2 text-meta">
+            <p class="m-0 font-semibold" aria-live="polite">
+              {{ $t(`${KEY}.pairsShown`, { shown: topPairs.length, total: pairTotal }) }}
+            </p>
+            <AppButton
+              tone="link"
+              class="text-meta"
+              :to="{ name: 'admin-similarityPairs', params: { runId: openRunId } }"
+            >
+              {{ $t(`${KEY}.allPairs`) }}
+            </AppButton>
+          </div>
+          <PairsTable :pairs="topPairs" :total="pairTotal" :filter="FIRST_PAGE" preview />
+        </QueryState>
+      </section>
+    </div>
+  </PageSection>
 </template>

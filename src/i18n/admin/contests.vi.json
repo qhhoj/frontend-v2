@@ -671,11 +671,11 @@
         "allProblems": "Tất cả",
         "user": "Lọc theo thí sinh",
         "userPlaceholder": "Thí sinh: tên đăng nhập, Enter để lọc",
-        "shown": "{shown} mới nhất / {total}",
+        "shown": "{shown} / {total}",
         "seeAll": "Xem tất cả",
         "empty": "Chưa có bài nộp nào trong kỳ thi này.",
         "emptyFiltered": "Không có bài nộp nào khớp bộ lọc.",
-        "pickAll": "Chọn cả {count} bài nộp đang hiện",
+        "pickAll": "Chọn cả {count} bài đang hiện",
         "bulkLine": "{count} bài nộp đã chọn trong kỳ thi này.",
         "rescoreNote": "Trong một kỳ thi, tính lại điểm luôn tính lại kết quả của cả kỳ thi, không riêng các bài nộp đã chọn."
       },

@@ -3,6 +3,7 @@ import { computed, ref, useTemplateRef, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { EditableContest } from '@/api/types/contest-editing';
 import Notice from '@/components/ui/Notice.vue';
+import PageSection from '@/components/ui/PageSection.vue';
 import { usePermissions } from '@/stores/use-permissions';
 import BatchActionDialogs from '../../rejudge/BatchActionDialogs.vue';
 import RejudgeFilterForm from '../../rejudge/RejudgeFilterForm.vue';
@@ -17,6 +18,7 @@ import type { ContestRejudgeScope, RejudgeFilter } from '../../rejudge/rejudge-f
 import type { RejudgeOutcome } from '../../rejudge/use-bulk-rejudge';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { needsPermissionText } from '../../ui/permission-text';
+import { CONTEST_TOOLS_ANCHORS } from '../workbench/contest-workbench-tabs';
 
 /**
  * Rejudge inside this contest: one problem, one contestant or all of it, optionally only some verdicts. The form and
@@ -51,26 +53,33 @@ watch(problems, (listed) => {
 </script>
 
 <template>
-  <p v-if="!can('judge.rejudge_submission')" class="m-0 text-meta text-muted">
-    {{ needsPermissionText('judge.rejudge_submission') }}
-  </p>
-  <div v-else class="flex flex-col gap-3" data-testid="contest-tool-rejudge">
-    <RejudgeFilterForm
-      v-model:filter="filter"
-      v-model:scope="scope"
-      :languages="[]"
-      :errors="errors"
-      :contest-problems="problems"
-      @rejudge="ask"
-    />
-    <Notice v-if="outcome" :tone="outcome.kind === 'done' ? 'success' : 'danger'" compact>
-      {{ outcome.text }}
-    </Notice>
-    <BatchActionDialogs
-      ref="dialogs"
-      :body="body"
-      :line="line"
-      @outcome="(next) => (outcome = next)"
-    />
-  </div>
+  <PageSection
+    :id="CONTEST_TOOLS_ANCHORS.rejudge"
+    class="scroll-mt-4"
+    :title="$t(`${KEY}.title`)"
+    data-testid="contest-tool-rejudge"
+  >
+    <p v-if="!can('judge.rejudge_submission')" class="m-0 text-meta text-muted">
+      {{ needsPermissionText('judge.rejudge_submission') }}
+    </p>
+    <div v-else class="flex flex-col gap-3">
+      <RejudgeFilterForm
+        v-model:filter="filter"
+        v-model:scope="scope"
+        :languages="[]"
+        :errors="errors"
+        :contest-problems="problems"
+        @rejudge="ask"
+      />
+      <Notice v-if="outcome" :tone="outcome.kind === 'done' ? 'success' : 'danger'" compact>
+        {{ outcome.text }}
+      </Notice>
+      <BatchActionDialogs
+        ref="dialogs"
+        :body="body"
+        :line="line"
+        @outcome="(next) => (outcome = next)"
+      />
+    </div>
+  </PageSection>
 </template>

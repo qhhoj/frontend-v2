@@ -11,6 +11,7 @@ import QueryState from '@/components/QueryState.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import BulkBar from '@/components/ui/BulkBar.vue';
 import Notice from '@/components/ui/Notice.vue';
+import PageSection from '@/components/ui/PageSection.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
 import SelectField from '@/components/ui/SelectField.vue';
 import Toolbar from '@/components/ui/Toolbar.vue';
@@ -133,83 +134,84 @@ const countText = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col gap-3" data-testid="contest-tool-submissions">
-    <Toolbar>
-      <template #left>
-        <SelectField
-          v-model="problem"
-          data-testid="tool-problem-filter"
-          :prefix="$t(`${KEY}.problem`)"
-          :options="problemOptions"
-          :active="problem !== ALL_PROBLEMS"
-        />
-        <form class="min-w-48 flex-1 sm:max-w-xs" @submit.prevent="applyUser" @change="applyUser">
-          <SearchInput
-            v-model="typedUser"
-            data-testid="tool-user-filter"
-            :label="$t(`${KEY}.user`)"
-            :placeholder="$t(`${KEY}.userPlaceholder`)"
+  <PageSection
+    :title="$t(`${KEY}.title`)"
+    :count="list.data.value ? countText : undefined"
+    :see-all="{ to: fullListTo, label: $t(`${KEY}.seeAll`) }"
+    data-testid="contest-tool-submissions"
+  >
+    <div class="flex flex-col gap-3">
+      <Toolbar>
+        <template #left>
+          <SelectField
+            v-model="problem"
+            data-testid="tool-problem-filter"
+            :prefix="$t(`${KEY}.problem`)"
+            :options="problemOptions"
+            :active="problem !== ALL_PROBLEMS"
           />
-        </form>
-      </template>
-      <template #right>
-        <span v-if="list.data.value" aria-live="polite">{{ countText }}</span>
-        <AppButton tone="link" class="text-meta" :to="fullListTo">
-          {{ $t(`${KEY}.seeAll`) }}
-        </AppButton>
-      </template>
-    </Toolbar>
-    <Notice v-if="outcome" :tone="outcome.kind === 'done' ? 'success' : 'danger'" compact>
-      {{ outcome.text }}
-    </Notice>
-    <QueryState :loading="list.isPending.value" :error="list.error.value" @retry="list.refetch()">
-      <template #skeleton><SubmissionTableSkeleton has-pick-column /></template>
-      <EmptyState v-if="rows.length === 0" compact>
-        {{ $t(problem || user ? `${KEY}.emptyFiltered` : `${KEY}.empty`) }}
-        <template #action>
-          <AppButton size="sm" :to="{ name: 'contest', params: { key: contest.key } }">
-            {{ $t('admin.contests.workbench.viewAsStudent') }}
+          <form class="min-w-60 flex-1 sm:max-w-xs" @submit.prevent="applyUser" @change="applyUser">
+            <SearchInput
+              v-model="typedUser"
+              data-testid="tool-user-filter"
+              :label="$t(`${KEY}.user`)"
+              :placeholder="$t(`${KEY}.userPlaceholder`)"
+            />
+          </form>
+          <AppButton
+            v-if="canRejudge && rows.length > 0 && !isAllPicked"
+            tone="quiet"
+            size="sm"
+            class="sm:ml-auto"
+            data-testid="tool-pick-all"
+            @click="pickAll"
+          >
+            {{ $t(`${KEY}.pickAll`, { count: rows.length }) }}
           </AppButton>
         </template>
-      </EmptyState>
-      <template v-else>
-        <BulkBar :count="picked.length" @clear="picked = []">
-          <AppButton size="sm" @click="dialogs?.open('rescore')">
-            {{ $t('common.rescore') }}
-          </AppButton>
-          <AppButton size="sm" @click="dialogs?.open('rejudge')">
-            <template #icon>
-              <component :is="STAFF_ICONS.rejudge" class="size-4" aria-hidden="true" />
-            </template>
-            {{ $t('common.rejudge') }}
-          </AppButton>
-        </BulkBar>
-        <SubmissionTable
-          :submissions="rows"
-          :problem-labels="problemLabels"
-          :contest-points="contestPoints"
-          :picked-ids="canRejudge ? picked : undefined"
-          unlimited-picks
-          @toggle-pick="togglePick"
-        />
-        <AppButton
-          v-if="canRejudge && !isAllPicked"
-          tone="quiet"
-          size="sm"
-          class="self-start"
-          data-testid="tool-pick-all"
-          @click="pickAll"
-        >
-          {{ $t(`${KEY}.pickAll`, { count: rows.length }) }}
-        </AppButton>
-      </template>
-    </QueryState>
-    <BatchActionDialogs
-      ref="dialogs"
-      :body="body"
-      :line="line"
-      :rescore-note="$t(`${KEY}.rescoreNote`)"
-      @outcome="showOutcome"
-    />
-  </div>
+      </Toolbar>
+      <Notice v-if="outcome" :tone="outcome.kind === 'done' ? 'success' : 'danger'" compact>
+        {{ outcome.text }}
+      </Notice>
+      <QueryState :loading="list.isPending.value" :error="list.error.value" @retry="list.refetch()">
+        <template #skeleton><SubmissionTableSkeleton has-pick-column /></template>
+        <EmptyState v-if="rows.length === 0" compact>
+          {{ $t(problem || user ? `${KEY}.emptyFiltered` : `${KEY}.empty`) }}
+          <template #action>
+            <AppButton size="sm" :to="{ name: 'contest', params: { key: contest.key } }">
+              {{ $t('admin.contests.workbench.viewAsStudent') }}
+            </AppButton>
+          </template>
+        </EmptyState>
+        <template v-else>
+          <BulkBar :count="picked.length" @clear="picked = []">
+            <AppButton size="sm" @click="dialogs?.open('rescore')">
+              {{ $t('common.rescore') }}
+            </AppButton>
+            <AppButton size="sm" @click="dialogs?.open('rejudge')">
+              <template #icon>
+                <component :is="STAFF_ICONS.rejudge" class="size-4" aria-hidden="true" />
+              </template>
+              {{ $t('common.rejudge') }}
+            </AppButton>
+          </BulkBar>
+          <SubmissionTable
+            :submissions="rows"
+            :problem-labels="problemLabels"
+            :contest-points="contestPoints"
+            :picked-ids="canRejudge ? picked : undefined"
+            unlimited-picks
+            @toggle-pick="togglePick"
+          />
+        </template>
+      </QueryState>
+      <BatchActionDialogs
+        ref="dialogs"
+        :body="body"
+        :line="line"
+        :rescore-note="$t(`${KEY}.rescoreNote`)"
+        @outcome="showOutcome"
+      />
+    </div>
+  </PageSection>
 </template>

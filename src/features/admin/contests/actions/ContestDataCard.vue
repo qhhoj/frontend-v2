@@ -78,7 +78,7 @@ const isReady = computed(() => status.value?.state === 'ready');
         <div class="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            :class="buttonClass('primary')"
+            :class="buttonClass('secondary')"
             :aria-disabled="!mayPrepare || undefined"
             @click="mayPrepare && (isPrepareOpen = true)"
           >

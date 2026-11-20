@@ -6,7 +6,7 @@ import { translate } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
 import AdminStatus from '../ui/AdminStatus.vue';
-import AdminSubmissionTable from '../submissions/AdminSubmissionTable.vue';
+import SubmissionTable from '@/features/submissions/SubmissionTable.vue';
 import RejudgeCountPanel from './RejudgeCountPanel.vue';
 import { toRescoreBody } from './rejudge-filter';
 import type { RejudgeOutcome } from './use-bulk-rejudge';
@@ -98,7 +98,7 @@ async function confirmRescore() {
     <p class="text-sm">{{ line }}</p>
     <div v-if="sample.length" class="flex flex-col gap-2">
       <p class="text-sm font-semibold">{{ $t('admin.rejudge.confirm.sample') }}</p>
-      <AdminSubmissionTable :items="sample" :label="$t('admin.rejudge.confirm.sample')" />
+      <SubmissionTable :submissions="sample" variant="surface" />
     </div>
     <p class="text-sm" data-testid="rejudge-skipped">
       {{ $t(`admin.rejudge.confirm.skipped.${isForced ? 'forced' : 'locked'}`) }}

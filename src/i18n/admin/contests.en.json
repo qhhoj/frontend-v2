@@ -671,7 +671,7 @@
         "allProblems": "All",
         "user": "Filter by contestant",
         "userPlaceholder": "Contestant: username, Enter to filter",
-        "shown": "Newest {shown} of {total}",
+        "shown": "{shown} / {total}",
         "seeAll": "See all",
         "empty": "No submissions in this contest yet.",
         "emptyFiltered": "No submissions match the filter.",

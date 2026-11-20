@@ -137,7 +137,7 @@ const at = (date: string | null) => (date ? formatDate(date, 'datetime', locale.
       <div class="flex flex-wrap gap-3">
         <button
           type="button"
-          :class="buttonClass('primary')"
+          :class="buttonClass('secondary')"
           :aria-disabled="!isValidKeyDays(days) || undefined"
           @click="ask('mint')"
         >

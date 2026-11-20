@@ -24,7 +24,7 @@ const isOpen = ref(false);
     <button
       v-else
       type="button"
-      :class="buttonClass('primary')"
+      :class="buttonClass('secondary')"
       class="self-start"
       @click="isOpen = true"
     >

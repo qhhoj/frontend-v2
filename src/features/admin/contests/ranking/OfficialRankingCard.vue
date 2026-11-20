@@ -109,7 +109,7 @@ const submitUrl = () => upload.run({ url: urlText.value.trim() });
           </p>
           <button
             type="button"
-            :class="[buttonClass('primary'), 'self-start']"
+            :class="[buttonClass('secondary'), 'self-start']"
             :disabled="!pickedFile || upload.isPending.value"
             @click="submitCsv"
           >
@@ -123,7 +123,7 @@ const submitUrl = () => upload.run({ url: urlText.value.trim() });
           <input id="official-url" v-model="urlText" type="url" :class="INPUT" />
           <button
             type="button"
-            :class="[buttonClass('primary'), 'self-start']"
+            :class="[buttonClass('secondary'), 'self-start']"
             :disabled="!urlText.trim() || upload.isPending.value"
             @click="submitUrl"
           >

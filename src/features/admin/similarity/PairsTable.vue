@@ -31,7 +31,11 @@ const count = (value: number) => formatNumber(value, locale.locale);
 const columns = computed<AdminColumn[]>(() => [
   { key: 'similarity', label: t('admin.similarity.pairs.columns.similarity'), align: 'end' },
   { key: 'authors', label: t('admin.similarity.pairs.columns.authors'), priority: 'primary' },
-  { key: 'problemCode', label: t('admin.similarity.pairs.columns.problem') },
+  {
+    key: 'problemCode',
+    label: t('admin.similarity.pairs.columns.problem'),
+    cellClass: 'whitespace-nowrap',
+  },
   { key: 'language', label: t('admin.similarity.pairs.columns.language') },
   { key: 'longest', label: t('admin.similarity.pairs.columns.longest'), align: 'end' },
   {
