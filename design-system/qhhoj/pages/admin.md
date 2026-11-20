@@ -180,7 +180,7 @@ Colour and opacity transitions use `--qh-duration-fast` (150 ms). Drawers and sh
 | 34 hand-made tables, ~28 pagers | **Replace** per screen PR with `ui/table/AdminDataTable.vue` + `components/NumberedPager.vue` + `components/ScrollRegion.vue` |
 | `users/UserLookupCard.vue`, problem/contest "Mã bài → Mở" cards | **Remove**, folded into `AdminFilterBar` search |
 | New | `ui/table/{AdminDataTable,AdminBulkBar,AdminRowMenu,AdminFilterBar}.vue`, `ui/form/{AdminFormSection,AdminSaveBar,AdminDateTimeField,use-dirty-guard}`, `ui/feedback/{AdminToast,AdminNotice}.vue`, `ui/AdminDrawer.vue`, `ui/AdminChip.vue`, `ui/admin-density.css` |
-| Reuse, do not rebuild | `components/{QueryState,StatePanel,EmptyState,SkeletonBlock,ConfirmDialog,NumberedPager,ScrollRegion,ToolbarSearch,ToolbarSelect,CopyButton}.vue` |
+| Reuse, do not rebuild | `components/{QueryState,StatePanel,EmptyState,SkeletonBlock,ConfirmDialog,NumberedPager,ScrollRegion,ToolbarSearch,CopyButton}.vue` |
 
 ## Per-screen redesign notes
 

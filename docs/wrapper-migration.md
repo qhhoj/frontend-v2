@@ -78,7 +78,6 @@ Uses, then files. The last M lane updates this table; the M lanes before it only
 | `AdminDrawer`        | `features/admin/ui/AdminDrawer.vue`               | 8 | 8 | `Drawer`                                                 |
 | `CommunityCard`      | `features/community/CommunityCard.vue`            | 5 | 5 | `Card` + `QueryState`                                    |
 | `AdminChoiceCards`   | `features/admin/ui/form/ChoiceCards.vue`          | 4 | 4 | `ChoiceCards` (`components/ui`)                          |
-| `PillTabs`           | `components/PillTabs.vue`                         | 9 | 3 | `Tabs`                                                   |
 | `SubmissionPager`    | `features/submissions/SubmissionPager.vue`        | 3 | 3 | `NumberedPager`                                          |
 | `AuthNotice`         | `features/auth/AuthNotice.vue`                    | 3 | 2 | `Notice`                                                 |
 | `admin-toasts`       | `features/admin/ui/feedback/admin-toasts.ts`      | 0 | 0 | `components/ui/toasts`                                   |
@@ -92,7 +91,7 @@ Not restricted, because they add behaviour the kit part lacks:
 - `AdminSwitch` and `AdminCheckbox` add `lockedBy`.
 - `MarkdownField` adds the staff preview call.
 - `UsernameChips` and `OrganizationChips` add the lookups over `ChipPicker`.
-- `ToolbarSelect` is a native select dressed as a toolbar button, with no kit equal yet.
+- `ToolbarSelect` is gone: the toolbar filter select is `SelectField prefix` (2026-11-20).
 - `button-classes.ts` is the kit's own recipe, for a link that looks like a button.
 
 ### Classes

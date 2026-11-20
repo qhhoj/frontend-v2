@@ -10,12 +10,45 @@ One control set on every page; `/dev/kit` shows it first ("Bộ điều khiển"
 
 - Shape tells the kind: a rounded rectangle (`rounded-control`, 4 px) can be clicked; a pill is a label and cannot.
 - Heights: 40 px (`md`, `--qh-control`) and 32 px (`sm`, `--qh-control-sm`: tables and panel headers); 44 px on touch. Fields, selects and the search box are 40 px with the border and radius of a button (`FormField.control.ts`).
-- Buttons (`AppButton`): `primary` (brand fill, one per page), `secondary` (surface + control border), `quiet` (brand text, no border). `ghost`, `danger` and `lg` are old names of quiet, secondary and md. Inside a `Readout` primary and secondary take the plate's colours. A text link is `tone="link"` or `SeeAllLink`.
+- Buttons (`AppButton`): `primary` (brand fill, one per page), `secondary` (surface + control border), `quiet` (brand text, no border), `danger` (the secondary shape with red text and a red icon; hover as secondary). `ghost` and `lg` are old names of quiet and md. Inside a `Readout` primary and secondary take the plate's colours. `link` is a text link (brand text, underline on hover); a section's "Xem tất cả" is `AppButton tone="link"`.
+- Icon-only buttons (`IconButton`, `AppButton icon-only`): a quiet square in neutral ink (`secondary` text), never brand. `label` is required and is both the `aria-label` and the tooltip. `tone="secondary"` adds the border, `tone="danger"` makes the icon red.
 - States, the same for all: hover = raised ground (primary: darker brand); focus = 2 px brand ring (a field: brand border + soft ring); disabled = 45 % opacity (`--qh-opacity-disabled`) with the reason beside it; pending = a spinner in place of the icon.
-- Filter toggles (`Chip pressed`, `SegmentedControl`, toolbar selects): 32 px rounded rectangles; on = soft brand ground + brand border + brand text. Never the primary look.
+- Filter toggles (`Chip pressed|to|removable`, `SegmentedControl`, `SelectField prefix` in a toolbar, a label around a checkbox or radio through `TOGGLE_CHECKABLE`): 32 px rounded rectangles; on = soft brand ground + brand border + brand text. Never the primary look. Anything you can click is a rectangle: a link around a pill is a bug.
 - Status tags (`Chip`): pills on the raised ground, no border, no hover, not clickable; `strong` = ink semibold. A tone colours only the dot or icon.
 - Tabs: underline only. Cards: one style (`Card`: 1 px line, 6 px corners, 16 px padding; `panel` = a flush header row). Section header: `PageSection`. Save bar: `SaveBar`, one per page.
-- Scales: spacing 2·4·8·12·16·24·32·48·64; type 12·13·14·15·16·18·20·24·28·32·40; weights 400·500·600·650·700; rows 44 (52 on a phone); radius 2·4·6·pill; durations 0.12·0.2·1.2 s. A value off a scale is a bug.
+- Scales: spacing 2·4·8·12·16·24·32·48·64; type 12·13·14·15·16·18·20·24·28·32·40; weights 400·500·600·650·700; control heights 40·32; rows 44 (52 on touch); radius 2·4·6·pill; durations 0.12·0.2·1.2 s. A value off a scale is a bug: snap it, or add a named token in `src/theme/tokens.css` and say why. Named tokens that are widths, not steps of a scale: DataTable column widths, Modal and Drawer widths, `--pane-submit`, `--qh-rail` (224), `--qh-stat-col-min` (96).
+
+### Colour roles
+
+One meaning per colour, the same on every page; the words always say it too.
+
+| Colour                         | Meaning                                                                                                                                          | Tokens                                                                         |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| Huế purple (brand)             | what you can act on and where you are: primary button, links, focus ring, current menu item and tab, a toggle that is on, the bar on my own rows | `accent*`, `--qh-focus-ring`                                                   |
+| Red                            | one family: wrong answer, error, destructive action                                                                                              | `negative` (= `verdict-wa`), `Notice tone="danger"`, `AppButton tone="danger"` |
+| Green, lime, amber, grey, blue | verdicts only: accepted, partial, time/memory/runtime failure, compile error, judging                                                            | `verdict-*` through `VerdictChip`, `Lamp`, `TestSquares`, `Gauge`              |
+| Gold                           | merit: a top-three rank and nothing else (no silver, no bronze)                                                                                  | `merit`, `lib/medal.ts`                                                        |
+| Neutral ink                    | everything that measures the thing and not the viewer: an AC rate, a solver count (`ProgressBar tone="neutral"`), icon-only buttons              | `content`, `secondary`, `muted`                                                |
+
+No row tints by verdict: the colour sits on the lamp, the code and the score. The plate (`Readout`) is the only dark surface and shows only what the judge or the clock measured.
+
+### Placement
+
+Fixed; a page that needs an exception is a design bug.
+
+| Area                                   | Left / first                                                    | Right / last                                                                                           |
+| -------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Page header (`PageHeader`)             | eyebrow, title (`titleTo` when it names another page), sub line | page buttons, primary last (a page with a sticky side panel puts its primary at the top of that panel) |
+| Plate (`Readout`)                      | the state or the biggest measurement                            | other measurements, then buttons, primary last                                                         |
+| Toolbar (`Toolbar`, `FilterBar`)       | search, then filter toggles                                     | count or a secondary tool                                                                              |
+| Section header (`PageSection`, `Card`) | title                                                           | meta, link or quiet button                                                                             |
+| Table                                  | status, name                                                    | numbers right-aligned, time last                                                                       |
+| Content                                | main column                                                     | side panel of fixed width (above the content on a phone)                                               |
+| Pager                                  | position                                                        | previous, next                                                                                         |
+
+### Formats
+
+Time, memory, limits and file sizes: only the functions of `src/lib/measure.ts` (imported from `@/lib/format`): number, a no-break space, unit; the decimal mark follows the locale. Measured: "1,05 s", "3,5 MB" (en "1.05 s"). Limits: "1,0 s", "256 MB". Files: "1,8 MB", "64 KB".
 
 ## 1. Tokens
 
@@ -23,12 +56,12 @@ Values live in code: `src/theme/tokens.css`, `@theme` in `src/theme/styles.css`,
 
 ### Type roles
 
-Kit 2 scale (spec `.batch/kit2/spec.md` §1b): Be Vietnam Pro (text) and JetBrains Mono (code and numbers), line height 1.5 (`--qh-leading`) for running text. Nothing is smaller than 13 px except the `kbd` hint (12 px).
+Be Vietnam Pro (text), Archivo at width 112 % and weight 650 (headings, `font-display`) and JetBrains Mono (code and numbers); line height 1.5 (`--qh-leading`) for running text. Nothing is smaller than 13 px except the `kbd` hint and a numeral inside a mark (12).
 
 | Class               | px / line | Role                                                                          |
 | ------------------- | --------- | ----------------------------------------------------------------------------- |
-| `text-page`         | 28 / 36   | the one H1 of a page (only through `PageHeader`), weight 600                  |
-| `text-heading`      | 18 / 26   | Card and Panel title, Dialog title, section titles (`PageSection`)            |
+| `text-page`         | 28 / 32   | the one H1 of a page (only through `PageHeader`), weight 650                  |
+| `text-heading`      | 18 / 24   | Card and Panel title, Dialog title, section titles (`PageSection`)            |
 | `text-long`         | 16 / 26   | long reading: statements, contest intro, posts; `text-content` or `secondary` |
 | `text-body`         | 15 / 22   | table cells, list rows, buttons, fields, tabs, menu items (row names 500)     |
 | `text-meta`         | 14 / 21   | facts lines, form labels, counts, table footer                                |
@@ -42,34 +75,31 @@ Deprecated type classes, kept as aliases until their last user moves to a role: 
 
 Every value is a variable in `src/theme/tokens.css`; components never write a number. Under touch (`pointer: coarse` or 640 px and narrower) every control is 44 or more and every row at least 44.
 
-| Token                                                           | px             | Used by                                                                                                                        |
-| --------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `--qh-control-sm`                                               | 32             | only inside a table: row actions, the table pager                                                                              |
-| `--qh-control`                                                  | 36             | every toolbar and form control: Button, IconButton, Input, Search, Select, Segmented, Tabs, rail items, removable filter chips |
-| `--qh-control-lg`                                               | 40             | the primary action of a page or form                                                                                           |
-| `--qh-chip`                                                     | 24             | Chip, StatusPill, VerdictChip                                                                                                  |
-| `--qh-row`                                                      | 44             | every one-line list row and table head                                                                                         |
-| `--qh-row-dense`                                                | 40             | the ranking board, menu items                                                                                                  |
-| `--qh-touch`                                                    | 44             | the touch height of every control and row                                                                                      |
-| `--qh-control-px-sm` / `--qh-control-px` / `--qh-control-px-lg` | 14 / 16 / 20   | horizontal padding of sm / md / lg controls (a field with a leading icon uses 14)                                              |
-| `--qh-pad-surface`, `--qh-pad-dialog`                           | 20, 24         | padding of a surface (Card, Panel) and of a Dialog or Sheet                                                                    |
-| `--qh-gap-control`, `--qh-gap-block`                            | 10, 16         | gap between controls; between a toolbar and content or between surfaces                                                        |
-| `--qh-control-inset`                                            | 3 (0 on touch) | space between a segmented track and its thumb                                                                                  |
+| Token                                    | px               | Used by                                                                 |
+| ---------------------------------------- | ---------------- | ----------------------------------------------------------------------- |
+| `--qh-control-sm`                        | 32               | tables and panel headers: row actions, the table pager, filter toggles  |
+| `--qh-control`                           | 40               | every button, field, select, search box and tab                         |
+| `--qh-control-lg`                        | 40               | old name of `--qh-control`                                              |
+| `--qh-chip`                              | 24               | status tag (`Chip`), `VerdictChip`                                      |
+| `--qh-row`                               | 44 (52 on touch) | every list row and table row                                            |
+| `--qh-row-dense`                         | 44               | old name of `--qh-row`                                                  |
+| `--qh-touch`                             | 44               | the touch height of every control and row                               |
+| `--qh-control-px-sm` / `--qh-control-px` | 12 / 16          | horizontal padding of sm / md controls and of fields                    |
+| `--qh-pad-surface`, `--qh-pad-dialog`    | 16, 24           | padding of a surface (Card, panel) and of a Dialog or Sheet             |
+| `--qh-gap-control`, `--qh-gap-block`     | 8, 16            | gap between controls; between a toolbar and content or between surfaces |
 
-Radius by rule: a control is a pill (`rounded-control`, 999); a surface is 12 (`rounded-card`, `--qh-radius-surface`); a box nested in a surface is 8 (`rounded-row`, `--qh-radius-nested`); a small square mark (checkbox, kbd, inline code) is 6 (`rounded-cell`, `--qh-radius-mark`). A multi-line field (TextArea, code editor) is a surface, not a control.
+Radius by rule: a control is 4 (`rounded-control`); a surface (card, panel, plate) is 6 (`rounded-card`); a box nested in a surface is 4 (`rounded-row`); a small square mark (checkbox, kbd, test square) is 2 (`--qh-radius-mark`); `rounded-pill` only for status tags, lamps, switches and avatars. Nothing you can click is a pill.
 
-Surface levels, by tone not by line: L0 ground (`bg-ground`), L1 surface (`bg-surface`: Card, Panel, table, contest card), L2 strong (`bg-surface-strong`: fields, secondary buttons, segmented track, current tab, neutral chips, inset tiles, the rail), hover `bg-surface-hover`, L3 overlay (L1 + `shadow-float` + `--qh-ring-overlay`: Menu, Popover, Dialog, Sheet, Toast). A field is one level away from its container (an L2 field on L0 or L1, an L1 field on the L2 rail). Lines stay between rows inside one surface, between StatStrip cells, and as the ring on an overlay. An invalid field draws a red tint and a 1 px red ring. In contrast-high mode controls and surfaces get a 1 px `--qh-line-control` edge back (`edge-high` utility).
+Surfaces: the page ground (`bg-ground`), the surface with a 1 px line (`Card`, tables), the raised ground (`bg-surface-strong`: hover, status tags, inset code) and the overlay (`overlay-surface`: Menu, Popover, Dialog, Sheet, Toast). A control draws the control border (`border-line-control`, 3:1). An invalid field draws a red border on the red tint.
 
-Tables: every table, including the hand-built ones, takes its row and head height from `components/ui/table-classes.ts` (44, 40 dense, touch 44; head 13 semibold muted on the row surface; hairlines between rows, no frame). Floating layers (Menu, Popover, Dialog, Sheet, Toast) use the `overlay-surface` utility: surface tone, 1 px `--qh-line` ring, float shadow; Menu items are 40, radius 8. Step 2 removed no alias, because about 170 files still use the radius names and `text-sm`/`text-tiny`.
+Tables: every table, including the hand-built ones, takes its row and head height from `components/ui/table-classes.ts` (44, 52 on touch; head 13 semibold muted on the row surface; hairlines between rows, no frame). Floating layers (Menu, Popover, Dialog, Sheet, Toast) use the `overlay-surface` utility: surface tone, 1 px `--qh-line` ring, float shadow; Menu items are 40, radius 8. Step 2 removed no alias, because about 170 files still use the radius names and `text-sm`/`text-tiny`.
 
 Deprecated token names, kept as aliases while many files use them: `--qh-radius-card` (= `--qh-radius-surface`), `--qh-radius-row` (= `--qh-radius-nested`), `--qh-radius-cell` (= `--qh-radius-mark`), `--qh-radius-pill`, `Card` `padding` `sm` and `lg` (= `md`, 20), Tabs `variant="underline"` (draws the pill row, same as `pill`), the CSS class `glass` (no border now), `--qa-chip` (= `--qh-control`).
 
 ### Spacing, widths, radii
 
-- Spacing roles (`--space-*`, smaller on a phone): `page-top` 24 · `header` 16 · `toolbar` 12 · `section` 40 · `section-title` 8 · `stack` 12. Use them as `gap-(--space-section)`, not raw numbers.
+- Spacing roles (`--space-*`, smaller on a phone): `page-top` 24 · `header` 16 · `toolbar` 12 · `section` 32 · `section-title` 8 · `stack` 12. Use them as `gap-(--space-section)`, not raw numbers.
 - Page width by role (`PageLayout width`): `wide` 80 rem (lists, normal pages) · `split` 120 rem (statement beside submit) · `read` 46 rem (long reading, forms).
-- Controls 36, primary 40, 32 only inside tables; chips 24; rows 44 (ranking and menus 40); 44 on touch (geometry table above).
-- Radius by role: see the geometry section above (`rounded-control` pill, `rounded-card` 12, `rounded-row` 8, `rounded-cell` 6).
 - Motion only on colour, border and opacity; the kit carries real movement. Z layers: `z-sticky` `z-savebar` `z-header` `z-bit` `z-overlay` `z-toast`.
 
 ### Colour cue map
@@ -88,7 +118,7 @@ Colour is a cue: one meaning, the same on every page, as text or a light tint, n
 
 Attempted, not solved: icon only, no row tint (owner 2026-11-16).
 
-Other colour meanings, unchanged: an acceptance rate has no colour (a neutral bar and the number; the five-colour ramp went with the "Sơn mài" problem list); rating = tier colour (`tier-*`); rating change = `cue-full` for a gain, `cue-zero` for a loss; ranks 1 to 3 = `medal-gold|silver|bronze` or none; tags = `tag-1..8`.
+Other colour meanings, unchanged: an acceptance rate has no colour (a neutral bar and the number; the five-colour ramp went with the "Sơn mài" problem list); rating = tier colour (`tier-*`); rating change = `cue-full` for a gain, `cue-zero` for a loss; ranks 1 to 3 = gold only (`lib/medal.ts`: a gold disc, a gold ring, a plain ring; `medalClass` for a rank in a line of text); tags = `tag-1..8`.
 
 Cue tokens versus verdict tokens: a submission's own result parts (`VerdictChip`, test strip, cases table, ranking cells, problem status mark) keep `verdict-*` (lists in `scripts/raw-element-rules.mjs`, `VERDICT_PARTS`). Everything else that says live, upcoming, ended, full, partial, zero or needs-attention uses `cue-*`. `positive`/`negative`/`warning`/`info` remain for `Notice`, `ProgressBar`, `StatGrid` and toasts inside the kit; pages use a Chip or StatusDot tone, not those classes (lint rule `status-colour`).
 
@@ -163,5 +193,4 @@ To add a token: define it in `src/theme/styles.css` (`@theme`) or, for a colour,
 - Cue tokens exist but most pages still use `text-positive`, `bg-warning-bg` and similar status classes (baselined under `status-colour`, 186 uses in 126 files). Convert page by page; the baseline only shrinks (`npm run raw-elements:shrink`).
 - `text-title`, `text-subtitle` and `text-section-legacy` have users left.
 - `/dev/kit` shows one mode at a time (the mode switch is in its header), because the palette scopes light and dark to the root element.
-- Contest lists and the rail show contest phase with ad-hoc classes; they should use `StatusDot` and `Chip` cues.
 - Difficulty and tier colours are separate scales outside the cue map; they are not yet in the gallery.
