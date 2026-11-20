@@ -1,7 +1,6 @@
 {
   "title": "Nhập tệp .zip",
   "lead": "Tải gói Polygon dạng .zip lên rồi theo dõi tiến trình nhập.",
-  "rateLimited": "Tối đa 10 lượt nhập mỗi giờ.",
   "form": {
     "board": "Nhập gói Polygon",
     "drop": "Kéo gói .zip vào đây",

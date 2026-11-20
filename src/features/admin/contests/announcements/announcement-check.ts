@@ -9,5 +9,5 @@ export function checkAnnouncementDraft(draft: { title: string }): FieldErrors {
   const length = draft.title.trim().length;
   return length >= 1 && length <= ANNOUNCEMENT_TITLE_MAX
     ? {}
-    : { title: translate('admin.contests.announcements.titleError') };
+    : { title: translate('admin.announcements.titleError') };
 }

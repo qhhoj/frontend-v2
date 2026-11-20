@@ -155,5 +155,13 @@
     "preview": "Preview"
   },
   "markdownSupported": "Markdown supported",
-  "charCount": "{count} chars"
+  "charCount": "{count} chars",
+  "polygonOptionRefusal": {
+    "statement_language_required": "Pick the main statement among: {languages}.",
+    "statement_language_unmapped": "Pick a QHHOJ language or Skip for the {language} statement.",
+    "statement_language_repeated": "Two statements are {language}: pick another language or Skip.",
+    "tutorial_language_required": "Pick the editorial among: {languages}.",
+    "too_many_testcases": "The problem has {count} tests, over your limit of {limit}."
+  },
+  "importRateLimited": "At most 10 imports per hour."
 }

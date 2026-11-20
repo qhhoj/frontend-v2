@@ -94,7 +94,7 @@ const rateLimitedText = (refusal: ApiError): string =>
 
 export const optionEntry: CodeEntry = {
   text: (refusal) =>
-    translate(`admin.polygonLink.configure.refusal.${refusal.code}`, {
+    translate(`admin.ui.polygonOptionRefusal.${refusal.code}`, {
       languages: textOf(paramsOf(refusal).languages),
       language: textOf(paramsOf(refusal).language),
       count: textOf(paramsOf(refusal).count),
@@ -109,12 +109,12 @@ export const CODE_ENTRIES: Readonly<Record<string, CodeEntry>> = {
   ...Object.fromEntries(POLYGON_OPTION_CODES.map((code) => [code, optionEntry])),
 };
 
-/** The import pages' wording of the shared hourly limit (`admin.polygon.rateLimited`); passed as `catalog` by them. */
+/** The import pages' wording of the shared hourly limit (`admin.ui.importRateLimited`); passed as `catalog` by them. */
 export const IMPORT_REFUSALS: Readonly<Record<string, CodeEntry>> = {
   rate_limited: {
     text: (refusal) =>
       refusal.retryAfterSeconds === null
-        ? translate('admin.polygon.rateLimited')
-        : `${translate('admin.polygon.rateLimited')} ${translate('admin.ui.retryIn', { wait: formatWait(refusal.retryAfterSeconds) })}`,
+        ? translate('admin.ui.importRateLimited')
+        : `${translate('admin.ui.importRateLimited')} ${translate('admin.ui.retryIn', { wait: formatWait(refusal.retryAfterSeconds) })}`,
   },
 };

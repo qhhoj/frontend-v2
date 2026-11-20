@@ -13,17 +13,12 @@ import type {
 } from '@/api/types/problem-editing';
 import { translate } from '@/i18n';
 import type { FieldErrors } from '../../ui/admin-errors';
+import { PROBLEM_LIMITS } from '@/features/problems/problem-limits';
 import { PROBLEM_CODE_PATTERN } from '../problem-code';
 import { EDIT_ALL_PROBLEM } from './field-lock';
 
 /** The backend's problem name rule: 1 to this many characters. */
 export const PROBLEM_NAME_MAX = 100;
-
-export const PROBLEM_LIMITS = {
-  timeLimit: { min: 0.01, max: 60, highAbove: 5 },
-  memoryLimit: { min: 0, max: 1_048_576 },
-  points: { min: 800, max: 3500 },
-} as const;
 
 export interface LanguageLimitForm {
   languageId: string;

@@ -1,18 +1,22 @@
-type Messages = { [key: string]: string | Messages };
+export type Messages = { [key: string]: string | Messages };
 type AreaFiles = Record<string, { default: Messages }>;
+export type AdminMessages = Record<'vi' | 'en', Record<string, Messages>>;
 
-/** `./admin/<area>.<locale>.json` files, merged as `admin.<area>`; a new area file needs no edit here. */
-const files = import.meta.glob<{ default: Messages }>('./admin/*.json', {
-  eager: true,
-}) as AreaFiles;
-
-function areasOf(locale: 'vi' | 'en'): Record<string, Messages> {
-  const areas: Record<string, Messages> = {};
+/** `<area>.<locale>.json` files, keyed by locale then area (merged as `admin.<area>`). */
+export function areasOf(files: AreaFiles): AdminMessages {
+  const messages: AdminMessages = { vi: {}, en: {} };
   for (const [path, module] of Object.entries(files)) {
     const match = /\/(\w+)\.(vi|en)\.json$/.exec(path);
-    if (match?.[2] === locale) areas[match[1]!] = module.default;
+    if (match) messages[match[2] as 'vi' | 'en'][match[1]!] = module.default;
   }
-  return areas;
+  return messages;
 }
 
-export const ADMIN_MESSAGES = { vi: areasOf('vi'), en: areasOf('en') };
+/**
+ * `./admin/shared/`: the admin areas that pages outside the admin area also show (through admin parts they import).
+ * They load with the app. Every other area in `./admin/` loads when an admin page is first opened
+ * (`loadAdminMessages`); `npm run lint:admin-messages` fails when a public page reaches one of those.
+ */
+export const SHARED_ADMIN_MESSAGES = areasOf(
+  import.meta.glob<{ default: Messages }>('./admin/shared/*.json', { eager: true }),
+);

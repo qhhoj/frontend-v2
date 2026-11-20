@@ -155,5 +155,13 @@
     "preview": "Xem trước"
   },
   "markdownSupported": "Hỗ trợ Markdown",
-  "charCount": "{count} ký tự"
+  "charCount": "{count} ký tự",
+  "polygonOptionRefusal": {
+    "statement_language_required": "Chọn đề chính trong số: {languages}.",
+    "statement_language_unmapped": "Chọn ngôn ngữ trên QHHOJ hoặc Bỏ qua cho đề {language}.",
+    "statement_language_repeated": "Hai đề cùng là {language}: chọn ngôn ngữ khác hoặc Bỏ qua.",
+    "tutorial_language_required": "Chọn đề lấy lời giải trong số: {languages}.",
+    "too_many_testcases": "Bài có {count} test, vượt giới hạn {limit} test của bạn."
+  },
+  "importRateLimited": "Tối đa 10 lượt nhập mỗi giờ."
 }

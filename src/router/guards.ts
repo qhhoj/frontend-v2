@@ -1,5 +1,6 @@
 import type { RouteLocationNormalized, RouteLocationRaw } from 'vue-router';
 import { canEnterAdmin } from '@/features/admin/admin-access';
+import { loadAdminMessages } from '@/i18n';
 import { allowsAny } from '@/lib/permissions';
 import type { useSessionStore } from '@/stores/session.store';
 import { safeRedirect } from './safe-redirect';
@@ -113,5 +114,7 @@ export async function resolveNavigation(
     const result = rule(to, session);
     if (result !== null) return result;
   }
+  // Admin pages render only with their texts; a failed download fails the navigation like a failed page chunk.
+  if (to.meta.adminArea) await loadAdminMessages();
   return true;
 }

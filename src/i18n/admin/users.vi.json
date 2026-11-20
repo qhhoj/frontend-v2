@@ -56,34 +56,6 @@
       "id": "ID"
     }
   },
-  "moderation": {
-    "title": "Cấm tài khoản",
-    "reasonLabel": "Lý do (bắt buộc, hiện cho người bị cấm)",
-    "reasonHint": "Tối đa 4 096 ký tự. Cấm sẽ thu hồi mọi phiên đăng nhập. Chưa hỗ trợ cấm có thời hạn: cấm kéo dài đến khi bỏ cấm.",
-    "reasonRequired": "Cần ghi lý do.",
-    "reasonTooLong": "Lý do dài hơn 4 096 ký tự.",
-    "ban": "Cấm người dùng",
-    "done": "Đã cấm {username}.",
-    "unbanned": "Đã bỏ cấm {username}.",
-    "alreadyBanned": "Tài khoản đã bị cấm từ trước.",
-    "notBanned": "Tài khoản không bị cấm.",
-    "banDialog": {
-      "title": "Cấm {username}?",
-      "body": "Tài khoản bị khóa, mọi phiên đăng nhập bị thu hồi và tài khoản bị ẩn khỏi bảng xếp hạng.",
-      "confirm": "Cấm"
-    },
-    "banned": {
-      "title": "Tài khoản đã bị cấm",
-      "reason": "Lý do cấm: {reason}",
-      "noReason": "Không có lý do được ghi.",
-      "unban": "Bỏ cấm",
-      "unbanHint": "Bỏ cấm trả hạng “user”, hiện lại và kích hoạt."
-    },
-    "unbanDialog": {
-      "title": "Bỏ cấm {username}?",
-      "body": "Tài khoản được trả hạng “user”, hiện lại trên bảng xếp hạng và đăng nhập lại được."
-    }
-  },
   "impersonate": {
     "title": "Đóng vai",
     "note": "Chỉ siêu quản trị. Không đóng vai được siêu quản trị khác hoặc tài khoản đã khóa.",

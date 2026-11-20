@@ -1,5 +1,5 @@
 import { createI18n } from 'vue-i18n';
-import { ADMIN_MESSAGES } from './admin-messages';
+import { SHARED_ADMIN_MESSAGES } from './admin-messages';
 import en from './en.json';
 import vi from './vi.json';
 
@@ -13,8 +13,28 @@ export const i18n = createI18n({
   globalInjection: true,
   locale: DEFAULT_LOCALE,
   fallbackLocale: DEFAULT_LOCALE,
-  messages: { vi: { ...vi, admin: ADMIN_MESSAGES.vi }, en: { ...en, admin: ADMIN_MESSAGES.en } },
+  messages: {
+    vi: { ...vi, admin: SHARED_ADMIN_MESSAGES.vi },
+    en: { ...en, admin: SHARED_ADMIN_MESSAGES.en },
+  },
 });
 
 /** Script-side translation; templates use `$t`. */
 export const translate = i18n.global.t;
+
+let adminMessagesLoad: Promise<void> | null = null;
+
+/** Adds the admin-only areas to both locales once (vi is the fallback); a failed download is retried on the next call. */
+export function loadAdminMessages(): Promise<void> {
+  adminMessagesLoad ??= import('./admin-only-messages').then(
+    ({ ADMIN_ONLY_MESSAGES }) => {
+      for (const locale of LOCALES)
+        i18n.global.mergeLocaleMessage(locale, { admin: ADMIN_ONLY_MESSAGES[locale] });
+    },
+    (error: unknown) => {
+      adminMessagesLoad = null;
+      throw error;
+    },
+  );
+  return adminMessagesLoad;
+}

@@ -192,13 +192,6 @@
       "kept": "Giữ nguyên: mã bài, điểm, nhóm, dạng bài, tác giả, người duyệt, ngôn ngữ được nộp (trừ ô bạn điền trong Cài đặt trên QHHOJ).",
       "lost": "Sửa đổi các mục trên trong QHHOJ sẽ mất.",
       "confirm": "Ghi đè {code} và nhập"
-    },
-    "refusal": {
-      "statement_language_required": "Chọn đề chính trong số: {languages}.",
-      "statement_language_unmapped": "Chọn ngôn ngữ trên QHHOJ hoặc Bỏ qua cho đề {language}.",
-      "statement_language_repeated": "Hai đề cùng là {language}: chọn ngôn ngữ khác hoặc Bỏ qua.",
-      "tutorial_language_required": "Chọn đề lấy lời giải trong số: {languages}.",
-      "too_many_testcases": "Bài có {count} test, vượt giới hạn {limit} test của bạn."
     }
   },
   "progress": {

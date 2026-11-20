@@ -52,10 +52,7 @@ watch(data, (answer) => {
       :is-pushed-live="isPushedLive"
       @posted="(created) => (justPostedId = created.id)"
     />
-    <section
-      class="flex min-w-0 flex-col gap-3"
-      :aria-label="$t('admin.contests.announcements.listLabel')"
-    >
+    <section class="flex min-w-0 flex-col gap-3" :aria-label="$t('admin.announcements.listLabel')">
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
           <div class="flex flex-col gap-3">
@@ -64,9 +61,7 @@ watch(data, (answer) => {
             <SkeletonBlock class="h-28 w-full" />
           </div>
         </template>
-        <EmptyState v-if="items.length === 0">{{
-          $t('admin.contests.announcements.empty')
-        }}</EmptyState>
+        <EmptyState v-if="items.length === 0">{{ $t('admin.announcements.empty') }}</EmptyState>
         <template v-else>
           <AnnouncementItem
             v-for="item in items"
@@ -77,13 +72,11 @@ watch(data, (answer) => {
             :is-pushed-live="isPushedLive"
           />
           <footer class="flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
-            <span>{{
-              $t('admin.contests.announcements.pager', { total, page, pages: pageCount })
-            }}</span>
+            <span>{{ $t('admin.announcements.pager', { total, page, pages: pageCount }) }}</span>
             <NumberedPager
               v-if="data && pageCount > 1"
               :meta="data.meta"
-              :label="$t('admin.contests.announcements.pagerLabel')"
+              :label="$t('admin.announcements.pagerLabel')"
               compact
             />
           </footer>

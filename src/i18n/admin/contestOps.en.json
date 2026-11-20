@@ -124,13 +124,5 @@
       "user": "Only {value}"
     },
     "tiebreakerOf": "Tiebreaker: {value}"
-  },
-  "announcements": {
-    "editNote": "Edits keep the original post time and are not sent again. Use resend to notify.",
-    "previewLabel": "Preview",
-    "previewEmpty": "Nothing to preview yet.",
-    "more": "More actions for “{title}”",
-    "deleted": "Deleted “{title}”.",
-    "saved": "Announcement saved."
   }
 }

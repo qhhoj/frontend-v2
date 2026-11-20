@@ -31,19 +31,18 @@ const isEditing = ref(false);
 const listKey = (): AdminQueryKey => ['admin', 'contest-announcements', props.contestKey];
 const when = computed(() =>
   props.isJustPosted
-    ? translate('admin.contests.announcements.justPosted')
+    ? translate('admin.announcements.justPosted')
     : formatDate(props.announcement.createdAt, 'datetime', locale.locale),
 );
 
 const resend = useAdminMutation({
   mutate: () => resendAnnouncement(props.contestKey, props.announcement.id),
-  successText: () => translate('admin.contests.announcements.resent'),
+  successText: () => translate('admin.announcements.resent'),
 });
 const remove = useAdminMutation({
   mutate: () => deleteAnnouncement(props.contestKey, props.announcement.id),
   invalidates: () => [listKey(), ['contests', 'announcements']],
-  successText: () =>
-    translate('admin.contestOps.announcements.deleted', { title: props.announcement.title }),
+  successText: () => translate('admin.announcements.deleted', { title: props.announcement.title }),
   onDone: () => {
     isConfirmOpen.value = false;
   },
@@ -54,7 +53,7 @@ const menuItems = computed<RowMenuItem[]>(() => [
   ...(props.isPushedLive
     ? [
         {
-          label: translate('admin.contests.announcements.resend'),
+          label: translate('admin.announcements.resend'),
           icon: Send,
           run: () => void resend.run(undefined),
         },
@@ -88,7 +87,7 @@ const menuItems = computed<RowMenuItem[]>(() => [
         </button>
         <AdminRowMenu
           :items="menuItems"
-          :label="$t('admin.contestOps.announcements.more', { title: announcement.title })"
+          :label="$t('admin.announcements.more', { title: announcement.title })"
         />
       </div>
     </header>
@@ -106,8 +105,8 @@ const menuItems = computed<RowMenuItem[]>(() => [
     />
     <ConfirmDialog
       v-model:visible="isConfirmOpen"
-      :title="$t('admin.contests.announcements.deleteTitle', { title: announcement.title })"
-      :body="$t('admin.contests.announcements.deleteBody')"
+      :title="$t('admin.announcements.deleteTitle', { title: announcement.title })"
+      :body="$t('admin.announcements.deleteBody')"
       tone="danger"
       :return-focus-to="composeHeading"
       :busy="remove.isPending.value"
