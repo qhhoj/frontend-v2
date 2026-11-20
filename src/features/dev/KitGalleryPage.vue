@@ -3,6 +3,7 @@ import PageHeader from '@/components/ui/PageHeader.vue';
 import PageLayout from '@/components/ui/PageLayout.vue';
 import ModeChoice from '@/features/appearance/ModeChoice.vue';
 import KitComponents from './KitComponents.vue';
+import KitControls from './KitControls.vue';
 import KitFoundations from './KitFoundations.vue';
 
 /**
@@ -20,6 +21,7 @@ defineOptions({ name: 'KitGalleryPage' });
       </PageHeader>
     </template>
     <div class="flex flex-col gap-(--space-section)">
+      <KitControls />
       <section aria-labelledby="kit-foundations" class="flex flex-col gap-(--space-section)">
         <h2 id="kit-foundations" class="sr-only">Nền tảng</h2>
         <KitFoundations />

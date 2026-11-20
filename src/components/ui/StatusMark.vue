@@ -10,7 +10,7 @@ defineProps<{ tone: 'accent' | 'danger'; label: string }>();
 
 <template>
   <span :title="label" class="inline-flex shrink-0 items-center align-middle">
-    <CircleAlert v-if="tone === 'danger'" aria-hidden="true" class="size-3.5 text-negative" />
+    <CircleAlert v-if="tone === 'danger'" aria-hidden="true" class="size-4 text-negative" />
     <span v-else aria-hidden="true" class="size-2 rounded-full bg-accent" />
     <span class="sr-only">{{ label }}</span>
   </span>

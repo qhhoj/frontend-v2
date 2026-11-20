@@ -50,16 +50,17 @@
   --radius-*: initial;
   --shadow-*: initial;
   --blur-*: initial;
-  /* Type scale (Kit 2, .batch/kit2/spec.md §1b), px / line height: title 28 / 36 (`page`), heading 18 / 26, long text 16 / 26,
-     body 15 / 22, meta 14 / 21, small 13 / 20, stat 28 mono, kbd 12. Nothing else is smaller than 13. Running text is 1.5 (--qh-leading).
+  /* Type scale ("Design is code": 12 · 13 · 14 · 15 · 16 · 18 · 20 · 24 · 28 · 32 · 40), px / line height: title 28 / 32 (`page`), heading 18 / 24,
+     long text 16 / 26, body 15 / 22, meta 14 / 21, small 13 / 20, stat 28 mono, kbd 12 (numerals inside a mark only). Running text is 1.5 (--qh-leading).
      Font size and the role's line height; the page-title and section-title utilities below pin theirs. */
-  --text-page: 27px;
+  --text-page: 28px;
   --text-page--line-height: 2rem;
-  --text-heading: 19px;
+  --text-heading: 18px;
   --text-heading--line-height: 1.5rem;
-  /* The plate (kit Readout): a value 20, a verdict word 22; its big numeral is --text-score. */
+  /* The plate (kit Readout): a value 20, a verdict word 24; its big numeral is --text-score (40), a second numeral --text-score-sm (32). */
   --text-readout: 20px;
-  --text-readout-word: 22px;
+  --text-readout-word: 24px;
+  --text-score-sm: 32px;
   --text-long: 16px;
   --text-long--line-height: 1.625;
   --text-body: 15px;
@@ -250,6 +251,7 @@
   --radius-pill: var(--qh-radius-pill);
   --radius-skeleton: var(--qh-radius-skeleton);
   --radius-control: var(--qh-radius-control);
+  --radius-mark: var(--qh-radius-mark);
   --shadow-float: var(--qh-shadow-float);
   --ease-standard: var(--qh-ease);
   --ease-exit: var(--qh-ease-exit);
@@ -302,14 +304,14 @@
     padding-inline: 2rem;
   }
 }
-/* Page title, 27 px on a 32 px line: one rule for every h1 (pages put it on the h1 instead of size classes). */
+/* Page title, 28 px on a 32 px line: one rule for every h1 (pages put it on the h1 instead of size classes). */
 @utility page-title {
   font-family: var(--qh-font-display);
   font-size: var(--text-page);
   font-weight: var(--qh-display-weight);
   line-height: var(--text-page--line-height);
 }
-/* Section title: the h2 of a page section, one size on every page, 19 px on a 24 px line (--text-heading). */
+/* Section title: the h2 of a page section, one size on every page, 18 px on a 24 px line (--text-heading). */
 @utility section-title {
   font-family: var(--qh-font-display);
   font-size: var(--text-section);
@@ -474,11 +476,12 @@
     z-index: 1;
   }
 }
-/* A surface is told apart by tone, not by a line (spec §3). `glass` keeps its name for its many users. */
+/* The one card look ("Sơn mài" controls): the surface with a 1 px line. `glass` keeps its name for its many users; the radius is `rounded-card`. */
 @utility glass {
+  border: 1px solid var(--qh-line-strong);
   background-color: var(--qh-surface);
   :root[data-contrast='high'] & {
-    box-shadow: inset 0 0 0 1px var(--qh-line-control);
+    border-color: var(--qh-line-control);
   }
 }
 /* L3 overlay (Menu, Popover, Dialog, Sheet, Toast): the one place a surface keeps a line, because it floats over any content (spec §3). */

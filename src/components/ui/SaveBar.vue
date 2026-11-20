@@ -40,6 +40,8 @@ const emit = defineEmits<{ discard: [] }>();
 const { t } = useI18n();
 
 const isDirty = computed(() => props.dirtyCount > 0);
+/** The page bar is a floating row of small buttons; a dialog footer keeps the full-height ones. */
+const buttonSize = computed(() => (props.variant === 'footer' ? 'md' : 'sm'));
 const cannotSave = computed(
   () => props.pending || !!props.blockedReason || (!props.allowClean && !isDirty.value),
 );
@@ -144,8 +146,8 @@ function keepFocusAbove() {
 
 <template>
   <Transition
-    enter-active-class="motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out"
-    leave-active-class="motion-safe:transition-transform motion-safe:duration-150 motion-safe:ease-in"
+    enter-active-class="motion-safe:transition-transform motion-safe:duration-(--qh-duration) motion-safe:ease-standard"
+    leave-active-class="motion-safe:transition-transform motion-safe:duration-(--qh-duration-fast) motion-safe:ease-exit"
     enter-from-class="motion-safe:translate-y-full"
     leave-to-class="motion-safe:translate-y-full"
   >
@@ -158,7 +160,7 @@ function keepFocusAbove() {
       :class="[
         variant === 'footer'
           ? 'flex-auto'
-          : 'sticky bottom-[var(--tab-bar-height,0px)] z-savebar -mx-[var(--qa-gutter,1rem)] border-t border-line bg-surface-solid px-[var(--qa-gutter,1rem)] py-3 pb-[max(0.75rem,var(--shell-inset-bottom,env(safe-area-inset-bottom)))]',
+          : 'sticky bottom-[calc(var(--tab-bar-height,0px)+max(0.75rem,var(--shell-inset-bottom,env(safe-area-inset-bottom))))] z-savebar rounded-card border border-accent bg-surface py-2 pr-2 pl-4 shadow-float',
       ]"
     >
       <p role="status" class="flex min-w-0 flex-1 basis-48 items-center gap-2 text-sm">
@@ -170,7 +172,7 @@ function keepFocusAbove() {
         <slot name="status">
           <span
             v-if="!isDirty && !blockedReason && savedTime"
-            class="inline-flex items-center gap-1.5 font-semibold text-positive"
+            class="inline-flex items-center gap-2 font-semibold text-positive"
             ><Check class="size-4 shrink-0" aria-hidden="true" />{{ statusText }}</span
           >
           <span v-else-if="statusText" :class="isDirty ? 'font-semibold' : 'text-muted'">{{
@@ -190,11 +192,18 @@ function keepFocusAbove() {
       </p>
       <div class="ml-auto flex flex-wrap items-center gap-2">
         <slot name="actions" />
-        <AppButton v-if="!allowClean" tone="ghost" :disabled="cannotDiscard" @click="discard">
+        <AppButton
+          v-if="!allowClean"
+          tone="secondary"
+          :size="buttonSize"
+          :disabled="cannotDiscard"
+          @click="discard"
+        >
           {{ $t('form.saveBar.discard') }}
         </AppButton>
         <AppButton
           tone="primary"
+          :size="buttonSize"
           type="submit"
           :form="form"
           :disabled="cannotSave"

@@ -25,7 +25,7 @@ export const CUE_TEXT: Record<CueTone, string> = {
   attention: 'text-cue-attention',
 };
 
-/** Text on a tint, no line: the chip look. */
+/** @deprecated The tinted chip look; `Chip` draws one ground for every tone now. Kept for old imports. */
 export const CUE_CHIP: Record<CueTone, string> = {
   live: 'bg-cue-live-bg text-cue-live',
   upcoming: 'bg-cue-upcoming-bg text-cue-upcoming',

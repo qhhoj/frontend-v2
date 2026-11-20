@@ -17,7 +17,7 @@ const isShown = ref(false);
     <template #suffix>
       <button
         type="button"
-        class="-mr-3 flex size-(--qh-control) items-center justify-center rounded-cell text-muted hover:text-content"
+        class="-mr-3 flex size-(--qh-control) items-center justify-center rounded-control text-muted hover:text-content"
         :aria-pressed="isShown ? 'true' : 'false'"
         :aria-label="$t('auth.showPassword')"
         @click="isShown = !isShown"

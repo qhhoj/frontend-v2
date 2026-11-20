@@ -1,75 +1,112 @@
 /**
- * The one button recipe (docs/design-language.md): `AppButton`/`IconButton`, and `buttonClass()` in `admin/ui/controls.ts` which
- * delegates here. Kit 2 (.batch/kit2/spec.md §5): a pill with no border. Height and padding come from the control tokens (32 inside a
- * table, 36, 40 for a page's primary action; 44 on touch). Variants change only the fill: primary is the accent, secondary the strong
- * surface (L2), ghost has none until hover, danger a red tint. Boxed buttons press with the `pressable` scale (motion notes 1).
- * Disabled is `aria-disabled` plus the strong surface with muted text, never opacity. A button with `aria-pressed` is a toggle and wears the
- * accent-soft pair while pressed. `link` is an inline text action: no box, a 44 px hit area.
+ * The one button recipe ("Sơn mài" controls, DESIGN.md): `AppButton`/`IconButton`, and `buttonClass()` in `admin/ui/controls.ts` which
+ * delegates here. A button is a rounded rectangle (`rounded-control`, 4 px) with a 1 px border, in exactly three kinds and two heights:
+ *
+ * - `primary`: the brand fill. The one main action of a page.
+ * - `secondary`: the surface with the control border. Every other action.
+ * - `quiet`: brand text, no border. A small action in a row or a panel header.
+ * - `md` 40 px (`--qh-control`) and `sm` 32 px (`--qh-control-sm`, inside a table or a panel header); both are 44 px on touch.
+ *
+ * Inside a `Readout` the same primary and secondary take the plate's colours by themselves (the `readout` utility re-points the tokens).
+ * One set of states for all: hover is the raised ground (primary: the darker brand), focus the 2 px brand ring (styles.css), disabled
+ * 45 % opacity (`aria-disabled`, with a reason beside it), pending a spinner in place of the icon. A button with `aria-pressed` is a
+ * toggle and takes the filter-toggle "on" look while pressed.
+ *
+ * Old names keep working and render one of the three: `ghost` is `quiet`, `danger` is `secondary` (the confirm dialog carries the
+ * warning), `lg` is `md`. `link` is a text link (brand text, underline on hover, a 44 px hit area), `row` a full-width secondary whose
+ * text is left aligned and may wrap, `plain` a control its container draws.
  */
-export type ButtonTone = 'primary' | 'secondary' | 'ghost' | 'danger' | 'link' | 'row' | 'plain';
+export type ButtonTone =
+  'primary' | 'secondary' | 'quiet' | 'ghost' | 'danger' | 'link' | 'row' | 'plain';
 export type ButtonSize = 'sm' | 'md' | 'lg';
+type ButtonKind = 'primary' | 'secondary' | 'quiet';
 type BoxedTone = Exclude<ButtonTone, 'link' | 'row' | 'plain'>;
 
-const CURSOR = 'aria-disabled:cursor-not-allowed disabled:cursor-not-allowed';
+const KIND_OF_TONE: Record<BoxedTone, ButtonKind> = {
+  primary: 'primary',
+  secondary: 'secondary',
+  quiet: 'quiet',
+  ghost: 'quiet',
+  danger: 'secondary',
+};
 
-/** Boxed tones: the fill changes, the shape never. Hover on a disabled button stays put. */
-const BOXED_TONES: Record<BoxedTone, string> = {
-  primary:
-    'edge-high bg-accent font-semibold text-on-accent hover:bg-accent-2 aria-disabled:bg-surface-strong aria-disabled:text-muted aria-disabled:hover:bg-surface-strong',
-  secondary:
-    'edge-high bg-surface-strong font-semibold text-content hover:bg-surface-hover aria-disabled:text-muted aria-disabled:hover:bg-surface-strong disabled:text-muted',
-  ghost:
-    'edge-high bg-transparent font-semibold text-content hover:bg-surface-hover aria-disabled:text-muted aria-disabled:hover:bg-transparent disabled:text-muted',
-  danger:
-    'edge-high bg-negative-bg font-semibold text-negative hover:bg-surface-hover aria-disabled:bg-surface-strong aria-disabled:text-muted aria-disabled:hover:bg-surface-strong',
+/** The states every kind shares: the colour step, the disabled look, and an icon drawn at the control icon size. */
+const STATES =
+  'pressable cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-(--qh-opacity-disabled) disabled:cursor-not-allowed disabled:opacity-(--qh-opacity-disabled) [&_svg:not([class*=size-])]:size-(--qh-control-icon) [&_svg]:shrink-0';
+
+/** Hover never moves a disabled button: every hover class carries `not-aria-disabled:not-disabled:` (whole names, so Tailwind finds them). */
+const KINDS: Record<ButtonKind, string> = {
+  primary: `border border-accent bg-accent font-semibold text-on-accent not-aria-disabled:not-disabled:hover:border-accent-strong not-aria-disabled:not-disabled:hover:bg-accent-strong`,
+  secondary: `border border-line-control bg-surface font-semibold text-content not-aria-disabled:not-disabled:hover:bg-surface-strong`,
+  quiet: `border border-transparent bg-transparent font-semibold text-accent-text not-aria-disabled:not-disabled:hover:bg-accent-soft`,
 };
 
 /**
- * `row`: a button that is a whole line of a list or form (a closed composer, a folded comment, a version in a history): full
- * width, left aligned, regular muted text that wraps, on a surface-radius strong-surface row. `pressed` takes the accent-soft pair.
+ * "On" (`aria-pressed`, `aria-current`): the soft brand ground, the brand border and brand text. The one look of a filter toggle
+ * that is on, a pressed toggle button and the current item of a side menu; it never looks like the primary button.
  */
-const ROW_CLASSES =
-  'inline-flex min-h-(--qh-row) w-full items-center justify-start gap-2 rounded-card bg-surface-strong px-(--qh-pad-surface) py-2 text-left text-body font-normal text-muted hover:bg-surface-hover aria-disabled:text-muted';
-
-/** A toggle that is on (`aria-pressed`): the accent-soft pair, whatever the hover. */
+export const TOGGLE_ON = 'border-accent bg-accent-soft text-accent-soft-text';
 const PRESSED =
-  'aria-pressed:bg-accent-soft aria-pressed:text-accent-soft-text aria-pressed:hover:bg-accent-soft';
+  'aria-pressed:border-accent aria-pressed:bg-accent-soft aria-pressed:text-accent-soft-text';
 
-/** A text action inside a sentence or a card: underlined accent text; `::after` stretches the hit area to 44 px. */
+/**
+ * A filter toggle (was "chip"): a 32 px rounded rectangle on the surface with the control border; `TOGGLE_ON` while it is on.
+ * `Chip` (when it can be clicked), `SegmentedControl` and the toolbar selects all draw it from here.
+ */
+export const TOGGLE_BASE =
+  'inline-flex min-h-(--qh-control-sm) shrink-0 items-center gap-2 rounded-control border px-(--qh-control-px-sm) text-meta font-semibold whitespace-nowrap transition-colors';
+export const TOGGLE_OFF =
+  'border-line-control bg-surface text-secondary hover:bg-surface-strong hover:text-content';
+
+/** `row`: a button that is a whole line of a list or form (a closed composer, a folded comment, a version in a history). */
+const ROW_CLASSES = `flex min-h-(--qh-control) w-full items-center justify-start gap-2 rounded-control border border-line-control bg-surface px-(--qh-control-px-sm) py-2 text-left text-body font-normal text-secondary not-aria-disabled:not-disabled:hover:bg-surface-strong`;
+
+/** A text link: brand text, underline on hover; `::after` stretches the hit area to 44 px. */
 const LINK_CLASSES =
-  "relative inline-flex items-center gap-1.5 text-accent-text underline after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-[''] hover:text-accent-2 aria-disabled:text-muted";
+  "relative inline-flex items-center gap-1 font-semibold text-accent-text underline-offset-2 after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2 after:content-[''] hover:underline aria-disabled:cursor-not-allowed aria-disabled:no-underline aria-disabled:opacity-(--qh-opacity-disabled)";
 
-const TOKEN_HEIGHTS: Record<ButtonSize, string> = {
-  sm: 'min-h-(--qh-control-sm) gap-1.5 text-meta',
-  md: 'min-h-(--qh-control) gap-2 text-body',
-  lg: 'min-h-(--qh-control-lg) gap-2 text-body',
+const md = 'min-h-(--qh-control) gap-2 text-body';
+const HEIGHTS: Record<ButtonSize, string> = {
+  sm: 'min-h-(--qh-control-sm) gap-2 text-meta',
+  md,
+  lg: md,
 };
 
-const TOKEN_PADDING: Record<ButtonSize, string> = {
-  sm: 'px-(--qh-control-px-sm)',
-  md: 'px-(--qh-control-px)',
-  lg: 'px-(--qh-control-px-lg)',
+/** Side padding: 16 in a 40 px button, 12 in a 32 px one; a quiet button has 8, so its text lines up with the row it sits in. */
+const PADDING: Record<ButtonKind, Record<ButtonSize, string>> = {
+  primary: {
+    sm: 'px-(--qh-control-px-sm)',
+    md: 'px-(--qh-control-px)',
+    lg: 'px-(--qh-control-px)',
+  },
+  secondary: {
+    sm: 'px-(--qh-control-px-sm)',
+    md: 'px-(--qh-control-px)',
+    lg: 'px-(--qh-control-px)',
+  },
+  quiet: { sm: 'px-2', md: 'px-2', lg: 'px-2' },
 };
 
-/** Round icon-only buttons: as wide as they are tall (a pill that is square is a circle), no side padding. */
-const TOKEN_ICON_WIDTHS: Record<ButtonSize, string> = {
+/** Icon-only buttons are square: as wide as they are tall, no side padding. */
+const ICON_WIDTHS: Record<ButtonSize, string> = {
   sm: 'min-w-(--qh-control-sm) px-0',
   md: 'min-w-(--qh-control) px-0',
-  lg: 'min-w-(--qh-control-lg) px-0',
+  lg: 'min-w-(--qh-control) px-0',
 };
 
 export interface ButtonClassOptions {
   tone?: ButtonTone;
   size?: ButtonSize;
-  /** A square, icon-only button (token shape). */
+  /** A square, icon-only button. */
   iconOnly?: boolean;
   /** Full width of its container. */
   block?: boolean;
 }
 
 function boxedClasses(tone: BoxedTone, size: ButtonSize, iconOnly: boolean) {
-  const width = iconOnly ? TOKEN_ICON_WIDTHS[size] : TOKEN_PADDING[size];
-  return `inline-flex ${TOKEN_HEIGHTS[size]} ${width} items-center justify-center whitespace-nowrap rounded-control pressable ${CURSOR} ${BOXED_TONES[tone]} ${PRESSED}`;
+  const kind = KIND_OF_TONE[tone];
+  const width = iconOnly ? ICON_WIDTHS[size] : PADDING[kind][size];
+  return `inline-flex ${HEIGHTS[size]} ${width} items-center justify-center whitespace-nowrap rounded-control ${STATES} ${KINDS[kind]} ${PRESSED}`;
 }
 
 /** The class list of a button or button-styled link. */
@@ -79,10 +116,12 @@ export function buttonClasses({
   iconOnly = false,
   block = false,
 }: ButtonClassOptions = {}) {
-  if (tone === 'row') return `${ROW_CLASSES} ${CURSOR} ${PRESSED}`;
+  if (tone === 'row') return `${ROW_CLASSES} ${STATES} ${PRESSED}`;
   // `plain`: a control its container draws (the rail's search and account row, a phone tab): the caller's classes are its look.
-  if (tone === 'plain') return block ? `${CURSOR} w-full` : CURSOR;
-  const classes =
-    tone === 'link' ? `${LINK_CLASSES} ${CURSOR}` : boxedClasses(tone, size, iconOnly);
+  if (tone === 'plain') {
+    const cursor = 'aria-disabled:cursor-not-allowed disabled:cursor-not-allowed';
+    return block ? `${cursor} w-full` : cursor;
+  }
+  const classes = tone === 'link' ? LINK_CLASSES : boxedClasses(tone, size, iconOnly);
   return block ? `${classes} w-full` : classes;
 }

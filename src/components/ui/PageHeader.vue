@@ -117,7 +117,7 @@ const GRID = {
     <nav
       v-if="shownCrumbs.length > 0"
       :aria-label="$t('common.breadcrumb')"
-      class="col-span-full row-start-1 hidden flex-wrap items-center gap-1.5 text-caption text-muted md:flex"
+      class="col-span-full row-start-1 hidden flex-wrap items-center gap-2 text-caption text-muted md:flex"
     >
       <template v-for="(crumb, index) in shownCrumbs" :key="index">
         <span v-if="index > 0" aria-hidden="true">/</span>

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { Search, X } from 'lucide-vue-next';
-import { onBeforeUnmount, ref, watch } from 'vue';
+import { onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
+import { FIELD_FRAME, FIELD_INPUT } from './FormField.control';
 import { useSplitAttrs } from './split-attrs';
 
 /**
- * The search box of a list: magnifier at the left, a 36 px pill (44 on touch) with 15 px text on the strong surface, and a clear button
+ * The search box of a list: the field frame (40 px, 44 on touch; `FormField.control.ts`) with a magnifier at the left and a clear button
  * once there is text (`clearable`, on by default). `debounce` (ms) delays `v-model` after typing stops; without it every
  * keystroke updates it. Clearing applies at once. `label` is the accessible name; `class` goes to the frame, other
  * attributes (`maxlength`, `@keydown`) to the input.
@@ -33,31 +34,35 @@ function commit(text: string) {
   timer = undefined;
   if (text !== model.value) model.value = text;
 }
-const clear = () => (typed.value = '');
+const field = useTemplateRef<HTMLInputElement>('field');
+/** A click on the frame (the magnifier, the padding) focuses the input. */
+const focusInput = () => field.value?.focus();
+function clear() {
+  typed.value = '';
+  focusInput();
+}
 </script>
 
 <template>
-  <div v-bind="frame" class="relative min-w-0">
-    <Search
-      aria-hidden="true"
-      class="pointer-events-none absolute top-1/2 left-(--qh-control-px-sm) size-3.5 -translate-y-1/2 text-muted"
-    />
+  <div v-bind="frame" :class="FIELD_FRAME" @click="focusInput">
+    <Search aria-hidden="true" class="size-4 shrink-0 text-muted" />
     <input
       v-bind="input"
+      ref="field"
       v-model="typed"
       type="search"
       :aria-label="label"
       :placeholder="placeholder ?? label"
-      class="edge-high h-(--qh-control) w-full min-w-0 appearance-none rounded-control bg-surface-strong pr-10 pl-9 text-body text-content placeholder:text-muted [&::-webkit-search-cancel-button]:hidden"
+      :class="`${FIELD_INPUT} [&::-webkit-search-cancel-button]:hidden`"
     />
     <button
       v-if="clearable && typed"
       type="button"
-      class="absolute top-1/2 right-0 flex size-(--qh-control) -translate-y-1/2 items-center justify-center rounded-control text-muted hover:text-content"
+      class="-mr-2 flex size-(--qh-control-sm) shrink-0 cursor-pointer items-center justify-center rounded-control text-muted hover:text-content"
       :aria-label="$t('common.clearSearch')"
-      @click="clear"
+      @click.stop="clear"
     >
-      <X aria-hidden="true" class="size-3.5" />
+      <X aria-hidden="true" class="size-4" />
     </button>
   </div>
 </template>

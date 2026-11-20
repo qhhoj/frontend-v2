@@ -30,10 +30,10 @@ const chosen = computed(
         v-for="option in options"
         :key="option.value"
         class="invisible col-start-1 row-start-1 truncate"
-        :class="{ 'pl-5.5': hasIcon }"
+        :class="{ 'pl-6': hasIcon }"
         >{{ option.label }}</span
       >
-      <span class="col-start-1 row-start-1 flex min-w-0 items-center gap-1.5">
+      <span class="col-start-1 row-start-1 flex min-w-0 items-center gap-2">
         <slot name="chosen-icon" />
         <span class="truncate">{{ chosen }}</span>
       </span>
@@ -47,6 +47,6 @@ const chosen = computed(
         {{ option.label }}
       </option>
     </select>
-    <ChevronDown class="pointer-events-none absolute right-4 size-3.5" aria-hidden="true" />
+    <ChevronDown class="pointer-events-none absolute right-3 size-4" aria-hidden="true" />
   </label>
 </template>

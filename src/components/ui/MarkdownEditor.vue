@@ -127,7 +127,7 @@ onBeforeUnmount(() => observer.disconnect());
         :id="`${id}-write`"
         role="tabpanel"
         :aria-labelledby="`${id}-write-tab`"
-        class="min-w-0 flex-col gap-1.5"
+        class="min-w-0 flex-col gap-2"
         :class="writeClass"
       >
         <slot name="toolbar" />
@@ -158,7 +158,7 @@ onBeforeUnmount(() => observer.disconnect());
         :id="`${id}-preview`"
         role="tabpanel"
         :aria-labelledby="`${id}-preview-tab`"
-        class="min-w-0 flex-col gap-1.5"
+        class="min-w-0 flex-col gap-2"
         :class="previewClass"
       >
         <div class="min-h-40 rounded-row border border-line bg-surface-strong p-4">
