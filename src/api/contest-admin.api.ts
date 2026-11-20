@@ -1,11 +1,8 @@
 import { apiSend } from './typed';
 import type { JsonBodyOf } from './typed';
 
-/** Contest editors' one-off operations: per-problem rejudge and rescore, hand-edited participations, delete. */
+/** Contest editors' one-off operations: per-problem rescore, hand-edited participations, delete. */
 
-export type ProblemRejudgeOptions = JsonBodyOf<'/contests/{key}/problems/{code}/rejudge', 'post'>;
-export const rejudgeContestProblem = (key: string, code: string, body: ProblemRejudgeOptions) =>
-  apiSend('post', '/contests/{key}/problems/{code}/rejudge', { path: { key, code }, body });
 export const rescoreContestProblem = (key: string, code: string) =>
   apiSend('post', '/contests/{key}/problems/{code}/rescore', { path: { key, code } });
 
