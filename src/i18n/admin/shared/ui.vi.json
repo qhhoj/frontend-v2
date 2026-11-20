@@ -140,7 +140,8 @@
     "points_above_problem": "Điểm không được vượt quá điểm của bài.",
     "points_not_partial": "Bài này không có điểm thành phần: chỉ dùng 0 hoặc điểm tối đa.",
     "accepted_needs_full_points": "Kết quả AC cần điểm tối đa.",
-    "problem_deleted": "Bài đã bị xóa."
+    "problem_deleted": "Bài đã bị xóa.",
+    "site_contest_rights": "Cần quyền “Tạo kỳ thi” để đưa kỳ thi ra khỏi mọi tổ chức về trang chính."
   },
   "uploading": "Đang tải lên…",
   "uploadBusy": "Đang tải lên. Hãy chọn lại tệp sau khi xong.",

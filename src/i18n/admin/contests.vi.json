@@ -546,9 +546,7 @@
         "none": "Đã có bài và quy định thí sinh.",
         "noProblems": "Chưa có bài",
         "problemSetup": "Bài {label} chưa xong thiết lập",
-        "open": "Chưa giới hạn thí sinh: ai thấy kỳ thi cũng vào được",
-        "organization": "Chưa chọn tổ chức",
-        "list": "Danh sách thí sinh còn trống"
+        "open": "Chưa giới hạn thí sinh: ai thấy kỳ thi cũng vào được"
       },
       "freeze": "Đóng băng bảng xếp hạng {minutes} phút cuối, từ {time}.",
       "saveFirst": "Lưu trước",
@@ -598,17 +596,57 @@
         "open": "Không giới hạn"
       },
       "notes": {
-        "organization": "Chỉ thành viên các tổ chức đã chọn vào được.",
-        "code": "Ai nhập đúng mã vào thì tham gia được.",
-        "list": "Chỉ những tài khoản trong danh sách vào được.",
-        "open": "Ai thấy kỳ thi cũng vào được."
+        "organization": "Chỉ thành viên các tổ chức đã chọn thấy và vào được kỳ thi.",
+        "code": "Ai cũng thấy kỳ thi; phải nhập đúng mã mới vào thi được.",
+        "list": "Chỉ các tài khoản trong danh sách thấy và vào được kỳ thi.",
+        "open": "Ai cũng thấy kỳ thi; tài khoản nào cũng vào thi được."
       },
       "joined": "Đã vào: {count} thí sinh.",
-      "mixed": "Kỳ thi đang giới hạn bằng nhiều cách cùng lúc ({modes}). Chọn một cách: các cách còn lại sẽ được bỏ khi lưu.",
+      "mixed": "Kỳ thi đang giới hạn bằng nhiều cách cùng lúc ({modes}); thí sinh phải qua tất cả. Chọn một cách nếu muốn bỏ các cách còn lại.",
       "code": {
         "set": "Đặt mã vào",
-        "replace": "Đặt mã mới",
-        "missing": "Nhập mã vào kỳ thi."
+        "replace": "Đặt mã mới"
+      },
+      "gaps": {
+        "organization": "Chưa chọn tổ chức",
+        "list": "Danh sách thí sinh còn trống",
+        "code": "Chưa nhập mã vào"
+      },
+      "changes": {
+        "title": "Khi lưu",
+        "removed": {
+          "organizationNamed": "Bỏ giới hạn tổ chức {names}",
+          "organization": "Bỏ giới hạn theo tổ chức ({count} tổ chức)",
+          "list": "Bỏ danh sách {count} thí sinh",
+          "code": "Bỏ mã vào"
+        },
+        "added": {
+          "organization": "Thêm giới hạn theo tổ chức",
+          "list": "Thêm giới hạn theo danh sách",
+          "code": "Thêm mã vào"
+        }
+      },
+      "refused": "Máy chủ từ chối thay đổi người tham gia",
+      "widen": {
+        "title": "Bỏ giới hạn người tham gia của {key}?",
+        "intro": "Lần lưu này:",
+        "see": {
+          "everyone": "Thấy kỳ thi: mọi người, kể cả khách chưa đăng nhập.",
+          "organization": "Thấy kỳ thi: chỉ thành viên các tổ chức đã chọn.",
+          "list": "Thấy kỳ thi: chỉ các tài khoản trong danh sách.",
+          "both": "Thấy kỳ thi: chỉ thành viên các tổ chức đã chọn có tên trong danh sách."
+        },
+        "join": {
+          "everyone": "Vào thi: mọi tài khoản đã đăng nhập.",
+          "organization": "Vào thi: thành viên các tổ chức đã chọn.",
+          "list": "Vào thi: các tài khoản trong danh sách.",
+          "both": "Vào thi: thành viên các tổ chức đã chọn có tên trong danh sách."
+        },
+        "withCode": "Phải nhập đúng mã vào.",
+        "withoutCode": "Không cần mã vào.",
+        "shown": "Kỳ thi đang hiện: thay đổi có hiệu lực ngay khi lưu.",
+        "hidden": "Kỳ thi đang ẩn: thay đổi có hiệu lực khi bạn hiện kỳ thi.",
+        "confirm": "Bỏ giới hạn và lưu"
       }
     },
     "announcements": {

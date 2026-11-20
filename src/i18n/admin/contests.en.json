@@ -546,9 +546,7 @@
         "none": "Problems and a participants rule are set.",
         "noProblems": "No problems yet",
         "problemSetup": "Problem {label} is not fully set up",
-        "open": "No participants limit: anyone who sees the contest may join",
-        "organization": "No organization chosen",
-        "list": "The participants list is empty"
+        "open": "No participants limit: anyone who sees the contest may join"
       },
       "freeze": "The ranking freezes for the last {minutes} minutes, from {time}.",
       "saveFirst": "Save first",
@@ -598,17 +596,57 @@
         "open": "No limit"
       },
       "notes": {
-        "organization": "Only members of the chosen organizations may join.",
-        "code": "Anyone who enters the access code may join.",
-        "list": "Only the accounts on the list may join.",
-        "open": "Anyone who sees the contest may join."
+        "organization": "Only members of the chosen organizations see the contest and may join.",
+        "code": "Everyone sees the contest; joining needs the access code.",
+        "list": "Only the accounts on the list see the contest and may join.",
+        "open": "Everyone sees the contest; any account may join."
       },
       "joined": "Joined: {count} participants.",
-      "mixed": "The contest limits participants in several ways at once ({modes}). Choose one: the others are removed on save.",
+      "mixed": "The contest limits participants in several ways at once ({modes}); a participant must pass all of them. Choose one to remove the others.",
       "code": {
         "set": "Set the access code",
-        "replace": "Set a new code",
-        "missing": "Enter the contest's access code."
+        "replace": "Set a new code"
+      },
+      "gaps": {
+        "organization": "No organization chosen",
+        "list": "The participants list is empty",
+        "code": "No access code entered"
+      },
+      "changes": {
+        "title": "On save",
+        "removed": {
+          "organizationNamed": "Remove the limit to {names}",
+          "organization": "Remove the organization limit ({count} organizations)",
+          "list": "Remove the list of {count} participants",
+          "code": "Remove the access code"
+        },
+        "added": {
+          "organization": "Add a limit by organization",
+          "list": "Add a limit by list",
+          "code": "Add an access code"
+        }
+      },
+      "refused": "The server refused the participants change",
+      "widen": {
+        "title": "Remove the participants limit of {key}?",
+        "intro": "This save will:",
+        "see": {
+          "everyone": "See the contest: everyone, guests included.",
+          "organization": "See the contest: only members of the chosen organizations.",
+          "list": "See the contest: only the accounts on the list.",
+          "both": "See the contest: only members of the chosen organizations who are on the list."
+        },
+        "join": {
+          "everyone": "Join: every signed-in account.",
+          "organization": "Join: members of the chosen organizations.",
+          "list": "Join: the accounts on the list.",
+          "both": "Join: members of the chosen organizations who are on the list."
+        },
+        "withCode": "The access code is required.",
+        "withoutCode": "No access code is needed.",
+        "shown": "The contest is shown: the change applies as soon as you save.",
+        "hidden": "The contest is hidden: the change applies when you show it.",
+        "confirm": "Remove the limit and save"
       }
     },
     "announcements": {

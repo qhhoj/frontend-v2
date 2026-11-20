@@ -64,10 +64,13 @@ const canChange = computed(() =>
   ),
 );
 
-const gapText = (gap: ContestGap) =>
-  gap.kind === 'problemSetup'
-    ? t(`${KEY}.gaps.problemSetup`, { label: gap.label })
-    : t(`${KEY}.gaps.${gap.kind === 'participants' ? gap.missing : gap.kind}`);
+/** A restriction that is not filled in reads as it does in the participants section. */
+const PARTICIPANT_GAPS = 'admin.contests.workbench.participants.gaps';
+function gapText(gap: ContestGap) {
+  if (gap.kind === 'problemSetup') return t(`${KEY}.gaps.problemSetup`, { label: gap.label });
+  if (gap.kind === 'noProblems') return t(`${KEY}.gaps.noProblems`);
+  return gap.missing === 'open' ? t(`${KEY}.gaps.open`) : t(`${PARTICIPANT_GAPS}.${gap.missing}`);
+}
 const gapTexts = computed(() => (props.gaps ?? []).map(gapText));
 const clockNote = computed(() => {
   const time = (iso: string) => formatDate(iso, 'datetime', locale.locale);

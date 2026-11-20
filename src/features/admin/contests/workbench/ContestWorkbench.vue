@@ -22,6 +22,7 @@ import { isPointsValid } from '../problems/contest-problems';
 import ContestOtherTab from './ContestOtherTab.vue';
 import ContestPlate from './ContestPlate.vue';
 import ContestResultsTab from './ContestResultsTab.vue';
+import ParticipantsWidenDialog from './ParticipantsWidenDialog.vue';
 import SetupInfo from './SetupInfo.vue';
 import SetupParticipants from './SetupParticipants.vue';
 import SetupProblems from './SetupProblems.vue';
@@ -168,8 +169,19 @@ watch(report, async (parts) => {
     problems: () => sections.add('problems'),
   };
   failed.forEach((id) => sectionsOf[id]());
+  if (workbench.participants.refusal.value) sections.add('participants');
   await revealInvalid([...sections]);
   reportBox.value?.scrollIntoView({ block: 'start' });
+});
+
+/** The participants row: every restriction the form has on ("Cả tổ chức + Ai có mã vào"), then what one still lacks. */
+const participantsSummary = computed(() => {
+  const { restrictions, gaps: missing } = workbench.participants;
+  const modes = restrictions.value.length > 0 ? restrictions.value : (['open'] as const);
+  return [
+    modes.map((id) => t(`${KEY}.participants.modes.${id}`)).join(' + '),
+    ...missing.value.map((id) => t(`${KEY}.participants.gaps.${id}`)),
+  ].join(' · ');
 });
 
 const { lengthText } = useContestLength(settings.form);
@@ -190,7 +202,7 @@ const summaries = computed(() => {
     problems: rows.length
       ? t(`${KEY}.problems.total`, { count: rows.length, points })
       : t(`${KEY}.problems.none`),
-    participants: t(`${KEY}.participants.modes.${workbench.participantMode.value}`),
+    participants: participantsSummary.value,
     announcements: t(`${KEY}.announcements.summary`),
     info: t(`${KEY}.info.summary`),
   };
@@ -350,6 +362,7 @@ const tools = computed(() => {
       :note="changedText"
       @discard="discard"
     />
+    <ParticipantsWidenDialog :contest="contest" :workbench="workbench" />
     <AdminLeaveGuard :dirty-count="dirtyCount" />
   </div>
 </template>

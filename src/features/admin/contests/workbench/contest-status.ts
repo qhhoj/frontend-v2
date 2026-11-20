@@ -1,7 +1,8 @@
 import type { EditableContest } from '@/api/types/contest-editing';
 import type { ListStep } from '../../search/problem-setup-marks';
 import { labelFor } from '../problems/contest-problems';
-import { participantGapOf, participantModeOf } from './participants-mode';
+import { activeRestrictions, participantGapsOf } from './participants-mode';
+import type { Restriction } from './participants-mode';
 import { toContestForm } from '../contest-form';
 
 /** The plate's sentence: a hidden contest is "hidden" whatever the clock says; a shown one follows its phase. */
@@ -9,11 +10,14 @@ export type ContestStatus = 'hidden' | 'upcoming' | 'running' | 'ended';
 export const contestStatusOf = (contest: EditableContest): ContestStatus =>
   contest.settings?.isVisible ? contest.phase : 'hidden';
 
-/** One thing the saved contest still lacks. `label`: the problem's label in the contest ("C"). */
+/**
+ * One thing the saved contest still lacks. `label`: the problem's label in the contest ("C"). `missing`: `open` when
+ * nothing restricts who takes part, else a restriction that is set but not filled in (an old contest may have several).
+ */
 export type ContestGap =
   | { kind: 'noProblems' }
   | { kind: 'problemSetup'; label: string; code: string }
-  | { kind: 'participants'; missing: 'open' | 'organization' | 'list' };
+  | { kind: 'participants'; missing: 'open' | Restriction };
 
 /**
  * What the saved contest still lacks, in the order a teacher fixes it: no problem at all, a problem whose setup is not
@@ -37,9 +41,10 @@ export function contestGapsOf(
       });
   });
   const form = toContestForm(contest);
-  const mode = participantModeOf(form, contest.requiresAccessCode);
-  const missing = mode === 'open' ? 'open' : participantGapOf(form, contest.requiresAccessCode);
-  if (missing === 'open' || missing === 'organization' || missing === 'list')
+  const hasCode = contest.requiresAccessCode;
+  if (activeRestrictions(form, hasCode).length === 0)
+    gaps.push({ kind: 'participants', missing: 'open' });
+  for (const missing of participantGapsOf(form, null, hasCode))
     gaps.push({ kind: 'participants', missing });
   return gaps;
 }
