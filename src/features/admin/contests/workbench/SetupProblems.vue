@@ -137,12 +137,9 @@ const total = computed(() =>
         <span class="flex min-w-0 flex-col">
           <span class="font-semibold">{{ row.name }}</span>
           <span data-testid="code" class="font-mono text-small text-muted">{{ row.code }}</span>
-          <span
-            v-if="problems.issueFor(indexOf(row))"
-            role="alert"
-            class="text-small text-negative"
-            >{{ problems.issueFor(indexOf(row)) }}</span
-          >
+          <Notice v-if="problems.issueFor(indexOf(row))" tone="danger" inline>{{
+            problems.issueFor(indexOf(row))
+          }}</Notice>
         </span>
       </template>
       <template #cell-setup="{ row }">
