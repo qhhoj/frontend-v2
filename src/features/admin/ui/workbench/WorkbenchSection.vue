@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useId } from 'vue';
-import type { RouteLocationRaw } from 'vue-router';
 import AppButton from '@/components/ui/AppButton.vue';
 import FoldPanel from '@/components/ui/FoldPanel.vue';
 import StatusMark from '@/components/ui/StatusMark.vue';
@@ -9,8 +8,8 @@ import { sectionDomId } from './section-dom-id';
 /**
  * One section of a workbench (the problem's and the contest's): a one-line row (number and title, what the section holds now, "Sửa") that opens the
  * section's form below it. The whole row is the control. The form stays in the DOM while closed, so its edits are kept.
- * The summary shows while the section is closed: once open, the form says the same. With `to` the row is a link to
- * where the section's work is done (the trial run on the problem page) and has no form; `actionLabel` names the link.
+ * The summary shows while the section is closed: once open, the form says the same. `actionLabel` replaces the row's
+ * "Sửa" where the section is not a form to edit (the trial run).
  */
 const open = defineModel<boolean>('open', { default: false });
 defineProps<{
@@ -21,7 +20,6 @@ defineProps<{
   summary: string;
   /** Unsaved changes inside, shown as a mark while the section is closed. */
   changeCount?: number;
-  to?: RouteLocationRaw;
   actionLabel?: string;
 }>();
 const panelId = useId();
@@ -33,9 +31,8 @@ const panelId = useId();
       tone="plain"
       data-section-toggle
       class="flex min-h-(--qh-row) w-full items-center gap-3 rounded-row text-left hover:bg-surface-strong"
-      :to="to"
-      :aria-expanded="to ? undefined : open"
-      :aria-controls="to ? undefined : panelId"
+      :aria-expanded="open"
+      :aria-controls="panelId"
       @click="open = !open"
     >
       <span class="shrink-0 text-body font-semibold">{{ index }} · {{ title }}</span>
@@ -49,7 +46,7 @@ const panelId = useId();
         actionLabel ?? $t(`admin.problems.workbench.sections.${open ? 'collapse' : 'edit'}`)
       }}</span>
     </AppButton>
-    <FoldPanel v-if="!to" :id="panelId" :open="open">
+    <FoldPanel :id="panelId" :open="open">
       <div class="flex flex-col gap-4 pt-2 pb-6"><slot /></div>
     </FoldPanel>
   </section>

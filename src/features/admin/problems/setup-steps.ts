@@ -7,12 +7,17 @@ export type SetupStepId = 'info' | 'statement' | 'tests' | 'scoring' | 'trial' |
 export interface SetupStep {
   id: SetupStepId;
   isDone: boolean;
-  /** Where the step is done: the workbench (an old tab address opens its section) or the problem page. */
+  /** Where the step is done: the workbench (an old tab address opens its section; the general one opens the next step). */
   routeName: string;
 }
 
-/** The trial step: the viewer has submitted to the problem. The one rule for the checklist and the problem list's mark. */
-export const isTrialDone = (viewerStatus: EditableProblem['viewerStatus']) => viewerStatus !== null;
+/**
+ * The trial step: the viewer has an accepted submission to the problem (`solved`: an AC that earned every test's points).
+ * The one rule for the plate's step, the trial section's summary, the publish warning and the lists' setup mark. The API
+ * cannot say whether that submission was judged on the tests as they are now, nor whether another editor has one.
+ */
+export const isTrialDone = (viewerStatus: EditableProblem['viewerStatus']) =>
+  viewerStatus === 'solved';
 
 const isWritten = (text: string | undefined) => (text ?? '').trim() !== '';
 
@@ -26,8 +31,8 @@ const hasStatement = (problem: EditableProblem) =>
   (problem.editor?.translations ?? []).some((translation) => isWritten(translation.description));
 
 /**
- * Mock-up 3C: the manual setup of a new problem, in order — information, statement, tests, checker and points, a trial
- * submission, publishing. `cases` is null while the test data is unknown (counted as not done).
+ * Mock-up 3C: the manual setup of a new problem, in order — information, statement, tests, checker and points, an
+ * accepted trial run, publishing. `cases` is null while the test data is unknown (counted as not done).
  */
 export function setupSteps(
   problem: EditableProblem,
@@ -45,7 +50,7 @@ export function setupSteps(
       isDone: isExternal || (hasCases && scoredCasePoints(cases ?? []) > 0),
       routeName: 'admin-problemData',
     },
-    { id: 'trial', isDone: isTrialDone(problem.viewerStatus), routeName: 'problem' },
+    { id: 'trial', isDone: isTrialDone(problem.viewerStatus), routeName: 'admin-problemGeneral' },
     { id: 'publish', isDone: problem.isPublic, routeName: 'admin-problemGeneral' },
   ];
 }

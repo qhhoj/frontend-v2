@@ -252,7 +252,8 @@
         "output": "Tệp output",
         "points": "Điểm",
         "test": "Test",
-        "actions": "Thao tác"
+        "actions": "Thao tác",
+        "trial": "Lời giải mẫu"
       },
       "batchLabel": "Nhóm {n}",
       "pretest": "Pretest",
@@ -296,6 +297,14 @@
       "rowName": {
         "test": "test {n}",
         "group": "nhóm {n}"
+      },
+      "trial": {
+        "none": "chưa chạy",
+        "waiting": "đang chờ",
+        "skipped": "không chấm",
+        "stale": "Kết quả của test cũ",
+        "of": "Lời giải mẫu",
+        "staleNote": "Cột “Lời giải mẫu” là kết quả trước khi test hoặc cách chấm đổi. Chạy lại ở mục 4."
       }
     },
     "errors": {
@@ -561,8 +570,8 @@
         "missing": "Test chưa có điểm"
       },
       "trial": {
-        "done": "Đã nộp thử",
-        "missing": "Chưa nộp thử"
+        "done": "Lời giải mẫu đã được chấp nhận",
+        "missing": "Chưa có lời giải mẫu được chấp nhận"
       }
     },
     "publish": {
@@ -604,7 +613,7 @@
         "public": "Chuyển về riêng tư bất cứ lúc nào; bài nộp cũ vẫn giữ.",
         "loading": "Đang đọc dữ liệu test…",
         "ready": "Đã đủ các bước. Công khai khi bạn sẵn sàng.",
-        "trial": "Còn một bước: nộp thử lời giải mẫu để chắc test và cách chấm đúng.",
+        "trial": "Còn một bước: chạy thử lời giải mẫu để chắc test và cách chấm đúng.",
         "todo": "Còn {count} bước. Trước hết: {missing}.",
         "unread": "Không đọc được dữ liệu test. Mở mục 3 để thử lại."
       },
@@ -618,7 +627,7 @@
       "next": {
         "statement": "Viết đề bài",
         "tests": "Thêm test và điểm",
-        "trial": "Nộp thử lời giải mẫu"
+        "trial": "Chạy thử lời giải mẫu"
       },
       "publishBlocked": "Chưa công khai được: {missing}",
       "saveFirst": "Lưu trước"
@@ -660,10 +669,35 @@
       "totalOff": "Tổng điểm của test khác điểm của bài."
     },
     "trial": {
-      "todo": "Chưa nộp thử",
-      "done": "Đã nộp thử",
-      "later": "chạy thử ngay tại trang này sẽ có ở bản sau",
-      "open": "Nộp thử ở trang bài"
+      "todo": "Chưa có lời giải mẫu được chấp nhận",
+      "done": "Lời giải mẫu đã được chấp nhận",
+      "open": "Chạy thử",
+      "label": "Kết quả chạy thử",
+      "idle": {
+        "label": "Lời giải mẫu",
+        "word": "Chưa chạy",
+        "note": "Kết quả từng test sẽ hiện ở đây và trong bảng test ở mục 3.",
+        "tests": "Test",
+        "squares": "Các test đang chờ lần chạy đầu",
+        "waiting": "Test {number}: chưa chạy"
+      },
+      "panel": "Lời giải mẫu",
+      "run": "Chạy lời giải này",
+      "hint": "Chạy cả lời giải sai hoặc chậm để chắc test bắt được.",
+      "blocked": {
+        "unsaved": "Lưu trước: lần chạy chấm theo bản đã lưu.",
+        "noTests": "Chưa có test đã lưu. Thêm test ở mục 3 rồi lưu."
+      },
+      "source": {
+        "page": "Lần chạy vừa rồi trên trang này",
+        "earlier": "Bài nộp gần nhất của bạn cho bài này"
+      },
+      "stale": "Test hoặc cách chấm đã đổi sau lần chạy này. Chạy lại để có kết quả mới.",
+      "full": "Xem bài nộp đầy đủ",
+      "runs": {
+        "title": "Các lần chạy thử",
+        "empty": "Chưa có lần chạy nào."
+      }
     },
     "other": {
       "summary": "Chấm ở trang ngoài, Polygon, gói bài, tệp nguồn, xóa bài"

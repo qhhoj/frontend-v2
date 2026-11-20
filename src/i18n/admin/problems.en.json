@@ -252,7 +252,8 @@
         "output": "Output file",
         "points": "Points",
         "test": "Test",
-        "actions": "Actions"
+        "actions": "Actions",
+        "trial": "Model solution"
       },
       "batchLabel": "Group {n}",
       "pretest": "Pretest",
@@ -296,6 +297,14 @@
       "rowName": {
         "test": "test {n}",
         "group": "group {n}"
+      },
+      "trial": {
+        "none": "not run",
+        "waiting": "waiting",
+        "skipped": "not judged",
+        "stale": "Result on the old tests",
+        "of": "Model solution",
+        "staleNote": "The \"Model solution\" column is from before the tests or the judging changed. Run again in section 4."
       }
     },
     "errors": {
@@ -561,8 +570,8 @@
         "missing": "Tests score nothing"
       },
       "trial": {
-        "done": "Tried",
-        "missing": "Not tried yet"
+        "done": "A model solution was accepted",
+        "missing": "No accepted model solution yet"
       }
     },
     "publish": {
@@ -604,7 +613,7 @@
         "public": "You can make it private at any time; past submissions are kept.",
         "loading": "Reading the test data…",
         "ready": "Every step is done. Publish when you are ready.",
-        "trial": "One step left: submit a model solution to check the tests and the judging.",
+        "trial": "One step left: run a model solution to check the tests and the judging.",
         "todo": "{count} steps left. First: {missing}.",
         "unread": "The test data could not be read. Open section 3 to retry."
       },
@@ -618,7 +627,7 @@
       "next": {
         "statement": "Write the statement",
         "tests": "Add tests and points",
-        "trial": "Submit a model solution"
+        "trial": "Run a model solution"
       },
       "publishBlocked": "Cannot publish yet: {missing}",
       "saveFirst": "Save first"
@@ -660,10 +669,35 @@
       "totalOff": "The tests' total differs from the problem's points."
     },
     "trial": {
-      "todo": "No trial submission yet",
-      "done": "Trial submission made",
-      "later": "running it on this page comes in a later version",
-      "open": "Submit on the problem page"
+      "todo": "No accepted model solution yet",
+      "done": "A model solution was accepted",
+      "open": "Run",
+      "label": "Trial run result",
+      "idle": {
+        "label": "Model solution",
+        "word": "Not run yet",
+        "note": "The result of each test shows here and in the test table of section 3.",
+        "tests": "Tests",
+        "squares": "Tests waiting for the first run",
+        "waiting": "Test {number}: not run yet"
+      },
+      "panel": "Model solution",
+      "run": "Run this solution",
+      "hint": "Also run a wrong or slow solution to make sure the tests catch it.",
+      "blocked": {
+        "unsaved": "Save first: a run is judged on what is saved.",
+        "noTests": "No saved tests yet. Add tests in section 3 and save."
+      },
+      "source": {
+        "page": "The last run on this page",
+        "earlier": "Your newest submission to this problem"
+      },
+      "stale": "The tests or the judging changed after this run. Run again for a current result.",
+      "full": "Open the full submission",
+      "runs": {
+        "title": "Trial runs",
+        "empty": "No runs yet."
+      }
     },
     "other": {
       "summary": "External judging, Polygon, package, source files, delete"

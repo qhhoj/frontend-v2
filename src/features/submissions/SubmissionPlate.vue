@@ -58,6 +58,8 @@ const props = defineProps<{
   currentTestcase: number;
   /** A judged contest submission: the contest points lead, the problem's score is the line under them. */
   contestScore?: { points: string; max: string } | null;
+  /** The page has no tests table under the plate (the problem workbench): a square opens nothing. */
+  withoutTestRows?: boolean;
 }>();
 const locale = useLocaleStore();
 const format = (points: number) => formatPoints(points, locale.locale, SCORE_FRACTION_DIGITS);
@@ -140,7 +142,9 @@ const isWideTests = computed(() => (tests.value?.squares.length ?? 0) > INLINE_S
  * `TestSquares` draws plain items, so the click is read here from its list: the item's place is the square's.
  */
 const router = useRouter();
-const hasTestRows = computed(() => tests.value?.unit === 'test' && props.submission.cases !== null);
+const hasTestRows = computed(
+  () => !props.withoutTestRows && tests.value?.unit === 'test' && props.submission.cases !== null,
+);
 function openTestRow(event: MouseEvent) {
   const item = (event.target as Element).closest('li');
   const square = item?.parentElement

@@ -1,4 +1,4 @@
-import { FINISHED_STATUSES } from '@/api/types/submissions';
+import { FINISHED_STATUSES, IN_PROGRESS_STATUSES } from '@/api/types/submissions';
 import type { CaseStatus, SubmissionResult, SubmissionStatus } from '@/api/types/submissions';
 
 export type VerdictTone = 'ac' | 'pc' | 'wa' | 'tle' | 'rte' | 'ce' | 'pending';
@@ -148,6 +148,18 @@ export function submissionVerdictOf(row: {
     ? verdictOfCode(PARTIAL_CODE)
     : verdict;
 }
+
+/**
+ * The verdict of a submission followed over its stream: the stream's status leads only while the grading goes on; a
+ * final status shows the stored row, which carries the result (PC when partial).
+ */
+export const followedVerdictOf = (
+  streamStatus: SubmissionStatus | null,
+  row: Parameters<typeof submissionVerdictOf>[0],
+): Verdict =>
+  streamStatus !== null && IN_PROGRESS_STATUSES.includes(streamStatus)
+    ? verdictOf({ status: streamStatus, result: null })
+    : submissionVerdictOf(row);
 
 /** The verdict of one test (or subtask summary): its status, with a partial AC shown as PC. */
 export function caseVerdictOf(testCase: {
