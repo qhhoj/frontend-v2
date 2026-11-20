@@ -1198,8 +1198,8 @@
     "tabs": {
       "statement": "Đề bài",
       "editorial": "Lời giải",
-      "submissions": "Bài nộp",
-      "mine": "Của tôi",
+      "submissions": "Tất cả bài nộp",
+      "mine": "Bài nộp của tôi",
       "best": "Tốt nhất"
     },
     "menu": {
@@ -1212,7 +1212,14 @@
     "limits": {
       "time": "Thời gian",
       "memory": "Bộ nhớ",
-      "points": "Điểm"
+      "points": "Điểm",
+      "title": "Giới hạn",
+      "inputFile": "Tệp vào",
+      "outputFile": "Tệp ra",
+      "fileWarning": "Bài này đọc và ghi bằng tệp, không dùng bàn phím và màn hình.",
+      "solvers": "{count} người",
+      "perLanguage": "Giới hạn theo ngôn ngữ",
+      "judgedOn": "Chấm trên"
     },
     "noStatement": {
       "title": "Chưa có đề bài",
@@ -1236,11 +1243,7 @@
     "rail": {
       "railLabel": "Thông tin bài",
       "facts": {
-        "io": "Nhập/xuất",
-        "input": "Nhập",
-        "output": "Xuất",
         "status": "Trạng thái",
-        "untried": "Chưa thử",
         "contestPoints": "Điểm kỳ thi"
       },
       "mine": {
@@ -1254,12 +1257,11 @@
       }
     },
     "pdfRender": "Tải PDF",
-    "externalJudge": "Chấm trên {oj}",
     "strip": {
       "partial": "từng phần",
-      "acRate": "Tỉ lệ AC",
-      "solvers": "Người giải"
-    }
+      "acRate": "Tỉ lệ AC"
+    },
+    "contestLabel": "Bài {label}"
   },
   "problems": {
     "title": "Bài tập",
@@ -1319,7 +1321,6 @@
       "solvedOnly": "{solved} bài"
     },
     "solvedFilter": {
-      "prefix": "Trạng thái",
       "label": "Lọc theo bài đã giải",
       "any": "Tất cả",
       "unsolved": "Chưa giải",

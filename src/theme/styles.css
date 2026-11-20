@@ -881,77 +881,95 @@
   }
 }
 
-/* Problem statement typography (StatementBody). Scoped to .statement so other user content keeps its own rhythm. */
+/* Problem statement typography (StatementBody; redesign "Sơn mài"). Scoped to .statement so other user content keeps its own
+   rhythm. Long reading: the 16 px step on its own line height (--text-long), a line no longer than --qh-measure. */
 .user-content.statement {
+  max-width: var(--qh-measure);
   font-family: var(--qh-font-body);
-  font-size: 14.5px;
-  line-height: 1.7;
+  font-size: var(--text-long);
+  line-height: var(--text-long--line-height);
+  /* Legacy statements use h1-h4 inconsistently for the same sections, so all of them look alike: the heading step, on a rule. */
   & h1,
   & h2,
   & h3,
   & h4 {
+    margin-block: 1.5rem 0.5rem;
+    padding-bottom: 0.25rem;
     font-family: var(--qh-font-display);
-    font-weight: 700;
+    font-size: var(--text-heading);
+    font-weight: var(--qh-display-weight);
+    line-height: var(--text-heading--line-height);
     color: var(--qh-text);
-    margin-block: 1.25em 0.4em;
-  }
-  /* Legacy statements use h2-h4 inconsistently for the same sections, so all of them look alike. */
-  & h1,
-  & h2,
-  & h3,
-  & h4 {
-    padding-bottom: 0.25em;
-    font-size: var(--text-section);
     border-bottom: 1px solid var(--qh-line);
   }
   & h5,
   & h6 {
-    margin-block: 1em 0.4em;
-    font-size: 14.5px;
+    margin-block: 1rem 0.5rem;
+    font-size: var(--text-long);
     font-weight: 700;
     color: var(--qh-text);
   }
   & > :first-child {
     margin-top: 0;
   }
+  /* A wide table scrolls inside its own box, never the page. */
+  & table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    font-size: var(--text-body);
+  }
+  & img {
+    max-width: 100%;
+    height: auto;
+  }
   /* Maths stays KaTeX (Computer Modern); it is a touch larger than the Be Vietnam Pro text beside it. */
   & .katex {
-    font-size: 1.12em;
+    font-size: 1.06em;
   }
   & .katex-display > .katex {
-    font-size: 1.2em;
+    font-size: 1.12em;
   }
 }
 
-/* Sample blocks in a statement are one rounded box: the copy bar is its top edge, the pre its body. The bar's padding keeps the focus ring (2px + 2px offset) inside the clipping user-content box. */
+/* A code or sample block in a statement: a bordered box that scrolls sideways inside itself. */
 .user-content.statement pre {
-  padding: 0.75rem 1rem;
+  padding: 0.75rem;
   overflow-x: auto;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: var(--text-meta);
+  line-height: var(--qh-leading);
   tab-size: 4;
   font-variant-ligatures: none;
-  background-color: var(--qh-surface-strong);
+  background-color: var(--qh-surface);
   border: 1px solid var(--qh-line);
-  border-radius: var(--qh-radius-cell);
+  border-radius: var(--qh-radius-control);
 }
-/* Input and output samples are paired: side by side (equal height) where each half has room for 18rem, stacked below that and whenever the submit pane is open (the page sets --sample-min to the full width then). */
+/* A titled sample ("Ví dụ vào" + its block) is one box: the title row with the copy button is its header strip, the block its
+   body. Input and output are paired: side by side (equal height) where each half has room for 16rem, stacked below that. */
 .user-content.statement .sample-pair {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--sample-min, 18rem)), 1fr));
-  gap: 0 1rem;
-  margin-block: 0.75em;
-  & > .sample {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-  /* Grid cells stretch, so the box fills what is left under the title row: both halves end level. */
-  & > .sample > pre {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 0.75rem;
+  margin-block: 0.75rem;
+}
+.user-content.statement .sample {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-block: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--qh-line);
+  border-radius: var(--qh-radius-control);
+  /* Grid cells stretch, so the block fills what is left under the title row: both halves end level. */
+  & > pre {
     flex: 1;
+    margin-block: 0;
+    border: 0;
+    border-radius: 0;
   }
 }
-.user-content.statement .sample > pre {
+.user-content.statement .sample-pair > .sample {
   margin-block: 0;
 }
 
@@ -969,56 +987,48 @@
 .user-content.statement .copy-bar + pre {
   display: grid;
   align-content: center;
-  min-height: 2.75rem;
+  min-height: var(--qh-row);
   margin-top: 0;
-  padding-right: 6.5rem;
+  padding-right: 7rem;
 }
 
-/* A sample's title row ("Ví dụ vào") is a small muted label with its copy button: one line, no bar above the box. Wins over the section heading rules by specificity. */
+/* A sample's title row ("Ví dụ vào"): the header strip of its box, a small label with the copy button at the right. Wins over the section heading rules by specificity. */
 .user-content.statement .sample-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  min-height: 1.75rem;
-  margin-block: 1em 0.4em;
-  padding-bottom: 0;
+  margin-block: 0;
+  padding: 0.25rem 0.25rem 0.25rem 0.75rem;
   font-family: var(--qh-font-body);
-  font-size: 13px;
+  font-size: var(--text-small);
   font-weight: 600;
-  color: var(--qh-text-muted);
+  line-height: var(--qh-leading);
+  color: var(--qh-text-secondary);
+  background-color: var(--qh-surface-strong);
   border-bottom: 0;
 }
 @utility copy-bar-inline {
   display: flex;
 }
 
-/* The copy button itself. */
-/* Compact (28px) so it fits a title row or a one-line block; ::before widens the mouse target; on touch the pill is 44px. */
+/* The copy button itself: a small secondary control (32 px; 44 px on touch). */
 @utility copy-block {
-  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  height: 1.75rem;
-  padding-inline: 0.6rem;
+  gap: 0.5rem;
+  min-height: var(--qh-control-sm);
+  padding-inline: 0.75rem;
   font: inherit;
-  font-size: 12px;
-  font-weight: 400;
+  font-size: var(--text-small);
+  font-weight: 600;
   line-height: 1;
   color: var(--qh-text);
-  background-color: var(--qh-surface-solid);
-  border: 1px solid var(--qh-line-strong);
-  border-radius: var(--qh-radius-pill);
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -0.5rem -0.25rem;
-  }
-  /* Touch: the pill itself is the 44 px target (the standard's touch rule), not only its ::before. */
-  @media (pointer: coarse), (max-width: 40rem) {
-    min-height: 2.75rem;
-    padding-inline: 0.9rem;
+  background-color: var(--qh-surface);
+  border: 1px solid var(--qh-line-control);
+  border-radius: var(--qh-radius-control);
+  &:hover {
+    background-color: var(--qh-surface-hover);
   }
 }
 @utility copy-icon {

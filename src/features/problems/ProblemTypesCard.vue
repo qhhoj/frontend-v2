@@ -6,18 +6,18 @@ import Disclosure from '@/components/ui/Disclosure.vue';
 import { UNCATEGORIZED_TYPE_NAME, problemTypeLabel } from './problem-type-label';
 
 /**
- * The problem's types, behind a hairline-topped disclosure row (open by default, so a reader who wants no hint can close it). The catch-all type
- * says nothing (the header already shows the group): with named types only, the card is left out when there are none.
+ * The problem's types, a folded row of the side panel: a type is a hint at the solution, so it shows only when asked. The
+ * catch-all type says nothing: with named types only, the row is left out when there are none.
  */
 const props = defineProps<{ problem: ProblemDetail }>();
-const typesShown = ref(true);
+const typesShown = ref(false);
 const types = computed(() =>
   props.problem.types.filter((type) => type.name !== UNCATEGORIZED_TYPE_NAME),
 );
 </script>
 
 <template>
-  <div v-if="types.length" class="border-t border-line" data-testid="problem-types">
+  <div v-if="types.length" data-testid="problem-types">
     <Disclosure
       v-model:open="typesShown"
       :label="$t('problems.columns.types')"

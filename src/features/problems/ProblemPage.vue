@@ -52,7 +52,7 @@ const isNotFound = computed(
 
 usePageTitle(() => (isNotFound.value ? translate('pages.notFound') : problem.value?.name));
 
-/** The submit panel is open beside the statement: the page column widens to fit both. */
+/** The side panel stands beside the statement: the contest's problem list starts folded, so the statement keeps its width. */
 const panelOpen = ref(false);
 const { isCollapsed: railCollapsed, toggle: toggleRail } = useProblemRailCollapse(panelOpen);
 const layout = computed(
@@ -84,6 +84,11 @@ const linkTo = (name: string, query: Record<string, string> = {}) => ({
 /** Page tabs, each a link: statement and editorial are the problem route (`?tab=`), the rest are its child routes. */
 const tabs = computed<ProblemTab[]>(() => [
   { id: DEFAULT_TAB, labelKey: 'problem.tabs.statement', to: linkTo('problem') },
+  ...(isSignedIn.value
+    ? [{ id: 'mine', labelKey: 'problem.tabs.mine', to: linkTo('problem-mine') }]
+    : []),
+  { id: 'submissions', labelKey: 'problem.tabs.submissions', to: linkTo('problem-submissions') },
+  { id: 'best', labelKey: 'problem.tabs.best', to: linkTo('problem-best') },
   ...(problem.value?.hasEditorial && !editorialGone.value
     ? [
         {
@@ -93,11 +98,6 @@ const tabs = computed<ProblemTab[]>(() => [
         },
       ]
     : []),
-  { id: 'submissions', labelKey: 'problem.tabs.submissions', to: linkTo('problem-submissions') },
-  ...(isSignedIn.value
-    ? [{ id: 'mine', labelKey: 'problem.tabs.mine', to: linkTo('problem-mine') }]
-    : []),
-  { id: 'best', labelKey: 'problem.tabs.best', to: linkTo('problem-best') },
 ]);
 const requestedTab = computed(() => (typeof route.query.tab === 'string' ? route.query.tab : null));
 const isStatementRoute = computed(() => route.name === 'problem');
@@ -132,9 +132,7 @@ watch(
               ? 'lg:grid-cols-[3rem_minmax(0,1fr)]'
               : 'lg:grid-cols-[var(--qh-rail)_minmax(0,1fr)]',
           ]
-        : panelOpen
-          ? '[--page-width:var(--page-split)] [--sample-min:100%]'
-          : '[--page-width:var(--page-wide)]',
+        : '[--page-width:var(--page-wide)]',
     ]"
   >
     <ContestProblemSwitcher
@@ -149,9 +147,7 @@ watch(
     <div class="flex min-w-0 flex-col gap-5">
       <QueryState :loading="isPending" :error="error" @retry="refetch()">
         <template #skeleton>
-          <div :class="layout.grid">
-            <StatementSkeleton header :class="layout.left" />
-          </div>
+          <StatementSkeleton header />
         </template>
         <ProblemContent
           v-if="problem"

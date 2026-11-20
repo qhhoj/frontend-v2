@@ -11,29 +11,29 @@ import ProblemArchivedNotice from '@/features/organizations/problems/ProblemArch
 import { useMediaQuery } from '@/lib/use-media-query';
 import { useSessionStore } from '@/stores/session.store';
 import EditorialTab from './EditorialTab.vue';
-import PdfLink from './PdfLink.vue';
 import NoStatement from './NoStatement.vue';
 import PdfStatement from './PdfStatement.vue';
 import ProblemHeader from './ProblemHeader.vue';
-import ProblemMySubmissions from './ProblemMySubmissions.vue';
 import StatementBody from './StatementBody.vue';
-import ProblemTypesCard from './ProblemTypesCard.vue';
 import StatementNote from './StatementNote.vue';
 import SubmitOpenButton from './SubmitOpenButton.vue';
+import ProblemSidePanel from './ProblemSidePanel.vue';
 import SubmitPane from './SubmitPane.vue';
 import SubmitSignInButton from './SubmitSignInButton.vue';
 import { useVerdictToastTracking } from '@/features/submissions/verdict-toast/use-toast-tracking';
 import { hasNoStatement } from './statement-presence';
 import type { ProblemLayout } from './problem-layout';
 import type { ProblemTab } from './problem-tab';
-import ProblemMoreMenu from './ProblemMoreMenu.vue';
 import { useScoreScale } from './use-contest-problem';
 import { useSubmitForm } from './use-submit-form';
 
 const DEFAULT_TAB = 'statement';
 /**
- * A loaded problem (Workbench split): left the header on the page background (facts in its meta line, tabs) and the statement without a card, then links, types and comments; right the submit pane once the viewer opens it from the header. The page keys it by code, so another problem never inherits the typed
- * code, pick or file.
+ * A loaded problem (redesign "Sơn mài"): the header on the page background (eyebrow, title, tabs), then two columns: the
+ * statement capped at the reading measure with the in-place editor and the folded comments under it, and the sticky side
+ * panel (the primary "Nộp bài", limits, my submissions, links). The editor opens only when the viewer asks. A submission
+ * tab has no panel (its table takes the width): its "Nộp bài" is in the header and the editor opens above the table.
+ * The page keys this by code, so another problem never inherits the typed code, pick or file.
  */
 const props = defineProps<{
   problem: ProblemDetail;
@@ -53,12 +53,9 @@ const route = useRoute();
 const session = useSessionStore();
 const isSignedIn = computed(() => session.status === 'authenticated');
 const usesSheet = useMediaQuery(() => props.layout.stacked);
-/** The pane and the sheet start closed, so the statement is what the viewer sees first; the header button opens them. */
+/** The editor and the sheet start closed, so the statement is what the viewer sees first; the panel's button opens them. */
 const submitOpen = ref(false);
-/** The pane takes a column beside the statement; the page widens its column for it. */
-const paneIsOpen = computed(() => isSignedIn.value && !usesSheet.value && submitOpen.value);
-watch(paneIsOpen, (isOpen) => emit('panel', isOpen), { immediate: true });
-/** The pane and the facts strip stick under whatever bar stays at the top: the impersonation banner, else the contest bar. */
+/** The side panel sticks under whatever bar stays at the top: the impersonation banner, else the contest bar. */
 const IMPERSONATION_BANNER_HEIGHT = '3.5rem';
 const stickyTop = computed(() => ({
   '--pane-top': session.impersonatorId
@@ -101,98 +98,76 @@ const tabItems = computed(() =>
 );
 /** The statement and the editorial are the frame's own panels; the submission tabs hand the space to the child route. */
 const isFramePanel = computed(() => props.tab === DEFAULT_TAB || props.tab === 'editorial');
+/** The side panel stands beside the statement: the contest's problem list folds to leave the statement its width. */
+const hasPanelBeside = computed(() => isFramePanel.value && !usesSheet.value);
+watch(hasPanelBeside, (isBeside) => emit('panel', isBeside), { immediate: true });
 </script>
 
 <template>
   <ProblemArchivedNotice :code="problem.code" :organization-ids="problem.organizations" />
-  <div :class="[layout.grid, paneIsOpen ? layout.columns.editor : '']" :style="stickyTop">
-    <!-- The left column: the header on the page background (sticky facts strip, tabs), then the statement card (statement tab only;
-         v-show keeps the tab panel the tabs point to). -->
-    <div :class="['min-w-0', layout.left]">
-      <ProblemHeader
-        :problem="problem"
-        :section="tab === 'editorial' ? 'editorial' : 'statement'"
-        :is-signed-in="isSignedIn"
-        :contest="contest"
-      >
-        <template #actions>
-          <!-- Wherever the bottom sheet is used its bar is the one submit entry (it shows for anonymous viewers too). -->
-          <PdfLink v-if="!problem.pdfStatementUrl" :problem="problem" icon-only />
-          <ProblemMoreMenu :problem="problem" :is-signed-in="isSignedIn" />
-          <div v-if="isSignedIn" :class="layout.hideWhenSheet">
-            <SubmitOpenButton
-              :form="submitForm"
-              :open="submitOpen && !usesSheet"
-              :show-result="!usesSheet"
-              @open="submitOpen = true"
-            />
-          </div>
-          <div v-else data-testid="submit-sign-in" :class="layout.hideWhenSheet">
-            <SubmitSignInButton />
-          </div>
-        </template>
-        <Tabs :items="tabItems" :label="$t('problem.tabsLabel')" overflow="scroll" />
-      </ProblemHeader>
-      <div v-show="tab === DEFAULT_TAB" data-testid="statement-card" class="mt-4">
-        <div :hidden="tab !== DEFAULT_TAB">
-          <template v-if="tab === DEFAULT_TAB">
-            <StatementNote v-if="!problem.translated && !problem.pdfStatementUrl" class="mt-4" />
-            <PdfStatement
-              v-if="problem.pdfStatementUrl"
-              :problem="problem"
-              :url="problem.pdfStatementUrl"
-              :untranslated="!problem.translated"
-              class="mt-4 mb-6 last:mb-0"
-            />
-            <NoStatement
-              v-if="hasNoStatement(problem)"
-              :code="problem.code"
-              :can-edit="problem.canEdit"
-              class="mt-4"
-            />
-            <StatementBody v-else :html="problem.descriptionHtml" class="mt-4" />
-            <p v-if="problem.authors.length" class="mt-6 text-sm text-muted">
-              {{ $t('problem.authors') }}
-              <template v-for="(author, index) in problem.authors" :key="author.id"
-                ><template v-if="index">, </template
-                ><UserName :username="author.username" :rating="author.rating"
-              /></template>
-            </p>
-          </template>
-        </div>
-      </div>
-      <!-- The submission tabs: the child route's list or ranking, under the same header. -->
-      <RouterView v-if="!isFramePanel" />
-    </div>
-    <!-- Keyed by code: another problem never inherits the typed code, pick or file. -->
+  <ProblemHeader :problem="problem" :contest="contest">
+    <!-- A submission tab has no side panel: the submit entry sits in its header (the sheet's bar where there is one). -->
+    <template v-if="!isFramePanel && !usesSheet" #actions>
+      <SubmitOpenButton
+        v-if="isSignedIn"
+        :form="submitForm"
+        :open="submitOpen"
+        :show-result="false"
+        @open="submitOpen = true"
+      />
+      <div v-else data-testid="submit-sign-in"><SubmitSignInButton /></div>
+    </template>
+    <Tabs :items="tabItems" :label="$t('problem.tabsLabel')" overflow="scroll" />
+  </ProblemHeader>
+  <!-- The submission tabs: the editor (once opened) above the child route's list or ranking, under the same header. -->
+  <div v-if="!isFramePanel" class="flex min-w-0 flex-col gap-6">
     <SubmitPane
-      :key="problem.code"
       v-model:open="submitOpen"
       :problem="problem"
       :form="submitForm"
       :uses-sheet="usesSheet"
       :is-signed-in="isSignedIn"
-      :place-class="layout.pane"
-      :scale="scoreScale"
     />
-    <div v-if="isFramePanel" :class="['@container flex min-w-0 flex-col gap-5', layout.left]">
-      <div v-if="hasEditorial" :hidden="tab !== 'editorial'">
-        <!-- Mounted only while selected, so the editorial request is lazy. -->
-        <EditorialTab v-if="tab === 'editorial'" :code="problem.code" @gone="$emit('gone')" />
-      </div>
-      <aside
-        data-testid="problem-rail"
-        :aria-label="$t('problem.rail.railLabel')"
-        class="flex flex-col"
+    <RouterView />
+  </div>
+  <div v-else :class="layout.grid" :style="stickyTop">
+    <div class="flex min-w-0 flex-col gap-6">
+      <div
+        v-if="tab === DEFAULT_TAB"
+        data-testid="statement-card"
+        class="flex min-w-0 flex-col gap-4"
       >
-        <!-- Folded rows on hairlines, no cards: the viewer's results and the types open on demand. -->
-        <ProblemMySubmissions
-          v-if="isSignedIn && usesSheet"
-          :code="problem.code"
-          :scale="scoreScale"
+        <StatementNote v-if="!problem.translated && !problem.pdfStatementUrl" />
+        <PdfStatement
+          v-if="problem.pdfStatementUrl"
+          :problem="problem"
+          :url="problem.pdfStatementUrl"
+          :untranslated="!problem.translated"
         />
-        <ProblemTypesCard :problem="problem" />
-      </aside>
+        <NoStatement
+          v-if="hasNoStatement(problem)"
+          :code="problem.code"
+          :can-edit="problem.canEdit"
+        />
+        <StatementBody v-else :html="problem.descriptionHtml" />
+        <p v-if="problem.authors.length" class="text-meta text-muted">
+          {{ $t('problem.authors') }}
+          <template v-for="(author, index) in problem.authors" :key="author.id"
+            ><template v-if="index">, </template
+            ><UserName :username="author.username" :rating="author.rating"
+          /></template>
+        </p>
+      </div>
+      <!-- Mounted only while selected, so the editorial request is lazy. -->
+      <EditorialTab v-else-if="hasEditorial" :code="problem.code" @gone="$emit('gone')" />
+      <!-- The editor opens in place, under what the viewer was reading. -->
+      <SubmitPane
+        v-model:open="submitOpen"
+        :problem="problem"
+        :form="submitForm"
+        :uses-sheet="usesSheet"
+        :is-signed-in="isSignedIn"
+      />
       <CommentsSection
         v-if="tab === DEFAULT_TAB"
         type="problem"
@@ -201,5 +176,17 @@ const isFramePanel = computed(() => props.tab === DEFAULT_TAB || props.tab === '
         placeholder-key="comments.composer.problemPlaceholder"
       />
     </div>
+    <ProblemSidePanel
+      :problem="problem"
+      :section="tab === 'editorial' ? 'editorial' : 'statement'"
+      :layout="layout"
+      :is-signed-in="isSignedIn"
+      :contest="contest"
+      :form="submitForm"
+      :submit-open="submitOpen"
+      :uses-sheet="usesSheet"
+      :scale="scoreScale"
+      @open="submitOpen = true"
+    />
   </div>
 </template>

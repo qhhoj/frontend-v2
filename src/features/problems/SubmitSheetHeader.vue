@@ -22,21 +22,20 @@ defineExpose({
 </script>
 
 <template>
-  <header v-if="!isExpanded">
-    <!-- The whole collapsed bar opens the sheet: label left, the last result (slot `result`), chevron right, 56 px tall (M-06). -->
+  <header v-if="!isExpanded" class="flex flex-col gap-2 px-4 pt-2 pb-2">
+    <!-- The collapsed bar is the phone's primary "Nộp bài": the whole width opens the sheet; the last result (slot `result`) is a line over it. -->
+    <div v-if="$slots.result" class="flex min-w-0 items-center gap-2"><slot name="result" /></div>
     <AppButton
       ref="barButton"
-      tone="row"
+      tone="primary"
+      size="lg"
+      block
       :aria-expanded="false"
       :aria-controls="controlsId"
-      class="min-h-14 gap-3 rounded-none px-4"
       @click="emit('toggle')"
     >
-      <span class="shrink-0 font-display text-base font-bold text-content">{{
-        $t('submit.title')
-      }}</span>
-      <span class="flex min-w-0 flex-1 items-center justify-end gap-2"><slot name="result" /></span>
-      <ChevronUp class="size-5 shrink-0 text-muted" aria-hidden="true" />
+      <template #icon><ChevronUp aria-hidden="true" /></template>
+      {{ $t('submit.title') }}
     </AppButton>
   </header>
   <header v-else>

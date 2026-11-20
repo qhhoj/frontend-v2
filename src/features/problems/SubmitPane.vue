@@ -4,12 +4,10 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import Card from '@/components/ui/Card.vue';
 import IconButton from '@/components/ui/IconButton.vue';
 import type { ProblemDetail } from '@/api/types/problems';
-import ProblemMySubmissions from './ProblemMySubmissions.vue';
 import SubmitForm from './SubmitForm.vue';
 import SubmitSheet from './SubmitSheet.vue';
 import { isFocusEditorShortcut } from './submit-shortcuts';
 import { OPEN_BUTTON_ID } from './submit-open';
-import type { ScoreScale } from './submit-result';
 import type { useSubmitForm } from './use-submit-form';
 import {
   FULLSCREEN_TOGGLE_ID,
@@ -20,20 +18,17 @@ import {
 const BODY_ID = 'submit-pane-body';
 const PANE_EDITOR = `#${BODY_ID} textarea, #${BODY_ID} [contenteditable="true"]`;
 /**
- * Where the viewer writes and sends a solution, once they open it (`open`). Beside the statement (Workbench) the pane: the
- * editor under its bar, the result strip under the bar beside Submit; closed, it takes no room. Where the statement takes the
- * whole column (`usesSheet`: phones, tablets) the bottom sheet, whose bar always shows. Either can go full screen. Exactly one form shows at a time; all share the form state the page
- * owns, so the code and the language are the same wherever the viewer looks.
+ * Where the viewer writes and sends a solution, once they open it (`open`). On a wide page the editor opens in place, a card
+ * under the statement: its bar holds the language, the upload and the page's one primary button, the result strip sits on
+ * top; closed, it takes no room. Where the page is one column (`usesSheet`: phones, tablets) the bottom sheet, whose bar
+ * always shows. Either can go full screen. Exactly one form shows at a time; all share the form state the page owns, so the
+ * code and the language are the same wherever the viewer looks.
  */
 const props = defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;
   usesSheet: boolean;
   isSignedIn: boolean;
-  /** What the viewer's earlier submissions in the pane are scored out of. */
-  scale: ScoreScale;
-  /** The layout's place for the pane in the page grid; the sheet and full screen are fixed and take none. */
-  placeClass: string;
 }>();
 /** Whether the pane or the expanded sheet is open. Closing keeps the form state: the page owns it. */
 const open = defineModel<boolean>('open', { required: true });
@@ -60,7 +55,12 @@ function onPanelEscape(event: KeyboardEvent) {
   setFullscreen(false);
 }
 
-const focusPaneEditor = () => document.querySelector<HTMLElement>(PANE_EDITOR)?.focus();
+const pane = ref<{ $el: HTMLElement } | null>(null);
+/** The editor without a jump of the page; the pane is then brought into view whole (not every engine has the method). */
+function focusPaneEditor() {
+  document.querySelector<HTMLElement>(PANE_EDITOR)?.focus({ preventScroll: true });
+  pane.value?.$el.scrollIntoView?.({ block: 'nearest' });
+}
 /** The caret goes into the pane's editor when it opens, and back to the button that opened it when it closes. */
 watch(open, async (isOpen) => {
   if (props.usesSheet || !props.isSignedIn) return;
@@ -119,12 +119,11 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
     as="section"
     :aria-label="$t('submit.title')"
     data-testid="submit-pane"
-    :class="['flex min-h-80 min-w-0 flex-col p-3', placeClass]"
+    ref="pane"
+    padding="md"
+    class="flex min-w-0 scroll-my-20 flex-col"
   >
     <SubmitForm :id="BODY_ID" :problem="problem" :form="form" layout="pane">
-      <template #history>
-        <ProblemMySubmissions :code="problem.code" :scale="scale" />
-      </template>
       <template #tools>
         <div class="flex items-center gap-1">
           <IconButton

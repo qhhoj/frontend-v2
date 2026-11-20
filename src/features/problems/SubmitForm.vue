@@ -21,7 +21,7 @@ const props = defineProps<{
   problem: ProblemDetail;
   form: ReturnType<typeof useSubmitForm>;
   /**
-   * `pane` is the desktop column beside the statement: a bar (language, upload, submit) over an editor that fills the
+   * `pane` is the editor that opens in place under the statement: a bar (language, upload, submit) over an editor that fills the
    * rest, and the slot `tools` (full screen) at the end of the line under the editor; `full` the same as a full-screen
    * panel, with the problem's name and the slot `actions` in the bar; `sheet` the phone's column that fills the sheet's
    * height, the submit button under the editor.
@@ -137,8 +137,6 @@ function loadDroppedFile(event: DragEvent) {
       class="w-full shrink-0"
       :class="classes.strip"
     />
-    <!-- The viewer's last submissions to this problem (the pane only), right under the result strip. -->
-    <div v-if="$slots.history" class="order-1 shrink-0"><slot name="history" /></div>
     <div :class="classes.header">
       <h2
         v-if="layout === 'full'"
@@ -180,7 +178,7 @@ function loadDroppedFile(event: DragEvent) {
       </p>
       <SourceUploadButton
         v-if="!isSheet && hasSourceUpload"
-        :icon-only="layout === 'pane'"
+        :icon-only="false"
         :class="REGION_ORDER.upload"
         @pick="(file) => state.loadFile(file)"
       />

@@ -13,7 +13,10 @@ defineProps<{ header?: boolean }>();
   <div class="min-w-0">
     <ProblemHeaderSkeleton v-if="header" />
     <div data-testid="statement-card" :class="header && 'mt-4'">
-      <div data-skeleton-region="statement" class="flex flex-col gap-4 text-sm leading-[1.75]">
+      <div
+        data-skeleton-region="statement"
+        class="flex max-w-(--qh-measure) flex-col gap-4 text-long"
+      >
         <p v-for="paragraph in PARAGRAPHS" :key="paragraph">
           <template v-for="line in LINES" :key="line">
             <SkeletonBlock text class="w-full" /><br />

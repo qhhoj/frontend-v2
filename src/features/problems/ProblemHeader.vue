@@ -2,166 +2,48 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import PageHeader from '@/components/ui/PageHeader.vue';
-import AdminEditLink from '@/features/admin/edit-link/AdminEditLink.vue';
-import { problemEditTarget } from '@/features/admin/edit-link/admin-edit-targets';
-import type { ProblemSection } from '@/features/admin/edit-link/admin-edit-targets';
+import type { PageCrumb } from '@/components/ui/PageHeader.vue';
 import type { ContestDetail } from '@/api/types/contests';
 import type { ProblemDetail } from '@/api/types/problems';
-import { CUE_TEXT } from '@/components/ui/cue-tones';
-import type { CueTone } from '@/components/ui/cue-tones';
-import Chip from '@/components/ui/Chip.vue';
-import OwnResultChip from '@/features/contests/OwnResultChip.vue';
-import { acRateTextClass } from '@/lib/ac-rate';
-import { formatMemoryLimit, formatNumber, formatPoints, formatTimeLimit } from '@/lib/format';
-import { useLocaleStore } from '@/stores/locale.store';
-import { useSessionStore } from '@/stores/session.store';
-import { UNCATEGORIZED_TYPE_NAME, problemTypeLabel } from './problem-type-label';
 import { useContestProblem } from './use-contest-problem';
-import { viewerStatusOf } from './viewer-status';
 
 /**
- * The top of the problem page, on the page background: the section crumb, the title, one meta line (code, group chip, AC
- * rate in its ramp colour, then the facts: limits, points, file names, solvers, the viewer's status), the edit link and the
- * `actions` slot (the submit button, right-most), then the tabs in the default slot. Inside the viewer's contest the points
- * are the contest's and the status is the viewer's own cell; the site-wide solve counts are left out.
- * Keep `ProblemHeaderSkeleton.vue` in step.
+ * The top of the problem page, on the page background: the eyebrow (inside the viewer's contest the contest's name and the
+ * problem's label, "SQRT Cup 2025 / Bài B"; else the section, which `PageHeader` writes itself), the title, and the tabs in
+ * the default slot. No facts: limits, points and the viewer's status are in the side panel (`ProblemLimits`). The `actions`
+ * slot is for a tab without the panel. Keep `ProblemHeaderSkeleton.vue` in step.
  */
-/** One fact of the meta line: a muted label, then its value (mono unless `mono` is false; `tone` or `class` colour it). */
-interface ProblemFact {
-  label?: string;
-  value: string;
-  mono?: boolean;
-  tone?: CueTone;
-  class?: string;
-  testId?: string;
-}
-/** `section`: the tab being read; the edit link opens its editor tab. */
-const props = defineProps<{
-  problem: ProblemDetail;
-  section?: ProblemSection;
-  isSignedIn: boolean;
-  contest?: ContestDetail | null;
-}>();
+const props = defineProps<{ problem: ProblemDetail; contest?: ContestDetail | null }>();
 const { t } = useI18n();
-const session = useSessionStore();
-const locale = useLocaleStore();
-const { contestProblem, ownContext, contestPoints } = useContestProblem(
+const { contestProblem } = useContestProblem(
   () => props.problem,
   () => props.contest,
 );
-const inContest = computed(() => contestPoints.value !== null);
-const status = computed(() => viewerStatusOf(props.problem.viewerStatus));
-const STATUS_TONE = { solved: 'full', attempted: 'partial' } as const;
-const statusTone = computed(() => {
-  const viewer = props.problem.viewerStatus;
-  return viewer === 'solved' || viewer === 'attempted' ? STATUS_TONE[viewer] : undefined;
+const crumbs = computed<PageCrumb[]>(() => {
+  const contest = props.contest;
+  if (!contest || !contestProblem.value) return [];
+  return [
+    { label: contest.name, to: { name: 'contest', params: { key: contest.key } } },
+    { label: t('problem.contestLabel', { label: contestProblem.value.label }) },
+  ];
 });
-const pointsText = computed(
-  () => contestPoints.value ?? formatPoints(props.problem.points, locale.locale),
-);
-/** Partial scoring says so right after the points (the site-wide scale only). */
-const partialFacts = computed<ProblemFact[]>(() =>
-  !inContest.value && props.problem.partial
-    ? [{ value: t('problem.strip.partial'), mono: false }]
-    : [],
-);
-/** File I/O names are facts worth a place: the contestant types them into `freopen`/`assign`. Standard I/O shows nothing. */
-const fileFacts = computed<ProblemFact[]>(() => {
-  const { mode, inputFile, outputFile } = props.problem.io;
-  return mode === 'file'
-    ? [
-        { label: t('problem.rail.facts.input'), value: inputFile ?? '' },
-        { label: t('problem.rail.facts.output'), value: outputFile ?? '' },
-      ]
-    : [];
-});
-const facts = computed<ProblemFact[]>(() => [
-  { label: t('problem.limits.time'), value: formatTimeLimit(props.problem.timeLimit) },
-  { label: t('problem.limits.memory'), value: formatMemoryLimit(props.problem.memoryLimit) },
-  {
-    label: t(inContest.value ? 'problem.rail.facts.contestPoints' : 'problem.limits.points'),
-    value: pointsText.value,
-  },
-  ...partialFacts.value,
-  ...fileFacts.value,
-  ...(inContest.value
-    ? []
-    : [
-        {
-          label: t('problem.strip.acRate'),
-          value: `${formatNumber(props.problem.acRate, locale.locale, 1)}%`,
-          class: acRateTextClass(props.problem.acRate),
-          testId: 'strip-ac-rate',
-        },
-        {
-          label: t('problem.strip.solvers'),
-          value: formatNumber(props.problem.userCount, locale.locale),
-        },
-      ]),
-  ...(props.isSignedIn && !(contestProblem.value && ownContext.value)
-    ? [
-        {
-          label: t('problem.rail.facts.status'),
-          value: t(status.value.key),
-          tone: statusTone.value,
-          mono: false,
-        },
-      ]
-    : []),
-]);
 </script>
 
 <template>
   <div data-testid="problem-header" class="contents">
-    <PageHeader :title="problem.name">
-      <template #meta>
-        <!-- One wrapping line, spaced by gaps: no separator character can end or start a wrapped line. -->
-        <div class="flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-1">
-          <span class="font-mono [overflow-wrap:anywhere]">{{ problem.code }}</span>
-          <Chip
-            v-if="problem.group && problem.group.name !== UNCATEGORIZED_TYPE_NAME"
-            data-testid="problem-group-chip"
-            >{{ problemTypeLabel(problem.group) }}</Chip
+    <PageHeader :title="problem.name" :crumbs="crumbs">
+      <!-- A phone has no crumb trail: the contest and the label stay over the title there. -->
+      <template v-if="contest && contestProblem" #above>
+        <p class="text-small text-muted md:hidden">
+          <RouterLink
+            :to="{ name: 'contest', params: { key: contest.key } }"
+            class="hover:text-content hover:underline"
+            >{{ contest.name }}</RouterLink
           >
-          <Chip v-if="problem.externalJudge" data-testid="external-judge-badge">{{
-            $t('problem.externalJudge', { oj: problem.externalJudge.oj })
-          }}</Chip>
-          <dl class="contents" data-testid="page-facts">
-            <div
-              v-for="fact in facts"
-              :key="fact.label ?? fact.value"
-              :data-testid="fact.testId"
-              class="flex items-baseline gap-1"
-            >
-              <dt v-if="fact.label">{{ fact.label }}</dt>
-              <dd
-                class="m-0"
-                :class="[
-                  fact.mono !== false && 'font-mono',
-                  fact.tone && CUE_TEXT[fact.tone],
-                  fact.class,
-                ]"
-              >
-                {{ fact.value }}
-              </dd>
-            </div>
-          </dl>
-          <span
-            v-if="contestProblem && ownContext"
-            data-testid="strip-own-result"
-            class="flex items-baseline gap-1"
-          >
-            {{ $t('contests.problems.columns.own') }}
-            <OwnResultChip :problem="contestProblem" :context="ownContext" inline />
-          </span>
-        </div>
+          / {{ $t('problem.contestLabel', { label: contestProblem.label }) }}
+        </p>
       </template>
-      <template #actions>
-        <div class="flex flex-wrap items-center gap-2">
-          <AdminEditLink :to="problemEditTarget(session.user, props.problem, props.section)" />
-          <slot name="actions" />
-        </div>
-      </template>
+      <template v-if="$slots.actions" #actions><slot name="actions" /></template>
       <template v-if="$slots.default" #tabs><slot /></template>
     </PageHeader>
   </div>

@@ -8,8 +8,6 @@ import Popover from '@/components/ui/Popover.vue';
 import { isComposing } from '@/components/ui/keys';
 import Toolbar from '@/components/ui/Toolbar.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
-import FilterToggle from './FilterToggle.vue';
-import ToolbarSelect from '@/components/ToolbarSelect.vue';
 import { translate } from '@/i18n';
 import { COMPACT_LIST_QUERY, useMediaQuery } from '@/lib/use-media-query';
 import { useDebouncedText } from '@/lib/use-debounced-text';
@@ -22,11 +20,11 @@ import { panelFilterCount } from './use-problem-filters';
 import type { ProblemFilters, SolvedFilter } from './use-problem-filters';
 
 /**
- * The list's `Toolbar`. A computer: search (Enter opens a typed code), the solved choice as a select ("Trạng thái: Chưa giải",
- * signed in), "Bộ lọc" with the rarer filters; at the right the result count and the random pick (it sorts by the column
- * headers). A phone: one row of the search, a filter icon button (with the count of active filters) and a sort icon button
- * (its rows have no column headers); under it the count small and the solved choice as two one-tap chips. The random pick
- * moves into the filter sheet. The default slot is the active-filter chips.
+ * The list's `Toolbar` (redesign "Sơn mài"): search (Enter opens a typed code), then the status toggles ("Tất cả", "Chưa giải",
+ * "Đã giải"; signed in), then "Bộ lọc" with the rarer filters (group, types, points, editorial); at the right the result count
+ * and the random pick. A computer sorts by the column headers. A phone: one row of the search, a filter icon button (with the
+ * count of active filters) and a sort icon button (its rows have no column headers); under it the status toggles and the count.
+ * The random pick moves into the filter sheet. The default slot is the active-filter chips.
  */
 const props = withDefaults(
   defineProps<{
@@ -96,14 +94,7 @@ const SOLVED_CHOICES = computed(() =>
     label: translate(`problems.solvedFilter.${value}`),
   })),
 );
-/** The phone's one-tap chips: each toggles its own choice against "all". */
-const SOLVED_CHIPS = computed(() => SOLVED_CHOICES.value.filter(({ value }) => value !== 'any'));
 const setSolved = (solved: SolvedFilter) => emit('update', { solved });
-/** The select reports a plain string; only a known choice is applied. */
-const pickSolved = (value: string) => {
-  const choice = SOLVED_CHOICES.value.find((option) => option.value === value);
-  if (choice) setSolved(choice.value);
-};
 </script>
 
 <template>
@@ -116,15 +107,22 @@ const pickSolved = (value: string) => {
         :class="isCompact ? 'min-w-0 flex-1 basis-0' : 'max-w-80 min-w-44 flex-1'"
         @keydown.enter="openExact"
       />
-      <!-- On a phone the choice moves under the row, beside the count, as one-tap chips. -->
-      <ToolbarSelect
+      <!-- On a phone the toggles move under the row, beside the count. -->
+      <div
         v-if="signedIn && !isCompact"
-        :label="$t('problems.solvedFilter.prefix')"
-        :options="SOLVED_CHOICES"
-        :model-value="filters.solved"
-        :active="filters.solved !== 'any'"
-        @update:model-value="pickSolved"
-      />
+        role="group"
+        :aria-label="$t('problems.solvedFilter.label')"
+        class="flex items-center gap-2"
+      >
+        <AppButton
+          v-for="choice in SOLVED_CHOICES"
+          :key="choice.value"
+          size="sm"
+          :pressed="filters.solved === choice.value"
+          @click="setSolved(choice.value)"
+          >{{ choice.label }}</AppButton
+        >
+      </div>
       <!-- A phone: an icon button, the active-filter count beside the icon; its name is the label and the tooltip. -->
       <AppButton
         data-testid="problem-filter-panel-toggle"
@@ -165,17 +163,23 @@ const pickSolved = (value: string) => {
       <RandomProblemButton :filters="filters" labelled />
     </template>
     <template v-if="isCompact || $slots.default" #chips>
-      <div v-if="isCompact" class="flex flex-wrap items-center justify-between gap-3">
-        <ProblemListCount :text="countText" class="text-caption" />
-        <div v-if="signedIn" class="flex items-center gap-(--qh-gap-control)">
-          <FilterToggle
-            v-for="choice in SOLVED_CHIPS"
+      <div v-if="isCompact" class="flex flex-wrap items-center justify-between gap-2">
+        <div
+          v-if="signedIn"
+          role="group"
+          :aria-label="$t('problems.solvedFilter.label')"
+          class="flex items-center gap-2"
+        >
+          <AppButton
+            v-for="choice in SOLVED_CHOICES"
             :key="choice.value"
+            size="sm"
             :pressed="filters.solved === choice.value"
-            @toggle="setSolved(filters.solved === choice.value ? 'any' : choice.value)"
-            >{{ choice.label }}</FilterToggle
+            @click="setSolved(choice.value)"
+            >{{ choice.label }}</AppButton
           >
         </div>
+        <ProblemListCount :text="countText" />
       </div>
       <slot />
     </template>
