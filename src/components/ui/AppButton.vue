@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, h, ref, useAttrs, useId, useSlots } from 'vue';
+import { computed, h, onBeforeUpdate, ref, useAttrs, useId, useSlots } from 'vue';
 import type { VNode } from 'vue';
 import { RouterLink } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
@@ -80,8 +80,20 @@ function press(event: MouseEvent, navigate?: (event: MouseEvent) => unknown) {
 
 const spinner = () =>
   h(LoaderCircle, { 'aria-hidden': 'true', class: 'size-4 motion-safe:animate-spin' });
+/**
+ * Counts the button's own updates. A parent that draws the button again with other slot content (a row of a `v-for`
+ * whose item changed) only swaps the slot functions, which nothing below reads reactively: the content reads this
+ * count, so it is drawn again with the button. Without it the button kept the content of its first draw.
+ */
+const updateCount = ref(0);
+onBeforeUpdate(() => {
+  updateCount.value += 1;
+});
 /** Icon (or the spinner while loading), then the label. */
-const ButtonContent = () => [props.loading ? spinner() : slots.icon?.(), slots.default?.()];
+const ButtonContent = () => {
+  void updateCount.value;
+  return [props.loading ? spinner() : slots.icon?.(), slots.default?.()];
+};
 /**
  * A button that may get a reason is always wrapped (the reason only appears while disabled), so toggling `disabled` never
  * re-creates the `<button>` and focus stays. Button and reason are one inline unit, so a flex toolbar gives them one gap. Without
