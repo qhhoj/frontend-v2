@@ -13,7 +13,7 @@ import TestSquares from '@/components/ui/TestSquares.vue';
 import type { TestSquare } from '@/components/ui/TestSquares.vue';
 import SubmitForm from '@/features/problems/SubmitForm.vue';
 import SubmissionPlate from '@/features/submissions/SubmissionPlate.vue';
-import SubmissionTable from '@/features/submissions/SubmissionTable.vue';
+import SubmissionCompactList from '@/features/submissions/SubmissionCompactList.vue';
 import { translate } from '@/i18n';
 import { formatDate } from '@/lib/format-date';
 import { useLocaleStore } from '@/stores/locale.store';
@@ -23,7 +23,9 @@ import type { TrialRun } from './trial/use-trial-run';
 /**
  * Section 4: a model solution is run and judged on this page. Left: the verdict plate of the run on show (the site's own
  * `SubmissionPlate`, live while the judge works; an idle plate before the first run), a line that says which run it is
- * and whether the tests changed after it, and the viewer's last runs. Right (above on a narrow page): the submit panel,
+ * and whether the tests changed after it, and the viewer's last runs as the site's compact submission rows (verdict
+ * and score, time, memory and language, when; the full table would drop the language at this width). Right (above on a
+ * narrow page): the submit panel,
  * the student form in its compact layout, with the one secondary button "Chạy lời giải này". The per-test results also
  * fill the column "Lời giải mẫu" of section 3.
  */
@@ -34,7 +36,8 @@ const props = defineProps<{
   testCount: number;
 }>();
 const KEY = 'admin.problems.workbench.trial';
-const RUN_COLUMNS = ['verdict', 'language', 'when'] as const;
+const RUN_COLUMNS = ['verdict', 'cost', 'language', 'when'] as const;
+const NO_HIGHLIGHT: ReadonlySet<string> = new Set();
 const locale = useLocaleStore();
 const session = useSessionStore();
 const { form, run, verdict, isLive, currentTestcase, isPageRun, isStale, runs, list } = props.trial;
@@ -134,12 +137,14 @@ watch(form.lastSubmissionId, async (id) => {
           <template #skeleton>
             <SkeletonBlock data-skeleton-region="trial-runs" class="h-(--qh-row) w-full" />
           </template>
-          <SubmissionTable
+          <SubmissionCompactList
             v-if="runs.length"
             data-testid="trial-runs"
             :submissions="runs"
-            :show-problem="false"
-            :column-keys="RUN_COLUMNS"
+            :columns="RUN_COLUMNS"
+            :highlight-ids="NO_HIGHLIGHT"
+            :problem-labels="{}"
+            :contest-points="{}"
           />
           <p v-else class="m-0 flex items-center gap-2 text-meta text-muted">
             <InlineBit kind="asleep" />{{ $t(`${KEY}.runs.empty`) }}
