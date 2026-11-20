@@ -222,12 +222,12 @@ const summaries = computed(() => {
   };
 });
 /** What the bar says changed: "Thời gian và thể thức 2 · Bài 1". */
-const changedText = computed(() => {
-  const changed = (['time', 'problems', 'participants', 'info'] as const)
-    .filter((id) => changes.value[id] > 0)
-    .map((id) => `${t(`${KEY}.sections.${id}`)} ${changes.value[id]}`);
-  return changed.length ? changed.join(' · ') : undefined;
-});
+const changedParts = computed(() =>
+  (['time', 'problems', 'participants', 'info'] as const).map((id) => ({
+    label: t(`${KEY}.sections.${id}`),
+    count: changes.value[id],
+  })),
+);
 
 const listLink = computed(() => ({ to: { name: 'admin-contests' }, label: t(`${KEY}.back`) }));
 </script>
@@ -348,7 +348,7 @@ const listLink = computed(() => ({ to: { name: 'admin-contests' }, label: t(`${K
       :dirty-count="dirtyCount"
       :pending="isSaving"
       :saved-at="savedAt"
-      :note="changedText"
+      :changed-parts="changedParts"
       @discard="discard"
     />
     <ParticipantsWidenDialog :contest="contest" :workbench="workbench" />
