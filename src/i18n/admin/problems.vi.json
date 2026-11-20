@@ -26,7 +26,7 @@
       "code": "Mã bài",
       "codeHint": "Chữ thường, số, gạch dưới (1 đến 32 ký tự). Đổi mã làm đổi địa chỉ bài.",
       "name": "Tên bài",
-      "nameHint": "Tối đa 100 ký tự. Chỉ gửi khi bạn sửa; tên theo ngôn ngữ nằm ở tab Đề bài và bản dịch.",
+      "nameHint": "Tối đa 100 ký tự. Chỉ gửi khi bạn sửa; tên theo ngôn ngữ nằm ở mục Đề bài.",
       "source": "Nguồn",
       "date": "Ngày đăng",
       "summary": "Tóm tắt",

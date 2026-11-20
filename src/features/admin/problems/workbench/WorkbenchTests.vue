@@ -107,7 +107,7 @@ const isAdvancedOpen = defineModel<boolean>('advancedOpen', { default: false });
         :text="$t('admin.externalJudge.dataNote', { oj: problem.externalJudge.oj })"
       />
       <DataFeedback :feedback="query.data.value.feedback" />
-      <Card padding="none" as="div">
+      <Card as="div">
         <DataArchiveCard :code="problem.code" :data="query.data.value">
           <template #upload>
             <UploadButton
@@ -145,7 +145,7 @@ const isAdvancedOpen = defineModel<boolean>('advancedOpen', { default: false });
           <AdminStatus kind="refused" :text="failureReasonOf(archiveFailure)" />
         </div>
       </Card>
-      <Card padding="none" as="div">
+      <Card as="div">
         <CasesEditor
           v-model="form.cases"
           :data="query.data.value"
@@ -163,7 +163,7 @@ const isAdvancedOpen = defineModel<boolean>('advancedOpen', { default: false });
           <span v-if="!summary.isAddingUp" class="text-muted">{{ $t(`${KEY}.totalOff`) }}</span>
         </p>
       </Card>
-      <Card panel padding="none" as="div" :title="$t(`${KEY}.judging`)">
+      <Card panel as="div" :title="$t(`${KEY}.judging`)">
         <CheckerSection
           v-model="form"
           part="main"

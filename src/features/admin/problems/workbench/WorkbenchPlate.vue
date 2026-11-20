@@ -38,8 +38,12 @@ const plateSteps = computed(() => (props.steps ? workbenchSteps(props.steps) : n
 const next = computed(() => plateSteps.value?.find((step) => !step.isDone) ?? null);
 const blockers = computed(() => (props.steps ? publishBlockers(props.steps) : []));
 const warnings = computed(() => (props.steps ? publishWarnings(props.steps) : []));
+/** "Chưa có đề bài · Chưa có test": with no test at all, their missing points go without saying. */
 const missingText = (ids: readonly string[]) =>
-  ids.map((id) => t(`${CHECKS}.${id}.missing`)).join(' · ');
+  ids
+    .filter((id) => id !== 'scoring' || !ids.includes('tests'))
+    .map((id) => t(`${CHECKS}.${id}.missing`))
+    .join(' · ');
 
 const sentenceKey = computed(() => {
   if (isPublic.value) return audience.value === 'members' ? 'members' : 'public';
@@ -127,7 +131,7 @@ const isDialogOpen = ref(false);
         >
           <Lamp :tone="step.isDone ? 'ac' : 'none'" still />
           <span class="flex min-w-0 flex-col">
-            <span class="truncate text-body font-semibold"
+            <span class="text-body font-semibold"
               >{{ index + 1 }} · {{ $t(`${KEY}.steps.${step.id}`) }}</span
             >
             <span class="truncate text-small text-muted">{{

@@ -86,7 +86,7 @@ const WORKBENCH = 'admin.problems.workbench.statement';
 </script>
 
 <template>
-  <Card as="div" class="flex flex-col gap-4">
+  <Card as="div" padding="md" class="flex flex-col gap-4">
     <div ref="root" class="flex flex-col gap-4">
       <SegmentedControl
         v-model="slot"
@@ -164,20 +164,10 @@ const WORKBENCH = 'admin.problems.workbench.statement';
     </p>
   </Card>
   <Disclosure v-model:open="isFilesOpen" :label="$t(`${WORKBENCH}.files`)">
-    <template #summary>
-      <span class="text-meta font-normal text-muted">{{
-        $t(`${WORKBENCH}.${problem.pdfStatementUrl ? 'hasPdf' : 'noPdf'}`)
-      }}</span>
-    </template>
     <ProblemFiles :problem="problem" :meta="meta" />
   </Disclosure>
   <Disclosure v-model:open="isEditorialOpen" :label="$t(`${WORKBENCH}.editorial`)">
-    <template #summary>
-      <span class="text-meta font-normal text-muted">{{
-        $t(`${WORKBENCH}.${problem.hasEditorial ? 'hasEditorial' : 'noEditorial'}`)
-      }}</span>
-    </template>
-    <Card as="div">
+    <Card as="div" padding="md">
       <EditorialFields v-model="editorialDraft" :content-error="contentError" />
     </Card>
   </Disclosure>

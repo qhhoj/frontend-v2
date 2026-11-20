@@ -117,21 +117,24 @@ const INFO_FIRST_FIELDS = [
   'typeIds',
   'allowedLanguages',
 ];
-/** Opens every section that holds something to fix and moves focus to the first invalid field. */
-async function reveal(sections: readonly WorkbenchSectionId[]) {
-  if (sections.length === 0) return;
+/** Opens every section (and fold) that holds something to fix. */
+function openInvalid(sections: readonly WorkbenchSectionId[]) {
   sections.forEach((id) => (open[id] = true));
   if (Object.keys(info.errors.value).some((field) => !INFO_FIRST_FIELDS.includes(field)))
     folds.infoMore = true;
   if (hasUnreadableDate.value) folds.infoMore = true;
   if (editorial.contentError.value || hasUnreadableDate.value) folds.editorial = true;
   if (sections.includes('tests')) folds.testsAdvanced = true;
+}
+/** A save the page refused itself: the sections open and focus moves to the first invalid field. */
+watch(invalidSections, async (sections) => {
+  if (sections.length === 0) return;
+  openInvalid(sections);
   await nextTick();
   const field = document.querySelector<HTMLElement>(`#${FORM_ID} [aria-invalid="true"]`);
   if (field) field.focus();
   else document.getElementById(sectionDomId(sections[0]!))?.scrollIntoView({ block: 'start' });
-}
-watch(invalidSections, reveal);
+});
 
 const SECTION_OF_PART: Record<SavePartId, WorkbenchSectionId> = {
   problem: 'info',
@@ -165,13 +168,15 @@ const reportLines = computed(() =>
   })),
 );
 const isReportFailed = computed(() => (report.value ?? []).some((part) => part.status !== 'saved'));
-watch(report, (parts) =>
-  reveal(
-    (parts ?? [])
-      .filter((part) => part.status === 'failed' || part.note)
-      .map((part) => SECTION_OF_PART[part.id]),
-  ),
-);
+/** A save the server refused in part: the report comes into view and the sections it names open below it. */
+const reportBox = ref<HTMLElement>();
+watch(report, async (parts) => {
+  const named = (parts ?? []).filter((part) => part.status === 'failed' || part.note);
+  if (named.length === 0) return;
+  openInvalid(named.map((part) => SECTION_OF_PART[part.id]));
+  await nextTick();
+  reportBox.value?.scrollIntoView({ block: 'start' });
+});
 
 /** What the bar says changed: "Thông tin 2 · Đề bài 1". */
 const changedText = computed(() => {
@@ -215,6 +220,25 @@ const listLink = computed(() => ({ to: { name: 'admin-problems' }, label: t(`${K
       :has-unsaved="dirtyCount > 0"
       @open="openStep"
     />
+    <div v-if="reportLines.length" ref="reportBox" class="scroll-mt-4">
+      <Notice
+        data-testid="save-report"
+        :role="isReportFailed ? 'alert' : 'status'"
+        :tone="isReportFailed ? 'danger' : 'warning'"
+        :title="$t(`${KEY}.save.${isReportFailed ? 'partial' : 'complaint'}`)"
+      >
+        <ul class="m-0 list-none p-0">
+          <li
+            v-for="line in reportLines"
+            :key="line.id"
+            :data-part="line.id"
+            :data-status="line.status"
+          >
+            {{ line.text }}
+          </li>
+        </ul>
+      </Notice>
+    </div>
     <div class="flex flex-col border-b border-line">
       <form :id="FORM_ID" novalidate @submit.prevent="submit">
         <fieldset :disabled="isSaving" class="m-0 flex min-w-0 flex-col border-0 p-0">
@@ -286,23 +310,6 @@ const listLink = computed(() => ({ to: { name: 'admin-problems' }, label: t(`${K
         <WorkbenchOther v-if="isOtherShown" :problem="problem" :meta="meta" />
       </WorkbenchSection>
     </div>
-    <Notice
-      v-if="reportLines.length"
-      data-testid="save-report"
-      :tone="isReportFailed ? 'danger' : 'warning'"
-      :title="$t(`${KEY}.save.${isReportFailed ? 'partial' : 'complaint'}`)"
-    >
-      <ul class="m-0 list-none p-0">
-        <li
-          v-for="line in reportLines"
-          :key="line.id"
-          :data-part="line.id"
-          :data-status="line.status"
-        >
-          {{ line.text }}
-        </li>
-      </ul>
-    </Notice>
     <SaveBar
       data-testid="problem-save-bar"
       :form="FORM_ID"

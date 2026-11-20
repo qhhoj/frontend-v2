@@ -24,7 +24,7 @@ const data = useProblemDataQuery(() => props.problem.code);
 <template>
   <ProblemExternalTab :problem="problem" :meta="meta" />
   <PolygonLinkPanel :code="problem.code" />
-  <Card padding="none" as="div"><ProblemPackageCard :code="problem.code" /></Card>
+  <Card as="div"><ProblemPackageCard :code="problem.code" /></Card>
   <DataSourceFiles v-if="data.data.value" :code="problem.code" :data="data.data.value" />
   <ProblemDangerZone v-if="canDelete" :code="problem.code" />
 </template>

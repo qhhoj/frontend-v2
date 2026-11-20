@@ -26,12 +26,12 @@ const isMoreOpen = defineModel<boolean>('moreOpen', { default: false });
 </script>
 
 <template>
-  <Card padding="none" as="div">
+  <Card as="div">
     <ProblemBasicForm v-model="form" :errors="errors" />
     <ProblemClassSection v-model="form" :meta="meta" :errors="errors" />
   </Card>
   <Disclosure v-model:open="isMoreOpen" :label="$t('admin.problems.workbench.info.more')">
-    <Card padding="none" as="div">
+    <Card as="div">
       <ProblemBasicsSection v-model="form" :errors="errors" />
       <ProblemLimitsSection v-model="form" :meta="meta" :errors="errors" />
       <ProblemClassSection v-model="form" :meta="meta" :errors="errors" part="license" />
