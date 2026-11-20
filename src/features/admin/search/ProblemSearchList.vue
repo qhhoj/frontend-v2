@@ -143,7 +143,8 @@ const resultText = computed(() =>
     <EmptyState v-if="isBare">
       {{ $t('admin.problemList.emptyOwn') }}
       <template v-if="canCreate" #action>
-        <AppButton tone="primary" @click="emit('create')">{{ $t('create.problem') }}</AppButton>
+        <!-- Secondary: the page's one primary is the same action in the header. -->
+        <AppButton @click="emit('create')">{{ $t('create.problem') }}</AppButton>
       </template>
     </EmptyState>
     <ProblemListTable

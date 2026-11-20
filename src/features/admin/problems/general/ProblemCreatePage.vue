@@ -28,7 +28,7 @@ const retry = () => void meta.refetch();
       <template #skeleton>
         <SkeletonBlock data-skeleton-region="problem-create" class="h-64 max-w-xl rounded-row" />
       </template>
-      <Card v-if="meta.data.value" class="max-w-xl">
+      <Card v-if="meta.data.value" padding="md" class="max-w-xl">
         <ProblemCreateForm :meta="meta.data.value" />
       </Card>
     </QueryState>
