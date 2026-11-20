@@ -54,7 +54,7 @@ export const CUES = CUE_TONES.map((tone) => ({
 }));
 
 export const TYPE_ROLES = [
-  { token: 'text-page', use: 'Tiêu đề trang (H1 duy nhất), 28/36', size: '28' },
+  { token: 'text-page', use: 'Tiêu đề trang (H1 duy nhất), 28/32', size: '28' },
   { token: 'text-heading', use: 'Tiêu đề thẻ, hộp thoại, mục, 18/26', size: '18' },
   { token: 'text-long', use: 'Văn bản dài: đề bài, bài viết, 16/26', size: '16' },
   { token: 'text-body', use: 'Chữ thân: ô bảng, hàng, nút, ô nhập, 15/22', size: '15' },
@@ -68,27 +68,27 @@ export const HEIGHTS = [
     token: '--qh-control-sm',
     class: 'h-(--qh-control-sm)',
     px: '32',
-    use: 'Chỉ trong bảng: nút hàng, phân trang',
+    use: 'Trong bảng và đầu khung: nút hàng, bộ lọc, phân trang',
   },
   {
     token: '--qh-control',
     class: 'h-(--qh-control)',
-    px: '36',
+    px: '40',
     use: 'Mọi nút, ô nhập, chọn, thanh công cụ, tab',
   },
   {
     token: '--qh-control-lg',
     class: 'h-(--qh-control-lg)',
     px: '40',
-    use: 'Hành động chính của trang hoặc biểu mẫu',
+    use: 'Tên cũ của --qh-control',
   },
   { token: '--qh-chip', class: 'h-(--qh-chip)', px: '24', use: 'Chip, trạng thái, kết quả' },
   { token: '--qh-row', class: 'h-(--qh-row)', px: '44', use: 'Hàng danh sách một dòng, đầu bảng' },
   {
     token: '--qh-row-dense',
     class: 'h-(--qh-row-dense)',
-    px: '40',
-    use: 'Bảng xếp hạng, mục trình đơn',
+    px: '44',
+    use: 'Tên cũ của --qh-row',
   },
   {
     token: '--qh-touch',

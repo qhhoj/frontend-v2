@@ -34,13 +34,11 @@ const KIND_OF_TONE: Record<BoxedTone, ButtonKind> = {
 const STATES =
   'pressable cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-(--qh-opacity-disabled) disabled:cursor-not-allowed disabled:opacity-(--qh-opacity-disabled) [&_svg:not([class*=size-])]:size-(--qh-control-icon) [&_svg]:shrink-0';
 
-/** Hover never moves a disabled button. */
-const HOVER = 'not-aria-disabled:not-disabled:hover';
-
+/** Hover never moves a disabled button: every hover class carries `not-aria-disabled:not-disabled:` (whole names, so Tailwind finds them). */
 const KINDS: Record<ButtonKind, string> = {
-  primary: `border border-accent bg-accent font-semibold text-on-accent ${HOVER}:border-accent-strong ${HOVER}:bg-accent-strong`,
-  secondary: `border border-line-control bg-surface font-semibold text-content ${HOVER}:bg-surface-strong`,
-  quiet: `border border-transparent bg-transparent font-semibold text-accent-text ${HOVER}:bg-accent-soft`,
+  primary: `border border-accent bg-accent font-semibold text-on-accent not-aria-disabled:not-disabled:hover:border-accent-strong not-aria-disabled:not-disabled:hover:bg-accent-strong`,
+  secondary: `border border-line-control bg-surface font-semibold text-content not-aria-disabled:not-disabled:hover:bg-surface-strong`,
+  quiet: `border border-transparent bg-transparent font-semibold text-accent-text not-aria-disabled:not-disabled:hover:bg-accent-soft`,
 };
 
 /**
@@ -61,7 +59,7 @@ export const TOGGLE_OFF =
   'border-line-control bg-surface text-secondary hover:bg-surface-strong hover:text-content';
 
 /** `row`: a button that is a whole line of a list or form (a closed composer, a folded comment, a version in a history). */
-const ROW_CLASSES = `flex min-h-(--qh-control) w-full items-center justify-start gap-2 rounded-control border border-line-control bg-surface px-(--qh-control-px-sm) py-2 text-left text-body font-normal text-secondary ${HOVER}:bg-surface-strong`;
+const ROW_CLASSES = `flex min-h-(--qh-control) w-full items-center justify-start gap-2 rounded-control border border-line-control bg-surface px-(--qh-control-px-sm) py-2 text-left text-body font-normal text-secondary not-aria-disabled:not-disabled:hover:bg-surface-strong`;
 
 /** A text link: brand text, underline on hover; `::after` stretches the hit area to 44 px. */
 const LINK_CLASSES =
