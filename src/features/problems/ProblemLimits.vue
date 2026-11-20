@@ -32,6 +32,8 @@ interface LimitFact {
   extra?: string;
   /** A file name the solution must use: amber. */
   isFile?: boolean;
+  /** Takes the whole line where the facts lie two a line (a fact left without a neighbour). */
+  isWide?: boolean;
 }
 const props = defineProps<{
   problem: ProblemDetail;
@@ -61,6 +63,7 @@ const pointsFact = computed<LimitFact>(() => {
       key: 'points',
       label: t('problem.rail.facts.contestPoints'),
       value: contestPoints.value,
+      isWide: true,
     };
   const points = formatPoints(props.problem.points, locale.locale);
   return {
@@ -139,7 +142,10 @@ const WIDE_FACT = `${FACT} col-span-full`;
         v-for="fact in facts"
         :key="fact.key"
         :data-testid="`limit-${fact.key}`"
-        :class="[FACT, fact.isFile && ['bg-cue-attention-bg', layout.factFile]]"
+        :class="[
+          fact.isWide ? WIDE_FACT : FACT,
+          fact.isFile && ['bg-cue-attention-bg', layout.factFile],
+        ]"
       >
         <dt class="shrink-0 text-muted">{{ fact.label }}</dt>
         <dd
