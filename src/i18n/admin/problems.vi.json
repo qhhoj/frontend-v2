@@ -484,7 +484,6 @@
     "drop": {
       "title": "Kéo thả tệp .zip hoặc các tệp input, output vào đây",
       "hint": "Tên cặp tệp được ghép tự động (1.inp và 1.out, test01/…). Tệp lớn được tải theo từng phần và tiếp tục được khi mất mạng.",
-      "replaces": " Một tệp .zip mới thay gói hiện tại.",
       "pick": "Chọn tệp",
       "packing": "Đang gói các tệp thành một tệp zip…",
       "refused": {
@@ -498,7 +497,9 @@
       },
       "replaceTitle": "Bài đã có gói test “{archive}”",
       "replaceBody": "Máy chủ chỉ giữ một gói và không gộp thêm tệp lẻ vào gói đã có. Nếu tiếp tục, {count} tệp vừa chọn thay toàn bộ {stored} tệp của gói hiện tại.",
-      "replaceConfirm": "Thay gói test bằng {count} tệp này"
+      "replaceConfirm": "Thay gói test bằng {count} tệp này",
+      "replaceZipBody": "Máy chủ chỉ giữ một gói. Nếu tiếp tục, tệp “{name}” thay toàn bộ {stored} tệp của gói hiện tại.",
+      "replaceZipConfirm": "Thay gói test hiện tại bằng {name}"
     }
   },
   "uploads": {

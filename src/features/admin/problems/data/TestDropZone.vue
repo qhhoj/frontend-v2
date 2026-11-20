@@ -8,7 +8,7 @@ import UploadButton from '@/components/ui/UploadButton.vue';
  * (the same set, for keyboard and phone). It only hands the files over (`files`); a dropped folder is reported
  * (`folder`), because its files cannot be read as a flat set.
  */
-defineProps<{ isPending: boolean; hasArchive: boolean }>();
+defineProps<{ isPending: boolean }>();
 const emit = defineEmits<{ files: [files: File[]]; folder: [] }>();
 const KEY = 'admin.problems.data.drop';
 const isOver = ref(false);
@@ -38,7 +38,6 @@ function onDrop(event: DragEvent) {
       <p class="m-0 font-semibold">{{ $t(`${KEY}.title`) }}</p>
       <p class="m-0 text-meta text-muted">
         {{ $t(`${KEY}.hint`) }}
-        <template v-if="hasArchive">{{ $t(`${KEY}.replaces`) }}</template>
       </p>
     </div>
     <UploadButton

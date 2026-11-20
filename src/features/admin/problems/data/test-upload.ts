@@ -6,7 +6,8 @@ export const LOOSE_ARCHIVE_NAME = 'tests.zip';
 
 /** Why a set of dropped or picked files is not sent; `name` is the file the reason is about. */
 export interface DropRefusal {
-  reason: 'empty' | 'mixed' | 'duplicate' | 'tooMany' | 'tooLarge' | 'folder' | 'unreadable';
+  reason:
+    'busy' | 'empty' | 'mixed' | 'duplicate' | 'tooMany' | 'tooLarge' | 'folder' | 'unreadable';
   name?: string;
 }
 
@@ -15,6 +16,14 @@ export type Dropped =
   | { kind: 'zip'; file: File }
   | { kind: 'loose'; files: File[] }
   | ({ kind: 'refused' } & DropRefusal);
+
+/** What waits for the teacher's word while a stored archive is there: the one archive, or the loose files to pack. */
+export type WaitingUpload = { kind: 'zip'; file: File } | { kind: 'loose'; files: File[] };
+
+/** What to do with sorted files: send now, or wait because a stored archive would be replaced. */
+export function routeUpload(hasStoredArchive: boolean): 'send' | 'wait' {
+  return hasStoredArchive ? 'wait' : 'send';
+}
 
 const isZip = (file: File) => file.name.toLowerCase().endsWith('.zip');
 const refused = (reason: DropRefusal['reason'], name?: string): Dropped => ({

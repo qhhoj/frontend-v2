@@ -484,7 +484,6 @@
     "drop": {
       "title": "Drop a .zip or loose input and output files here",
       "hint": "File pairs are matched by name (1.inp and 1.out, test01/…). A large upload goes in parts and resumes after a lost connection.",
-      "replaces": " A new .zip replaces the current archive.",
       "pick": "Choose files",
       "packing": "Packing the files into one zip…",
       "refused": {
@@ -498,7 +497,9 @@
       },
       "replaceTitle": "This problem already has the test archive “{archive}”",
       "replaceBody": "The server keeps one archive and cannot add loose files to it. If you go on, the {count} chosen files replace all {stored} files of the current archive.",
-      "replaceConfirm": "Replace the archive with these {count} files"
+      "replaceConfirm": "Replace the archive with these {count} files",
+      "replaceZipBody": "The server keeps one archive. If you go on, “{name}” replaces all {stored} files of the current archive.",
+      "replaceZipConfirm": "Replace the current test archive with {name}"
     }
   },
   "uploads": {

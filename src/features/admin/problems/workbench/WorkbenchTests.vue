@@ -66,10 +66,28 @@ const { chunked } = upload;
 const refusalText = computed(() => {
   const refusal = upload.refusal.value;
   if (!refusal) return '';
+  if (refusal.reason === 'busy') return translate('common.upload.busy');
   return translate(`${DROP}.refused.${refusal.reason}`, {
     name: refusal.name ?? '',
     max: formatFileSize(UPLOAD_LIMITS.archive),
   });
+});
+
+/** The bar's words name what happens: one `.zip` replaces the archive, or the loose files replace it. */
+const replaceBody = computed(() => {
+  const waiting = upload.waiting.value;
+  if (!waiting) return '';
+  const stored = query.data.value?.archiveFiles.length ?? 0;
+  return waiting.kind === 'zip'
+    ? translate(`${DROP}.replaceZipBody`, { name: waiting.file.name, stored })
+    : translate(`${DROP}.replaceBody`, { count: waiting.files.length, stored });
+});
+const replaceConfirm = computed(() => {
+  const waiting = upload.waiting.value;
+  if (!waiting) return '';
+  return waiting.kind === 'zip'
+    ? translate(`${DROP}.replaceZipConfirm`, { name: waiting.file.name })
+    : translate(`${DROP}.replaceConfirm`, { count: waiting.files.length });
 });
 
 /** A row whose args box does not parse blocks the save: the table names the tests and groups. */
@@ -131,7 +149,6 @@ watch(
         <div class="flex min-w-0 flex-col gap-3">
           <TestDropZone
             :is-pending="upload.isBusy.value"
-            :has-archive="Boolean(query.data.value.archive)"
             @files="upload.take"
             @folder="upload.refuse('folder')"
           />
@@ -145,12 +162,7 @@ watch(
             data-testid="replace-archive"
             :title="$t(`${DROP}.replaceTitle`, { archive: query.data.value.archive })"
           >
-            {{
-              $t(`${DROP}.replaceBody`, {
-                count: upload.waiting.value.length,
-                stored: query.data.value.archiveFiles.length,
-              })
-            }}
+            {{ replaceBody }}
             <template #action>
               <div class="flex flex-wrap gap-2">
                 <AppButton size="sm" tone="secondary" @click="upload.cancelReplace">
@@ -162,7 +174,7 @@ watch(
                   data-testid="replace-archive-confirm"
                   @click="upload.confirmReplace"
                 >
-                  {{ $t(`${DROP}.replaceConfirm`, { count: upload.waiting.value.length }) }}
+                  {{ replaceConfirm }}
                 </AppButton>
               </div>
             </template>
