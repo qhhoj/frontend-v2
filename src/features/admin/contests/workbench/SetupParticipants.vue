@@ -17,6 +17,7 @@ import { needsPermissionText } from '../../ui/permission-text';
 import TagChips from '../general/TagChips.vue';
 import ContestParticipantsTab from '../participants/ContestParticipantsTab.vue';
 import { PARTICIPANT_MODES, activeModes } from './participants-mode';
+import type { ParticipantMode } from './participants-mode';
 import type { ContestWorkbenchState } from './use-contest-workbench';
 
 /**
@@ -41,13 +42,24 @@ const ACCESS_CODE = 'judge.contest_access_code';
 const form = props.workbench.settings.form;
 const mode = props.workbench.participantMode;
 const hasStoredCode = computed(() => props.contest.requiresAccessCode);
-/** The code mode is offered only to an account that may set a code, or when it is the contest's mode already. */
+const NEEDS: Record<ParticipantMode, string | null> = {
+  organization: PRIVATE,
+  list: PRIVATE,
+  code: ACCESS_CODE,
+  open: null,
+};
+/** A mode is offered to an account that may set its fields, or when it is the contest's mode already. */
 const options = computed(() =>
   PARTICIPANT_MODES.filter(
-    (value) => value !== 'code' || can(ACCESS_CODE) || mode.value === 'code',
+    (value) => NEEDS[value] === null || can(NEEDS[value]) || mode.value === value,
   ).map((value) => ({ value, label: t(`${KEY}.modes.${value}`), testid: `contest-mode-${value}` })),
 );
-const isLocked = computed(() => !can(PRIVATE));
+/** Leaving a mode clears its fields, which needs that mode's permission too. */
+const lockedBy = computed(() => {
+  const needed = NEEDS[mode.value];
+  return needed !== null && !can(needed) ? needed : undefined;
+});
+const isLocked = computed(() => lockedBy.value !== undefined);
 /** An old contest may limit in two ways at once; picking a mode keeps one. */
 const mixed = computed(() => activeModes(form.value, hasStoredCode.value));
 const joined = computed(() =>
@@ -66,7 +78,7 @@ const joined = computed(() =>
         :disabled="isLocked"
         @update:model-value="workbench.pickParticipantMode($event)"
       />
-      <p v-if="isLocked" class="m-0 text-meta text-muted">{{ needsPermissionText(PRIVATE) }}</p>
+      <p v-if="lockedBy" class="m-0 text-meta text-muted">{{ needsPermissionText(lockedBy) }}</p>
       <p class="m-0 text-meta text-muted" data-testid="contest-mode-note">
         {{ $t(`${KEY}.notes.${mode}`) }} {{ joined }}
       </p>
@@ -78,13 +90,13 @@ const joined = computed(() =>
       v-if="mode === 'organization'"
       v-model="form.organizations"
       :label="$t(`${FIELDS}.fields.organizations`)"
-      :locked-by="isLocked ? PRIVATE : undefined"
+      :locked-by="can(PRIVATE) ? undefined : PRIVATE"
     />
     <UsernameChips
       v-if="mode === 'list'"
       v-model="form.privateContestants"
       :label="$t(`${FIELDS}.fields.privateContestants`)"
-      :locked-by="isLocked ? PRIVATE : undefined"
+      :locked-by="can(PRIVATE) ? undefined : PRIVATE"
     />
     <div v-if="mode === 'code'" class="flex max-w-md flex-col gap-2">
       <FormField

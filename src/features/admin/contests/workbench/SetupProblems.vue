@@ -88,6 +88,14 @@ function removeRow(row: ProblemRow) {
   selected.value = next;
   props.problems.remove(indexOf(row));
 }
+/** A position typed out of range is clamped by the list; an empty or non-number box does nothing. */
+function commitPosition(row: ProblemRow, event: Event) {
+  const input = event.target as HTMLInputElement;
+  const from = indexOf(row);
+  const typed = Number.parseInt(input.value, 10);
+  if (Number.isInteger(typed) && typed !== from + 1) props.problems.moveTo(from, typed - 1);
+  input.value = String(indexOf(row) + 1);
+}
 const isCopyOpen = ref(false);
 const total = computed(() =>
   rows.value.reduce((sum, row) => sum + (isPointsValid(row.points) ? row.points : 0), 0),
@@ -200,6 +208,18 @@ const total = computed(() =>
       </template>
       <template #actions="{ row }">
         <span class="flex items-center justify-end gap-1">
+          <span class="block w-16">
+            <TextInput
+              :model-value="indexOf(row) + 1"
+              type="number"
+              min="1"
+              :max="rows.length"
+              class="font-mono"
+              :aria-label="$t(`${KEY}.positionFor`, { code: row.code })"
+              @change="commitPosition(row, $event)"
+              @keydown.enter.prevent="commitPosition(row, $event)"
+            />
+          </span>
           <IconButton
             size="sm"
             :label="$t(`${KEY}.moveUp`, { code: row.code })"

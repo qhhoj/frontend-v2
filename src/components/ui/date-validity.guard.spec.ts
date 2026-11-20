@@ -27,6 +27,8 @@ const PROVIDER: Record<string, string> = {
   'admin/problems/general/ProblemBasicsSection.vue': 'admin/problems/workbench/use-workbench.ts',
   'admin/contests/general/ContestTimeSection.vue': 'admin/contests/general/use-contest-form.ts',
   'admin/contests/general/ContestBasicTime.vue': 'admin/contests/general/use-contest-form.ts',
+  'admin/contests/workbench/SetupTime.vue': 'admin/contests/general/use-contest-form.ts',
+  'admin/contests/workbench/SetupTimeMore.vue': 'admin/contests/general/use-contest-form.ts',
   'admin/rejudge/RejudgeFilterForm.vue': 'admin/rejudge/BulkRejudgePage.vue',
   'admin/settings/ScalarSettingField.vue': 'admin/settings/SiteSettingsPage.vue',
   'blog/editor/PostSettingsCard.vue': 'blog/editor/PostEditorPage.vue',
