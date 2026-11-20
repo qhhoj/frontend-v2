@@ -60,7 +60,7 @@ const FILE_LIST = 'm-0 list-none divide-y divide-line rounded-control border bor
 
 <template>
   <div class="flex flex-col gap-3" data-testid="compare-mode">
-    <p id="data-compare-label" class="m-0 text-meta text-muted">{{ t(`${key}.compare.label`) }}</p>
+    <p class="m-0 text-meta text-muted">{{ t(`${key}.compare.label`) }}</p>
     <SegmentedControl
       size="sm"
       :label="t(`${key}.compare.label`)"

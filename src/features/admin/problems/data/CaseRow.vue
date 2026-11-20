@@ -41,6 +41,8 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const KEY = 'admin.problems.data.cases';
 const CELL = 'border-b border-line px-2 py-0.5';
+/** The menu's cell has no side padding: on a phone the button alone is the 44 px target. */
+const MENU_CELL = 'border-b border-line py-0.5 text-right';
 const COLUMN_COUNT = 5;
 const CASE_CHECKERS: CaseChecker[] = [
   '',
@@ -138,7 +140,7 @@ const menu = computed<MenuEntry[]>(() => {
         @input="row.points = numberBoxValue($event)"
       />
     </td>
-    <td :class="[CELL, 'text-right']">
+    <td :class="MENU_CELL">
       <RowMenu :items="menu" :label="t(`${KEY}.menu.group`, names)" />
     </td>
   </tr>
@@ -187,7 +189,7 @@ const menu = computed<MenuEntry[]>(() => {
         @input="row.points = numberBoxValue($event)"
       />
     </td>
-    <td :class="[CELL, 'text-right']">
+    <td :class="MENU_CELL">
       <RowMenu :items="menu" :label="t(`${KEY}.menu.test`, names)" />
     </td>
   </tr>
@@ -195,7 +197,7 @@ const menu = computed<MenuEntry[]>(() => {
     <td :colspan="COLUMN_COUNT - 1" :class="[CELL, 'text-meta text-muted']">
       {{ t(`${KEY}.strayEnd`) }}
     </td>
-    <td :class="[CELL, 'text-right']">
+    <td :class="MENU_CELL">
       <IconButton size="sm" :label="t(`${KEY}.removeStrayEnd`)" @click="emit('remove')">
         <X aria-hidden="true" />
       </IconButton>

@@ -96,7 +96,7 @@ function remove(shown: TableRow) {
       <option v-for="file in data.archiveFiles" :key="file" :value="file" />
     </datalist>
     <ScrollRegion v-if="rows.length > 0" class="min-w-0" :label="$t(`${KEY}.title`)" no-hint>
-      <table class="w-full min-w-md border-separate border-spacing-0 text-body">
+      <table class="w-full min-w-sm border-separate border-spacing-0 text-body">
         <caption class="sr-only">
           {{
             $t(`${KEY}.title`)
@@ -104,7 +104,7 @@ function remove(shown: TableRow) {
         </caption>
         <thead>
           <tr class="text-left">
-            <th scope="col" :class="[TABLE_HEAD_CELL, HEAD, 'w-16']">
+            <th scope="col" :class="[TABLE_HEAD_CELL, HEAD, 'w-10']">
               {{ $t(`${KEY}.columns.test`) }}
             </th>
             <th scope="col" :class="[TABLE_HEAD_CELL, HEAD]">{{ $t(`${KEY}.columns.input`) }}</th>
@@ -112,7 +112,7 @@ function remove(shown: TableRow) {
             <th scope="col" :class="[TABLE_HEAD_CELL, HEAD, 'w-24 text-right']">
               {{ $t(`${KEY}.columns.points`) }}
             </th>
-            <th scope="col" :class="[TABLE_HEAD_CELL, HEAD, 'w-12']">
+            <th scope="col" :class="[TABLE_HEAD_CELL, 'w-11 border-b border-line']">
               <span class="sr-only">{{ $t(`${KEY}.columns.actions`) }}</span>
             </th>
           </tr>

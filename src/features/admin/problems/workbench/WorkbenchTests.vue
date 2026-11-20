@@ -210,7 +210,7 @@ watch(
             </template>
             <template #actions>
               <AppButton
-                v-if="autofill?.pairCount && !autofill.live"
+                v-if="autofill?.newPairCount && !autofill.live"
                 size="sm"
                 tone="secondary"
                 data-testid="zip-autofill-open"

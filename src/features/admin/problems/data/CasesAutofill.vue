@@ -5,7 +5,7 @@ import AppButton from '@/components/ui/AppButton.vue';
 import SegmentedControl from '@/components/ui/SegmentedControl.vue';
 import TextInput from '@/components/ui/TextInput.vue';
 import { numberBoxValue } from '../../ui/form/number-box';
-import { caseBody, casesFromPairs } from './test-cases';
+import { caseBody, caseCount, casesFromPairs } from './test-cases';
 import type { KeyedCase } from './test-cases';
 import { newPairsOnly, pairArchiveFiles, splitPoints, totalPointsOf } from './zip-autofill';
 
@@ -97,12 +97,14 @@ function undo() {
   cases.value = live.value.base;
   applied.value = null;
 }
-defineExpose({ start, pairCount: computed(() => pairing.value.pairs.length), live });
+/** The archive's pairs the table does not list yet: what "Tạo test từ gói" would add. */
+const newPairCount = computed(() => newPairsOnly(pairing.value.pairs, cases.value).length);
+defineExpose({ start, newPairCount, live });
 
 const modeOptions = computed(() =>
   (['append', 'replace'] as const).map((value) => ({
     value,
-    label: t(`${KEY}.modes.${value}`, { count: live.value?.base.length ?? 0 }),
+    label: t(`${KEY}.modes.${value}`, { count: caseCount(live.value?.base ?? []) }),
     testid: `autofill-mode-${value}`,
   })),
 );
@@ -110,7 +112,8 @@ const statusText = computed(() => {
   const made = live.value;
   if (!made) return '';
   if (made.added === 0) return t(`${KEY}.nothingNew`, { count: made.skipped });
-  const said = t(`${KEY}.${mode.value === 'replace' ? 'appliedReplace' : 'applied'}`, {
+  const isReplacing = mode.value === 'replace' && made.base.length > 0;
+  const said = t(`${KEY}.${isReplacing ? 'appliedReplace' : 'applied'}`, {
     count: made.added,
   });
   return made.skipped > 0 ? `${said} ${t(`${KEY}.skipped`, { count: made.skipped })}` : said;
