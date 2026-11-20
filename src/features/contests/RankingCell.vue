@@ -19,8 +19,11 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
 <template>
   <td class="h-(--qh-row-dense) px-0.5 py-0">
     <!-- An empty cell keeps the filled cell's box height so a row without attempts is as tall as the rest. -->
-    <span v-if="view.kind === 'empty'" class="block" :class="CELL_BOX_CLASS"
-      ><span class="sr-only">{{ $t(view.labelKey) }}</span></span
+    <span
+      v-if="view.kind === 'empty'"
+      class="flex items-center justify-center"
+      :class="[CELL_BOX_CLASS, TABLE_CELL_CLASSES.empty]"
+      ><span aria-hidden="true">—</span><span class="sr-only">{{ $t(view.labelKey) }}</span></span
     >
     <component
       :is="to ? RouterLink : 'span'"
@@ -37,9 +40,9 @@ const labelCount = computed(() => Number(props.view.labelParams.tries ?? 1));
       <Star
         v-if="view.kind === 'first-solve'"
         aria-hidden="true"
-        class="absolute top-0.5 right-0.5 size-2.5 text-cue-full"
+        class="absolute top-0.5 right-0.5 size-2.5 fill-current text-merit"
       />
-      <span aria-hidden="true" class="text-sm font-normal"
+      <span aria-hidden="true" class="text-sm font-semibold"
         ><ScoreTick :text="view.text" :animate="tick"
       /></span>
       <span

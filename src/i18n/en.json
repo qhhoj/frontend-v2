@@ -124,18 +124,12 @@
     "detail": {
       "authors": "Set by:",
       "freezeAt": "{time} freeze",
-      "freeze": "Freeze",
-      "timeLeft": "Time left",
-      "notStarted": "Not started yet",
       "endedOn": "Ended at {time}",
-      "endedAt": "Ended at {time}",
       "elapsed": "{span} in",
       "notFoundTitle": "Contest not found",
       "notFoundBody": "This contest does not exist or is hidden from you.",
       "backToList": "Back to contests",
-      "aside": "Contest details",
-      "ratingChange": "Your rating {change}",
-      "firstRating": "First rating: {rating}"
+      "aside": "Contest details"
     },
     "problems": {
       "caption": "Contest problems",
@@ -143,7 +137,7 @@
         "label": "Problem",
         "name": "Name",
         "points": "Points",
-        "own": "Yours",
+        "own": "Mine",
         "open": "Open"
       },
       "open": "Open",
@@ -156,7 +150,6 @@
       "afterStart": "The problems show when the contest starts and you enter.",
       "afterJoin": "The problems show as soon as you enter.",
       "hidden": "The problems are not public yet.",
-      "heading": "Problems",
       "printAll": "Print all statements"
     },
     "announcements": {
@@ -384,6 +377,20 @@
       "title": "Start now?",
       "body": "The {span} clock runs from the moment you click and cannot be paused.",
       "wait": "Not yet"
+    },
+    "plate": {
+      "label": "Clock and results of the contest",
+      "left": "time left",
+      "startsIn": "starts in",
+      "freezeIn": "Freeze in",
+      "start": "Start",
+      "length": "Length",
+      "rating": "Rating",
+      "timeline": "Contest timeline",
+      "now": "Now: {elapsed}",
+      "event": "{elapsed} · Problem {problem}: {verdict}",
+      "eventsNote": "The dots on the scale are your submissions.",
+      "freezeNote": "Hatched zone: the scoreboard is frozen from {time}."
     }
   },
   "placeholder": {
@@ -1434,8 +1441,6 @@
       "pendingLabel": "Results pending"
     },
     "timeLeft": "Time left",
-    "showProblems": "Show the contestant's problems",
-    "hideProblems": "Hide the contestant's problems",
     "scrollRegion": "Scrollable ranking board",
     "columns": {
       "rank": "Rank",
@@ -1447,16 +1452,15 @@
       "scorePenalty": "Score · Penalty"
     },
     "legend": {
-      "firstSolve": "first solve",
-      "solved": "+n: solved after n wrong tries, solve time on the line below",
-      "failed": "red −n: n wrong tries",
-      "pending": "?n: waiting to be revealed",
-      "firstPoints": "full points and first to solve",
-      "fullPoints": "green fill: the problem's full points",
-      "partialPoints": "plain score: part of the problem's points",
-      "zeroPoints": "red 0: submitted, no points yet",
-      "notAttempted": "blank: not attempted",
-      "button": "Legend"
+      "label": "Legend",
+      "fullPoints": "full score",
+      "partialPoints": "partial",
+      "zeroPoints": "no points",
+      "notAttempted": "not tried",
+      "solved": "solved after n wrong tries",
+      "failed": "n wrong tries",
+      "pending": "awaiting results",
+      "firstSolve": "first solve"
     },
     "cell": {
       "firstSolve": "First solve, after {tries} wrong try, at {time} | First solve, after {tries} wrong tries, at {time}",
@@ -2685,6 +2689,16 @@
     "rankingShort": "Ranking",
     "sticky": {
       "label": "Live contest bar"
+    },
+    "rank": "Rank {rank}",
+    "score": "{score} points",
+    "problems": "Problems of the contest",
+    "letter": {
+      "solved": "solved",
+      "partial": "partial score",
+      "failed": "tried, no points yet",
+      "pending": "judging",
+      "none": "not tried"
     }
   },
   "balloons": {

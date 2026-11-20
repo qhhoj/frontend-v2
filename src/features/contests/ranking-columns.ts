@@ -17,6 +17,8 @@ export const RATING_COLUMN_REM = 8;
 /** The name column fits the longest name and stops at 240 px (15 rem); longer names are cut with a tooltip. */
 export const NAME_COLUMN_MIN_REM = 10;
 export const NAME_COLUMN_MAX_REM = 15;
+/** On a phone the name column is fixed and narrow (it stays while the cells scroll), so a problem column shows beside it. */
+export const NAME_COLUMN_PHONE_REM = 8.5;
 /** Avatar (24 px), its gap and the cell's padding, then about 0.5 rem per character of the name (13 px, medium). */
 const NAME_FIXED_REM = 4.5;
 const NAME_CHAR_REM = 0.5;
@@ -24,7 +26,7 @@ const NAME_CHAR_REM = 0.5;
 /** The board's numbers are JetBrains Mono: every character is 0.6 em wide, so a text's width follows from its length. */
 const MONO_EM = 0.6;
 const ROOT_PX = 16;
-/** `text-sm` (cells, scores) and `text-tiny` (times, phone mini cells). */
+/** `text-sm` (cells, scores) and `text-tiny` (times). */
 const TEXT_PX = 14;
 const TINY_PX = 11;
 /** The total score column prints `text-base`. */
