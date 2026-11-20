@@ -10,7 +10,7 @@ export type HomePlate =
   | { kind: 'running' | 'upcoming'; contest: ContestListItem }
   | { kind: 'none' };
 
-/** The clock decides the phase, not the list's `phase` field: a list read before a start or an end is stale. */
+/** The clock decides when a contest is over or has started, not the list's `phase` field: a list read before that is stale. */
 export function homePlate(
   current: CurrentParticipation | null,
   running: readonly ContestListItem[],
@@ -21,7 +21,8 @@ export function homePlate(
     const contest = running.find((item) => item.key === current.contest.key) ?? null;
     return { kind: 'mine', current, contest };
   }
-  const live = running.find((item) => phaseAt(item, now) === 'running');
+  // A row of the running list counts until its end: at the second a contest starts, the caller's clock may still be before it.
+  const live = running.find((item) => phaseAt(item, now) !== 'ended');
   if (live) return { kind: 'running', contest: live };
   const next = upcoming
     .filter((item) => phaseAt(item, now) === 'upcoming')

@@ -17,7 +17,7 @@ import { useMyProblemsQuery } from './home.queries';
 /**
  * "Bài của tôi" (staff only): the problems the viewer may edit, unfinished first, one row each, a link as a whole, with its setup state
  * ("Chưa xong" and what it still lacks; a click goes to the tab that fixes the first gap). The texts are the home's own:
- * the `admin.*` messages load only on admin pages.
+ * the `admin.problemList` messages load only on admin pages.
  * The header links to the list filtered to the viewer's own problems; the foot has "+ Tạo bài".
  */
 const props = defineProps<{ username: string }>();
