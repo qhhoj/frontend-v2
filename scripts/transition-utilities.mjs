@@ -31,7 +31,6 @@ export const ALLOWED = {
   'components/ui/DataTable.vue': { 'transition-transform': CHEVRON },
   'components/ui/Disclosure.vue': { 'transition-transform': CHEVRON },
   'components/ui/Notice.vue': { 'transition-transform': CHEVRON },
-  'features/admin/problems/ProblemSetupChecklist.vue': { 'transition-transform': CHEVRON },
   'features/admin/problems/import/ImportOptionsForm.vue': { 'transition-transform': CHEVRON },
   'features/admin/problems/polygon/PolygonLinkPanel.vue': { 'transition-transform': CHEVRON },
   'features/admin/problems/polygon/PolygonLinkStep.vue': { 'transition-transform': CHEVRON },

@@ -12,7 +12,7 @@ import type { Locale } from '@/i18n';
  * - file sizes (`formatFileSize`): megabytes cut to one decimal, whole kilobytes below one megabyte.
  */
 const UNIT_GAP = ' ';
-const KIB_PER_MIB = 1024;
+export const KIB_PER_MIB = 1024;
 const BYTES_PER_KILOBYTE = 1024;
 const BYTES_PER_MEGABYTE = 1024 * 1024;
 

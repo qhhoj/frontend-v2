@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { editableProblem, problemEditor, testCase } from '@/test/admin-fixtures/problems';
-import { isSetupOpen, nextStep, setupSteps, tabSetupDone } from './setup-steps';
+import {
+  nextStep,
+  publishBlockers,
+  publishWarnings,
+  setupSteps,
+  workbenchSteps,
+} from './setup-steps';
 
 const fresh = editableProblem({
   editor: { ...problemEditor(), description: '', translations: [] },
@@ -79,30 +85,24 @@ describe('setupSteps', () => {
   });
 });
 
-describe('isSetupOpen', () => {
-  const scored = [testCase({ type: 'C', points: 100 })];
+describe('the workbench plate', () => {
+  const scored = [testCase({ type: 'C', points: 10 })];
+  const unscored = [testCase({ type: 'C', points: 0 })];
 
-  it('stays open on a private problem while a step before publishing is open', () =>
-    expect(isSetupOpen(fresh, setupSteps(fresh, []))).toBe(true));
-
-  it('closes on a finished, tried site problem kept private, but not on an organization one', () => {
-    const tried = editableProblem({ viewerStatus: 'solved' });
-    expect(isSetupOpen(tried, setupSteps(tried, scored))).toBe(false);
-    const orgProblem = editableProblem({ viewerStatus: 'solved', isOrganizationPrivate: true });
-    expect(isSetupOpen(orgProblem, setupSteps(orgProblem, scored))).toBe(true);
+  it('shows tests and their points as one step and names what it still misses', () => {
+    const steps = workbenchSteps(setupSteps(editableProblem(), unscored));
+    expect(steps.map((step) => step.id)).toEqual(['info', 'statement', 'tests', 'trial']);
+    expect(steps.find((step) => step.id === 'tests')).toMatchObject({
+      isDone: false,
+      missing: ['scoring'],
+    });
   });
 
-  it('never shows on a public problem', () => {
-    const published = editableProblem({ isPublic: true });
-    expect(isSetupOpen(published, setupSteps(published, []))).toBe(false);
-  });
-});
-
-describe('tabSetupDone', () => {
-  it('says per tab whether its steps are done, and nothing for a tab without steps', () => {
-    const steps = setupSteps(fresh, []);
-    expect(tabSetupDone('statements', steps)).toBe(false);
-    expect(tabSetupDone('data', steps)).toBe(false);
-    expect(tabSetupDone('editorial', steps)).toBeNull();
+  it('holds publishing for a missing statement or tests, and only warns about a missing trial', () => {
+    const untried = setupSteps(editableProblem(), scored);
+    expect(publishBlockers(untried)).toEqual([]);
+    expect(publishWarnings(untried).map((step) => step.id)).toEqual(['trial']);
+    const noTests = setupSteps(editableProblem(), []);
+    expect(publishBlockers(noTests).map((step) => step.id)).toEqual(['tests', 'scoring']);
   });
 });

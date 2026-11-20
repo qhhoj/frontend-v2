@@ -14,7 +14,16 @@ import { EDIT_ALL_PROBLEM, lockNotice } from './field-lock';
 import type { ProblemForm } from './problem-form';
 
 const form = defineModel<ProblemForm>({ required: true });
-const props = defineProps<{ meta: ProblemEditingMeta; errors: FieldErrors; sectionId?: string }>();
+/** `part`: the licence is rarely changed and sits apart from the rest (group, types, languages) on the workbench. */
+const props = withDefaults(
+  defineProps<{
+    meta: ProblemEditingMeta;
+    errors: FieldErrors;
+    sectionId?: string;
+    part?: 'classes' | 'license';
+  }>(),
+  { sectionId: undefined, part: 'classes' },
+);
 const { can } = usePermissions();
 const isStaffLocked = computed(() => !can(EDIT_ALL_PROBLEM));
 const allowedLanguagesLockId = useId();
@@ -67,10 +76,19 @@ function setLanguageAllowed(languageId: string, isAllowed: boolean) {
 <template>
   <AdminFormSection
     :id="sectionId"
-    :title="$t('admin.problems.general.sections.classes')"
-    :description="$t('admin.problems.general.descriptions.classes')"
+    :title="
+      $t(
+        part === 'license'
+          ? 'admin.problems.general.classes.license'
+          : 'admin.problems.general.sections.classes',
+      )
+    "
+    :description="
+      part === 'license' ? undefined : $t('admin.problems.general.descriptions.classes')
+    "
   >
     <AdminField
+      v-if="part === 'classes'"
       v-slot="{ id, describedBy }"
       input-id="problem-group"
       :label="$t('admin.problems.general.classes.group')"
@@ -82,6 +100,7 @@ function setLanguageAllowed(languageId: string, isAllowed: boolean) {
       </select>
     </AdminField>
     <AdminField
+      v-if="part === 'license'"
       v-slot="{ id, describedBy }"
       input-id="problem-license"
       :label="$t('admin.problems.general.classes.license')"
@@ -101,7 +120,7 @@ function setLanguageAllowed(languageId: string, isAllowed: boolean) {
       </select>
     </AdminField>
 
-    <div class="flex flex-col gap-2 lg:col-span-2">
+    <div v-if="part === 'classes'" class="flex flex-col gap-2 lg:col-span-2">
       <h3 class="text-sm font-semibold">
         {{ $t('admin.problems.general.classes.types')
         }}<span aria-hidden="true" class="ml-0.5 text-negative">*</span>
@@ -137,6 +156,7 @@ function setLanguageAllowed(languageId: string, isAllowed: boolean) {
     </div>
 
     <fieldset
+      v-if="part === 'classes'"
       class="m-0 flex min-w-0 flex-col gap-2 border-0 p-0 lg:col-span-2"
       :aria-describedby="isStaffLocked ? allowedLanguagesLockId : undefined"
     >

@@ -31,11 +31,15 @@ export function useSeededDraft<Stored>(source: () => Stored, options: SeededDraf
     reseed(next);
   });
 
+  /** The seeded item was renamed by a save (a problem's new code): the draft follows it and keeps its edits. */
+  function retarget(id: string) {
+    seededId = id;
+  }
   function target(): string | null {
     const named = route.params[options.routeParam];
     const isShown = options.idOf(source()) === seededId && String(named) === seededId;
     return isShown ? seededId : null;
   }
 
-  return { target, reseed };
+  return { target, reseed, retarget };
 }

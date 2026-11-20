@@ -4,22 +4,9 @@
     "radio": 2,
     "select": 1
   },
-  "features/admin/problems/ProblemEditorPage.vue": {
-    "AdminChip": 4,
-    "AdminPageHeader": 1,
-    "button": 1,
-    "controls": 2,
-    "fixed-size": 2,
-    "hardcoded-script-value": 1
-  },
   "features/admin/problems/ProblemImportMenu.vue": {
     "button": 1,
     "controls": 1
-  },
-  "features/admin/problems/ProblemSetupChecklist.vue": {
-    "button": 1,
-    "controls": 3,
-    "status-colour": 5
   },
   "features/admin/problems/ProblemsIndexPage.vue": {
     "AdminPageHeader": 1
@@ -86,9 +73,6 @@
     "controls": 2,
     "input": 1
   },
-  "features/admin/problems/data/ProblemDataTab.vue": {
-    "controls": 3
-  },
   "features/admin/problems/data/SourceCheckStatus.vue": {
     "details": 1
   },
@@ -106,10 +90,6 @@
   },
   "features/admin/problems/data/problem-data.queries.ts": {
     "hardcoded-script-value": 1
-  },
-  "features/admin/problems/editorial/ProblemEditorialTab.vue": {
-    "AdminDateTimeField": 1,
-    "controls": 1
   },
   "features/admin/problems/external/ExternalJudgeNotConnected.vue": {
     "controls": 1,
@@ -176,10 +156,6 @@
   "features/admin/problems/general/ProblemCreatePage.vue": {
     "AdminPageHeader": 1
   },
-  "features/admin/problems/general/ProblemGeneralTab.vue": {
-    "controls": 1,
-    "hardcoded-value": 2
-  },
   "features/admin/problems/general/ProblemOrganizationsField.vue": {
     "controls": 1,
     "select": 1,
@@ -192,11 +168,6 @@
     "AdminField": 1,
     "controls": 2,
     "input": 1
-  },
-  "features/admin/problems/general/ProblemVisibilityCard.vue": {
-    "AdminChip": 4,
-    "checkbox": 1,
-    "status-colour": 2
   },
   "features/admin/problems/general/ProblemVisibilitySection.vue": {
     "AdminField": 1,
@@ -330,12 +301,6 @@
   },
   "features/admin/problems/polygon/use-link-check.ts": {
     "hardcoded-script-value": 2
-  },
-  "features/admin/problems/statements/ProblemStatementsTab.vue": {
-    "AdminField": 1,
-    "button": 1,
-    "controls": 3,
-    "input": 1
   },
   "features/admin/search/IndexSearchBox.vue": {
     "button": 1,

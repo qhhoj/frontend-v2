@@ -7,7 +7,7 @@ export type SetupStepId = 'info' | 'statement' | 'tests' | 'scoring' | 'trial' |
 export interface SetupStep {
   id: SetupStepId;
   isDone: boolean;
-  /** Where the step is done: an editor tab or the problem page. */
+  /** Where the step is done: the workbench (an old tab address opens its section) or the problem page. */
   routeName: string;
 }
 
@@ -54,26 +54,41 @@ export function setupSteps(
 export const nextStep = (steps: readonly SetupStep[]): SetupStep | null =>
   steps.find((step) => !step.isDone) ?? null;
 
+/** The workbench shows four steps: tests and their points are one step there ("Test và cách chấm"). */
+export const WORKBENCH_STEPS = {
+  info: ['info'],
+  statement: ['statement'],
+  tests: ['tests', 'scoring'],
+  trial: ['trial'],
+} as const satisfies Record<string, readonly SetupStepId[]>;
+export type WorkbenchStepId = keyof typeof WORKBENCH_STEPS;
+
+export interface WorkbenchStep {
+  id: WorkbenchStepId;
+  isDone: boolean;
+  /** The setup steps of this one still open, in order: what the plate names as the reason. */
+  missing: SetupStepId[];
+}
+
+/** The four workbench steps, from the same rule as every other readiness mark (`setupSteps`). */
+export function workbenchSteps(steps: readonly SetupStep[]): WorkbenchStep[] {
+  return (Object.keys(WORKBENCH_STEPS) as WorkbenchStepId[]).map((id) => {
+    const parts: readonly SetupStepId[] = WORKBENCH_STEPS[id];
+    const missing = steps
+      .filter((step) => parts.includes(step.id) && !step.isDone)
+      .map((step) => step.id);
+    return { id, isDone: missing.length === 0, missing };
+  });
+}
+
 /**
- * Whether the checklist is shown: never on a public problem; on a private one while a setup step before publishing is
- * open, or until an organization problem is shown to its members. A finished, tried site problem kept private (a contest
- * problem) shows nothing.
+ * What publishing waits for: a statement, tests and their points (a contestant can do nothing without them). The trial
+ * submission is not here: publishing without it is allowed and the confirm dialog warns.
  */
-export function isSetupOpen(problem: EditableProblem, steps: readonly SetupStep[]): boolean {
-  if (problem.isPublic) return false;
-  const beforePublishing = steps.filter((step) => step.id !== 'publish');
-  return problem.isOrganizationPrivate || beforePublishing.some((step) => !step.isDone);
-}
+const PUBLISH_BLOCKERS: readonly SetupStepId[] = ['statement', 'tests', 'scoring'];
+export const publishBlockers = (steps: readonly SetupStep[]): SetupStep[] =>
+  steps.filter((step) => PUBLISH_BLOCKERS.includes(step.id) && !step.isDone);
 
-/** The setup steps each editor tab finishes; a tab not listed here has no setup state. */
-const TAB_STEPS: Readonly<Record<string, readonly SetupStepId[]>> = {
-  statements: ['statement'],
-  data: ['tests', 'scoring'],
-};
-
-/** Whether a tab's setup steps are all done: true or false, or null for a tab with no steps. */
-export function tabSetupDone(tabId: string, steps: readonly SetupStep[]): boolean | null {
-  const ids = TAB_STEPS[tabId];
-  if (!ids) return null;
-  return steps.filter((step) => ids.includes(step.id)).every((step) => step.isDone);
-}
+/** What the publish dialog warns about: every step before publishing that is still open. */
+export const publishWarnings = (steps: readonly SetupStep[]): SetupStep[] =>
+  steps.filter((step) => step.id !== 'info' && step.id !== 'publish' && !step.isDone);

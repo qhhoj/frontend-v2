@@ -1,13 +1,11 @@
 import { computed, ref, watch } from 'vue';
+import type { Ref } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
-import { useRoute, useRouter } from 'vue-router';
 import { updateProblem } from '@/api/problem-editing.api';
 import type { EditableProblem, ProblemEditingMeta } from '@/api/types/problem-editing';
-import { translate } from '@/i18n';
 import { usePermissions } from '@/stores/use-permissions';
 import { useViewerId } from '@/stores/use-viewer-id';
 import type { FieldErrors } from '../../ui/admin-errors';
-import { provideDateValidity } from '@/components/ui/date-validity';
 import { useSeededDraft } from '../../ui/form/seeded-draft';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import {
@@ -33,7 +31,7 @@ function useFormSeed(problem: () => EditableProblem, meta: () => ProblemEditingM
   );
   const isDirty = computed(() => dirtyCount.value > 0);
   // A clean form follows the server: the seed and the form move together, so a later save never sends the old values back.
-  const { target, reseed } = useSeededDraft(problem, {
+  const { reseed } = useSeededDraft(problem, {
     idOf: (stored) => stored.code,
     routeParam: 'code',
     isDirty: () => isDirty.value,
@@ -42,40 +40,49 @@ function useFormSeed(problem: () => EditableProblem, meta: () => ProblemEditingM
       form.value = cloneForm(seed.value);
     },
   });
-  return { seed, form, dirtyCount, isDirty, target, reseed };
+  return { seed, form, dirtyCount, reseed };
 }
 
-/** The general tab's form: seeded from the detail, PATCHes only what changed, re-seeded from the answer. */
-export function useProblemForm(problem: () => EditableProblem, meta: () => ProblemEditingMeta) {
-  const route = useRoute();
-  const router = useRouter();
+/** The date boxes' state of the page that owns the save (`provideDateValidity`, called once per page). */
+export interface FormDates {
+  hasUnreadableDate: Ref<boolean>;
+  resetDates: () => void;
+}
+
+/** What one problem PATCH sends besides the changed info fields: the original statement, when it changed too. */
+export interface ProblemPatchExtra {
+  description?: string;
+}
+
+/**
+ * The workbench's info form: seeded from the detail, PATCHes only what changed, re-seeded from the answer. The page's one
+ * save calls `validate()` and then `saveTo()`; a renamed problem's route change is the page's job, after every part is sent.
+ */
+export function useProblemForm(
+  problem: () => EditableProblem,
+  meta: () => ProblemEditingMeta,
+  dates: FormDates,
+) {
   const queryClient = useQueryClient();
   const viewer = useViewerId();
   const { can } = usePermissions();
-  const { seed, form, dirtyCount, isDirty, target, reseed } = useFormSeed(problem, meta);
+  const { seed, form, dirtyCount, reseed } = useFormSeed(problem, meta);
   const localErrors = ref<FieldErrors>({});
   /** Why this save is made: the revision comment, never stored on the problem; cleared after each save. */
   const changeMessage = ref('');
-  const savedAt = ref<Date | null>(null);
-  /** True while a date box holds text that is not a date: the save is refused, never sent without it. */
-  const { hasUnreadableDate, resetDates } = provideDateValidity();
 
   const mutation = useAdminMutation({
-    mutate: (code: string) =>
+    mutate: ({ code, extra }: { code: string; extra: ProblemPatchExtra }) =>
       updateProblem(code, {
         ...changedProblemFields(seed.value, form.value),
+        ...extra,
         changeMessage: changeMessage.value.trim() || undefined,
       }),
     invalidates: () => [PUBLIC_PROBLEMS_KEY, PROBLEM_INDEX_KEY],
-    successText: (saved: EditableProblem) =>
-      translate('admin.problems.general.savedToast', { code: saved.code }),
-    onSuccess: () => (savedAt.value = new Date()),
-    onDone: (saved: EditableProblem, code: string) => {
+    onDone: (saved: EditableProblem) => {
       queryClient.setQueryData(editableProblemKey(saved.code, viewer.value), saved);
       reseed(saved);
       changeMessage.value = '';
-      if (saved.code !== code)
-        void router.replace({ name: route.name!, params: { code: saved.code } });
     },
   });
 
@@ -83,24 +90,22 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
   function discard() {
     form.value = cloneForm(seed.value);
     changeMessage.value = '';
-    resetDates();
+    dates.resetDates();
   }
 
-  async function save() {
+  /** Checks the form and shows what is wrong under each field; true when it may be sent. */
+  function validate(): boolean {
     localErrors.value = {
       ...checkProblemForm(form.value, can),
       ...checkAllowedLanguages(form.value, can, seed.value),
     };
-    // The PATCH goes to the problem the form was filled from, and nowhere while the page shows another one.
-    const code = target();
-    if (
-      code &&
-      Object.keys(localErrors.value).length === 0 &&
-      isDirty.value &&
-      !hasUnreadableDate.value
-    ) {
-      await mutation.run(code);
-    }
+    return Object.keys(localErrors.value).length === 0 && !dates.hasUnreadableDate.value;
+  }
+
+  /** Sends the changed fields (and `extra`) to the problem `code`: the saved problem, or the refusal. */
+  async function saveTo(code: string, extra: ProblemPatchExtra = {}) {
+    const saved = await mutation.run({ code, extra });
+    return saved ?? mutation.failure.value;
   }
 
   // A message describes the values it was made from: editing a field retires it until the next save.
@@ -117,16 +122,5 @@ export function useProblemForm(problem: () => EditableProblem, meta: () => Probl
     ...mutation.fieldErrors.value,
     ...localErrors.value,
   }));
-  return {
-    form,
-    seed,
-    dirtyCount,
-    isDirty,
-    savedAt,
-    save,
-    discard,
-    errors,
-    mutation,
-    changeMessage,
-  };
+  return { form, seed, dirtyCount, errors, changeMessage, validate, saveTo, discard };
 }

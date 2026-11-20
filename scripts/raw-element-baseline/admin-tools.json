@@ -141,12 +141,6 @@
   "features/admin/ui/form/AdminFormSection.vue": {
     "status-colour": 2
   },
-  "features/admin/ui/form/AdminSectionNav.vue": {
-    "controls": 1,
-    "select": 1,
-    "status-colour": 1,
-    "uppercase": 1
-  },
   "features/admin/ui/table/AdminDataTable.vue": {
     "hardcoded-script-value": 1
   },

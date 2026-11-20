@@ -2,7 +2,7 @@ import { computed, ref, watch } from 'vue';
 import { useQueryClient } from '@tanstack/vue-query';
 import { putProblemData } from '@/api/problem-data.api';
 import type { ProblemData, ProblemDataBody } from '@/api/types/problem-data';
-import { translate } from '@/i18n';
+import type { ApiError } from '@/api/client';
 import { useViewerId } from '@/stores/use-viewer-id';
 import type { FieldErrors } from '../../ui/admin-errors';
 import { useSeededDraft } from '../../ui/form/seeded-draft';
@@ -20,8 +20,9 @@ interface DataSave {
 }
 
 /**
- * The data tab's form: seeded from the query, saved as a whole. A clean form follows the server (a Polygon sync, an
- * upload), so a later save never sends the old configuration back; a refetch never overwrites an edit.
+ * The judging form of the workbench: seeded from the query, saved as a whole by the page's one save (`validate`, then
+ * `saveTo`). A clean form follows the server (a Polygon sync, an upload), so a later save never sends the old
+ * configuration back; a refetch never overwrites an edit, and a rename of the problem keeps the edits (`retarget`).
  * `saved` is the configuration the form was last seeded from or saved as: the dirty count compares with it.
  */
 export function useDataForm(code: () => string) {
@@ -30,7 +31,6 @@ export function useDataForm(code: () => string) {
   const query = useProblemDataQuery(code);
   const form = ref<DataForm | null>(null);
   const saved = ref<ProblemData | null>(null);
-  const savedAt = ref<Date | null>(null);
   const dirtyCount = computed(() =>
     form.value && saved.value ? countDataChanges(form.value, toDataForm(saved.value)) : 0,
   );
@@ -39,11 +39,13 @@ export function useDataForm(code: () => string) {
   );
   const { badRowNumbers, markInvalid } = useInvalidArgs(form);
 
+  /** Nothing typed: no change, and no args box holding text that does not parse. */
+  const isClean = () => dirtyCount.value === 0 && badRowNumbers.value.length === 0;
   /** Another problem empties the form until its own data loads; the query watch below then fills it. */
-  const { target } = useSeededDraft(code, {
+  const { retarget } = useSeededDraft(code, {
     idOf: (shown) => shown,
     routeParam: 'code',
-    isDirty: () => false,
+    isDirty: () => !isClean(),
     refill: () => {
       form.value = null;
       saved.value = null;
@@ -52,9 +54,6 @@ export function useDataForm(code: () => string) {
 
   const mutation = useAdminMutation({
     mutate: ({ to, body }: DataSave) => putProblemData(to, body),
-    successText: (_answer: ProblemData, { to }: DataSave) =>
-      translate('admin.problems.data.savedToast', { code: to }),
-    onSuccess: () => (savedAt.value = new Date()),
     onDone: (answer: ProblemData, { to }: DataSave) => {
       queryClient.setQueryData(problemDataKey(to, viewer.value), answer);
       saved.value = answer;
@@ -69,8 +68,6 @@ export function useDataForm(code: () => string) {
   /** Whether the server's configuration differs from the one the form was seeded from (row keys and non-form fields aside). */
   const isNewConfig = (data: ProblemData) =>
     !saved.value || countDataChanges(toDataForm(data), toDataForm(saved.value)) > 0;
-  /** Nothing typed: no change, and no args box holding text that does not parse. */
-  const isClean = () => dirtyCount.value === 0 && badRowNumbers.value.length === 0;
   watch(
     () => query.data.value,
     (data) => {
@@ -85,20 +82,25 @@ export function useDataForm(code: () => string) {
     if (latest) seed(latest);
   }
 
-  /** The configuration goes to the problem it was filled from, and nowhere while the page shows another one. */
-  function save() {
-    const to = target();
-    if (
-      !to ||
-      !form.value ||
-      badRowNumbers.value.length > 0 ||
-      Object.keys(errors.value).length > 0
-    )
-      return;
-    if (dirtyCount.value === 0) return;
-    const result = toDataBody(form.value);
-    if ('errors' in result) return;
-    void mutation.run({ to, body: result.body });
+  /** True when the form may be sent: every args box parses and no field is refused locally. */
+  function validate(): boolean {
+    if (!form.value) return true;
+    return (
+      badRowNumbers.value.length === 0 &&
+      Object.keys(errors.value).length === 0 &&
+      !('errors' in toDataBody(form.value))
+    );
+  }
+
+  /**
+   * Sends the whole configuration to the problem `to`. The answer may be a 200 that still carries the judge's complaint
+   * (`feedback`: a file missing from the archive, a group not closed), so the caller shows it after every save.
+   */
+  async function saveTo(to: string): Promise<{ failure: ApiError | null; feedback: string }> {
+    const result = form.value ? toDataBody(form.value) : null;
+    if (!result || 'errors' in result) return { failure: null, feedback: '' };
+    const answer = await mutation.run({ to, body: result.body });
+    return { failure: mutation.failure.value, feedback: answer?.feedback ?? '' };
   }
 
   return {
@@ -107,11 +109,11 @@ export function useDataForm(code: () => string) {
     saved,
     errors,
     dirtyCount,
-    savedAt,
     badRowNumbers,
     markInvalid,
-    save,
+    validate,
+    saveTo,
+    retarget,
     discard,
-    mutation,
   };
 }
