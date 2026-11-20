@@ -14,7 +14,7 @@ import {
   PUBLIC_CONTESTS_KEY,
   editableContestKey,
 } from '../contest-editing.queries';
-import { canSetVisible } from '../contest-form';
+import { canSetVisible } from '../contest-patch';
 
 /**
  * "Hiển thị": shows or hides the contest at once, outside the tab's form. The state reads in words beside the switch, and
