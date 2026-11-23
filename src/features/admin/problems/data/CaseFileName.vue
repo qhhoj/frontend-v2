@@ -12,11 +12,23 @@ const name = defineModel<string>({ required: true });
 defineProps<{ label: string; testid: string }>();
 const isEditing = ref(false);
 const box = useTemplateRef<{ $el: HTMLInputElement }>('box');
+const button = useTemplateRef<{ focus: () => void }>('button');
+/** The name as it was when the edit began: Escape puts it back. */
+let before = '';
 
 async function edit() {
+  before = name.value;
   isEditing.value = true;
   await nextTick();
   box.value?.$el.focus();
+}
+
+/** Enter or Escape ends the edit and gives the focus back to the name, so Tab goes on from the same place. */
+async function finish(cancel: boolean) {
+  if (cancel) name.value = before;
+  isEditing.value = false;
+  await nextTick();
+  button.value?.focus();
 }
 </script>
 
@@ -32,10 +44,12 @@ async function edit() {
     :data-testid="testid"
     :aria-label="label"
     @blur="isEditing = false"
-    @keydown.enter.prevent="isEditing = false"
+    @keydown.enter.prevent="finish(false)"
+    @keydown.esc.prevent="finish(true)"
   />
   <AppButton
     v-else
+    ref="button"
     tone="plain"
     :data-testid="testid"
     :aria-label="label"
