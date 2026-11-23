@@ -20,6 +20,7 @@ import AdminDateTimeField from '../../ui/form/AdminDateTimeField.vue';
 import { provideDateValidity } from '@/components/ui/date-validity';
 import { CARD, INPUT, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
+import { useCardPrimaryTone } from '../workbench/card-primary';
 import { expiryPreview, publicRankingUrl, toLinkPatch } from './ranking-link';
 import type { LinkForm } from './ranking-link';
 
@@ -70,6 +71,7 @@ const url = computed(() =>
 const preview = computed(() =>
   link.value ? expiryPreview(form.value, new Date(link.value.regeneratedAt), locale.locale) : null,
 );
+const primaryTone = useCardPrimaryTone();
 const queryClient = useQueryClient();
 /** Every write answers the link as it now is, so the answer is stored as is (a refetch could read it back stale). */
 const storeLink = (saved: RankingLink) => queryClient.setQueryData(linkKey(), saved);
@@ -120,7 +122,7 @@ async function saveLink() {
         <p class="text-sm text-muted">{{ $t('admin.contests.ranking.link.none') }}</p>
         <button
           type="button"
-          :class="buttonClass('primary')"
+          :class="buttonClass(primaryTone)"
           class="self-start"
           @click="create.run(undefined)"
         >
@@ -219,7 +221,7 @@ async function saveLink() {
 
         <p v-if="formError" role="alert" class="text-sm text-negative">{{ formError }}</p>
         <div class="flex flex-wrap items-center gap-3">
-          <button type="button" :class="buttonClass('primary')" @click="saveLink">
+          <button type="button" :class="buttonClass(primaryTone)" @click="saveLink">
             {{ $t('common.save') }}
           </button>
           <button type="button" :class="buttonClass('danger')" @click="isRegenerateOpen = true">

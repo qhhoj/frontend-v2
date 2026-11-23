@@ -28,6 +28,7 @@ import SetupParticipants from './SetupParticipants.vue';
 import SetupProblems from './SetupProblems.vue';
 import SetupTime from './SetupTime.vue';
 import { useContestProblemMarks } from './contest-problem-marks';
+import { provideSaveBarShown } from './card-primary';
 import { contestGapsOf } from './contest-status';
 import {
   CONTEST_TOOLS_ANCHORS,
@@ -58,6 +59,7 @@ const SETUP_ID = 'contest-workbench-setup';
 const workbench = useContestWorkbench(() => props.contest);
 const { settings, problems, changes, dirtyCount, isSaving, savedAt, report, invalidSections } =
   workbench;
+provideSaveBarShown(computed(() => dirtyCount.value > 0));
 const { save, discard } = workbench;
 
 const marksQuery = useContestProblemMarks(() =>

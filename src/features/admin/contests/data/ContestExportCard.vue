@@ -16,9 +16,11 @@ import { failureTextOf, hasIssueCode } from '../../ui/admin-errors';
 import { CARD, buttonClass } from '../../ui/controls';
 import { useAdminMutation } from '../../ui/use-admin-mutation';
 import { canPrepareAgain } from '../actions/contest-actions';
+import { useCardPrimaryTone } from '../workbench/card-primary';
 import { contestActionsKey, contestExportKey, useContestExportQuery } from '../contest-ops.queries';
 
 const props = defineProps<{ contest: EditableContest }>();
+const primaryTone = useCardPrimaryTone();
 const viewer = useViewerId();
 const locale = useLocaleStore();
 const now = useNow();
@@ -84,7 +86,7 @@ const isReady = computed(() => status.value?.state === 'ready');
         <div class="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            :class="buttonClass('primary')"
+            :class="buttonClass(primaryTone)"
             :aria-disabled="!mayPrepare || prepare.isPending.value || undefined"
             @click="mayPrepare && prepare.run(undefined)"
           >
