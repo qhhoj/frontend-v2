@@ -91,18 +91,6 @@
     "radio": 1,
     "status-colour": 1
   },
-  "features/admin/contests/general/ContestAccessSection.vue": {
-    "AdminField": 3,
-    "controls": 6,
-    "input": 1,
-    "password": 2
-  },
-  "features/admin/contests/general/ContestFormatSection.vue": {
-    "AdminField": 4,
-    "controls": 6,
-    "input": 2,
-    "select": 2
-  },
   "features/admin/contests/general/ContestInfoSection.vue": {
     "AdminField": 3,
     "controls": 4,
@@ -114,31 +102,10 @@
     "controls": 1,
     "textarea": 1
   },
-  "features/admin/contests/general/ContestRatingSection.vue": {
-    "AdminField": 1,
-    "controls": 2,
-    "input": 1
-  },
-  "features/admin/contests/general/ContestTimeSection.vue": {
-    "AdminDateTimeField": 3,
-    "AdminField": 2,
-    "controls": 4,
-    "input": 2
-  },
-  "features/admin/contests/general/SectionJumpSelect.vue": {
-    "controls": 1,
-    "select": 1
-  },
   "features/admin/contests/general/TagChips.vue": {
     "controls": 2,
     "input": 1,
     "status-colour": 1
-  },
-  "features/admin/contests/general/contest-sections.ts": {
-    "hardcoded-script-value": 1
-  },
-  "features/admin/contests/general/contest-timeline.ts": {
-    "hardcoded-script-value": 1
   },
   "features/admin/contests/ghosts/ContestGhostsTab.vue": {
     "controls": 1

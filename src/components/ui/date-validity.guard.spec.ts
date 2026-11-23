@@ -25,7 +25,6 @@ const PROVIDER: Record<string, string> = {
   'admin/contests/ranking/RankingLinkCard.vue': 'self',
   'admin/problems/editorial/EditorialFields.vue': 'admin/problems/workbench/use-workbench.ts',
   'admin/problems/general/ProblemBasicsSection.vue': 'admin/problems/workbench/use-workbench.ts',
-  'admin/contests/general/ContestTimeSection.vue': 'admin/contests/general/use-contest-form.ts',
   'admin/contests/general/ContestCreateForm.vue': 'self',
   'admin/contests/workbench/SetupTime.vue': 'admin/contests/general/use-contest-form.ts',
   'admin/contests/workbench/SetupTimeMore.vue': 'admin/contests/general/use-contest-form.ts',

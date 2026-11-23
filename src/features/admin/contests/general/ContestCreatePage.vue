@@ -7,7 +7,6 @@ import ContestCreateForm from './ContestCreateForm.vue';
   <CreatePageShell
     :title="$t('admin.contests.create.title')"
     :lead="$t('admin.contests.create.lead')"
-    :back="{ to: { name: 'admin-contests' }, label: $t('admin.contests.index.title') }"
   >
     <ContestCreateForm />
   </CreatePageShell>
