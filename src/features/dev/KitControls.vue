@@ -45,19 +45,17 @@ const scoring = ref('best');
 const isLocked = ref(true);
 const dirtyCount = ref(2);
 /** A button row drawn by `v-for` over items that are replaced as a whole: each button must show the new item. */
-const buttonRows = [
-  [
-    { id: 'a', label: 'Sao chép', icon: Copy },
-    { id: 'b', label: 'Tải lên', icon: FileUp },
-  ],
-  [
-    { id: 'a', label: 'Chỉnh sửa', icon: Pencil },
-    { id: 'b', label: 'Xóa bỏ', icon: Trash2 },
-  ],
+const FIRST_BUTTON_ROWS = [
+  { id: 'a', label: 'Sao chép', icon: Copy },
+  { id: 'b', label: 'Tải lên', icon: FileUp },
 ];
-const buttonRowIndex = ref(0);
+const SECOND_BUTTON_ROWS = [
+  { id: 'a', label: 'Chỉnh sửa', icon: Pencil },
+  { id: 'b', label: 'Xóa bỏ', icon: Trash2 },
+];
+const isSecondButtonRows = ref(false);
 const buttonRowItems = computed(() =>
-  buttonRows[buttonRowIndex.value].map((item) => ({ ...item })),
+  (isSecondButtonRows.value ? SECOND_BUTTON_ROWS : FIRST_BUTTON_ROWS).map((item) => ({ ...item })),
 );
 </script>
 
@@ -189,10 +187,7 @@ const buttonRowItems = computed(() =>
           >
         </div>
         <div>
-          <AppButton
-            size="sm"
-            data-row-toggle
-            @click="buttonRowIndex = buttonRowIndex === 0 ? 1 : 0"
+          <AppButton size="sm" data-row-toggle @click="isSecondButtonRows = !isSecondButtonRows"
             >Đổi dữ liệu</AppButton
           >
         </div>
