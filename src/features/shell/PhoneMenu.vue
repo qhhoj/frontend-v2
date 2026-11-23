@@ -29,7 +29,7 @@ const LANGUAGES: ReadonlyArray<{ value: Locale; label: string }> = [
   { value: 'en', label: 'English' },
 ];
 const ROW =
-  'flex min-h-11 items-center gap-3 rounded-pill px-3 font-semibold hover:bg-surface-hover';
+  'flex min-h-11 items-center gap-3 rounded-control px-3 font-semibold hover:bg-surface-hover';
 /** The page's section, in the menu's sections and in "Quản lý" alike: soft brand ground, brand text. */
 const CURRENT_ROW = 'bg-accent-soft font-bold text-accent-text';
 const HEADING = 'mb-2 text-sm font-semibold text-muted';
