@@ -38,16 +38,17 @@ useAccountThemeSync();
 useAccountAppearanceSync();
 useAccountBitRoamSync();
 const route = useRoute();
-/** While the viewer takes part in a contest, every public page carries its bar (and the rail its card). */
+/** While the viewer takes part in a contest, every page of the site frame carries the rail's card, and the contest's own pages its bar. */
 const { current: currentContest } = useCurrentContest(
   () => route.meta.layout !== 'admin' && route.meta.layout !== 'auth',
 );
 const isSearchOpen = ref(false);
 const { isCollapsed: isRailCollapsed } = useRailCollapse();
-/** On the contest's own pages its bar is the status; on every other page the phone's top bar carries a chip instead (the desktop rail's card shows it always). */
+/** On the contest's own pages its bar is the status; on every other page the phone's top bar carries a chip instead (the desktop rail's card shows it always). The organiser's workbench of that contest (an `adminArea` route with the same `key`) is not one of its pages. */
 const isOnCurrentContest = computed(
   () =>
     currentContest.value !== null &&
+    !route.meta.adminArea &&
     (route.params.key === currentContest.value.contest.key ||
       navSectionOverride.value === '/contests'),
 );

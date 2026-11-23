@@ -69,9 +69,6 @@ export function useManageItems() {
   );
 }
 
-/** Every place a page can belong to: the public sections, then the "Quản lý" lists (their pages sit under `/admin/...`). */
-const SECTIONS: readonly NavItem[] = [...NAV_ITEMS, ...MANAGE_ITEMS];
-
 /** The section the viewer just asked for; it is lit at once while the page behind it loads. Null when none is pending. */
 const pendingPath = ref<string | null>(null);
 
@@ -119,15 +116,17 @@ export function useNavLinkEvents() {
 }
 
 /**
- * The section of the page on screen (its claim through `useNavSection`, else its path), or null outside `SECTIONS`. Unlike
- * `useIsNavCurrent` it ignores a pending click: the top bar's crumbs name the page that is shown.
+ * The section of the page on screen (its claim through `useNavSection`, else its path): one of the public sections or of
+ * the viewer's "Quản lý" lists (their pages sit under `/admin/...`), or null outside them. Unlike `useIsNavCurrent` it
+ * ignores a pending click: the top bar's crumbs name the page that is shown.
  */
 export function useCurrentSection() {
   const route = useRoute();
+  const manageItems = useManageItems();
   return computed(() => {
     const claimed = navSectionOverride.value;
     return (
-      SECTIONS.find((item) =>
+      [...NAV_ITEMS, ...manageItems.value].find((item) =>
         claimed === null ? isInSection(item.path, route.path) : item.path === claimed,
       ) ?? null
     );
