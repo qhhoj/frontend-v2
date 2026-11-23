@@ -23,6 +23,7 @@
   "cannotEdit": "This account cannot edit contest {key}.",
   "index": {
     "title": "Contests",
+    "titleOwn": "My contests",
     "lead": "Find, filter and open the contests you manage.",
     "create": "Create contest"
   },

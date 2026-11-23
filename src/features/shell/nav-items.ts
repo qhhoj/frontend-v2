@@ -1,5 +1,6 @@
 import {
   Building2,
+  CalendarCog,
   ChartColumn,
   FileText,
   House,
@@ -13,6 +14,7 @@ import { computed, provide, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { CURRENT_SECTION_KEY } from '@/components/ui/page-section';
 import { canUseAdmin } from '@/features/admin/admin-access';
+import type { AdminAccess } from '@/features/admin/admin-access';
 import { ADMIN_SCREENS } from '@/features/admin/admin-screens';
 import { useSessionStore } from '@/stores/session.store';
 import type { RouteLocationNormalized } from 'vue-router';
@@ -41,17 +43,34 @@ export const NAV_ITEMS: readonly NavItem[] = [
 export const MENU_ITEMS: readonly NavItem[] = NAV_ITEMS.filter((item) => item.path !== '/users');
 
 /**
- * The menu's "Quản lý" group: the viewer's own work as a setter. "Bài tập của tôi" is listed for whoever may open the
- * problem list of the admin area (create or edit problems); nobody else gets the group.
+ * The menu's "Quản lý" group: the viewer's own work as a setter and organiser, drawn in this shell like any section.
+ * Each item opens the list of its admin-area screen and is listed only for whoever may open that screen (the same
+ * check the admin menu runs, `canUseAdmin`); a viewer with neither right gets no group.
  */
+const MANAGE_ITEMS: ReadonlyArray<NavItem & { access: AdminAccess }> = [
+  {
+    path: ADMIN_SCREENS.problems.path,
+    labelKey: 'nav.myProblems',
+    icon: FileText,
+    access: ADMIN_SCREENS.problems,
+  },
+  {
+    path: ADMIN_SCREENS.contests.path,
+    labelKey: 'nav.myContests',
+    icon: CalendarCog,
+    access: ADMIN_SCREENS.contests,
+  },
+];
+
 export function useManageItems() {
   const session = useSessionStore();
   return computed<NavItem[]>(() =>
-    canUseAdmin(session.user, ADMIN_SCREENS.problems)
-      ? [{ path: ADMIN_SCREENS.problems.path, labelKey: 'nav.myProblems', icon: FileText }]
-      : [],
+    MANAGE_ITEMS.filter((item) => canUseAdmin(session.user, item.access)),
   );
 }
+
+/** Every place a page can belong to: the public sections, then the "Quản lý" lists (their pages sit under `/admin/...`). */
+const SECTIONS: readonly NavItem[] = [...NAV_ITEMS, ...MANAGE_ITEMS];
 
 /** The section the viewer just asked for; it is lit at once while the page behind it loads. Null when none is pending. */
 const pendingPath = ref<string | null>(null);
@@ -100,7 +119,7 @@ export function useNavLinkEvents() {
 }
 
 /**
- * The section of the page on screen (its claim through `useNavSection`, else its path), or null outside the seven. Unlike
+ * The section of the page on screen (its claim through `useNavSection`, else its path), or null outside `SECTIONS`. Unlike
  * `useIsNavCurrent` it ignores a pending click: the top bar's crumbs name the page that is shown.
  */
 export function useCurrentSection() {
@@ -108,7 +127,7 @@ export function useCurrentSection() {
   return computed(() => {
     const claimed = navSectionOverride.value;
     return (
-      NAV_ITEMS.find((item) =>
+      SECTIONS.find((item) =>
         claimed === null ? isInSection(item.path, route.path) : item.path === claimed,
       ) ?? null
     );

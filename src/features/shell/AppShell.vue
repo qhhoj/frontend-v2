@@ -27,6 +27,10 @@ import { useRailCollapse } from './use-rail-collapse';
 
 /** Lazy: the admin nav and icons stay out of the bundle every visitor loads. */
 const AdminShell = defineAsyncComponent(() => import('@/features/admin/shell/AdminShell.vue'));
+/** Lazy for the same reason: around a teacher's screen ("Quản lý"), which this shell draws like any site page. */
+const SiteScreenGate = defineAsyncComponent(
+  () => import('@/features/admin/shell/SiteScreenGate.vue'),
+);
 
 providePageSection();
 useAccountCacheSync();
@@ -91,7 +95,8 @@ const chipContest = computed(() =>
         <OfficialModeBanner class="print:hidden" />
         <HighPriorityBanner class="print:hidden" />
         <main id="main" tabindex="-1" class="relative flex-1 focus-visible:outline-none">
-          <slot />
+          <SiteScreenGate v-if="route.meta.adminArea"><slot /></SiteScreenGate>
+          <slot v-else />
         </main>
         <AppFooter class="print:hidden" />
       </div>

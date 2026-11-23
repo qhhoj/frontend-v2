@@ -23,6 +23,7 @@
   "cannotEdit": "Tài khoản này không sửa được kỳ thi {key}.",
   "index": {
     "title": "Kỳ thi",
+    "titleOwn": "Kỳ thi của tôi",
     "lead": "Tìm, lọc và mở kỳ thi bạn quản trị.",
     "create": "Tạo kỳ thi"
   },

@@ -10,6 +10,8 @@ export interface AdminScreen {
   permission: PermissionRule | null;
   /** An object right that also opens the screen, for viewers without the permission. */
   capability?: AdminCapability;
+  /** `'site'`: a teacher's own work ("Quản lý" in the site menu), drawn in the site shell. Absent: the admin shell. */
+  shell?: 'site';
 }
 
 /** The backend's `canEdit` needs `edit_own_problem` for every edit; `edit_all_problem` only widens which problems. */
@@ -24,30 +26,39 @@ export const SYNC_POLYGON = 'judge.sync_polygon_problem';
 const problemTab = (tab: string): AdminScreen => ({
   path: `/admin/problems/:code/${tab}`,
   permission: PROBLEM_EDIT,
+  shell: 'site',
 });
 const contestTab = (tab: string): AdminScreen => ({
   path: `/admin/contests/:key/${tab}`,
   permission: CONTEST_EDIT,
+  shell: 'site',
 });
 
 /** Every admin screen of plans 8f-1 and 8f-2. Ids are camelCase; route names are `admin-<id>`; titles `admin.shell.screens.<id>`. */
 export const ADMIN_SCREENS = {
   dashboard: { path: '/admin', permission: null },
-  problems: { path: '/admin/problems', permission: ['judge.add_problem', PROBLEM_EDIT] },
+  problems: {
+    path: '/admin/problems',
+    permission: ['judge.add_problem', PROBLEM_EDIT],
+    shell: 'site',
+  },
   problemNew: {
     path: '/admin/problems/new',
     permission: ['judge.add_problem', 'judge.suggest_new_problem'],
     capability: 'problemCreation',
+    shell: 'site',
   },
   polygonImport: {
     path: '/admin/problems/polygon',
     permission: ['judge.add_problem', SYNC_POLYGON],
     capability: 'problemCreation',
+    shell: 'site',
   },
   problemImport: {
     path: '/admin/problems/import',
     permission: ['judge.add_problem', PROBLEM_EDIT],
     capability: 'problemCreation',
+    shell: 'site',
   },
   problemGeneral: problemTab('general'),
   problemStatements: problemTab('statements'),
@@ -59,11 +70,16 @@ export const ADMIN_SCREENS = {
     path: '/admin/types',
     permission: ['judge.change_problemtype', 'judge.change_problemgroup', 'judge.change_license'],
   },
-  contests: { path: '/admin/contests', permission: ['judge.add_contest', ...CONTEST_EDIT] },
+  contests: {
+    path: '/admin/contests',
+    permission: ['judge.add_contest', ...CONTEST_EDIT],
+    shell: 'site',
+  },
   contestNew: {
     path: '/admin/contests/new',
     permission: 'judge.add_contest',
     capability: 'contestCreation',
+    shell: 'site',
   },
   contestTags: { path: '/admin/contest-tags', permission: 'judge.change_contest_tag' },
   contestGeneral: contestTab('general'),
@@ -131,4 +147,7 @@ export const ADMIN_SCREENS = {
 } as const satisfies Record<string, AdminScreen>;
 
 export type AdminScreenId = keyof typeof ADMIN_SCREENS;
+/** Whether the site shell draws the screen (see `AdminScreen.shell`). */
+export const isSiteScreen = (id: AdminScreenId): boolean =>
+  (ADMIN_SCREENS[id] as AdminScreen).shell === 'site';
 export const adminRouteName = (id: AdminScreenId) => `admin-${id}`;

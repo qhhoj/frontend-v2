@@ -4,7 +4,7 @@ import AppShell from '@/features/shell/AppShell.vue';
 import PendingPageSkeleton from '@/features/shell/PendingPageSkeleton.vue';
 import StagingBanner from '@/features/shell/StagingBanner.vue';
 
-/** While the first navigation waits for the session, a public page shows a skeleton; sign-in and admin pages stay empty. */
+/** While the first navigation waits for the session, a page of the site frame shows a skeleton; sign-in and admin-shell pages stay empty. */
 const router = useRouter();
 const isPublicTarget = !router.resolve(router.options.history.location).meta.layout;
 </script>

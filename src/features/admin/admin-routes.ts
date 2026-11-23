@@ -1,5 +1,5 @@
 import type { RouteComponent, RouteRecordRaw } from 'vue-router';
-import { ADMIN_SCREENS, adminRouteName } from './admin-screens';
+import { ADMIN_SCREENS, adminRouteName, isSiteScreen } from './admin-screens';
 import type { AdminScreen, AdminScreenId } from './admin-screens';
 
 type Loader = () => Promise<RouteComponent | { default: RouteComponent }>;
@@ -58,7 +58,10 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
   organizationQuotas: () => import('./organizations/quotas/QuotaOverviewPage.vue'),
 };
 
-const ADMIN_META = { requiresAuth: true, adminArea: true, layout: 'admin' } as const;
+/** Every `/admin` route: signed-in, the admin-area rules of the guard, and the admin texts loaded before it renders. */
+const AREA_META = { requiresAuth: true, adminArea: true } as const;
+/** The admin shell draws the route. A teacher's screens (`shell: 'site'`) leave it out: the site shell draws them, behind `SiteScreenGate`. */
+const ADMIN_META = { ...AREA_META, layout: 'admin' } as const;
 
 const screenRoute = (id: AdminScreenId): RouteRecordRaw => {
   const screen: AdminScreen = ADMIN_SCREENS[id];
@@ -67,7 +70,7 @@ const screenRoute = (id: AdminScreenId): RouteRecordRaw => {
     name: adminRouteName(id),
     component: SCREEN_COMPONENTS[id],
     meta: {
-      ...ADMIN_META,
+      ...(isSiteScreen(id) ? AREA_META : ADMIN_META),
       titleKey: `admin.shell.screens.${id}`,
       permission: screen.permission ?? undefined,
       capability: screen.capability,
