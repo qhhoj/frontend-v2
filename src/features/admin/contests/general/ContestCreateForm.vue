@@ -147,11 +147,13 @@ watch(
           size="sm"
           :data-testid="`contest-quick-${minutes}`"
           :disabled="!form.startTime"
-          :disabled-reason="form.startTime ? undefined : $t(`${BENCH}.startFirst`)"
           @click="lastFor(minutes)"
         >
           {{ $t(`${KEY}.basic.quick`, { n: minutes }) }}
         </AppButton>
+        <span v-if="!form.startTime" class="text-meta text-muted">{{
+          $t(`${BENCH}.startFirst`)
+        }}</span>
       </div>
     </div>
     <Notice v-if="refusalText" tone="danger" data-testid="create-refused">{{ refusalText }}</Notice>
