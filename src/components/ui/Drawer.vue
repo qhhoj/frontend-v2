@@ -30,9 +30,9 @@ const body = useTemplateRef<HTMLElement>('body');
 const heading = useTemplateRef<HTMLElement>('heading');
 
 const WIDTHS: Record<DrawerSize, string> = {
-  sm: 'md:w-[25rem]',
-  md: 'md:w-[35rem]',
-  lg: 'md:w-[45rem]',
+  sm: 'md:w-(--width-drawer-sm)',
+  md: 'md:w-(--width-drawer-md)',
+  lg: 'md:w-(--width-drawer-lg)',
 };
 /** Per side: where the panel sits, its edge line, and the slide it enters by. */
 const SIDES: Record<DrawerSide, string> = {

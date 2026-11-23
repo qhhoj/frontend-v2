@@ -9,7 +9,7 @@ import Disclosure from '@/components/ui/Disclosure.vue';
 import Gauge from '@/components/ui/Gauge.vue';
 import Readout from '@/components/ui/Readout.vue';
 import ReadoutCell from '@/components/ui/ReadoutCell.vue';
-import TestSquares from '@/components/ui/TestSquares.vue';
+import TestSquares, { type TestSquare } from '@/components/ui/TestSquares.vue';
 import { translate } from '@/i18n';
 import {
   NO_VALUE,
@@ -137,21 +137,13 @@ const passed = computed(() => passedCount(props.submission));
 const hasTestsCell = computed(() => tests.value !== null || passed.value !== null);
 /** Many squares leave the row of readings and wrap on a line of their own under it. */
 const isWideTests = computed(() => (tests.value?.squares.length ?? 0) > INLINE_SQUARES_MAX);
-/**
- * A square that has a row in the tests table opens that row (`#case-<n>`, which `CasesTable.vue` follows). The kit's
- * `TestSquares` draws plain items, so the click is read here from its list: the item's place is the square's.
- */
+/** A square that has a row in the tests table opens that row (`#case-<n>`, which `CasesTable.vue` follows). */
 const router = useRouter();
 const hasTestRows = computed(
   () => !props.withoutTestRows && tests.value?.unit === 'test' && props.submission.cases !== null,
 );
-function openTestRow(event: MouseEvent) {
-  const item = (event.target as Element).closest('li');
-  const square = item?.parentElement
-    ? tests.value?.squares[[...item.parentElement.children].indexOf(item)]
-    : undefined;
-  if (!hasTestRows.value || !square || square.tone === 'waiting' || square.number === undefined)
-    return;
+function openTestRow(square: TestSquare) {
+  if (square.number === undefined) return;
   void router.replace({ hash: `#case-${square.number}` });
 }
 
@@ -231,22 +223,19 @@ const isStaffMessageOpen = ref(false);
         <template v-if="passed">{{ passed.passed }}</template>
         <template v-if="passed" #unit>/{{ passed.total }}</template>
         <template v-if="tests" #below>
-          <div
+          <TestSquares
             data-testid="plate-squares"
-            :class="hasTestRows && '[&_li]:cursor-pointer'"
-            @click="openTestRow"
-          >
-            <TestSquares
-              :tests="tests.squares"
-              :label="
-                $t(
-                  tests.unit === 'group'
-                    ? 'submission.plate.groupSquares'
-                    : 'submission.plate.squares',
-                )
-              "
-            />
-          </div>
+            :tests="tests.squares"
+            :selectable="hasTestRows"
+            :label="
+              $t(
+                tests.unit === 'group'
+                  ? 'submission.plate.groupSquares'
+                  : 'submission.plate.squares',
+              )
+            "
+            @select="openTestRow"
+          />
         </template>
       </ReadoutCell>
       <!-- The two readings against a limit stay side by side: when the row is full they wrap as a pair. -->
