@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { PanelLeftClose, PanelLeftOpen, Search } from 'lucide-vue-next';
 import BitSprite from '@/components/BitSprite.vue';
 import AppButton from '@/components/ui/AppButton.vue';
@@ -28,7 +29,13 @@ import UserMenu from './UserMenu.vue';
  * column of icons (44 px targets) whose labels stay their accessible names and tooltips. Opaque: the page background is
  * drawn behind `main` only.
  */
-defineProps<{ current: CurrentParticipation | null }>();
+const props = defineProps<{
+  current: CurrentParticipation | null;
+  /** The page lists every contest (home, contest list): no card repeats them. */
+  isContestListShown: boolean;
+  /** The contest the page already shows (its bar, plate or tabs); null when none. */
+  shownContestKey: string | null;
+}>();
 const emit = defineEmits<{ search: [] }>();
 const isCurrent = useIsNavCurrent();
 const linkEvents = useNavLinkEvents();
@@ -37,6 +44,13 @@ const { runningCount, next } = useNextContest();
 const { isCollapsed, toggle } = useRailCollapse();
 /** Below `md` the rail is hidden by CSS: its bell, language and look controls are not mounted then, so the phone's top bar owns the only bell. */
 const isPhone = useMediaQuery(PHONE_QUERY);
+/** A contest's card stays unless the page already shows that contest. */
+const isCardShown = (contestKey: string) =>
+  !props.isContestListShown && props.shownContestKey !== contestKey;
+const showsLive = computed(() => props.current !== null && isCardShown(props.current.contest.key));
+const showsNext = computed(
+  () => !props.current && next.value !== null && isCardShown(next.value.contest.key),
+);
 const BIT: BitLook = { headgear: 'none', palette: 'terracotta' };
 
 /** One row: a control tall (36 px) for a mouse, 44 on touch; the current section is a soft brand ground, brand text and a 3 px brand bar on the left. */
@@ -145,9 +159,9 @@ const CURRENT_ROW =
         <span class="min-w-0 flex-1 truncate rail-slim:sr-only">{{ $t(item.labelKey) }}</span>
       </RouterLink>
     </nav>
-    <RailNextContest v-if="!current && next" :next="next" />
-    <RailLiveContest v-if="current" :current="current" class="mt-auto" />
-    <div :class="['flex flex-col gap-1 border-t border-line pt-2', !current && 'mt-auto']">
+    <RailNextContest v-if="showsNext && next" :next="next" />
+    <RailLiveContest v-if="showsLive && current" :current="current" class="mt-auto" />
+    <div :class="['flex flex-col gap-1 border-t border-line pt-2', !showsLive && 'mt-auto']">
       <!-- Icons stay 24 px; each button is a 44 px target (the rail's 48 px inner width fits it). -->
       <div
         v-if="!isPhone"

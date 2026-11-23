@@ -17,7 +17,7 @@ import { useRailCollapse } from './use-rail-collapse';
  * The rail's card for the contest the viewer is in: its status, name, the clock, and for a contestant the rank and the
  * solved count. The rank is `standing.rank` of the participation (re-read every 2 minutes); it is left out when there is none
  * or the board is frozen. The solved count comes from the contest's problem list (the contest page's query), re-read
- * after each of the viewer's verdicts. A spectator sees the clock only.
+ * after each of the viewer's verdicts. A spectator sees the clock only. `AppRail` leaves it out where the page already shows this contest.
  */
 /** The rank and the solved count are drawn on the open rail only; narrower or collapsed, the list is not asked. */
 const WIDE_RAIL_QUERY = '(min-width: 68.75rem)';

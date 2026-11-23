@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { CalendarClock, Timer } from 'lucide-vue-next';
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
 import { CUE_TEXT } from '@/components/ui/cue-tones';
 import StatusDot from '@/components/ui/StatusDot.vue';
 import StretchedLink from '@/components/ui/StretchedLink.vue';
@@ -15,19 +14,16 @@ import type { NextContest } from './use-next-contest';
 /**
  * The rail's block for the contest to look at next when the viewer is in none: the running one (green) or else the
  * soonest upcoming one (blue). The whole block is the link. It says the name, how long until it starts (or ends) and
- * the date, and is left out on the home and the contest list, which already show it (the caller also leaves it out
- * while the viewer takes part: `RailLiveContest` shows then). On the narrow rail it is the icon with a cue dot; the
+ * the date. `AppRail` leaves it out where the page already shows that contest (home, contest list, the contest's own
+ * pages) and while the viewer takes part (`RailLiveContest` shows then). On the narrow rail it is the icon with a cue dot; the
  * name stays its accessible name. Minute precision is enough, so the clock ticks every 30 seconds.
  */
-const HIDDEN_ROUTES: ReadonlySet<unknown> = new Set(['home', 'contests']);
 const props = defineProps<{ next: NextContest }>();
-const route = useRoute();
 const locale = useLocaleStore();
 const spanText = useSpanText();
 const now = useNow(30_000);
 const isRunning = computed(() => props.next.phase === 'running');
 const tone = computed(() => (isRunning.value ? 'live' : 'upcoming'));
-const isHidden = computed(() => HIDDEN_ROUTES.has(route.name));
 /** Seconds to the end of a running contest, or to the start of an upcoming one. */
 const secondsLeft = computed(() => {
   const target = isRunning.value ? props.next.contest.endTime : props.next.contest.startTime;
@@ -38,7 +34,6 @@ const whenText = computed(() => spanText(spanMessage(secondsLeft.value)));
 
 <template>
   <div
-    v-if="!isHidden"
     data-testid="rail-next-contest"
     :title="next.contest.name"
     class="box-link flex flex-col gap-1 rounded-card bg-surface p-3 transition-colors rail-slim:items-center rail-slim:p-2"
