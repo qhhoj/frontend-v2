@@ -75,7 +75,7 @@ const toolbarFrame = computed(() =>
   <span v-else class="relative block">
     <select
       v-bind="$attrs"
-      :id="field?.id"
+      :id="field?.id ?? ($attrs.id as string | undefined)"
       v-model="model"
       :aria-describedby="field?.describedBy"
       :aria-invalid="field?.invalid"

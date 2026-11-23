@@ -23,7 +23,7 @@ function focusInput(event: MouseEvent) {
   <input
     v-if="!$slots.prefix && !$slots.suffix"
     v-bind="$attrs"
-    :id="field?.id"
+    :id="field?.id ?? ($attrs.id as string | undefined)"
     v-model="model"
     :aria-describedby="
       field?.describedBy ??
@@ -40,7 +40,7 @@ function focusInput(event: MouseEvent) {
     /></span>
     <input
       v-bind="input"
-      :id="field?.id"
+      :id="field?.id ?? ($attrs.id as string | undefined)"
       v-model="model"
       :aria-describedby="
         field?.describedBy ??
