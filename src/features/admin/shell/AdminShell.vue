@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { defineAsyncComponent, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import AdminForbidden from './AdminForbidden.vue';
 import '../ui/admin-density.css';
@@ -16,10 +16,6 @@ const AdminCommandPalette = defineAsyncComponent(() => import('./search/AdminCom
 const route = useRoute();
 /** Checked before the page mounts, so a forbidden screen never asks for its data. */
 const isAllowed = useScreenAccess();
-
-/** On <html>, so dialogs teleported to <body> get the admin control tokens too (admin-density.css). */
-onMounted(() => document.documentElement.classList.add('qh-admin'));
-onBeforeUnmount(() => document.documentElement.classList.remove('qh-admin'));
 
 const navCounts = useNavCounts();
 const isPhoneNavOpen = ref(false);

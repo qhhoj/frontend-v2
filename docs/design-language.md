@@ -29,7 +29,7 @@ Root problem it fixes: the same control was built four ways (admin `controls.ts`
 
 Headings (D-04): every h1 is `PageHeader`'s (`page-title`, 24 px; the contest hero uses the same step and only its countdown is `text-hero`), one per page. An h2 that opens a page section is `section-title` (`text-section` 16, bold, 24 px line): the problem page's "Nộp bài", "Liên kết" and "Bình luận", the appearance page's "Giao diện" and "Xem trước", the contest and submission pages' sections. Navigation group labels are not headings (the admin nav sits before the h1). A card's own title stays `text-title` 17 until the layout slices move it; dialog titles `text-subtitle`.
 
-Admin scope: `AdminShell` puts `qh-admin` on `<html>` while mounted (teleported dialogs included). It sets `--qh-radius-control` to the cell radius and `--qh-control` to `--qh-control-sm`.
+Admin scope: none. Admin pages use the public control height and shape (the `qh-admin` class on `<html>` was removed; nothing read it).
 
 Lint (`npm run lint:tokens`, `scripts/check-tokens.mjs`) errors on raw colours, stock `rounded-*`/`shadow-*`, stock `text-lg` … `text-9xl`, `rounded-tile`/`rounded-panel`, bare `transition`/`transition-all`/`transition-transform`, `uppercase` on a table header, a hairline border on a form control, a raw `<h1` outside `PageHeader` (the few pages that cannot use it are listed with a reason in `scripts/page-headings.mjs` and still take `page-title`), `text-[<n>px|rem]`, `rounded-[…]` and `z-[…]`. Exceptions are listed by file in `scripts/arbitrary-utilities.mjs` (`ALLOWED`): off-scale display sizes waiting for PageHeader/StatGrid, and radii under 5 px on tiny marks.
 
