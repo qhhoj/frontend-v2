@@ -20,7 +20,14 @@ defineProps<{
   tests: readonly TestSquare[];
   /** Names the list ("Kết quả từng test"). */
   label: string;
+  /** Each judged square becomes a real button that emits `select`; a `waiting` square stays plain. Off: plain items. */
+  selectable?: boolean;
 }>();
+const emit = defineEmits<{ select: [test: TestSquare, index: number] }>();
+
+/** A button keeps its look; on touch an invisible 44 px box (the `--qh-touch` token) centres on the square. */
+const BUTTON_CLASS =
+  'relative m-0 inline-flex size-full cursor-pointer items-center justify-center rounded-mark border-0 bg-transparent p-0 font-mono text-kbd leading-none text-inherit focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus touch:after:absolute touch:after:top-1/2 touch:after:left-1/2 touch:after:size-(--qh-touch) touch:after:-translate-1/2';
 </script>
 
 <template>
@@ -36,8 +43,19 @@ defineProps<{
           : [VERDICT_MARK_CLASSES[test.tone], 'font-bold']
       "
     >
-      <span aria-hidden="true">{{ test.number ?? index + 1 }}</span>
-      <span class="sr-only">{{ test.label }}</span>
+      <button
+        v-if="selectable && test.tone !== 'waiting'"
+        type="button"
+        :class="[BUTTON_CLASS, 'font-bold']"
+        @click="emit('select', test, index)"
+      >
+        <span aria-hidden="true">{{ test.number ?? index + 1 }}</span>
+        <span class="sr-only">{{ test.label }}</span>
+      </button>
+      <template v-else>
+        <span aria-hidden="true">{{ test.number ?? index + 1 }}</span>
+        <span class="sr-only">{{ test.label }}</span>
+      </template>
     </li>
   </ol>
 </template>

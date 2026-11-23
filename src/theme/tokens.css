@@ -79,6 +79,15 @@
   --qh-page-max: var(--page-wide);
   /* The submit pane beside the problem statement (460 px). */
   --pane-submit: 28.75rem;
+  /* Dialog widths by size (`Modal`): the default card (448), then sm 480, md 640, lg 760; the dialog's own max-width keeps 16 px of margin on a phone. */
+  --width-dialog: 28rem;
+  --width-dialog-sm: 30rem;
+  --width-dialog-md: 40rem;
+  --width-dialog-lg: 47.5rem;
+  /* Drawer widths by size (`Drawer`), from 768 px up: sm 400, md 560, lg 720. */
+  --width-drawer-sm: 25rem;
+  --width-drawer-md: 35rem;
+  --width-drawer-lg: 45rem;
   /* Vertical rhythm, 4 px base (layout plan §3); the phone values are in the media query below. */
   --space-page-top: 1.5rem;
   --space-header: 1rem;

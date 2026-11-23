@@ -33,9 +33,9 @@ const attrs = useAttrs();
 const titleId = useId();
 
 const WIDTHS: Record<ModalSize, string> = {
-  sm: 'sm:w-[min(30rem,calc(100vw-2rem))]',
-  md: 'sm:w-[min(40rem,calc(100vw-2rem))]',
-  lg: 'sm:w-[min(47.5rem,calc(100vw-2rem))]',
+  sm: 'sm:w-(--width-dialog-sm)',
+  md: 'sm:w-(--width-dialog-md)',
+  lg: 'sm:w-(--width-dialog-lg)',
 };
 /** Only the widest size is full screen on a phone; sm and md stay a centred card with 1 rem margins. */
 const FULL_ON_PHONE =
@@ -74,7 +74,7 @@ const handlers = useModalDialog(useTemplateRef<HTMLDialogElement>('dialog'), vis
       role="dialog"
       aria-modal="true"
       :aria-labelledby="labelledBy"
-      class="m-auto max-h-[calc(100dvh-2rem)] w-[min(28rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] flex-col rounded-card overlay-surface p-0 text-content outline-none transition-[opacity,scale] duration-(--qh-duration) ease-standard backdrop:bg-ground/70 backdrop:transition-opacity backdrop:duration-(--qh-duration-fast) open:flex starting:open:scale-96 starting:open:opacity-0 starting:open:backdrop:opacity-0"
+      class="m-auto max-h-[calc(100dvh-2rem)] w-(--width-dialog) max-w-[calc(100vw-2rem)] flex-col rounded-card overlay-surface p-0 text-content outline-none transition-[opacity,scale] duration-(--qh-duration) ease-standard backdrop:bg-ground/70 backdrop:transition-opacity backdrop:duration-(--qh-duration-fast) open:flex starting:open:scale-96 starting:open:opacity-0 starting:open:backdrop:opacity-0"
       :class="sizeClass"
       @cancel="handlers.onCancel"
       @close="handlers.onClose"
