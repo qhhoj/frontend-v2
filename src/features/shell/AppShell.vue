@@ -44,7 +44,7 @@ const { current: currentContest } = useCurrentContest(
 );
 const isSearchOpen = ref(false);
 const { isCollapsed: isRailCollapsed } = useRailCollapse();
-/** On the contest's own pages its bar is the status; on every other page the phone's top bar carries a chip instead (the desktop rail's card shows it always). The organiser's workbench of that contest (a `siteScreen` route with the same `key`) is not one of its pages. */
+/** On the contest's own pages its bar is the status; on every other page the phone's top bar carries a chip and the desktop rail a card. The organiser's workbench of that contest (a `siteScreen` route with the same `key`) is not one of its pages. */
 const isOnCurrentContest = computed(
   () =>
     currentContest.value !== null &&
@@ -54,7 +54,14 @@ const isOnCurrentContest = computed(
 );
 /** The home's plate already shows the viewer's contest: there the rail's card and the phone's chip would repeat it. */
 const isOnHome = computed(() => route.name === 'home');
-const railContest = computed(() => (isOnHome.value ? null : currentContest.value));
+/** The home's plate and the contest list already show every contest, so the rail's cards would repeat them. */
+const isContestListShown = computed(() => isOnHome.value || route.name === 'contests');
+/** The contest the page itself shows (its bar, plate or tabs): the rail's card for the same contest would repeat it. */
+const shownContestKey = computed(() => {
+  if (isOnCurrentContest.value) return currentContest.value?.contest.key ?? null;
+  const { key } = route.params;
+  return !route.meta.siteScreen && typeof key === 'string' ? key : null;
+});
 const chipContest = computed(() =>
   isOnCurrentContest.value || isOnHome.value ? null : currentContest.value,
 );
@@ -86,7 +93,12 @@ const chipContest = computed(() =>
     </main>
     <!-- Workbench: the rail (from md) beside the page column; on a phone the top bar and the tab bar; a desktop has no top bar. The rail and the bars are opaque, so the page background shows behind the page column only. -->
     <div v-else class="flex flex-1" :data-rail="isRailCollapsed ? 'collapsed' : 'open'">
-      <AppRail :current="railContest" @search="isSearchOpen = true" />
+      <AppRail
+        :current="currentContest"
+        :is-contest-list-shown="isContestListShown"
+        :shown-contest-key="shownContestKey"
+        @search="isSearchOpen = true"
+      />
       <div class="flex min-w-0 flex-1 flex-col">
         <NotificationAnnouncer />
         <TopBar :live-contest="chipContest" @search="isSearchOpen = true" />
