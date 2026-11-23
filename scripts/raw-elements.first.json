@@ -400,30 +400,11 @@
     "input": 1,
     "password": 2
   },
-  "features/admin/contests/general/ContestBasicForm.vue": {
-    "AdminChoiceCards": 1,
-    "AdminField": 3,
-    "controls": 5,
-    "input": 2,
-    "select": 1
-  },
-  "features/admin/contests/general/ContestBasicTime.vue": {
-    "AdminDateTimeField": 2,
-    "button": 1,
-    "controls": 1
-  },
-  "features/admin/contests/general/ContestCreatePage.vue": {
-    "AdminPageHeader": 1,
-    "controls": 2
-  },
   "features/admin/contests/general/ContestFormatSection.vue": {
     "AdminField": 4,
     "controls": 6,
     "input": 2,
     "select": 2
-  },
-  "features/admin/contests/general/ContestGeneralForm.vue": {
-    "controls": 1
   },
   "features/admin/contests/general/ContestGeneralTab.vue": {
     "AdminNotice": 1

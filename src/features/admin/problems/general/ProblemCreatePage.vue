@@ -2,10 +2,9 @@
 import { computed } from 'vue';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import Card from '@/components/ui/Card.vue';
 import { usePermissions } from '@/stores/use-permissions';
+import CreatePageShell from '../../creation/CreatePageShell.vue';
 import { useCreationScope } from '../../creation/creation-scope';
-import AdminPageHeader from '../../ui/AdminPageHeader.vue';
 import { useProblemEditingMetaQuery } from '../problem-editing.queries';
 import ProblemCreateForm from './ProblemCreateForm.vue';
 
@@ -22,15 +21,12 @@ const retry = () => void meta.refetch();
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
-    <AdminPageHeader :title="$t('admin.problems.general.create.title')" :lead="$t(leadKey)" />
+  <CreatePageShell :title="$t('admin.problems.general.create.title')" :lead="$t(leadKey)">
     <QueryState :loading="meta.isPending.value" :error="meta.error.value" @retry="retry">
       <template #skeleton>
-        <SkeletonBlock data-skeleton-region="problem-create" class="h-64 max-w-xl rounded-row" />
+        <SkeletonBlock data-skeleton-region="problem-create" class="h-64 rounded-row" />
       </template>
-      <Card v-if="meta.data.value" padding="md" class="max-w-xl">
-        <ProblemCreateForm :meta="meta.data.value" />
-      </Card>
+      <ProblemCreateForm v-if="meta.data.value" :meta="meta.data.value" />
     </QueryState>
-  </div>
+  </CreatePageShell>
 </template>
