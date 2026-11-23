@@ -8,10 +8,9 @@ import { useLocaleStore } from '@/stores/locale.store';
 import AppButton from '@/components/ui/AppButton.vue';
 import Chip from '@/components/ui/Chip.vue';
 import type { ChipTone } from '@/components/ui/Chip.vue';
-import { buttonClass } from '../ui/controls';
+import DataTable from '@/components/ui/DataTable.vue';
+import type { DataTableColumn } from '@/components/ui/DataTableColumns';
 import { shortId } from '../ui/short-id';
-import AdminDataTable from '../ui/table/AdminDataTable.vue';
-import type { AdminColumn } from '../ui/table/table-columns';
 import { runDurationText, runStatusText } from './run-text';
 import { scopeQuery, totalPairs } from './similarity-runs';
 
@@ -30,13 +29,13 @@ defineEmits<{ open: [runId: string] }>();
 const { t } = useI18n();
 const locale = useLocaleStore();
 
-const columns = computed<AdminColumn[]>(() => [
+const columns = computed<DataTableColumn[]>(() => [
   { key: 'id', label: t('admin.similarity.runs.columns.id'), priority: 'primary' },
   { key: 'status', label: t('admin.similarity.runs.columns.status'), priority: 'badge' },
-  { key: 'createdAt', label: t('admin.similarity.runs.columns.createdAt') },
-  { key: 'duration', label: t('admin.similarity.runs.columns.duration') },
   { key: 'groups', label: t('admin.similarity.runs.columns.groups'), align: 'end' },
   { key: 'pairs', label: t('admin.similarity.runs.columns.pairs'), align: 'end' },
+  { key: 'duration', label: t('admin.similarity.runs.columns.duration'), align: 'end' },
+  { key: 'createdAt', label: t('admin.similarity.runs.columns.createdAt') },
 ]);
 const TONES: Record<RunStatus, ChipTone> = {
   queued: 'neutral',
@@ -63,8 +62,9 @@ const detailTo = (run: SimilarityRun) => ({
           : $t('admin.similarity.runs.ofContest', { key: scope.contest })
       }}
     </h2>
-    <AdminDataTable
+    <DataTable
       data-testid="runs"
+      :variant="inPlace ? 'ledger' : 'surface'"
       :columns="columns"
       :rows="runs"
       :row-key="(run) => run.id"
@@ -96,10 +96,10 @@ const detailTo = (run: SimilarityRun) => ({
         >
           {{ $t(`admin.similarity.runs.${openId === row.id ? 'hidePairs' : 'showPairs'}`) }}
         </AppButton>
-        <RouterLink v-else :to="detailTo(row)" :class="buttonClass('secondary', 'sm')">
+        <AppButton v-else size="sm" :to="detailTo(row)">
           {{ $t('admin.similarity.runs.detail') }}
-        </RouterLink>
+        </AppButton>
       </template>
-    </AdminDataTable>
+    </DataTable>
   </section>
 </template>

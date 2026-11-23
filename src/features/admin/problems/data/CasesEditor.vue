@@ -101,7 +101,7 @@ function remove(shown: TableRow) {
       <option v-for="file in data.archiveFiles" :key="file" :value="file" />
     </datalist>
     <ScrollRegion v-if="rows.length > 0" class="min-w-0" :label="$t(`${KEY}.title`)" no-hint>
-      <table class="w-full min-w-sm border-separate border-spacing-0 text-body">
+      <table class="w-full border-separate border-spacing-0 text-body">
         <caption class="sr-only">
           {{
             $t(`${KEY}.title`)

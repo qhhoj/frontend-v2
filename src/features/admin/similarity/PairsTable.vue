@@ -3,13 +3,15 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { SIMILARITY_PAIRS_PAGE_SIZE } from '@/api/similarity.api';
 import type { SimilarityPair } from '@/api/types/similarity';
+import EmptyState from '@/components/EmptyState.vue';
+import UserLink from '@/components/UserLink.vue';
+import AppButton from '@/components/ui/AppButton.vue';
+import DataTable from '@/components/ui/DataTable.vue';
+import type { DataTableColumn } from '@/components/ui/DataTableColumns';
+import ProgressBar from '@/components/ui/ProgressBar.vue';
 import { formatNumber } from '@/lib/format';
 import { useLocaleStore } from '@/stores/locale.store';
-import AdminUserLabel from '../ui/AdminUserLabel.vue';
-import { buttonClass } from '../ui/controls';
-import AdminDataTable from '../ui/table/AdminDataTable.vue';
-import type { AdminColumn } from '../ui/table/table-columns';
-import { percentText } from './similarity-pairs';
+import { percentText, percentValue } from './similarity-pairs';
 import type { PairFilter } from './similarity-pairs';
 
 /**
@@ -28,7 +30,7 @@ const { t } = useI18n();
 const locale = useLocaleStore();
 const count = (value: number) => formatNumber(value, locale.locale);
 
-const columns = computed<AdminColumn[]>(() => [
+const columns = computed<DataTableColumn[]>(() => [
   { key: 'similarity', label: t('admin.similarity.pairs.columns.similarity'), align: 'end' },
   { key: 'authors', label: t('admin.similarity.pairs.columns.authors'), priority: 'primary' },
   {
@@ -64,7 +66,8 @@ const emptyTitle = computed(() =>
 </script>
 
 <template>
-  <AdminDataTable
+  <DataTable
+    :variant="preview ? 'ledger' : 'surface'"
     :pager="preview ? undefined : { meta, label: $t('admin.similarity.pairs.pager') }"
     :columns="columns"
     :rows="pairs"
@@ -74,20 +77,22 @@ const emptyTitle = computed(() =>
   >
     <template #cell-similarity="{ row }">
       <span class="inline-flex items-center justify-end gap-2">
-        <span aria-hidden="true" class="h-1.5 w-12 rounded-pill bg-surface-strong">
-          <span
-            class="block h-full rounded-pill bg-accent"
-            :style="{ width: percentText(row.similarity) }"
-          />
-        </span>
+        <ProgressBar
+          aria-hidden="true"
+          size="sm"
+          tone="neutral"
+          class="w-12"
+          :value="percentValue(row.similarity)"
+          :label="percentText(row.similarity)"
+        />
         <span class="font-semibold">{{ percentText(row.similarity) }}</span>
       </span>
     </template>
     <template #cell-authors="{ row }">
       <span class="flex min-w-0 flex-wrap items-center gap-2">
-        <AdminUserLabel :username="row.left.username" />
+        <UserLink :username="row.left.username" />
         <span aria-hidden="true">↔</span>
-        <AdminUserLabel :username="row.right.username" />
+        <UserLink :username="row.right.username" />
       </span>
     </template>
     <template #cell-problemCode="{ row }">
@@ -100,21 +105,19 @@ const emptyTitle = computed(() =>
     <template #cell-overlap="{ row }">{{ count(row.totalOverlap) }}</template>
     <template #cell-fragments="{ row }">{{ count(row.fragmentCount) }}</template>
     <template #actions="{ row }">
-      <RouterLink
-        :to="{ name: 'admin-similarityPair', params: { pairId: row.id } }"
-        :class="buttonClass('secondary', 'sm')"
-      >
+      <AppButton size="sm" :to="{ name: 'admin-similarityPair', params: { pairId: row.id } }">
         {{ $t('admin.similarity.pairs.open') }}
-      </RouterLink>
+      </AppButton>
     </template>
     <template #empty>
-      <div class="flex flex-col items-center gap-2 px-4 py-8 text-center">
-        <p class="m-0 font-semibold">{{ emptyTitle }}</p>
-        <p class="m-0 text-sm text-muted">{{ $t('admin.similarity.pairs.emptyHint') }}</p>
-        <button type="button" :class="buttonClass('secondary', 'sm')" @click="$emit('reset')">
-          {{ $t('admin.similarity.pairs.resetFilters') }}
-        </button>
-      </div>
+      <EmptyState compact>
+        {{ emptyTitle }} {{ $t('admin.similarity.pairs.emptyHint') }}
+        <template #action>
+          <AppButton size="sm" @click="$emit('reset')">
+            {{ $t('admin.similarity.pairs.resetFilters') }}
+          </AppButton>
+        </template>
+      </EmptyState>
     </template>
-  </AdminDataTable>
+  </DataTable>
 </template>
