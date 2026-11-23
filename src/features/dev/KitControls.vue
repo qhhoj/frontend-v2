@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Copy, FileUp, Trash2, X } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { Copy, FileUp, Pencil, Trash2, X } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import Card from '@/components/ui/Card.vue';
 import Checkbox from '@/components/ui/Checkbox.vue';
@@ -44,6 +44,21 @@ const isLive = ref(true);
 const scoring = ref('best');
 const isLocked = ref(true);
 const dirtyCount = ref(2);
+/** A button row drawn by `v-for` over items that are replaced as a whole: each button must show the new item. */
+const buttonRows = [
+  [
+    { id: 'a', label: 'Sao chép', icon: Copy },
+    { id: 'b', label: 'Tải lên', icon: FileUp },
+  ],
+  [
+    { id: 'a', label: 'Chỉnh sửa', icon: Pencil },
+    { id: 'b', label: 'Xóa bỏ', icon: Trash2 },
+  ],
+];
+const buttonRowIndex = ref(0);
+const buttonRowItems = computed(() =>
+  buttonRows[buttonRowIndex.value].map((item) => ({ ...item })),
+);
 </script>
 
 <template>
@@ -119,6 +134,68 @@ const dirtyCount = ref(2);
           Biểu tượng đứng trước chữ. Nút chỉ có biểu tượng: mực trung tính, không viền, không tím;
           luôn có tên và chú thích khi rê.
         </p>
+      </Card>
+
+      <Card as="div" padding="md" class="flex flex-col gap-3" data-kit-button-rows>
+        <h3 class="eyebrow">Nút trong danh sách đổi dữ liệu</h3>
+        <div class="flex flex-wrap items-center gap-3">
+          <AppButton
+            v-for="item in buttonRowItems"
+            :key="`to-${item.id}`"
+            to="/dev/kit"
+            data-row="to"
+            ><template #icon><component :is="item.icon" aria-hidden="true" /></template
+            >{{ item.label }}</AppButton
+          >
+          <AppButton
+            v-for="item in buttonRowItems"
+            :key="`href-${item.id}`"
+            href="#kit-controls"
+            data-row="href"
+            ><template #icon><component :is="item.icon" aria-hidden="true" /></template
+            >{{ item.label }}</AppButton
+          >
+          <AppButton v-for="item in buttonRowItems" :key="`plain-${item.id}`" data-row="plain"
+            ><template #icon><component :is="item.icon" aria-hidden="true" /></template
+            >{{ item.label }}</AppButton
+          >
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <AppButton
+            v-for="item in buttonRowItems"
+            :key="`to-r-${item.id}`"
+            to="/dev/kit"
+            disabled-reason="Lý do"
+            data-row="to-reason"
+            ><template #icon><component :is="item.icon" aria-hidden="true" /></template
+            >{{ item.label }}</AppButton
+          >
+          <AppButton
+            v-for="item in buttonRowItems"
+            :key="`href-r-${item.id}`"
+            href="#kit-controls"
+            disabled-reason="Lý do"
+            data-row="href-reason"
+            ><template #icon><component :is="item.icon" aria-hidden="true" /></template
+            >{{ item.label }}</AppButton
+          >
+          <AppButton
+            v-for="item in buttonRowItems"
+            :key="`plain-r-${item.id}`"
+            disabled-reason="Lý do"
+            data-row="plain-reason"
+            ><template #icon><component :is="item.icon" aria-hidden="true" /></template
+            >{{ item.label }}</AppButton
+          >
+        </div>
+        <div>
+          <AppButton
+            size="sm"
+            data-row-toggle
+            @click="buttonRowIndex = buttonRowIndex === 0 ? 1 : 0"
+            >Đổi dữ liệu</AppButton
+          >
+        </div>
       </Card>
 
       <Readout as="div" label="Nút trên bảng đo" class="flex flex-col gap-3 self-start">

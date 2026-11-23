@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, h, onBeforeUpdate, ref, useAttrs, useId, useSlots } from 'vue';
+import { computed, h, ref, useAttrs, useId } from 'vue';
 import type { VNode } from 'vue';
 import { RouterLink } from 'vue-router';
 import type { RouteLocationRaw } from 'vue-router';
@@ -40,7 +40,6 @@ const props = withDefaults(
   },
 );
 const emit = defineEmits<{ click: [event: MouseEvent] }>();
-const slots = useSlots();
 const control = ref<HTMLElement | null>(null);
 /** Refs reach the button itself even when a disabled reason wraps it. */
 defineExpose({ focus: (options?: FocusOptions) => control.value?.focus(options) });
@@ -78,22 +77,6 @@ function press(event: MouseEvent, navigate?: (event: MouseEvent) => unknown) {
   if (navigate) void navigate(event);
 }
 
-const spinner = () =>
-  h(LoaderCircle, { 'aria-hidden': 'true', class: 'size-4 motion-safe:animate-spin' });
-/**
- * Counts the button's own updates. A parent that draws the button again with other slot content (a row of a `v-for`
- * whose item changed) only swaps the slot functions, which nothing below reads reactively: the content reads this
- * count, so it is drawn again with the button. Without it the button kept the content of its first draw.
- */
-const updateCount = ref(0);
-onBeforeUpdate(() => {
-  updateCount.value += 1;
-});
-/** Icon (or the spinner while loading), then the label. */
-const ButtonContent = () => {
-  void updateCount.value;
-  return [props.loading ? spinner() : slots.icon?.(), slots.default?.()];
-};
 /**
  * A button that may get a reason is always wrapped (the reason only appears while disabled), so toggling `disabled` never
  * re-creates the `<button>` and focus stays. Button and reason are one inline unit, so a flex toolbar gives them one gap. Without
@@ -125,7 +108,9 @@ const WithReason = (_props: object, { slots }: { slots: { default?: () => VNode[
         :href="routeHref"
         @click="press($event, navigate)"
       >
-        <ButtonContent />
+        <LoaderCircle v-if="loading" aria-hidden="true" class="size-4 motion-safe:animate-spin" />
+        <slot v-else name="icon" />
+        <slot />
       </a>
     </RouterLink>
     <a
@@ -141,7 +126,9 @@ const WithReason = (_props: object, { slots }: { slots: { default?: () => VNode[
       :href="href"
       @click="press"
     >
-      <ButtonContent />
+      <LoaderCircle v-if="loading" aria-hidden="true" class="size-4 motion-safe:animate-spin" />
+      <slot v-else name="icon" />
+      <slot />
     </a>
     <button
       v-else
@@ -156,7 +143,9 @@ const WithReason = (_props: object, { slots }: { slots: { default?: () => VNode[
       :type="type"
       @click="press"
     >
-      <ButtonContent />
+      <LoaderCircle v-if="loading" aria-hidden="true" class="size-4 motion-safe:animate-spin" />
+      <slot v-else name="icon" />
+      <slot />
     </button>
   </WithReason>
 </template>
