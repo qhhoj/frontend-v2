@@ -74,7 +74,7 @@ Placement is fixed (table in `DESIGN.md`): header = eyebrow, title, sub line | p
 
 The kit lives in `src/components/ui/`; new code imports from there. Thin wrappers kept for old call sites (ESLint rejects a new import; ledger in `docs/wrapper-migration.md`): the `Admin*` components and the classes of `features/admin/ui/controls.ts`, which are aliases of the kit's recipes.
 
-**Shell** (`src/features/shell/`, build plan step 2). `AppShell` lays out the public pages; the admin area keeps `AdminShell`, the auth pages their own bar.
+**Shell** (`src/features/shell/`, build plan step 2). `AppShell` lays out the public pages and a teacher's own screens (the "Quản lý" group: "Bài tập của tôi", "Kỳ thi của tôi"; `/admin/...` URLs, `shell: 'site'` in `ADMIN_SCREENS`); the rest of the admin area keeps `AdminShell`, the auth pages their own bar.
 
 - Desktop (from `md`): `AppRail` (224 px `--qh-rail` from 1100 px, `rail-wide:`; an icon column below, `max-rail-wide:`; collapsible) beside the page column: brand with Bit, search button, the sections from `nav-items.ts`, the account row (`UserMenu variant="row"`). The global ranking is not in the menu or on the home page; it stays reachable from a profile.
 - Phone (under `md`): `TopBar` is 56 px (back to the section, the page name or the brand, search, bell or sign-in) and `TabBar` (4 sections + "Tôi", which opens the `PhoneMenu` sheet) is the navigation.

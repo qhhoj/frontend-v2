@@ -27,6 +27,10 @@ import { useRailCollapse } from './use-rail-collapse';
 
 /** Lazy: the admin nav and icons stay out of the bundle every visitor loads. */
 const AdminShell = defineAsyncComponent(() => import('@/features/admin/shell/AdminShell.vue'));
+/** Lazy for the same reason: around a teacher's screen ("Quản lý"), which this shell draws like any site page. */
+const SiteScreenGate = defineAsyncComponent(
+  () => import('@/features/admin/shell/SiteScreenGate.vue'),
+);
 
 providePageSection();
 useAccountCacheSync();
@@ -34,16 +38,17 @@ useAccountThemeSync();
 useAccountAppearanceSync();
 useAccountBitRoamSync();
 const route = useRoute();
-/** While the viewer takes part in a contest, every public page carries its bar (and the rail its card). */
+/** While the viewer takes part in a contest, every page of the site frame carries the rail's card, and the contest's own pages its bar. */
 const { current: currentContest } = useCurrentContest(
   () => route.meta.layout !== 'admin' && route.meta.layout !== 'auth',
 );
 const isSearchOpen = ref(false);
 const { isCollapsed: isRailCollapsed } = useRailCollapse();
-/** On the contest's own pages its bar is the status; on every other page the phone's top bar carries a chip instead (the desktop rail's card shows it always). */
+/** On the contest's own pages its bar is the status; on every other page the phone's top bar carries a chip instead (the desktop rail's card shows it always). The organiser's workbench of that contest (a `siteScreen` route with the same `key`) is not one of its pages. */
 const isOnCurrentContest = computed(
   () =>
     currentContest.value !== null &&
+    !route.meta.siteScreen &&
     (route.params.key === currentContest.value.contest.key ||
       navSectionOverride.value === '/contests'),
 );
@@ -91,7 +96,8 @@ const chipContest = computed(() =>
         <OfficialModeBanner class="print:hidden" />
         <HighPriorityBanner class="print:hidden" />
         <main id="main" tabindex="-1" class="relative flex-1 focus-visible:outline-none">
-          <slot />
+          <SiteScreenGate v-if="route.meta.siteScreen"><slot /></SiteScreenGate>
+          <slot v-else />
         </main>
         <AppFooter class="print:hidden" />
       </div>

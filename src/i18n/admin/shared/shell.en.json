@@ -11,8 +11,6 @@
   "moreTabs": "More sections",
   "backTo": "Back to {label}",
   "groups": {
-    "problems": "Problems",
-    "contests": "Contests",
     "judging": "Judging",
     "community": "Community",
     "users": "Users",

@@ -22,7 +22,7 @@ import UserMenu from './UserMenu.vue';
 
 /**
  * The desktop rail, from `md` up: the brand, the search button (Ctrl K), the menu's sections (Kỳ thi with its count of
- * running contests), the "Quản lý" group for a viewer who sets problems, the contest the viewer is taking part in (or else the next one to look at), and at the foot one row of icons (bell, language, look,
+ * running contests), the "Quản lý" group for a viewer who sets problems or runs contests, the contest the viewer is taking part in (or else the next one to look at), and at the foot one row of icons (bell, language, look,
  * collapse; stacked in the narrow column) over the account. 224 px from 1100 px
  * (`rail-open`); below that, or when the viewer collapses it (button at the foot, `[`; AppShell sets `data-rail`), a 56 px
  * column of icons (44 px targets) whose labels stay their accessible names and tooltips. Opaque: the page background is

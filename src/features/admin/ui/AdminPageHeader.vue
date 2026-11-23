@@ -6,11 +6,13 @@ import { useRoute } from 'vue-router';
 import AppButton from '@/components/ui/AppButton.vue';
 import PageHeader from '@/components/ui/PageHeader.vue';
 import Popover from '@/components/ui/Popover.vue';
+import { useInjectedSection } from '@/components/ui/page-section';
 import { navCrumbsOf } from '../shell/admin-nav';
 import type { AdminCrumb } from '../shell/admin-nav';
 
 /**
- * Shim over `PageHeader` (new pages use it directly, with `overflow` items): the breadcrumb is led by the nav's crumbs,
+ * Shim over `PageHeader` (new pages use it directly, with `overflow` items): the breadcrumb is led by the nav's crumbs
+ * (a teacher's screen is in no admin menu group: there the site section leads, "Bài tập của tôi", except on its own list),
  * and below `md` it becomes one back link: `back`, else the nearest crumb that links somewhere. One primary action per
  * page goes in `#actions` with the secondary ones; the `#overflow` slot (hand-built items, until its pages move to
  * `PageHeader overflow`) opens behind the same "⋯ Thêm" button. `#meta` sits under the title.
@@ -29,7 +31,14 @@ defineSlots<{
 const slots = useSlots();
 const route = useRoute();
 const { t } = useI18n();
-const crumbs = computed(() => [...navCrumbsOf(route.path, t), ...(props.trail ?? [])]);
+const section = useInjectedSection();
+const leadCrumbs = computed<AdminCrumb[]>(() => {
+  const navCrumbs = navCrumbsOf(route.path, t);
+  const place = section.value;
+  if (navCrumbs.length > 0 || !place || place.path === route.path) return navCrumbs;
+  return [{ label: t(place.labelKey), to: place.path }];
+});
+const crumbs = computed(() => [...leadCrumbs.value, ...(props.trail ?? [])]);
 const backLink = computed(() => {
   const target = props.back ?? crumbs.value.filter((crumb) => crumb.to).at(-1);
   if (!target?.to) return null;

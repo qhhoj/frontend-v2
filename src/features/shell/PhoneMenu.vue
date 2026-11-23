@@ -18,7 +18,7 @@ import { useAccountLinks } from './account-links';
 import { MENU_ITEMS, useIsNavCurrent, useManageItems, useNavLinkEvents } from './nav-items';
 
 /**
- * The sheet behind the tab bar's "Tôi" (`TabBar`, which owns the button). It rises from the bottom: the menu's sections (the current one marked), the "Quản lý" group for a viewer who sets problems, then what the
+ * The sheet behind the tab bar's "Tôi" (`TabBar`, which owns the button). It rises from the bottom: the menu's sections (the current one marked), the "Quản lý" group for a viewer who sets problems or runs contests, then what the
  * desktop row shows beside the navigation: the official-mode pill, the account (who is signed in, its pages in the
  * desktop menu's order and sign-out, or register for a visitor; sign-in and the bell stay in the header), the language
  * and the light/dark mode (the rest of the look is one link away). The drawer traps focus and closes on Esc; any
@@ -30,6 +30,8 @@ const LANGUAGES: ReadonlyArray<{ value: Locale; label: string }> = [
 ];
 const ROW =
   'flex min-h-11 items-center gap-3 rounded-pill px-3 font-semibold hover:bg-surface-hover';
+/** The page's section, in the menu's sections and in "Quản lý" alike: soft brand ground, brand text. */
+const CURRENT_ROW = 'bg-accent-soft font-bold text-accent-text';
 const HEADING = 'mb-2 text-sm font-semibold text-muted';
 
 const session = useSessionStore();
@@ -57,7 +59,7 @@ watch(
         :key="item.path"
         :to="item.path"
         :aria-current="isCurrent(item.path) ? 'page' : undefined"
-        :class="[ROW, isCurrent(item.path) ? 'bg-accent-soft font-bold text-accent-text' : '']"
+        :class="[ROW, isCurrent(item.path) && CURRENT_ROW]"
         v-on="linkEvents(item.path)"
       >
         <component :is="item.icon" aria-hidden="true" class="size-5 shrink-0" />
@@ -74,7 +76,8 @@ watch(
         v-for="item in manageItems"
         :key="item.path"
         :to="item.path"
-        :class="ROW"
+        :aria-current="isCurrent(item.path) ? 'page' : undefined"
+        :class="[ROW, isCurrent(item.path) && CURRENT_ROW]"
         v-on="linkEvents(item.path)"
       >
         <component :is="item.icon" aria-hidden="true" class="size-5 shrink-0" />

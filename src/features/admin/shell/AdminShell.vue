@@ -1,29 +1,21 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { defineAsyncComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { useSessionStore } from '@/stores/session.store';
-import { canUseAdmin } from '../admin-access';
 import AdminForbidden from './AdminForbidden.vue';
 import '../ui/admin-density.css';
 import AdminRail from './AdminRail.vue';
 import AdminNavSheet from './AdminNavSheet.vue';
 import AdminTopBar from './AdminTopBar.vue';
 import { useNavCounts } from './overview/admin-overview.queries';
-import { useRecentScreens } from './recent/recent-screens';
 import { usePaletteShortcut } from './search/use-palette-shortcut';
+import { useScreenAccess } from './use-screen-access';
 
 /** Loaded on first open: the search and its queries stay out of the shell's first paint. */
 const AdminCommandPalette = defineAsyncComponent(() => import('./search/AdminCommandPalette.vue'));
 
 const route = useRoute();
-const session = useSessionStore();
 /** Checked before the page mounts, so a forbidden screen never asks for its data. */
-const isAllowed = computed(() =>
-  canUseAdmin(session.user, {
-    permission: route.meta.permission ?? null,
-    capability: route.meta.capability,
-  }),
-);
+const isAllowed = useScreenAccess();
 
 /** On <html>, so dialogs teleported to <body> get the admin control tokens too (admin-density.css). */
 onMounted(() => document.documentElement.classList.add('qh-admin'));
@@ -39,15 +31,10 @@ function openPalette() {
 }
 usePaletteShortcut(openPalette);
 
-const { remember } = useRecentScreens();
-/** A chosen link closes the phone menu, and each screen the viewer may open joins the dashboard's recent list. */
+/** A chosen link closes the phone menu. */
 watch(
   () => route.fullPath,
-  () => {
-    isPhoneNavOpen.value = false;
-    if (isAllowed.value) remember(route);
-  },
-  { immediate: true },
+  () => (isPhoneNavOpen.value = false),
 );
 </script>
 

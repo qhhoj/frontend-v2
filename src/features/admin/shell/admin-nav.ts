@@ -22,6 +22,7 @@ import {
   Settings,
   Tag,
   Tags,
+  Trash2,
   Trophy,
   Users,
 } from 'lucide-vue-next';
@@ -43,9 +44,13 @@ export interface AdminNavItem extends AdminAccess {
   /** Further sections the item stands for (the comments item: every comment and the locked pages beside the reports). */
   alsoPaths: readonly string[];
 }
-/** By object, the rare screens under "Công cụ" (last, folded until opened). Breadcrumbs read the same groups. */
+/**
+ * By object, the rare screens under "Công cụ" (last, folded until opened). Breadcrumbs read the same groups. A teacher's
+ * screens (`shell: 'site'`: problems, deleted problems, contests, their imports and editors) have no item here: the site menu's "Quản lý"
+ * lists them, and an item would be a jump to another frame.
+ */
 export interface AdminNavGroup {
-  id: 'problems' | 'contests' | 'judging' | 'community' | 'users' | 'system' | 'tools';
+  id: 'judging' | 'community' | 'users' | 'system' | 'tools';
   labelKey: string;
   items: AdminNavItem[];
 }
@@ -81,12 +86,6 @@ const group = (id: AdminNavGroup['id'], items: AdminNavItem[]): AdminNavGroup =>
 });
 
 export const ADMIN_NAV: AdminNavGroup[] = [
-  group('problems', [
-    screenItem('problems', FileText),
-    screenItem('polygonImport', CloudDownload),
-    screenItem('problemImport', Download),
-  ]),
-  group('contests', [screenItem('contests', Trophy)]),
   group('judging', [
     screenItem('submissions', ListChecks, { labelKey: 'admin.shell.nav.submissions' }),
     screenItem('judges', Server),
@@ -127,10 +126,20 @@ export const PALETTE_ONLY_SCREENS: readonly AdminNavItem[] = [
   screenItem('cannedReplies', LifeBuoy),
 ];
 
+/** The site shell's screens that open without a record: the admin menu has no item for them, Ctrl+K still finds them. */
+const SITE_SCREENS: readonly AdminNavItem[] = [
+  screenItem('problems', FileText),
+  screenItem('polygonImport', CloudDownload),
+  screenItem('problemImport', Download),
+  screenItem('problemsDeleted', Trash2),
+  screenItem('contests', Trophy),
+];
+
 /** Every screen Ctrl+K lists, nav items first. */
 export const PALETTE_SCREENS: readonly AdminNavItem[] = [
   ...ADMIN_NAV.flatMap((navGroup) => navGroup.items),
   ...PALETTE_ONLY_SCREENS,
+  ...SITE_SCREENS,
 ];
 
 /** The groups folded until the viewer opens them: the rare tools. */
@@ -150,8 +159,8 @@ const isWithin = (basePath: string, routePath: string) =>
 const pathsOf = (item: AdminNavItem) => [item.path, ...item.alsoPaths];
 const NAV_PATHS = ADMIN_NAV.flatMap((navGroup) => navGroup.items.flatMap(pathsOf));
 /**
- * An item is current when the route is its page or inside it, unless a longer item path also holds the route:
- * `/admin/problems/polygon` is the Polygon import item's, not the problems item's, and no list of exceptions is needed.
+ * An item is current when the route is its page or inside it, unless a longer item path also holds the route: a page
+ * under `/admin/a/b` belongs to the item at `/admin/a/b`, not to the one at `/admin/a`, and no list of exceptions is needed.
  */
 export function isCurrentNav(
   itemPath: string,
