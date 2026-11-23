@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ContestTag } from '@/api/types/contest-tags';
 import InlineBit from '@/components/InlineBit.vue';
-import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { EXTRAS_BITS } from './contest-extras-bits';
 import type { TagFilterState } from './tag-chips';
@@ -55,23 +55,18 @@ const SKELETON_CHIPS = 5;
     >
       <ul class="m-0 flex w-max list-none gap-2 p-0 sm:w-auto sm:flex-wrap">
         <li>
-          <AppButton
-            size="sm"
-            :pressed="selected === null || state === 'unknown'"
-            @click="emit('select', null)"
-          >
+          <Chip :pressed="selected === null || state === 'unknown'" @click="emit('select', null)">
             {{ $t('contestTags.all') }}
-          </AppButton>
+          </Chip>
         </li>
         <li v-for="tag in tags" :key="tag.slug">
-          <AppButton
-            size="sm"
+          <Chip
             :pressed="selected === tag.slug"
             :title="tag.description || undefined"
             @click="emit('select', tag.slug)"
           >
             {{ tag.name }}
-          </AppButton>
+          </Chip>
         </li>
       </ul>
     </nav>

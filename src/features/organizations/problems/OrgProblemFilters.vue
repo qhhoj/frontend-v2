@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import type { ProblemTag } from '@/api/types/organization-problems';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
-import AppButton from '@/components/ui/AppButton.vue';
+import Chip from '@/components/ui/Chip.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
 import { formatNumber } from '@/lib/format';
 import { useDebouncedText } from '@/lib/use-debounced-text';
 import { useLocaleStore } from '@/stores/locale.store';
 import { ARCHIVE_FILTERS } from './org-problem-filters';
 import type { OrgProblemFilters } from './org-problems.queries';
-import { TAG_DOT_CLASSES } from './org-tag-classes';
 
 /** The toolbar (search left, the `actions` slot right: the one create), tag chips and the archive switch; every change goes to the URL through `change`. */
 const props = defineProps<{
@@ -38,30 +37,23 @@ const text = useDebouncedText(
       <div class="ml-auto"><slot name="actions" /></div>
     </div>
     <div class="flex flex-wrap gap-2" role="group" :aria-label="$t('orgProblems.tagFilter')">
-      <AppButton size="sm" :pressed="filters.tag === null" @click="emit('change', { tag: null })">
+      <Chip :pressed="filters.tag === null" @click="emit('change', { tag: null })">
         {{ $t('orgProblems.allTags') }}
-      </AppButton>
-      <AppButton
+      </Chip>
+      <Chip
         v-for="tag in tags"
         :key="tag.id"
-        size="sm"
         :pressed="filters.tag === tag.slug"
         @click="emit('change', { tag: tag.slug })"
       >
-        <span
-          aria-hidden="true"
-          class="size-2.5 rounded-full"
-          :class="TAG_DOT_CLASSES[tag.color]"
-        />
         {{ tag.name }}
-      </AppButton>
+      </Chip>
     </div>
     <div class="flex flex-wrap items-center gap-3">
       <div class="flex flex-wrap gap-1" role="group" :aria-label="$t('orgProblems.archiveFilter')">
-        <AppButton
+        <Chip
           v-for="option in ARCHIVE_FILTERS"
           :key="option"
-          size="sm"
           :pressed="filters.archived === option"
           @click="emit('change', { archived: option })"
         >
@@ -74,7 +66,7 @@ const text = useDebouncedText(
             <template v-if="total !== null">{{ formatNumber(total, locale.locale) }}</template
             ><SkeletonBlock v-else text class="w-[1ch]"
           /></span>
-        </AppButton>
+        </Chip>
       </div>
     </div>
   </div>
