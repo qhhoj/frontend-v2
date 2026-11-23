@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ProblemTag } from '@/api/types/organization-problems';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import AppButton from '@/components/ui/AppButton.vue';
 import SearchInput from '@/components/ui/SearchInput.vue';
 import { formatNumber } from '@/lib/format';
 import { useDebouncedText } from '@/lib/use-debounced-text';
@@ -22,8 +23,6 @@ const text = useDebouncedText(
   () => props.filters.q,
   (value) => emit('change', { q: value }),
 );
-const CHIP =
-  'inline-flex min-h-11 items-center gap-1.5 rounded-pill border border-line px-3 text-sm font-semibold hover:bg-surface-hover aria-pressed:border-accent aria-pressed:bg-accent-soft aria-pressed:text-accent-soft-text';
 </script>
 
 <template>
@@ -39,20 +38,14 @@ const CHIP =
       <div class="ml-auto"><slot name="actions" /></div>
     </div>
     <div class="flex flex-wrap gap-2" role="group" :aria-label="$t('orgProblems.tagFilter')">
-      <button
-        type="button"
-        :class="CHIP"
-        :aria-pressed="filters.tag === null"
-        @click="emit('change', { tag: null })"
-      >
+      <AppButton size="sm" :pressed="filters.tag === null" @click="emit('change', { tag: null })">
         {{ $t('orgProblems.allTags') }}
-      </button>
-      <button
+      </AppButton>
+      <AppButton
         v-for="tag in tags"
         :key="tag.id"
-        type="button"
-        :class="CHIP"
-        :aria-pressed="filters.tag === tag.slug"
+        size="sm"
+        :pressed="filters.tag === tag.slug"
         @click="emit('change', { tag: tag.slug })"
       >
         <span
@@ -61,16 +54,15 @@ const CHIP =
           :class="TAG_DOT_CLASSES[tag.color]"
         />
         {{ tag.name }}
-      </button>
+      </AppButton>
     </div>
     <div class="flex flex-wrap items-center gap-3">
       <div class="flex flex-wrap gap-1" role="group" :aria-label="$t('orgProblems.archiveFilter')">
-        <button
+        <AppButton
           v-for="option in ARCHIVE_FILTERS"
           :key="option"
-          type="button"
-          :class="CHIP"
-          :aria-pressed="filters.archived === option"
+          size="sm"
+          :pressed="filters.archived === option"
           @click="emit('change', { archived: option })"
         >
           {{ $t(`orgProblems.archive.${option}`)
@@ -82,7 +74,7 @@ const CHIP =
             <template v-if="total !== null">{{ formatNumber(total, locale.locale) }}</template
             ><SkeletonBlock v-else text class="w-[1ch]"
           /></span>
-        </button>
+        </AppButton>
       </div>
     </div>
   </div>

@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import InlineBit from '@/components/InlineBit.vue';
+import TextInput from '@/components/ui/TextInput.vue';
 import { errorMessageKey } from '@/i18n/error-message';
 
 const props = defineProps<{
@@ -38,7 +39,7 @@ function submit() {
     <label :for="INPUT_ID" class="text-caption font-semibold tracking-wider text-muted uppercase">
       {{ $t('contests.actions.codeLabel') }}
     </label>
-    <input
+    <TextInput
       :id="INPUT_ID"
       v-model="code"
       autofocus
@@ -46,7 +47,6 @@ function submit() {
       autocomplete="new-password"
       maxlength="255"
       aria-describedby="contest-access-code-hint"
-      class="min-h-11 rounded-pill border border-line-control bg-surface-strong px-4"
     />
     <p id="contest-access-code-hint" class="text-sm text-muted">
       {{ $t('contests.actions.codeHint') }}
