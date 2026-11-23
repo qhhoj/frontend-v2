@@ -5,8 +5,8 @@ import { useI18n } from 'vue-i18n';
 import { CONTEST_TAG_PAGE_SIZE, deleteContestTag } from '@/api/contest-tags.api';
 import type { ContestTag } from '@/api/types/contest-tags';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import Chip from '@/components/ui/Chip.vue';
 import { CONTEST_TAGS_KEY, useContestTagsQuery } from '@/features/contests/contest-extras.queries';
+import { TAG_COLOR_CLASSES } from '@/features/contests/tag-colors';
 import { translate } from '@/i18n';
 import AdminPageHeader from '../ui/AdminPageHeader.vue';
 import { failureTextOf } from '../ui/admin-errors';
@@ -122,7 +122,13 @@ const menuOf = (tag: ContestTag): RowMenuItem[] => [
       @retry="refetch()"
     >
       <template #cell-tag="{ row }">
-        <Chip size="md" :tone="row.color">{{ row.name }}</Chip>
+        <span
+          :class="[
+            'inline-flex h-(--qa-chip) items-center rounded-pill border px-2.5 text-caption leading-4 font-semibold',
+            TAG_COLOR_CLASSES[row.color],
+          ]"
+          >{{ row.name }}</span
+        >
       </template>
       <template #cell-slug="{ row }">
         <span class="font-mono text-meta">{{ row.slug }}</span>
