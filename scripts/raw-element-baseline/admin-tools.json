@@ -63,12 +63,6 @@
     "AdminUserLabel": 1,
     "hardcoded-value": 1
   },
-  "features/admin/similarity/PairsTable.vue": {
-    "AdminDataTable": 1,
-    "AdminUserLabel": 2,
-    "button": 1,
-    "controls": 2
-  },
   "features/admin/similarity/SimilarityGroupsTable.vue": {
     "AdminDataTable": 1
   },
@@ -88,10 +82,6 @@
   },
   "features/admin/similarity/SimilarityRunsPage.vue": {
     "AdminPageHeader": 1
-  },
-  "features/admin/similarity/SimilarityRunsTable.vue": {
-    "AdminDataTable": 1,
-    "controls": 1
   },
   "features/admin/similarity/SimilarityScopeForm.vue": {
     "SettingsCard": 1,

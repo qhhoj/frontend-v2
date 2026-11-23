@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import type { EditableContest } from '@/api/types/contest-editing';
 import QueryState from '@/components/QueryState.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
+import EmptyState from '@/components/EmptyState.vue';
 import AppButton from '@/components/ui/AppButton.vue';
 import PageSection from '@/components/ui/PageSection.vue';
 import { usePermissions } from '@/stores/use-permissions';
@@ -17,6 +18,7 @@ import {
   useSimilarityRunsQuery,
 } from '../../similarity/similarity.queries';
 import { needsPermissionText } from '../../ui/permission-text';
+import SimilarityStartButton from './SimilarityStartButton.vue';
 
 /**
  * Similarity for this contest, on the contest's own page: start a run (the hourly limit is said before the click), this
@@ -50,22 +52,29 @@ const pairTotal = computed(() => pairs.data.value?.meta.total ?? 0);
       {{ needsPermissionText('judge.moss_contest') }}
     </p>
     <div v-else class="flex flex-col gap-3">
-      <div class="flex flex-wrap items-center gap-3">
-        <AppButton
-          data-testid="similarity-start"
-          :loading="isPending"
-          :disabled="hasActiveRun"
-          :disabled-reason="$t(`${KEY}.running`)"
-          @click="startRun"
-        >
-          {{ $t('admin.similarity.scope.start') }}
-        </AppButton>
+      <div v-if="runList.length > 0" class="flex flex-wrap items-center gap-3">
+        <SimilarityStartButton
+          :is-pending="isPending"
+          :is-blocked="hasActiveRun"
+          @start="startRun"
+        />
         <p class="m-0 text-meta text-muted">{{ $t('admin.similarity.scope.startHint') }}</p>
       </div>
       <SimilarityStartResult :is-done="isDone" :failure="failure" :running-to="null" />
       <QueryState :loading="runs.isPending.value" :error="runs.error.value" @retry="runs.refetch()">
         <template #skeleton><SkeletonBlock class="h-(--qh-row) w-full" /></template>
+        <EmptyState v-if="runList.length === 0" compact>
+          {{ $t('admin.similarity.runs.empty') }} {{ $t('admin.similarity.scope.startHint') }}
+          <template #action>
+            <SimilarityStartButton
+              :is-pending="isPending"
+              :is-blocked="hasActiveRun"
+              @start="startRun"
+            />
+          </template>
+        </EmptyState>
         <SimilarityRunsTable
+          v-else
           :runs="runList"
           :scope="scope"
           in-place

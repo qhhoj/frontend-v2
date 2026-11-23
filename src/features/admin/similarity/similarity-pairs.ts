@@ -57,8 +57,10 @@ export function toPairsRequest(filter: PairFilter): PairsRequest {
   return request;
 }
 
-export const percentText = (similarity: number): string =>
-  `${Math.round(similarity * MAX_PERCENT)}%`;
+/** A similarity (0 to 1) as a whole percent. */
+export const percentValue = (similarity: number): number => Math.round(similarity * MAX_PERCENT);
+
+export const percentText = (similarity: number): string => `${percentValue(similarity)}%`;
 
 type Side = 'left' | 'right';
 
