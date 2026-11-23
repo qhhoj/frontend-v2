@@ -16,6 +16,7 @@ import { TABLE_ROW_HEIGHT } from '@/components/ui/table-classes';
 import { numberBoxValue } from '../../ui/form/number-box';
 import { argsText, parseArgs } from './test-cases';
 import type { KeyedCase } from './test-cases';
+import CaseFileName from './CaseFileName.vue';
 import CaseTrialResult from './CaseTrialResult.vue';
 import type { TableRow } from './test-table';
 import type { TrialResults } from './trial-results';
@@ -55,9 +56,12 @@ const hasTrialLine = computed(
   () =>
     props.trial !== undefined && props.trial.phase !== 'none' && props.view.kind !== 'stray-end',
 );
-const ruleClass = computed(() =>
-  hasTrialLine.value ? 'border-b border-line max-sm:border-b-0' : 'border-b border-line',
-);
+const ruleClass = computed(() => {
+  const rule = props.view.kind === 'group' ? 'border-line-strong' : 'border-line';
+  // A group's row is framed by strong rules: where the last group ends and this one starts.
+  const sides = props.view.kind === 'group' ? 'border-y' : 'border-b';
+  return `${sides} ${rule}${hasTrialLine.value ? ' max-sm:border-b-0' : ''}`;
+});
 const cellClass = computed(() => `${ruleClass.value} px-2 py-0.5`);
 /** The menu's cell has no side padding: on a phone the button alone is the 44 px target. */
 const menuCellClass = computed(() => `${ruleClass.value} py-0.5 text-right`);
@@ -172,25 +176,17 @@ const menu = computed<MenuEntry[]>(() => {
       <Chip v-if="hasOptions" class="ml-2">{{ t(`${KEY}.hasOptions`) }}</Chip>
     </th>
     <td :class="cellClass">
-      <TextInput
+      <CaseFileName
         v-model="row.input"
-        class="font-mono"
-        list="archive-files"
-        autocomplete="off"
-        spellcheck="false"
-        :data-testid="`case-${view.index}-input`"
-        :aria-label="t(`${KEY}.inputOf`, names)"
+        :testid="`case-${view.index}-input`"
+        :label="t(`${KEY}.inputOf`, names)"
       />
     </td>
     <td :class="cellClass">
-      <TextInput
+      <CaseFileName
         v-model="row.output"
-        class="font-mono"
-        list="archive-files"
-        autocomplete="off"
-        spellcheck="false"
-        :data-testid="`case-${view.index}-output`"
-        :aria-label="t(`${KEY}.outputOf`, names)"
+        :testid="`case-${view.index}-output`"
+        :label="t(`${KEY}.outputOf`, names)"
       />
     </td>
     <td :class="[cellClass, 'text-right']">
