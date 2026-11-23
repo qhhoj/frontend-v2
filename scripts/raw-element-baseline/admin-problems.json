@@ -1,8 +1,6 @@
 {
   "features/admin/creation/CreationOwnerPicker.vue": {
-    "controls": 3,
-    "radio": 2,
-    "select": 1
+    "radio": 2
   },
   "features/admin/problems/ProblemImportMenu.vue": {
     "button": 1,
@@ -11,44 +9,14 @@
   "features/admin/problems/ProblemsIndexPage.vue": {
     "AdminPageHeader": 1
   },
-  "features/admin/problems/data/CaseRow.vue": {
-    "button": 3,
-    "checkbox": 1,
-    "controls": 18,
-    "details": 1,
-    "input": 7,
-    "select": 2,
-    "status-colour": 2
-  },
-  "features/admin/problems/data/CasesAutofill.vue": {
-    "button": 1,
-    "controls": 1
-  },
   "features/admin/problems/data/CasesEditor.vue": {
-    "button": 2,
-    "controls": 2,
-    "hardcoded-value": 1,
-    "status-colour": 2,
     "table": 1
-  },
-  "features/admin/problems/data/CheckerPicker.vue": {
-    "AdminChoiceCards": 1
   },
   "features/admin/problems/data/CheckerRuleOptions.vue": {
     "AdminField": 4,
     "controls": 6,
     "input": 2,
     "select": 2
-  },
-  "features/admin/problems/data/CheckerSection.vue": {
-    "AdminField": 2,
-    "controls": 4,
-    "input": 2
-  },
-  "features/admin/problems/data/DataArchiveCard.vue": {
-    "AdminChip": 2,
-    "button": 1,
-    "controls": 1
   },
   "features/admin/problems/data/DataFeedback.vue": {
     "AdminNotice": 1
@@ -61,32 +29,11 @@
     "controls": 1,
     "status-colour": 1
   },
-  "features/admin/problems/data/GraderPicker.vue": {
-    "AdminChoiceCards": 1
-  },
   "features/admin/problems/data/InitYamlDialog.vue": {
     "hardcoded-value": 1
   },
-  "features/admin/problems/data/IoMethodPicker.vue": {
-    "AdminChoiceCards": 1,
-    "AdminField": 1,
-    "controls": 2,
-    "input": 1
-  },
   "features/admin/problems/data/SourceCheckStatus.vue": {
     "details": 1
-  },
-  "features/admin/problems/data/ZipAutofillDialog.vue": {
-    "AdminChip": 2,
-    "AdminField": 1,
-    "button": 2,
-    "controls": 7,
-    "details": 1,
-    "hardcoded-value": 3,
-    "input": 1,
-    "radio": 1,
-    "table": 1,
-    "verdict-tone": 1
   },
   "features/admin/problems/data/problem-data.queries.ts": {
     "hardcoded-script-value": 1
@@ -152,9 +99,6 @@
     "AdminField": 1,
     "input": 1,
     "status-colour": 1
-  },
-  "features/admin/problems/general/ProblemCreatePage.vue": {
-    "AdminPageHeader": 1
   },
   "features/admin/problems/general/ProblemOrganizationsField.vue": {
     "controls": 1,

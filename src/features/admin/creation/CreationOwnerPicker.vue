@@ -3,7 +3,7 @@ import { computed, useId, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { Lock } from 'lucide-vue-next';
 import OrganizationLogo from '@/features/organizations/OrganizationLogo.vue';
-import { INPUT } from '../ui/controls';
+import SelectField from '@/components/ui/SelectField.vue';
 import CreationOwnerNotice from './CreationOwnerNotice.vue';
 import { useCreationOwnersQuery, initialOwner } from './creation-owners';
 import type { CreationOwner } from './creation-owners';
@@ -111,17 +111,14 @@ const ownerHint = computed(() => {
         <Lock class="size-3.5" aria-hidden="true" />{{ $t('admin.creation.owner.fixed') }}
       </span>
     </template>
-    <select
-      v-else-if="isSelect"
-      v-model="selectedSlug"
-      :class="[INPUT, layout === 'field' ? 'w-full lg:w-1/2' : 'w-auto max-w-full']"
-      :aria-label="$t('admin.creation.owner.label')"
-    >
-      <option v-if="scope.site" :value="SITE">{{ $t('admin.creation.owner.site') }}</option>
-      <option v-for="option in options" :key="option.slug" :value="option.slug">
-        {{ option.name }} ({{ option.problemCodePrefix }}…)
-      </option>
-    </select>
+    <div v-else-if="isSelect" class="min-w-0" :class="layout === 'field' && 'w-full'">
+      <SelectField v-model="selectedSlug" :aria-label="$t('admin.creation.owner.label')">
+        <option v-if="scope.site" :value="SITE">{{ $t('admin.creation.owner.site') }}</option>
+        <option v-for="option in options" :key="option.slug" :value="option.slug">
+          {{ option.name }} ({{ option.problemCodePrefix }}…)
+        </option>
+      </SelectField>
+    </div>
     <template v-else-if="choiceCount > 1">
       <label v-for="option in options" :key="option.slug" :class="OWNER_CARD">
         <input
