@@ -32,10 +32,10 @@ const locale = useLocaleStore();
 const columns = computed<DataTableColumn[]>(() => [
   { key: 'id', label: t('admin.similarity.runs.columns.id'), priority: 'primary' },
   { key: 'status', label: t('admin.similarity.runs.columns.status'), priority: 'badge' },
-  { key: 'createdAt', label: t('admin.similarity.runs.columns.createdAt') },
-  { key: 'duration', label: t('admin.similarity.runs.columns.duration') },
   { key: 'groups', label: t('admin.similarity.runs.columns.groups'), align: 'end' },
   { key: 'pairs', label: t('admin.similarity.runs.columns.pairs'), align: 'end' },
+  { key: 'duration', label: t('admin.similarity.runs.columns.duration'), align: 'end' },
+  { key: 'createdAt', label: t('admin.similarity.runs.columns.createdAt') },
 ]);
 const TONES: Record<RunStatus, ChipTone> = {
   queued: 'neutral',
