@@ -394,18 +394,6 @@
     "radio": 1,
     "status-colour": 1
   },
-  "features/admin/contests/general/ContestAccessSection.vue": {
-    "AdminField": 3,
-    "controls": 6,
-    "input": 1,
-    "password": 2
-  },
-  "features/admin/contests/general/ContestFormatSection.vue": {
-    "AdminField": 4,
-    "controls": 6,
-    "input": 2,
-    "select": 2
-  },
   "features/admin/contests/general/ContestGeneralTab.vue": {
     "AdminNotice": 1
   },
@@ -420,28 +408,13 @@
     "controls": 1,
     "textarea": 1
   },
-  "features/admin/contests/general/ContestRatingSection.vue": {
-    "AdminField": 1,
-    "controls": 2,
-    "input": 1
-  },
   "features/admin/contests/general/ContestSummaryRail.vue": {
     "button": 1,
     "controls": 2,
     "uppercase": 1
   },
-  "features/admin/contests/general/ContestTimeSection.vue": {
-    "AdminDateTimeField": 3,
-    "AdminField": 2,
-    "controls": 4,
-    "input": 2
-  },
   "features/admin/contests/general/ContestVisibilitySwitch.vue": {
     "status-colour": 1
-  },
-  "features/admin/contests/general/SectionJumpSelect.vue": {
-    "controls": 1,
-    "select": 1
   },
   "features/admin/contests/general/TagChips.vue": {
     "button": 1,

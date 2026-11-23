@@ -147,7 +147,6 @@
       "labelNumeric": "1, 2, 3…",
       "pointsPrecision": "Số chữ số điểm",
       "formatConfigTitle": "Cấu hình thể thức {format}",
-      "formatConfigNote": "Trường thay đổi theo thể thức; đổi thể thức sẽ về cấu hình mặc định của thể thức đó.",
       "formatNoOptions": "Thể thức này không có tùy chọn.",
       "runPretestsOnly": "Chỉ chạy pretest",
       "hideProblemTags": "Ẩn thẻ bài",
@@ -165,7 +164,6 @@
       "rankingAccessCode": "Mã xem bảng xếp hạng",
       "removeRankingAccessCode": "Bỏ mã xem bảng",
       "isPrivate": "Riêng tư",
-      "isPrivateHint": "Chỉ danh sách thí sinh được chọn.",
       "privateContestants": "Thí sinh được chọn",
       "isOrganizationPrivate": "Riêng tư theo tổ chức",
       "organizations": "Tổ chức",
@@ -179,10 +177,8 @@
       "rateExclude": "Loại khỏi rating",
       "ogImage": "Ảnh xem trước liên kết",
       "logoOverrideImage": "Logo trong kỳ thi",
-      "optionsTitle": "Tùy chọn hiển thị và chấm",
       "runPretestsOnlyHint": "Trong giờ thi chỉ chấm pretest; chấm đủ test khi chấm cuối.",
-      "hideProblemTagsHint": "Thí sinh không thấy thẻ của bài.",
-      "isOrganizationPrivateHint": "Chỉ thành viên các tổ chức được chọn vào được."
+      "hideProblemTagsHint": "Thí sinh không thấy thẻ của bài."
     },
     "hints": {
       "key": "Không đổi được sau khi tạo.",

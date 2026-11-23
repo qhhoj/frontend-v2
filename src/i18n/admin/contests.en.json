@@ -147,7 +147,6 @@
       "labelNumeric": "1, 2, 3…",
       "pointsPrecision": "Decimal places of points",
       "formatConfigTitle": "Configuration of the {format} format",
-      "formatConfigNote": "Fields depend on the format; changing the format restores that format's defaults.",
       "formatNoOptions": "This format has no options.",
       "runPretestsOnly": "Run pretests only",
       "hideProblemTags": "Hide problem tags",
@@ -165,7 +164,6 @@
       "rankingAccessCode": "Ranking access code",
       "removeRankingAccessCode": "Remove ranking code",
       "isPrivate": "Private",
-      "isPrivateHint": "Only the contestants listed.",
       "privateContestants": "Listed contestants",
       "isOrganizationPrivate": "Private to organizations",
       "organizations": "Organizations",
@@ -179,10 +177,8 @@
       "rateExclude": "Excluded from rating",
       "ogImage": "Link preview image",
       "logoOverrideImage": "Logo inside the contest",
-      "optionsTitle": "Display and judging options",
       "runPretestsOnlyHint": "Only pretests run during the contest; full tests at final judging.",
-      "hideProblemTagsHint": "Contestants do not see the problem tags.",
-      "isOrganizationPrivateHint": "Only members of the chosen organizations may enter."
+      "hideProblemTagsHint": "Contestants do not see the problem tags."
     },
     "hints": {
       "key": "Cannot change after creation.",
