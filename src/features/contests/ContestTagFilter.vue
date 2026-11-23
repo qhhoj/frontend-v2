@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { ContestTag } from '@/api/types/contest-tags';
 import InlineBit from '@/components/InlineBit.vue';
+import Chip from '@/components/ui/Chip.vue';
 import SkeletonBlock from '@/components/SkeletonBlock.vue';
 import { EXTRAS_BITS } from './contest-extras-bits';
 import type { TagFilterState } from './tag-chips';
-import { TAG_COLOR_CLASSES } from './tag-colors';
 
 defineProps<{
   tags: ContestTag[];
@@ -14,10 +14,6 @@ defineProps<{
   hasFailed: boolean;
 }>();
 const emit = defineEmits<{ select: [tag: string | null] }>();
-/** 44 px: these chips are buttons (26 px chips are only for display). */
-const CHIP =
-  'inline-flex min-h-11 items-center rounded-pill border px-4 text-sm font-semibold whitespace-nowrap hover:bg-surface-hover';
-const PRESSED = 'border-current ring-1 ring-current ring-inset';
 const SKELETON_CHIPS = 5;
 </script>
 
@@ -49,8 +45,7 @@ const SKELETON_CHIPS = 5;
         v-for="index in SKELETON_CHIPS"
         :key="index"
         data-skeleton-region="tag-chip"
-        pill
-        class="h-11 w-24 shrink-0"
+        class="h-8 w-24 shrink-0"
       />
     </div>
     <nav
@@ -60,29 +55,18 @@ const SKELETON_CHIPS = 5;
     >
       <ul class="m-0 flex w-max list-none gap-2 p-0 sm:w-auto sm:flex-wrap">
         <li>
-          <button
-            type="button"
-            :aria-pressed="selected === null || state === 'unknown'"
-            :class="[
-              CHIP,
-              'border-line bg-surface-strong text-content',
-              (selected === null || state === 'unknown') && PRESSED,
-            ]"
-            @click="emit('select', null)"
-          >
+          <Chip :pressed="selected === null || state === 'unknown'" @click="emit('select', null)">
             {{ $t('contestTags.all') }}
-          </button>
+          </Chip>
         </li>
         <li v-for="tag in tags" :key="tag.slug">
-          <button
-            type="button"
-            :aria-pressed="selected === tag.slug"
+          <Chip
+            :pressed="selected === tag.slug"
             :title="tag.description || undefined"
-            :class="[CHIP, TAG_COLOR_CLASSES[tag.color], selected === tag.slug && PRESSED]"
             @click="emit('select', tag.slug)"
           >
             {{ tag.name }}
-          </button>
+          </Chip>
         </li>
       </ul>
     </nav>

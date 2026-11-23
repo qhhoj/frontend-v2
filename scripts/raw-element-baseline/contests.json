@@ -1,6 +1,5 @@
 {
   "features/contests/AccessCodeDialog.vue": {
-    "password": 1,
     "uppercase": 1,
     "verdict-tone": 1
   },
@@ -20,9 +19,6 @@
     "checkbox": 1,
     "hardcoded-value": 1,
     "verdict-tone": 1
-  },
-  "features/contests/ContestTagFilter.vue": {
-    "button": 2
   },
   "features/contests/LanguageStatsTable.vue": {
     "hardcoded-value": 1,

@@ -21,11 +21,7 @@
   "features/organizations/problems/OrgBulkTagDialog.vue": {
     "radio": 3
   },
-  "features/organizations/problems/OrgProblemActions.vue": {
-    "button": 2
-  },
   "features/organizations/problems/OrgProblemFilters.vue": {
-    "button": 3,
     "hardcoded-value": 1
   },
   "features/organizations/problems/OrgProblemTagsDialog.vue": {
