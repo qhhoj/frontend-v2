@@ -13,8 +13,10 @@ declare module 'vue-router' {
     adminArea?: boolean;
     /** Reachable while the second factor is pending. */
     allowPartial?: boolean;
-    /** `'auth'`: the page draws its own top bar (only a route that renders `AuthLayout`). `'admin'`: AppShell renders AdminShell instead of the site frame. An `adminArea` route without it is a teacher's screen: the site frame draws it, behind `SiteScreenGate`. */
+    /** `'auth'`: the page draws its own top bar (only a route that renders `AuthLayout`). `'admin'`: AppShell renders AdminShell instead of the site frame. */
     layout?: 'auth' | 'admin';
+    /** A teacher's screen of the admin area (`shell: 'site'` in `ADMIN_SCREENS`, set in `admin-routes.ts`): the site frame draws it, inside `SiteScreenGate` (the page column and the screen's permission check). */
+    siteScreen?: boolean;
     /** A public page only holders of this right may open; anyone else (signed out too) gets the not-found page, its existence unrevealed (the profile's comments). */
     notFoundWithout?: PermissionRule;
     /** Admin screens: the permission (or any-of list) the screen needs; viewers without it (and without `capability`) see AdminForbidden in place. */

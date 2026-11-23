@@ -60,8 +60,10 @@ const SCREEN_COMPONENTS: Record<AdminScreenId, Loader> = {
 
 /** Every `/admin` route: signed-in, the admin-area rules of the guard, and the admin texts loaded before it renders. */
 const AREA_META = { requiresAuth: true, adminArea: true } as const;
-/** The admin shell draws the route. A teacher's screens (`shell: 'site'`) leave it out: the site shell draws them, behind `SiteScreenGate`. */
+/** The admin shell draws the route. */
 const ADMIN_META = { ...AREA_META, layout: 'admin' } as const;
+/** A teacher's screen (`shell: 'site'` in `ADMIN_SCREENS`): the site shell draws the route, behind `SiteScreenGate`. */
+const SITE_META = { ...AREA_META, siteScreen: true } as const;
 
 const screenRoute = (id: AdminScreenId): RouteRecordRaw => {
   const screen: AdminScreen = ADMIN_SCREENS[id];
@@ -70,7 +72,7 @@ const screenRoute = (id: AdminScreenId): RouteRecordRaw => {
     name: adminRouteName(id),
     component: SCREEN_COMPONENTS[id],
     meta: {
-      ...(isSiteScreen(id) ? AREA_META : ADMIN_META),
+      ...(isSiteScreen(id) ? SITE_META : ADMIN_META),
       titleKey: `admin.shell.screens.${id}`,
       permission: screen.permission ?? undefined,
       capability: screen.capability,

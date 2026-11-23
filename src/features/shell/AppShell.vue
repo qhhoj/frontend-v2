@@ -44,11 +44,11 @@ const { current: currentContest } = useCurrentContest(
 );
 const isSearchOpen = ref(false);
 const { isCollapsed: isRailCollapsed } = useRailCollapse();
-/** On the contest's own pages its bar is the status; on every other page the phone's top bar carries a chip instead (the desktop rail's card shows it always). The organiser's workbench of that contest (an `adminArea` route with the same `key`) is not one of its pages. */
+/** On the contest's own pages its bar is the status; on every other page the phone's top bar carries a chip instead (the desktop rail's card shows it always). The organiser's workbench of that contest (a `siteScreen` route with the same `key`) is not one of its pages. */
 const isOnCurrentContest = computed(
   () =>
     currentContest.value !== null &&
-    !route.meta.adminArea &&
+    !route.meta.siteScreen &&
     (route.params.key === currentContest.value.contest.key ||
       navSectionOverride.value === '/contests'),
 );
@@ -96,7 +96,7 @@ const chipContest = computed(() =>
         <OfficialModeBanner class="print:hidden" />
         <HighPriorityBanner class="print:hidden" />
         <main id="main" tabindex="-1" class="relative flex-1 focus-visible:outline-none">
-          <SiteScreenGate v-if="route.meta.adminArea"><slot /></SiteScreenGate>
+          <SiteScreenGate v-if="route.meta.siteScreen"><slot /></SiteScreenGate>
           <slot v-else />
         </main>
         <AppFooter class="print:hidden" />

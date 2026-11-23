@@ -46,7 +46,7 @@ export interface AdminNavItem extends AdminAccess {
 }
 /**
  * By object, the rare screens under "Công cụ" (last, folded until opened). Breadcrumbs read the same groups. A teacher's
- * screens (`shell: 'site'`: problems, contests, their imports and editors) have no item here: the site menu's "Quản lý"
+ * screens (`shell: 'site'`: problems, deleted problems, contests, their imports and editors) have no item here: the site menu's "Quản lý"
  * lists them, and an item would be a jump to another frame.
  */
 export interface AdminNavGroup {
@@ -108,7 +108,6 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   group('tools', [
     screenItem('types', Tags, { labelKey: 'admin.shell.nav.types' }),
     screenItem('contestTags', Tag),
-    screenItem('problemsDeleted', Trash2),
     screenItem('similarity', GitCompare),
     screenItem('rejudge', RotateCcw),
     screenItem('pages', Files),
@@ -132,6 +131,7 @@ const SITE_SCREENS: readonly AdminNavItem[] = [
   screenItem('problems', FileText),
   screenItem('polygonImport', CloudDownload),
   screenItem('problemImport', Download),
+  screenItem('problemsDeleted', Trash2),
   screenItem('contests', Trophy),
 ];
 
