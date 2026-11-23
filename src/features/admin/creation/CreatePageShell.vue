@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { RouteLocationRaw } from 'vue-router';
+import PageHeader from '@/components/ui/PageHeader.vue';
 import Card from '@/components/ui/Card.vue';
-import AdminPageHeader from '../ui/AdminPageHeader.vue';
 
 /**
  * The frame every "create" page shares (problem, contest): the page header with its way back, then one narrow card that
@@ -16,7 +16,7 @@ defineProps<{
 
 <template>
   <div class="flex flex-col gap-4">
-    <AdminPageHeader :title="title" :lead="lead" :back="back" />
+    <PageHeader :title="title" :lead="lead" :back="back" />
     <Card padding="md" class="max-w-xl"><slot /></Card>
   </div>
 </template>
